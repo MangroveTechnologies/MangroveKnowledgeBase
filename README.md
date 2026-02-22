@@ -1,4 +1,4 @@
-# mangrove-signals
+# MangroveKnowledgeBase
 
 Open-source trading signals and technical indicators for quantitative finance and algorithmic trading.
 
@@ -6,7 +6,7 @@ Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem.
 
 ## What This Is
 
-`mangrove-signals` is a standalone Python library providing:
+`mangrove-knowledge-base` is a standalone Python library providing:
 
 - **40+ technical indicators** across momentum, trend, volume, volatility, and return categories
 - **96 trading signal functions** — boolean evaluators for market conditions (TRIGGER and FILTER types)
@@ -19,14 +19,14 @@ Signals are designed to be consumed by trading strategy engines, backtesting fra
 ## Installation
 
 ```bash
-pip install mangrove-signals
+pip install mangrove-knowledge-base
 ```
 
 Or from source:
 
 ```bash
-git clone https://github.com/MangroveTechnologies/mangrove-signals.git
-cd mangrove-signals
+git clone https://github.com/MangroveTechnologies/MangroveKnowledgeBase.git
+cd MangroveKnowledgeBase
 pip install -e ".[dev]"
 ```
 
@@ -38,7 +38,7 @@ All indicators use a stateless `compute()` classmethod API:
 
 ```python
 import pandas as pd
-from mangrove_signals.indicators import RSI, MACD, BollingerBands
+from mangrove_knowledge_base.indicators import RSI, MACD, BollingerBands
 
 # RSI
 result = RSI.compute(data={'close': df['Close']}, params={'window': 14})
@@ -64,9 +64,9 @@ upper, middle, lower = result['upper'], result['middle'], result['lower']
 Signals are boolean functions that evaluate market conditions:
 
 ```python
-from mangrove_signals.signals.momentum import rsi_oversold, stoch_overbought
-from mangrove_signals.signals.trend import macd_bullish_cross, ema_crossover
-from mangrove_signals.signals.volatility import bb_squeeze
+from mangrove_knowledge_base.signals.momentum import rsi_oversold, stoch_overbought
+from mangrove_knowledge_base.signals.trend import macd_bullish_cross, ema_crossover
+from mangrove_knowledge_base.signals.volatility import bb_squeeze
 
 # Direct function calls
 if rsi_oversold(df, window=14, threshold=30.0):
@@ -81,8 +81,8 @@ if macd_bullish_cross(df, window_fast=12, window_slow=26, window_sign=9):
 Evaluate signals by name — useful for strategy engines:
 
 ```python
-from mangrove_signals.registry import RuleRegistry
-from mangrove_signals.signals import momentum, trend, volume, volatility  # triggers registration
+from mangrove_knowledge_base.registry import RuleRegistry
+from mangrove_knowledge_base.signals import momentum, trend, volume, volatility  # triggers registration
 
 # Evaluate by name
 rule = {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30.0}}
@@ -97,8 +97,8 @@ print(list(RuleRegistry._registry.keys()))
 The docstring parser extracts structured metadata from signal functions:
 
 ```python
-from mangrove_signals.docstring_parser import parse_all_signals
-from mangrove_signals.signals import momentum, trend, volume, volatility
+from mangrove_knowledge_base.docstring_parser import parse_all_signals
+from mangrove_knowledge_base.signals import momentum, trend, volume, volatility
 
 metadata = parse_all_signals([momentum, trend, volume, volatility])
 
@@ -204,10 +204,10 @@ pip install -e ".[dev]"
 pytest tests/ -v
 
 # Lint
-flake8 mangrove_signals/ --max-line-length=120
+flake8 mangrove_knowledge_base/ --max-line-length=120
 
 # Format
-black mangrove_signals/ tests/
+black mangrove_knowledge_base/ tests/
 ```
 
 ## License

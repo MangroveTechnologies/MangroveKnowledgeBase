@@ -1,4 +1,4 @@
-"""mangrove-signals: Open-source trading signals and technical indicators library.
+"""mangrove-knowledge-base: Open-source trading signals and technical indicators library.
 
 Provides a comprehensive library of trading signals and technical indicators
 for quantitative finance and algorithmic trading.
@@ -19,6 +19,6 @@ Indicator Categories:
 
 __version__ = "0.1.0"
 
-from mangrove_signals.registry import RuleRegistry
-from mangrove_signals import indicators
-from mangrove_signals import signals
+from mangrove_knowledge_base.registry import RuleRegistry
+from mangrove_knowledge_base import indicators
+from mangrove_knowledge_base import signals

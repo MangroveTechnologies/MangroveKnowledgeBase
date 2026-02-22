@@ -9,4 +9,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["flake8", "mangrove_signals/", "--max-line-length=120", "--ignore=E501,W503"]
+    command: ["flake8", "mangrove_knowledge_base/", "--max-line-length=120", "--ignore=E501,W503"]

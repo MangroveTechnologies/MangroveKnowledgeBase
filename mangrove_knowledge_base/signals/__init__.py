@@ -12,7 +12,7 @@ Signal Categories:
 """
 
 # Import all signal modules to trigger registration with RuleRegistry
-from mangrove_signals.signals import momentum
-from mangrove_signals.signals import trend
-from mangrove_signals.signals import volume
-from mangrove_signals.signals import volatility
+from mangrove_knowledge_base.signals import momentum
+from mangrove_knowledge_base.signals import trend
+from mangrove_knowledge_base.signals import volume
+from mangrove_knowledge_base.signals import volatility
