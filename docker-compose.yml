@@ -1,0 +1,12 @@
+services:
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["pytest", "tests/", "-v"]
+
+  lint:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["flake8", "mangrove_signals/", "--max-line-length=120", "--ignore=E501,W503"]
