@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="document">
+    <header class="document-header">
+        <div class="breadcrumbs">
+            <a href="/">Table of Contents</a>
+            <span class="separator">/</span>
+            <span class="current">{{ document.title }}</span>
+        </div>
+
+        <h1 class="document-title">{{ document.title }}</h1>
+
+        {% if document.tags %}
+        <div class="document-tags">
+            {% for tag in document.tags %}
+            <a href="/tags/{{ tag }}" class="tag">{{ tag }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </header>
+
+    <div class="document-content">
+        {{ html_content | safe }}
+    </div>
+
+    <footer class="document-footer">
+        <nav class="document-pagination">
+            {% if prev_doc %}
+            <a href="/doc/{{ prev_doc.slug }}" class="pagination-link prev">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
+                <div class="pagination-text">
+                    <span class="pagination-label">Previous</span>
+                    <span class="pagination-title">{{ prev_doc.title }}</span>
+                </div>
+            </a>
+            {% else %}
+            <div class="pagination-link disabled"></div>
+            {% endif %}
+
+            {% if next_doc %}
+            <a href="/doc/{{ next_doc.slug }}" class="pagination-link next">
+                <div class="pagination-text">
+                    <span class="pagination-label">Next</span>
+                    <span class="pagination-title">{{ next_doc.title }}</span>
+                </div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </a>
+            {% else %}
+            <div class="pagination-link disabled"></div>
+            {% endif %}
+        </nav>
+    </footer>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Highlight current section on scroll
+document.addEventListener('DOMContentLoaded', function() {
+    const tocLinks = document.querySelectorAll('.tree-section');
+    const headings = document.querySelectorAll('h2[id], h3[id]');
+
+    function updateActiveLink() {
+        let current = '';
+
+        headings.forEach(heading => {
+            const rect = heading.getBoundingClientRect();
+            if (rect.top <= 100) {
+                current = heading.id;
+            }
+        });
+
+        tocLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-anchor') === current) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveLink);
+    updateActiveLink();
+});
+</script>
+{% endblock %}

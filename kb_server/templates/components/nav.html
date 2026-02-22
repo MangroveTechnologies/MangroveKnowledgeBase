@@ -1,0 +1,10 @@
+<div class="doc-nav">
+    <h3 class="doc-nav-title">Documents</h3>
+    <ul class="doc-nav-list">
+        {% for doc in all_documents %}
+        <li class="doc-nav-item {% if document and document.slug == doc.slug %}active{% endif %}">
+            <a href="/doc/{{ doc.slug }}">{{ doc.title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

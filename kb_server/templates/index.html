@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="toc-page">
+    <div class="toc-content">
+        {{ toc_html | safe }}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const content = document.querySelector('.toc-content');
+
+    // Map chapter numbers to document slugs
+    const docMap = {
+        '1': '1-market-foundations',
+        '2': '2-instruments-market-mechanics',
+        '3': '3-core-trading-concepts',
+        '4': '4-indicators',
+        '5': '5-chart-patterns',
+        '6': '6-quantitative-analysis',
+        '7': '7-strategy-design-modeling',
+        '8': '8-risk-management',
+        '9': '9-glossary'
+    };
+
+    // Process all h1 headings (chapters) - make them linkable
+    content.querySelectorAll('h1').forEach(h1 => {
+        const text = h1.textContent;
+        const match = text.match(/^(\d+)\.\s+(.+)$/);
+        if (match) {
+            const num = match[1];
+            const slug = docMap[num];
+            if (slug) {
+                const link = document.createElement('a');
+                link.href = '/doc/' + slug;
+                link.textContent = text;
+                h1.textContent = '';
+                h1.appendChild(link);
+            }
+        }
+    });
+
+    // Process all h2 headings (sections) - make them linkable
+    content.querySelectorAll('h2').forEach(h2 => {
+        const text = h2.textContent;
+        const match = text.match(/^(\d+)\.(\d+)\s+(.+)$/);
+        if (match) {
+            const chapterNum = match[1];
+            const sectionNum = match[2];
+            const title = match[3];
+            const slug = docMap[chapterNum];
+            if (slug) {
+                // Create anchor from section number and title
+                const anchor = chapterNum + '-' + sectionNum + '-' + title.toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+
+                const link = document.createElement('a');
+                link.href = '/doc/' + slug + '#' + anchor;
+                link.textContent = text;
+                h2.textContent = '';
+                h2.appendChild(link);
+            }
+        }
+    });
+
+    // Make descriptions collapsible
+    // Find all paragraphs that are descriptions (follow h1 or h2, not Tags:)
+    const headings = content.querySelectorAll('h1, h2');
+    headings.forEach(heading => {
+        let nextEl = heading.nextElementSibling;
+        let descriptions = [];
+
+        // Collect all paragraphs until we hit another heading, hr, or end
+        while (nextEl && !['H1', 'H2', 'HR'].includes(nextEl.tagName)) {
+            if (nextEl.tagName === 'P') {
+                const text = nextEl.textContent;
+                // Skip "Tags:" lines
+                if (!text.startsWith('Tags:')) {
+                    descriptions.push(nextEl);
+                }
+            }
+            nextEl = nextEl.nextElementSibling;
+        }
+
+        // If we have descriptions, make them collapsible
+        if (descriptions.length > 0) {
+            descriptions.forEach((p, index) => {
+                if (index === 0) {
+                    // First paragraph - show preview, make expandable
+                    const fullText = p.textContent;
+                    const previewLength = 120;
+
+                    if (fullText.length > previewLength) {
+                        const preview = fullText.substring(0, previewLength);
+
+                        p.classList.add('collapsible-desc');
+                        p.innerHTML = `
+                            <span class="desc-preview">${preview}...</span>
+                            <span class="desc-full" style="display:none;">${fullText}</span>
+                            <button class="expand-btn">Show more</button>
+                        `;
+
+                        const btn = p.querySelector('.expand-btn');
+                        const previewSpan = p.querySelector('.desc-preview');
+                        const fullSpan = p.querySelector('.desc-full');
+
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            if (fullSpan.style.display === 'none') {
+                                previewSpan.style.display = 'none';
+                                fullSpan.style.display = 'inline';
+                                btn.textContent = 'Show less';
+                            } else {
+                                previewSpan.style.display = 'inline';
+                                fullSpan.style.display = 'none';
+                                btn.textContent = 'Show more';
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

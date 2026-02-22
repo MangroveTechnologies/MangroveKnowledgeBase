@@ -10,3 +10,39 @@ services:
       context: .
       dockerfile: Dockerfile
     command: ["flake8", "mangrove_knowledge_base/", "--max-line-length=120", "--ignore=E501,W503"]
+
+  knowledge-base:
+    build:
+      context: .
+      dockerfile: kb_server/Dockerfile
+    container_name: mkb-knowledge-base
+    ports:
+      - "${KB_PORT:-8080}:8080"
+    volumes:
+      # Mount the knowledge base markdown files (read-only)
+      - ./knowledge-base:/kb:ro
+      # Persist the SQLite database
+      - kb-data:/app/kb_server/data
+    environment:
+      - KB_SERVER_KB_PATH=/kb
+      - KB_SERVER_DB_PATH=/app/kb_server/data/knowledge.db
+      - KB_SERVER_PORT=8080
+      - KB_SERVER_DEBUG=${KB_DEBUG:-false}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/status')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mangrove-network
+
+networks:
+  mangrove-network:
+    name: mangrove-network
+    external: true
+
+volumes:
+  kb-data:
+    name: mangrove-kb-data
