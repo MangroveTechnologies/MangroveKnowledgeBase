@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="search-page">
+    <header class="search-header">
+        <h1 class="page-title">Search</h1>
+
+        <form class="search-form-large" action="/search" method="GET" id="search-page-form">
+            <div class="search-controls">
+                <div class="search-input-large-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input
+                        type="text"
+                        name="q"
+                        class="search-input-large"
+                        placeholder="Search for trading concepts, indicators, patterns..."
+                        value="{{ query }}"
+                        autofocus
+                    >
+                </div>
+
+                <!-- Hidden field for tags - populated by JavaScript -->
+                <input type="hidden" name="tags" id="page-tags-hidden" value="{{ selected_tags|join(',') }}">
+
+                {% if all_tags %}
+                <div class="tag-dropdown-wrapper">
+                    <button type="button" class="tag-dropdown-btn" id="tagDropdownBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                            <line x1="7" y1="7" x2="7.01" y2="7"/>
+                        </svg>
+                        Tags
+                        <span class="tag-count-badge" id="selectedTagCount" {% if not selected_tags %}style="display:none;"{% endif %}>{{ selected_tags|length }}</span>
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                    <div class="tag-dropdown-menu" id="tagDropdownMenu">
+                        <div class="tag-dropdown-header">
+                            <span>Filter by tags</span>
+                            <button type="button" class="clear-tags-btn" id="clearTagsBtn">Clear all</button>
+                        </div>
+                        <div class="tag-dropdown-list">
+                            {% for name in all_tags.keys()|sort %}
+                            <label class="tag-dropdown-item">
+                                <input
+                                    type="checkbox"
+                                    value="{{ name }}"
+                                    class="tag-checkbox"
+                                    {% if name in selected_tags %}checked{% endif %}
+                                >
+                                <span class="tag-name">{{ name }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <button type="submit" class="search-button">Search</button>
+            </div>
+        </form>
+    </header>
+
+    {% if results %}
+    <div class="search-results">
+        <div class="results-meta">
+            <span class="results-count">{{ results.total_results }} result{% if results.total_results != 1 %}s{% endif %}</span>
+            {% if results.expanded_query %}
+            <span class="query-expanded">
+                Query expanded: <code>{{ results.expanded_query }}</code>
+            </span>
+            {% endif %}
+        </div>
+
+        <ul class="results-list">
+            {% for result in results.results %}
+            <li class="result-item">
+                <a href="/doc/{{ result.document_slug }}{% if result.section_anchor %}#{{ result.section_anchor }}{% endif %}" class="result-link">
+                    <div class="result-header">
+                        <h3 class="result-title">
+                            {{ result.document_title }}
+                            {% if result.section_title %}
+                            <span class="result-section">/ {{ result.section_title }}</span>
+                            {% endif %}
+                        </h3>
+                        <span class="result-type {{ result.match_type }}">{{ result.match_type }}</span>
+                    </div>
+
+                    <p class="result-snippet">{{ result.snippet | safe }}</p>
+
+                    {% if result.tags %}
+                    <div class="result-tags">
+                        {% for tag in result.tags[:3] %}
+                        <span class="tag-small">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif query or selected_tags %}
+    <div class="no-results">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+            <line x1="8" y1="8" x2="14" y2="14"/>
+            <line x1="14" y1="8" x2="8" y2="14"/>
+        </svg>
+        <h2>No results found</h2>
+        <p>Try different keywords or check your spelling.</p>
+    </div>
+    {% else %}
+    <div class="search-tips">
+        <h2>Search Tips</h2>
+        <ul>
+            <li>Use quotes for exact phrases: <code>"moving average"</code></li>
+            <li>Search by abbreviations: <code>RSI</code>, <code>MACD</code>, <code>ATR</code></li>
+            <li>Synonyms are expanded automatically (e.g., "MA" finds "moving average")</li>
+            <li>Use tags to filter results to specific topics</li>
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdownBtn = document.getElementById('tagDropdownBtn');
+    const dropdownMenu = document.getElementById('tagDropdownMenu');
+    const clearBtn = document.getElementById('clearTagsBtn');
+    const countBadge = document.getElementById('selectedTagCount');
+    const hiddenInput = document.getElementById('page-tags-hidden');
+    const checkboxes = document.querySelectorAll('.tag-checkbox');
+
+    if (!dropdownBtn) return;
+
+    // Toggle dropdown
+    dropdownBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('open');
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+        if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.remove('open');
+        }
+    });
+
+    // Update hidden input and count badge
+    function updateTags() {
+        const selected = Array.from(checkboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
+        hiddenInput.value = selected.join(',');
+
+        if (selected.length > 0) {
+            countBadge.textContent = selected.length;
+            countBadge.style.display = 'inline-flex';
+        } else {
+            countBadge.style.display = 'none';
+        }
+    }
+
+    checkboxes.forEach(cb => cb.addEventListener('change', updateTags));
+
+    // Clear all
+    clearBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        checkboxes.forEach(cb => cb.checked = false);
+        updateTags();
+    });
+});
+</script>
+{% endblock %}

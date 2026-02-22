@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="glossary-page">
+    <header class="glossary-header">
+        <h1 class="page-title">Glossary</h1>
+        <p class="page-subtitle">Trading terminology, abbreviations, and definitions</p>
+
+        <nav class="alpha-nav">
+            {% for letter in grouped_entries.keys() | sort %}
+            <a href="#letter-{{ letter }}" class="alpha-link">{{ letter }}</a>
+            {% endfor %}
+        </nav>
+    </header>
+
+    <div class="glossary-content">
+        {% for letter, letter_entries in grouped_entries.items() | sort %}
+        <section class="glossary-section" id="letter-{{ letter }}">
+            <h2 class="letter-heading">{{ letter }}</h2>
+
+            <dl class="glossary-list">
+                {% for entry in letter_entries %}
+                <div class="glossary-entry" id="{{ entry.anchor }}">
+                    <dt class="term">
+                        {{ entry.term }}
+                        {% if entry.abbreviation %}
+                        <span class="abbreviation">({{ entry.abbreviation }})</span>
+                        {% endif %}
+                    </dt>
+                    <dd class="definition">
+                        {{ entry.definition }}
+
+                        {% if entry.backlinks %}
+                        <div class="backlinks">
+                            <span class="backlinks-label">Referenced in:</span>
+                            {% for backlink in entry.backlinks[:5] %}
+                            <a href="/doc/{{ backlink.source_document }}#{{ backlink.source_anchor }}" class="backlink">
+                                {{ backlink.source_title }}
+                            </a>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if entry.related_terms %}
+                        <div class="related-terms">
+                            <span class="related-label">Related:</span>
+                            {% for related in entry.related_terms %}
+                            <a href="#{{ related | lower | replace(' ', '-') }}" class="related-link">{{ related }}</a>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <a href="/doc/{{ entry.document_slug }}#{{ entry.anchor }}" class="view-more">
+                            View in context
+                        </a>
+                    </dd>
+                </div>
+                {% endfor %}
+            </dl>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
