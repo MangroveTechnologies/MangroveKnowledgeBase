@@ -39,9 +39,9 @@ From MangroveAI into this standalone package:
 ### MangroveAI Integration
 
 MangroveAI now imports signals and indicators from this package via re-export wrappers:
-- `MangroveAI.domains.signals.registry` re-exports `mangrove_signals.registry`
-- `MangroveAI.domains.indicators` re-exports `mangrove_signals.indicators`
-- Signal category modules re-export from `mangrove_signals.signals.*`
+- `MangroveAI.domains.signals.registry` re-exports `mangrove_knowledge_base.registry`
+- `MangroveAI.domains.indicators` re-exports `mangrove_knowledge_base.indicators`
+- Signal category modules re-export from `mangrove_knowledge_base.signals.*`
 - Social signals remain in MangroveAI and register into the shared `RuleRegistry`
 - `signals_metadata.json` has been deleted
 - `kb_signal_parser.py` now uses the docstring parser instead of KB markdown regex
@@ -63,9 +63,9 @@ MangroveAI now imports signals and indicators from this package via re-export wr
 ## Current Architecture
 
 ```
-mangrove-signals (this repo, public)
+MangroveKnowledgeBase (this repo, public)
     |
-    +-- mangrove_signals/
+    +-- mangrove_knowledge_base/
     |       +-- registry.py          # RuleRegistry singleton
     |       +-- docstring_parser.py  # Metadata extraction from docstrings
     |       +-- signals/             # 96 signal functions (4 categories)
@@ -80,28 +80,28 @@ mangrove-signals (this repo, public)
 MangroveAI (private, consumes this package)
     |
     +-- domains/signals/
-    |       +-- registry.py          # Re-exports from mangrove_signals
+    |       +-- registry.py          # Re-exports from mangrove_knowledge_base
     |       +-- kb_signal_parser.py  # Uses docstring parser
     |       +-- services.py          # Signal metadata service
-    |       +-- momentum/signals.py  # Re-exports from mangrove_signals
-    |       +-- trend/signals.py     # Re-exports from mangrove_signals
-    |       +-- volume/signals.py    # Re-exports from mangrove_signals
-    |       +-- volatility/signals.py # Re-exports from mangrove_signals
+    |       +-- momentum/signals.py  # Re-exports from mangrove_knowledge_base
+    |       +-- trend/signals.py     # Re-exports from mangrove_knowledge_base
+    |       +-- volume/signals.py    # Re-exports from mangrove_knowledge_base
+    |       +-- volatility/signals.py # Re-exports from mangrove_knowledge_base
     |       +-- social/signals.py    # Private, registers into shared registry
     |
     +-- domains/indicators/
-            +-- __init__.py          # Re-exports from mangrove_signals
+            +-- __init__.py          # Re-exports from mangrove_knowledge_base
 ```
 
 ## Next Steps
 
 ### Short-term
 
-- [ ] Publish to GitHub (`MangroveTechnologies/mangrove-signals`)
+- [ ] Publish to GitHub (`MangroveTechnologies/MangroveKnowledgeBase`)
 - [ ] Set up GitHub Actions CI (lint + test on push)
 - [ ] Add a LICENSE file
 - [ ] Consider publishing to PyPI for easier installation
-- [ ] Pin mangrove-signals version in MangroveAI requirements.txt (e.g., `@v0.1.0` tag)
+- [ ] Pin MangroveKnowledgeBase version in MangroveAI requirements.txt (e.g., `@v0.1.0` tag)
 
 ### Medium-term
 

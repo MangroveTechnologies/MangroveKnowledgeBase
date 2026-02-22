@@ -17,20 +17,20 @@ import json
 import pytest
 
 # ---------------------------------------------------------------------------
-# Import from mangrove_signals (the standalone open-source package)
+# Import from mangrove_knowledge_base (the standalone open-source package)
 # ---------------------------------------------------------------------------
 
-from mangrove_signals.registry import RuleRegistry  # noqa: E402
-from mangrove_signals.signals import momentum as momentum_signals  # noqa: E402
-from mangrove_signals.signals import trend as trend_signals  # noqa: E402
-from mangrove_signals.signals import volume as volume_signals  # noqa: E402
-from mangrove_signals.signals import volatility as volatility_signals  # noqa: E402
-from mangrove_signals.docstring_parser import (  # noqa: E402
+from mangrove_knowledge_base.registry import RuleRegistry  # noqa: E402
+from mangrove_knowledge_base.signals import momentum as momentum_signals  # noqa: E402
+from mangrove_knowledge_base.signals import trend as trend_signals  # noqa: E402
+from mangrove_knowledge_base.signals import volume as volume_signals  # noqa: E402
+from mangrove_knowledge_base.signals import volatility as volatility_signals  # noqa: E402
+from mangrove_knowledge_base.docstring_parser import (  # noqa: E402
     parse_signal_docstring,
     parse_all_signals,
 )
 
-# Social signals are private (not in mangrove_signals). Skip them in tests.
+# Social signals are private (not in mangrove_knowledge_base). Skip them in tests.
 # The JSON has 127 signals (122 enabled + 5 social). We validate the 122 public ones.
 SOCIAL_SIGNALS = {
     "x_user_post_trigger",
@@ -436,7 +436,7 @@ class TestIndividualParsing:
         assert window_fast["optional"] is False
         assert "default" not in window_fast
 
-    @pytest.mark.skip(reason="Social signals are private, not in mangrove_signals")
+    @pytest.mark.skip(reason="Social signals are private, not in mangrove_knowledge_base")
     def test_parse_disabled_signal(self):
         """Verify parsing of a disabled social signal."""
         pass
@@ -476,7 +476,7 @@ class TestIndividualParsing:
         assert threshold["max"] == 0
         assert threshold["default"] == -20.0
 
-    @pytest.mark.skip(reason="Social signals are private, not in mangrove_signals")
+    @pytest.mark.skip(reason="Social signals are private, not in mangrove_knowledge_base")
     def test_parse_requires_none(self):
         """Verify that Requires: None produces an empty list."""
         pass

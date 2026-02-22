@@ -22,10 +22,10 @@ import logging
 
 import pandas as pd
 
-from mangrove_signals.registry import RuleRegistry
+from mangrove_knowledge_base.registry import RuleRegistry
 
 # Import volume and return indicator classes
-from mangrove_signals.indicators import (
+from mangrove_knowledge_base.indicators import (
     ADI,
     OBV,
     CMF,

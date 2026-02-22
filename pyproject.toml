@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mangrove-signals"
+name = "mangrove-knowledge-base"
 version = "0.1.0"
 description = "Open-source trading signals and technical indicators library"
 readme = "README.md"
@@ -37,11 +37,11 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/MangroveTechnologies/mangrove-signals"
-Repository = "https://github.com/MangroveTechnologies/mangrove-signals"
+Homepage = "https://github.com/MangroveTechnologies/MangroveKnowledgeBase"
+Repository = "https://github.com/MangroveTechnologies/MangroveKnowledgeBase"
 
 [tool.setuptools.packages.find]
-include = ["mangrove_signals*"]
+include = ["mangrove_knowledge_base*"]
 
 [tool.black]
 line-length = 120

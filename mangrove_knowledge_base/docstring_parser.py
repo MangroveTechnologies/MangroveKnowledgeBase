@@ -451,7 +451,7 @@ def parse_all_signals(signal_modules: list) -> dict:
             }
     """
     try:
-        from mangrove_signals.registry import RuleRegistry
+        from mangrove_knowledge_base.registry import RuleRegistry
         registry = RuleRegistry._registry
     except ImportError:
         try:
@@ -459,7 +459,7 @@ def parse_all_signals(signal_modules: list) -> dict:
             registry = RuleRegistry._registry
         except ImportError:
             raise ImportError(
-                "Cannot import RuleRegistry. Ensure mangrove_signals or MangroveAI is on sys.path."
+                "Cannot import RuleRegistry. Ensure mangrove_knowledge_base or MangroveAI is on sys.path."
             )
 
     # Build a set of module names for fast lookup
