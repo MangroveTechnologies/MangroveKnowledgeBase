@@ -1,0 +1,56 @@
+---
+title: "Instruments & Market Mechanics"
+description: "Financial instruments and market mechanics -- spot markets, derivatives, leverage, and crypto-specific considerations."
+---
+
+# Instruments & Market Mechanics
+
+This document covers the various financial instruments available for trading and the specific mechanics governing each market type, including derivatives, leverage, and crypto-specific considerations.
+
+## Spot Markets
+
+Direct exchange of assets at the current market price with immediate settlement. The simplest form of trading.
+
+**Key characteristics:**
+- Immediate ownership transfer
+- No leverage (unless margin is used)
+- No expiration dates
+- Settlement typically T+0 for crypto, T+2 for equities
+
+## Derivatives
+
+Financial contracts whose value derives from an underlying asset.
+
+### Futures
+Standardized contracts to buy or sell an asset at a predetermined price on a future date.
+
+### Options
+Contracts giving the right (not obligation) to buy (call) or sell (put) at a specific price before expiration.
+
+### Perpetual Swaps
+Crypto-specific derivative with no expiration date, using a funding rate mechanism to anchor the price to spot.
+
+## Leverage
+
+Using borrowed capital to increase the potential return of an investment. Amplifies both gains and losses.
+
+**Crypto leverage considerations:**
+- Exchange-provided leverage ranges from 2x to 125x
+- Liquidation occurs when margin falls below maintenance level
+- Funding rates on perpetual swaps can be a significant cost
+- Higher leverage requires tighter stop-losses
+
+## Crypto-Specific Mechanics
+
+### 24/7 Trading
+Cryptocurrency markets operate continuously with no closing bells or weekends.
+
+### Decentralized Exchanges (DEXs)
+Automated market makers (AMMs) using liquidity pools instead of order books. Key concepts include impermanent loss, slippage tolerance, and gas fees.
+
+### On-Chain Settlement
+Blockchain-based settlement provides transparency but introduces gas costs and confirmation times.
+
+<Note>
+For the complete Instruments and Market Mechanics reference, see `knowledge-base/02-instruments-market-mechanics.md` in the repository.
+</Note>

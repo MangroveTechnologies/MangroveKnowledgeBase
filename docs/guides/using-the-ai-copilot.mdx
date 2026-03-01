@@ -1,0 +1,331 @@
+---
+title: "Using the AI Copilot"
+description: "How to use the conversational AI Copilot to build, refine, and backtest trading strategies through natural language."
+---
+
+# Using the AI Copilot
+
+The AI Copilot lets you build trading strategies through conversation instead of manually assembling signal configurations. Describe your trading idea in plain English, and the copilot guides you through signal selection, parameter configuration, and backtesting.
+
+This guide shows you how to interact with the copilot API, what to expect at each stage, and how to get the best results.
+
+## What the copilot does
+
+The copilot is a stateful, multi-step workflow. When you send a message, the copilot:
+
+1. Understands your trading intent
+2. Matches your description to signals from the 96-signal registry
+3. Assembles a valid strategy configuration (1 TRIGGER + 1 FILTER)
+4. Runs a backtest and evaluates the results
+5. Optionally iterates on parameters if the first attempt underperforms
+
+All of this happens through a conversation -- you send messages, and the copilot responds with questions, suggestions, and results.
+
+## Prerequisites
+
+- **An authentication token.** See the [Authentication guide](/authentication).
+- **A session ID.** Each conversation is identified by a unique session ID. You create this yourself (any UUID or unique string works).
+
+<CodeGroup>
+```bash cURL
+export TOKEN="your-jwt-token-here"
+export SESSION_ID="my-session-$(date +%s)"
+```
+
+```python Python
+import requests
+import time
+import uuid
+
+BASE_URL = "http://localhost:5001"
+TOKEN = "your-jwt-token-here"
+HEADERS = {
+    "Authorization": f"Bearer {TOKEN}",
+    "Content-Type": "application/json",
+}
+SESSION_ID = f"session-{uuid.uuid4()}"
+```
+
+```javascript JavaScript
+const BASE_URL = "http://localhost:5001";
+const TOKEN = "your-jwt-token-here";
+const headers = {
+  Authorization: `Bearer ${TOKEN}`,
+  "Content-Type": "application/json",
+};
+const SESSION_ID = `session-${crypto.randomUUID()}`;
+```
+</CodeGroup>
+
+## Step 1: Start a conversation
+
+Send your first message to the copilot. Describe your trading idea -- you do not need to know signal names or parameters.
+
+<CodeGroup>
+```bash cURL
+curl -s -X POST "http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "I want to build a strategy for BTC that buys when momentum is turning bullish and the overall trend is up. I am an intermediate trader."
+  }'
+```
+
+```python Python
+response = requests.post(
+    f"{BASE_URL}/api/v1/ai-copilot/chat/{SESSION_ID}",
+    headers=HEADERS,
+    json={
+        "message": "I want to build a strategy for BTC that buys when "
+                   "momentum is turning bullish and the overall trend is up. "
+                   "I am an intermediate trader."
+    },
+)
+# The endpoint returns 202 -- the response is being processed asynchronously
+print(f"Status: {response.status_code}")
+```
+
+```javascript JavaScript
+const response = await fetch(
+  `${BASE_URL}/api/v1/ai-copilot/chat/${SESSION_ID}`,
+  {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      message:
+        "I want to build a strategy for BTC that buys when momentum is " +
+        "turning bullish and the overall trend is up. I am an intermediate trader.",
+    }),
+  }
+);
+// Returns 202 -- response is being processed asynchronously
+console.log(`Status: ${response.status}`);
+```
+</CodeGroup>
+
+<Note>
+The chat endpoint returns **202 Accepted** immediately. The copilot processes your message asynchronously (typically 5-30 seconds). You need to poll for the response.
+</Note>
+
+## Step 2: Poll for the response
+
+After sending a message, poll the conversation endpoint until the copilot's response appears. The response is ready when the `conversation_history` array grows by one entry.
+
+<CodeGroup>
+```bash cURL
+# Poll every 2 seconds until a new message appears
+while true; do
+  RESPONSE=$(curl -s "http://localhost:5001/api/v1/ai-copilot/conversations/$SESSION_ID" \
+    -H "Authorization: Bearer $TOKEN")
+
+  MSG_COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('conversation_history',[])))")
+
+  if [ "$MSG_COUNT" -gt 1 ]; then
+    echo "$RESPONSE" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+latest = data['conversation_history'][-1]
+print(f\"[{latest['role']}]: {latest['content']}\")
+print(f\"Current state: {data.get('current_mode', 'unknown')}\")
+"
+    break
+  fi
+
+  sleep 2
+done
+```
+
+```python Python
+def poll_for_response(session_id, expected_count, timeout=60):
+    """Poll until the conversation has the expected number of messages."""
+    start = time.time()
+    while time.time() - start < timeout:
+        response = requests.get(
+            f"{BASE_URL}/api/v1/ai-copilot/conversations/{session_id}",
+            headers=HEADERS,
+        )
+        data = response.json()
+        history = data.get("conversation_history", [])
+
+        if len(history) >= expected_count:
+            latest = history[-1]
+            print(f"[{latest['role']}]: {latest['content'][:200]}...")
+            print(f"Current state: {data.get('current_mode', 'unknown')}")
+            return data
+
+        time.sleep(2)
+
+    raise TimeoutError("Copilot did not respond in time")
+
+
+# Poll for the copilot's first response (message count = 2: your message + reply)
+conversation = poll_for_response(SESSION_ID, expected_count=2)
+```
+
+```javascript JavaScript
+async function pollForResponse(sessionId, expectedCount, timeout = 60000) {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    const response = await fetch(
+      `${BASE_URL}/api/v1/ai-copilot/conversations/${sessionId}`,
+      { headers }
+    );
+    const data = await response.json();
+    const history = data.conversation_history || [];
+
+    if (history.length >= expectedCount) {
+      const latest = history[history.length - 1];
+      console.log(`[${latest.role}]: ${latest.content.slice(0, 200)}...`);
+      console.log(`Current state: ${data.current_mode || "unknown"}`);
+      return data;
+    }
+
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  throw new Error("Copilot did not respond in time");
+}
+
+// Poll for the copilot's first response
+const conversation = await pollForResponse(SESSION_ID, 2);
+```
+</CodeGroup>
+
+## The copilot workflow
+
+The copilot moves through five states. Each message you send advances the workflow by one state (or stays in the current state if it needs more information).
+
+### State 1: collect_user_input
+
+The copilot gathers your trading intent. It may ask clarifying questions like:
+
+- "What asset do you want to trade?"
+- "What timeframe are you thinking?"
+- "Are you looking for trend-following or mean-reversion?"
+
+Answer naturally. The copilot extracts your intention, sentiment, and knowledge level to tailor the strategy.
+
+### State 2: plan_signals
+
+The copilot uses semantic matching to find signals that match your description. It will suggest:
+
+- A TRIGGER signal for entry timing
+- A FILTER signal for market state confirmation
+- Optionally, exit signals
+
+You can accept the suggestions or ask for alternatives.
+
+### State 3: assemble_strategy
+
+The copilot assembles a complete strategy configuration with:
+
+- Entry rules (1 TRIGGER + 1 FILTER)
+- Exit rules (optional)
+- Default execution config and state
+- A timestamped strategy name
+
+The strategy is validated against the schema before proceeding.
+
+### State 4: backtest
+
+The copilot runs a backtest automatically and reports the results:
+
+- If the backtest **passes** threshold checks: the strategy status is updated to `inactive` (ready for use), and the workflow moves to `done`.
+- If the backtest **fails**: the copilot may attempt parameter optimization (up to 4 attempts), adjusting signal parameters to improve performance.
+
+### State 5: done
+
+The conversation enters a terminal state. You can ask follow-up questions about the strategy, its signals, or the backtest results.
+
+## Example conversation flow
+
+Here is a typical multi-turn interaction:
+
+**You:** "I want a BTC strategy that buys on SMA crossovers when the trend is strong"
+
+**Copilot:** "Got it -- a trend-following strategy for BTC. What timeframe are you thinking? And should I use standard SMA periods like 10/50, or do you have specific windows in mind?"
+
+**You:** "Use 1h bars with 10/50 SMA crossover"
+
+**Copilot:** "I have mapped your idea to these signals:
+- Entry TRIGGER: `sma_cross_up` (window_fast=10, window_slow=50)
+- Entry FILTER: `adx_strong_trend` (window=14, threshold=25)
+
+The SMA crossover fires when the 10-period SMA crosses above the 50-period SMA. The ADX filter confirms a strong trend is in place. Should I proceed with these, or would you like to adjust anything?"
+
+**You:** "Looks good, go ahead"
+
+**Copilot:** "Strategy assembled: `btc_sma_trend_20260222_103045`. Running backtest over 12 months of BTC/1h data..."
+
+**Copilot:** "Backtest complete. Results:
+- Sharpe Ratio: 1.35
+- Win Rate: 52%
+- Max Drawdown: 11.2%
+- Total Trades: 28
+
+The strategy passed the performance thresholds. It has been saved with status `inactive`. Would you like to adjust any parameters or ask about the results?"
+
+## Sending follow-up messages
+
+Continue the conversation by sending additional messages to the same session:
+
+<CodeGroup>
+```bash cURL
+curl -s -X POST "http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Can you explain why the win rate is only 52%?"}'
+```
+
+```python Python
+response = requests.post(
+    f"{BASE_URL}/api/v1/ai-copilot/chat/{SESSION_ID}",
+    headers=HEADERS,
+    json={"message": "Can you explain why the win rate is only 52%?"},
+)
+# Poll for the new response (message count increases by 2: your message + reply)
+conversation = poll_for_response(SESSION_ID, expected_count=6)
+```
+
+```javascript JavaScript
+await fetch(`${BASE_URL}/api/v1/ai-copilot/chat/${SESSION_ID}`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({
+    message: "Can you explain why the win rate is only 52%?",
+  }),
+});
+const conversation = await pollForResponse(SESSION_ID, 6);
+```
+</CodeGroup>
+
+## Tips for effective prompts
+
+**Be specific about your trading idea:**
+- Good: "Buy BTC when RSI recovers from oversold and price is above the 200 SMA on 4h bars"
+- Vague: "Make me a good strategy"
+
+**Mention the asset and timeframe early:**
+- This saves a round-trip of clarification questions
+
+**State your experience level:**
+- "I am a beginner" tells the copilot to explain more and use conservative defaults
+- "I am an experienced trader" gets you more technical responses
+
+**Ask for alternatives:**
+- "What other FILTER signals would work here?" gets the copilot to suggest options
+
+**Request specific parameters:**
+- "Use RSI with a 21-period window and threshold of 25" gives the copilot exact values
+
+## Important constraints
+
+- **Signal generation is disabled.** The copilot uses existing signals from the 96-signal registry only. It cannot create new signal functions.
+- **One state per message.** The workflow advances one step per user message. You cannot skip states.
+- **Backtest results are never fabricated.** If results are not yet available, the copilot will say so rather than inventing numbers.
+- **Strategies created by the copilot** are automatically given a timestamped name (e.g., `btc_sma_trend_20260222_103045`) to prevent name collisions.
+
+## Next steps
+
+- [Understand signals](/guides/understanding-signals) to make better requests to the copilot
+- [Run a backtest manually](/guides/running-a-backtest) if you want direct control over the backtest parameters
+- [Tune risk parameters](/guides/risk-management) to adjust the execution config after the copilot creates your strategy

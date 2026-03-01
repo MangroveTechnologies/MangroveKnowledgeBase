@@ -1,0 +1,231 @@
+---
+title: "Execution API"
+description: "Stateful strategy execution with position management, order tracking, and risk controls."
+---
+
+# Execution API
+
+The Execution API provides strategy evaluation against current market data. It supports stateful execution with position persistence, stop-loss/take-profit order management, and risk controls. Set `persist=false` for dry-run evaluation without affecting database state.
+
+## Base URL
+
+```
+http://localhost:5001/api/v1/execution
+```
+
+## Endpoints
+
+### Evaluate Strategy by ID
+
+`POST /api/v1/execution/evaluate/{strategy_id}`
+
+Evaluates a persisted strategy with current market data:
+
+1. Loads strategy with execution_config and execution_state
+2. Loads open positions and their orders from database
+3. Evaluates exit conditions (SL, TP, signals, time-based) for open positions
+4. Evaluates entry signals for new positions
+5. Returns order objects (existing SL/TP or new market orders)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `persist` | boolean | No | Persist orders and trades to database (default: true) |
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/execution/evaluate/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"persist": true}'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    f"http://localhost:5001/api/v1/execution/evaluate/{strategy_id}",
+    headers={"Authorization": f"Bearer {token}"},
+    json={"persist": True}
+)
+data = response.json()
+for order in data.get("new_orders", []):
+    print(f"{order['side']} {order['order_type']} at {order['price']}")
+```
+</CodeGroup>
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "strategy_id": "550e8400-e29b-41d4-a716-446655440000",
+  "strategy_name": "BTC Momentum Strategy",
+  "asset": "BTC-USD",
+  "current_price": 77677.58,
+  "timestamp": "2026-01-31T19:55:05.165935",
+  "execution_state": {
+    "cash_balance": 116338.79,
+    "account_value": 116338.79,
+    "total_trades": 1,
+    "num_open_positions": 0
+  },
+  "new_orders": [
+    {
+      "id": "order-uuid",
+      "asset": "BTC-USD",
+      "side": "exit_long",
+      "order_type": "take_profit",
+      "status": "filled",
+      "price": 77677.58,
+      "position_size": 0.5,
+      "position_id": "position-uuid"
+    }
+  ],
+  "execution_time_seconds": 2.478
+}
+```
+
+### Evaluate Strategy by Object
+
+`POST /api/v1/execution/evaluate`
+
+Evaluate a strategy using a JSON object instead of a persisted strategy ID. Useful for testing draft strategies or one-off evaluations.
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": {
+      "name": "btc_rsi_test",
+      "asset": "BTC",
+      "rules": {
+        "name": "btc_rsi_test",
+        "asset": "BTC",
+        "entry": [
+          {"name": "rsi_oversold", "signal_type": "TRIGGER", "timeframe": "1h", "params": {"window": 14, "threshold": 30}},
+          {"name": "macd_bullish_cross", "signal_type": "FILTER", "timeframe": "1h", "params": {"window_fast": 12, "window_slow": 26, "window_sign": 9}}
+        ],
+        "exit": []
+      },
+      "execution_config": {
+        "max_risk_per_trade": 0.01,
+        "reward_factor": 2,
+        "stop_loss_calculation": "dynamic_atr",
+        "atr_period": 14,
+        "atr_volatility_factor": 2.0
+      },
+      "execution_state": {
+        "cash_balance": 10000.0,
+        "account_value": 10000.0,
+        "total_trades": 0,
+        "num_open_positions": 0
+      }
+    },
+    "persist": false
+  }'
+```
+
+```python Python
+response = requests.post(
+    "http://localhost:5001/api/v1/execution/evaluate",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "strategy": {
+            "name": "btc_rsi_test",
+            "asset": "BTC",
+            "rules": {
+                "entry": [
+                    {"name": "rsi_oversold", "signal_type": "TRIGGER", "timeframe": "1h", "params": {"window": 14, "threshold": 30}},
+                    {"name": "macd_bullish_cross", "signal_type": "FILTER", "timeframe": "1h", "params": {"window_fast": 12, "window_slow": 26, "window_sign": 9}}
+                ],
+                "exit": []
+            },
+            "execution_config": {"max_risk_per_trade": 0.01, "reward_factor": 2, "stop_loss_calculation": "dynamic_atr"},
+            "execution_state": {"cash_balance": 10000.0, "account_value": 10000.0, "total_trades": 0, "num_open_positions": 0}
+        },
+        "persist": False
+    }
+)
+```
+</CodeGroup>
+
+### Bulk Evaluate Strategies
+
+`POST /api/v1/execution/evaluate/bulk`
+
+Evaluates multiple strategies in a single request. Market data is fetched once per unique `(asset, timeframe)` pair and shared across all strategies.
+
+```bash
+curl -X POST http://localhost:5001/api/v1/execution/evaluate/bulk \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy_ids": [
+      "550e8400-e29b-41d4-a716-446655440000",
+      "661f9511-f30c-52e5-b827-557766551111"
+    ],
+    "persist": false
+  }'
+```
+
+**Response includes per-strategy results:**
+
+```json
+{
+  "success": true,
+  "results": [
+    {
+      "success": true,
+      "strategy_id": "550e8400...",
+      "strategy_name": "BTC Momentum",
+      "asset": "BTC",
+      "current_price": 77677.58,
+      "new_orders": [...],
+      "error": null
+    }
+  ],
+  "data_fetches": 1,
+  "total_execution_time_seconds": 2.1
+}
+```
+
+## Order Types
+
+| Side | Description |
+|------|-------------|
+| `enter_long` | Open a new long position |
+| `exit_long` | Close an existing long position |
+
+| Order Type | Description |
+|------------|-------------|
+| `market` | Execute at current market price |
+| `stop_loss` | Exit when price falls below threshold |
+| `take_profit` | Exit when price rises above threshold |
+
+## Use Cases
+
+### Real-Time Signal Monitoring
+
+```bash
+# Poll every 5 minutes for signals
+while true; do
+  curl -s -X POST http://localhost:5001/api/v1/execution/evaluate/$STRATEGY_ID \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{"persist": true}' | jq '.new_orders'
+  sleep 300
+done
+```
+
+### Dry-Run Validation
+
+Test strategy signals without persisting changes:
+
+```bash
+curl -s -X POST http://localhost:5001/api/v1/execution/evaluate/bulk \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"strategy_ids": ["$ID1", "$ID2"], "persist": false}' | jq '.'
+```

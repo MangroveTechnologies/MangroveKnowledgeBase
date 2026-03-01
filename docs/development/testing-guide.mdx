@@ -1,0 +1,87 @@
+---
+title: "Testing Guide"
+description: "Test suite organization, markers, and execution patterns for MangroveAI."
+---
+
+# Testing Guide
+
+The MangroveAI test suite uses pytest with markers for selective test execution, enabling fast feedback during development and comprehensive testing in CI/CD.
+
+## Test Categories
+
+| Marker | Speed | Count | Description |
+|--------|-------|-------|-------------|
+| `@pytest.mark.fast` | &lt;0.1s each | ~70 | Unit tests with mocked dependencies |
+| `@pytest.mark.slow` | 0.1-5s each | ~103 | Database CRUD and API endpoint tests |
+| `@pytest.mark.integration` | &gt;5s each | ~4 | End-to-end workflows with external services |
+| `@pytest.mark.performance` | varies | 0 | Load testing and benchmarks |
+
+## Running Tests
+
+### By Suite
+
+```bash
+# Fast tests only (default for local dev)
+pytest --test-suite=fast
+
+# Fast + database tests
+pytest --test-suite=slow
+
+# All except performance
+pytest --test-suite=integration
+
+# Everything
+pytest --test-suite=all
+```
+
+### Via Environment Variable
+
+```bash
+export TEST_SUITE=fast
+pytest
+```
+
+### Via Docker
+
+```bash
+docker compose exec mangrove-app pytest --test-suite=fast -v
+```
+
+## Test Organization
+
+```
+tests/
+  test_domains/
+    test_signals/       # Signal evaluation and validation
+    test_strategies/    # Strategy CRUD and validation
+    test_backtesting/   # Backtest execution and metrics
+    test_ai_copilot/    # Conversation workflow
+  test_integrations/    # External API client tests
+  conftest.py           # Shared fixtures
+```
+
+## Writing Tests
+
+### Fast Test Example
+
+```python
+import pytest
+
+@pytest.mark.fast
+def test_signal_validation_rejects_invalid_params():
+    """Signal validator should reject out-of-range parameters."""
+    result = validate_params("rsi_oversold", {"window": 2000})
+    assert not result["valid"]
+    assert "exceeds maximum" in result["errors"][0]
+```
+
+### Slow Test Example
+
+```python
+@pytest.mark.slow
+def test_strategy_create_and_retrieve(db_session):
+    """Create a strategy and verify it persists correctly."""
+    strategy = create_strategy(db_session, name="test", asset="BTC", ...)
+    retrieved = get_strategy(db_session, strategy.id)
+    assert retrieved.name == "test"
+```
