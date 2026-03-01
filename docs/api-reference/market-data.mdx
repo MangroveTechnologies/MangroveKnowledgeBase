@@ -1,0 +1,176 @@
+---
+title: "Market Data API"
+description: "Historical and real-time market data including trades, quotes, and OHLCV candlestick data."
+---
+
+# Market Data API
+
+The Market Data API provides access to real-time and historical market data including trades, quotes, and OHLCV (Open, High, Low, Close, Volume) data.
+
+## Base URL
+
+| Environment | URL |
+|-------------|-----|
+| Dev | `https://dev-api.mangrovetrader.com` |
+| Test | `https://test-api.mangrovetrader.com` |
+| Prod | `https://api.mangrovetrader.com` |
+
+All endpoints follow the pattern: `GET /api/v1/marketdata/{endpoint}`
+
+## Authentication
+
+The Market Data API requires Bearer token authentication.
+
+## Data Types
+
+### Trade
+
+```json
+{
+  "instrument_id": "uuid",
+  "instrument_name": "string",
+  "time_exchange": "2025-12-04T12:01:23Z",
+  "price": "decimal",
+  "size": "decimal",
+  "taker_side": "buy|sell"
+}
+```
+
+### Quote
+
+```json
+{
+  "instrument_id": "uuid",
+  "instrument_name": "string",
+  "time_exchange": "2025-12-04T12:01:23Z",
+  "ask_price": "decimal",
+  "ask_size": "decimal",
+  "bid_price": "decimal",
+  "bid_size": "decimal"
+}
+```
+
+### OHLCV
+
+```json
+{
+  "instrument_id": "uuid",
+  "instrument_name": "string",
+  "start": "2025-12-04T12:01:00Z",
+  "end": "2025-12-04T12:02:00Z",
+  "price_open": "decimal",
+  "price_high": "decimal",
+  "price_low": "decimal",
+  "price_close": "decimal",
+  "volume": "decimal",
+  "trades": 150
+}
+```
+
+## Endpoints
+
+### Health Check
+
+`GET /api/v1/marketdata/health`
+
+### Trades
+
+#### Get Latest Trade
+
+`GET /api/v1/marketdata/trades/{base}/{quote}/latest`
+
+```bash
+curl -X GET "https://dev-api.mangrovetrader.com/api/v1/marketdata/trades/BTC/USDT/latest" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### Get Trade History
+
+`GET /api/v1/marketdata/trades/{base}/{quote}/history`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `start_time` | string | yes | Start time (RFC3339) |
+| `end_time` | string | yes | End time (RFC3339) |
+| `limit` | integer | no | Max trades (default: 100, max: 1000) |
+| `asc` | boolean | no | Sort ascending (default: false) |
+
+### Quotes
+
+#### Get Latest Quote
+
+`GET /api/v1/marketdata/quotes/{base}/{quote}/latest`
+
+#### Get Quote History
+
+`GET /api/v1/marketdata/quotes/{base}/{quote}/history`
+
+### OHLCV
+
+#### Get Latest OHLCV
+
+`GET /api/v1/marketdata/ohlcv/{base}/{quote}/latest`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `period` | string | yes | `ONE_MINUTE`, `FIVE_MINUTES`, `FIFTEEN_MINUTES`, `THIRTY_MINUTES`, `ONE_HOUR`, `FOUR_HOURS`, `ONE_DAY` |
+
+```bash
+curl -X GET "https://dev-api.mangrovetrader.com/api/v1/marketdata/ohlcv/BTC/USDT/latest?period=ONE_HOUR" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### Get OHLCV Interval
+
+`GET /api/v1/marketdata/ohlcv/{base}/{quote}/interval`
+
+Returns 1-minute bars for the specified time range.
+
+```bash
+curl -X GET "https://dev-api.mangrovetrader.com/api/v1/marketdata/ohlcv/BTC/USDT/interval?start_time=2025-12-04T12:00:00Z&end_time=2025-12-04T13:00:00Z" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+#### Get OHLCV Period
+
+`GET /api/v1/marketdata/ohlcv/{base}/{quote}/period`
+
+Returns a single OHLCV bar for a specific period and end time.
+
+## Complete Example
+
+<CodeGroup>
+```bash cURL
+# Get latest trade
+curl -X GET "https://dev-api.mangrovetrader.com/api/v1/marketdata/trades/BTC/USDT/latest" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Get latest quote
+curl -X GET "https://dev-api.mangrovetrader.com/api/v1/marketdata/quotes/BTC/USDT/latest" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Get 1-hour OHLCV bars
+curl -X GET "https://dev-api.mangrovetrader.com/api/v1/marketdata/ohlcv/BTC/USDT/interval?start_time=2025-12-04T12:00:00Z&end_time=2025-12-04T13:00:00Z" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+```python Python
+import requests
+
+BASE = "https://dev-api.mangrovetrader.com/api/v1/marketdata"
+headers = {"Authorization": f"Bearer {token}"}
+
+# Latest trade
+trade = requests.get(f"{BASE}/trades/BTC/USDT/latest", headers=headers).json()
+
+# Latest quote
+quote = requests.get(f"{BASE}/quotes/BTC/USDT/latest", headers=headers).json()
+
+# OHLCV interval
+ohlcv = requests.get(
+    f"{BASE}/ohlcv/BTC/USDT/interval",
+    headers=headers,
+    params={"start_time": "2025-12-04T12:00:00Z", "end_time": "2025-12-04T13:00:00Z"}
+).json()
+```
+</CodeGroup>

@@ -1,0 +1,89 @@
+---
+title: "AI Copilot Workflow"
+description: "Architecture and state machine for the conversational AI strategy creation workflow."
+---
+
+# AI Copilot Workflow
+
+The AI Copilot is a conversational workflow that helps users define trading strategies, map them to existing signals, assemble strategy configurations, and run backtests.
+
+## Key Constraints
+
+- Signal generation is disabled. The system uses existing signals from the signal registry only.
+- The workflow executes one state per user message.
+- Backtest results must never be fabricated. If results are not in context, the agent says they are not available yet.
+
+## State Machine
+
+The workflow consists of 5 sequential states:
+
+```
+collect_user_input -> plan_signals -> assemble_strategy -> backtest -> done
+```
+
+### 1. collect_user_input
+
+Conversationally collect and refine the strategy request.
+
+- Persists extracted information into `context.collected_info`
+- Required fields: `user_intention`, `user_sentiment`, `user_knowledge_level`
+- Asks up to 5 clarification questions
+
+### 2. plan_signals
+
+Convert user requirements into structured entry/exit rule objects.
+
+- Uses semantic matching to find signals from the registry
+- Populates `context.rules` with matched signal metadata
+- Validates that TRIGGER signals are present before proceeding
+- Enforces the 1 TRIGGER + 1 FILTER constraint
+
+### 3. assemble_strategy
+
+Build a complete strategy configuration.
+
+- Assembles `context.strategy_config` using rules and schema constraints
+- Validates against JSON schema
+- Auto-suffixes strategy name with timestamp (`_%Y%m%d_%H%M%S`)
+- Builds full strategy object with `execution_config` and `execution_state`
+
+### 4. backtest
+
+Execute historical testing.
+
+- Creates a backtest run record
+- Executes the backtest via the backtesting engine
+- Stores results in `context.backtest_results`
+- Evaluates metrics against thresholds
+- On PASS: updates strategy status to `inactive`, transitions to `done`
+- On FAIL: may attempt optimization (up to 4 attempts), then transitions to `done`
+
+### 5. done
+
+Terminal conversational state for follow-up questions about the strategy and its performance.
+
+## WorkingContext Model
+
+The `WorkingContext` object carries all state through the conversation:
+
+| Field | Description |
+|-------|-------------|
+| `session_id` | Unique session identifier |
+| `current_mode` | Current workflow state |
+| `conversation_history` | All messages in the conversation |
+| `collected_info` | Extracted strategy requirements |
+| `rules` | Matched signal metadata keyed by rule name |
+| `strategy_config` | Assembled strategy configuration |
+| `backtest_id` | Backtest run identifier |
+| `backtest_results` | Performance metrics and trade history |
+
+## Async Processing Model
+
+The AI Copilot uses an async request/poll pattern:
+
+1. Client sends a message via `POST /chat/{session_id}` -- returns 202 immediately
+2. Client polls `GET /conversations/{session_id}` every 1-2 seconds
+3. Client detects when `conversation_history` length increases
+4. The newest message in the array is the agent's response
+
+Typical response time: 5-30 seconds depending on LLM complexity and current state.

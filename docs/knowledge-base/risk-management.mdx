@@ -1,0 +1,59 @@
+---
+title: "Risk Management"
+description: "Comprehensive risk management principles -- position sizing, stop-losses, portfolio risk, and drawdown management."
+---
+
+# Risk Management
+
+Risk management is the foundation upon which all successful trading is built. This document covers comprehensive risk management principles and techniques essential for preserving capital and achieving sustainable performance.
+
+## Risk Dimensions
+
+Risk is multi-dimensional. Focusing on one dimension while ignoring others leads to false confidence.
+
+| Dimension | Description | Metric |
+|-----------|-------------|--------|
+| Per-trade risk | Maximum loss on a single trade | % of capital |
+| Daily risk | Maximum loss in a single day | Daily VaR |
+| Portfolio risk | Aggregate exposure across all positions | Portfolio volatility |
+| Drawdown risk | Peak-to-trough capital decline | Max drawdown |
+| Correlation risk | Risk from correlated positions moving together | Correlation matrix |
+
+## Position Sizing
+
+### Fixed Fractional Method
+Risk a fixed percentage of capital per trade (typically 1-2%).
+
+```
+Position Size = (Account * Risk%) / (Entry - StopLoss)
+```
+
+### ATR-Based Sizing (MangroveAI Default)
+Uses Average True Range to dynamically adjust position sizes based on volatility.
+
+MangroveAI strategies use `execution_config.max_risk_per_trade` (default: 0.01 = 1%) with ATR-based stop-loss calculation.
+
+## Stop-Loss Management
+
+### Dynamic ATR Stop-Loss
+MangroveAI's default method:
+- Stop distance = ATR * volatility factor
+- Default: 14-period ATR * 2.0 multiplier
+- Configured via `atr_period` and `atr_volatility_factor` in `execution_config`
+
+### Time-Based Exits
+- `max_hold_bars` -- Exit after N bars regardless of P/L
+- `exit_on_loss_after_bars` -- Exit losing positions after N bars
+- `exit_on_profit_after_bars` -- Exit winning positions after N bars
+
+## Key Principles
+
+1. **Never risk more than you can afford to lose** on a single trade
+2. **Diversify across uncorrelated strategies and assets**
+3. **Set maximum drawdown limits** and stop trading if breached
+4. **Size positions based on volatility**, not conviction
+5. **Use stop-losses on every trade** -- no exceptions
+
+<Note>
+For the complete Risk Management reference, see `knowledge-base/05-risk-management.md` in the repository.
+</Note>

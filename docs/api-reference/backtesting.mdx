@@ -1,0 +1,188 @@
+---
+title: "Backtesting API"
+description: "Test trading strategies against historical market data with comprehensive performance metrics."
+---
+
+# Backtesting API
+
+The Backtesting API runs historical strategy testing with performance metrics and trade-by-trade analysis.
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/backtesting/backtest` | Run a new backtest |
+| `GET` | `/api/v1/backtesting/backtest/{id}` | Retrieve a historical backtest result |
+| `POST` | `/api/v1/backtesting/backtest/bulk` | Run backtests for multiple strategies |
+
+## Run a Backtest
+
+`POST /api/v1/backtesting/backtest`
+
+Runs a synchronous backtest and returns metrics and trade history. Loads market data from CoinAPI for the specified asset and date range.
+
+### Date Range Modes
+
+| Mode | Parameters | Behavior |
+|------|-----------|----------|
+| Explicit Range | `start_date` + `end_date` | Exact date window |
+| From Date to Now | `start_date` only | Start date to current time |
+| Lookback from End | `end_date` + `lookback_months` | N months back from end date |
+| Recent History | `lookback_months` only | N months from current time |
+
+### Example: Historical Lookback
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/backtesting/backtest \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asset": "ETH",
+    "interval": "1h",
+    "lookback_months": 12,
+    "initial_balance": 10000.0,
+    "min_balance_threshold": 0.1,
+    "min_trade_amount": 25.0,
+    "max_open_positions": 5,
+    "max_trades_per_day": 50,
+    "max_risk_per_trade": 0.01,
+    "max_units_per_trade": 100.0,
+    "max_trade_amount": 10000.0,
+    "volatility_window": 24,
+    "target_volatility": 0.02,
+    "volatility_mode": "stddev",
+    "enable_volatility_adjustment": false,
+    "cooldown_bars": 24,
+    "daily_momentum_limit": 3.0,
+    "weekly_momentum_limit": 3.0,
+    "strategy_json": "{\"name\": \"ETH Strategy\", \"asset\": \"ETH\", \"entry\": [{\"name\": \"macd_bullish_cross\", \"timeframe\": \"1h\", \"signal_type\": \"TRIGGER\", \"params\": {\"window_fast\": 12, \"window_slow\": 26, \"window_sign\": 9}}, {\"name\": \"is_above_sma\", \"timeframe\": \"1h\", \"params\": {\"window\": 50}, \"signal_type\": \"FILTER\"}], \"exit\": []}"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "http://localhost:5001/api/v1/backtesting/backtest",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "asset": "ETH",
+        "interval": "1h",
+        "lookback_months": 12,
+        "initial_balance": 10000.0,
+        "min_balance_threshold": 0.1,
+        "min_trade_amount": 25.0,
+        "max_open_positions": 5,
+        "max_trades_per_day": 50,
+        "max_risk_per_trade": 0.01,
+        "max_units_per_trade": 100.0,
+        "max_trade_amount": 10000.0,
+        "volatility_window": 24,
+        "target_volatility": 0.02,
+        "volatility_mode": "stddev",
+        "enable_volatility_adjustment": False,
+        "cooldown_bars": 24,
+        "daily_momentum_limit": 3.0,
+        "weekly_momentum_limit": 3.0,
+        "strategy_json": '{"name": "ETH Strategy", "asset": "ETH", "entry": [{"name": "macd_bullish_cross", "timeframe": "1h", "signal_type": "TRIGGER", "params": {"window_fast": 12, "window_slow": 26, "window_sign": 9}}, {"name": "is_above_sma", "timeframe": "1h", "params": {"window": 50}, "signal_type": "FILTER"}], "exit": []}'
+    }
+)
+metrics = response.json().get("metrics", {})
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "metrics": {
+    "sharpe_ratio": 1.23,
+    "sortino_ratio": 1.10,
+    "calmar_ratio": 0.80,
+    "irr_annualized": 0.25,
+    "max_drawdown": 0.15,
+    "max_drawdown_duration": 42,
+    "win_rate": 0.55
+  },
+  "execution_time_seconds": 3.21,
+  "trade_count": 12
+}
+```
+
+### Required Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `asset` | string | Asset symbol (e.g., "BTC", "ETH") |
+| `interval` | string | Time interval ("1h", "4h", "1d") |
+| `initial_balance` | number | Starting account balance |
+| `strategy_json` | string | Stringified JSON strategy configuration |
+
+### Strategy JSON Format
+
+Entry rules require exactly 1 TRIGGER + 1 FILTER signal:
+
+```json
+{
+  "name": "Strategy Name",
+  "asset": "BTC",
+  "entry": [
+    {"name": "signal_name", "timeframe": "1h", "signal_type": "TRIGGER", "params": {}},
+    {"name": "signal_name", "timeframe": "1h", "signal_type": "FILTER", "params": {}}
+  ],
+  "exit": []
+}
+```
+
+<Note>
+Do NOT include `atr_period` or `atr_multiplier` in `strategy_json`. These belong in `execution_config` and are injected at runtime.
+</Note>
+
+## Retrieve Backtest Result
+
+`GET /api/v1/backtesting/backtest/{backtest_id}`
+
+Retrieves a previously executed backtest including full trade history.
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5001/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000"
+```
+
+## Bulk Backtest
+
+`POST /api/v1/backtesting/backtest/bulk`
+
+Evaluates multiple strategies over a shared date range. Market data is fetched once per unique `(asset, timeframe)` pair.
+
+Provide either `strategy_ids` (UUIDs from database) or `strategy_configs` (inline strategy objects).
+
+```bash
+curl -X POST http://localhost:5001/api/v1/backtesting/backtest/bulk \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy_ids": ["id-1", "id-2", "id-3"],
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "initial_balance": 10000.0,
+    "min_balance_threshold": 0.1,
+    "min_trade_amount": 25.0,
+    "max_open_positions": 5,
+    "max_trades_per_day": 50,
+    "max_risk_per_trade": 0.01,
+    "max_units_per_trade": 100.0,
+    "max_trade_amount": 10000.0,
+    "volatility_window": 24,
+    "target_volatility": 0.02,
+    "volatility_mode": "stddev",
+    "enable_volatility_adjustment": false,
+    "cooldown_bars": 24,
+    "daily_momentum_limit": 3.0,
+    "weekly_momentum_limit": 3.0
+  }'
+```
+
+Individual strategy failures are captured per-result without aborting the batch. The `data_fetches` field shows how many unique API calls were made.

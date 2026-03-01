@@ -1,0 +1,88 @@
+---
+title: "Signals Quick Reference"
+description: "Alphabetical index of all 136 trading signals with type, category, and description."
+---
+
+# Signals Quick Reference
+
+Alphabetical index of all trading signals available in MangroveAI. For detailed documentation, see the [Indicators](/knowledge-base/indicators) page or query the [Signals API](/api-reference/signals).
+
+## How to Use This Reference
+
+Each signal is listed with:
+- Signal name (used in API calls)
+- Type: TRIGGER (event-based) or FILTER (state-based)
+- Category: momentum, trend, volume, volatility, or patterns
+- Brief description
+
+## Momentum Signals (26)
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `rsi_oversold` | FILTER | RSI below threshold (oversold) |
+| `rsi_overbought` | FILTER | RSI above threshold (overbought) |
+| `rsi_cross_up` | TRIGGER | RSI crosses above threshold |
+| `rsi_cross_down` | TRIGGER | RSI crosses below threshold |
+| `stoch_overbought` | FILTER | Stochastic above threshold (overbought) |
+| `stoch_oversold` | FILTER | Stochastic below threshold (oversold) |
+| `williams_r_oversold` | FILTER | Williams %R in oversold zone |
+| `williams_r_overbought` | FILTER | Williams %R in overbought zone |
+
+## Trend Signals (38)
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `sma_cross_up` | TRIGGER | Fast SMA crosses above slow SMA |
+| `sma_cross_down` | TRIGGER | Fast SMA crosses below slow SMA |
+| `is_above_sma` | FILTER | Price is above SMA |
+| `sma_crossover` | FILTER | SMA crossover condition |
+| `ema_cross_up` | TRIGGER | Fast EMA crosses above slow EMA |
+| `ema_cross_down` | TRIGGER | Fast EMA crosses below slow EMA |
+| `ema_crossover` | FILTER | EMA crossover condition |
+| `price_above_ema` | FILTER | Price is above EMA |
+| `macd_bullish_cross` | TRIGGER | MACD line crosses above signal line |
+| `macd_bearish_cross` | TRIGGER | MACD line crosses below signal line |
+| `adx_strong_trend` | FILTER | ADX indicates strong trend |
+| `adx_bullish_di` | FILTER | ADX bullish directional indicator |
+
+## Volume Signals (22)
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `obv_bullish` | FILTER | On-Balance Volume trending up |
+| `obv_bearish` | FILTER | On-Balance Volume trending down |
+| `mfi_oversold` | FILTER | Money Flow Index below threshold |
+| `mfi_overbought` | FILTER | Money Flow Index above threshold |
+| `cmf_bullish` | FILTER | Chaikin Money Flow positive |
+| `cmf_bearish` | FILTER | Chaikin Money Flow negative |
+| `vwap_above` | FILTER | Price above VWAP |
+| `vwap_below` | FILTER | Price below VWAP |
+
+## Volatility Signals (10)
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `bb_upper_breakout` | TRIGGER | Price breaks above upper Bollinger Band |
+| `bb_lower_breakout` | TRIGGER | Price breaks below lower Bollinger Band |
+| `bb_squeeze` | TRIGGER | Bollinger Bands contract (low volatility) |
+| `atr_high_volatility` | FILTER | ATR indicates high volatility |
+| `dc_upper_breakout` | TRIGGER | Price breaks above upper Donchian Channel |
+| `kc_upper_breakout` | TRIGGER | Price breaks above upper Keltner Channel |
+| `kc_lower_breakout` | TRIGGER | Price breaks below lower Keltner Channel |
+
+## Patterns Signals (40)
+
+| Signal | Type | Description |
+|--------|------|-------------|
+| `bullish_engulfing` | TRIGGER | Bullish engulfing candlestick pattern |
+| `bearish_engulfing` | TRIGGER | Bearish engulfing candlestick pattern |
+| `hammer` | TRIGGER | Hammer candlestick pattern |
+| `inverted_hammer` | TRIGGER | Inverted hammer candlestick pattern |
+| `doji` | TRIGGER | Doji candlestick pattern |
+| `morning_star` | TRIGGER | Morning star three-bar reversal pattern |
+| `evening_star` | TRIGGER | Evening star three-bar reversal pattern |
+| `shooting_star` | TRIGGER | Shooting star candlestick pattern |
+
+<Note>
+This is a representative subset. For the complete list of all 136 signals, use the `GET /api/v1/signals` endpoint or see `knowledge-base/10-signals-quick-reference.md` in the repository.
+</Note>

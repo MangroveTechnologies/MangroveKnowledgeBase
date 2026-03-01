@@ -1,0 +1,266 @@
+---
+title: "Signals API"
+description: "Discover, validate, and evaluate 136 trading signals across momentum, trend, volume, volatility, and patterns categories."
+---
+
+# Signals API
+
+The Signals API provides endpoints for discovering, validating, and evaluating trading signals. MangroveAI includes 136 active signals (66 TRIGGER, 70 FILTER) organized by category.
+
+## Signal Classification
+
+- **TRIGGER (66 signals)**: Event-based signals that fire when specific conditions occur (crossovers, breakouts, pattern completions)
+- **FILTER (70 signals)**: State-based signals describing ongoing market conditions (price above SMA, RSI in range)
+
+Entry conditions must include exactly one TRIGGER and exactly one FILTER.
+
+## Base URL
+
+```
+http://localhost:5001/api/v1/signals
+```
+
+## Endpoints
+
+### List All Signals
+
+`GET /api/v1/signals`
+
+**Query Parameters:**
+- `limit` (optional, int, default=50): Maximum number of signals (1-100)
+- `offset` (optional, int, default=0): Pagination offset
+
+<CodeGroup>
+```bash cURL
+curl -X GET "http://localhost:5001/api/v1/signals?limit=10&offset=0"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "http://localhost:5001/api/v1/signals",
+    params={"limit": 10, "offset": 0}
+)
+signals = response.json()["signals"]
+```
+</CodeGroup>
+
+**Response:**
+
+```json
+{
+  "signals": [
+    {
+      "name": "rsi_oversold",
+      "category": "momentum",
+      "metadata": {
+        "rule_name": "rsi_oversold",
+        "description": "RSI is below threshold (oversold condition)",
+        "requires": ["Close"],
+        "params": {
+          "window": {"type": "int", "min": 2, "max": 100, "default": 14},
+          "threshold": {"type": "float", "min": 0.0, "max": 50.0, "optional": true, "default": 30.0}
+        }
+      }
+    }
+  ],
+  "total": 136,
+  "limit": 10,
+  "offset": 0
+}
+```
+
+### Get Signal Details
+
+`GET /api/v1/signals/{signal_name}`
+
+```bash
+curl -X GET http://localhost:5001/api/v1/signals/rsi_oversold
+```
+
+### Search Signals
+
+`POST /api/v1/signals/search`
+
+Search for signals by name, parameters, or keywords.
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/signals/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "moving average",
+    "search_type": "keywords",
+    "limit": 20
+  }'
+```
+
+```python Python
+response = requests.post(
+    "http://localhost:5001/api/v1/signals/search",
+    json={"query": "moving average", "search_type": "keywords", "limit": 20}
+)
+```
+</CodeGroup>
+
+**Search types:** `"name"`, `"params"`, `"keywords"`
+
+### Match Signals (Semantic)
+
+`POST /api/v1/signals/match`
+
+Intent-aware semantic signal matching using natural language descriptions.
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/signals/match \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_description": "I want to buy when RSI is low and showing oversold conditions",
+    "num_results": 3,
+    "match_type": "entry"
+  }'
+```
+
+```python Python
+response = requests.post(
+    "http://localhost:5001/api/v1/signals/match",
+    json={
+        "user_description": "I want to buy when RSI is low",
+        "num_results": 3,
+        "match_type": "entry"
+    }
+)
+matches = response.json()["matches"]
+```
+</CodeGroup>
+
+**Response:**
+
+```json
+{
+  "matches": [
+    {
+      "signal_name": "rsi_oversold",
+      "score": 0.92,
+      "match_method": "semantic",
+      "category": "momentum",
+      "signal_type": "FILTER",
+      "description": "RSI is below threshold (oversold condition)",
+      "reasoning": "Matches intent for oversold RSI conditions"
+    }
+  ]
+}
+```
+
+### Evaluate Signal
+
+`POST /api/v1/signals/{signal_name}/evaluate`
+
+Evaluate a signal against provided market data. Returns a boolean result.
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/signals/is_above_sma/evaluate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "market_data": [
+      {"Close": 100}, {"Close": 102}, {"Close": 101},
+      {"Close": 103}, {"Close": 105}, {"Close": 104}
+    ],
+    "parameters": {"window": 2}
+  }'
+```
+
+```python Python
+response = requests.post(
+    "http://localhost:5001/api/v1/signals/is_above_sma/evaluate",
+    json={
+        "market_data": [
+            {"Close": 100}, {"Close": 102}, {"Close": 101},
+            {"Close": 103}, {"Close": 105}, {"Close": 104}
+        ],
+        "parameters": {"window": 2}
+    }
+)
+result = response.json()["result"]  # True or False
+```
+</CodeGroup>
+
+### Evaluate Multiple Signals (Multi-Timeframe)
+
+`POST /api/v1/signals/evaluate-multiple-series`
+
+Evaluate chart data for a date range with multiple signals across different timeframes.
+
+```bash
+curl -X POST http://localhost:5001/api/v1/signals/evaluate-multiple-series \
+  -H "Content-Type: application/json" \
+  -d '{
+    "symbol": "BTC",
+    "chart_timeframe": "1h",
+    "start_date": "2025-01-01T00:00:00Z",
+    "end_date": "2025-01-07T00:00:00Z",
+    "signals": [
+      {"name": "rsi_overbought", "timeframe": "1h", "params": {"window": 14, "threshold": 70}},
+      {"name": "is_above_sma", "timeframe": "4h", "params": {"window": 50}}
+    ]
+  }'
+```
+
+### Validate Signal Parameters
+
+`POST /api/v1/signals/{signal_name}/validate-params`
+
+Validate parameters for a signal without evaluating it.
+
+```bash
+curl -X POST http://localhost:5001/api/v1/signals/is_above_sma/validate-params \
+  -H "Content-Type: application/json" \
+  -d '{"parameters": {"window": 20}}'
+```
+
+## Signal Categories
+
+### Momentum (26 signals)
+
+RSI, Stochastic, Williams %R, TSI, and related oscillators.
+
+Examples: `rsi_oversold`, `rsi_overbought`, `stoch_oversold`, `williams_r_oversold`
+
+### Trend (38 signals)
+
+SMA, EMA, MACD, ADX, and moving average crossovers.
+
+Examples: `sma_cross_up`, `sma_cross_down`, `ema_cross_up`, `macd_bullish_cross`, `adx_strong_trend`
+
+### Volume (22 signals)
+
+OBV, MFI, CMF, VWAP, and volume-based indicators.
+
+Examples: `obv_bullish`, `mfi_oversold`, `cmf_bullish`, `vwap_above`
+
+### Volatility (10 signals)
+
+Bollinger Bands, ATR, Keltner Channel, and volatility measures.
+
+Examples: `bb_upper_breakout`, `bb_lower_breakout`, `atr_high_volatility`, `kc_upper_breakout`
+
+### Patterns (40 signals)
+
+Candlestick patterns and multi-bar pattern recognition.
+
+Examples: `bullish_engulfing`, `bearish_engulfing`, `hammer`, `doji`, `morning_star`, `evening_star`
+
+## Signal Metadata Structure
+
+Each signal includes:
+
+| Field | Description |
+|-------|-------------|
+| `rule_name` | Signal function name |
+| `description` | Human-readable description |
+| `requires` | DataFrame columns needed (e.g., `["Close", "Volume"]`) |
+| `params` | Parameter definitions with type, min, max, default |
+| `type` | `"TRIGGER"` or `"FILTER"` |
