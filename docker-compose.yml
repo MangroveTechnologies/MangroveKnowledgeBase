@@ -11,13 +11,13 @@ services:
       dockerfile: Dockerfile
     command: ["flake8", "mangrove_knowledge_base/", "--max-line-length=120", "--ignore=E501,W503"]
 
-  knowledge-base:
+  mkb-knowledge-base:
     build:
       context: .
       dockerfile: kb_server/Dockerfile
     container_name: mkb-knowledge-base
     ports:
-      - "${KB_PORT:-8080}:8080"
+      - "${KB_PORT:-8081}:8080"
     volumes:
       # Mount the knowledge base markdown files (read-only)
       - ./knowledge-base:/kb:ro

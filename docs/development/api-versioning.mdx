@@ -1,0 +1,41 @@
+---
+title: "API Versioning"
+description: "API versioning strategy, backward compatibility, and deprecation guidelines."
+---
+
+# API Versioning
+
+MangroveAI follows URL-based API versioning with a single active version.
+
+## Current Version
+
+**Version:** v1
+**Base URL:** `http://localhost:5001/api/v1`
+**Status:** Current (released Q4 2025)
+
+## URL Pattern
+
+```
+http://localhost:5001/api/v1/{domain}/{resource}
+```
+
+Examples:
+- `GET /api/v1/signals` -- List signals
+- `POST /api/v1/strategies` -- Create strategy
+- `POST /api/v1/backtesting/backtest` -- Run backtest
+- `POST /api/v1/ai-copilot/chat/{session_id}` -- Send message
+
+## When to Increment Version
+
+A new major version (v2, v3) is required for:
+
+1. **Breaking request changes** -- Required fields removed, field types changed
+2. **Breaking response changes** -- Fields removed/renamed, structure changes
+3. **Breaking path changes** -- Endpoints removed or restructured
+
+Non-breaking changes (new optional fields, new endpoints) are added to the current version.
+
+## Unversioned Endpoints
+
+Operational endpoints remain unversioned:
+- `GET /health` -- Docker healthchecks

@@ -7,6 +7,7 @@ Provides a comprehensive library of technical analysis indicators:
 - Trend indicators (MACD, EMA, SMA, ADX, Aroon, Ichimoku, PSAR, TRIX, CCI, etc.)
 - Volume indicators (OBV, MFI, CMF, ForceIndex, VWAP, ADI, EaseOfMovement, VPT, NVI, etc.)
 - Return indicators (DailyReturn, DailyLogReturn, CumulativeReturn)
+- Pattern indicators (Doji, Hammer, Engulfing, MorningStar, InsideBar, NarrowRange, etc.)
 
 All indicators inherit from IndicatorInterface and use a stateless classmethod-based API.
 """
@@ -80,6 +81,37 @@ from .return_indicators import (
     CumulativeReturn,
 )
 
+# Pattern indicators
+from .pattern_indicators import (
+    Doji,
+    LongLeggedDoji,
+    DragonflyDoji,
+    GravestoneDoji,
+    Hammer,
+    HangingMan,
+    InvertedHammer,
+    ShootingStar,
+    Marubozu,
+    SpinningTop,
+    Engulfing,
+    Harami,
+    PiercingLine,
+    DarkCloudCover,
+    TweezerTops,
+    TweezerBottoms,
+    MorningStar,
+    EveningStar,
+    ThreeWhiteSoldiers,
+    ThreeBlackCrows,
+    ThreeInsideUp,
+    ThreeInsideDown,
+    InsideBar,
+    OutsideBar,
+    PinBar,
+    TwoBarReversal,
+    NarrowRange,
+)
+
 __all__ = [
     # Interface
     "IndicatorInterface",
@@ -134,4 +166,32 @@ __all__ = [
     "DailyReturn",
     "DailyLogReturn",
     "CumulativeReturn",
+    # Pattern indicators
+    "Doji",
+    "LongLeggedDoji",
+    "DragonflyDoji",
+    "GravestoneDoji",
+    "Hammer",
+    "HangingMan",
+    "InvertedHammer",
+    "ShootingStar",
+    "Marubozu",
+    "SpinningTop",
+    "Engulfing",
+    "Harami",
+    "PiercingLine",
+    "DarkCloudCover",
+    "TweezerTops",
+    "TweezerBottoms",
+    "MorningStar",
+    "EveningStar",
+    "ThreeWhiteSoldiers",
+    "ThreeBlackCrows",
+    "ThreeInsideUp",
+    "ThreeInsideDown",
+    "InsideBar",
+    "OutsideBar",
+    "PinBar",
+    "TwoBarReversal",
+    "NarrowRange",
 ]

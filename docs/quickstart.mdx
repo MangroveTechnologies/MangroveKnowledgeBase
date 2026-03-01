@@ -1,0 +1,207 @@
+---
+title: "Quickstart"
+description: "Get up and running with the MangroveAI API in 5 minutes."
+---
+
+# Quickstart
+
+This guide walks you through authenticating with the API and making your first requests: listing signals, creating a strategy, and running a backtest.
+
+## Prerequisites
+
+- A MangroveAI account (sign up at the [Developer Portal](https://admin.mangrovetechnologies.ai))
+- `curl` or any HTTP client
+- The API running locally at `http://localhost:5001` or access to a deployed instance
+
+## Step 1: Authenticate
+
+MangroveAI supports Firebase OAuth and API keys. For programmatic access, API keys are recommended.
+
+<CodeGroup>
+```bash cURL
+# Exchange Firebase token for JWT
+curl -X POST http://localhost:5001/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firebase_token": "YOUR_FIREBASE_TOKEN"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "http://localhost:5001/api/v1/auth/login",
+    json={"firebase_token": "YOUR_FIREBASE_TOKEN"}
+)
+data = response.json()
+token = data["access_token"]
+```
+
+```javascript JavaScript
+const response = await fetch("http://localhost:5001/api/v1/auth/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ firebase_token: "YOUR_FIREBASE_TOKEN" })
+});
+const { access_token } = await response.json();
+```
+</CodeGroup>
+
+Save the `access_token` from the response. You will use it in the `Authorization` header for all subsequent requests.
+
+```bash
+export TOKEN="your-access-token-here"
+```
+
+## Step 2: List Available Signals
+
+Discover the 136 trading signals available for building strategies.
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:5001/api/v1/signals?limit=10"
+```
+
+```python Python
+response = requests.get(
+    "http://localhost:5001/api/v1/signals",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"limit": 10}
+)
+signals = response.json()["signals"]
+for s in signals:
+    print(f"{s['name']} ({s['category']})")
+```
+</CodeGroup>
+
+Each signal has a `name`, `category` (momentum, trend, volume, volatility, patterns), and `metadata` with parameter definitions.
+
+## Step 3: Create a Strategy
+
+Strategies require entry rules with exactly 1 TRIGGER signal and 1 FILTER signal.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "http://localhost:5001/api/v1/strategies" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "BTC RSI Strategy",
+    "asset": "BTC",
+    "entry": [
+      {
+        "name": "rsi_oversold",
+        "signal_type": "TRIGGER",
+        "timeframe": "1h",
+        "params": {"window": 14, "threshold": 30}
+      },
+      {
+        "name": "is_above_sma",
+        "signal_type": "FILTER",
+        "timeframe": "1h",
+        "params": {"window": 50}
+      }
+    ],
+    "exit": [],
+    "reward_factor": 2.0
+  }'
+```
+
+```python Python
+strategy = requests.post(
+    "http://localhost:5001/api/v1/strategies",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "name": "BTC RSI Strategy",
+        "asset": "BTC",
+        "entry": [
+            {"name": "rsi_oversold", "signal_type": "TRIGGER", "timeframe": "1h", "params": {"window": 14, "threshold": 30}},
+            {"name": "is_above_sma", "signal_type": "FILTER", "timeframe": "1h", "params": {"window": 50}}
+        ],
+        "exit": [],
+        "reward_factor": 2.0
+    }
+)
+strategy_id = strategy.json()["strategy"]["id"]
+print(f"Created strategy: {strategy_id}")
+```
+</CodeGroup>
+
+Save the `strategy.id` from the response for backtesting.
+
+## Step 4: Run a Backtest
+
+Test the strategy against 6 months of historical BTC data.
+
+<CodeGroup>
+```bash cURL
+curl -X POST "http://localhost:5001/api/v1/backtesting/backtest" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asset": "BTC",
+    "interval": "1h",
+    "lookback_months": 6,
+    "initial_balance": 10000.0,
+    "min_balance_threshold": 0.1,
+    "min_trade_amount": 25.0,
+    "max_open_positions": 5,
+    "max_trades_per_day": 50,
+    "max_risk_per_trade": 0.01,
+    "max_units_per_trade": 100.0,
+    "max_trade_amount": 10000.0,
+    "volatility_window": 24,
+    "target_volatility": 0.02,
+    "volatility_mode": "stddev",
+    "enable_volatility_adjustment": false,
+    "cooldown_bars": 24,
+    "daily_momentum_limit": 3.0,
+    "weekly_momentum_limit": 3.0,
+    "strategy_json": "{\"name\": \"BTC RSI Strategy\", \"asset\": \"BTC\", \"entry\": [{\"name\": \"rsi_oversold\", \"timeframe\": \"1h\", \"signal_type\": \"TRIGGER\", \"params\": {\"window\": 14, \"threshold\": 30}}, {\"name\": \"is_above_sma\", \"timeframe\": \"1h\", \"signal_type\": \"FILTER\", \"params\": {\"window\": 50}}], \"exit\": []}"
+  }'
+```
+
+```python Python
+backtest = requests.post(
+    "http://localhost:5001/api/v1/backtesting/backtest",
+    headers={"Authorization": f"Bearer {token}"},
+    json={
+        "asset": "BTC",
+        "interval": "1h",
+        "lookback_months": 6,
+        "initial_balance": 10000.0,
+        "min_balance_threshold": 0.1,
+        "min_trade_amount": 25.0,
+        "max_open_positions": 5,
+        "max_trades_per_day": 50,
+        "max_risk_per_trade": 0.01,
+        "max_units_per_trade": 100.0,
+        "max_trade_amount": 10000.0,
+        "volatility_window": 24,
+        "target_volatility": 0.02,
+        "volatility_mode": "stddev",
+        "enable_volatility_adjustment": False,
+        "cooldown_bars": 24,
+        "daily_momentum_limit": 3.0,
+        "weekly_momentum_limit": 3.0,
+        "strategy_json": '{"name": "BTC RSI Strategy", "asset": "BTC", "entry": [{"name": "rsi_oversold", "timeframe": "1h", "signal_type": "TRIGGER", "params": {"window": 14, "threshold": 30}}, {"name": "is_above_sma", "timeframe": "1h", "signal_type": "FILTER", "params": {"window": 50}}], "exit": []}'
+    }
+)
+metrics = backtest.json().get("metrics", {})
+print(f"Sharpe Ratio: {metrics.get('sharpe_ratio')}")
+print(f"Win Rate: {metrics.get('win_rate')}")
+print(f"Max Drawdown: {metrics.get('max_drawdown')}")
+```
+</CodeGroup>
+
+The response includes performance metrics (Sharpe ratio, Sortino ratio, max drawdown, win rate) and trade history.
+
+## Next Steps
+
+- **[Authentication](/authentication)** -- Learn about API keys, JWT tokens, and the full auth flow
+- **[Signals API](/api-reference/signals)** -- Explore all 136 signals with parameter details
+- **[Strategies API](/api-reference/strategies)** -- Full strategy CRUD operations
+- **[AI Copilot](/api-reference/ai-copilot)** -- Use the conversational AI to build strategies
+- **[Signal Architecture](/guides/signal-architecture)** -- Understand TRIGGER vs FILTER signal design

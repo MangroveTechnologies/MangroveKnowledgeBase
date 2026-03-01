@@ -38,3 +38,8 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Generated Mintlify files (built by scripts/)
+docs/knowledge-base-source/
+docs/mint.json
+docs/.mintlify/

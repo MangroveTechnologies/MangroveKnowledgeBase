@@ -1,0 +1,6389 @@
+---
+title: "Signal Catalog"
+description: "Complete reference for all 136 trading signals"
+---
+
+# Signal Catalog
+
+Complete reference for all **136** trading signals 
+(66 TRIGGER, 70 FILTER) organized by category.
+
+See [Signals Overview](/signals/overview) for an introduction to how signals work.
+
+## Summary
+
+| Name | Type | Category | Requires |
+|------|------|----------|----------|
+| [`ao_bearish`](#ao-bearish) | FILTER | Momentum | High, Low |
+| [`ao_bullish`](#ao-bullish) | FILTER | Momentum | High, Low |
+| [`ao_zero_cross`](#ao-zero-cross) | TRIGGER | Momentum | High, Low |
+| [`kama_cross_down`](#kama-cross-down) | TRIGGER | Momentum | Close |
+| [`kama_cross_up`](#kama-cross-up) | TRIGGER | Momentum | Close |
+| [`ppo_bearish_cross`](#ppo-bearish-cross) | TRIGGER | Momentum | Close |
+| [`ppo_bullish_cross`](#ppo-bullish-cross) | TRIGGER | Momentum | Close |
+| [`pvo_bearish_cross`](#pvo-bearish-cross) | TRIGGER | Momentum | Volume |
+| [`pvo_bullish_cross`](#pvo-bullish-cross) | TRIGGER | Momentum | Volume |
+| [`roc_momentum_shift`](#roc-momentum-shift) | TRIGGER | Momentum | Close |
+| [`roc_negative`](#roc-negative) | FILTER | Momentum | Close |
+| [`roc_positive`](#roc-positive) | FILTER | Momentum | Close |
+| [`rsi_cross_down`](#rsi-cross-down) | TRIGGER | Momentum | Close |
+| [`rsi_cross_up`](#rsi-cross-up) | TRIGGER | Momentum | Close |
+| [`rsi_overbought`](#rsi-overbought) | FILTER | Momentum | Close |
+| [`rsi_oversold`](#rsi-oversold) | FILTER | Momentum | Close |
+| [`stoch_overbought`](#stoch-overbought) | FILTER | Momentum | High, Low, Close |
+| [`stoch_oversold`](#stoch-oversold) | FILTER | Momentum | High, Low, Close |
+| [`stochrsi_overbought`](#stochrsi-overbought) | FILTER | Momentum | Close |
+| [`stochrsi_oversold`](#stochrsi-oversold) | FILTER | Momentum | Close |
+| [`tsi_bearish`](#tsi-bearish) | FILTER | Momentum | Close |
+| [`tsi_bullish`](#tsi-bullish) | FILTER | Momentum | Close |
+| [`uo_overbought`](#uo-overbought) | FILTER | Momentum | High, Low, Close |
+| [`uo_oversold`](#uo-oversold) | FILTER | Momentum | High, Low, Close |
+| [`williams_r_overbought`](#williams-r-overbought) | FILTER | Momentum | High, Low, Close |
+| [`williams_r_oversold`](#williams-r-oversold) | FILTER | Momentum | High, Low, Close |
+| [`adx_bullish_di`](#adx-bullish-di) | FILTER | Trend | High, Low, Close |
+| [`adx_strong_trend`](#adx-strong-trend) | FILTER | Trend | High, Low, Close |
+| [`aroon_crossover`](#aroon-crossover) | TRIGGER | Trend | High, Low |
+| [`aroon_down_trend`](#aroon-down-trend) | FILTER | Trend | High, Low |
+| [`aroon_up_trend`](#aroon-up-trend) | FILTER | Trend | High, Low |
+| [`cci_overbought`](#cci-overbought) | FILTER | Trend | High, Low, Close |
+| [`cci_oversold`](#cci-oversold) | FILTER | Trend | High, Low, Close |
+| [`dpo_negative`](#dpo-negative) | FILTER | Trend | Close |
+| [`dpo_positive`](#dpo-positive) | FILTER | Trend | Close |
+| [`ema_cross_down`](#ema-cross-down) | TRIGGER | Trend | Close |
+| [`ema_cross_up`](#ema-cross-up) | TRIGGER | Trend | Close |
+| [`ema_crossover`](#ema-crossover) | TRIGGER | Trend | Close |
+| [`ichimoku_bearish`](#ichimoku-bearish) | FILTER | Trend | High, Low |
+| [`ichimoku_bullish`](#ichimoku-bullish) | FILTER | Trend | High, Low |
+| [`ichimoku_tk_cross`](#ichimoku-tk-cross) | TRIGGER | Trend | High, Low |
+| [`is_above_sma`](#is-above-sma) | FILTER | Trend | Close |
+| [`kst_bearish_cross`](#kst-bearish-cross) | TRIGGER | Trend | Close |
+| [`kst_bullish_cross`](#kst-bullish-cross) | TRIGGER | Trend | Close |
+| [`macd_bearish_cross`](#macd-bearish-cross) | TRIGGER | Trend | Close |
+| [`macd_bullish_cross`](#macd-bullish-cross) | TRIGGER | Trend | Close |
+| [`macd_positive`](#macd-positive) | FILTER | Trend | Close |
+| [`mass_reversal_signal`](#mass-reversal-signal) | TRIGGER | Trend | High, Low |
+| [`price_above_ema`](#price-above-ema) | FILTER | Trend | Close |
+| [`psar_bearish`](#psar-bearish) | FILTER | Trend | High, Low, Close |
+| [`psar_bullish`](#psar-bullish) | FILTER | Trend | High, Low, Close |
+| [`psar_reversal`](#psar-reversal) | TRIGGER | Trend | High, Low, Close |
+| [`sma_cross_down`](#sma-cross-down) | TRIGGER | Trend | Close |
+| [`sma_cross_up`](#sma-cross-up) | TRIGGER | Trend | Close |
+| [`sma_crossover`](#sma-crossover) | TRIGGER | Trend | Close |
+| [`stc_overbought`](#stc-overbought) | FILTER | Trend | Close |
+| [`stc_oversold`](#stc-oversold) | FILTER | Trend | Close |
+| [`trix_bearish`](#trix-bearish) | FILTER | Trend | Close |
+| [`trix_bullish`](#trix-bullish) | FILTER | Trend | Close |
+| [`vortex_bearish`](#vortex-bearish) | FILTER | Trend | High, Low, Close |
+| [`vortex_bullish`](#vortex-bullish) | FILTER | Trend | High, Low, Close |
+| [`vortex_crossover`](#vortex-crossover) | TRIGGER | Trend | High, Low, Close |
+| [`wma_cross_down`](#wma-cross-down) | TRIGGER | Trend | Close |
+| [`wma_cross_up`](#wma-cross-up) | TRIGGER | Trend | Close |
+| [`adi_bearish`](#adi-bearish) | FILTER | Volume | High, Low, Close, Volume |
+| [`adi_bullish`](#adi-bullish) | FILTER | Volume | High, Low, Close, Volume |
+| [`cmf_bearish`](#cmf-bearish) | FILTER | Volume | High, Low, Close, Volume |
+| [`cmf_bullish`](#cmf-bullish) | FILTER | Volume | High, Low, Close, Volume |
+| [`cumulative_return_positive`](#cumulative-return-positive) | FILTER | Volume | Close |
+| [`cumulative_return_target`](#cumulative-return-target) | FILTER | Volume | Close |
+| [`daily_return_negative`](#daily-return-negative) | FILTER | Volume | Close |
+| [`daily_return_positive`](#daily-return-positive) | FILTER | Volume | Close |
+| [`eom_bearish`](#eom-bearish) | FILTER | Volume | High, Low, Volume |
+| [`eom_bullish`](#eom-bullish) | FILTER | Volume | High, Low, Volume |
+| [`force_bearish`](#force-bearish) | FILTER | Volume | Close, Volume |
+| [`force_bullish`](#force-bullish) | FILTER | Volume | Close, Volume |
+| [`mfi_overbought`](#mfi-overbought) | FILTER | Volume | High, Low, Close, Volume |
+| [`mfi_oversold`](#mfi-oversold) | FILTER | Volume | High, Low, Close, Volume |
+| [`nvi_bearish`](#nvi-bearish) | FILTER | Volume | Close, Volume |
+| [`nvi_bullish`](#nvi-bullish) | FILTER | Volume | Close, Volume |
+| [`obv_bearish`](#obv-bearish) | FILTER | Volume | Close, Volume |
+| [`obv_bullish`](#obv-bullish) | FILTER | Volume | Close, Volume |
+| [`vpt_bearish`](#vpt-bearish) | FILTER | Volume | Close, Volume |
+| [`vpt_bullish`](#vpt-bullish) | FILTER | Volume | Close, Volume |
+| [`vwap_above`](#vwap-above) | FILTER | Volume | High, Low, Close, Volume |
+| [`vwap_below`](#vwap-below) | FILTER | Volume | High, Low, Close, Volume |
+| [`atr_high_volatility`](#atr-high-volatility) | FILTER | Volatility | High, Low, Close |
+| [`bb_lower_breakout`](#bb-lower-breakout) | TRIGGER | Volatility | Close |
+| [`bb_squeeze`](#bb-squeeze) | TRIGGER | Volatility | Close |
+| [`bb_upper_breakout`](#bb-upper-breakout) | TRIGGER | Volatility | Close |
+| [`dc_lower_breakout`](#dc-lower-breakout) | TRIGGER | Volatility | High, Low, Close |
+| [`dc_upper_breakout`](#dc-upper-breakout) | TRIGGER | Volatility | High, Low, Close |
+| [`kc_lower_breakout`](#kc-lower-breakout) | TRIGGER | Volatility | High, Low, Close |
+| [`kc_upper_breakout`](#kc-upper-breakout) | TRIGGER | Volatility | High, Low, Close |
+| [`ulcer_high_risk`](#ulcer-high-risk) | FILTER | Volatility | Close |
+| [`ulcer_low_risk`](#ulcer-low-risk) | FILTER | Volatility | Close |
+| [`bearish_engulfing_trigger`](#bearish-engulfing-trigger) | TRIGGER | Patterns | Open, Close |
+| [`bearish_harami_trigger`](#bearish-harami-trigger) | TRIGGER | Patterns | Open, Close |
+| [`bearish_pattern_recent`](#bearish-pattern-recent) | FILTER | Patterns | Open, High, Low, Close |
+| [`bearish_pin_bar_trigger`](#bearish-pin-bar-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`bullish_engulfing_trigger`](#bullish-engulfing-trigger) | TRIGGER | Patterns | Open, Close |
+| [`bullish_harami_trigger`](#bullish-harami-trigger) | TRIGGER | Patterns | Open, Close |
+| [`bullish_pattern_recent`](#bullish-pattern-recent) | FILTER | Patterns | Open, High, Low, Close |
+| [`bullish_pin_bar_trigger`](#bullish-pin-bar-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`continuation_pattern_bearish`](#continuation-pattern-bearish) | FILTER | Patterns | Open, High, Low, Close |
+| [`continuation_pattern_bullish`](#continuation-pattern-bullish) | FILTER | Patterns | Open, High, Low, Close |
+| [`dark_cloud_cover_trigger`](#dark-cloud-cover-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`doji_trigger`](#doji-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`dragonfly_doji_trigger`](#dragonfly-doji-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`evening_star_trigger`](#evening-star-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`gravestone_doji_trigger`](#gravestone-doji-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`hammer_trigger`](#hammer-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`hanging_man_trigger`](#hanging-man-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`indecision_pattern_recent`](#indecision-pattern-recent) | FILTER | Patterns | Open, High, Low, Close |
+| [`inside_bar_trigger`](#inside-bar-trigger) | TRIGGER | Patterns | High, Low |
+| [`inverted_hammer_trigger`](#inverted-hammer-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`long_legged_doji_trigger`](#long-legged-doji-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`marubozu_bearish_trigger`](#marubozu-bearish-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`marubozu_bullish_trigger`](#marubozu-bullish-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`morning_star_trigger`](#morning-star-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`nr7_trigger`](#nr7-trigger) | TRIGGER | Patterns | High, Low |
+| [`outside_bar_trigger`](#outside-bar-trigger) | TRIGGER | Patterns | High, Low |
+| [`piercing_line_trigger`](#piercing-line-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`reversal_pattern_bearish`](#reversal-pattern-bearish) | FILTER | Patterns | Open, High, Low, Close |
+| [`reversal_pattern_bullish`](#reversal-pattern-bullish) | FILTER | Patterns | Open, High, Low, Close |
+| [`shooting_star_trigger`](#shooting-star-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`spinning_top_trigger`](#spinning-top-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`strong_body_recent`](#strong-body-recent) | FILTER | Patterns | Open, High, Low, Close |
+| [`three_black_crows_trigger`](#three-black-crows-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`three_inside_down_trigger`](#three-inside-down-trigger) | TRIGGER | Patterns | Open, Close |
+| [`three_inside_up_trigger`](#three-inside-up-trigger) | TRIGGER | Patterns | Open, Close |
+| [`three_white_soldiers_trigger`](#three-white-soldiers-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`tweezer_bottoms_trigger`](#tweezer-bottoms-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`tweezer_tops_trigger`](#tweezer-tops-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`two_bar_reversal_bearish_trigger`](#two-bar-reversal-bearish-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`two_bar_reversal_bullish_trigger`](#two-bar-reversal-bullish-trigger) | TRIGGER | Patterns | Open, High, Low, Close |
+
+---
+
+## Momentum Signals
+
+_26 signals in this category._
+
+### ao_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Awesome Oscillator indicates bearish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 15 | `5` | Fast SMA window |
+| `window_slow` | `int` | 20 -- 60 | `34` | Slow SMA window |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ao_bearish",
+    "parameters": {
+        "window_fast": 5,
+        "window_slow": 34,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ao_bearish",
+  "parameters": {
+    "window_fast": 5,
+    "window_slow": 34,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### ao_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Awesome Oscillator indicates bullish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 15 | `5` | Fast SMA window |
+| `window_slow` | `int` | 20 -- 60 | `34` | Slow SMA window |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ao_bullish",
+    "parameters": {
+        "window_fast": 5,
+        "window_slow": 34,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ao_bullish",
+  "parameters": {
+    "window_fast": 5,
+    "window_slow": 34,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### ao_zero_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Awesome Oscillator crosses zero line.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 15 | `5` | Fast SMA window |
+| `window_slow` | `int` | 20 -- 60 | `34` | Slow SMA window |
+| `direction` | `str` | - | `bullish` | Direction: 'bullish' for cross above, 'bearish' for cross below |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ao_zero_cross",
+    "parameters": {
+        "window_fast": 5,
+        "window_slow": 34,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ao_zero_cross",
+  "parameters": {
+    "window_fast": 5,
+    "window_slow": 34,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### kama_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if price crosses below KAMA (bearish signal).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `10` | Efficiency ratio period |
+| `pow1` | `int` | 1 -- 10 | `2` | Fast smoothing constant |
+| `pow2` | `int` | 10 -- 50 | `30` | Slow smoothing constant |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "kama_cross_down",
+    "parameters": {
+        "window": 10,
+        "pow1": 2,
+        "pow2": 30
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kama_cross_down",
+  "parameters": {
+    "window": 10,
+    "pow1": 2,
+    "pow2": 30
+  }
+}'
+```
+
+</CodeGroup>
+
+### kama_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if price crosses above KAMA (bullish signal).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `10` | Efficiency ratio period |
+| `pow1` | `int` | 1 -- 10 | `2` | Fast smoothing constant |
+| `pow2` | `int` | 10 -- 50 | `30` | Slow smoothing constant |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "kama_cross_up",
+    "parameters": {
+        "window": 10,
+        "pow1": 2,
+        "pow2": 30
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kama_cross_up",
+  "parameters": {
+    "window": 10,
+    "pow1": 2,
+    "pow2": 30
+  }
+}'
+```
+
+</CodeGroup>
+
+### ppo_bearish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if PPO crosses below signal line (bearish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 15 -- 50 | `26` | Slow EMA period |
+| `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
+| `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ppo_bearish_cross",
+    "parameters": {
+        "window_slow": 26,
+        "window_fast": 12,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ppo_bearish_cross",
+  "parameters": {
+    "window_slow": 26,
+    "window_fast": 12,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### ppo_bullish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if PPO crosses above signal line (bullish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 15 -- 50 | `26` | Slow EMA period |
+| `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
+| `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ppo_bullish_cross",
+    "parameters": {
+        "window_slow": 26,
+        "window_fast": 12,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ppo_bullish_cross",
+  "parameters": {
+    "window_slow": 26,
+    "window_fast": 12,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### pvo_bearish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Volume
+
+Check if PVO crosses below signal line (bearish volume).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 15 -- 50 | `26` | Slow EMA period |
+| `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
+| `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "pvo_bearish_cross",
+    "parameters": {
+        "window_slow": 26,
+        "window_fast": 12,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "pvo_bearish_cross",
+  "parameters": {
+    "window_slow": 26,
+    "window_fast": 12,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### pvo_bullish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Volume
+
+Check if PVO crosses above signal line (bullish volume).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 15 -- 50 | `26` | Slow EMA period |
+| `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
+| `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "pvo_bullish_cross",
+    "parameters": {
+        "window_slow": 26,
+        "window_fast": 12,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "pvo_bullish_cross",
+  "parameters": {
+    "window_slow": 26,
+    "window_fast": 12,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### roc_momentum_shift
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if ROC crosses zero (momentum shift).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 1 -- 50 | `12` | ROC period |
+| `direction` | `str` | - | `bullish` | Direction: 'bullish' for cross above zero, 'bearish' for cross below |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "roc_momentum_shift",
+    "parameters": {
+        "window": 12,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "roc_momentum_shift",
+  "parameters": {
+    "window": 12,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### roc_negative
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Rate of Change indicates negative momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 1 -- 50 | `12` | ROC period |
+| `threshold` | `float` | -10.0 -- 10.0 | `0.0` | Negative momentum threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "roc_negative",
+    "parameters": {
+        "window": 12,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "roc_negative",
+  "parameters": {
+    "window": 12,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### roc_positive
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Rate of Change indicates positive momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 1 -- 50 | `12` | ROC period |
+| `threshold` | `float` | -10.0 -- 10.0 | `0.0` | Positive momentum threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "roc_positive",
+    "parameters": {
+        "window": 12,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "roc_positive",
+  "parameters": {
+    "window": 12,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if RSI crosses below a threshold level. Returns True when RSI was at or above the threshold in the previous bar and is now below the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
+| `threshold` | `float` | 0.0 -- 100.0 | `50.0` | Threshold level to cross below |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "rsi_cross_down",
+    "parameters": {
+        "window": 14,
+        "threshold": 50.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_cross_down",
+  "parameters": {
+    "window": 14,
+    "threshold": 50.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if RSI crosses above a threshold level. Returns True when RSI was at or below the threshold in the previous bar and is now above the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
+| `threshold` | `float` | 0.0 -- 100.0 | `50.0` | Threshold level to cross above |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "rsi_cross_up",
+    "parameters": {
+        "window": 14,
+        "threshold": 50.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_cross_up",
+  "parameters": {
+    "window": 14,
+    "threshold": 50.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if RSI is above the overbought threshold. RSI values above 70 typically indicate overbought conditions, suggesting the asset may be due for a pullback. In crypto markets, consider higher thresholds (80/20) during strong trends.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
+| `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "rsi_overbought",
+    "parameters": {
+        "window": 14,
+        "threshold": 70.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_overbought",
+  "parameters": {
+    "window": 14,
+    "threshold": 70.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if RSI is below the oversold threshold. RSI values below 30 typically indicate oversold conditions, suggesting the asset may be due for a bounce. In crypto markets, consider higher thresholds (80/20) during strong trends.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
+| `threshold` | `float` | 0.0 -- 50.0 | `30.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "rsi_oversold",
+    "parameters": {
+        "window": 14,
+        "threshold": 30.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_oversold",
+  "parameters": {
+    "window": 14,
+    "threshold": 30.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### stoch_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Stochastic %K is above the overbought threshold.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | %K period |
+| `smooth_window` | `int` | 1 -- 10 | `3` | %K smoothing period |
+| `threshold` | `float` | 70.0 -- 100.0 | `80.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "stoch_overbought",
+    "parameters": {
+        "window": 14,
+        "smooth_window": 3,
+        "threshold": 80.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stoch_overbought",
+  "parameters": {
+    "window": 14,
+    "smooth_window": 3,
+    "threshold": 80.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### stoch_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Stochastic %K is below the oversold threshold.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | %K period |
+| `smooth_window` | `int` | 1 -- 10 | `3` | %K smoothing period |
+| `threshold` | `float` | 0.0 -- 30.0 | `20.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "stoch_oversold",
+    "parameters": {
+        "window": 14,
+        "smooth_window": 3,
+        "threshold": 20.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stoch_oversold",
+  "parameters": {
+    "window": 14,
+    "smooth_window": 3,
+    "threshold": 20.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### stochrsi_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Stochastic RSI indicates overbought condition. In crypto markets, consider adjusting thresholds during strong trends.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | RSI period |
+| `smooth1` | `int` | 1 -- 10 | `3` | Stochastic %K smoothing |
+| `smooth2` | `int` | 1 -- 10 | `3` | Stochastic %D smoothing |
+| `threshold` | `float` | 0.6 -- 1.0 | `0.8` | Overbought threshold (0-1 scale) |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "stochrsi_overbought",
+    "parameters": {
+        "window": 14,
+        "smooth1": 3,
+        "smooth2": 3,
+        "threshold": 0.8
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stochrsi_overbought",
+  "parameters": {
+    "window": 14,
+    "smooth1": 3,
+    "smooth2": 3,
+    "threshold": 0.8
+  }
+}'
+```
+
+</CodeGroup>
+
+### stochrsi_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Stochastic RSI indicates oversold condition. In crypto markets, consider adjusting thresholds during strong trends.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | RSI period |
+| `smooth1` | `int` | 1 -- 10 | `3` | Stochastic %K smoothing |
+| `smooth2` | `int` | 1 -- 10 | `3` | Stochastic %D smoothing |
+| `threshold` | `float` | 0.0 -- 0.4 | `0.2` | Oversold threshold (0-1 scale) |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "stochrsi_oversold",
+    "parameters": {
+        "window": 14,
+        "smooth1": 3,
+        "smooth2": 3,
+        "threshold": 0.2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stochrsi_oversold",
+  "parameters": {
+    "window": 14,
+    "smooth1": 3,
+    "smooth2": 3,
+    "threshold": 0.2
+  }
+}'
+```
+
+</CodeGroup>
+
+### tsi_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if True Strength Index indicates bearish momentum. TSI below zero indicates bearish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 10 -- 50 | `25` | Slow EMA period |
+| `window_fast` | `int` | 5 -- 25 | `13` | Fast EMA period |
+| `threshold` | `float` | -50.0 -- 50.0 | `0.0` | Bearish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "tsi_bearish",
+    "parameters": {
+        "window_slow": 25,
+        "window_fast": 13,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "tsi_bearish",
+  "parameters": {
+    "window_slow": 25,
+    "window_fast": 13,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### tsi_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if True Strength Index indicates bullish momentum. TSI above zero indicates bullish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 10 -- 50 | `25` | Slow EMA period |
+| `window_fast` | `int` | 5 -- 25 | `13` | Fast EMA period |
+| `threshold` | `float` | -50.0 -- 50.0 | `0.0` | Bullish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "tsi_bullish",
+    "parameters": {
+        "window_slow": 25,
+        "window_fast": 13,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "tsi_bullish",
+  "parameters": {
+    "window_slow": 25,
+    "window_fast": 13,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### uo_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Ultimate Oscillator indicates overbought condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_short` | `int` | 3 -- 20 | `7` | Short window |
+| `window_medium` | `int` | 7 -- 30 | `14` | Medium window |
+| `window_long` | `int` | 14 -- 50 | `28` | Long window |
+| `threshold` | `float` | 60.0 -- 90.0 | `70.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "uo_overbought",
+    "parameters": {
+        "window_short": 7,
+        "window_medium": 14,
+        "window_long": 28,
+        "threshold": 70.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "uo_overbought",
+  "parameters": {
+    "window_short": 7,
+    "window_medium": 14,
+    "window_long": 28,
+    "threshold": 70.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### uo_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Ultimate Oscillator indicates oversold condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_short` | `int` | 3 -- 20 | `7` | Short window |
+| `window_medium` | `int` | 7 -- 30 | `14` | Medium window |
+| `window_long` | `int` | 14 -- 50 | `28` | Long window |
+| `threshold` | `float` | 10.0 -- 40.0 | `30.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "uo_oversold",
+    "parameters": {
+        "window_short": 7,
+        "window_medium": 14,
+        "window_long": 28,
+        "threshold": 30.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "uo_oversold",
+  "parameters": {
+    "window_short": 7,
+    "window_medium": 14,
+    "window_long": 28,
+    "threshold": 30.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### williams_r_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Williams %R is above the overbought threshold. Williams %R ranges from -100 to 0. Values above -20 indicate overbought.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | Lookback window |
+| `threshold` | `float` | -30.0 -- 0.0 | `-20.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "williams_r_overbought",
+    "parameters": {
+        "window": 14,
+        "threshold": -20.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "williams_r_overbought",
+  "parameters": {
+    "window": 14,
+    "threshold": -20.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### williams_r_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Williams %R is below the oversold threshold. Williams %R ranges from -100 to 0. Values below -80 indicate oversold.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | Lookback window |
+| `threshold` | `float` | -100.0 -- -70.0 | `-80.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "williams_r_oversold",
+    "parameters": {
+        "window": 14,
+        "threshold": -80.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "williams_r_oversold",
+  "parameters": {
+    "window": 14,
+    "threshold": -80.0
+  }
+}'
+```
+
+</CodeGroup>
+
+---
+
+## Trend Signals
+
+_38 signals in this category._
+
+### adx_bullish_di
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if +DI is greater than -DI (bullish directional movement). When +DI &gt; -DI, bulls have the upper hand.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | ADX period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "adx_bullish_di",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "adx_bullish_di",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### adx_strong_trend
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if ADX indicates a strong trend. ADX values above 25 typically indicate a strong trend (either up or down).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | ADX period |
+| `threshold` | `float` | 15.0 -- 50.0 | `25.0` | Trend strength threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "adx_strong_trend",
+    "parameters": {
+        "window": 14,
+        "threshold": 25.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "adx_strong_trend",
+  "parameters": {
+    "window": 14,
+    "threshold": 25.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### aroon_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Aroon lines cross (trend change signal).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `25` | Lookback period |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "aroon_crossover",
+    "parameters": {
+        "window": 25,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "aroon_crossover",
+  "parameters": {
+    "window": 25,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### aroon_down_trend
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Aroon Down indicates strong downtrend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `25` | Lookback period |
+| `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Strong trend threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "aroon_down_trend",
+    "parameters": {
+        "window": 25,
+        "threshold": 70.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "aroon_down_trend",
+  "parameters": {
+    "window": 25,
+    "threshold": 70.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### aroon_up_trend
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Aroon Up indicates strong uptrend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `25` | Lookback period |
+| `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Strong trend threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "aroon_up_trend",
+    "parameters": {
+        "window": 25,
+        "threshold": 70.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "aroon_up_trend",
+  "parameters": {
+    "window": 25,
+    "threshold": 70.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### cci_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if CCI indicates overbought condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | CCI period |
+| `constant` | `float` | 0.001 -- 0.1 | `0.015` | CCI constant |
+| `threshold` | `float` | 50.0 -- 200.0 | `100.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "cci_overbought",
+    "parameters": {
+        "window": 20,
+        "constant": 0.015,
+        "threshold": 100.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cci_overbought",
+  "parameters": {
+    "window": 20,
+    "constant": 0.015,
+    "threshold": 100.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### cci_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if CCI indicates oversold condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | CCI period |
+| `constant` | `float` | 0.001 -- 0.1 | `0.015` | CCI constant |
+| `threshold` | `float` | -200.0 -- -50.0 | `-100.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "cci_oversold",
+    "parameters": {
+        "window": 20,
+        "constant": 0.015,
+        "threshold": -100.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cci_oversold",
+  "parameters": {
+    "window": 20,
+    "constant": 0.015,
+    "threshold": -100.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### dpo_negative
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if DPO is negative (price below detrended average).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | DPO period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "dpo_negative",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dpo_negative",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### dpo_positive
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if DPO is positive (price above detrended average).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | DPO period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "dpo_positive",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dpo_positive",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### ema_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast EMA window |
+| `window_slow` | `int` | 5 -- 200 | `21` | Slow EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ema_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ema_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### ema_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast EMA window |
+| `window_slow` | `int` | 5 -- 200 | `21` | Slow EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ema_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ema_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### ema_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect an EMA crossover signal with configurable direction (bullish or bearish). Uses EMA indicator to calculate window_fast and window_slow EMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover: window_fast EMA crosses above window_slow EMA Bearish crossover: window_fast EMA crosses below window_slow EMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast &lt;= prev window_slow AND current window_fast &gt; current window_slow - Bearish: prev window_fast &gt;= prev window_slow AND current window_fast &lt; current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 500 | _required_ | Fast EMA window in bars |
+| `window_slow` | `int` | 1 -- 1000 | _required_ | Slow EMA window in bars |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ema_crossover",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ema_crossover",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### ichimoku_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Ichimoku indicates bearish signal (price below cloud).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_tenkan` | `int` | 5 -- 20 | `9` | Tenkan-sen (conversion line) window |
+| `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
+| `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ichimoku_bearish",
+    "parameters": {
+        "window_tenkan": 9,
+        "window_kijun": 26,
+        "window_senkou": 52
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ichimoku_bearish",
+  "parameters": {
+    "window_tenkan": 9,
+    "window_kijun": 26,
+    "window_senkou": 52
+  }
+}'
+```
+
+</CodeGroup>
+
+### ichimoku_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Ichimoku indicates bullish signal (price above cloud).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_tenkan` | `int` | 5 -- 20 | `9` | Tenkan-sen (conversion line) window |
+| `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
+| `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ichimoku_bullish",
+    "parameters": {
+        "window_tenkan": 9,
+        "window_kijun": 26,
+        "window_senkou": 52
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ichimoku_bullish",
+  "parameters": {
+    "window_tenkan": 9,
+    "window_kijun": 26,
+    "window_senkou": 52
+  }
+}'
+```
+
+</CodeGroup>
+
+### ichimoku_tk_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Tenkan-sen crosses Kijun-sen (TK cross).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_tenkan` | `int` | 5 -- 20 | `9` | Tenkan-sen (conversion line) window |
+| `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
+| `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ichimoku_tk_cross",
+    "parameters": {
+        "window_tenkan": 9,
+        "window_kijun": 26,
+        "window_senkou": 52,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ichimoku_tk_cross",
+  "parameters": {
+    "window_tenkan": 9,
+    "window_kijun": 26,
+    "window_senkou": 52,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_sma
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Simple Moving Average. Uses SMA indicator to calculate the SMA for the given window and returns True if the most recent close price is strictly greater than the SMA value. Returns False if insufficient data is available. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 1 -- 1000 | _required_ | SMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "is_above_sma",
+    "parameters": {
+        "window": 1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_sma",
+  "parameters": {
+    "window": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+### kst_bearish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if KST crosses below signal line (bearish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `roc1` | `int` | 1 -- 1000 | `10` | ROC1 period |
+| `roc2` | `int` | 1 -- 1000 | `15` | ROC2 period |
+| `roc3` | `int` | 1 -- 1000 | `20` | ROC3 period |
+| `roc4` | `int` | 1 -- 1000 | `30` | ROC4 period |
+| `window_sma1` | `int` | 2 -- 500 | `10` | SMA1 smoothing window for ROC1 |
+| `window_sma2` | `int` | 2 -- 500 | `10` | SMA2 smoothing window for ROC2 |
+| `window_sma3` | `int` | 2 -- 500 | `10` | SMA3 smoothing window for ROC3 |
+| `window_sma4` | `int` | 2 -- 500 | `15` | SMA4 smoothing window for ROC4 |
+| `nsig` | `int` | 1 -- 1000 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "kst_bearish_cross",
+    "parameters": {
+        "roc1": 10,
+        "roc2": 15,
+        "roc3": 20,
+        "roc4": 30,
+        "window_sma1": 10,
+        "window_sma2": 10,
+        "window_sma3": 10,
+        "window_sma4": 15,
+        "nsig": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kst_bearish_cross",
+  "parameters": {
+    "roc1": 10,
+    "roc2": 15,
+    "roc3": 20,
+    "roc4": 30,
+    "window_sma1": 10,
+    "window_sma2": 10,
+    "window_sma3": 10,
+    "window_sma4": 15,
+    "nsig": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### kst_bullish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if KST crosses above signal line (bullish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `roc1` | `int` | 1 -- 1000 | `10` | ROC1 period |
+| `roc2` | `int` | 1 -- 1000 | `15` | ROC2 period |
+| `roc3` | `int` | 1 -- 1000 | `20` | ROC3 period |
+| `roc4` | `int` | 1 -- 1000 | `30` | ROC4 period |
+| `window_sma1` | `int` | 2 -- 500 | `10` | SMA1 smoothing window for ROC1 |
+| `window_sma2` | `int` | 2 -- 500 | `10` | SMA2 smoothing window for ROC2 |
+| `window_sma3` | `int` | 2 -- 500 | `10` | SMA3 smoothing window for ROC3 |
+| `window_sma4` | `int` | 2 -- 500 | `15` | SMA4 smoothing window for ROC4 |
+| `nsig` | `int` | 1 -- 1000 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "kst_bullish_cross",
+    "parameters": {
+        "roc1": 10,
+        "roc2": 15,
+        "roc3": 20,
+        "roc4": 30,
+        "window_sma1": 10,
+        "window_sma2": 10,
+        "window_sma3": 10,
+        "window_sma4": 15,
+        "nsig": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kst_bullish_cross",
+  "parameters": {
+    "roc1": 10,
+    "roc2": 15,
+    "roc3": 20,
+    "roc4": 30,
+    "window_sma1": 10,
+    "window_sma2": 10,
+    "window_sma3": 10,
+    "window_sma4": 15,
+    "nsig": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### macd_bearish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect MACD bearish crossover (MACD line crosses below signal line). A bearish MACD crossover occurs when the MACD line crosses below the signal line, indicating potential downward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `12` | Fast EMA window |
+| `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
+| `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "macd_bearish_cross",
+    "parameters": {
+        "window_fast": 12,
+        "window_slow": 26,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "macd_bearish_cross",
+  "parameters": {
+    "window_fast": 12,
+    "window_slow": 26,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### macd_bullish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect MACD bullish crossover (MACD line crosses above signal line). A bullish MACD crossover occurs when the MACD line crosses above the signal line, indicating potential upward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `12` | Fast EMA window |
+| `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
+| `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "macd_bullish_cross",
+    "parameters": {
+        "window_fast": 12,
+        "window_slow": 26,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "macd_bullish_cross",
+  "parameters": {
+    "window_fast": 12,
+    "window_slow": 26,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### macd_positive
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `12` | Fast EMA window |
+| `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
+| `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "macd_positive",
+    "parameters": {
+        "window_fast": 12,
+        "window_slow": 26,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "macd_positive",
+  "parameters": {
+    "window_fast": 12,
+    "window_slow": 26,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### mass_reversal_signal
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Mass Index signals potential reversal (reversal bulge). A reversal bulge occurs when Mass Index rises above 27 then falls below 26.5.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 5 -- 15 | `9` | Fast EMA period |
+| `window_slow` | `int` | 15 -- 40 | `25` | Sum period |
+| `threshold_high` | `float` | 25.0 -- 30.0 | `27.0` | Upper threshold |
+| `threshold_low` | `float` | 24.0 -- 27.0 | `26.5` | Lower threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "mass_reversal_signal",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 25,
+        "threshold_high": 27.0,
+        "threshold_low": 26.5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "mass_reversal_signal",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 25,
+    "threshold_high": 27.0,
+    "threshold_low": 26.5
+  }
+}'
+```
+
+</CodeGroup>
+
+### price_above_ema
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `20` | EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "price_above_ema",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "price_above_ema",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### psar_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if PSAR indicates bearish trend (PSAR above price).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
+| `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "psar_bearish",
+    "parameters": {
+        "step": 0.02,
+        "max_step": 0.2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "psar_bearish",
+  "parameters": {
+    "step": 0.02,
+    "max_step": 0.2
+  }
+}'
+```
+
+</CodeGroup>
+
+### psar_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if PSAR indicates bullish trend (PSAR below price).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
+| `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "psar_bullish",
+    "parameters": {
+        "step": 0.02,
+        "max_step": 0.2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "psar_bullish",
+  "parameters": {
+    "step": 0.02,
+    "max_step": 0.2
+  }
+}'
+```
+
+</CodeGroup>
+
+### psar_reversal
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if PSAR flips sides (potential reversal).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
+| `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
+| `direction` | `str` | - | `bullish` | Reversal direction, 'bullish' (flip to below price) or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "psar_reversal",
+    "parameters": {
+        "step": 0.02,
+        "max_step": 0.2,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "psar_reversal",
+  "parameters": {
+    "step": 0.02,
+    "max_step": 0.2,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### sma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish SMA crossover as an exit signal. Returns True when the window_fast SMA crosses below the window_slow SMA (death cross). This is a momentum-driven exit signal, indicating a transition from bullish to bearish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 500 | _required_ | Fast SMA window in bars |
+| `window_slow` | `int` | 1 -- 1000 | _required_ | Slow SMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "sma_cross_down",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "sma_cross_down",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+### sma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish SMA crossover as an entry signal. Returns True when the window_fast SMA crosses above the window_slow SMA (golden cross). This is a momentum-driven entry signal, indicating a transition from bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 500 | _required_ | Fast SMA window in bars |
+| `window_slow` | `int` | 1 -- 1000 | _required_ | Slow SMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "sma_cross_up",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "sma_cross_up",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+### sma_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect an SMA crossover signal with configurable direction (bullish or bearish). Uses SMA indicator to calculate window_fast and window_slow SMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover (golden cross): window_fast SMA crosses above window_slow SMA Bearish crossover (death cross): window_fast SMA crosses below window_slow SMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast &lt;= prev window_slow AND current window_fast &gt; current window_slow - Bearish: prev window_fast &gt;= prev window_slow AND current window_fast &lt; current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 500 | _required_ | Fast SMA window in bars |
+| `window_slow` | `int` | 1 -- 1000 | _required_ | Slow SMA window in bars |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "sma_crossover",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "sma_crossover",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### stc_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if STC indicates overbought condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 2 -- 500 | `50` | Slow EMA period |
+| `window_fast` | `int` | 2 -- 500 | `23` | Fast EMA period |
+| `cycle` | `int` | 1 -- 1000 | `10` | Cycle period |
+| `smooth1` | `int` | 1 -- 1000 | `3` | First smoothing period |
+| `smooth2` | `int` | 1 -- 1000 | `3` | Second smoothing period |
+| `threshold` | `float` | 0.0 -- 100.0 | `75.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "stc_overbought",
+    "parameters": {
+        "window_slow": 50,
+        "window_fast": 23,
+        "cycle": 10,
+        "smooth1": 3,
+        "smooth2": 3,
+        "threshold": 75.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stc_overbought",
+  "parameters": {
+    "window_slow": 50,
+    "window_fast": 23,
+    "cycle": 10,
+    "smooth1": 3,
+    "smooth2": 3,
+    "threshold": 75.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### stc_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if STC indicates oversold condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 2 -- 500 | `50` | Slow EMA period |
+| `window_fast` | `int` | 2 -- 500 | `23` | Fast EMA period |
+| `cycle` | `int` | 1 -- 1000 | `10` | Cycle period |
+| `smooth1` | `int` | 1 -- 1000 | `3` | First smoothing period |
+| `smooth2` | `int` | 1 -- 1000 | `3` | Second smoothing period |
+| `threshold` | `float` | 0.0 -- 100.0 | `25.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "stc_oversold",
+    "parameters": {
+        "window_slow": 50,
+        "window_fast": 23,
+        "cycle": 10,
+        "smooth1": 3,
+        "smooth2": 3,
+        "threshold": 25.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stc_oversold",
+  "parameters": {
+    "window_slow": 50,
+    "window_fast": 23,
+    "cycle": 10,
+    "smooth1": 3,
+    "smooth2": 3,
+    "threshold": 25.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### trix_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if TRIX indicates bearish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `15` | TRIX period |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "trix_bearish",
+    "parameters": {
+        "window": 15,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "trix_bearish",
+  "parameters": {
+    "window": 15,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### trix_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if TRIX indicates bullish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `15` | TRIX period |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "trix_bullish",
+    "parameters": {
+        "window": 15,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "trix_bullish",
+  "parameters": {
+    "window": 15,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### vortex_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Vortex Indicator shows bearish trend (-VI &gt; +VI).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | Vortex period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "vortex_bearish",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vortex_bearish",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### vortex_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Vortex Indicator shows bullish trend (+VI &gt; -VI).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | Vortex period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "vortex_bullish",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vortex_bullish",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### vortex_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Vortex lines cross (trend change).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | Vortex period |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "vortex_crossover",
+    "parameters": {
+        "window": 14,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vortex_crossover",
+  "parameters": {
+    "window": 14,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### wma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if fast WMA crosses below slow WMA (bearish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `9` | Fast WMA window |
+| `window_slow` | `int` | 10 -- 100 | `21` | Slow WMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "wma_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "wma_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### wma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if fast WMA crosses above slow WMA (bullish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `9` | Fast WMA window |
+| `window_slow` | `int` | 10 -- 100 | `21` | Slow WMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "wma_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "wma_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+---
+
+## Volume Signals
+
+_22 signals in this category._
+
+### adi_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if ADI (Accumulation/Distribution) is falling (bearish volume).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "adi_bearish",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "adi_bearish",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### adi_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if ADI (Accumulation/Distribution) is rising (bullish volume).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "adi_bullish",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "adi_bullish",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### cmf_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if CMF (Chaikin Money Flow) indicates selling pressure.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | CMF period |
+| `threshold` | `float` | -1.0 -- 1.0 | `0.0` | Bearish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "cmf_bearish",
+    "parameters": {
+        "window": 20,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cmf_bearish",
+  "parameters": {
+    "window": 20,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### cmf_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if CMF (Chaikin Money Flow) indicates buying pressure.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | CMF period |
+| `threshold` | `float` | -1.0 -- 1.0 | `0.0` | Bullish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "cmf_bullish",
+    "parameters": {
+        "window": 20,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cmf_bullish",
+  "parameters": {
+    "window": 20,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### cumulative_return_positive
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if cumulative return from start is positive.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Minimum cumulative return in percent |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "cumulative_return_positive",
+    "parameters": {
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cumulative_return_positive",
+  "parameters": {
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### cumulative_return_target
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if cumulative return has reached target.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `target` | `float` | 1.0 -- 100.0 | `10.0` | Target cumulative return in percent |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "cumulative_return_target",
+    "parameters": {
+        "target": 10.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cumulative_return_target",
+  "parameters": {
+    "target": 10.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### daily_return_negative
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if daily return is negative.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Maximum return threshold in percent |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "daily_return_negative",
+    "parameters": {
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "daily_return_negative",
+  "parameters": {
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### daily_return_positive
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if daily return is positive.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Minimum return threshold in percent |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "daily_return_positive",
+    "parameters": {
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "daily_return_positive",
+  "parameters": {
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### eom_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Volume
+
+Check if Ease of Movement indicates bearish (easy downward movement).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | EOM period |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "eom_bearish",
+    "parameters": {
+        "window": 14,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "eom_bearish",
+  "parameters": {
+    "window": 14,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### eom_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Volume
+
+Check if Ease of Movement indicates bullish (easy upward movement).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | EOM period |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "eom_bullish",
+    "parameters": {
+        "window": 14,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "eom_bullish",
+  "parameters": {
+    "window": 14,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### force_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if Force Index indicates bearish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `13` | EMA period for smoothing |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "force_bearish",
+    "parameters": {
+        "window": 13,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "force_bearish",
+  "parameters": {
+    "window": 13,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### force_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if Force Index indicates bullish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `13` | EMA period for smoothing |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "force_bullish",
+    "parameters": {
+        "window": 13,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "force_bullish",
+  "parameters": {
+    "window": 13,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### mfi_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if MFI (Money Flow Index) indicates overbought condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | MFI period |
+| `threshold` | `float` | 70.0 -- 95.0 | `80.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "mfi_overbought",
+    "parameters": {
+        "window": 14,
+        "threshold": 80.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "mfi_overbought",
+  "parameters": {
+    "window": 14,
+    "threshold": 80.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### mfi_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if MFI (Money Flow Index) indicates oversold condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | MFI period |
+| `threshold` | `float` | 5.0 -- 30.0 | `20.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "mfi_oversold",
+    "parameters": {
+        "window": 14,
+        "threshold": 20.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "mfi_oversold",
+  "parameters": {
+    "window": 14,
+    "threshold": 20.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### nvi_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if NVI (Negative Volume Index) indicates smart money selling. NVI below its moving average suggests smart money distribution.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 100 -- 500 | `255` | EMA period for signal |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "nvi_bearish",
+    "parameters": {
+        "window": 255
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "nvi_bearish",
+  "parameters": {
+    "window": 255
+  }
+}'
+```
+
+</CodeGroup>
+
+### nvi_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if NVI (Negative Volume Index) indicates smart money buying. NVI above its moving average suggests smart money accumulation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 100 -- 500 | `255` | EMA period for signal |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "nvi_bullish",
+    "parameters": {
+        "window": 255
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "nvi_bullish",
+  "parameters": {
+    "window": 255
+  }
+}'
+```
+
+</CodeGroup>
+
+### obv_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if OBV is falling (bearish volume confirmation).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "obv_bearish",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "obv_bearish",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### obv_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if OBV is rising (bullish volume confirmation).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "obv_bullish",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "obv_bullish",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### vpt_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if VPT (Volume Price Trend) is falling.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 5 -- 50 | `20` | Lookback for trend |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "vpt_bearish",
+    "parameters": {
+        "lookback": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vpt_bearish",
+  "parameters": {
+    "lookback": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### vpt_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+
+Check if VPT (Volume Price Trend) is rising.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 5 -- 50 | `20` | Lookback for trend |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "vpt_bullish",
+    "parameters": {
+        "lookback": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vpt_bullish",
+  "parameters": {
+    "lookback": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### vwap_above
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if price is above VWAP (bullish bias).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | VWAP period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "vwap_above",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vwap_above",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### vwap_below
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+
+Check if price is below VWAP (bearish bias).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | VWAP period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "vwap_below",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vwap_below",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+---
+
+## Volatility Signals
+
+_10 signals in this category._
+
+### atr_high_volatility
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if ATR indicates high volatility relative to price. High volatility (ATR as % of close &gt; threshold) can indicate potential trading opportunities or increased risk.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | ATR period |
+| `threshold_pct` | `float` | 0.5 -- 10.0 | `3.0` | ATR as percentage of close threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "atr_high_volatility",
+    "parameters": {
+        "window": 14,
+        "threshold_pct": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "atr_high_volatility",
+  "parameters": {
+    "window": 14,
+    "threshold_pct": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### bb_lower_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect price breaking below the lower Bollinger Band. Fires on the bar where price crosses below the lower band, not while price remains below it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | MA period for center band |
+| `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bb_lower_breakout",
+    "parameters": {
+        "window": 20,
+        "window_dev": 2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bb_lower_breakout",
+  "parameters": {
+    "window": 20,
+    "window_dev": 2
+  }
+}'
+```
+
+</CodeGroup>
+
+### bb_squeeze
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect Bollinger Band squeeze onset (low volatility, potential breakout). Fires on the bar where band width drops below the threshold, not while it remains below.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | MA period for center band |
+| `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
+| `threshold` | `float` | 1.0 -- 20.0 | `5.0` | Band width percentage threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bb_squeeze",
+    "parameters": {
+        "window": 20,
+        "window_dev": 2,
+        "threshold": 5.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bb_squeeze",
+  "parameters": {
+    "window": 20,
+    "window_dev": 2,
+    "threshold": 5.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### bb_upper_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect price breaking above the upper Bollinger Band. Fires on the bar where price crosses above the upper band, not while price remains above it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | MA period for center band |
+| `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bb_upper_breakout",
+    "parameters": {
+        "window": 20,
+        "window_dev": 2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bb_upper_breakout",
+  "parameters": {
+    "window": 20,
+    "window_dev": 2
+  }
+}'
+```
+
+</CodeGroup>
+
+### dc_lower_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking below lower Donchian Channel (new low). Fires on the bar where price crosses below the lower band.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | Lookback period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "dc_lower_breakout",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dc_lower_breakout",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### dc_upper_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking above upper Donchian Channel (new high). Fires on the bar where price crosses above the upper band.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | Lookback period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "dc_upper_breakout",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dc_upper_breakout",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### kc_lower_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking below lower Keltner Channel band. Fires on the bar where price crosses below the lower band.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | EMA period |
+| `window_atr` | `int` | 5 -- 30 | `10` | ATR period |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
+| `original_version` | `bool` | - | `False` | Use original Keltner Channel formula instead of EMA+ATR |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "kc_lower_breakout",
+    "parameters": {
+        "window": 20,
+        "window_atr": 10,
+        "multiplier": 2.0,
+        "original_version": false
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kc_lower_breakout",
+  "parameters": {
+    "window": 20,
+    "window_atr": 10,
+    "multiplier": 2.0,
+    "original_version": false
+  }
+}'
+```
+
+</CodeGroup>
+
+### kc_upper_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking above upper Keltner Channel band. Fires on the bar where price crosses above the upper band.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | EMA period |
+| `window_atr` | `int` | 5 -- 30 | `10` | ATR period |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
+| `original_version` | `bool` | - | `False` | Use original Keltner Channel formula instead of EMA+ATR |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "kc_upper_breakout",
+    "parameters": {
+        "window": 20,
+        "window_atr": 10,
+        "multiplier": 2.0,
+        "original_version": false
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kc_upper_breakout",
+  "parameters": {
+    "window": 20,
+    "window_atr": 10,
+    "multiplier": 2.0,
+    "original_version": false
+  }
+}'
+```
+
+</CodeGroup>
+
+### ulcer_high_risk
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Ulcer Index indicates high downside risk. Higher Ulcer Index values indicate greater downside volatility.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | Lookback period |
+| `threshold` | `float` | 5.0 -- 30.0 | `10.0` | High risk threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ulcer_high_risk",
+    "parameters": {
+        "window": 14,
+        "threshold": 10.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ulcer_high_risk",
+  "parameters": {
+    "window": 14,
+    "threshold": 10.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### ulcer_low_risk
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Ulcer Index indicates low downside risk. Lower Ulcer Index values indicate lower downside volatility.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | Lookback period |
+| `threshold` | `float` | 1.0 -- 15.0 | `5.0` | Low risk threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "ulcer_low_risk",
+    "parameters": {
+        "window": 14,
+        "threshold": 5.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ulcer_low_risk",
+  "parameters": {
+    "window": 14,
+    "threshold": 5.0
+  }
+}'
+```
+
+</CodeGroup>
+
+---
+
+## Patterns Signals
+
+_40 signals in this category._
+
+### bearish_engulfing_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+
+Check if a bearish engulfing pattern completed on the current bar. Current bearish candle's body completely contains the previous bullish candle's body. Strong bearish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bearish_engulfing_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bearish_engulfing_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### bearish_harami_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+
+Check if a bearish harami pattern completed on the current bar. Current small bearish candle's body is inside the previous large bullish candle's body. Potential bearish reversal. References: [NISON], [STOCKCHARTS].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bearish_harami_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bearish_harami_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### bearish_pattern_recent
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if any bearish candlestick pattern was detected within lookback bars. Scans for hanging man, shooting star, bearish engulfing, bearish harami, dark cloud cover, evening star, gravestone doji, three black crows, three inside down, tweezer tops, and bearish pin bar within the recent window.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bearish_pattern_recent",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bearish_pattern_recent",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### bearish_pin_bar_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bearish pin bar is detected on the current bar. Long upper wick with body in the lower portion of the range. Bearish reversal at resistance. References: [KB-07], [TSR], [PRICEACTION].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum dominant wick to body ratio |
+| `body_position` | `float` | 0.1 -- 0.5 | `0.33` | Maximum body distance from end as fraction of range |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bearish_pin_bar_trigger",
+    "parameters": {
+        "wick_ratio": 2.0,
+        "body_position": 0.33
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bearish_pin_bar_trigger",
+  "parameters": {
+    "wick_ratio": 2.0,
+    "body_position": 0.33
+  }
+}'
+```
+
+</CodeGroup>
+
+### bullish_engulfing_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+
+Check if a bullish engulfing pattern completed on the current bar. Current bullish candle's body completely contains the previous bearish candle's body. Strong bullish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bullish_engulfing_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bullish_engulfing_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### bullish_harami_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+
+Check if a bullish harami pattern completed on the current bar. Current small bullish candle's body is inside the previous large bearish candle's body. Potential bullish reversal. References: [NISON], [STOCKCHARTS].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bullish_harami_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bullish_harami_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### bullish_pattern_recent
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if any bullish candlestick pattern was detected within lookback bars. Scans for hammer, inverted hammer, bullish engulfing, bullish harami, piercing line, morning star, dragonfly doji, three white soldiers, three inside up, tweezer bottoms, and bullish pin bar within the recent window.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bullish_pattern_recent",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bullish_pattern_recent",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### bullish_pin_bar_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bullish pin bar is detected on the current bar. Long lower wick with body in the upper portion of the range. Bullish reversal at support. References: [KB-07], [TSR], [PRICEACTION].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum dominant wick to body ratio |
+| `body_position` | `float` | 0.1 -- 0.5 | `0.33` | Maximum body distance from end as fraction of range |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "bullish_pin_bar_trigger",
+    "parameters": {
+        "wick_ratio": 2.0,
+        "body_position": 0.33
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bullish_pin_bar_trigger",
+  "parameters": {
+    "wick_ratio": 2.0,
+    "body_position": 0.33
+  }
+}'
+```
+
+</CodeGroup>
+
+### continuation_pattern_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bearish continuation pattern was detected within lookback bars. Scans for three black crows and three inside down.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "continuation_pattern_bearish",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "continuation_pattern_bearish",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### continuation_pattern_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bullish continuation pattern was detected within lookback bars. Scans for three white soldiers and three inside up.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "continuation_pattern_bullish",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "continuation_pattern_bullish",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### dark_cloud_cover_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a dark cloud cover pattern completed on the current bar. Bearish reversal: bullish candle followed by bearish candle opening above prior high and closing below midpoint of prior body. References: [NISON], [KB-07].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `min_penetration` | `float` | 0.3 -- 0.8 | `0.5` | Minimum penetration into previous body |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "dark_cloud_cover_trigger",
+    "parameters": {
+        "min_penetration": 0.5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dark_cloud_cover_trigger",
+  "parameters": {
+    "min_penetration": 0.5
+  }
+}'
+```
+
+</CodeGroup>
+
+### doji_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a doji pattern is detected on the current bar. A doji forms when open and close are nearly equal relative to the candle's range, signaling indecision. References: [NISON], [KB-07], [CM45T3R].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "doji_trigger",
+    "parameters": {
+        "body_threshold": 0.1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "doji_trigger",
+  "parameters": {
+    "body_threshold": 0.1
+  }
+}'
+```
+
+</CodeGroup>
+
+### dragonfly_doji_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a dragonfly doji is detected on the current bar. A doji with open/close near the high and a long lower shadow. Bullish signal at support. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
+| `upper_wick_max` | `float` | 0.01 -- 0.2 | `0.1` | Maximum upper wick-to-range ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "dragonfly_doji_trigger",
+    "parameters": {
+        "body_threshold": 0.1,
+        "upper_wick_max": 0.1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dragonfly_doji_trigger",
+  "parameters": {
+    "body_threshold": 0.1,
+    "upper_wick_max": 0.1
+  }
+}'
+```
+
+</CodeGroup>
+
+### evening_star_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if an evening star pattern completed on the current bar. Three-candle bearish reversal: bullish candle, small-bodied star, then bearish candle closing below midpoint of first. References: [NISON], [KB-07].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `body_threshold` | `float` | 0.1 -- 0.5 | `0.3` | Maximum body-to-range ratio for middle candle |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "evening_star_trigger",
+    "parameters": {
+        "body_threshold": 0.3
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "evening_star_trigger",
+  "parameters": {
+    "body_threshold": 0.3
+  }
+}'
+```
+
+</CodeGroup>
+
+### gravestone_doji_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a gravestone doji is detected on the current bar. A doji with open/close near the low and a long upper shadow. Bearish signal at resistance. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
+| `lower_wick_max` | `float` | 0.01 -- 0.2 | `0.1` | Maximum lower wick-to-range ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "gravestone_doji_trigger",
+    "parameters": {
+        "body_threshold": 0.1,
+        "lower_wick_max": 0.1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "gravestone_doji_trigger",
+  "parameters": {
+    "body_threshold": 0.1,
+    "lower_wick_max": 0.1
+  }
+}'
+```
+
+</CodeGroup>
+
+### hammer_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a hammer shape is detected on the current bar. Small body at upper end with long lower wick and minimal upper wick. Bullish reversal after downtrend. References: [NISON], [KB-07], [CM45T3R].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum lower wick to body ratio |
+| `upper_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum upper wick to body ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "hammer_trigger",
+    "parameters": {
+        "wick_ratio": 2.0,
+        "upper_wick_max": 0.1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "hammer_trigger",
+  "parameters": {
+    "wick_ratio": 2.0,
+    "upper_wick_max": 0.1
+  }
+}'
+```
+
+</CodeGroup>
+
+### hanging_man_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body, long lower wick) but interpreted as a bearish reversal when appearing after an uptrend. References: [NISON], [STOCKCHARTS].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum lower wick to body ratio |
+| `upper_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum upper wick to body ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "hanging_man_trigger",
+    "parameters": {
+        "wick_ratio": 2.0,
+        "upper_wick_max": 0.1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "hanging_man_trigger",
+  "parameters": {
+    "wick_ratio": 2.0,
+    "upper_wick_max": 0.1
+  }
+}'
+```
+
+</CodeGroup>
+
+### indecision_pattern_recent
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if an indecision pattern was detected within lookback bars. Scans for doji, spinning top, inside bar, and NR7.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "indecision_pattern_recent",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "indecision_pattern_recent",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### inside_bar_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if an inside bar is detected on the current bar. Current bar's range is completely contained within the previous bar's range. Signals consolidation and potential breakout. References: [KB-07], [TSR].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "inside_bar_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "inside_bar_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### inverted_hammer_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if an inverted hammer shape is detected on the current bar. Same shape as shooting star (small body, long upper wick) but interpreted as a bullish reversal when appearing after a downtrend. References: [NISON], [STOCKCHARTS].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum upper wick to body ratio |
+| `lower_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum lower wick to body ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "inverted_hammer_trigger",
+    "parameters": {
+        "wick_ratio": 2.0,
+        "lower_wick_max": 0.1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "inverted_hammer_trigger",
+  "parameters": {
+    "wick_ratio": 2.0,
+    "lower_wick_max": 0.1
+  }
+}'
+```
+
+</CodeGroup>
+
+### long_legged_doji_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a long-legged doji is detected on the current bar. A doji with both upper and lower wicks at least wick_threshold of the total range, indicating extreme indecision. References: [NISON], [STOCKCHARTS].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
+| `wick_threshold` | `float` | 0.1 -- 0.5 | `0.25` | Minimum wick-to-range ratio for both wicks |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "long_legged_doji_trigger",
+    "parameters": {
+        "body_threshold": 0.1,
+        "wick_threshold": 0.25
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "long_legged_doji_trigger",
+  "parameters": {
+    "body_threshold": 0.1,
+    "wick_threshold": 0.25
+  }
+}'
+```
+
+</CodeGroup>
+
+### marubozu_bearish_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bearish marubozu is detected on the current bar. Full-bodied bearish candle with minimal or no wicks. Signals strong selling conviction. References: [NISON], [KB-07], [CM45T3R].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_tolerance` | `float` | 0.0 -- 0.1 | `0.05` | Maximum wick-to-range ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "marubozu_bearish_trigger",
+    "parameters": {
+        "wick_tolerance": 0.05
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "marubozu_bearish_trigger",
+  "parameters": {
+    "wick_tolerance": 0.05
+  }
+}'
+```
+
+</CodeGroup>
+
+### marubozu_bullish_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bullish marubozu is detected on the current bar. Full-bodied bullish candle with minimal or no wicks. Signals strong buying conviction. References: [NISON], [KB-07], [CM45T3R].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_tolerance` | `float` | 0.0 -- 0.1 | `0.05` | Maximum wick-to-range ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "marubozu_bullish_trigger",
+    "parameters": {
+        "wick_tolerance": 0.05
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "marubozu_bullish_trigger",
+  "parameters": {
+    "wick_tolerance": 0.05
+  }
+}'
+```
+
+</CodeGroup>
+
+### morning_star_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a morning star pattern completed on the current bar. Three-candle bullish reversal: bearish candle, small-bodied star, then bullish candle closing above midpoint of first. References: [NISON], [KB-07].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `body_threshold` | `float` | 0.1 -- 0.5 | `0.3` | Maximum body-to-range ratio for middle candle |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "morning_star_trigger",
+    "parameters": {
+        "body_threshold": 0.3
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "morning_star_trigger",
+  "parameters": {
+    "body_threshold": 0.3
+  }
+}'
+```
+
+</CodeGroup>
+
+### nr7_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if a narrow range day is detected on the current bar. Current bar has the smallest range within the lookback period. Signals volatility compression and imminent breakout. Default lookback=7 for NR7; use 4 for NR4. References: [CRABEL], [KB-07], [BULKOWSKI].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 4 -- 20 | `7` | Number of bars to compare range against |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "nr7_trigger",
+    "parameters": {
+        "lookback": 7
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "nr7_trigger",
+  "parameters": {
+    "lookback": 7
+  }
+}'
+```
+
+</CodeGroup>
+
+### outside_bar_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if an outside bar is detected on the current bar. Current bar's range completely engulfs the previous bar's range. Signals increased volatility. References: [KB-07], [TSR].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "outside_bar_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "outside_bar_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### piercing_line_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a piercing line pattern completed on the current bar. Bullish reversal: bearish candle followed by bullish candle opening below prior low and closing above midpoint of prior body. References: [NISON], [KB-07].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `min_penetration` | `float` | 0.3 -- 0.8 | `0.5` | Minimum penetration into previous body |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "piercing_line_trigger",
+    "parameters": {
+        "min_penetration": 0.5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "piercing_line_trigger",
+  "parameters": {
+    "min_penetration": 0.5
+  }
+}'
+```
+
+</CodeGroup>
+
+### reversal_pattern_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bearish reversal pattern was detected within lookback bars. Scans for hanging man, shooting star, bearish engulfing, evening star, dark cloud cover, and gravestone doji -- the classic bearish reversal patterns.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "reversal_pattern_bearish",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "reversal_pattern_bearish",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### reversal_pattern_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bullish reversal pattern was detected within lookback bars. Scans for hammer, inverted hammer, bullish engulfing, morning star, piercing line, and dragonfly doji -- the classic bullish reversal patterns.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "reversal_pattern_bullish",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "reversal_pattern_bullish",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### shooting_star_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a shooting star shape is detected on the current bar. Small body at lower end with long upper wick and minimal lower wick. Bearish reversal after uptrend. References: [NISON], [STOCKCHARTS].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum upper wick to body ratio |
+| `lower_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum lower wick to body ratio |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "shooting_star_trigger",
+    "parameters": {
+        "wick_ratio": 2.0,
+        "lower_wick_max": 0.1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "shooting_star_trigger",
+  "parameters": {
+    "wick_ratio": 2.0,
+    "lower_wick_max": 0.1
+  }
+}'
+```
+
+</CodeGroup>
+
+### spinning_top_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a spinning top is detected on the current bar. Small body with significant wicks on both sides, signaling indecision. References: [NISON], [CM45T3R], [STOCKCHARTS].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `body_max` | `float` | 0.1 -- 0.5 | `0.3` | Maximum body-to-range ratio |
+| `wick_min` | `float` | 0.1 -- 0.5 | `0.2` | Minimum wick-to-range ratio for both wicks |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "spinning_top_trigger",
+    "parameters": {
+        "body_max": 0.3,
+        "wick_min": 0.2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "spinning_top_trigger",
+  "parameters": {
+    "body_max": 0.3,
+    "wick_min": 0.2
+  }
+}'
+```
+
+</CodeGroup>
+
+### strong_body_recent
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a marubozu (strong body) was detected within lookback bars. Scans for both bullish and bearish marubozu patterns.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `lookback` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "strong_body_recent",
+    "parameters": {
+        "lookback": 5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "strong_body_recent",
+  "parameters": {
+    "lookback": 5
+  }
+}'
+```
+
+</CodeGroup>
+
+### three_black_crows_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if three black crows pattern completed on the current bar. Three consecutive bearish candles with lower closes, each opening within the previous body. Strong bearish signal. References: [NISON], [KB-07], [STOCKCHARTS].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `min_body_ratio` | `float` | 0.3 -- 0.8 | `0.5` | Minimum body-to-range ratio per candle |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "three_black_crows_trigger",
+    "parameters": {
+        "min_body_ratio": 0.5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "three_black_crows_trigger",
+  "parameters": {
+    "min_body_ratio": 0.5
+  }
+}'
+```
+
+</CodeGroup>
+
+### three_inside_down_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+
+Check if three inside down pattern completed on the current bar. Bullish candle, bearish harami, then bearish close below first candle's open. Confirmed bearish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "three_inside_down_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "three_inside_down_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### three_inside_up_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+
+Check if three inside up pattern completed on the current bar. Bearish candle, bullish harami, then bullish close above first candle's open. Confirmed bullish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "three_inside_up_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "three_inside_up_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### three_white_soldiers_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if three white soldiers pattern completed on the current bar. Three consecutive bullish candles with higher closes, each opening within the previous body. Strong bullish signal. References: [NISON], [KB-07], [STOCKCHARTS].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `min_body_ratio` | `float` | 0.3 -- 0.8 | `0.5` | Minimum body-to-range ratio per candle |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "three_white_soldiers_trigger",
+    "parameters": {
+        "min_body_ratio": 0.5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "three_white_soldiers_trigger",
+  "parameters": {
+    "min_body_ratio": 0.5
+  }
+}'
+```
+
+</CodeGroup>
+
+### tweezer_bottoms_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a tweezer bottoms pattern completed on the current bar. Two consecutive candles with approximately equal lows, first bearish and second bullish. Bullish reversal. References: [NISON], [CM45T3R].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `tolerance` | `float` | 0.001 -- 0.05 | `0.01` | Maximum low-to-low difference as fraction of average range |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "tweezer_bottoms_trigger",
+    "parameters": {
+        "tolerance": 0.01
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "tweezer_bottoms_trigger",
+  "parameters": {
+    "tolerance": 0.01
+  }
+}'
+```
+
+</CodeGroup>
+
+### tweezer_tops_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a tweezer tops pattern completed on the current bar. Two consecutive candles with approximately equal highs, first bullish and second bearish. Bearish reversal. References: [NISON], [CM45T3R].
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `tolerance` | `float` | 0.001 -- 0.05 | `0.01` | Maximum high-to-high difference as fraction of average range |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "tweezer_tops_trigger",
+    "parameters": {
+        "tolerance": 0.01
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "tweezer_tops_trigger",
+  "parameters": {
+    "tolerance": 0.01
+  }
+}'
+```
+
+</CodeGroup>
+
+### two_bar_reversal_bearish_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bearish two-bar reversal completed on the current bar. Bullish bar followed by bearish bar that takes out the high then closes below the prior open. References: [KB-07], [TSR], [DAILYFOREX].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "two_bar_reversal_bearish_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "two_bar_reversal_bearish_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### two_bar_reversal_bullish_trigger
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if a bullish two-bar reversal completed on the current bar. Bearish bar followed by bullish bar that takes out the low then closes above the prior open. References: [KB-07], [TSR], [DAILYFOREX].
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_knowledge_base import RuleRegistry
+
+rule = {
+    "name": "two_bar_reversal_bullish_trigger",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovetechnologies.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "two_bar_reversal_bullish_trigger",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+---
+
+_Generated from docstring metadata. 136 signals total (66 TRIGGER, 70 FILTER)._

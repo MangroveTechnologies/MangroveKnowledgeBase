@@ -1,0 +1,194 @@
+---
+title: "Understanding Signals"
+description: "Learn how TRIGGER and FILTER signals work, how they compose into strategies, and how to tune their parameters."
+---
+
+# Understanding Signals
+
+Signals are the building blocks of every strategy in MangroveAI. A signal is a function that evaluates market data and returns `true` or `false`. When you combine signals into a strategy, they tell the system **when** to enter a trade and **under what conditions**.
+
+This guide covers what signals are, the two signal types, how they compose into strategies, and how to tune parameters for better results.
+
+## What is a signal?
+
+A signal takes a window of historical price data (OHLCV bars) and a set of parameters, then returns a boolean:
+
+- **`true`** -- the condition described by the signal is currently met
+- **`false`** -- the condition is not met
+
+For example, the `rsi_oversold` signal checks whether the Relative Strength Index is below a given threshold. If RSI is at 25 and your threshold is 30, the signal returns `true`.
+
+MangroveAI provides **136 active signals** across five categories:
+
+| Category | Count | Examples |
+|----------|-------|---------|
+| Momentum | 26 | `rsi_oversold`, `stoch_oversold`, `williams_r_oversold` |
+| Trend | 38 | `sma_cross_up`, `ema_cross_up`, `macd_bullish_cross`, `adx_strong_trend` |
+| Volume | 22 | `obv_bullish`, `mfi_oversold`, `vwap_above` |
+| Volatility | 10 | `bb_upper_breakout`, `atr_high_volatility`, `kc_upper_breakout` |
+| Patterns | 40 | `bullish_engulfing`, `hammer`, `doji`, `morning_star` |
+
+## TRIGGER vs FILTER
+
+Every signal is classified as exactly one of two types. This classification determines how the signal is used in a strategy.
+
+### TRIGGER signals (66 active)
+
+A TRIGGER detects a **discrete event** -- something that just happened at this specific bar.
+
+Think of TRIGGERs as answering the question: **"Did something just happen?"**
+
+Common patterns:
+- **Crossovers** -- a fast moving average just crossed above a slow one (`sma_cross_up`)
+- **Breakouts** -- price just broke above the upper Bollinger Band (`bb_upper_breakout`)
+- **Reversals** -- MACD just crossed its signal line (`macd_bullish_cross`)
+
+TRIGGERs are typically `true` for only one or a few bars, then flip back to `false`. They fire at a specific moment.
+
+### FILTER signals (70 active)
+
+A FILTER checks an **ongoing condition** -- whether the market is currently in a certain state.
+
+Think of FILTERs as answering the question: **"Is the market in the right state?"**
+
+Common patterns:
+- **Price position** -- price is currently above the 50-period SMA (`is_above_sma`)
+- **Overbought/oversold** -- RSI is currently below 30 (`rsi_oversold`)
+- **Trend strength** -- ADX is above 25, indicating a strong trend (`adx_strong_trend`)
+- **Volume confirmation** -- On-Balance Volume is trending upward (`obv_bullish`)
+
+FILTERs can remain `true` for many consecutive bars. They describe a persistent market state.
+
+### How to tell them apart
+
+| | TRIGGER | FILTER |
+|---|---------|--------|
+| **Question answered** | "Did X just happen?" | "Is X currently true?" |
+| **Duration** | Fires briefly (1-2 bars) | Can persist for many bars |
+| **Use** | Timing -- when to act | Confirmation -- is the market ready |
+| **Naming patterns** | `*_cross_up`, `*_breakout`, `*_reversal` | `is_above_*`, `*_oversold`, `*_bullish`, `*_strong_trend` |
+
+<Note>
+The word "bullish" does not determine signal type. A `macd_bullish_cross` is a TRIGGER (a crossover event), while `obv_bullish` is a FILTER (an ongoing state). Check the signal's `signal_type` field in the API response to be sure.
+</Note>
+
+## How signals compose into strategies
+
+MangroveAI enforces a strict composition rule called the **1+1 constraint**.
+
+### Entry rules
+
+Every strategy entry requires exactly **1 TRIGGER + 1 FILTER**:
+
+- The **TRIGGER** fires when a specific event occurs (the timing signal)
+- The **FILTER** confirms the market is in a favorable state (the confirmation signal)
+- Both must be `true` on the same bar for an entry to occur
+
+This means an entry happens only when the right event occurs at the right time in the right market conditions.
+
+### Exit rules
+
+Exit rules require:
+- Exactly **1 TRIGGER** (the exit event)
+- Optionally **0 or 1 FILTER** (exit confirmation)
+
+Exit rules are optional. If you do not define exit signals, the strategy relies on the built-in stop-loss, take-profit, and time-based exits from the `execution_config`.
+
+### Why 1+1?
+
+This constraint exists for good reasons:
+
+1. **Simplicity** -- each strategy is easy to understand and explain
+2. **Reduced overfitting** -- fewer degrees of freedom means less chance of curve-fitting to noise
+3. **Clear intent** -- the TRIGGER says "when to act" and the FILTER says "is the market ready"
+4. **Better debugging** -- when a backtest underperforms, you know exactly which signal to examine
+
+<Warning>
+Submitting more than 1 TRIGGER or more than 1 FILTER in entry rules will be rejected by the API. The system enforces the 1+1 constraint at validation time.
+</Warning>
+
+## Example: a simple momentum strategy
+
+Here is a concrete example. You want to buy ETH when the MACD crosses bullish and the price is above its 50-period SMA:
+
+- **Entry TRIGGER**: `macd_bullish_cross` -- fires when the MACD line crosses above the signal line
+- **Entry FILTER**: `is_above_sma` with `window: 50` -- confirms the price is in an uptrend
+
+```json
+{
+  "entry": [
+    {
+      "name": "macd_bullish_cross",
+      "signal_type": "TRIGGER",
+      "timeframe": "1h",
+      "params": {"window_fast": 12, "window_slow": 26, "window_sign": 9}
+    },
+    {
+      "name": "is_above_sma",
+      "signal_type": "FILTER",
+      "timeframe": "1h",
+      "params": {"window": 50}
+    }
+  ]
+}
+```
+
+An entry only occurs when `macd_bullish_cross` fires **and** `is_above_sma` is `true` on the same bar.
+
+## Parameter tuning basics
+
+Every signal has configurable parameters with documented ranges and defaults. You can view these via the API:
+
+<CodeGroup>
+```bash cURL
+curl http://localhost:5001/api/v1/signals/rsi_oversold
+```
+
+```python Python
+import requests
+
+response = requests.get("http://localhost:5001/api/v1/signals/rsi_oversold")
+signal = response.json()
+
+for param_name, param_info in signal["metadata"]["params"].items():
+    print(f"{param_name}: default={param_info.get('default')}, "
+          f"range=[{param_info['min']}, {param_info['max']}]")
+```
+
+```javascript JavaScript
+const response = await fetch("http://localhost:5001/api/v1/signals/rsi_oversold");
+const signal = await response.json();
+
+for (const [name, info] of Object.entries(signal.metadata.params)) {
+  console.log(`${name}: default=${info.default}, range=[${info.min}, ${info.max}]`);
+}
+```
+</CodeGroup>
+
+Key principles for tuning:
+
+- **Shorter windows** (e.g., SMA window of 10) react faster but produce more false signals
+- **Longer windows** (e.g., SMA window of 200) are slower but filter out noise
+- **Lower thresholds** for oversold signals (e.g., RSI threshold of 20 instead of 30) trigger less often but at more extreme conditions
+- **Always backtest** after changing parameters to see the effect on performance
+
+## Common signal combinations
+
+These pairings are popular starting points. Results depend on the asset, timeframe, and market regime.
+
+| Strategy Type | TRIGGER | FILTER | Idea |
+|--------------|---------|--------|------|
+| Trend following | `sma_cross_up` | `adx_strong_trend` | Enter on moving average crossover, but only when the trend is strong |
+| Mean reversion | `rsi_cross_up` | `bb_lower_breakout` | Enter when RSI starts recovering from oversold, confirmed by price near lower Bollinger Band |
+| Momentum | `macd_bullish_cross` | `is_above_sma` | Enter on MACD cross, confirmed by price above long-term average |
+| Volume breakout | `bb_upper_breakout` | `obv_bullish` | Enter on Bollinger Band breakout, confirmed by rising volume |
+
+<Tip>
+Use the semantic match endpoint (`POST /api/v1/signals/match`) to describe your trading idea in plain English. The system will suggest signals that match your intent.
+</Tip>
+
+## Next steps
+
+- [Browse the signal catalog](/signals/catalog) for the full list of 136 signals
+- [Create your first strategy](/guides/creating-a-strategy) using the signals you have learned about
+- [Run a backtest](/guides/running-a-backtest) to test how your signal combination performs
