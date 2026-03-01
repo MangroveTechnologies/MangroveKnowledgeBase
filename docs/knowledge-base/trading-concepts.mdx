@@ -1,0 +1,52 @@
+---
+title: "Core Trading Concepts"
+description: "Fundamental analytical frameworks -- trend analysis, support/resistance, volume analysis, and market regimes."
+---
+
+# Core Trading Concepts
+
+This document covers the fundamental analytical frameworks and concepts used by traders to interpret market behavior, identify opportunities, and make trading decisions.
+
+## Core Market Wisdom
+
+Before diving into technical concepts, traders must internalize foundational truths:
+
+- **Markets are probabilistic** -- No strategy wins every trade. Success comes from positive expected value over many trades.
+- **Risk management precedes strategy** -- Preserving capital is more important than maximizing returns.
+- **Simplicity outperforms complexity** -- The best strategies are often the simplest to explain and execute.
+- **Timeframe determines perspective** -- What looks like a trend on a 5-minute chart may be noise on a daily chart.
+
+## Trend Analysis
+
+### Definition
+A trend is a sustained directional movement in price. Trends are the most reliable pattern in markets and the foundation of most profitable strategies.
+
+### Types
+- **Uptrend**: Higher highs and higher lows
+- **Downtrend**: Lower highs and lower lows
+- **Sideways/Range**: Price oscillates between support and resistance
+
+### Trend Identification
+Moving averages are the primary tool for trend identification in MangroveAI. The `is_above_sma` FILTER signal confirms an uptrend, while crossover TRIGGER signals detect trend changes.
+
+## Support and Resistance
+
+Price levels where buying (support) or selling (resistance) pressure historically emerges. These levels are not exact prices but zones where supply and demand shift.
+
+## Volume Analysis
+
+Volume confirms price movements:
+- **Rising price + rising volume** = strong trend (continuation likely)
+- **Rising price + falling volume** = weak trend (reversal possible)
+- **Volume spike** = significant market event, potential reversal or breakout
+
+## Market Regimes
+
+Markets alternate between trending and ranging regimes. Strategy selection should match the current regime:
+- **Trending**: Momentum and trend-following strategies
+- **Ranging**: Mean-reversion strategies
+- **Volatile**: Breakout strategies with tight risk management
+
+<Note>
+For the complete Core Trading Concepts reference, see `knowledge-base/03-core-trading-concepts.md` in the repository.
+</Note>

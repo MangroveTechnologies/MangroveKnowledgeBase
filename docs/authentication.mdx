@@ -1,0 +1,243 @@
+---
+title: "Authentication"
+description: "Authenticate with the MangroveAI API using Firebase OAuth, JWT tokens, or API keys."
+---
+
+# Authentication
+
+MangroveAI supports multiple authentication methods to accommodate different use cases.
+
+## Authentication Methods
+
+| Method | Best For | Flow |
+|--------|----------|------|
+| Firebase OAuth | Web apps, mobile apps | Firebase SSO -> Exchange for JWT -> Use JWT |
+| API Keys | Scripts, server-to-server, agents | Generate key via portal -> Use in Authorization header |
+| GCP IAM Tokens | Cloud infrastructure | `gcloud auth print-identity-token` -> Use in header |
+
+## Firebase Authentication (Recommended for Web/Mobile)
+
+### Step 1: Client-Side Firebase Authentication
+
+<CodeGroup>
+```javascript JavaScript
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "mangroveai-dev.firebaseapp.com",
+  projectId: "mangroveai-dev"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+const result = await signInWithPopup(auth, provider);
+const firebaseToken = await result.user.getIdToken();
+```
+</CodeGroup>
+
+### Step 2: Exchange for MangroveAI JWT
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firebase_token": "YOUR_FIREBASE_TOKEN"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "http://localhost:5001/api/v1/auth/login",
+    json={"firebase_token": firebase_token}
+)
+data = response.json()
+access_token = data["access_token"]
+refresh_token = data["refresh_token"]
+```
+
+```javascript JavaScript
+const response = await fetch("http://localhost:5001/api/v1/auth/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ firebase_token: firebaseToken })
+});
+const { access_token, refresh_token, user } = await response.json();
+```
+</CodeGroup>
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+  "user": {
+    "id": "uuid",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "org_id": "uuid"
+  }
+}
+```
+
+**Token Lifetimes:**
+- Access token: 1 hour
+- Refresh token: 30 days
+
+### Step 3: Use JWT for API Requests
+
+```bash
+curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  http://localhost:5001/api/v1/signals
+```
+
+## API Key Authentication (Recommended for Programmatic Access)
+
+### Generate an API Key
+
+Requires an active JWT session first:
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/auth/api-keys \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Production Server Key",
+    "scopes": ["read:strategies", "write:backtests"],
+    "expires_days": 365
+  }'
+```
+
+```python Python
+response = requests.post(
+    "http://localhost:5001/api/v1/auth/api-keys",
+    headers={"Authorization": f"Bearer {access_token}"},
+    json={
+        "name": "Production Server Key",
+        "scopes": ["read:strategies", "write:backtests"],
+        "expires_days": 365
+    }
+)
+api_key = response.json()["key"]
+# IMPORTANT: Save this immediately -- it is only shown once
+```
+</CodeGroup>
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "key": "dev_a1b2c3d4e5f6...",
+  "key_id": "uuid-here",
+  "key_prefix": "dev_a1b2c3d4",
+  "name": "Production Server Key",
+  "created_at": "2025-12-01T10:00:00Z",
+  "expires_at": "2026-12-01T10:00:00Z"
+}
+```
+
+<Warning>
+Save the `key` value immediately. It is only shown once and cannot be retrieved later.
+</Warning>
+
+### Use the API Key
+
+```bash
+curl -H "Authorization: Bearer dev_a1b2c3d4e5f6..." \
+  http://localhost:5001/api/v1/signals
+```
+
+## Token Refresh
+
+When your access token expires, use the refresh token to obtain a new one:
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:5001/api/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refresh_token": "YOUR_REFRESH_TOKEN"
+  }'
+```
+
+```python Python
+response = requests.post(
+    "http://localhost:5001/api/v1/auth/refresh",
+    json={"refresh_token": refresh_token}
+)
+new_access_token = response.json()["access_token"]
+```
+
+```javascript JavaScript
+async function refreshAccessToken(refreshToken) {
+  const response = await fetch("/api/v1/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: refreshToken })
+  });
+  const { access_token } = await response.json();
+  return access_token;
+}
+```
+</CodeGroup>
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/auth/login` | Exchange Firebase token for JWT |
+| `POST` | `/api/v1/auth/refresh` | Refresh access token |
+| `GET` | `/api/v1/auth/profile` | Get current user profile |
+| `PUT` | `/api/v1/auth/profile` | Update user profile |
+| `POST` | `/api/v1/auth/api-keys` | Generate new API key |
+| `GET` | `/api/v1/auth/api-keys` | List all API keys |
+| `DELETE` | `/api/v1/auth/api-keys/{key_id}` | Revoke an API key |
+| `GET` | `/api/v1/auth/is-admin` | Check admin status |
+
+## Authorization Levels
+
+| Level | Required | Access |
+|-------|----------|--------|
+| Authenticated User | Valid JWT or API key | Own data only (strategies, backtests, conversations) |
+| Management User | Management API key or admin email | All user data, platform administration |
+| Unauthenticated | None | Health checks and Swagger docs only |
+
+## Error Responses
+
+**401 Unauthorized** -- Token missing, invalid, or expired:
+
+```json
+{
+  "error": "Unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+**403 Forbidden** -- Insufficient permissions:
+
+```json
+{
+  "error": "Forbidden",
+  "message": "Insufficient permissions for this operation"
+}
+```
+
+## Security Best Practices
+
+1. **Never commit tokens or API keys** to version control
+2. **Use environment variables** for API keys in production
+3. **Rotate API keys regularly** -- generate new keys, revoke old ones
+4. **Use minimal scopes** -- only request the permissions you need
+5. **Set expiration dates** on API keys
+6. **Store access tokens in memory** (not localStorage) for frontend apps
+7. **Store refresh tokens** in httpOnly secure cookies or secure storage

@@ -1,0 +1,417 @@
+---
+title: "Risk Management"
+description: "Understand how stop losses, position sizing, and risk controls work in MangroveAI's execution_config."
+---
+
+# Risk Management
+
+Every strategy in MangroveAI has an `execution_config` that controls risk management, position sizing, and trade lifecycle rules. This guide explains each field, how they interact, and how to tune them for your trading style.
+
+## How risk management works
+
+When a strategy generates an entry signal, the execution engine does not just open a position -- it calculates the appropriate position size based on your risk budget, sets a dynamic stop-loss using ATR, and enforces limits on how many positions you can hold, how long you can hold them, and how often you can trade.
+
+All of this is configured in the `execution_config` object, which is stored with each strategy.
+
+## The execution_config object
+
+Here is the complete `execution_config` with default values. Each field is explained in the sections below.
+
+```json
+{
+  "max_risk_per_trade": 0.01,
+  "reward_factor": 2,
+  "stop_loss_calculation": "dynamic_atr",
+  "atr_period": 14,
+  "atr_volatility_factor": 2.0,
+  "min_balance_threshold": 0.1,
+  "min_trade_amount": 25,
+  "max_open_positions": 10,
+  "max_trades_per_day": 50,
+  "volatility_window": 24,
+  "target_volatility": 0.02,
+  "volatility_mode": "stddev",
+  "enable_volatility_adjustment": false,
+  "max_hold_time_hours": null,
+  "cooldown_bars": 24,
+  "daily_momentum_limit": 3,
+  "weekly_momentum_limit": 3,
+  "max_hold_bars": 50,
+  "exit_on_loss_after_bars": 50,
+  "exit_on_profit_after_bars": 60,
+  "profit_threshold_pct": 0.05
+}
+```
+
+<Note>
+If you do not provide `execution_config` when creating a strategy, the API populates it with defaults from `trading_defaults.json`. You only need to include fields you want to override.
+</Note>
+
+## Stop-loss calculation
+
+The stop-loss determines where a losing trade is automatically closed. MangroveAI uses dynamic ATR-based stops by default.
+
+### How dynamic ATR stops work
+
+ATR (Average True Range) measures recent price volatility. A dynamic ATR stop-loss places the stop at a distance proportional to recent volatility:
+
+```
+stop_loss_price = entry_price - (ATR * atr_volatility_factor)
+```
+
+For example, if you enter BTC at $80,000, the 14-period ATR is $2,000, and your `atr_volatility_factor` is 2.0:
+
+```
+stop_loss_price = $80,000 - ($2,000 * 2.0) = $76,000
+```
+
+The stop is $4,000 below entry, representing 2x the current volatility.
+
+### Relevant fields
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `stop_loss_calculation` | `"dynamic_atr"` | Stop-loss method. Use `"dynamic_atr"` for volatility-adjusted stops. |
+| `atr_period` | `14` | Number of bars to calculate ATR. Longer periods smooth out volatility spikes. |
+| `atr_volatility_factor` | `2.0` | Multiplier for ATR distance. Higher = wider stop = more room to breathe. |
+
+### Tuning the stop-loss
+
+| Scenario | atr_volatility_factor | Effect |
+|----------|----------------------|--------|
+| Tight risk control | 1.0 - 1.5 | Stops are close to entry. More trades get stopped out, but losses are small. |
+| Standard | 2.0 | Balanced tradeoff. The default for most strategies. |
+| Wide stops | 2.5 - 3.5 | Stops give the trade room to fluctuate. Fewer stop-outs, but larger individual losses. |
+
+<Warning>
+ATR parameters (`atr_period`, `atr_volatility_factor`) belong in `execution_config`, not in `strategy_json`. They are injected at runtime by the backtesting and execution engines.
+</Warning>
+
+## Take-profit calculation
+
+Take-profit is calculated from the stop-loss distance and the `reward_factor`:
+
+```
+take_profit_distance = stop_loss_distance * reward_factor
+take_profit_price = entry_price + take_profit_distance
+```
+
+Using the example above with `reward_factor: 2`:
+
+```
+take_profit_price = $80,000 + ($4,000 * 2) = $88,000
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `reward_factor` | `2` | Risk/reward ratio. A value of 2 means the take-profit target is 2x the stop-loss distance. |
+
+A `reward_factor` of 2 means you need to win only 34% of trades to break even (excluding fees). Combined with a reasonable win rate, this creates a positive expected value.
+
+## Position sizing
+
+Position sizing determines how much capital to allocate per trade.
+
+### Risk-based sizing
+
+The `max_risk_per_trade` field sets the maximum percentage of your account you are willing to lose on a single trade:
+
+```
+risk_amount = account_value * max_risk_per_trade
+position_size = risk_amount / stop_loss_distance
+```
+
+Example with a $10,000 account, 1% risk, and $4,000 stop distance on BTC:
+
+```
+risk_amount = $10,000 * 0.01 = $100
+position_size = $100 / $4,000 = 0.025 BTC
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `max_risk_per_trade` | `0.01` | Max risk per trade as a decimal (0.01 = 1% of account). |
+| `min_trade_amount` | `25` | Minimum trade size in dollars. Trades below this are skipped. |
+| `min_balance_threshold` | `0.1` | Minimum account balance as a fraction. Trading pauses if balance drops below this. |
+
+### Volatility-adjusted sizing
+
+Optionally, position sizes can be scaled based on current volatility:
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `enable_volatility_adjustment` | `false` | When `true`, position size is scaled inversely to volatility. |
+| `volatility_window` | `24` | Number of bars for volatility calculation. |
+| `target_volatility` | `0.02` | Target portfolio volatility level. |
+| `volatility_mode` | `"stddev"` | Volatility measure: `"stddev"` (standard deviation) or `"atr"`. |
+
+When enabled, positions are smaller during high-volatility periods and larger during low-volatility periods, targeting consistent portfolio risk.
+
+## Position limits
+
+These fields prevent over-concentration and overtrading:
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `max_open_positions` | `10` | Maximum concurrent open positions. New entries are blocked once this limit is reached. |
+| `max_trades_per_day` | `50` | Daily trade cap. Prevents runaway trading in volatile markets. |
+
+### Tuning for your style
+
+| Trading style | max_open_positions | max_trades_per_day |
+|--------------|-------------------|-------------------|
+| Conservative | 1 - 3 | 5 - 10 |
+| Moderate | 5 - 10 | 20 - 50 |
+| Active | 10 - 20 | 50 - 100 |
+
+## Cooldown bars
+
+After a trade closes (win or loss), the `cooldown_bars` setting prevents the strategy from immediately re-entering.
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `cooldown_bars` | `24` | Number of bars to wait after a trade before the next entry is allowed. |
+
+On a 1-hour timeframe, the default of 24 means the strategy waits 24 hours between trades. This prevents:
+
+- Whipsaw entries in choppy markets
+- Excessive trading around the same price level
+- Emotional re-entry after a stop-out
+
+**Tuning:** Set `cooldown_bars` relative to your timeframe. For 4h bars, a cooldown of 6 (24 hours) might make sense. For daily bars, a cooldown of 1-3 is typical.
+
+## Time-based exits
+
+These fields force positions to close after a certain number of bars, regardless of signals:
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `max_hold_bars` | `50` | Maximum bars to hold any position. Forces exit after this limit. |
+| `max_hold_time_hours` | `null` | Maximum hold time in hours. `null` means no time limit (uses `max_hold_bars` instead). |
+| `exit_on_loss_after_bars` | `50` | Force-exit losing positions after this many bars. |
+| `exit_on_profit_after_bars` | `60` | Force-exit winning positions after this many bars. |
+| `profit_threshold_pct` | `0.05` | What counts as "winning" for `exit_on_profit_after_bars`. 0.05 = 5% unrealized profit. |
+
+Time-based exits are a safety net. They prevent positions from lingering indefinitely in a stagnant market.
+
+### Example scenario
+
+With defaults on a 1h timeframe:
+- A losing trade is forced closed after 50 bars (about 2 days)
+- A winning trade (5%+ profit) is forced closed after 60 bars (about 2.5 days)
+- Any position, regardless of P&L, closes after 50 bars (`max_hold_bars`)
+
+## Momentum limits
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `daily_momentum_limit` | `3` | Daily momentum threshold. |
+| `weekly_momentum_limit` | `3` | Weekly momentum threshold. |
+
+These thresholds limit entry signals in extreme momentum conditions, preventing the strategy from chasing moves that have already played out.
+
+## Putting it all together
+
+Here is a complete example that creates a strategy with custom risk parameters -- tighter stops, smaller position sizes, and fewer concurrent positions:
+
+<CodeGroup>
+```bash cURL
+curl -s -X POST "http://localhost:5001/api/v1/strategies" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Conservative BTC Strategy",
+    "asset": "BTC",
+    "entry": [
+      {
+        "name": "sma_cross_up",
+        "signal_type": "TRIGGER",
+        "timeframe": "4h",
+        "params": {"window_fast": 10, "window_slow": 50}
+      },
+      {
+        "name": "adx_strong_trend",
+        "signal_type": "FILTER",
+        "timeframe": "4h",
+        "params": {"window": 14, "threshold": 25}
+      }
+    ],
+    "exit": [],
+    "reward_factor": 2.5,
+    "execution_config": {
+      "max_risk_per_trade": 0.005,
+      "reward_factor": 2.5,
+      "stop_loss_calculation": "dynamic_atr",
+      "atr_period": 14,
+      "atr_volatility_factor": 1.5,
+      "min_balance_threshold": 0.1,
+      "min_trade_amount": 50,
+      "max_open_positions": 3,
+      "max_trades_per_day": 10,
+      "volatility_window": 24,
+      "target_volatility": 0.02,
+      "volatility_mode": "stddev",
+      "enable_volatility_adjustment": false,
+      "max_hold_time_hours": null,
+      "cooldown_bars": 12,
+      "daily_momentum_limit": 3,
+      "weekly_momentum_limit": 3,
+      "max_hold_bars": 30,
+      "exit_on_loss_after_bars": 24,
+      "exit_on_profit_after_bars": 36,
+      "profit_threshold_pct": 0.03
+    }
+  }' | python3 -m json.tool
+```
+
+```python Python
+conservative_strategy = {
+    "name": "Conservative BTC Strategy",
+    "asset": "BTC",
+    "entry": [
+        {
+            "name": "sma_cross_up",
+            "signal_type": "TRIGGER",
+            "timeframe": "4h",
+            "params": {"window_fast": 10, "window_slow": 50},
+        },
+        {
+            "name": "adx_strong_trend",
+            "signal_type": "FILTER",
+            "timeframe": "4h",
+            "params": {"window": 14, "threshold": 25},
+        },
+    ],
+    "exit": [],
+    "reward_factor": 2.5,
+    "execution_config": {
+        "max_risk_per_trade": 0.005,       # 0.5% risk per trade (half the default)
+        "reward_factor": 2.5,               # Higher reward target
+        "stop_loss_calculation": "dynamic_atr",
+        "atr_period": 14,
+        "atr_volatility_factor": 1.5,       # Tighter stops (default is 2.0)
+        "min_balance_threshold": 0.1,
+        "min_trade_amount": 50,
+        "max_open_positions": 3,            # Max 3 concurrent positions
+        "max_trades_per_day": 10,
+        "volatility_window": 24,
+        "target_volatility": 0.02,
+        "volatility_mode": "stddev",
+        "enable_volatility_adjustment": False,
+        "max_hold_time_hours": None,
+        "cooldown_bars": 12,                # 12 bars = 2 days on 4h
+        "daily_momentum_limit": 3,
+        "weekly_momentum_limit": 3,
+        "max_hold_bars": 30,                # Max 30 bars = 5 days on 4h
+        "exit_on_loss_after_bars": 24,
+        "exit_on_profit_after_bars": 36,
+        "profit_threshold_pct": 0.03,       # 3% counts as "winning"
+    },
+}
+
+response = requests.post(
+    f"{BASE_URL}/api/v1/strategies",
+    headers=HEADERS,
+    json=conservative_strategy,
+)
+result = response.json()
+print(f"Strategy created: {result['strategy']['id']}")
+print(f"Max risk/trade: {result['strategy']['execution_config']['max_risk_per_trade']}")
+print(f"ATR factor: {result['strategy']['execution_config']['atr_volatility_factor']}")
+```
+
+```javascript JavaScript
+const conservativeStrategy = {
+  name: "Conservative BTC Strategy",
+  asset: "BTC",
+  entry: [
+    {
+      name: "sma_cross_up",
+      signal_type: "TRIGGER",
+      timeframe: "4h",
+      params: { window_fast: 10, window_slow: 50 },
+    },
+    {
+      name: "adx_strong_trend",
+      signal_type: "FILTER",
+      timeframe: "4h",
+      params: { window: 14, threshold: 25 },
+    },
+  ],
+  exit: [],
+  reward_factor: 2.5,
+  execution_config: {
+    max_risk_per_trade: 0.005,        // 0.5% risk per trade
+    reward_factor: 2.5,                // Higher reward target
+    stop_loss_calculation: "dynamic_atr",
+    atr_period: 14,
+    atr_volatility_factor: 1.5,        // Tighter stops
+    min_balance_threshold: 0.1,
+    min_trade_amount: 50,
+    max_open_positions: 3,             // Max 3 concurrent positions
+    max_trades_per_day: 10,
+    volatility_window: 24,
+    target_volatility: 0.02,
+    volatility_mode: "stddev",
+    enable_volatility_adjustment: false,
+    max_hold_time_hours: null,
+    cooldown_bars: 12,                 // 12 bars = 2 days on 4h
+    daily_momentum_limit: 3,
+    weekly_momentum_limit: 3,
+    max_hold_bars: 30,                 // Max 30 bars = 5 days on 4h
+    exit_on_loss_after_bars: 24,
+    exit_on_profit_after_bars: 36,
+    profit_threshold_pct: 0.03,        // 3% counts as "winning"
+  },
+};
+
+const response = await fetch(`${BASE_URL}/api/v1/strategies`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify(conservativeStrategy),
+});
+const result = await response.json();
+console.log(`Strategy created: ${result.strategy.id}`);
+console.log(`Max risk/trade: ${result.strategy.execution_config.max_risk_per_trade}`);
+console.log(`ATR factor: ${result.strategy.execution_config.atr_volatility_factor}`);
+```
+</CodeGroup>
+
+Key differences from defaults:
+- **0.5% risk** per trade instead of 1% -- halves position sizes
+- **1.5x ATR** stops instead of 2x -- tighter exit on losses
+- **2.5x reward** factor -- requires more upside before taking profit
+- **3 max positions** instead of 10 -- less capital at risk simultaneously
+- **12-bar cooldown** -- waits 2 days between entries on 4h bars
+
+## Quick reference: all fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `max_risk_per_trade` | number | 0.01 | Max risk per trade (0.01 = 1%) |
+| `reward_factor` | number | 2 | Risk/reward ratio for take-profit |
+| `stop_loss_calculation` | string | `"dynamic_atr"` | Stop method (`"dynamic_atr"` or `"fixed"`) |
+| `atr_period` | int | 14 | ATR lookback period (bars) |
+| `atr_volatility_factor` | number | 2.0 | ATR multiplier for stop distance |
+| `min_balance_threshold` | number | 0.1 | Min balance fraction before trading pauses |
+| `min_trade_amount` | number | 25 | Min trade size in dollars |
+| `max_open_positions` | int | 10 | Max concurrent positions |
+| `max_trades_per_day` | int | 50 | Daily trade limit |
+| `volatility_window` | int | 24 | Bars for volatility calc |
+| `target_volatility` | number | 0.02 | Target portfolio volatility |
+| `volatility_mode` | string | `"stddev"` | Volatility method (`"stddev"` or `"atr"`) |
+| `enable_volatility_adjustment` | bool | false | Scale position sizes by volatility |
+| `max_hold_time_hours` | number/null | null | Max hold time in hours (null = no limit) |
+| `cooldown_bars` | int | 24 | Bars between trades |
+| `daily_momentum_limit` | number | 3 | Daily momentum cap |
+| `weekly_momentum_limit` | number | 3 | Weekly momentum cap |
+| `max_hold_bars` | int | 50 | Max bars for any position |
+| `exit_on_loss_after_bars` | int | 50 | Force-exit losers after N bars |
+| `exit_on_profit_after_bars` | int | 60 | Force-exit winners after N bars |
+| `profit_threshold_pct` | number | 0.05 | Threshold for "winning" (0.05 = 5%) |
+
+## Next steps
+
+- [Create a strategy](/guides/creating-a-strategy) with custom risk parameters
+- [Run a backtest](/guides/running-a-backtest) to see how risk settings affect performance
+- [Use the AI Copilot](/guides/using-the-ai-copilot) to get risk parameter suggestions

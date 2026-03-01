@@ -1,0 +1,86 @@
+---
+title: "Introduction"
+description: "Welcome to the Mangrove developer documentation. Build, backtest, and deploy trading strategies with AI-powered tools."
+---
+
+# Welcome to Mangrove
+
+Mangrove is a trading strategy development and backtesting platform. It provides a complete toolkit for building, testing, and deploying algorithmic trading strategies -- from signal discovery through backtesting to live execution.
+
+## What Mangrove Provides
+
+<CardGroup cols={2}>
+  <Card title="136 Trading Signals" icon="chart-line">
+    Pre-built technical indicators across momentum, trend, volume, volatility, and patterns categories. Each signal is classified as TRIGGER (event-based) or FILTER (state-based) for precise strategy composition.
+  </Card>
+  <Card title="AI Copilot" icon="robot">
+    Conversational AI that guides you through strategy creation. Describe your trading idea in natural language and the copilot maps it to signals, assembles a strategy, and runs a backtest.
+  </Card>
+  <Card title="Backtesting Engine" icon="clock-rotate-left">
+    Test strategies against historical market data with comprehensive performance metrics including Sharpe ratio, max drawdown, win rate, and trade-by-trade analysis.
+  </Card>
+  <Card title="Execution Engine" icon="bolt">
+    Stateful strategy execution with position management, stop-loss/take-profit orders, and risk controls. Supports both dry-run evaluation and persistent state tracking.
+  </Card>
+</CardGroup>
+
+## Platform Architecture
+
+MangroveAI is built as a Flask REST API with 60+ endpoints across 16 domains:
+
+- **Signals** -- 136 technical indicator signals with parameter validation and semantic matching
+- **Strategies** -- CRUD operations with signal composition rules (1 TRIGGER + 1 FILTER per entry)
+- **Backtesting** -- Historical strategy testing with CoinAPI market data integration
+- **Execution** -- Real-time strategy evaluation with position and order management
+- **AI Copilot** -- 5-state conversational workflow for guided strategy creation
+- **Crypto Assets** -- 19 endpoints for asset data, risk scoring, and on-chain analytics
+- **Market Data** -- OHLCV, trades, and quotes from multiple providers
+
+## Who This Is For
+
+**Developers** building integrations with the MangroveAI REST API. You need authentication guides, endpoint references, and code examples.
+
+**AI Agents** consuming MangroveAI endpoints programmatically. You need structured, machine-readable API documentation with clear parameter schemas.
+
+**Traders and Researchers** exploring signals and indicators. The Knowledge Base covers market foundations, strategy design, risk management, and a comprehensive indicator reference.
+
+**Contributors** working on the platform. Architecture docs, development guides, and deployment instructions are in the Development section.
+
+## Quick Links
+
+<CardGroup cols={3}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get up and running in 5 minutes
+  </Card>
+  <Card title="Authentication" icon="lock" href="/authentication">
+    API keys and JWT tokens
+  </Card>
+  <Card title="Signals API" icon="wave-pulse" href="/api-reference/signals">
+    Discover available signals
+  </Card>
+  <Card title="Strategies API" icon="layer-group" href="/api-reference/strategies">
+    Create and manage strategies
+  </Card>
+  <Card title="Backtesting API" icon="chart-bar" href="/api-reference/backtesting">
+    Test against historical data
+  </Card>
+  <Card title="Knowledge Base" icon="book" href="/knowledge-base/market-foundations">
+    Trading education content
+  </Card>
+</CardGroup>
+
+## Base URL
+
+All API endpoints use the following base URL pattern:
+
+```
+http://localhost:5001/api/v1
+```
+
+For production deployments, replace with your configured domain.
+
+## Source Code
+
+Mangrove is developed by [Mangrove Technologies](https://github.com/MangroveTechnologies). The knowledge base and signal library are open source:
+
+- [MangroveKnowledgeBase](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) -- Signals, indicators, knowledge base, and this documentation

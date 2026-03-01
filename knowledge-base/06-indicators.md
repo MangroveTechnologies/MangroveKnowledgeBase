@@ -74,65 +74,7 @@ SMA(n) = (P_1 + P_2 + ... + P_n) / n
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>is_above_sma</strong> — FILTER — Check if current price is above Simple Moving Average</summary>
-
-
-#### Description
-Check if current price is above Simple Moving Average
-
-#### Parameters
-- `window` (int, 1-1000, required): SMA window in bars
-
-#### Usage
-`{"name": "is_above_sma", "params": {"window": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>sma_cross_up</strong> — TRIGGER — Detect when fast SMA crosses above slow SMA (bullish entry signal)</summary>
-
-
-#### Description
-Detect when fast SMA crosses above slow SMA (bullish entry signal)
-
-#### Parameters
-- `window_fast` (int, 1-500, required): Fast window SMA window in bars
-- `window_slow` (int, 1-1000, required): Slow window SMA window in bars
-
-#### Usage
-`{"name": "sma_cross_up", "params": {"window_fast": value, "window_slow": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>sma_cross_down</strong> — TRIGGER — Detect when fast SMA crosses below slow SMA (bearish exit signal)</summary>
-
-
-#### Description
-Detect when fast SMA crosses below slow SMA (bearish exit signal)
-
-#### Parameters
-- `window_fast` (int, 1-500, required): Fast window SMA window in bars
-- `window_slow` (int, 1-1000, required): Slow window SMA window in bars
-
-#### Usage
-`{"name": "sma_cross_down", "params": {"window_fast": value, "window_slow": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>sma_crossover</strong> — TRIGGER — Detect SMA crossover signal with configurable direction (bullish or bearish)</summary>
-
-
-#### Description
-Detect SMA crossover signal with configurable direction (bullish or bearish)
-
-#### Parameters
-- `window_fast` (int, 1-500, required): Fast window SMA window in bars
-- `window_slow` (int, 1-1000, required): Slow window SMA window in bars
-- `direction` (str, optional, default="bullish"): Crossover direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "sma_crossover", "params": {"window_fast": value, "window_slow": value, "direction": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -172,65 +114,7 @@ Where k = 2 / (n + 1)
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>ema_cross_down</strong> — TRIGGER — Detect bearish EMA crossover (fast EMA crosses below slow EMA)</summary>
-
-
-#### Description
-Detect bearish EMA crossover (fast EMA crosses below slow EMA)
-
-#### Parameters
-- `window_fast` (int, 2-100, optional, default=9): Fast window EMA window
-- `window_slow` (int, 5-200, optional, default=21): Slow window EMA window
-
-#### Usage
-`{"name": "ema_cross_down", "params": {"window_fast": value, "window_slow": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>ema_cross_up</strong> — TRIGGER — Detect bullish EMA crossover (fast EMA crosses above slow EMA)</summary>
-
-
-#### Description
-Detect bullish EMA crossover (fast EMA crosses above slow EMA)
-
-#### Parameters
-- `window_fast` (int, 2-100, optional, default=9): Fast window EMA window
-- `window_slow` (int, 5-200, optional, default=21): Slow window EMA window
-
-#### Usage
-`{"name": "ema_cross_up", "params": {"window_fast": value, "window_slow": value}}`
-
-</details>
-<details markdown="1"><summary><strong>ema_crossover</strong> — TRIGGER — Detect EMA crossover signal with configurable direction (bullish or bearish) Common periods: 9/21 (short), 50/200 (long). Adjust for crypto's 24/7 markets.</summary>
-
-
-#### Description
-Detect EMA crossover signal with configurable direction (bullish or bearish) Common periods: 9/21 (short), 50/200 (long). Adjust for crypto's 24/7 markets.
-
-#### Parameters
-- `window_fast` (int, 1-500, required): Fast window EMA window in bars
-- `window_slow` (int, 1-1000, required): Slow window EMA window in bars
-- `direction` (str, optional, default="bullish"): Crossover direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "ema_crossover", "params": {"window_fast": value, "window_slow": value, "direction": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>price_above_ema</strong> — FILTER — Check if price is above the EMA</summary>
-
-
-#### Description
-Check if price is above the EMA
-
-#### Parameters
-- `window` (int, 2-200, optional, default=20): EMA window
-
-#### Usage
-`{"name": "price_above_ema", "params": {"window": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -308,34 +192,7 @@ ADX = EMA(DX, n periods, typically 14)
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>adx_bullish_di</strong> — FILTER — Check if +DI is greater than -DI (bullish directional movement)</summary>
-
-
-#### Description
-Check if +DI is greater than -DI (bullish directional movement)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): ADX period
-
-#### Usage
-`{"name": "adx_bullish_di", "params": {"window": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>adx_strong_trend</strong> — FILTER — Check if ADX indicates a strong trend (above 25)</summary>
-
-
-#### Description
-Check if ADX indicates a strong trend (>25)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): ADX period
-- `threshold` (float, 15-50, optional, default=25.0): Trend strength threshold
-
-#### Usage
-`{"name": "adx_strong_trend", "params": {"window": value, "threshold": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -367,52 +224,7 @@ Where:
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>psar_bullish</strong> — FILTER — Check if PSAR indicates bullish trend (PSAR below price)</summary>
-
-
-#### Description
-Check if PSAR indicates bullish trend (PSAR below price)
-
-#### Parameters
-- `step` (float, 0.01-0.1, optional, default=0.02): PSAR acceleration factor step
-- `max_step` (float, 0.1-0.5, optional, default=0.2): PSAR max acceleration factor
-
-#### Usage
-`{"name": "psar_bullish", "params": {"step": value, "max_step": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>psar_bearish</strong> — FILTER — Check if PSAR indicates bearish trend (PSAR above price)</summary>
-
-
-#### Description
-Check if PSAR indicates bearish trend (PSAR above price)
-
-#### Parameters
-- `step` (float, 0.01-0.1, optional, default=0.02): PSAR acceleration factor step
-- `max_step` (float, 0.1-0.5, optional, default=0.2): PSAR max acceleration factor
-
-#### Usage
-`{"name": "psar_bearish", "params": {"step": value, "max_step": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>psar_reversal</strong> — TRIGGER — Check if PSAR flips sides (potential reversal)</summary>
-
-
-#### Description
-Check if PSAR flips sides (potential reversal)
-
-#### Parameters
-- `step` (float, 0.01-0.1, optional, default=0.02): PSAR acceleration factor step
-- `max_step` (float, 0.1-0.5, optional, default=0.2): PSAR max acceleration factor
-- `direction` (str, optional, default="bullish"): Direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "psar_reversal", "params": {"step": value, "max_step": value, "direction": value}}`
-
-</details>
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -462,54 +274,7 @@ Chikou Span (Lagging Span) = Current close, plotted 26 periods back
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>ichimoku_bearish</strong> — FILTER — Check if Ichimoku indicates bearish signal (price below cloud)</summary>
-
-
-#### Description
-Check if Ichimoku indicates bearish signal (price below cloud)
-
-#### Parameters
-- `window_tenkan` (int, 5-20, optional, default=9): Tenkan-sen (conversion line) window
-- `window_kijun` (int, 15-40, optional, default=26): Kijun-sen (base line) window
-- `window_senkou` (int, 30-70, optional, default=52): Senkou Span B (leading span B) window
-
-#### Usage
-`{"name": "ichimoku_bearish", "params": {"window_tenkan": value, "window_kijun": value, "window_senkou": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>ichimoku_bullish</strong> — FILTER — Check if Ichimoku indicates bullish signal (price above cloud)</summary>
-
-
-#### Description
-Check if Ichimoku indicates bullish signal (price above cloud)
-
-#### Parameters
-- `window_tenkan` (int, 5-20, optional, default=9): Tenkan-sen (conversion line) window
-- `window_kijun` (int, 15-40, optional, default=26): Kijun-sen (base line) window
-- `window_senkou` (int, 30-70, optional, default=52): Senkou Span B (leading span B) window
-
-#### Usage
-`{"name": "ichimoku_bullish", "params": {"window_tenkan": value, "window_kijun": value, "window_senkou": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>ichimoku_tk_cross</strong> — TRIGGER — Check if Tenkan-sen crosses Kijun-sen (TK cross)</summary>
-
-
-#### Description
-Check if Tenkan-sen crosses Kijun-sen (TK cross)
-
-#### Parameters
-- `window_tenkan` (int, 5-20, optional, default=9): Tenkan-sen (conversion line) window
-- `window_kijun` (int, 15-40, optional, default=26): Kijun-sen (base line) window
-- `window_senkou` (int, 30-70, optional, default=52): Senkou Span B (leading span B) window
-- `direction` (str, optional, default="bullish"): Direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "ichimoku_tk_cross", "params": {"window_tenkan": value, "window_kijun": value, "window_senkou": value, "direction": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -537,54 +302,8 @@ Standard period: 25
 - Detecting consolidation periods
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>aroon_up_trend</strong> — FILTER — Check if Aroon Up indicates strong uptrend</summary>
 
-
-#### Description
-Check if Aroon Up indicates strong uptrend
-
-#### Parameters
-- `window` (int, 10-50, optional, default=25): Lookback period
-- `threshold` (float, 50-100, optional, default=70.0): Strong trend threshold
-
-#### Usage
-`{"name": "aroon_up_trend", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>aroon_down_trend</strong> — FILTER — Check if Aroon Down indicates strong downtrend</summary>
-
-
-#### Description
-Check if Aroon Down indicates strong downtrend
-
-#### Parameters
-- `window` (int, 10-50, optional, default=25): Lookback period
-- `threshold` (float, 50-100, optional, default=70.0): Strong trend threshold
-
-#### Usage
-`{"name": "aroon_down_trend", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>aroon_crossover</strong> — TRIGGER — Check if Aroon lines cross (trend change signal)</summary>
-
-
-#### Description
-Check if Aroon lines cross (trend change signal)
-
-#### Parameters
-- `window` (int, 10-50, optional, default=25): Lookback period
-- `direction` (str, optional, default="bullish"): Direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "aroon_crossover", "params": {"window": value, "direction": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -605,38 +324,8 @@ Where weights decrease linearly from most recent to oldest
 - Crossovers between fast and slow WMA signal trend changes
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>wma_cross_up</strong> — TRIGGER — Check if fast WMA crosses above slow WMA (bullish)</summary>
 
-
-#### Description
-Check if fast WMA crosses above slow WMA (bullish)
-
-#### Parameters
-- `window_fast` (int, 2-50, optional, default=9): Fast window WMA window
-- `window_slow` (int, 10-100, optional, default=21): Slow window WMA window
-
-#### Usage
-`{"name": "wma_cross_up", "params": {"window_fast": value, "window_slow": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>wma_cross_down</strong> — TRIGGER — Check if fast WMA crosses below slow WMA (bearish)</summary>
-
-
-#### Description
-Check if fast WMA crosses below slow WMA (bearish)
-
-#### Parameters
-- `window_fast` (int, 2-50, optional, default=9): Fast window WMA window
-- `window_slow` (int, 10-100, optional, default=21): Slow window WMA window
-
-#### Usage
-`{"name": "wma_cross_down", "params": {"window_fast": value, "window_slow": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -658,40 +347,8 @@ KAMA = Previous KAMA + SC * (Price - Previous KAMA)
 - More responsive during trending periods
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>kama_cross_up</strong> — TRIGGER — Check if price crosses above KAMA (bullish signal)</summary>
 
-
-#### Description
-Check if price crosses above KAMA (bullish signal)
-
-#### Parameters
-- `window` (int, 5-30, optional, default=10): Efficiency ratio period
-- `pow1` (int, 1-10, optional, default=2): Fast smoothing constant
-- `pow2` (int, 10-50, optional, default=30): Slow smoothing constant
-
-#### Usage
-`{"name": "kama_cross_up", "params": {"window": value, "pow1": value, "pow2": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>kama_cross_down</strong> — TRIGGER — Check if price crosses below KAMA (bearish signal)</summary>
-
-
-#### Description
-Check if price crosses below KAMA (bearish signal)
-
-#### Parameters
-- `window` (int, 5-30, optional, default=10): Efficiency ratio period
-- `pow1` (int, 1-10, optional, default=2): Fast smoothing constant
-- `pow2` (int, 10-50, optional, default=30): Slow smoothing constant
-
-#### Usage
-`{"name": "kama_cross_down", "params": {"window": value, "pow1": value, "pow2": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -715,38 +372,8 @@ TRIX = (EMA3 - Previous EMA3) / Previous EMA3 * 100
 - Very smooth—filters out most noise
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>trix_bullish</strong> — FILTER — Check if TRIX indicates bullish momentum</summary>
 
-
-#### Description
-Check if TRIX indicates bullish momentum
-
-#### Parameters
-- `window` (int, 5-30, optional, default=15): TRIX period
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bullish threshold
-
-#### Usage
-`{"name": "trix_bullish", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>trix_bearish</strong> — FILTER — Check if TRIX indicates bearish momentum</summary>
-
-
-#### Description
-Check if TRIX indicates bearish momentum
-
-#### Parameters
-- `window` (int, 5-30, optional, default=15): TRIX period
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bearish threshold
-
-#### Usage
-`{"name": "trix_bearish", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -771,52 +398,8 @@ TR = True Range
 - Wider spread = stronger trend
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>vortex_bullish</strong> — FILTER — Check if Vortex Indicator shows bullish trend (+VI above -VI)</summary>
 
-
-#### Description
-Check if Vortex Indicator shows bullish trend (+VI > -VI)
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): Vortex period
-
-#### Usage
-`{"name": "vortex_bullish", "params": {"window": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>vortex_bearish</strong> — FILTER — Check if Vortex Indicator shows bearish trend (-VI above +VI)</summary>
-
-
-#### Description
-Check if Vortex Indicator shows bearish trend (-VI > +VI)
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): Vortex period
-
-#### Usage
-`{"name": "vortex_bearish", "params": {"window": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>vortex_crossover</strong> — TRIGGER — Check if Vortex lines cross (trend change)</summary>
-
-
-#### Description
-Check if Vortex lines cross (trend change)
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): Vortex period
-- `direction` (str, optional, default="bullish"): Direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "vortex_crossover", "params": {"window": value, "direction": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -837,36 +420,8 @@ DPO = Close - SMA(Close, period) shifted back (period/2 + 1) days
 - Not affected by long-term trends
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>dpo_positive</strong> — FILTER — Check if DPO is positive (price above detrended average)</summary>
 
-
-#### Description
-Check if DPO is positive (price above detrended average)
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): DPO period
-
-#### Usage
-`{"name": "dpo_positive", "params": {"window": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>dpo_negative</strong> — FILTER — Check if DPO is negative (price below detrended average)</summary>
-
-
-#### Description
-Check if DPO is negative (price below detrended average)
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): DPO period
-
-#### Usage
-`{"name": "dpo_negative", "params": {"window": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -939,99 +494,7 @@ Standard period: 14
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>rsi_overbought</strong> — FILTER — Check if RSI is above the overbought threshold (default 70)</summary>
-
-
-#### Description
-Check if RSI is above the overbought threshold (default 70)
-
-#### Parameters
-- `window` (int, 2-100, optional, default=14): RSI calculation window
-- `threshold` (float, 50-100, optional, default=70.0): Overbought threshold
-
-#### Usage
-`{"name": "rsi_overbought", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>rsi_oversold</strong> — FILTER — Check if RSI is below the oversold threshold (default 30)</summary>
-
-
-#### Description
-Check if RSI is below the oversold threshold (default 30)
-
-#### Parameters
-- `window` (int, 2-100, optional, default=14): RSI calculation window
-- `threshold` (float, 0-50, optional, default=30.0): Oversold threshold
-
-#### Usage
-`{"name": "rsi_oversold", "params": {"window": value, "threshold": value}}`
-
-</details>
-<details markdown="1"><summary><strong>rsi_cross_up</strong> — TRIGGER — Check if RSI crosses above a threshold level In crypto markets, consider higher thresholds (80/20) during strong trends.</summary>
-
-
-#### Description
-Check if RSI crosses above a threshold level In crypto markets, consider higher thresholds (80/20) during strong trends.
-
-#### Parameters
-- `window` (int, 2-100, optional, default=14): RSI calculation window
-- `threshold` (float, 0-100, optional, default=50.0): Threshold level to cross above
-
-#### Usage
-`{"name": "rsi_cross_up", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>rsi_cross_down</strong> — TRIGGER — Check if RSI crosses below a threshold level In crypto markets, consider higher thresholds (80/20) during strong trends.</summary>
-
-
-#### Description
-Check if RSI crosses below a threshold level In crypto markets, consider higher thresholds (80/20) during strong trends.
-
-#### Parameters
-- `window` (int, 2-100, optional, default=14): RSI calculation window
-- `threshold` (float, 0-100, optional, default=50.0): Threshold level to cross below
-
-#### Usage
-`{"name": "rsi_cross_down", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>stochrsi_overbought</strong> — FILTER — Check if Stochastic RSI indicates overbought condition</summary>
-
-
-#### Description
-Check if Stochastic RSI indicates overbought condition
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): RSI period
-- `smooth1` (int, 1-10, optional, default=3): Stochastic %K smoothing
-- `smooth2` (int, 1-10, optional, default=3): Stochastic %D smoothing
-- `threshold` (float, 0.6-1.0, optional, default=0.8): Overbought threshold (0-1 scale)
-
-#### Usage
-`{"name": "stochrsi_overbought", "params": {"window": value, "smooth1": value, "smooth2": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>stochrsi_oversold</strong> — FILTER — Check if Stochastic RSI indicates oversold condition</summary>
-
-
-#### Description
-Check if Stochastic RSI indicates oversold condition
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): RSI period
-- `smooth1` (int, 1-10, optional, default=3): Stochastic %K smoothing
-- `smooth2` (int, 1-10, optional, default=3): Stochastic %D smoothing
-- `threshold` (float, 0.0-0.4, optional, default=0.2): Oversold threshold (0-1 scale)
-
-#### Usage
-`{"name": "stochrsi_oversold", "params": {"window": value, "smooth1": value, "smooth2": value, "threshold": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1077,53 +540,7 @@ Histogram = MACD Line - Signal Line
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>macd_bearish_cross</strong> — TRIGGER — Detect MACD bearish crossover (MACD line crosses below signal line)</summary>
-
-
-#### Description
-Detect MACD bearish crossover (MACD line crosses below signal line)
-
-#### Parameters
-- `window_fast` (int, 2-50, optional, default=12): Fast window EMA window
-- `window_slow` (int, 10-100, optional, default=26): Slow window EMA window
-- `window_sign` (int, 2-50, optional, default=9): Signal line EMA window
-
-#### Usage
-`{"name": "macd_bearish_cross", "params": {"window_fast": value, "window_slow": value, "window_sign": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>macd_bullish_cross</strong> — TRIGGER — Detect MACD bullish crossover (MACD line crosses above signal line)</summary>
-
-
-#### Description
-Detect MACD bullish crossover (MACD line crosses above signal line)
-
-#### Parameters
-- `window_fast` (int, 2-50, optional, default=12): Fast window EMA window
-- `window_slow` (int, 10-100, optional, default=26): Slow window EMA window
-- `window_sign` (int, 2-50, optional, default=9): Signal line EMA window
-
-#### Usage
-`{"name": "macd_bullish_cross", "params": {"window_fast": value, "window_slow": value, "window_sign": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>macd_positive</strong> — FILTER — Check if MACD histogram is positive (bullish momentum)</summary>
-
-
-#### Description
-Check if MACD histogram is positive (bullish momentum)
-
-#### Parameters
-- `window_fast` (int, 2-50, optional, default=12): Fast window EMA window
-- `window_slow` (int, 10-100, optional, default=26): Slow window EMA window
-- `window_sign` (int, 2-50, optional, default=9): Signal line EMA window
-
-#### Usage
-`{"name": "macd_positive", "params": {"window_fast": value, "window_slow": value, "window_sign": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1132,38 +549,7 @@ Check if MACD histogram is positive (bullish momentum)
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>stoch_overbought</strong> — FILTER — Check if Stochastic %K is above the overbought threshold</summary>
-
-
-#### Description
-Check if Stochastic %K is above the overbought threshold
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): %K period
-- `smooth_window` (int, 1-10, optional, default=3): %K smoothing period
-- `threshold` (float, 70-100, optional, default=80.0): Overbought threshold
-
-#### Usage
-`{"name": "stoch_overbought", "params": {"window": value, "smooth_window": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>stoch_oversold</strong> — FILTER — Check if Stochastic %K is below the oversold threshold</summary>
-
-
-#### Description
-Check if Stochastic %K is below the oversold threshold
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): %K period
-- `smooth_window` (int, 1-10, optional, default=3): %K smoothing period
-- `threshold` (float, 0-30, optional, default=20.0): Oversold threshold
-
-#### Usage
-`{"name": "stoch_oversold", "params": {"window": value, "smooth_window": value, "threshold": value}}`
-
-</details>
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 #### Definition
 Momentum indicator comparing closing price to price range over a specified period, showing where current price stands relative to recent high-low range.
@@ -1235,37 +621,7 @@ Typical period: 20
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>cci_overbought</strong> — FILTER — Check if CCI indicates overbought condition</summary>
-
-
-#### Description
-Check if CCI indicates overbought condition
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): CCI period
-- `constant` (float, 0.001-0.1, optional, default=0.015): CCI constant
-- `threshold` (float, 50-200, optional, default=100.0): Overbought threshold
-
-#### Usage
-`{"name": "cci_overbought", "params": {"window": value, "constant": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>cci_oversold</strong> — FILTER — Check if CCI indicates oversold condition</summary>
-
-
-#### Description
-Check if CCI indicates oversold condition
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): CCI period
-- `constant` (float, 0.001-0.1, optional, default=0.015): CCI constant
-- `threshold` (float, -200--50, optional, default=-100.0): Oversold threshold
-
-#### Usage
-`{"name": "cci_oversold", "params": {"window": value, "constant": value, "threshold": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1302,50 +658,7 @@ Typical periods: 9, 12, 25
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>roc_momentum_shift</strong> — TRIGGER — Check if ROC crosses zero (momentum shift)</summary>
-
-
-#### Description
-Check if ROC crosses zero (momentum shift)
-
-#### Parameters
-- `window` (int, 1-50, optional, default=12): ROC period
-- `direction` (str, optional, default="bullish"): Direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "roc_momentum_shift", "params": {"window": value, "direction": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>roc_negative</strong> — FILTER — Check if Rate of Change indicates negative momentum</summary>
-
-
-#### Description
-Check if Rate of Change indicates negative momentum
-
-#### Parameters
-- `window` (int, 1-50, optional, default=12): ROC period
-- `threshold` (float, -10-10, optional, default=0.0): Negative momentum threshold
-
-#### Usage
-`{"name": "roc_negative", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>roc_positive</strong> — FILTER — Check if Rate of Change indicates positive momentum</summary>
-
-
-#### Description
-Check if Rate of Change indicates positive momentum
-
-#### Parameters
-- `window` (int, 1-50, optional, default=12): ROC period
-- `threshold` (float, -10-10, optional, default=0.0): Positive momentum threshold
-
-#### Usage
-`{"name": "roc_positive", "params": {"window": value, "threshold": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1354,36 +667,7 @@ Check if Rate of Change indicates positive momentum
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>williams_r_overbought</strong> — FILTER — Check if Williams %R is above the overbought threshold (above -20)</summary>
-
-
-#### Description
-Check if Williams %R is above the overbought threshold (> -20)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): Lookback window
-- `threshold` (float, -30-0, optional, default=-20.0): Overbought threshold
-
-#### Usage
-`{"name": "williams_r_overbought", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>williams_r_oversold</strong> — FILTER — Check if Williams %R is below the oversold threshold (below -80)</summary>
-
-
-#### Description
-Check if Williams %R is below the oversold threshold (< -80)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): Lookback window
-- `threshold` (float, -100--70, optional, default=-80.0): Oversold threshold
-
-#### Usage
-`{"name": "williams_r_oversold", "params": {"window": value, "threshold": value}}`
-
-</details>
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 #### Definition
 Momentum oscillator measuring overbought/oversold levels, similar to stochastic but inverted scale.
@@ -1438,35 +722,7 @@ Typical period: 14
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>mfi_overbought</strong> — FILTER — Check if MFI (Money Flow Index) indicates overbought condition</summary>
-
-
-#### Description
-Check if MFI (Money Flow Index) indicates overbought condition
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): MFI period
-- `threshold` (float, 70-95, optional, default=80.0): Overbought threshold
-
-#### Usage
-`{"name": "mfi_overbought", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>mfi_oversold</strong> — FILTER — Check if MFI (Money Flow Index) indicates oversold condition</summary>
-
-
-#### Description
-Check if MFI (Money Flow Index) indicates oversold condition
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): MFI period
-- `threshold` (float, 5-30, optional, default=20.0): Oversold threshold
-
-#### Usage
-`{"name": "mfi_oversold", "params": {"window": value, "threshold": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1488,57 +744,8 @@ AO = SMA(Midpoint, 5) - SMA(Midpoint, 34)
 - Twin peaks pattern for divergence analysis
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>ao_bullish</strong> — FILTER — Check if Awesome Oscillator indicates bullish momentum</summary>
 
-
-#### Description
-Check if Awesome Oscillator indicates bullish momentum
-
-#### Parameters
-- `window_fast` (int, 2-15, optional, default=5): Fast SMA window
-- `window_slow` (int, 20-60, optional, default=34): Slow SMA window
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bullish threshold
-
-#### Usage
-`{"name": "ao_bullish", "params": {"window_fast": value, "window_slow": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>ao_bearish</strong> — FILTER — Check if Awesome Oscillator indicates bearish momentum</summary>
-
-
-#### Description
-Check if Awesome Oscillator indicates bearish momentum
-
-#### Parameters
-- `window_fast` (int, 2-15, optional, default=5): Fast SMA window
-- `window_slow` (int, 20-60, optional, default=34): Slow SMA window
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bearish threshold
-
-#### Usage
-`{"name": "ao_bearish", "params": {"window_fast": value, "window_slow": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>ao_zero_cross</strong> — TRIGGER — Check if Awesome Oscillator crosses zero line</summary>
-
-
-#### Description
-Check if Awesome Oscillator crosses zero line
-
-#### Parameters
-- `window_fast` (int, 2-15, optional, default=5): Fast SMA window
-- `window_slow` (int, 20-60, optional, default=34): Slow SMA window
-- `direction` (str, optional, default="bullish"): Direction: 'bullish' or 'bearish'
-
-#### Usage
-`{"name": "ao_zero_cross", "params": {"window_fast": value, "window_slow": value, "direction": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1560,38 +767,8 @@ Smoothed Force Index = EMA(Force Index, period)
 - Falling Force Index: Increasing selling pressure
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>force_bullish</strong> — FILTER — Check if Force Index indicates bullish momentum</summary>
 
-
-#### Description
-Check if Force Index indicates bullish momentum
-
-#### Parameters
-- `window` (int, 5-30, optional, default=13): EMA period for smoothing
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bullish threshold
-
-#### Usage
-`{"name": "force_bullish", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>force_bearish</strong> — FILTER — Check if Force Index indicates bearish momentum</summary>
-
-
-#### Description
-Check if Force Index indicates bearish momentum
-
-#### Parameters
-- `window` (int, 5-30, optional, default=13): EMA period for smoothing
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bearish threshold
-
-#### Usage
-`{"name": "force_bearish", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1617,52 +794,8 @@ Signal = SMA(KST, 9)
 - Smoothed version reduces whipsaws
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>kst_bullish_cross</strong> — TRIGGER — Check if KST crosses above signal line (bullish)</summary>
 
-
-#### Description
-Check if KST crosses above signal line (bullish)
-
-#### Parameters
-- `roc1` (int, 1-1000, optional, default=10): ROC1 period
-- `roc2` (int, 1-1000, optional, default=15): ROC2 period
-- `roc3` (int, 1-1000, optional, default=20): ROC3 period
-- `roc4` (int, 1-1000, optional, default=30): ROC4 period
-- `window_sma1` (int, 2-500, optional, default=10): SMA1 smoothing window (for ROC1)
-- `window_sma2` (int, 2-500, optional, default=10): SMA2 smoothing window (for ROC2)
-- `window_sma3` (int, 2-500, optional, default=10): SMA3 smoothing window (for ROC3)
-- `window_sma4` (int, 2-500, optional, default=15): SMA4 smoothing window (for ROC4)
-- `nsig` (int, 1-1000, optional, default=9): Signal line period
-
-#### Usage
-`{"name": "kst_bullish_cross", "params": {"roc1": value, "roc2": value, "roc3": value, "roc4": value, "window_sma1": value, "window_sma2": value, "window_sma3": value, "window_sma4": value, "nsig": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>kst_bearish_cross</strong> — TRIGGER — Check if KST crosses below signal line (bearish)</summary>
-
-
-#### Description
-Check if KST crosses below signal line (bearish)
-
-#### Parameters
-- `roc1` (int, 1-1000, optional, default=10): ROC1 period
-- `roc2` (int, 1-1000, optional, default=15): ROC2 period
-- `roc3` (int, 1-1000, optional, default=20): ROC3 period
-- `roc4` (int, 1-1000, optional, default=30): ROC4 period
-- `window_sma1` (int, 2-500, optional, default=10): SMA1 smoothing window (for ROC1)
-- `window_sma2` (int, 2-500, optional, default=10): SMA2 smoothing window (for ROC2)
-- `window_sma3` (int, 2-500, optional, default=10): SMA3 smoothing window (for ROC3)
-- `window_sma4` (int, 2-500, optional, default=15): SMA4 smoothing window (for ROC4)
-- `nsig` (int, 1-1000, optional, default=9): Signal line period
-
-#### Usage
-`{"name": "kst_bearish_cross", "params": {"roc1": value, "roc2": value, "roc3": value, "roc4": value, "window_sma1": value, "window_sma2": value, "window_sma3": value, "window_sma4": value, "nsig": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1684,40 +817,8 @@ Signal Line = EMA(PPO, 9)
 - Signal line crossovers for timing
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>ppo_bullish_cross</strong> — TRIGGER — Check if PPO crosses above signal line (bullish)</summary>
 
-
-#### Description
-Check if PPO crosses above signal line (bullish)
-
-#### Parameters
-- `window_slow` (int, 15-50, optional, default=26): Slow EMA period
-- `window_fast` (int, 5-20, optional, default=12): Fast EMA period
-- `window_sign` (int, 3-15, optional, default=9): Signal line period
-
-#### Usage
-`{"name": "ppo_bullish_cross", "params": {"window_slow": value, "window_fast": value, "window_sign": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>ppo_bearish_cross</strong> — TRIGGER — Check if PPO crosses below signal line (bearish)</summary>
-
-
-#### Description
-Check if PPO crosses below signal line (bearish)
-
-#### Parameters
-- `window_slow` (int, 15-50, optional, default=26): Slow EMA period
-- `window_fast` (int, 5-20, optional, default=12): Fast EMA period
-- `window_sign` (int, 3-15, optional, default=9): Signal line period
-
-#### Usage
-`{"name": "ppo_bearish_cross", "params": {"window_slow": value, "window_fast": value, "window_sign": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1740,46 +841,8 @@ STC = Double smoothed %K
 - Good for identifying trend changes early
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>stc_oversold</strong> — FILTER — Check if STC indicates oversold condition</summary>
 
-
-#### Description
-Check if STC indicates oversold condition
-
-#### Parameters
-- `window_slow` (int, 2-500, optional, default=50): Slow EMA period
-- `window_fast` (int, 2-500, optional, default=23): Fast EMA period
-- `cycle` (int, 1-1000, optional, default=10): Cycle period
-- `smooth1` (int, 1-1000, optional, default=3): Smoothing 1
-- `smooth2` (int, 1-1000, optional, default=3): Smoothing 2
-- `threshold` (float, 0.0-100.0, optional, default=25.0): Oversold threshold
-
-#### Usage
-`{"name": "stc_oversold", "params": {"window_slow": value, "window_fast": value, "cycle": value, "smooth1": value, "smooth2": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>stc_overbought</strong> — FILTER — Check if STC indicates overbought condition</summary>
-
-
-#### Description
-Check if STC indicates overbought condition
-
-#### Parameters
-- `window_slow` (int, 2-500, optional, default=50): Slow EMA period
-- `window_fast` (int, 2-500, optional, default=23): Fast EMA period
-- `cycle` (int, 1-1000, optional, default=10): Cycle period
-- `smooth1` (int, 1-1000, optional, default=3): Smoothing 1
-- `smooth2` (int, 1-1000, optional, default=3): Smoothing 2
-- `threshold` (float, 0.0-100.0, optional, default=75.0): Overbought threshold
-
-#### Usage
-`{"name": "stc_overbought", "params": {"window_slow": value, "window_fast": value, "cycle": value, "smooth1": value, "smooth2": value, "threshold": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1803,40 +866,8 @@ TSI = (Double Smoothed PC / Double Smoothed Absolute PC) * 100
 - Less noise than RSI due to double smoothing
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>tsi_bullish</strong> — FILTER — Check if True Strength Index indicates bullish momentum (TSI above threshold)</summary>
 
-
-#### Description
-Check if True Strength Index indicates bullish momentum (TSI > threshold)
-
-#### Parameters
-- `window_slow` (int, 10-50, optional, default=25): Slow EMA period
-- `window_fast` (int, 5-25, optional, default=13): Fast EMA period
-- `threshold` (float, -50-50, optional, default=0.0): Bullish threshold
-
-#### Usage
-`{"name": "tsi_bullish", "params": {"window_slow": value, "window_fast": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>tsi_bearish</strong> — FILTER — Check if True Strength Index indicates bearish momentum (TSI below threshold)</summary>
-
-
-#### Description
-Check if True Strength Index indicates bearish momentum (TSI < threshold)
-
-#### Parameters
-- `window_slow` (int, 10-50, optional, default=25): Slow EMA period
-- `window_fast` (int, 5-25, optional, default=13): Fast EMA period
-- `threshold` (float, -50-50, optional, default=0.0): Bearish threshold
-
-#### Usage
-`{"name": "tsi_bearish", "params": {"window_slow": value, "window_fast": value, "threshold": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1862,42 +893,8 @@ UO = 100 * ((4 * Average7) + (2 * Average14) + Average28) / 7
 - Divergences with price signal reversals
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>uo_oversold</strong> — FILTER — Check if Ultimate Oscillator indicates oversold condition</summary>
 
-
-#### Description
-Check if Ultimate Oscillator indicates oversold condition
-
-#### Parameters
-- `window_short` (int, 3-20, optional, default=7): Short window
-- `window_medium` (int, 7-30, optional, default=14): Medium window
-- `window_long` (int, 14-50, optional, default=28): Long window
-- `threshold` (float, 10-40, optional, default=30.0): Oversold threshold
-
-#### Usage
-`{"name": "uo_oversold", "params": {"window_short": value, "window_medium": value, "window_long": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>uo_overbought</strong> — FILTER — Check if Ultimate Oscillator indicates overbought condition</summary>
-
-
-#### Description
-Check if Ultimate Oscillator indicates overbought condition
-
-#### Parameters
-- `window_short` (int, 3-20, optional, default=7): Short window
-- `window_medium` (int, 7-30, optional, default=14): Medium window
-- `window_long` (int, 14-50, optional, default=28): Long window
-- `threshold` (float, 60-90, optional, default=70.0): Overbought threshold
-
-#### Usage
-`{"name": "uo_overbought", "params": {"window_short": value, "window_medium": value, "window_long": value, "threshold": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -1971,51 +968,7 @@ Bandwidth = (Upper - Lower) / Middle * 100
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>bb_lower_breakout</strong> — TRIGGER — Check if price closes below the lower Bollinger Band</summary>
-
-
-#### Description
-Check if price closes below the lower Bollinger Band
-
-#### Parameters
-- `window` (int, 5-100, optional, default=20): MA period for center band
-- `window_dev` (int, 1-5, optional, default=2): Standard deviation multiplier
-
-#### Usage
-`{"name": "bb_lower_breakout", "params": {"window": value, "window_dev": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>bb_squeeze</strong> — TRIGGER — Detect Bollinger Band squeeze (low volatility, potential breakout)</summary>
-
-
-#### Description
-Detect Bollinger Band squeeze (low volatility, potential breakout)
-
-#### Parameters
-- `window` (int, 5-100, optional, default=20): MA period for center band
-- `window_dev` (int, 1-5, optional, default=2): Standard deviation multiplier
-- `threshold` (float, 1-20, optional, default=5.0): Band width percentage threshold
-
-#### Usage
-`{"name": "bb_squeeze", "params": {"window": value, "window_dev": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>bb_upper_breakout</strong> — TRIGGER — Check if price closes above the upper Bollinger Band</summary>
-
-
-#### Description
-Check if price closes above the upper Bollinger Band
-
-#### Parameters
-- `window` (int, 5-100, optional, default=20): MA period for center band
-- `window_dev` (int, 1-5, optional, default=2): Standard deviation multiplier
-
-#### Usage
-`{"name": "bb_upper_breakout", "params": {"window": value, "window_dev": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2064,20 +1017,7 @@ Typical period: 14
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>atr_high_volatility</strong> — FILTER — Check if ATR indicates high volatility relative to price</summary>
-
-
-#### Description
-Check if ATR indicates high volatility relative to price
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): ATR period
-- `threshold_pct` (float, 0.5-10, optional, default=3.0): ATR as percentage of close threshold
-
-#### Usage
-`{"name": "atr_high_volatility", "params": {"window": value, "threshold_pct": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2086,40 +1026,7 @@ Check if ATR indicates high volatility relative to price
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>kc_upper_breakout</strong> — TRIGGER — Check if price breaks above upper Keltner Channel band</summary>
-
-
-#### Description
-Check if price breaks above upper Keltner Channel band
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): EMA period
-- `window_atr` (int, 5-30, optional, default=10): ATR period
-- `multiplier` (float, 0.5-5.0, optional, default=2.0): ATR multiplier for band width
-- `original_version` (bool, optional, default=False): Use original Keltner Channel formula
-
-#### Usage
-`{"name": "kc_upper_breakout", "params": {"window": value, "window_atr": value, "multiplier": value, "original_version": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>kc_lower_breakout</strong> — TRIGGER — Check if price breaks below lower Keltner Channel band</summary>
-
-
-#### Description
-Check if price breaks below lower Keltner Channel band
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): EMA period
-- `window_atr` (int, 5-30, optional, default=10): ATR period
-- `multiplier` (float, 0.5-5.0, optional, default=2.0): ATR multiplier for band width
-- `original_version` (bool, optional, default=False): Use original Keltner Channel formula
-
-#### Usage
-`{"name": "kc_lower_breakout", "params": {"window": value, "window_atr": value, "multiplier": value, "original_version": value}}`
-
-</details>
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 #### Definition
 Volatility-based bands using ATR instead of standard deviation, typically around an EMA.
@@ -2139,8 +1046,7 @@ Lower Channel = EMA - (2 * ATR)
 
 #### Related Trading Signals
 
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 #### Trading Applications
 - Combined with Bollinger Bands for squeeze detection
@@ -2209,36 +1115,8 @@ Standard period: 20
 - Breakouts below lower channel signal short entries
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>dc_upper_breakout</strong> — TRIGGER — Check if price breaks above upper Donchian Channel (new high)</summary>
 
-
-#### Description
-Check if price breaks above upper Donchian Channel (new high)
-
-#### Parameters
-- `window` (int, 5-100, optional, default=20): Lookback period
-
-#### Usage
-`{"name": "dc_upper_breakout", "params": {"window": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>dc_lower_breakout</strong> — TRIGGER — Check if price breaks below lower Donchian Channel (new low)</summary>
-
-
-#### Description
-Check if price breaks below lower Donchian Channel (new low)
-
-#### Parameters
-- `window` (int, 5-100, optional, default=20): Lookback period
-
-#### Usage
-`{"name": "dc_lower_breakout", "params": {"window": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2261,24 +1139,8 @@ Mass Index = Sum(Single EMA / Double EMA, 25)
 - Identifies volatility cycle changes
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>mass_reversal_signal</strong> — TRIGGER — Check if Mass Index signals potential reversal (reversal bulge)</summary>
 
-
-#### Description
-Check if Mass Index signals potential reversal (reversal bulge)
-
-#### Parameters
-- `window_fast` (int, 5-15, optional, default=9): Fast EMA period
-- `window_slow` (int, 15-40, optional, default=25): Sum period
-- `threshold_high` (float, 25-30, optional, default=27.0): Upper threshold
-- `threshold_low` (float, 24-27, optional, default=26.5): Lower threshold
-
-#### Usage
-`{"name": "mass_reversal_signal", "params": {"window_fast": value, "window_slow": value, "threshold_high": value, "threshold_low": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2300,38 +1162,8 @@ Ulcer Index = Square Root of Mean of Squared Drawdowns
 - Useful for risk-adjusted performance (Martin Ratio)
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>ulcer_low_risk</strong> — FILTER — Check if Ulcer Index indicates low downside risk</summary>
 
-
-#### Description
-Check if Ulcer Index indicates low downside risk
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): Lookback period
-- `threshold` (float, 1-15, optional, default=5.0): Low risk threshold
-
-#### Usage
-`{"name": "ulcer_low_risk", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>ulcer_high_risk</strong> — FILTER — Check if Ulcer Index indicates high downside risk</summary>
-
-
-#### Description
-Check if Ulcer Index indicates high downside risk
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): Lookback period
-- `threshold` (float, 5-30, optional, default=10.0): High risk threshold
-
-#### Usage
-`{"name": "ulcer_high_risk", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2392,33 +1224,7 @@ If Close = Previous Close: OBV = Previous OBV
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>obv_bearish</strong> — FILTER — Check if OBV is falling (bearish volume confirmation)</summary>
-
-
-#### Description
-Check if OBV is falling (bearish volume confirmation)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=20): Lookback for trend
-
-#### Usage
-`{"name": "obv_bearish", "params": {"window": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>obv_bullish</strong> — FILTER — Check if OBV is rising (bullish volume confirmation)</summary>
-
-
-#### Description
-Check if OBV is rising (bullish volume confirmation)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=20): Lookback for trend
-
-#### Usage
-`{"name": "obv_bullish", "params": {"window": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2427,34 +1233,7 @@ Check if OBV is rising (bullish volume confirmation)
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>adi_bullish</strong> — FILTER — Check if ADI (Accumulation/Distribution) is rising</summary>
-
-
-#### Description
-Check if ADI (Accumulation/Distribution) is rising
-
-#### Parameters
-- `window` (int, 5-50, optional, default=20): Lookback for trend
-
-#### Usage
-`{"name": "adi_bullish", "params": {"window": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>adi_bearish</strong> — FILTER — Check if ADI (Accumulation/Distribution) is falling</summary>
-
-
-#### Description
-Check if ADI (Accumulation/Distribution) is falling
-
-#### Parameters
-- `window` (int, 5-50, optional, default=20): Lookback for trend
-
-#### Usage
-`{"name": "adi_bearish", "params": {"window": value}}`
-
-</details>
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 #### Definition
 Volume-based indicator measuring the cumulative flow of money into and out of a security.
@@ -2512,33 +1291,7 @@ Typical Price = (High + Low + Close) / 3
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>vwap_above</strong> — FILTER — Check if price is above VWAP (bullish bias)</summary>
-
-
-#### Description
-Check if price is above VWAP (bullish bias)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): VWAP period
-
-#### Usage
-`{"name": "vwap_above", "params": {"window": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>vwap_below</strong> — FILTER — Check if price is below VWAP (bearish bias)</summary>
-
-
-#### Description
-Check if price is below VWAP (bearish bias)
-
-#### Parameters
-- `window` (int, 5-50, optional, default=14): VWAP period
-
-#### Usage
-`{"name": "vwap_below", "params": {"window": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2575,35 +1328,7 @@ Typical period: 20
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>cmf_bearish</strong> — FILTER — Check if CMF (Chaikin Money Flow) indicates selling pressure</summary>
-
-
-#### Description
-Check if CMF (Chaikin Money Flow) indicates selling pressure
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): CMF period
-- `threshold` (float, -1.0-1.0, optional, default=0.0): Bearish threshold
-
-#### Usage
-`{"name": "cmf_bearish", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-<details markdown="1"><summary><strong>cmf_bullish</strong> — FILTER — Check if CMF (Chaikin Money Flow) indicates buying pressure</summary>
-
-
-#### Description
-Check if CMF (Chaikin Money Flow) indicates buying pressure
-
-#### Parameters
-- `window` (int, 10-50, optional, default=20): CMF period
-- `threshold` (float, -1.0-1.0, optional, default=0.0): Bullish threshold
-
-#### Usage
-`{"name": "cmf_bullish", "params": {"window": value, "threshold": value}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2647,38 +1372,8 @@ EMV SMA = SMA(EMV, 14)
 - Low values: Difficult price movement
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>eom_bullish</strong> — FILTER — Check if Ease of Movement indicates bullish</summary>
 
-
-#### Description
-Check if Ease of Movement indicates bullish
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): EOM period
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bullish threshold
-
-#### Usage
-`{"name": "eom_bullish", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>eom_bearish</strong> — FILTER — Check if Ease of Movement indicates bearish</summary>
-
-
-#### Description
-Check if Ease of Movement indicates bearish
-
-#### Parameters
-- `window` (int, 5-30, optional, default=14): EOM period
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Bearish threshold
-
-#### Usage
-`{"name": "eom_bearish", "params": {"window": value, "threshold": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2702,36 +1397,8 @@ Else:
 - Less noise than volume-inclusive indicators
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>nvi_bullish</strong> — FILTER — Check if NVI (Negative Volume Index) indicates smart money buying</summary>
 
-
-#### Description
-Check if NVI (Negative Volume Index) indicates smart money buying
-
-#### Parameters
-- `window` (int, 100-500, optional, default=255): EMA period for signal
-
-#### Usage
-`{"name": "nvi_bullish", "params": {"window": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>nvi_bearish</strong> — FILTER — Check if NVI (Negative Volume Index) indicates smart money selling</summary>
-
-
-#### Description
-Check if NVI (Negative Volume Index) indicates smart money selling
-
-#### Parameters
-- `window` (int, 100-500, optional, default=255): EMA period for signal
-
-#### Usage
-`{"name": "nvi_bearish", "params": {"window": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2753,40 +1420,8 @@ Signal Line = EMA(PVO, 9)
 - Confirms price breakouts with volume expansion
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>pvo_bullish_cross</strong> — TRIGGER — Check if PVO crosses above signal line (bullish volume)</summary>
 
-
-#### Description
-Check if PVO crosses above signal line (bullish volume)
-
-#### Parameters
-- `window_slow` (int, 15-50, optional, default=26): Slow EMA period
-- `window_fast` (int, 5-20, optional, default=12): Fast EMA period
-- `window_sign` (int, 3-15, optional, default=9): Signal line period
-
-#### Usage
-`{"name": "pvo_bullish_cross", "params": {"window_slow": value, "window_fast": value, "window_sign": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>pvo_bearish_cross</strong> — TRIGGER — Check if PVO crosses below signal line (bearish volume)</summary>
-
-
-#### Description
-Check if PVO crosses below signal line (bearish volume)
-
-#### Parameters
-- `window_slow` (int, 15-50, optional, default=26): Slow EMA period
-- `window_fast` (int, 5-20, optional, default=12): Fast EMA period
-- `window_sign` (int, 3-15, optional, default=9): Signal line period
-
-#### Usage
-`{"name": "pvo_bearish_cross", "params": {"window_slow": value, "window_fast": value, "window_sign": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -2807,36 +1442,8 @@ VPT = Previous VPT + Volume * ((Close - Previous Close) / Previous Close)
 - More sensitive than OBV to price magnitude
 
 #### Related Trading Signals
-<details markdown="1"><summary><strong>vpt_bullish</strong> — FILTER — Check if VPT (Volume Price Trend) is rising</summary>
 
-
-#### Description
-Check if VPT (Volume Price Trend) is rising
-
-#### Parameters
-- `lookback` (int, 5-50, optional, default=20): Lookback for trend
-
-#### Usage
-`{"name": "vpt_bullish", "params": {"lookback": value}}`
-
-</details>
-
-
-<details markdown="1"><summary><strong>vpt_bearish</strong> — FILTER — Check if VPT (Volume Price Trend) is falling</summary>
-
-
-#### Description
-Check if VPT (Volume Price Trend) is falling
-
-#### Parameters
-- `lookback` (int, 5-50, optional, default=20): Lookback for trend
-
-#### Usage
-`{"name": "vpt_bearish", "params": {"lookback": value}}`
-
-</details>
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ---
 
@@ -3096,8 +1703,7 @@ Where `n` is the lookback period (typically 12 bars).
 
 #### Related Trading Signals
 
-
-
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ### 6.8.2 Daily and Cumulative Returns
 
@@ -3131,61 +1737,7 @@ Cumulative Return = ((Close - Close[start]) / Close[start]) * 100
 
 #### Related Trading Signals
 
-<details markdown="1"><summary><strong>daily_return_positive</strong> — FILTER — Check if daily return is positive</summary>
-
-
-#### Description
-Evaluates to true when the current bar shows a positive return compared to the previous bar
-
-#### Parameters
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Minimum return threshold in percent
-
-#### Usage
-`{"name": "daily_return_positive", "params": {}}`
-
-</details>
-
-<details markdown="1"><summary><strong>daily_return_negative</strong> — FILTER — Check if daily return is negative</summary>
-
-
-#### Description
-Evaluates to true when the current bar shows a negative return compared to the previous bar
-
-#### Parameters
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Maximum return threshold in percent
-
-#### Usage
-`{"name": "daily_return_negative", "params": {}}`
-
-</details>
-
-<details markdown="1"><summary><strong>cumulative_return_positive</strong> — FILTER — Check if cumulative return from start is positive</summary>
-
-
-#### Description
-Evaluates to true when the total return from the strategy start point is positive
-
-#### Parameters
-- `threshold` (float, 0.0-100.0, optional, default=0.0): Minimum cumulative return in percent
-
-#### Usage
-`{"name": "cumulative_return_positive", "params": {}}`
-
-</details>
-
-<details markdown="1"><summary><strong>cumulative_return_target</strong> — FILTER — Check if cumulative return has reached target</summary>
-
-
-#### Description
-Evaluates to true when cumulative return exceeds a specified target threshold
-
-#### Parameters
-- `target` (float, 1-100, optional, default=10.0): Target cumulative return in percent
-
-#### Usage
-`{"name": "cumulative_return_target", "params": {"target": 20.0}}`
-
-</details>
+See the [Signal Catalog](/signals/catalog) for full parameter details and usage examples.
 
 ### Best Practices for Return Indicators
 

@@ -1,0 +1,106 @@
+---
+title: "Signal Architecture"
+description: "Understanding TRIGGER and FILTER signal types and the 1+1 composition constraint for strategies."
+---
+
+# Signal Architecture: TRIGGER and FILTER
+
+MangroveAI provides 136 active signals (66 TRIGGER, 70 FILTER) classified into two fundamental types. This classification enforces a strict architectural constraint that ensures strategies have precisely one trigger event and one filter condition for entry.
+
+## Signal Types
+
+### TRIGGER Signals (66 active)
+
+Event-based signals that detect specific market events or pattern completions.
+
+**Characteristics:**
+- Detect crossovers, breakouts, or pattern completions
+- Return `True` when the event occurs at a specific moment
+- Used for timing entry/exit decisions
+
+**Examples:** `sma_cross_up`, `ema_cross_up`, `macd_bullish_cross`, `bb_upper_breakout`
+
+### FILTER Signals (70 active)
+
+State-based signals that check current market conditions.
+
+**Characteristics:**
+- Evaluate current market state
+- Return `True` when the condition is met (can persist for extended periods)
+- Used to validate or confirm trading decisions
+
+**Examples:** `rsi_oversold`, `rsi_overbought`, `is_above_sma`, `obv_bullish`, `adx_strong_trend`
+
+## The 1+1 Constraint
+
+### Entry Rules
+
+Every strategy entry requires:
+- **Exactly 1 TRIGGER** -- the event that fires the entry
+- **Exactly 1 FILTER** -- the condition that validates the market state
+
+Both must evaluate to `True` for an entry to occur.
+
+```json
+{
+  "entry": [
+    {
+      "name": "sma_cross_up",
+      "signal_type": "TRIGGER",
+      "params": {"window_fast": 10, "window_slow": 50}
+    },
+    {
+      "name": "rsi_oversold",
+      "signal_type": "FILTER",
+      "params": {"window": 14, "threshold": 30}
+    }
+  ]
+}
+```
+
+### Exit Rules
+
+- **Exactly 1 TRIGGER** -- the exit event
+- **0 or 1 FILTER** -- optional exit condition
+
+<Warning>
+Multiple TRIGGERs or multiple FILTERs in entry rules will be rejected. The system enforces this at the Strategy class level.
+</Warning>
+
+## Why This Architecture
+
+1. **Simplicity** -- Strategies are easy to understand and explain
+2. **Reduced Overfitting** -- Fewer degrees of freedom means less curve-fitting
+3. **Clear Intent** -- TRIGGER answers "when to act", FILTER answers "is the market ready"
+4. **Better Backtesting** -- Easier to analyze why a strategy entered or did not
+5. **Explainability** -- AI Copilot can clearly explain trading decisions
+
+## Signal Classification Rules
+
+### TRIGGER Classification
+
+Use for signals that detect discrete events:
+- Crossovers: `*_cross_up`, `*_cross_down`, `*_crossover`
+- Breakouts: `*_breakout`
+- Reversals: `*_reversal`
+- Squeezes: `*_squeeze`
+
+### FILTER Classification
+
+Use for signals that check ongoing conditions:
+- State checks: `is_above_*`, `is_below_*`
+- Overbought/oversold: `*_overbought`, `*_oversold`
+- Strength: `*_strong_trend`, `*_weak`
+- Direction: `*_bullish`, `*_bearish` (when checking state, not events)
+
+<Note>
+Direction words like "bullish" do not determine signal type. A `bullish_cross` is a TRIGGER (discrete event), while `bullish_di` is a FILTER (current state).
+</Note>
+
+## Validation Points
+
+The 1+1 constraint is validated at multiple stages:
+
+1. **Strategy Class** -- Validates signal_type fields and enforces count constraints
+2. **Plan Signals State** -- AI Copilot validates TRIGGER presence before assembly
+3. **Assemble Strategy State** -- Uses docstring metadata as source of truth for signal types

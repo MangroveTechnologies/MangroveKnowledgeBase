@@ -1,0 +1,62 @@
+---
+title: "Subscription System"
+description: "Multi-tier subscription system with database-enforced usage limits, seat enforcement, and feature gating."
+---
+
+# Subscription System
+
+Multi-tier subscription system with database-enforced usage limits, org-level and user-level subscriptions, seat enforcement, and feature access gating.
+
+## Architecture
+
+The subscription system enforces usage limits at the database level using PostgreSQL functions. Limits are checked before resource creation and incremented after successful operations.
+
+Two subscription levels coexist:
+- **User-level**: For users in the default Mangrove org (`user_subscriptions` + `user_usage_counters`)
+- **Org-level**: For users in personal orgs (`org_subscriptions` + `org_usage_counters`)
+
+## Org-Level Tiers (Team Plans)
+
+| Feature | Free ($0/mo) | Startup ($99/mo) | Enterprise ($799/mo) |
+|---------|-------------|-------------------|----------------------|
+| Seats | 1 | 5 | 25 |
+| Strategies | 2 | 50 | 600 |
+| Backtests/month | 5 | 100 | 1,500 |
+| Tokens/month | 20,000 | 400,000 | 5,000,000 |
+| API calls/month | 200 | 5,000 | 50,000 |
+| Basic crypto data | No | Yes | Yes |
+| All crypto data | No | No | Yes |
+
+Annual pricing: Startup $990/yr, Enterprise $7,990/yr (2 months free).
+
+## User-Level Tiers (Individual Plans)
+
+| Feature | Beginner ($0/mo) | Intermediate ($7.99/mo) | Pro ($24.99/mo) |
+|---------|------------------|-------------------------|-----------------|
+| Strategies | 2 | 5 | 25 |
+| Backtests/month | 5 | 25 | 100 |
+| Tokens/month | 20,000 | 40,000 | 150,000 |
+| API calls/month | 200 | 400 | 1,200 |
+
+## Limit Enforcement
+
+Limits are enforced via PostgreSQL functions that check counters before allowing resource creation:
+
+- **Strategy creation**: Checks strategy count against tier limit
+- **Backtest execution**: Checks monthly backtest count
+- **API calls**: Tracks per-month API call volume
+- **Token usage**: Monitors LLM token consumption
+
+When a limit is exceeded, the API returns:
+
+```json
+{
+  "error": "USAGE_LIMIT_EXCEEDED",
+  "message": "Monthly backtest limit reached (5/5). Upgrade your plan for more backtests.",
+  "code": "USAGE_LIMIT_EXCEEDED"
+}
+```
+
+## Custom Tier
+
+The Custom tier supports per-subscription limits for institutional customers with individually negotiated limits on all resources.

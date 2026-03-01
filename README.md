@@ -8,8 +8,8 @@ Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem.
 
 MangroveKnowledgeBase is a standalone repository providing:
 
-- **96 trading signal functions** across momentum, trend, volume, and volatility categories (34 TRIGGER, 62 FILTER)
-- **40+ technical indicator classes** with a stateless `compute()` API
+- **136 trading signal functions** across momentum, trend, volume, volatility, and pattern categories (66 TRIGGER, 70 FILTER)
+- **70 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
 - **A Knowledge Base server** (FastAPI + SQLite FTS5) serving 11 trading education documents with full-text search, synonym expansion, glossary, cross-references, and tagging
 - **Self-describing metadata** -- every signal carries its type, required data columns, and parameter ranges directly in its docstring
 - **A docstring parser** that extracts structured metadata from signal functions at runtime
@@ -24,17 +24,20 @@ MangroveKnowledgeBase/
   mangrove_knowledge_base/     # Python package (pip install)
     registry.py                # RuleRegistry for signal evaluation by name
     docstring_parser.py        # Extracts structured metadata from docstrings
-    signals/                   # 96 signal functions (4 categories)
+    signals/                   # 136 signal functions (5 categories)
       momentum.py              # RSI, Stochastic, KAMA, ROC, PPO, PVO, ...
       trend.py                 # SMA, EMA, MACD, ADX, Ichimoku, PSAR, ...
       volume.py                # OBV, CMF, MFI, VWAP, ADI, VPT, NVI, ...
       volatility.py            # Bollinger Bands, ATR, Keltner, Donchian, ...
-    indicators/                # 40+ indicator classes
+      patterns.py              # Doji, Hammer, Engulfing, MorningStar, NR7, ...
+    indicators/                # 70 indicator classes
       momentum_indicators.py
       trend_indicators.py
       volume_indicators.py
       volatility_indicators.py
       return_indicators.py
+      pattern_indicators.py    # 27 candlestick/multi-bar pattern indicators
+      pattern_utils.py         # Vectorized candle geometry helpers
   kb_server/                   # Knowledge Base FastAPI server
     main.py                    # FastAPI app with 13 API endpoints
     routers/                   # API and UI routes
@@ -44,7 +47,7 @@ MangroveKnowledgeBase/
   knowledge-base/              # 11 trading education markdown documents
   notebooks/                   # Signal explorer notebook
   data/                        # 7 sample OHLCV datasets (BTC, ETH, SOL, ...)
-  tests/                       # Docstring parser validation (27 tests)
+  tests/                       # Docstring parser + pattern signal validation (51 tests)
   findings/                    # Planning docs and session notes
 ```
 
@@ -114,7 +117,7 @@ Evaluate signals by name -- useful for strategy engines:
 
 ```python
 from mangrove_knowledge_base.registry import RuleRegistry
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility
+from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
 
 rule = {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30.0}}
 is_oversold = RuleRegistry.evaluate(rule, df)
@@ -126,9 +129,9 @@ The docstring parser extracts structured metadata from signal functions:
 
 ```python
 from mangrove_knowledge_base.docstring_parser import parse_all_signals
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility
+from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
 
-metadata = parse_all_signals([momentum, trend, volume, volatility])
+metadata = parse_all_signals([momentum, trend, volume, volatility, patterns])
 # Returns: {signal_name: {type, requires, params: {name: {type, min, max, default}}}}
 ```
 
@@ -163,10 +166,14 @@ ADI, OBV, CMF, Force Index, EOM, VPT, NVI, MFI, VWAP, Daily Return, Cumulative R
 
 Bollinger Bands, ATR, Keltner Channel, Donchian Channel, Ulcer Index
 
+### Patterns (40 signals)
+
+Doji (standard, long-legged, dragonfly, gravestone), Hammer, Hanging Man, Inverted Hammer, Shooting Star, Marubozu, Spinning Top, Engulfing, Harami, Piercing Line, Dark Cloud Cover, Tweezer Tops/Bottoms, Morning Star, Evening Star, Three White Soldiers, Three Black Crows, Three Inside Up/Down, Inside Bar, Outside Bar, Pin Bar, Two-Bar Reversal, NR7, plus 8 composite FILTER signals
+
 ## Signal Types
 
-- **FILTER** (62 signals): State-based conditions evaluated every bar (e.g., "RSI > 70")
-- **TRIGGER** (34 signals): Event-based crossovers that fire once per event (e.g., "MACD crosses above signal line")
+- **FILTER** (70 signals): State-based conditions evaluated every bar (e.g., "RSI > 70", "bullish pattern within 5 bars")
+- **TRIGGER** (66 signals): Event-based crossovers/detections that fire once per event (e.g., "MACD crosses above signal line", "hammer detected")
 
 ## Knowledge Base Content
 
@@ -183,7 +190,7 @@ Bollinger Bands, ATR, Keltner Channel, Donchian Channel, Ulcer Index
 | Chart Patterns | Candlestick, reversal, continuation patterns |
 | Quantitative Analysis | Statistical methods, mean reversion, momentum |
 | Glossary | 135 trading terms with abbreviations and cross-references |
-| Signals Quick Reference | Alphabetical index of all 96 signals |
+| Signals Quick Reference | Alphabetical index of all 136 signals |
 
 ## MangroveAI Integration
 

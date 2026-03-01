@@ -1,0 +1,52 @@
+---
+title: "Quantitative Analysis"
+description: "Quantitative patterns and statistical phenomena -- seasonality, volatility dynamics, mean reversion, and ML approaches."
+---
+
+# Quantitative Analysis
+
+This document covers quantitative patterns and statistical phenomena exploited in systematic trading strategies, including seasonality effects, volatility dynamics, mean reversion signals, and machine learning approaches.
+
+## Seasonality and Time-of-Day Effects
+
+Markets exhibit recurring patterns based on time:
+- **Intraday patterns** -- Volume and volatility follow predictable curves (high at open/close, low midday)
+- **Day-of-week effects** -- Monday and Friday often show different behavior
+- **Monthly effects** -- End-of-month rebalancing creates predictable flows
+- **Quarterly effects** -- Earnings seasons and options expiration create volatility
+
+## Volatility Dynamics
+
+### Volatility Clustering
+Periods of high volatility tend to be followed by high volatility (and vice versa). GARCH models capture this phenomenon.
+
+### Mean Reversion of Volatility
+Extreme volatility reverts to the mean over time. Strategies can profit from selling volatility after spikes or buying after extended calm periods.
+
+### Implied vs Realized Volatility
+The difference between option-implied volatility and actual realized volatility creates trading opportunities.
+
+## Mean Reversion
+
+### Statistical Basis
+Prices that deviate significantly from their mean tend to revert. This is especially true for:
+- Pairs of correlated assets (pairs trading)
+- Assets at extreme RSI or Bollinger Band levels
+- Spreads between related instruments
+
+### Implementation in MangroveAI
+Mean reversion strategies use FILTER signals (`rsi_oversold`, `bb_lower_breakout`) combined with TRIGGER signals that detect the beginning of the reversion.
+
+## Statistical Measures
+
+| Measure | Description | Use |
+|---------|-------------|-----|
+| Sharpe Ratio | Return per unit of risk | Strategy comparison |
+| Sortino Ratio | Return per unit of downside risk | Asymmetric strategies |
+| Calmar Ratio | Return / max drawdown | Drawdown-sensitive strategies |
+| Maximum Drawdown | Largest peak-to-trough decline | Risk assessment |
+| Win Rate | Percentage of profitable trades | Strategy validation |
+
+<Note>
+For the complete Quantitative Analysis reference, see `knowledge-base/08-quantitative-analysis.md` in the repository.
+</Note>
