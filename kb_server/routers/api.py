@@ -11,6 +11,8 @@ from ..models import (
     SearchResponse, TagListResponse, GlossaryResponse, GlossaryEntry
 )
 from ..services import SearchEngine, CrossReferenceEngine, DocumentLoader
+from ..services.signal_service import SignalService
+from ..services.indicator_service import IndicatorService
 from ..config import settings
 
 logger = logging.getLogger(__name__)
@@ -23,6 +25,8 @@ router = APIRouter(prefix="/api", tags=["api"])
 _search_engine: Optional[SearchEngine] = None
 _cross_ref_engine: Optional[CrossReferenceEngine] = None
 _document_loader: Optional[DocumentLoader] = None
+_signal_service: Optional[SignalService] = None
+_indicator_service: Optional[IndicatorService] = None
 
 
 def get_search_engine() -> SearchEngine:
@@ -47,6 +51,22 @@ def get_document_loader() -> DocumentLoader:
     if _document_loader is None:
         _document_loader = DocumentLoader(settings.kb_path)
     return _document_loader
+
+
+def get_signal_service() -> SignalService:
+    """Get the signal service instance."""
+    global _signal_service
+    if _signal_service is None:
+        _signal_service = SignalService()
+    return _signal_service
+
+
+def get_indicator_service() -> IndicatorService:
+    """Get the indicator service instance."""
+    global _indicator_service
+    if _indicator_service is None:
+        _indicator_service = IndicatorService()
+    return _indicator_service
 
 
 # =============================================================================
@@ -294,6 +314,73 @@ async def get_backlinks(
         "total": len(backlinks),
         "backlinks": backlinks
     }
+
+
+# =============================================================================
+# Signal Endpoints
+# =============================================================================
+
+@router.get("/signals")
+async def list_signals(
+    category: Optional[str] = Query(None, description="Filter by category (Momentum, Trend, Volume, Volatility, Patterns)"),
+    signal_type: Optional[str] = Query(None, description="Filter by type (TRIGGER or FILTER)"),
+    signal_service: SignalService = Depends(get_signal_service)
+):
+    """
+    List all signals with optional filtering by category and type.
+    """
+    signals = signal_service.list_signals(category=category, signal_type=signal_type)
+    return {
+        "total": len(signals),
+        "signals": signals
+    }
+
+
+@router.get("/signals/{name}")
+async def get_signal(
+    name: str,
+    signal_service: SignalService = Depends(get_signal_service)
+):
+    """
+    Get full metadata for a single signal by name.
+    """
+    signal = signal_service.get_signal(name)
+    if signal is None:
+        raise HTTPException(status_code=404, detail=f"Signal '{name}' not found")
+    return signal
+
+
+# =============================================================================
+# Indicator Endpoints
+# =============================================================================
+
+@router.get("/indicators")
+async def list_indicators(
+    category: Optional[str] = Query(None, description="Filter by category (Momentum, Trend, Volume, Volatility, Patterns, Returns)"),
+    indicator_service: IndicatorService = Depends(get_indicator_service)
+):
+    """
+    List all indicators with optional category filter.
+    """
+    indicators = indicator_service.list_indicators(category=category)
+    return {
+        "total": len(indicators),
+        "indicators": indicators
+    }
+
+
+@router.get("/indicators/{name}")
+async def get_indicator(
+    name: str,
+    indicator_service: IndicatorService = Depends(get_indicator_service)
+):
+    """
+    Get full spec for a single indicator by name.
+    """
+    indicator = indicator_service.get_indicator(name)
+    if indicator is None:
+        raise HTTPException(status_code=404, detail=f"Indicator '{name}' not found")
+    return indicator
 
 
 # =============================================================================

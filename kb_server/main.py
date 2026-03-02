@@ -19,6 +19,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .routers import api_router, ui_router
 from .services import DocumentLoader, SearchEngine, CrossReferenceEngine
+from .services.signal_service import SignalService
+from .services.indicator_service import IndicatorService
 
 
 # Configure logging
@@ -33,11 +35,13 @@ logger = logging.getLogger(__name__)
 _search_engine: SearchEngine = None
 _cross_ref_engine: CrossReferenceEngine = None
 _document_loader: DocumentLoader = None
+_signal_service: SignalService = None
+_indicator_service: IndicatorService = None
 
 
 def initialize_services():
     """Initialize and index the knowledge base on startup."""
-    global _search_engine, _cross_ref_engine, _document_loader
+    global _search_engine, _cross_ref_engine, _document_loader, _signal_service, _indicator_service
 
     logger.info(f"Initializing Knowledge Base from: {settings.kb_path}")
 
@@ -76,12 +80,25 @@ def initialize_services():
 
     logger.info("Cross-references processed")
 
+    # Initialize signal and indicator services
+    _signal_service = SignalService()
+    logger.info(f"SignalService initialized: {len(_signal_service.list_signals())} signals")
+    _indicator_service = IndicatorService()
+    logger.info(f"IndicatorService initialized: {len(_indicator_service.list_indicators())} indicators")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
     # Startup
     initialize_services()
+
+    # Mount MCP server
+    from .mcp.tools import create_mcp_server
+    mcp_server = create_mcp_server(_search_engine, _cross_ref_engine, _signal_service, _indicator_service)
+    app.mount("/mcp", mcp_server.http_app())
+    logger.info("MCP server mounted at /mcp")
+
     logger.info(f"Knowledge Base Server ready at http://{settings.host}:{settings.port}")
 
     yield
