@@ -297,7 +297,9 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     """
     Detect price breaking above upper Donchian Channel (new high).
 
-    Fires on the bar where price crosses above the upper band.
+    Fires on the bar where close exceeds the prior period's upper band.
+    The channel is computed from the N bars BEFORE the current bar (offset=1)
+    so the current bar's high doesn't inflate the band it's compared against.
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -307,14 +309,14 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
         window (int): Lookback period. Range: 5-100. Default: 20.
 
     Returns:
-        bool: True on the bar where close crosses above upper band.
+        bool: True on the bar where close breaks above the prior upper band.
     """
-    if len(df) < window + 1:
+    if len(df) < window + 2:
         return False
 
     result = DonchianChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'window': window, 'offset': 0}
+        params={'window': window, 'offset': 1}
     )
     upper = result['hband']
 
@@ -326,7 +328,7 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     prev_upper = float(upper.iloc[-2])
     curr_upper = float(upper.iloc[-1])
 
-    return prev_close < prev_upper and curr_close >= curr_upper
+    return prev_close <= prev_upper and curr_close > curr_upper
 
 
 @RuleRegistry.register("dc_lower_breakout")
@@ -334,7 +336,9 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     """
     Detect price breaking below lower Donchian Channel (new low).
 
-    Fires on the bar where price crosses below the lower band.
+    Fires on the bar where close drops below the prior period's lower band.
+    The channel is computed from the N bars BEFORE the current bar (offset=1)
+    so the current bar's low doesn't deflate the band it's compared against.
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -344,14 +348,14 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
         window (int): Lookback period. Range: 5-100. Default: 20.
 
     Returns:
-        bool: True on the bar where close crosses below lower band.
+        bool: True on the bar where close breaks below the prior lower band.
     """
-    if len(df) < window + 1:
+    if len(df) < window + 2:
         return False
 
     result = DonchianChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'window': window, 'offset': 0}
+        params={'window': window, 'offset': 1}
     )
     lower = result['lband']
 
@@ -363,7 +367,7 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     prev_lower = float(lower.iloc[-2])
     curr_lower = float(lower.iloc[-1])
 
-    return prev_close > prev_lower and curr_close <= curr_lower
+    return prev_close >= prev_lower and curr_close < curr_lower
 
 
 # =============================================================================
