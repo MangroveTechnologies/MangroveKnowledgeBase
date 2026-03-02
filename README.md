@@ -10,7 +10,7 @@ MangroveKnowledgeBase is a standalone repository providing:
 
 - **136 trading signal functions** across momentum, trend, volume, volatility, and pattern categories (66 TRIGGER, 70 FILTER)
 - **70 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
-- **A Knowledge Base server** (FastAPI + SQLite FTS5) serving 11 trading education documents with full-text search, synonym expansion, glossary, cross-references, and tagging
+- **A unified server** with dual protocol access (REST API + MCP) serving 11 trading education documents with full-text search, signal/indicator metadata (free), and signal evaluation/indicator computation (x402 gated)
 - **Self-describing metadata** -- every signal carries its type, required data columns, and parameter ranges directly in its docstring
 - **A docstring parser** that extracts structured metadata from signal functions at runtime
 - **A signal explorer notebook** with 7 sample OHLCV datasets for interactive signal visualization
@@ -38,16 +38,17 @@ MangroveKnowledgeBase/
       return_indicators.py
       pattern_indicators.py    # 27 candlestick/multi-bar pattern indicators
       pattern_utils.py         # Vectorized candle geometry helpers
-  kb_server/                   # Knowledge Base FastAPI server
-    main.py                    # FastAPI app with 13 API endpoints
-    routers/                   # API and UI routes
-    services/                  # Search engine, document loader, synonyms
-    templates/                 # Jinja2 HTML templates
+  kb_server/                   # Unified server (REST + MCP)
+    main.py                    # FastAPI + FastMCP on same port
+    routers/                   # REST API routes
+    services/                  # Search, signals, indicators, cross-refs
+    mcp/                       # 16 MCP tools
+    x402/                      # Payment middleware and pricing
     API.md                     # Full API endpoint documentation
   knowledge-base/              # 11 trading education markdown documents
   notebooks/                   # Signal explorer notebook
   data/                        # 7 sample OHLCV datasets (BTC, ETH, SOL, ...)
-  tests/                       # Docstring parser + pattern signal validation (51 tests)
+  tests/                       # 102 tests (services, API, MCP, x402, docstring parser, patterns)
   findings/                    # Planning docs and session notes
 ```
 
