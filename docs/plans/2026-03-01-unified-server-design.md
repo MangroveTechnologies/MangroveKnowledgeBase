@@ -10,7 +10,7 @@
 
 The MangroveKnowledgeBase repository has three deliverables:
 
-1. **Pip package** (`mangrove-knowledge-base`) -- signals, indicators, registry, parser
+1. **Pip package** (`mangrove-kb`) -- signals, indicators, registry, parser
 2. **KB server** (`kb_server/`) -- FastAPI REST API for document search, glossary, cross-references
 3. **MCP server** (planned) -- MCP tools exposing KB resources to external AI agents
 
@@ -23,7 +23,7 @@ The KB server and MCP server access identical underlying resources. Building the
 A single FastAPI process serves both REST and MCP on the same port. Both protocols call the same service layer.
 
 ```
-mangrove_knowledge_base/          # pip package (signals, indicators, registry, parser)
+mangrove_kb/          # pip package (signals, indicators, registry, parser)
         |
    [service layer]                # shared business logic
    SearchEngine                   # FTS5 document search (existing)
@@ -146,7 +146,7 @@ Adapted from MangroveAI's existing x402 implementation (`src/MangroveAI/v402/`):
 
 ### PyPI Package
 
-Publish `mangrove-knowledge-base` 0.1.0 to PyPI:
+Publish `mangrove-kb` 0.1.0 to PyPI:
 - Pure Python, no native dependencies
 - numpy + pandas only
 - 136 signals, 70 indicators, RuleRegistry, docstring parser
@@ -160,7 +160,7 @@ Publish `mangrove-knowledge-base` 0.1.0 to PyPI:
 
 ## What This Does Not Change
 
-- Pip package structure (mangrove_knowledge_base/)
+- Pip package structure (mangrove_kb/)
 - Knowledge base content (knowledge-base/)
 - Mintlify docs site (docs/)
 - Generation scripts (scripts/)

@@ -888,7 +888,7 @@ def body_ratio(open_s: pd.Series, high_s: pd.Series, low_s: pd.Series, close_s: 
 ### 3.1 File Layout
 
 ```
-mangrove_knowledge_base/
+mangrove_kb/
   indicators/
     __init__.py                    # Add pattern indicator exports
     indicator_interface.py         # Unchanged
@@ -936,7 +936,7 @@ No circular dependencies. Pattern indicators depend only on `IndicatorInterface`
 All 25 pattern indicator classes live in a single file `pattern_indicators.py` grouped by category:
 
 ```python
-# mangrove_knowledge_base/indicators/pattern_indicators.py
+# mangrove_kb/indicators/pattern_indicators.py
 
 """Candlestick and multi-bar pattern indicator classes."""
 
@@ -981,7 +981,7 @@ class NarrowRange(IndicatorInterface): ...
 All 30 pattern signals live in a single file `signals/patterns.py`:
 
 ```python
-# mangrove_knowledge_base/signals/patterns.py
+# mangrove_kb/signals/patterns.py
 
 """Candlestick and multi-bar pattern signal functions."""
 
@@ -1041,7 +1041,7 @@ Pattern indicators follow the same split:
 #### Step 1: Pattern Utilities and Infrastructure
 
 **Files created:**
-- `mangrove_knowledge_base/indicators/pattern_utils.py`
+- `mangrove_kb/indicators/pattern_utils.py`
 
 **Work:**
 1. Implement the 7 helper functions (`candle_body`, `candle_range`, `upper_wick`, `lower_wick`, `is_bullish`, `is_bearish`, `body_ratio`)
@@ -1053,8 +1053,8 @@ Pattern indicators follow the same split:
 #### Step 2: Single-Candle Pattern Indicators
 
 **Files created/modified:**
-- `mangrove_knowledge_base/indicators/pattern_indicators.py` (create)
-- `mangrove_knowledge_base/indicators/__init__.py` (add exports)
+- `mangrove_kb/indicators/pattern_indicators.py` (create)
+- `mangrove_kb/indicators/__init__.py` (add exports)
 
 **Work:**
 1. Implement 10 single-candle indicator classes: Doji, LongLeggedDoji, DragonflyDoji, GravestoneDoji, Hammer, HangingMan, InvertedHammer, ShootingStar, Marubozu, SpinningTop
@@ -1084,8 +1084,8 @@ Pattern indicators follow the same split:
 #### Step 5: Pattern Signals -- TRIGGER
 
 **Files created/modified:**
-- `mangrove_knowledge_base/signals/patterns.py` (create)
-- `mangrove_knowledge_base/signals/__init__.py` (add import)
+- `mangrove_kb/signals/patterns.py` (create)
+- `mangrove_kb/signals/__init__.py` (add import)
 
 **Work:**
 1. Implement 22 TRIGGER signal functions
@@ -1107,7 +1107,7 @@ Pattern indicators follow the same split:
 #### Step 7: TA-Lib Removal and KB Documentation Update
 
 **Files modified:**
-- `knowledge-base/07-chart-patterns.md` -- Replace TA-Lib section (7.4) with reference to `mangrove_knowledge_base.indicators.pattern_indicators`
+- `knowledge-base/07-chart-patterns.md` -- Replace TA-Lib section (7.4) with reference to `mangrove_kb.indicators.pattern_indicators`
 - `knowledge-base/00-table-of-contents.md` -- Remove TA-Lib references and tags
 
 **Work:**
@@ -1131,7 +1131,7 @@ Pattern indicators follow the same split:
 #### Step 9: Integration Verification
 
 **Work:**
-1. Verify `from mangrove_knowledge_base.signals.patterns import *` triggers registration
+1. Verify `from mangrove_kb.signals.patterns import *` triggers registration
 2. Verify `RuleRegistry.evaluate({"name": "bullish_engulfing_trigger"}, df)` works
 3. Verify docstring parser extracts correct metadata for all 30 signals
 4. Update signal explorer notebook with pattern detection examples

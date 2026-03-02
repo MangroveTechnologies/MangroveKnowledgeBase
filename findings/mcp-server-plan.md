@@ -741,7 +741,7 @@ The MCP server lives as a new top-level directory within the MangroveKnowledgeBa
 ```
 MangroveKnowledgeBase/
     |
-    +-- mangrove_knowledge_base/    # Python package (signals, indicators, registry)
+    +-- mangrove_kb/    # Python package (signals, indicators, registry)
     |
     +-- kb_server/                  # Existing FastAPI KB server
     |
@@ -795,9 +795,9 @@ MCP Server (mcp_server/server.py)
     +-- imports --> kb_server.services.SearchEngine
     +-- imports --> kb_server.services.CrossReferenceEngine
     +-- imports --> kb_server.services.DocumentLoader
-    +-- imports --> mangrove_knowledge_base.registry.RuleRegistry
-    +-- imports --> mangrove_knowledge_base.docstring_parser
-    +-- imports --> mangrove_knowledge_base.indicators.*
+    +-- imports --> mangrove_kb.registry.RuleRegistry
+    +-- imports --> mangrove_kb.docstring_parser
+    +-- imports --> mangrove_kb.indicators.*
 ```
 
 **Why in-process, not HTTP proxy:**
@@ -1083,7 +1083,7 @@ Logs are written to stdout (for container log aggregation) in structured JSON fo
 
 **Dependencies:**
 - Phase 1 complete (Phase 2 is independent and can run in parallel)
-- `mangrove_knowledge_base` package must be importable (it is -- the MCP server lives in the same repo)
+- `mangrove_kb` package must be importable (it is -- the MCP server lives in the same repo)
 - All 96 signal functions must have valid structured docstrings (they do -- validated by 27 existing tests)
 
 **Testing strategy:**
@@ -1187,4 +1187,4 @@ Phases 2 and 3 are independent of each other and can be executed in parallel if 
 
 4. **Indicator parameter documentation.** The IndicatorInterface only defines `_data`, `_params`, and `_outputs` as lists of names. It does not include parameter types, ranges, or defaults (unlike signals, which have this in their docstrings). To provide rich indicator metadata via `kb_get_indicator`, we would need to either (a) add structured docstrings to indicator classes, or (b) accept that indicator metadata is less detailed than signal metadata for now.
 
-5. **Versioning.** Should the MCP server version be tied to the `mangrove-knowledge-base` package version (currently 0.1.0), or should it have its own version? If the KB content changes (documents added/updated) without code changes, does the version change?
+5. **Versioning.** Should the MCP server version be tied to the `mangrove-kb` package version (currently 0.1.0), or should it have its own version? If the KB content changes (documents added/updated) without code changes, does the version change?

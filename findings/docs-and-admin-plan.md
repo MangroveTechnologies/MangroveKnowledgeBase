@@ -397,7 +397,7 @@ Mintlify supports multi-language code examples via `<CodeGroup>`. Target languag
 
 ```
 MangroveKnowledgeBase/
-|-- mangrove_knowledge_base/     # (existing) Python signals + indicators package
+|-- mangrove_kb/     # (existing) Python signals + indicators package
 |-- kb_server/                   # (existing) FastAPI KB service
 |-- knowledge-base/              # (existing) 11 markdown files for KB
 |-- tests/                       # (existing) Docstring parser tests
@@ -557,7 +557,7 @@ After implementation, MangroveKnowledgeBase contains four logical components:
 ```
 MangroveKnowledgeBase
 |
-+-- mangrove_knowledge_base/   [Python package: signals + indicators]
++-- mangrove_kb/   [Python package: signals + indicators]
 |     Published to PyPI or installed via git
 |     Consumed by MangroveAI as pip dependency
 |
@@ -745,7 +745,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["flake8", "mangrove_knowledge_base/", "--max-line-length=120", "--ignore=E501,W503"]
+    command: ["flake8", "mangrove_kb/", "--max-line-length=120", "--ignore=E501,W503"]
 
   knowledge-base:
     build:

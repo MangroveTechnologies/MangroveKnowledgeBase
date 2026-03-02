@@ -12,10 +12,10 @@ import logging
 
 import pandas as pd
 
-from mangrove_knowledge_base.registry import RuleRegistry
+from mangrove_kb.registry import RuleRegistry
 
 # Import volatility indicator classes
-from mangrove_knowledge_base.indicators import (
+from mangrove_kb.indicators import (
     ATR,
     BollingerBands,
     KeltnerChannel,

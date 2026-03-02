@@ -13,7 +13,7 @@ pytest tests/ -v
 
 ## Adding a Signal
 
-1. Choose the correct module in `mangrove_knowledge_base/signals/` (momentum, trend, volume, volatility, or patterns)
+1. Choose the correct module in `mangrove_kb/signals/` (momentum, trend, volume, volatility, or patterns)
 
 2. Write the signal function with the required docstring format:
 
@@ -45,7 +45,7 @@ def your_signal_name(df: pd.DataFrame, window: int = 14, threshold: float = 70.0
 
 ## Adding an Indicator
 
-1. Add the class to the appropriate module in `mangrove_knowledge_base/indicators/`
+1. Add the class to the appropriate module in `mangrove_kb/indicators/`
 
 2. Follow the IndicatorInterface pattern:
 
@@ -65,7 +65,7 @@ class YourIndicator(IndicatorInterface):
         return {"your_output": pd.Series(result, name="your_output")}
 ```
 
-3. Export it in `mangrove_knowledge_base/indicators/__init__.py`
+3. Export it in `mangrove_kb/indicators/__init__.py`
 
 ## Code Standards
 
@@ -86,7 +86,7 @@ pytest tests/ -v
 pytest tests/test_signal_service.py -v
 
 # Run with coverage (if installed)
-pytest tests/ --cov=mangrove_knowledge_base
+pytest tests/ --cov=mangrove_kb
 ```
 
 Every new signal must be parseable by the docstring parser. The existing tests in `test_docstring_parser.py` validate this automatically for all registered signals.
@@ -97,7 +97,7 @@ Every new signal must be parseable by the docstring parser. The existing tests i
 2. Create a feature branch (`feat/your-signal-name`)
 3. Add the signal or indicator with proper docstring
 4. Run `pytest tests/ -v` -- all tests must pass
-5. Run `flake8 mangrove_knowledge_base/ --max-line-length=120`
+5. Run `flake8 mangrove_kb/ --max-line-length=120`
 6. Submit a PR with a description of what the signal/indicator does and references (textbooks, papers, or trading resources)
 
 ## Knowledge Base Content

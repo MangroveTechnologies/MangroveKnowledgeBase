@@ -18,13 +18,13 @@
 
 ### Phase 3: MangroveKnowledgeBase Extraction
 - Scaffolded the `MangroveKnowledgeBase` repo with signals, indicators, registry, docstring parser, tests, Dockerfile, CI, README
-- Copied and fixed imports across all files (`MangroveAI.domains.*` to `mangrove_knowledge_base.*`)
+- Copied and fixed imports across all files (`MangroveAI.domains.*` to `mangrove_kb.*`)
 - Published to GitHub at `MangroveTechnologies/MangroveKnowledgeBase` (public)
 - Added signal explorer notebook + 7 sample OHLCV datasets
 - Set up MangroveAI build environment (venv, pip install)
 
 ### Phase 4: MangroveAI Integration
-- Wired MangroveAI to import signals/indicators from `mangrove-knowledge-base` pip package
+- Wired MangroveAI to import signals/indicators from `mangrove-kb` pip package
 - Implemented `USE_EXTERNAL_KB` env var toggle (default `true`) with full inline fallback implementations
 - Retired `signals_metadata.json` (still on disk but no longer used at runtime)
 - Updated `kb_client.py` glossary lookup from filesystem read to KB HTTP API call
@@ -58,7 +58,7 @@
 
 6. **Tests for MangroveAI** -- no MangroveAI test suite was run to validate the signal/indicator changes end-to-end (tested via Docker exec and curl, not pytest)
 
-7. **GitHub Actions CI** -- the MangroveKnowledgeBase CI workflow exists but has not been tested. MangroveAI's deploy workflow needs updating for the `mangrove-knowledge-base` pip dependency (git URL in requirements.txt needs the repo to be accessible from CI)
+7. **GitHub Actions CI** -- the MangroveKnowledgeBase CI workflow exists but has not been tested. MangroveAI's deploy workflow needs updating for the `mangrove-kb` pip dependency (git URL in requirements.txt needs the repo to be accessible from CI)
 
 8. **Version pinning** -- MangroveAI's `requirements.txt` points to `main` branch of MangroveKnowledgeBase with no version pin. Should use a tag like `@v0.1.0` for production stability.
 

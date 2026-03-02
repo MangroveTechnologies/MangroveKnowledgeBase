@@ -24,8 +24,8 @@ import logging
 
 import pandas as pd
 
-from mangrove_knowledge_base.registry import RuleRegistry
-from mangrove_knowledge_base.indicators.pattern_indicators import (
+from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.indicators.pattern_indicators import (
     Doji,
     LongLeggedDoji,
     DragonflyDoji,

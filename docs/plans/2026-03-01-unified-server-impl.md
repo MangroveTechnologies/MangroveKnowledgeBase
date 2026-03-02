@@ -6,7 +6,7 @@
 
 **Architecture:** Single FastAPI process with FastMCP mounted at /mcp. Shared service layer (SearchEngine, SignalService, IndicatorService) called by both REST and MCP. x402 middleware gates compute endpoints on both transports.
 
-**Tech Stack:** FastAPI, FastMCP, uvicorn, SQLite FTS5, x402 protocol, mangrove-knowledge-base pip package
+**Tech Stack:** FastAPI, FastMCP, uvicorn, SQLite FTS5, x402 protocol, mangrove-kb pip package
 
 **Design doc:** docs/plans/2026-03-01-unified-server-design.md
 
@@ -116,15 +116,15 @@ Expected: FAIL (module not found)
 # kb_server/services/signal_service.py
 """Signal metadata and evaluation service.
 
-Wraps the mangrove_knowledge_base docstring parser and RuleRegistry
+Wraps the mangrove_kb docstring parser and RuleRegistry
 to provide signal discovery (free) and evaluation (x402 gated).
 """
 
 import pandas as pd
 
-from mangrove_knowledge_base.registry import RuleRegistry
-from mangrove_knowledge_base.docstring_parser import parse_all_signals
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.docstring_parser import parse_all_signals
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
 
 
 # Module-to-category mapping
@@ -280,11 +280,11 @@ python -m pytest tests/test_indicator_service.py -v
 # kb_server/services/indicator_service.py
 """Indicator metadata and computation service.
 
-Wraps the mangrove_knowledge_base indicator classes to provide
+Wraps the mangrove_kb indicator classes to provide
 discovery (free) and computation (x402 gated).
 """
 
-import mangrove_knowledge_base.indicators as ind_module
+import mangrove_kb.indicators as ind_module
 
 
 # Category mapping based on module
@@ -992,13 +992,13 @@ pip install build twine
 ```bash
 python -m build
 ```
-Expected: Creates `dist/mangrove_knowledge_base-0.1.0.tar.gz` and `dist/mangrove_knowledge_base-0.1.0-py3-none-any.whl`
+Expected: Creates `dist/mangrove_kb-0.1.0.tar.gz` and `dist/mangrove_kb-0.1.0-py3-none-any.whl`
 
 **Step 3: Test the wheel installs cleanly**
 
 ```bash
-pip install dist/mangrove_knowledge_base-0.1.0-py3-none-any.whl --force-reinstall
-python -c "from mangrove_knowledge_base import RuleRegistry; print(len(RuleRegistry._registry))"
+pip install dist/mangrove_kb-0.1.0-py3-none-any.whl --force-reinstall
+python -c "from mangrove_kb import RuleRegistry; print(len(RuleRegistry._registry))"
 ```
 Expected: 136
 

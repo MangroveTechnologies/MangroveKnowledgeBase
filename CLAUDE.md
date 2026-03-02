@@ -48,7 +48,7 @@ curl -X POST http://localhost:8081/api/evaluate \
 
 Open-source trading signals, technical indicators, and knowledge base. Three components:
 
-1. **Python Package** (`mangrove_knowledge_base`) -- 136 signal functions, 70 indicator classes (including 27 pattern indicators), RuleRegistry, docstring parser
+1. **Python Package** (`mangrove_kb`) -- 136 signal functions, 70 indicator classes (including 27 pattern indicators), RuleRegistry, docstring parser
 2. **KB Server** (`kb_server/`) -- Unified server with dual protocol access (REST + MCP) on the same port. FastAPI REST API + FastMCP tools. SQLite FTS5 full-text search, 11 trading education documents, glossary, cross-references, synonym expansion. Signal/indicator metadata (free) and computation (x402 gated).
 3. **Knowledge Base Content** (`knowledge-base/`) -- 11 markdown documents covering market foundations through quantitative analysis
 
@@ -57,7 +57,7 @@ MangroveAI consumes this as a pip dependency and connects to the KB server over 
 ## Project Structure
 
 ```
-mangrove_knowledge_base/       # pip package: signals, indicators, registry, parser
+mangrove_kb/       # pip package: signals, indicators, registry, parser
 kb_server/                     # unified server (REST + MCP)
   main.py                      # FastAPI + FastMCP mounted at /mcp
   services/                    # shared service layer
@@ -139,5 +139,5 @@ URL resolution handled by deployment automation. No hardcoded URLs in code.
 ## GitHub
 
 - Repo: [MangroveTechnologies/MangroveKnowledgeBase](https://github.com/MangroveTechnologies/MangroveKnowledgeBase)
-- Pip package name: `mangrove-knowledge-base`
-- Python package name: `mangrove_knowledge_base`
+- Pip package name: `mangrove-kb`
+- Python package name: `mangrove_kb`

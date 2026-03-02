@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["flake8", "mangrove_knowledge_base/", "--max-line-length=120", "--ignore=E501,W503"]
+    command: ["flake8", "mangrove_kb/", "--max-line-length=120", "--ignore=E501,W503"]
 
   mkb-knowledge-base:
     build:
