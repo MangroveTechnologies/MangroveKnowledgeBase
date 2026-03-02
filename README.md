@@ -4,6 +4,18 @@ Open-source trading signals, technical indicators, and knowledge base for quanti
 
 Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem.
 
+**If you find this useful, please star the repo** -- it helps others discover it and keeps the project growing.
+
+## Our Mission
+
+Mangrove is named after the mangrove tree -- an ecosystem where everything is interconnected, resilient, and thriving. In nature, mangroves protect coastlines, nurture marine life, and create conditions where diverse species flourish together.
+
+We believe the same principle applies to trading knowledge. The best strategies, the deepest understanding of markets, and the most reliable tools don't come from hoarding information behind paywalls. They come from a community that openly shares knowledge and experience.
+
+**MangroveKnowledgeBase is for the people, by the people.** Every signal function, every indicator implementation, and every education document in this repository exists because someone chose to share what they know. We invite you to do the same.
+
+Whether you're a quant who can improve an RSI calculation, a trader who spots a missing candlestick pattern, or a student who wants to add to the knowledge base -- your contribution makes the whole ecosystem stronger.
+
 ## What This Is
 
 MangroveKnowledgeBase is a standalone repository providing:
@@ -15,42 +27,7 @@ MangroveKnowledgeBase is a standalone repository providing:
 - **A docstring parser** that extracts structured metadata from signal functions at runtime
 - **A signal explorer notebook** with 7 sample OHLCV datasets for interactive signal visualization
 
-MangroveAI consumes this package as a pip dependency (`mangrove-knowledge-base`). Signals and indicators are designed to be used by trading strategy engines, backtesting frameworks, and AI agents.
-
-## Repository Structure
-
-```
-MangroveKnowledgeBase/
-  mangrove_knowledge_base/     # Python package (pip install)
-    registry.py                # RuleRegistry for signal evaluation by name
-    docstring_parser.py        # Extracts structured metadata from docstrings
-    signals/                   # 136 signal functions (5 categories)
-      momentum.py              # RSI, Stochastic, KAMA, ROC, PPO, PVO, ...
-      trend.py                 # SMA, EMA, MACD, ADX, Ichimoku, PSAR, ...
-      volume.py                # OBV, CMF, MFI, VWAP, ADI, VPT, NVI, ...
-      volatility.py            # Bollinger Bands, ATR, Keltner, Donchian, ...
-      patterns.py              # Doji, Hammer, Engulfing, MorningStar, NR7, ...
-    indicators/                # 70 indicator classes
-      momentum_indicators.py
-      trend_indicators.py
-      volume_indicators.py
-      volatility_indicators.py
-      return_indicators.py
-      pattern_indicators.py    # 27 candlestick/multi-bar pattern indicators
-      pattern_utils.py         # Vectorized candle geometry helpers
-  kb_server/                   # Unified server (REST + MCP)
-    main.py                    # FastAPI + FastMCP on same port
-    routers/                   # REST API routes
-    services/                  # Search, signals, indicators, cross-refs
-    mcp/                       # 16 MCP tools
-    x402/                      # Payment middleware and pricing
-    API.md                     # Full API endpoint documentation
-  knowledge-base/              # 11 trading education markdown documents
-  notebooks/                   # Signal explorer notebook
-  data/                        # 7 sample OHLCV datasets (BTC, ETH, SOL, ...)
-  tests/                       # 102 tests (services, API, MCP, x402, docstring parser, patterns)
-  findings/                    # Planning docs and session notes
-```
+Signals and indicators are designed to be used by trading strategy engines, backtesting frameworks, and AI agents.
 
 ## Installation
 
@@ -72,8 +49,8 @@ pip install -e ".[dev]"
 
 ```bash
 cd MangroveKnowledgeBase
-docker compose up -d knowledge-base
-# KB server available at http://localhost:8080
+docker compose up -d mkb-knowledge-base
+# KB server available at http://localhost:8081
 ```
 
 ## Quick Start
@@ -102,14 +79,15 @@ macd_line, signal_line = result['macd'], result['signal']
 Signals are boolean functions that evaluate market conditions:
 
 ```python
-from mangrove_knowledge_base.signals.momentum import rsi_oversold, stoch_overbought
+from mangrove_knowledge_base.signals.momentum import rsi_oversold
 from mangrove_knowledge_base.signals.trend import macd_bullish_cross
+from mangrove_knowledge_base.signals.patterns import hammer_trigger
 
 if rsi_oversold(df, window=14, threshold=30.0):
     print("RSI indicates oversold")
 
-if macd_bullish_cross(df, window_fast=12, window_slow=26, window_sign=9):
-    print("MACD bullish crossover detected")
+if hammer_trigger(df):
+    print("Hammer candlestick detected")
 ```
 
 ### Using RuleRegistry
@@ -140,41 +118,51 @@ metadata = parse_all_signals([momentum, trend, volume, volatility, patterns])
 
 ```bash
 # Search for trading concepts
-curl "http://localhost:8080/api/search?q=RSI+overbought&limit=5"
+curl "http://localhost:8081/api/search?q=RSI+overbought&limit=5"
 
 # Get a document
-curl "http://localhost:8080/api/documents/6-indicators"
+curl "http://localhost:8081/api/documents/6-indicators"
 
-# Look up a glossary term
-curl "http://localhost:8080/api/glossary/RSI"
+# Signal metadata (free)
+curl "http://localhost:8081/api/signals"
+
+# Evaluate a signal (x402 gated)
+curl -X POST http://localhost:8081/api/evaluate \
+  -H "Content-Type: application/json" \
+  -H "X-402-Payment: proof" \
+  -d '{"name":"rsi_oversold","ohlcv":{"Close":[100,101,99,98]},"params":{"window":14,"threshold":30}}'
+```
+
+## Repository Structure
+
+```
+MangroveKnowledgeBase/
+  mangrove_knowledge_base/     # Python package (pip install)
+    registry.py                # RuleRegistry for signal evaluation by name
+    docstring_parser.py        # Extracts structured metadata from docstrings
+    signals/                   # 136 signal functions (5 categories)
+    indicators/                # 70 indicator classes
+  kb_server/                   # Unified server (REST + MCP)
+    main.py                    # FastAPI + FastMCP on same port
+    services/                  # Search, signals, indicators, cross-refs
+    mcp/                       # 16 MCP tools
+    x402/                      # Payment middleware and pricing
+  knowledge-base/              # 11 trading education markdown documents
+  notebooks/                   # Signal explorer + validation notebooks
+  data/                        # 7 sample OHLCV datasets (BTC, ETH, SOL, ...)
+  tests/                       # 102 tests
 ```
 
 ## Signal Categories
 
-### Momentum (26 signals)
-
-RSI, Stochastic, Williams %R, TSI, Ultimate Oscillator, KAMA, ROC, Awesome Oscillator, Stochastic RSI, PPO, PVO
-
-### Trend (38 signals)
-
-SMA, EMA, WMA, MACD, ADX, Aroon, TRIX, Mass Index, Ichimoku, KST, DPO, CCI, Vortex, PSAR, STC
-
-### Volume (22 signals)
-
-ADI, OBV, CMF, Force Index, EOM, VPT, NVI, MFI, VWAP, Daily Return, Cumulative Return
-
-### Volatility (10 signals)
-
-Bollinger Bands, ATR, Keltner Channel, Donchian Channel, Ulcer Index
-
-### Patterns (40 signals)
-
-Doji (standard, long-legged, dragonfly, gravestone), Hammer, Hanging Man, Inverted Hammer, Shooting Star, Marubozu, Spinning Top, Engulfing, Harami, Piercing Line, Dark Cloud Cover, Tweezer Tops/Bottoms, Morning Star, Evening Star, Three White Soldiers, Three Black Crows, Three Inside Up/Down, Inside Bar, Outside Bar, Pin Bar, Two-Bar Reversal, NR7, plus 8 composite FILTER signals
-
-## Signal Types
-
-- **FILTER** (70 signals): State-based conditions evaluated every bar (e.g., "RSI > 70", "bullish pattern within 5 bars")
-- **TRIGGER** (66 signals): Event-based crossovers/detections that fire once per event (e.g., "MACD crosses above signal line", "hammer detected")
+| Category | TRIGGER | FILTER | Total | Examples |
+|----------|---------|--------|-------|----------|
+| Momentum | 8 | 18 | 26 | RSI, Stochastic, Williams %R, TSI, KAMA, ROC, PPO, PVO |
+| Trend | 18 | 20 | 38 | SMA, EMA, MACD, ADX, Aroon, Ichimoku, PSAR, Vortex |
+| Volume | 2 | 20 | 22 | OBV, CMF, MFI, VWAP, ADI, Force Index, NVI |
+| Volatility | 6 | 4 | 10 | Bollinger Bands, ATR, Keltner, Donchian, Ulcer Index |
+| Patterns | 32 | 8 | 40 | Doji, Hammer, Engulfing, MorningStar, NR7, Inside Bar |
+| **Total** | **66** | **70** | **136** | |
 
 ## Knowledge Base Content
 
@@ -193,14 +181,15 @@ Doji (standard, long-legged, dragonfly, gravestone), Hammer, Hanging Man, Invert
 | Glossary | 135 trading terms with abbreviations and cross-references |
 | Signals Quick Reference | Alphabetical index of all 136 signals |
 
-## MangroveAI Integration
+## Contributing
 
-MangroveAI consumes this package via pip. It supports both external (this package) and internal (local fallback) implementations, controlled by the `USE_EXTERNAL_KB` environment variable:
+We actively welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add signals, indicators, and knowledge base content.
 
-- `USE_EXTERNAL_KB=false` (default): MangroveAI uses its own local signal/indicator implementations
-- `USE_EXTERNAL_KB=true`: MangroveAI imports from this package
-
-All MangroveAI code uses the same import paths regardless of mode (`from MangroveAI.domains.signals.registry import RuleRegistry`). The toggle is transparent to consuming code.
+The best way to contribute:
+- Add a signal or indicator you use in your own trading
+- Improve the accuracy of an existing implementation
+- Add educational content to the knowledge base
+- Report bugs or suggest improvements via [GitHub Issues](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues)
 
 ## Development
 
@@ -208,19 +197,23 @@ All MangroveAI code uses the same import paths regardless of mode (`from Mangrov
 # Install with dev dependencies
 pip install -e ".[dev]"
 
-# Run tests
+# Run tests (102 tests)
 pytest tests/ -v
 
 # Lint
 flake8 mangrove_knowledge_base/ --max-line-length=120
 
-# Format
-black mangrove_knowledge_base/ tests/
-
 # Start KB server locally
-docker compose up -d knowledge-base
+docker compose up -d mkb-knowledge-base
 ```
+
+## Links
+
+- [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase)
+- [PyPI Package](https://pypi.org/project/mangrove-knowledge-base/)
+- [Documentation](https://docs.mangrovedeveloper.ai)
+- [Mangrove](https://mangrove.ai)
 
 ## License
 
-MIT
+[MIT](LICENSE) -- Use it freely. Cite it proudly. Contribute back when you can.
