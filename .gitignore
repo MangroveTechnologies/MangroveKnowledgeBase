@@ -43,3 +43,4 @@ Thumbs.db
 docs/knowledge-base-source/
 docs/mint.json
 docs/.mintlify/
+dist/
