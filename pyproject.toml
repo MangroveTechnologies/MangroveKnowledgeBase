@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "mangrove-knowledge-base"
 version = "0.1.0"
 description = "Open-source trading signals and technical indicators library"
-readme = "README.md"
+readme = "PKG_README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
