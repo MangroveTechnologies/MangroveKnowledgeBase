@@ -154,13 +154,19 @@ Timestamp  Open      High      Low       Close     Volume
 
 Required columns depend on the signal/indicator (check `Requires:` in docstrings or metadata).
 
+## Part of the Mangrove Ecosystem
+
+This package is part of [MangroveKnowledgeBase](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) -- an open-source project built on the belief that trading knowledge is stronger when shared openly. Visit the repo to learn about our mission, explore the full knowledge base, and see how you can contribute.
+
+**Star the repo** if you find this useful -- it helps others discover it.
+
 ## Links
 
-- [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase)
+- [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) -- star it, fork it, contribute
 - [Documentation](https://docs.mangrovedeveloper.ai)
-- [Signal Catalog](https://docs.mangrovedeveloper.ai/signals/catalog)
+- [Contributing Guide](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/CONTRIBUTING.md)
 - [Mangrove](https://mangrove.ai)
 
 ## License
 
-MIT
+[MIT](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/LICENSE) -- Use it freely. Cite it proudly. Contribute back when you can.
