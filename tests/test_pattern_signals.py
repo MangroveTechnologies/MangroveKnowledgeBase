@@ -11,9 +11,9 @@ Usage:
 
 import pytest
 
-from mangrove_knowledge_base.registry import RuleRegistry
-from mangrove_knowledge_base.signals import patterns as pattern_signals
-from mangrove_knowledge_base.docstring_parser import (
+from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.signals import patterns as pattern_signals
+from mangrove_kb.docstring_parser import (
     parse_signal_docstring,
     parse_all_signals,
 )

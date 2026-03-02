@@ -1,9 +1,9 @@
-# mangrove-knowledge-base
+# mangrove-kb
 
 Open-source trading signals and technical indicators for Python. Pure Python, no native dependencies.
 
 ```bash
-pip install mangrove-knowledge-base
+pip install mangrove-kb
 ```
 
 ## What You Get
@@ -20,7 +20,7 @@ Dependencies: numpy, pandas. That's it.
 All indicators use a stateless classmethod API. Pass data and params, get results:
 
 ```python
-from mangrove_knowledge_base.indicators import RSI, MACD, BollingerBands, EMA
+from mangrove_kb.indicators import RSI, MACD, BollingerBands, EMA
 import pandas as pd
 
 df = pd.read_csv("your_ohlcv_data.csv")
@@ -61,9 +61,9 @@ upper, middle, lower = result["hband"], result["mavg"], result["lband"]
 Signals are boolean functions. TRIGGER signals detect events (crossovers, pattern detections). FILTER signals check ongoing state (above/below thresholds).
 
 ```python
-from mangrove_knowledge_base.signals.momentum import rsi_oversold, rsi_overbought
-from mangrove_knowledge_base.signals.trend import macd_bullish_cross, ema_cross_up
-from mangrove_knowledge_base.signals.patterns import hammer_trigger, bullish_engulfing_trigger
+from mangrove_kb.signals.momentum import rsi_oversold, rsi_overbought
+from mangrove_kb.signals.trend import macd_bullish_cross, ema_cross_up
+from mangrove_kb.signals.patterns import hammer_trigger, bullish_engulfing_trigger
 
 # Direct function calls
 if rsi_oversold(df, window=14, threshold=30.0):
@@ -81,9 +81,9 @@ if macd_bullish_cross(df, window_fast=12, window_slow=26, window_sign=9):
 Evaluate signals by name -- useful for strategy engines and configuration-driven systems:
 
 ```python
-from mangrove_knowledge_base.registry import RuleRegistry
+from mangrove_kb.registry import RuleRegistry
 # Import signal modules to register them
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
 
 # Evaluate by name
 rule = {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30.0}}
@@ -109,8 +109,8 @@ print(f"Available signals: {len(RuleRegistry._registry)}")
 Every signal carries its metadata in its docstring. Extract it at runtime:
 
 ```python
-from mangrove_knowledge_base.docstring_parser import parse_all_signals
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.docstring_parser import parse_all_signals
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
 
 metadata = parse_all_signals([momentum, trend, volume, volatility, patterns])
 
@@ -126,7 +126,7 @@ print(sig["params"])      # {"window": {"type": "int", "min": 2, "max": 100, "de
 27 pattern indicator classes detect candlestick and multi-bar patterns:
 
 ```python
-from mangrove_knowledge_base.indicators import Hammer, BullishEngulfing, MorningStar, NR7
+from mangrove_kb.indicators import Hammer, BullishEngulfing, MorningStar, NR7
 
 # Hammer detection (returns 1 where detected, 0 otherwise)
 result = Hammer.compute(

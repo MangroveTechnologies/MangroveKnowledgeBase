@@ -34,7 +34,7 @@ Signals and indicators are designed to be used by trading strategy engines, back
 ### Python Package (signals + indicators)
 
 ```bash
-pip install mangrove-knowledge-base
+pip install mangrove-kb
 ```
 
 Or from source:
@@ -60,7 +60,7 @@ docker compose up -d mkb-knowledge-base
 All indicators use a stateless `compute()` classmethod API:
 
 ```python
-from mangrove_knowledge_base.indicators import RSI, MACD, BollingerBands
+from mangrove_kb.indicators import RSI, MACD, BollingerBands
 
 # RSI
 result = RSI.compute(data={'close': df['Close']}, params={'window': 14})
@@ -79,9 +79,9 @@ macd_line, signal_line = result['macd'], result['signal']
 Signals are boolean functions that evaluate market conditions:
 
 ```python
-from mangrove_knowledge_base.signals.momentum import rsi_oversold
-from mangrove_knowledge_base.signals.trend import macd_bullish_cross
-from mangrove_knowledge_base.signals.patterns import hammer_trigger
+from mangrove_kb.signals.momentum import rsi_oversold
+from mangrove_kb.signals.trend import macd_bullish_cross
+from mangrove_kb.signals.patterns import hammer_trigger
 
 if rsi_oversold(df, window=14, threshold=30.0):
     print("RSI indicates oversold")
@@ -95,8 +95,8 @@ if hammer_trigger(df):
 Evaluate signals by name -- useful for strategy engines:
 
 ```python
-from mangrove_knowledge_base.registry import RuleRegistry
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
 
 rule = {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30.0}}
 is_oversold = RuleRegistry.evaluate(rule, df)
@@ -107,8 +107,8 @@ is_oversold = RuleRegistry.evaluate(rule, df)
 The docstring parser extracts structured metadata from signal functions:
 
 ```python
-from mangrove_knowledge_base.docstring_parser import parse_all_signals
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.docstring_parser import parse_all_signals
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
 
 metadata = parse_all_signals([momentum, trend, volume, volatility, patterns])
 # Returns: {signal_name: {type, requires, params: {name: {type, min, max, default}}}}
@@ -137,7 +137,7 @@ curl -X POST http://localhost:8081/api/evaluate \
 
 ```
 MangroveKnowledgeBase/
-  mangrove_knowledge_base/     # Python package (pip install)
+  mangrove_kb/     # Python package (pip install)
     registry.py                # RuleRegistry for signal evaluation by name
     docstring_parser.py        # Extracts structured metadata from docstrings
     signals/                   # 136 signal functions (5 categories)
@@ -201,7 +201,7 @@ pip install -e ".[dev]"
 pytest tests/ -v
 
 # Lint
-flake8 mangrove_knowledge_base/ --max-line-length=120
+flake8 mangrove_kb/ --max-line-length=120
 
 # Start KB server locally
 docker compose up -d mkb-knowledge-base
@@ -210,7 +210,7 @@ docker compose up -d mkb-knowledge-base
 ## Links
 
 - [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase)
-- [PyPI Package](https://pypi.org/project/mangrove-knowledge-base/)
+- [PyPI Package](https://pypi.org/project/mangrove-kb/)
 - [Documentation](https://docs.mangrovedeveloper.ai)
 - [Mangrove](https://mangrove.ai)
 

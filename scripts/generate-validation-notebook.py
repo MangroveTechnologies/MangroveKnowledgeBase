@@ -51,7 +51,7 @@ def build_notebook():
     # Title
     cells.append(md_cell("""# Signal Validation Report
 
-Validates all 136 trading signals from `mangrove-knowledge-base` against BTC daily data (2022-2026).
+Validates all 136 trading signals from `mangrove-kb` against BTC daily data (2022-2026).
 Each signal gets one plot showing where it fires (TRIGGER) or is active (FILTER).
 
 **Dataset:** BTC/USD 1D, 1295 bars, 2022-08-01 to 2026-02-14"""))
@@ -63,9 +63,9 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
 
-from mangrove_knowledge_base.registry import RuleRegistry
-from mangrove_knowledge_base.docstring_parser import parse_all_signals
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.docstring_parser import parse_all_signals
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
 
 # Parse all signals
 SIGNAL_MODULES = [momentum, trend, volume, volatility, patterns]

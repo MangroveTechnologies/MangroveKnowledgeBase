@@ -23,8 +23,8 @@ References key (see findings/chart-patterns-plan.md Section 5 for full citations
 
 import pandas as pd
 
-from mangrove_knowledge_base.indicators.indicator_interface import IndicatorInterface
-from mangrove_knowledge_base.indicators.pattern_utils import (
+from mangrove_kb.indicators.indicator_interface import IndicatorInterface
+from mangrove_kb.indicators.pattern_utils import (
     candle_body,
     candle_range,
     upper_wick,

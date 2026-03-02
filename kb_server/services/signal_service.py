@@ -1,14 +1,14 @@
 """Signal metadata and evaluation service.
 
-Wraps the mangrove_knowledge_base docstring parser and RuleRegistry
+Wraps the mangrove_kb docstring parser and RuleRegistry
 to provide signal discovery (free) and evaluation (x402 gated).
 """
 
 import pandas as pd
 
-from mangrove_knowledge_base.registry import RuleRegistry
-from mangrove_knowledge_base.docstring_parser import parse_all_signals
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.docstring_parser import parse_all_signals
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
 
 _MODULE_CATEGORY = {
     "momentum": "Momentum",

@@ -1,11 +1,11 @@
 """Indicator metadata and computation service.
 
-Wraps the mangrove_knowledge_base indicator classes to provide
+Wraps the mangrove_kb indicator classes to provide
 discovery (free) and computation (x402 gated).
 """
 
-import mangrove_knowledge_base.indicators as ind_module
-from mangrove_knowledge_base.indicators.indicator_interface import IndicatorInterface
+import mangrove_kb.indicators as ind_module
+from mangrove_kb.indicators.indicator_interface import IndicatorInterface
 
 _INDICATOR_CATEGORIES = {
     "momentum_indicators": "Momentum",

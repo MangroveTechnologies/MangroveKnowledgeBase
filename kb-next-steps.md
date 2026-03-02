@@ -6,7 +6,7 @@ The repo has three clean components, no developer portal code:
 
 ```
 MangroveKnowledgeBase/
-  mangrove_knowledge_base/     # Pip package: 136 signals, 70 indicators, registry, parser
+  mangrove_kb/     # Pip package: 136 signals, 70 indicators, registry, parser
   kb_server/                   # FastAPI KB server (standalone, port 8080)
   knowledge-base/              # 11 trading education markdown documents (source of truth)
   docs/                        # Mintlify public docs site (docs.mangrovedeveloper.ai)
@@ -35,7 +35,7 @@ Navigation links between them:
 | Content | Source of truth | Flows to |
 |---------|----------------|----------|
 | Knowledge base (11 trading docs) | `knowledge-base/*.md` in this repo | `docs/knowledge-base-source/` (generated), KB server SQLite FTS5 |
-| Signal/indicator catalog | Docstrings in `mangrove_knowledge_base/` | `docs/signals/catalog.mdx` (generated) |
+| Signal/indicator catalog | Docstrings in `mangrove_kb/` | `docs/signals/catalog.mdx` (generated) |
 | API reference (OpenAPI) | MangroveAI live swagger.json | Mintlify fetches at build time |
 | User guides | MangroveAI `src/MangroveAdmin/frontend/public/docs/guides/` | `docs/guides/` in this repo (to be generated) |
 

@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mangrove-knowledge-base"
+name = "mangrove-kb"
 version = "0.1.0"
 description = "Open-source trading signals and technical indicators library"
 readme = "PKG_README.md"
@@ -41,7 +41,7 @@ Homepage = "https://github.com/MangroveTechnologies/MangroveKnowledgeBase"
 Repository = "https://github.com/MangroveTechnologies/MangroveKnowledgeBase"
 
 [tool.setuptools.packages.find]
-include = ["mangrove_knowledge_base*"]
+include = ["mangrove_kb*"]
 
 [tool.black]
 line-length = 120

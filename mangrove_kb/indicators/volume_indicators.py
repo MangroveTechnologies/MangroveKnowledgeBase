@@ -11,8 +11,8 @@ import typing as tp
 import numpy as np
 import pandas as pd
 
-from mangrove_knowledge_base.indicators.indicator_interface import IndicatorInterface
-from mangrove_knowledge_base.indicators.trend_indicators import EMA, SMA
+from mangrove_kb.indicators.indicator_interface import IndicatorInterface
+from mangrove_kb.indicators.trend_indicators import EMA, SMA
 
 
 class ADI(IndicatorInterface):

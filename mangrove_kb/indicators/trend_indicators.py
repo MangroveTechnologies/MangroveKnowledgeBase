@@ -9,8 +9,8 @@ Originally from ta-master library by Dario Lopez Padial (Bukosabino).
 import numpy as np
 import pandas as pd
 
-from mangrove_knowledge_base.indicators.indicator_interface import IndicatorInterface
-from mangrove_knowledge_base.indicators.utils import get_min_max, true_range
+from mangrove_kb.indicators.indicator_interface import IndicatorInterface
+from mangrove_kb.indicators.utils import get_min_max, true_range
 
 
 class SMA(IndicatorInterface):

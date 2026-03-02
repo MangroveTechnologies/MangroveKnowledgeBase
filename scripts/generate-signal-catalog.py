@@ -24,10 +24,10 @@ sys.path.insert(0, PROJECT_ROOT)
 # ---------------------------------------------------------------------------
 # Import the package -- this triggers signal registration
 # ---------------------------------------------------------------------------
-import mangrove_knowledge_base  # noqa: E402
-from mangrove_knowledge_base.registry import RuleRegistry  # noqa: E402
-from mangrove_knowledge_base.docstring_parser import parse_all_signals  # noqa: E402
-from mangrove_knowledge_base.signals import momentum, trend, volume, volatility, patterns  # noqa: E402
+import mangrove_kb  # noqa: E402
+from mangrove_kb.registry import RuleRegistry  # noqa: E402
+from mangrove_kb.docstring_parser import parse_all_signals  # noqa: E402
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Category classification
@@ -115,7 +115,7 @@ def _build_example_python(signal_name: str, params: dict) -> str:
     else:
         params_block = '    "parameters": {}'
 
-    return f"""from mangrove_knowledge_base import RuleRegistry
+    return f"""from mangrove_kb import RuleRegistry
 
 rule = {{
     "name": "{signal_name}",
