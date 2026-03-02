@@ -29,6 +29,12 @@ class Settings(BaseModel):
     # Cross-reference settings
     max_links_per_section: int = 1  # Only first occurrence gets linked
 
+    # x402 payment settings
+    v402_enabled: bool = True
+    v402_facilitator_url: str = "https://x402.org/facilitator"
+    v402_payment_address: str = ""
+    v402_network: str = "eip155:84532"
+
     class Config:
         env_prefix = "KB_SERVER_"
 

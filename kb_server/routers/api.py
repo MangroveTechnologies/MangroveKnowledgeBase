@@ -4,7 +4,7 @@ REST API endpoints for the Knowledge Base Document Server.
 
 import logging
 from typing import List, Optional
-from fastapi import APIRouter, Query, HTTPException, Depends
+from fastapi import APIRouter, Query, HTTPException, Depends, Request
 
 from ..models import (
     DocumentListResponse, DocumentSummary, Document, Section,
@@ -381,6 +381,44 @@ async def get_indicator(
     if indicator is None:
         raise HTTPException(status_code=404, detail=f"Indicator '{name}' not found")
     return indicator
+
+
+# =============================================================================
+# x402-Gated Computation Endpoints
+# =============================================================================
+
+@router.post("/evaluate")
+async def evaluate_signal_endpoint(request: Request, signal_svc=Depends(get_signal_service)):
+    """Evaluate a signal against OHLCV data. x402 gated."""
+    from kb_server.x402.middleware import validate_x402_payment
+    import pandas as pd
+    payment = validate_x402_payment(dict(request.headers), "evaluate_signal")
+    if not payment["valid"]:
+        raise HTTPException(status_code=402, detail=payment)
+    body = await request.json()
+    df = pd.DataFrame(body["ohlcv"])
+    result = signal_svc.evaluate(body["name"], df, body.get("params", {}))
+    return {"signal": body["name"], "result": result}
+
+@router.post("/compute")
+async def compute_indicator_endpoint(request: Request, indicator_svc=Depends(get_indicator_service)):
+    """Compute an indicator. x402 gated."""
+    from kb_server.x402.middleware import validate_x402_payment
+    import pandas as pd
+    payment = validate_x402_payment(dict(request.headers), "compute_indicator")
+    if not payment["valid"]:
+        raise HTTPException(status_code=402, detail=payment)
+    body = await request.json()
+    data = {k: pd.Series(v) for k, v in body["data"].items()}
+    result = indicator_svc.compute(body["name"], data, body.get("params", {}))
+    serialized = {}
+    for k, v in result.items():
+        if hasattr(v, "tolist"):
+            # Replace NaN with None for JSON compatibility
+            serialized[k] = [None if pd.isna(x) else x for x in v]
+        else:
+            serialized[k] = v
+    return {"indicator": body["name"], "result": serialized}
 
 
 # =============================================================================
