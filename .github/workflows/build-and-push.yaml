@@ -1,4 +1,4 @@
-name: Deploy KB Server to Dev
+name: Build and Push KB Image
 
 on:
   push:
@@ -10,12 +10,10 @@ env:
   REGION: us-central1
   GCP_REPO_PROJECT: mangroveai-platform
   REPO_NAME: mangrove-ai-repo
-  KB_SERVICE_NAME: mangrove-knowledgebase-dev
   KB_IMAGE_NAME: mangrove-ai-kb
-  KB_URL: devkb.mangrove.trade
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +23,7 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_DEV_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_AR_SA_KEY }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -47,23 +45,10 @@ jobs:
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:latest
 
-      - name: Deploy to Cloud Run
-        run: |
-          gcloud run deploy ${{ env.KB_SERVICE_NAME }} \
-            --region ${{ env.REGION }} \
-            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:${{ github.sha }}
-
-      - name: Health Check
-        run: |
-          echo "Waiting for service..."
-          sleep 30
-          curl --fail --retry 5 --retry-delay 10 --retry-all-errors \
-            "https://${{ env.KB_URL }}/api/status"
-
-      - name: Deployment Summary
+      - name: Summary
         if: success()
         run: |
-          echo "==================== KB DEPLOYMENT SUCCESSFUL ===================="
-          echo "Service: ${{ env.KB_SERVICE_NAME }}"
-          echo "URL: https://${{ env.KB_URL }}"
-          echo "==================================================================="
+          echo "==================== KB IMAGE PUSHED ===================="
+          echo "Image: ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:${{ github.sha }}"
+          echo "Tag: latest"
+          echo "========================================================="
