@@ -341,7 +341,7 @@ def eom_bearish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
 
 
 @RuleRegistry.register("vpt_bullish")
-def vpt_bullish(df: pd.DataFrame, lookback: int = 20) -> bool:
+def vpt_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     """
     Check if VPT (Volume Price Trend) is rising.
 
@@ -350,26 +350,26 @@ def vpt_bullish(df: pd.DataFrame, lookback: int = 20) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Lookback for trend. Range: 5-50. Default: 20.
+        window (int): Window for trend comparison. Range: 5-50. Default: 20.
 
     Returns:
         bool: True if VPT trending up, False otherwise.
     """
-    if len(df) < lookback:
+    if len(df) < window:
         return False
 
     result = VPT.compute(data={'close': df["Close"], 'volume': df["Volume"],
     }, params={'smoothing_factor': None, 'dropnans': False})
     vpt = result['vpt']
 
-    if len(vpt) < lookback or pd.isna(vpt.iloc[-1]) or pd.isna(vpt.iloc[-lookback]):
+    if len(vpt) < window or pd.isna(vpt.iloc[-1]) or pd.isna(vpt.iloc[-window]):
         return False
 
-    return float(vpt.iloc[-1]) > float(vpt.iloc[-lookback])
+    return float(vpt.iloc[-1]) > float(vpt.iloc[-window])
 
 
 @RuleRegistry.register("vpt_bearish")
-def vpt_bearish(df: pd.DataFrame, lookback: int = 20) -> bool:
+def vpt_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     """
     Check if VPT (Volume Price Trend) is falling.
 
@@ -378,22 +378,22 @@ def vpt_bearish(df: pd.DataFrame, lookback: int = 20) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Lookback for trend. Range: 5-50. Default: 20.
+        window (int): Window for trend comparison. Range: 5-50. Default: 20.
 
     Returns:
         bool: True if VPT trending down, False otherwise.
     """
-    if len(df) < lookback:
+    if len(df) < window:
         return False
 
     result = VPT.compute(data={'close': df["Close"], 'volume': df["Volume"],
     }, params={'smoothing_factor': None, 'dropnans': False})
     vpt = result['vpt']
 
-    if len(vpt) < lookback or pd.isna(vpt.iloc[-1]) or pd.isna(vpt.iloc[-lookback]):
+    if len(vpt) < window or pd.isna(vpt.iloc[-1]) or pd.isna(vpt.iloc[-window]):
         return False
 
-    return float(vpt.iloc[-1]) < float(vpt.iloc[-lookback])
+    return float(vpt.iloc[-1]) < float(vpt.iloc[-window])
 
 
 @RuleRegistry.register("nvi_bullish")
