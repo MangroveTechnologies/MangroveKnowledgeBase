@@ -17,7 +17,7 @@ Indicator Categories:
     - Return indicators
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from mangrove_kb.registry import RuleRegistry
 from mangrove_kb import indicators
