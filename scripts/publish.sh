@@ -59,7 +59,8 @@ echo ""
 
 # --- Bump version ---
 sed -i "s/^version = \"$CURRENT\"/version = \"$NEW_VERSION\"/" "$PYPROJECT"
-echo "Updated $PYPROJECT to $NEW_VERSION"
+sed -i "s/__version__ = \"$CURRENT\"/__version__ = \"$NEW_VERSION\"/" mangrove_kb/__init__.py
+echo "Updated $PYPROJECT and mangrove_kb/__init__.py to $NEW_VERSION"
 
 # --- Clean and build ---
 rm -rf dist/ build/ *.egg-info mangrove_kb.egg-info
@@ -73,7 +74,7 @@ twine upload dist/*
 echo ""
 
 # --- Git tag ---
-git add "$PYPROJECT"
+git add "$PYPROJECT" mangrove_kb/__init__.py
 git commit -m "release: v${NEW_VERSION}"
 git tag -a "v${NEW_VERSION}" -m "Release v${NEW_VERSION}"
 
