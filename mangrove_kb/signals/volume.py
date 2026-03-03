@@ -36,7 +36,6 @@ from mangrove_kb.indicators import (
     MFI,
     VWAP,
     DailyReturn,
-    DailyLogReturn,
     CumulativeReturn,
 )
 
