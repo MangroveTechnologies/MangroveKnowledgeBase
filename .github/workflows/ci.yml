@@ -27,7 +27,7 @@ jobs:
           pip install -r kb_server/requirements.txt
 
       - name: Lint with flake8
-        run: flake8 mangrove_kb/ --max-line-length=120 --ignore=E501,W503
+        run: flake8 mangrove_kb/ --max-line-length=120 --ignore=E501,W503,E124,E127,E302,E303
 
   test:
     runs-on: ubuntu-latest

@@ -471,7 +471,9 @@ def parse_all_signals(signal_modules: list) -> dict:
 
     all_signals = {}
 
-    for name, func in registry.items():
+    # Snapshot the registry to avoid "dictionary changed size during iteration"
+    # when signal module imports trigger late registrations.
+    for name, func in dict(registry).items():
         # Check if this function belongs to one of the provided modules
         func_module = getattr(func, "__module__", None)
         if func_module is None:

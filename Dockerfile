@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml README.md ./
-COPY mangrove_knowledge_base/ ./mangrove_knowledge_base/
+COPY pyproject.toml PKG_README.md ./
+COPY mangrove_kb/ ./mangrove_kb/
 
 RUN pip install --no-cache-dir -e ".[dev]"
 
