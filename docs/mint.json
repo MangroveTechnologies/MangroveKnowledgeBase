@@ -1,0 +1,113 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Mangrove Developer Docs",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#42a7c6",
+    "light": "#74c3d5",
+    "dark": "#2b5664",
+    "background": {
+      "dark": "#1a1a2e"
+    },
+    "anchors": {
+      "from": "#42a7c6",
+      "to": "#ff9e18"
+    }
+  },
+  "openapi": "openapi3.json",
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/MangroveTechnologies"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Developer Portal",
+    "url": "https://app.mangrovedeveloper.ai"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    },
+    {
+      "name": "Knowledge Base",
+      "url": "knowledge-base"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": ["introduction", "quickstart", "authentication"]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/overview",
+        "api-reference/strategies",
+        "api-reference/signals",
+        "api-reference/backtesting",
+        "api-reference/ai-copilot",
+        "api-reference/execution",
+        "api-reference/crypto-assets",
+        "api-reference/market-data"
+      ]
+    },
+    {
+      "group": "Signals",
+      "pages": [
+        "signals/overview",
+        "signals/catalog"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/understanding-signals",
+        "guides/creating-a-strategy",
+        "guides/running-a-backtest",
+        "guides/using-the-ai-copilot",
+        "guides/risk-management"
+      ]
+    },
+    {
+      "group": "Architecture",
+      "pages": [
+        "architecture/overview",
+        "architecture/domain-driven-design"
+      ]
+    },
+    {
+      "group": "Knowledge Base",
+      "pages": [
+        "knowledge-base-source/01-market-foundations",
+        "knowledge-base-source/02-instruments-market-mechanics",
+        "knowledge-base-source/03-core-trading-concepts",
+        "knowledge-base-source/04-strategy-design-modeling",
+        "knowledge-base-source/05-risk-management",
+        "knowledge-base-source/06-indicators",
+        "knowledge-base-source/07-chart-patterns",
+        "knowledge-base-source/08-quantitative-analysis",
+        "knowledge-base-source/09-glossary",
+        "knowledge-base-source/10-signals-quick-reference"
+      ]
+    },
+    {
+      "group": "Development",
+      "pages": [
+        "development/getting-started",
+        "development/docker-setup",
+        "development/testing-guide",
+        "development/api-versioning",
+        "development/commit-standards"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/MangroveTechnologies"
+  }
+}
