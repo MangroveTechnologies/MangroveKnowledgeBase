@@ -1,0 +1,45 @@
+# Stage 1: Build - Install mintlify CLI, run prebuild to generate content
+FROM node:20-slim AS builder
+
+# Install mintlify CLI globally
+RUN npm install -g mintlify@4.2.414
+
+# Copy docs source content
+WORKDIR /docs-source
+COPY docs/ .
+
+# Run mintlify dev briefly to:
+# 1. Download the pre-built Next.js client to ~/.mintlify/mint/
+# 2. Run prebuild() to populate src/_props/ and public/ with processed content
+# Then kill it - we only need the prebuild output, not the dev server
+RUN mintlify dev --port 9999 & \
+    MPID=$! && \
+    # Wait for "preview ready" signal (prebuild complete)
+    for i in $(seq 1 60); do \
+      if curl -s -o /dev/null http://localhost:9999/ 2>/dev/null; then break; fi; \
+      sleep 2; \
+    done && \
+    kill $MPID 2>/dev/null; \
+    wait $MPID 2>/dev/null || true
+
+# Stage 2: Runtime - minimal image with just the built client
+FROM node:20-slim
+
+WORKDIR /app
+
+# Copy the pre-built Next.js standalone client
+COPY --from=builder /root/.mintlify/mint/apps/client/ ./client/
+
+# Copy required node_modules (next.js runtime dependencies)
+COPY --from=builder /root/.mintlify/mint/node_modules/ ./node_modules/
+
+# The standalone server resolves 'next' from node_modules
+# Set NODE_PATH so the client's server.js can find the parent node_modules
+ENV NODE_PATH=/app/node_modules
+ENV NODE_ENV=production
+ENV PORT=3000
+
+EXPOSE 3000
+
+WORKDIR /app/client
+CMD ["node", "server.js"]
