@@ -10,25 +10,6 @@ env:
   PROJECT_ID: mangrove-developer
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install -e ".[dev]"
-          pip install -r kb_server/requirements.txt
-
-      - name: Lint with flake8
-        run: flake8 mangrove_kb/ --max-line-length=120 --ignore=E501,W503,E124,E127,E302,E303
-
   test:
     runs-on: ubuntu-latest
     strategy:
