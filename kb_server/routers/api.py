@@ -426,7 +426,7 @@ async def compute_indicator_endpoint(request: Request, indicator_svc=Depends(get
 # =============================================================================
 
 @router.post("/reindex")
-async def reindex_knowledge_base(
+def reindex_knowledge_base(
     search_engine: SearchEngine = Depends(get_search_engine),
     cross_ref: CrossReferenceEngine = Depends(get_cross_ref_engine),
     loader: DocumentLoader = Depends(get_document_loader)
