@@ -14,7 +14,6 @@ COPY docs/ .
 # Then kill it - we only need the prebuild output, not the dev server
 RUN mintlify dev --port 9999 & \
     MPID=$! && \
-    # Wait for "preview ready" signal (prebuild complete)
     for i in $(seq 1 60); do \
       if curl -s -o /dev/null http://localhost:9999/ 2>/dev/null; then break; fi; \
       sleep 2; \
@@ -22,8 +21,14 @@ RUN mintlify dev --port 9999 & \
     kill $MPID 2>/dev/null; \
     wait $MPID 2>/dev/null || true
 
-# Stage 2: Runtime - minimal image with just the built client
+# Stage 2: Runtime - nginx serves static files, node serves dynamic routes
+# nginx is needed because Next.js standalone server does not properly decode
+# percent-encoded parentheses in static file paths (e.g. route groups like
+# "(local)" become "%28local%29" in browser requests, causing 404s).
 FROM node:20-slim
+
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends nginx \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -33,13 +38,14 @@ COPY --from=builder /root/.mintlify/mint/apps/client/ ./client/
 # Copy required node_modules (next.js runtime dependencies)
 COPY --from=builder /root/.mintlify/mint/node_modules/ ./node_modules/
 
-# The standalone server resolves 'next' from node_modules
-# Set NODE_PATH so the client's server.js can find the parent node_modules
+# nginx config: serve _next/static directly, proxy rest to Next.js
+COPY nginx-docs.conf /etc/nginx/sites-available/default
+
 ENV NODE_PATH=/app/node_modules
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 EXPOSE 3000
 
-WORKDIR /app/client
-CMD ["node", "server.js"]
+# Start nginx (background) then Next.js standalone server on port 3001
+CMD nginx && PORT=3001 node /app/client/server.js
