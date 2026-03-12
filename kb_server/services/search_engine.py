@@ -168,10 +168,22 @@ class SearchEngine:
 
     @contextmanager
     def _get_connection(self):
-        """Get a database connection with proper settings."""
-        conn = sqlite3.connect(str(self.db_path))
+        """
+        Get a database connection with optimised settings for concurrent reads.
+
+        WAL mode allows multiple simultaneous readers without blocking each other,
+        which is essential now that sync route handlers run in Starlette's thread pool.
+        cache_size and mmap_size keep the FTS5 inverted index in memory, avoiding
+        repeated disk I/O on every BM25 ranking pass.
+        """
+        conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("PRAGMA journal_mode = WAL")
+        conn.execute("PRAGMA synchronous = NORMAL")
+        conn.execute("PRAGMA cache_size = -32000")    # 32 MB page cache per connection
+        conn.execute("PRAGMA mmap_size = 268435456")  # 256 MB memory-mapped I/O
+        conn.execute("PRAGMA temp_store = MEMORY")
         try:
             yield conn
         finally:
@@ -277,13 +289,39 @@ class SearchEngine:
         tags_matched = set()
 
         with self._get_connection() as conn:
-            # Search documents
-            doc_results = self._search_documents(conn, search_query, tags, limit)
-            results.extend(doc_results)
+            # Fetch raw rows from both FTS tables, then resolve tags in one batch
+            doc_rows = self._fetch_document_rows(conn, search_query, tags, limit)
+            sec_rows = self._fetch_section_rows(conn, search_query, tags, limit)
 
-            # Search sections
-            section_results = self._search_sections(conn, search_query, tags, limit)
-            results.extend(section_results)
+            # Single round-trip for all tags needed by both result sets
+            all_slugs = list({r['slug'] for r in doc_rows} | {r['doc_slug'] for r in sec_rows})
+            tags_by_slug = self._get_tags_for_slugs(conn, all_slugs)
+
+            for row in doc_rows:
+                doc_tags = tags_by_slug.get(row['slug'], [])
+                results.append(SearchResult(
+                    document_slug=row['slug'],
+                    document_title=row['title'],
+                    section_anchor=None,
+                    section_title=None,
+                    snippet=row['snippet'] or row['summary'] or '',
+                    relevance_score=abs(row['score']) + (row['importance'] / 100),
+                    match_type='document',
+                    tags=doc_tags
+                ))
+
+            for row in sec_rows:
+                doc_tags = tags_by_slug.get(row['doc_slug'], [])
+                results.append(SearchResult(
+                    document_slug=row['doc_slug'],
+                    document_title=row['doc_title'],
+                    section_anchor=row['anchor'],
+                    section_title=row['title'],
+                    snippet=row['snippet'] or '',
+                    relevance_score=abs(row['score']),
+                    match_type='section',
+                    tags=doc_tags
+                ))
 
             # Collect matched tags
             for result in results:
@@ -409,17 +447,14 @@ class SearchEngine:
 
         return glossary_results, other_results
 
-    def _search_documents(
+    def _fetch_document_rows(
         self,
         conn: sqlite3.Connection,
         query: str,
         tags: Optional[List[str]],
         limit: int
-    ) -> List[SearchResult]:
-        """Search documents table."""
-        results = []
-
-        # Build query
+    ) -> List[sqlite3.Row]:
+        """Run FTS query against documents table, return raw rows."""
         sql = """
             SELECT
                 d.slug,
@@ -431,10 +466,8 @@ class SearchEngine:
             FROM documents_fts
             JOIN documents d ON documents_fts.rowid = d.id
         """
-
         params = []
 
-        # Add tag filter if specified
         if tags:
             sql += """
                 JOIN document_tags dt ON d.id = dt.document_id
@@ -452,38 +485,18 @@ class SearchEngine:
         params.append(limit)
 
         try:
-            rows = conn.execute(sql, params).fetchall()
-
-            for row in rows:
-                # Get document tags
-                doc_tags = self._get_document_tags(conn, row['slug'])
-
-                results.append(SearchResult(
-                    document_slug=row['slug'],
-                    document_title=row['title'],
-                    section_anchor=None,
-                    section_title=None,
-                    snippet=row['snippet'] or row['summary'] or '',
-                    relevance_score=abs(row['score']) + (row['importance'] / 100),
-                    match_type='document',
-                    tags=doc_tags
-                ))
+            return conn.execute(sql, params).fetchall()
         except sqlite3.OperationalError:
-            # FTS query syntax error - try simpler query
-            pass
+            return []
 
-        return results
-
-    def _search_sections(
+    def _fetch_section_rows(
         self,
         conn: sqlite3.Connection,
         query: str,
         tags: Optional[List[str]],
         limit: int
-    ) -> List[SearchResult]:
-        """Search sections table."""
-        results = []
-
+    ) -> List[sqlite3.Row]:
+        """Run FTS query against sections table, return raw rows."""
         sql = """
             SELECT
                 d.slug as doc_slug,
@@ -496,7 +509,6 @@ class SearchEngine:
             JOIN sections s ON sections_fts.rowid = s.id
             JOIN documents d ON s.document_id = d.id
         """
-
         params = []
 
         if tags:
@@ -515,25 +527,36 @@ class SearchEngine:
         params.append(limit)
 
         try:
-            rows = conn.execute(sql, params).fetchall()
-
-            for row in rows:
-                doc_tags = self._get_document_tags(conn, row['doc_slug'])
-
-                results.append(SearchResult(
-                    document_slug=row['doc_slug'],
-                    document_title=row['doc_title'],
-                    section_anchor=row['anchor'],
-                    section_title=row['title'],
-                    snippet=row['snippet'] or '',
-                    relevance_score=abs(row['score']),
-                    match_type='section',
-                    tags=doc_tags
-                ))
+            return conn.execute(sql, params).fetchall()
         except sqlite3.OperationalError:
-            pass
+            return []
 
-        return results
+    def _get_tags_for_slugs(
+        self,
+        conn: sqlite3.Connection,
+        slugs: List[str]
+    ) -> Dict[str, List[str]]:
+        """
+        Fetch tags for multiple document slugs in a single query.
+
+        Replaces the previous per-row _get_document_tags() pattern which caused
+        up to 40 extra round-trips per search request.
+        """
+        if not slugs:
+            return {}
+        placeholders = ','.join('?' * len(slugs))
+        rows = conn.execute(f"""
+            SELECT d.slug, t.name
+            FROM tags t
+            JOIN document_tags dt ON t.id = dt.tag_id
+            JOIN documents d ON dt.document_id = d.id
+            WHERE d.slug IN ({placeholders})
+        """, slugs).fetchall()
+
+        result: Dict[str, List[str]] = {}
+        for row in rows:
+            result.setdefault(row['slug'], []).append(row['name'])
+        return result
 
     def _prepare_fts_query(self, query: str) -> str:
         """
@@ -668,23 +691,35 @@ class SearchEngine:
                 ORDER BY importance DESC, title
             """).fetchall()
 
-            result = []
-            for doc in docs:
-                tags = self._get_document_tags(conn, doc['slug'])
-                section_count = conn.execute(
-                    "SELECT COUNT(*) as count FROM sections WHERE document_id = ?",
-                    (doc['id'],)
-                ).fetchone()['count']
+            if not docs:
+                return []
 
-                result.append({
+            slugs = [doc['slug'] for doc in docs]
+            tags_by_slug = self._get_tags_for_slugs(conn, slugs)
+
+            # Fetch all section counts in one query
+            id_to_slug = {doc['id']: doc['slug'] for doc in docs}
+            count_rows = conn.execute("""
+                SELECT document_id, COUNT(*) as count
+                FROM sections
+                GROUP BY document_id
+            """).fetchall()
+            section_counts = {
+                id_to_slug[row['document_id']]: row['count']
+                for row in count_rows
+                if row['document_id'] in id_to_slug
+            }
+
+            return [
+                {
                     'slug': doc['slug'],
                     'title': doc['title'],
                     'summary': doc['summary'],
-                    'tags': tags,
-                    'section_count': section_count
-                })
-
-            return result
+                    'tags': tags_by_slug.get(doc['slug'], []),
+                    'section_count': section_counts.get(doc['slug'], 0),
+                }
+                for doc in docs
+            ]
 
     def store_term_reference(
         self,
