@@ -74,7 +74,7 @@ def get_indicator_service() -> IndicatorService:
 # =============================================================================
 
 @router.get("/documents", response_model=DocumentListResponse)
-async def list_documents(
+def list_documents(
     search_engine: SearchEngine = Depends(get_search_engine)
 ):
     """
@@ -100,7 +100,7 @@ async def list_documents(
 
 
 @router.get("/documents/{slug}")
-async def get_document(
+def get_document(
     slug: str,
     search_engine: SearchEngine = Depends(get_search_engine)
 ):
@@ -118,7 +118,7 @@ async def get_document(
 
 
 @router.get("/documents/{slug}/sections")
-async def get_document_sections(
+def get_document_sections(
     slug: str,
     search_engine: SearchEngine = Depends(get_search_engine)
 ):
@@ -144,7 +144,7 @@ async def get_document_sections(
 # =============================================================================
 
 @router.get("/search", response_model=SearchResponse)
-async def search(
+def search(
     q: str = Query(..., min_length=1, description="Search query"),
     tags: Optional[str] = Query(None, description="Comma-separated tags to filter by"),
     limit: int = Query(20, ge=1, le=100, description="Maximum results"),
@@ -179,7 +179,7 @@ async def search(
 # =============================================================================
 
 @router.get("/tags", response_model=TagListResponse)
-async def list_tags(
+def list_tags(
     search_engine: SearchEngine = Depends(get_search_engine)
 ):
     """
@@ -194,7 +194,7 @@ async def list_tags(
 
 
 @router.get("/tags/{tag_name}")
-async def get_documents_by_tag(
+def get_documents_by_tag(
     tag_name: str,
     search_engine: SearchEngine = Depends(get_search_engine)
 ):
@@ -234,7 +234,7 @@ async def get_documents_by_tag(
 # =============================================================================
 
 @router.get("/glossary", response_model=GlossaryResponse)
-async def get_glossary(
+def get_glossary(
     cross_ref: CrossReferenceEngine = Depends(get_cross_ref_engine),
     loader: DocumentLoader = Depends(get_document_loader)
 ):
@@ -255,7 +255,7 @@ async def get_glossary(
 
 
 @router.get("/glossary/{term}")
-async def get_glossary_term(
+def get_glossary_term(
     term: str,
     cross_ref: CrossReferenceEngine = Depends(get_cross_ref_engine),
     loader: DocumentLoader = Depends(get_document_loader),
@@ -300,7 +300,7 @@ async def get_glossary_term(
 # =============================================================================
 
 @router.get("/backlinks/{anchor}")
-async def get_backlinks(
+def get_backlinks(
     anchor: str,
     search_engine: SearchEngine = Depends(get_search_engine)
 ):
@@ -321,7 +321,7 @@ async def get_backlinks(
 # =============================================================================
 
 @router.get("/signals")
-async def list_signals(
+def list_signals(
     category: Optional[str] = Query(None, description="Filter by category (Momentum, Trend, Volume, Volatility, Patterns)"),
     signal_type: Optional[str] = Query(None, description="Filter by type (TRIGGER or FILTER)"),
     signal_service: SignalService = Depends(get_signal_service)
@@ -337,7 +337,7 @@ async def list_signals(
 
 
 @router.get("/signals/{name}")
-async def get_signal(
+def get_signal(
     name: str,
     signal_service: SignalService = Depends(get_signal_service)
 ):
@@ -355,7 +355,7 @@ async def get_signal(
 # =============================================================================
 
 @router.get("/indicators")
-async def list_indicators(
+def list_indicators(
     category: Optional[str] = Query(None, description="Filter by category (Momentum, Trend, Volume, Volatility, Patterns, Returns)"),
     indicator_service: IndicatorService = Depends(get_indicator_service)
 ):
@@ -370,7 +370,7 @@ async def list_indicators(
 
 
 @router.get("/indicators/{name}")
-async def get_indicator(
+def get_indicator(
     name: str,
     indicator_service: IndicatorService = Depends(get_indicator_service)
 ):
@@ -469,7 +469,7 @@ async def reindex_knowledge_base(
 
 
 @router.get("/status")
-async def get_status(
+def get_status(
     search_engine: SearchEngine = Depends(get_search_engine),
     cross_ref: CrossReferenceEngine = Depends(get_cross_ref_engine)
 ):

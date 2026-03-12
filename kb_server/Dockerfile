@@ -53,4 +53,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/status')" || exit 1
 
 # Default command: Initialize DB and start server
-CMD ["sh", "-c", "cd /app/kb_server && python init_db.py --force && cd /app && python -m uvicorn kb_server.main:app --host 0.0.0.0 --port 8080"]
+CMD ["sh", "-c", "cd /app/kb_server && python init_db.py --force && cd /app && python -m uvicorn kb_server.main:app --host 0.0.0.0 --port 8080 --workers 2"]
