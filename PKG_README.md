@@ -138,7 +138,7 @@ hammers = result["hammer"]  # pd.Series of 0/1
 # NR7 (Narrowest Range of 7 bars)
 result = NR7.compute(
     data={"high": df["High"], "low": df["Low"]},
-    params={"lookback": 7},
+    params={"window": 7},
 )
 nr7_bars = result["nr7"]
 ```

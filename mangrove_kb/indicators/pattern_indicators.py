@@ -826,23 +826,23 @@ class NarrowRange(IndicatorInterface):
     """Narrow range pattern detection (NR4/NR7).
 
     Detects when the current bar has the smallest range within the
-    lookback period. Default lookback=7 gives NR7; use 4 for NR4.
+    window period. Default window=7 gives NR7; use 4 for NR4.
 
     References: [CRABEL], [KB-07], [CHARTSCHOOL-NR7], [BULKOWSKI]
     """
 
     _data = ["high", "low"]
-    _params = ["lookback"]
+    _params = ["window"]
     _outputs = ["narrow_range"]
 
     @classmethod
     def _compute(cls, data, params):
         h, l = data["high"], data["low"]
         rng = candle_range(h, l)
-        lookback = params["lookback"]
+        window = params["window"]
 
         # Current range must be strictly less than all previous N ranges
-        rolling_min = rng.shift(1).rolling(window=lookback - 1, min_periods=lookback - 1).min()
+        rolling_min = rng.shift(1).rolling(window=window - 1, min_periods=window - 1).min()
         detected = (rng < rolling_min).astype(int)
         # NaN rows get 0
         detected = detected.fillna(0).astype(int)
