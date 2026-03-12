@@ -883,39 +883,39 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame) -> bool:
 
 
 @RuleRegistry.register("nr7_trigger")
-def nr7_trigger(df: pd.DataFrame, lookback: int = 7) -> bool:
+def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
     """
     Check if a narrow range day is detected on the current bar.
 
-    Current bar has the smallest range within the lookback period.
+    Current bar has the smallest range within the window period.
     Signals volatility compression and imminent breakout.
-    Default lookback=7 for NR7; use 4 for NR4. References: [CRABEL], [KB-07], [BULKOWSKI].
+    Default window=7 for NR7; use 4 for NR4. References: [CRABEL], [KB-07], [BULKOWSKI].
 
     Type: TRIGGER
     Requires: High, Low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of bars to compare range against. Range: 4-20. Default: 7.
+        window (int): Number of bars to compare range against. Range: 4-20. Default: 7.
 
     Returns:
         bool: True if narrow range detected on current bar, False otherwise.
     """
-    if len(df) < lookback:
+    if len(df) < window:
         return False
-    result = NarrowRange.compute(data=_hl_data(df), params={"lookback": lookback})
+    result = NarrowRange.compute(data=_hl_data(df), params={"lookback": window})
     return int(result["narrow_range"].iloc[-1]) == 1
 
 
 # =============================================================================
-# FILTER Signals (Pattern Within Lookback Window)
+# FILTER Signals (Pattern Within Recent Window)
 # =============================================================================
 
 
 @RuleRegistry.register("bullish_pattern_recent")
-def bullish_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
+def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if any bullish candlestick pattern was detected within lookback bars.
+    Check if any bullish candlestick pattern was detected within recent window.
 
     Scans for hammer, inverted hammer, bullish engulfing, bullish harami,
     piercing line, morning star, dragonfly doji, three white soldiers,
@@ -926,10 +926,10 @@ def bullish_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if any bullish pattern found in lookback window, False otherwise.
+        bool: True if any bullish pattern found in recent window, False otherwise.
     """
     if len(df) < 2:
         return False
@@ -954,16 +954,16 @@ def bullish_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
         ])
 
     for series in checks:
-        window = series.iloc[-lookback:]
-        if (window > 0).any():
+        recent = series.iloc[-window:]
+        if (recent > 0).any():
             return True
     return False
 
 
 @RuleRegistry.register("bearish_pattern_recent")
-def bearish_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
+def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if any bearish candlestick pattern was detected within lookback bars.
+    Check if any bearish candlestick pattern was detected within recent window.
 
     Scans for hanging man, shooting star, bearish engulfing, bearish harami,
     dark cloud cover, evening star, gravestone doji, three black crows,
@@ -974,10 +974,10 @@ def bearish_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if any bearish pattern found in lookback window, False otherwise.
+        bool: True if any bearish pattern found in recent window, False otherwise.
     """
     if len(df) < 2:
         return False
@@ -1002,16 +1002,16 @@ def bearish_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
         ])
 
     for series in checks:
-        window = series.iloc[-lookback:]
-        if (window > 0).any():
+        recent = series.iloc[-window:]
+        if (recent > 0).any():
             return True
     return False
 
 
 @RuleRegistry.register("reversal_pattern_bullish")
-def reversal_pattern_bullish(df: pd.DataFrame, lookback: int = 5) -> bool:
+def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if a bullish reversal pattern was detected within lookback bars.
+    Check if a bullish reversal pattern was detected within recent window.
 
     Scans for hammer, inverted hammer, bullish engulfing, morning star,
     piercing line, and dragonfly doji -- the classic bullish reversal patterns.
@@ -1021,10 +1021,10 @@ def reversal_pattern_bullish(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if bullish reversal pattern found in lookback window, False otherwise.
+        bool: True if bullish reversal pattern found in recent window, False otherwise.
     """
     if len(df) < 2:
         return False
@@ -1044,16 +1044,16 @@ def reversal_pattern_bullish(df: pd.DataFrame, lookback: int = 5) -> bool:
         )
 
     for series in checks:
-        window = series.iloc[-lookback:]
-        if (window > 0).any():
+        recent = series.iloc[-window:]
+        if (recent > 0).any():
             return True
     return False
 
 
 @RuleRegistry.register("reversal_pattern_bearish")
-def reversal_pattern_bearish(df: pd.DataFrame, lookback: int = 5) -> bool:
+def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if a bearish reversal pattern was detected within lookback bars.
+    Check if a bearish reversal pattern was detected within recent window.
 
     Scans for hanging man, shooting star, bearish engulfing, evening star,
     dark cloud cover, and gravestone doji -- the classic bearish reversal patterns.
@@ -1063,10 +1063,10 @@ def reversal_pattern_bearish(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if bearish reversal pattern found in lookback window, False otherwise.
+        bool: True if bearish reversal pattern found in recent window, False otherwise.
     """
     if len(df) < 2:
         return False
@@ -1086,16 +1086,16 @@ def reversal_pattern_bearish(df: pd.DataFrame, lookback: int = 5) -> bool:
         )
 
     for series in checks:
-        window = series.iloc[-lookback:]
-        if (window > 0).any():
+        recent = series.iloc[-window:]
+        if (recent > 0).any():
             return True
     return False
 
 
 @RuleRegistry.register("continuation_pattern_bullish")
-def continuation_pattern_bullish(df: pd.DataFrame, lookback: int = 5) -> bool:
+def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if a bullish continuation pattern was detected within lookback bars.
+    Check if a bullish continuation pattern was detected within recent window.
 
     Scans for three white soldiers and three inside up.
 
@@ -1104,10 +1104,10 @@ def continuation_pattern_bullish(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if bullish continuation pattern found in lookback window, False otherwise.
+        bool: True if bullish continuation pattern found in recent window, False otherwise.
     """
     if len(df) < 3:
         return False
@@ -1120,16 +1120,16 @@ def continuation_pattern_bullish(df: pd.DataFrame, lookback: int = 5) -> bool:
     ]
 
     for series in checks:
-        window = series.iloc[-lookback:]
-        if (window > 0).any():
+        recent = series.iloc[-window:]
+        if (recent > 0).any():
             return True
     return False
 
 
 @RuleRegistry.register("continuation_pattern_bearish")
-def continuation_pattern_bearish(df: pd.DataFrame, lookback: int = 5) -> bool:
+def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if a bearish continuation pattern was detected within lookback bars.
+    Check if a bearish continuation pattern was detected within recent window.
 
     Scans for three black crows and three inside down.
 
@@ -1138,10 +1138,10 @@ def continuation_pattern_bearish(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if bearish continuation pattern found in lookback window, False otherwise.
+        bool: True if bearish continuation pattern found in recent window, False otherwise.
     """
     if len(df) < 3:
         return False
@@ -1154,16 +1154,16 @@ def continuation_pattern_bearish(df: pd.DataFrame, lookback: int = 5) -> bool:
     ]
 
     for series in checks:
-        window = series.iloc[-lookback:]
-        if (window > 0).any():
+        recent = series.iloc[-window:]
+        if (recent > 0).any():
             return True
     return False
 
 
 @RuleRegistry.register("indecision_pattern_recent")
-def indecision_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
+def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if an indecision pattern was detected within lookback bars.
+    Check if an indecision pattern was detected within recent window.
 
     Scans for doji, spinning top, inside bar, and NR7.
 
@@ -1172,10 +1172,10 @@ def indecision_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if indecision pattern found in lookback window, False otherwise.
+        bool: True if indecision pattern found in recent window, False otherwise.
     """
     if len(df) < 2:
         return False
@@ -1193,16 +1193,16 @@ def indecision_pattern_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
         )
 
     for series in checks:
-        window = series.iloc[-lookback:]
-        if (window > 0).any():
+        recent = series.iloc[-window:]
+        if (recent > 0).any():
             return True
     return False
 
 
 @RuleRegistry.register("strong_body_recent")
-def strong_body_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
+def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
-    Check if a marubozu (strong body) was detected within lookback bars.
+    Check if a marubozu (strong body) was detected within recent window.
 
     Scans for both bullish and bearish marubozu patterns.
 
@@ -1211,13 +1211,13 @@ def strong_body_recent(df: pd.DataFrame, lookback: int = 5) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        lookback (int): Number of recent bars to check. Range: 1-20. Default: 5.
+        window (int): Number of recent bars to check. Range: 1-20. Default: 5.
 
     Returns:
-        bool: True if marubozu found in lookback window, False otherwise.
+        bool: True if marubozu found in recent window, False otherwise.
     """
     if len(df) < 1:
         return False
     result = Marubozu.compute(data=_ohlc_data(df), params={"wick_tolerance": 0.05})
-    window = result["marubozu"].iloc[-lookback:]
-    return (window != 0).any()
+    recent = result["marubozu"].iloc[-window:]
+    return (recent != 0).any()
