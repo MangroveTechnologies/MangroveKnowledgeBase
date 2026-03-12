@@ -15,7 +15,7 @@ This module contains signal functions based on candlestick pattern indicators:
 
 Each signal is registered with RuleRegistry and returns a boolean.
 TRIGGER signals detect the pattern on the current (last) bar.
-FILTER signals check for patterns within a recent lookback window.
+FILTER signals check for patterns within a recent window.
 
 Detection logic references: see findings/chart-patterns-plan.md Section 5.
 """
@@ -903,7 +903,7 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
     """
     if len(df) < window:
         return False
-    result = NarrowRange.compute(data=_hl_data(df), params={"lookback": window})
+    result = NarrowRange.compute(data=_hl_data(df), params={"window": window})
     return int(result["narrow_range"].iloc[-1]) == 1
 
 
@@ -1189,7 +1189,7 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     ]
     if len(df) >= 7:
         checks.append(
-            NarrowRange.compute(data=hl, params={"lookback": 7})["narrow_range"]
+            NarrowRange.compute(data=hl, params={"window": 7})["narrow_range"]
         )
 
     for series in checks:

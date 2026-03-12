@@ -241,14 +241,14 @@ class TestSpecificPatterns:
         meta = parsed_patterns["nr7_trigger"]
         assert meta["type"] == "TRIGGER"
         assert meta["requires"] == ["High", "Low"]
-        p = meta["params"]["lookback"]
+        p = meta["params"]["window"]
         assert p["type"] == "int"
         assert p["default"] == 7
 
     def test_bullish_pattern_recent(self, parsed_patterns):
         meta = parsed_patterns["bullish_pattern_recent"]
         assert meta["type"] == "FILTER"
-        assert "lookback" in meta["params"]
+        assert "window" in meta["params"]
 
     def test_indecision_pattern_recent(self, parsed_patterns):
         meta = parsed_patterns["indecision_pattern_recent"]
