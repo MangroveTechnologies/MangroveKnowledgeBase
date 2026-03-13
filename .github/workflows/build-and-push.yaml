@@ -19,6 +19,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Get version from git tags
+        id: version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Package version: ${VERSION}"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -33,9 +43,12 @@ jobs:
           gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       - name: Build Docker image
+        env:
+          PKG_VERSION: ${{ steps.version.outputs.version }}
         run: |
           docker build \
             -f kb_server/Dockerfile \
+            --build-arg SETUPTOOLS_SCM_PRETEND_VERSION="$PKG_VERSION" \
             -t ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:${{ github.sha }} \
             -t ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:latest \
             .
