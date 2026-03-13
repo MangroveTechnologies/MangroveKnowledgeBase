@@ -5,11 +5,13 @@ Configuration settings for the Knowledge Base Document Server.
 import os
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Settings(BaseModel):
     """Application configuration settings."""
+
+    model_config = ConfigDict(env_prefix="KB_SERVER_")
 
     # Server settings
     host: str = "0.0.0.0"
@@ -34,9 +36,6 @@ class Settings(BaseModel):
     v402_facilitator_url: str = "https://x402.org/facilitator"
     v402_payment_address: str = ""
     v402_network: str = "eip155:84532"
-
-    class Config:
-        env_prefix = "KB_SERVER_"
 
 
 def get_settings() -> Settings:

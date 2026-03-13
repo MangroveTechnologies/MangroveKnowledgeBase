@@ -33,13 +33,11 @@ class IndicatorInterface:
         )
 
     @classmethod
-    @property
     def inputs(cls) -> dict:
         """Return {'data': [...], 'params': [...]}"""
         return {'data': cls._data, 'params': cls._params}
 
     @classmethod
-    @property
     def outputs(cls) -> dict:
         """Return {'names': [...], 'count': N}"""
         return {'names': cls._outputs, 'count': len(cls._outputs)}

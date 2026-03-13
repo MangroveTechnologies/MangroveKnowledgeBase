@@ -1,56 +1,117 @@
 name: Release to PyPI
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Install dependencies
         run: |
           pip install -e ".[dev]"
           pip install -r kb_server/requirements.txt
-      - run: pytest tests/ -v
 
-  publish:
-    needs: test
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
+      - name: Run tests
+        run: pytest tests/ -v
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - name: Compute next version
+        id: version
+        env:
+          BUMP_TYPE: ${{ github.event.inputs.bump }}
+        run: |
+          # Get latest tag, default to v0.0.0 if none exists
+          LATEST_TAG=$(git tag -l 'v*' --sort=-v:refname | head -1)
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v0.0.0"
+          fi
 
-      - name: Install build tools
-        run: pip install build
+          # Strip the v prefix and split
+          CURRENT="${LATEST_TAG#v}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          # Bump based on input
+          case "$BUMP_TYPE" in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH + 1)) ;;
+          esac
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "previous=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
+          echo "Releasing: ${LATEST_TAG} -> v${NEW_VERSION}"
+
+      - name: Create and push tag
+        env:
+          VERSION_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$VERSION_TAG" -m "Release $VERSION_TAG"
+          git push origin "$VERSION_TAG"
 
       - name: Build package
-        run: python -m build
+        run: |
+          pip install build setuptools-scm
+          python -m build
+
+      - name: Verify built version
+        env:
+          EXPECTED_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          echo "Expected: ${EXPECTED_VERSION}"
+          BUILT=$(unzip -p dist/*.whl '*/METADATA' | grep '^Version:' | cut -d' ' -f2)
+          echo "Built:    ${BUILT}"
+          if [ "$BUILT" != "$EXPECTED_VERSION" ]; then
+            echo "ERROR: Version mismatch!"
+            exit 1
+          fi
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
-  github-release:
-    needs: publish
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          PREVIOUS_TAG: ${{ steps.version.outputs.previous }}
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
           generate_release_notes: true
+          body: |
+            ## mangrove-kb ${{ steps.version.outputs.version }}
+
+            ```bash
+            pip install mangrove-kb==${{ steps.version.outputs.version }}
+            ```

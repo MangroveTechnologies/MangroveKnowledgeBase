@@ -4,7 +4,7 @@ Pydantic models for the Knowledge Base Document Server.
 
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # =============================================================================
@@ -22,22 +22,22 @@ class Section(BaseModel):
     parent_anchor: Optional[str] = Field(None, description="Parent section anchor")
     children: List["Section"] = Field(default_factory=list, description="Child sections")
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Tag(BaseModel):
     """Represents a document tag for categorization."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: Optional[int] = None
     name: str = Field(..., description="Tag name/keyword")
-
-    class Config:
-        from_attributes = True
 
 
 class Document(BaseModel):
     """Represents a knowledge base document."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: Optional[int] = None
     slug: str = Field(..., description="URL-safe document identifier")
@@ -48,9 +48,6 @@ class Document(BaseModel):
     sections: List[Section] = Field(default_factory=list, description="Document sections")
     tags: List[str] = Field(default_factory=list, description="Document tags")
     importance: int = Field(default=0, description="Document importance ranking")
-
-    class Config:
-        from_attributes = True
 
 
 class DocumentSummary(BaseModel):
