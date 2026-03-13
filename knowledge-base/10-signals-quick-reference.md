@@ -120,6 +120,54 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 ### C
 
+**bearish_engulfing_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bearish engulfing pattern completed on the current bar.
+
+**bearish_harami_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bearish harami pattern completed on the current bar.
+
+**bearish_pattern_recent**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if any bearish candlestick pattern was detected within recent window.
+
+**bearish_pin_bar_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bearish pin bar is detected on the current bar.
+
+**bullish_engulfing_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bullish engulfing pattern completed on the current bar.
+
+**bullish_harami_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bullish harami pattern completed on the current bar.
+
+**bullish_pattern_recent**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if any bullish candlestick pattern was detected within recent window.
+
+**bullish_pin_bar_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bullish pin bar is detected on the current bar.
+
 **cci_overbought**
 - Type: FILTER
 - Parent Indicator: CCI (Commodity Channel Index)
@@ -143,6 +191,18 @@ Where parameter values are provided in this reference, they serve as **examples 
 - Parent Indicator: CMF (Chaikin Money Flow)
 - Category: Volume
 - Description: Check if CMF (Chaikin Money Flow) indicates buying pressure
+
+**continuation_pattern_bearish**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bearish continuation pattern was detected within recent window.
+
+**continuation_pattern_bullish**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bullish continuation pattern was detected within recent window.
 
 **cumulative_return_positive**
 - Type: FILTER
@@ -171,6 +231,12 @@ Where parameter values are provided in this reference, they serve as **examples 
 - Category: Unknown
 - Description: Check if daily return is positive
 
+**dark_cloud_cover_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a dark cloud cover pattern completed on the current bar.
+
 **dc_lower_breakout**
 - Type: TRIGGER
 - Parent Indicator: Donchian Channel
@@ -182,6 +248,12 @@ Where parameter values are provided in this reference, they serve as **examples 
 - Parent Indicator: Donchian Channel
 - Category: Volatility
 - Description: Check if price breaks above upper Donchian Channel (new high)
+
+**doji_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a doji pattern is detected on the current bar.
 
 **dpo_negative**
 - Type: FILTER
@@ -197,6 +269,12 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 
 ### E
+
+**dragonfly_doji_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a dragonfly doji is detected on the current bar.
 
 **ema_cross_down**
 - Type: TRIGGER
@@ -231,6 +309,12 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 ### F
 
+**evening_star_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if an evening star pattern completed on the current bar.
+
 **force_bearish**
 - Type: FILTER
 - Parent Indicator: Force Index
@@ -245,6 +329,24 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 
 ### I
+
+**gravestone_doji_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a gravestone doji is detected on the current bar.
+
+**hammer_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a hammer shape is detected on the current bar.
+
+**hanging_man_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a hanging man shape is detected on the current bar.
 
 **ichimoku_bearish**
 - Type: FILTER
@@ -263,6 +365,24 @@ Where parameter values are provided in this reference, they serve as **examples 
 - Parent Indicator: Ichimoku Cloud
 - Category: Trend
 - Description: Check if Tenkan-sen crosses Kijun-sen (TK cross)
+
+**indecision_pattern_recent**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if an indecision pattern was detected within recent window.
+
+**inside_bar_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if an inside bar is detected on the current bar.
+
+**inverted_hammer_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if an inverted hammer shape is detected on the current bar.
 
 **is_above_sma**
 - Type: FILTER
@@ -312,6 +432,12 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 ### M
 
+**long_legged_doji_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a long-legged doji is detected on the current bar.
+
 **macd_bearish_cross**
 - Type: TRIGGER
 - Parent Indicator: MACD (Moving Average Convergence Divergence)
@@ -329,6 +455,18 @@ Where parameter values are provided in this reference, they serve as **examples 
 - Parent Indicator: MACD (Moving Average Convergence Divergence)
 - Category: Trend
 - Description: Check if MACD histogram is positive (bullish momentum)
+
+**marubozu_bearish_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bearish marubozu is detected on the current bar.
+
+**marubozu_bullish_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bullish marubozu is detected on the current bar.
 
 **mass_reversal_signal**
 - Type: TRIGGER
@@ -350,6 +488,18 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 
 ### N
+
+**morning_star_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a morning star pattern completed on the current bar.
+
+**nr7_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a narrow range day is detected on the current bar.
 
 **nvi_bearish**
 - Type: FILTER
@@ -380,6 +530,18 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 
 ### P
+
+**outside_bar_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if an outside bar is detected on the current bar.
+
+**piercing_line_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a piercing line pattern completed on the current bar.
 
 **ppo_bearish_cross**
 - Type: TRIGGER
@@ -432,6 +594,18 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 ### R
 
+**reversal_pattern_bearish**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bearish reversal pattern was detected within recent window.
+
+**reversal_pattern_bullish**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bullish reversal pattern was detected within recent window.
+
 **roc_momentum_shift**
 - Type: TRIGGER
 - Parent Indicator: ROC (Rate of Change)
@@ -477,6 +651,12 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 ### S
 
+**shooting_star_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a shooting star shape is detected on the current bar.
+
 **sma_cross_down**
 - Type: TRIGGER
 - Parent Indicator: SMA (Simple Moving Average)
@@ -494,6 +674,12 @@ Where parameter values are provided in this reference, they serve as **examples 
 - Parent Indicator: SMA (Simple Moving Average)
 - Category: Trend
 - Description: Detect SMA crossover signal with configurable direction (bullish or bearish)
+
+**spinning_top_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a spinning top is detected on the current bar.
 
 **stc_overbought**
 - Type: FILTER
@@ -534,6 +720,36 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 ### T
 
+**strong_body_recent**
+- Type: FILTER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a marubozu (strong body) was detected within recent window.
+
+**three_black_crows_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if three black crows pattern completed on the current bar.
+
+**three_inside_down_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if three inside down pattern completed on the current bar.
+
+**three_inside_up_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if three inside up pattern completed on the current bar.
+
+**three_white_soldiers_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if three white soldiers pattern completed on the current bar.
+
 **trix_bearish**
 - Type: FILTER
 - Parent Indicator: TRIX
@@ -560,6 +776,30 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 
 ### U
+
+**tweezer_bottoms_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a tweezer bottoms pattern completed on the current bar.
+
+**tweezer_tops_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a tweezer tops pattern completed on the current bar.
+
+**two_bar_reversal_bearish_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bearish two-bar reversal completed on the current bar.
+
+**two_bar_reversal_bullish_trigger**
+- Type: TRIGGER
+- Parent Indicator: Pattern Detection
+- Category: Patterns
+- Description: Check if a bullish two-bar reversal completed on the current bar.
 
 **ulcer_high_risk**
 - Type: FILTER

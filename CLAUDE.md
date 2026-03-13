@@ -12,7 +12,9 @@ docker compose up -d mkb-knowledge-base
 # Run all tests (102 tests)
 python -m pytest tests/ -v
 
-# Publish to PyPI (bumps version, builds, uploads, tags)
+# Publish to PyPI (preferred: use GitHub Actions workflow)
+# Go to Actions > "Release to PyPI" > Run workflow > pick bump type
+# Local fallback:
 ./scripts/publish.sh patch   # or minor, major
 
 # Generate Mintlify docs
@@ -117,7 +119,11 @@ x402 payment is enforced on both HTTP and MCP via shared middleware.
 ## CI/CD
 
 ### PyPI Package
-Run `./scripts/publish.sh [patch|minor|major]` to bump version, run tests, build, upload to PyPI, commit, and tag.
+**Preferred:** GitHub Actions > "Release to PyPI" > Run workflow > pick `patch`/`minor`/`major`. This runs tests, computes version from latest git tag, creates tag, builds, publishes to PyPI, and creates a GitHub Release.
+
+**Local fallback:** `./scripts/publish.sh [patch|minor|major]`
+
+**Versioning:** `setuptools-scm` derives version from git tags at build time. No hardcoded version strings in source. `__version__` reads from `importlib.metadata` at runtime.
 
 ### Docker Image (KB Server)
 On push to main, the `build-and-push` GitHub Actions workflow builds the KB server image and pushes it to:
@@ -129,7 +135,7 @@ Tags: `latest` + commit SHA.
 MangroveAI controls Cloud Run deployment separately (via its own `deploy-kb-dev` / `deploy-kb-prod` workflows).
 
 ### CI
-On push/PR to main, the `ci` workflow runs flake8 lint and pytest across Python 3.10, 3.11, 3.12.
+On push/PR to main, the `ci` workflow runs pytest across Python 3.10, 3.11, 3.12.
 
 ## Deployment
 
