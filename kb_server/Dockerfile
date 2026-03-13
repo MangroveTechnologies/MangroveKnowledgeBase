@@ -21,9 +21,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and install the mangrove_kb signals/indicators package
+ARG SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=${SETUPTOOLS_SCM_PRETEND_VERSION}
 COPY pyproject.toml PKG_README.md ./
 COPY mangrove_kb/ ./mangrove_kb/
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir .
 
 # Copy kb_server requirements and install
 COPY kb_server/requirements.txt /tmp/kb-requirements.txt
