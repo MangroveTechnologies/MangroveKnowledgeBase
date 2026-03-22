@@ -407,7 +407,7 @@ def nvi_bullish(df: pd.DataFrame, window: int = 255) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window (int): EMA period for signal. Range: 100-500. Default: 255.
+        window (int): EMA period for signal. Range: 100-200. Default: 255.
 
     Returns:
         bool: True if NVI > NVI EMA, False otherwise.
@@ -437,7 +437,7 @@ def nvi_bearish(df: pd.DataFrame, window: int = 255) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window (int): EMA period for signal. Range: 100-500. Default: 255.
+        window (int): EMA period for signal. Range: 100-200. Default: 255.
 
     Returns:
         bool: True if NVI < NVI EMA, False otherwise.
