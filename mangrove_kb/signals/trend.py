@@ -60,7 +60,7 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window (int): SMA window in bars. Range: 1-1000.
+        window (int): SMA window in bars. Range: 1-200.
 
     Returns:
         bool: True if close > SMA, False otherwise.
@@ -100,8 +100,8 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast SMA window in bars. Range: 1-500.
-        window_slow (int): Slow SMA window in bars. Range: 1-1000.
+        window_fast (int): Fast SMA window in bars. Range: 1-200.
+        window_slow (int): Slow SMA window in bars. Range: 1-200.
         direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
 
     Returns:
@@ -157,8 +157,8 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast SMA window in bars. Range: 1-500.
-        window_slow (int): Slow SMA window in bars. Range: 1-1000.
+        window_fast (int): Fast SMA window in bars. Range: 1-200.
+        window_slow (int): Slow SMA window in bars. Range: 1-200.
 
     Returns:
         bool: True if bullish crossover detected in the current bar, False otherwise.
@@ -182,8 +182,8 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast SMA window in bars. Range: 1-500.
-        window_slow (int): Slow SMA window in bars. Range: 1-1000.
+        window_fast (int): Fast SMA window in bars. Range: 1-200.
+        window_slow (int): Slow SMA window in bars. Range: 1-200.
 
     Returns:
         bool: True if bearish crossover detected in the current bar, False otherwise.
@@ -435,8 +435,8 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast EMA window in bars. Range: 1-500.
-        window_slow (int): Slow EMA window in bars. Range: 1-1000.
+        window_fast (int): Fast EMA window in bars. Range: 1-200.
+        window_slow (int): Slow EMA window in bars. Range: 1-200.
         direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
 
     Returns:
@@ -991,15 +991,15 @@ def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        roc1 (int): ROC1 period. Range: 1-1000. Default: 10.
-        roc2 (int): ROC2 period. Range: 1-1000. Default: 15.
-        roc3 (int): ROC3 period. Range: 1-1000. Default: 20.
-        roc4 (int): ROC4 period. Range: 1-1000. Default: 30.
-        window_sma1 (int): SMA1 smoothing window for ROC1. Range: 2-500. Default: 10.
-        window_sma2 (int): SMA2 smoothing window for ROC2. Range: 2-500. Default: 10.
-        window_sma3 (int): SMA3 smoothing window for ROC3. Range: 2-500. Default: 10.
-        window_sma4 (int): SMA4 smoothing window for ROC4. Range: 2-500. Default: 15.
-        nsig (int): Signal line period. Range: 1-1000. Default: 9.
+        roc1 (int): ROC1 period. Range: 1-200. Default: 10.
+        roc2 (int): ROC2 period. Range: 1-200. Default: 15.
+        roc3 (int): ROC3 period. Range: 1-200. Default: 20.
+        roc4 (int): ROC4 period. Range: 1-200. Default: 30.
+        window_sma1 (int): SMA1 smoothing window for ROC1. Range: 2-200. Default: 10.
+        window_sma2 (int): SMA2 smoothing window for ROC2. Range: 2-200. Default: 10.
+        window_sma3 (int): SMA3 smoothing window for ROC3. Range: 2-200. Default: 10.
+        window_sma4 (int): SMA4 smoothing window for ROC4. Range: 2-200. Default: 15.
+        nsig (int): Signal line period. Range: 1-200. Default: 9.
 
     Returns:
         bool: True if KST crosses above signal, False otherwise.
@@ -1043,15 +1043,15 @@ def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        roc1 (int): ROC1 period. Range: 1-1000. Default: 10.
-        roc2 (int): ROC2 period. Range: 1-1000. Default: 15.
-        roc3 (int): ROC3 period. Range: 1-1000. Default: 20.
-        roc4 (int): ROC4 period. Range: 1-1000. Default: 30.
-        window_sma1 (int): SMA1 smoothing window for ROC1. Range: 2-500. Default: 10.
-        window_sma2 (int): SMA2 smoothing window for ROC2. Range: 2-500. Default: 10.
-        window_sma3 (int): SMA3 smoothing window for ROC3. Range: 2-500. Default: 10.
-        window_sma4 (int): SMA4 smoothing window for ROC4. Range: 2-500. Default: 15.
-        nsig (int): Signal line period. Range: 1-1000. Default: 9.
+        roc1 (int): ROC1 period. Range: 1-200. Default: 10.
+        roc2 (int): ROC2 period. Range: 1-200. Default: 15.
+        roc3 (int): ROC3 period. Range: 1-200. Default: 20.
+        roc4 (int): ROC4 period. Range: 1-200. Default: 30.
+        window_sma1 (int): SMA1 smoothing window for ROC1. Range: 2-200. Default: 10.
+        window_sma2 (int): SMA2 smoothing window for ROC2. Range: 2-200. Default: 10.
+        window_sma3 (int): SMA3 smoothing window for ROC3. Range: 2-200. Default: 10.
+        window_sma4 (int): SMA4 smoothing window for ROC4. Range: 2-200. Default: 15.
+        nsig (int): Signal line period. Range: 1-200. Default: 9.
 
     Returns:
         bool: True if KST crosses below signal, False otherwise.
@@ -1440,11 +1440,11 @@ def stc_overbought(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 2
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_slow (int): Slow EMA period. Range: 2-500. Default: 50.
-        window_fast (int): Fast EMA period. Range: 2-500. Default: 23.
-        cycle (int): Cycle period. Range: 1-1000. Default: 10.
-        smooth1 (int): First smoothing period. Range: 1-1000. Default: 3.
-        smooth2 (int): Second smoothing period. Range: 1-1000. Default: 3.
+        window_slow (int): Slow EMA period. Range: 2-200. Default: 50.
+        window_fast (int): Fast EMA period. Range: 2-200. Default: 23.
+        cycle (int): Cycle period. Range: 1-200. Default: 10.
+        smooth1 (int): First smoothing period. Range: 1-200. Default: 3.
+        smooth2 (int): Second smoothing period. Range: 1-200. Default: 3.
         threshold (float): Overbought threshold. Range: 0.0-100.0. Default: 75.0.
 
     Returns:
@@ -1481,11 +1481,11 @@ def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23,
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_slow (int): Slow EMA period. Range: 2-500. Default: 50.
-        window_fast (int): Fast EMA period. Range: 2-500. Default: 23.
-        cycle (int): Cycle period. Range: 1-1000. Default: 10.
-        smooth1 (int): First smoothing period. Range: 1-1000. Default: 3.
-        smooth2 (int): Second smoothing period. Range: 1-1000. Default: 3.
+        window_slow (int): Slow EMA period. Range: 2-200. Default: 50.
+        window_fast (int): Fast EMA period. Range: 2-200. Default: 23.
+        cycle (int): Cycle period. Range: 1-200. Default: 10.
+        smooth1 (int): First smoothing period. Range: 1-200. Default: 3.
+        smooth2 (int): Second smoothing period. Range: 1-200. Default: 3.
         threshold (float): Oversold threshold. Range: 0.0-100.0. Default: 25.0.
 
     Returns:
