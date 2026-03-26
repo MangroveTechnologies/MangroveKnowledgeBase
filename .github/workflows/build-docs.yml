@@ -6,6 +6,7 @@ on:
     paths:
       - 'docs/**'
       - 'Dockerfile.docs'
+      - 'nginx-docs.conf'
   workflow_dispatch:
 
 env:
