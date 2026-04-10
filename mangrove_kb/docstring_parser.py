@@ -287,7 +287,7 @@ def _get_rule_name_from_registry(func) -> Optional[str]:
         The registered rule name string, or None if not found.
     """
     try:
-        from MangroveAI.domains.signals.registry import RuleRegistry
+        from mangrove_kb.registry import RuleRegistry
         for name, registered_func in RuleRegistry._registry.items():
             if registered_func is func:
                 return name
@@ -450,17 +450,8 @@ def parse_all_signals(signal_modules: list) -> dict:
                 ...
             }
     """
-    try:
-        from mangrove_kb.registry import RuleRegistry
-        registry = RuleRegistry._registry
-    except ImportError:
-        try:
-            from MangroveAI.domains.signals.registry import RuleRegistry
-            registry = RuleRegistry._registry
-        except ImportError:
-            raise ImportError(
-                "Cannot import RuleRegistry. Ensure mangrove_kb or MangroveAI is on sys.path."
-            )
+    from mangrove_kb.registry import RuleRegistry
+    registry = RuleRegistry._registry
 
     # Build a set of module names for fast lookup
     module_names = set()
