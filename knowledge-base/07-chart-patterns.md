@@ -161,13 +161,15 @@ Bullish_Engulfing:
 #### Piercing Line / Dark Cloud Cover
 **Piercing Line (Bullish):**
 - First candle: bearish
-- Second candle: opens below first's low, closes above midpoint of first
+- Second candle: opens below first's low (classic) or below first's close (relaxed), closes above midpoint of first
 - Bullish reversal at support
+- Note: The classic definition requires a gap (open below previous low), which is rare in 24/7 crypto/forex markets. The `require_gap` parameter controls this -- set to `False` for crypto.
 
 **Dark Cloud Cover (Bearish):**
 - First candle: bullish
-- Second candle: opens above first's high, closes below midpoint of first
+- Second candle: opens above first's high (classic) or above first's close (relaxed), closes below midpoint of first
 - Bearish reversal at resistance
+- Note: Same gap consideration as Piercing Line. Use `require_gap=False` for 24/7 markets.
 
 ---
 
@@ -324,13 +326,14 @@ Outside_Bar:
 **Structure:** Two consecutive bars forming a reversal pattern at an extreme.
 
 **Bullish Two-Bar Reversal:**
-- First bar: Strong bearish close
-- Second bar: Strong bullish close, closes above first bar's open
+- First bar: Strong bearish close (close in lower portion of range)
+- Second bar: Strong bullish close (close in upper portion of range), closes above first bar's open
 - Combined forms a hammer-like structure
+- The `close_proximity` parameter (default 0.25) controls how close the close must be to the extreme -- 0.25 means within 25% of the bar's range
 
 **Bearish Two-Bar Reversal:**
-- First bar: Strong bullish close
-- Second bar: Strong bearish close, closes below first bar's open
+- First bar: Strong bullish close (close in upper portion of range)
+- Second bar: Strong bearish close (close in lower portion of range), closes below first bar's open
 - Combined forms a shooting star-like structure
 
 ---

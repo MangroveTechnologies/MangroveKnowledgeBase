@@ -378,11 +378,18 @@ class PiercingLine(IndicatorInterface):
     opens below the prior low and closes above the midpoint of the
     prior body.
 
+    Args:
+        data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {
+            'min_penetration': float (default 0.5) - Minimum penetration into first candle body. Range: 0.3-0.8.
+            'require_gap': bool (default True) - If True, requires open below previous low (classic Nison definition). If False, requires open below previous close (relaxed for 24/7 crypto/forex markets).
+        }
+
     References: [NISON], [KB-07], [STOCKCHARTS], [TRENDSPIDER]
     """
 
     _data = ["open", "high", "low", "close"]
-    _params = ["min_penetration"]
+    _params = ["min_penetration", "require_gap"]
     _outputs = ["piercing_line"]
 
     @classmethod
@@ -393,7 +400,11 @@ class PiercingLine(IndicatorInterface):
 
         prev_bear = prev_c < prev_o
         curr_bull = c > o
-        gaps_below = o < prev_l
+        require_gap = params.get("require_gap", True)
+        if require_gap:
+            gaps_below = o < prev_l  # Classic Nison: open below previous low
+        else:
+            gaps_below = o < prev_c  # Relaxed: open below previous close (for 24/7 markets)
         penetrates = c > prev_c + (prev_o - prev_c) * pen
 
         detected = (prev_bear & curr_bull & gaps_below & penetrates).astype(int)
@@ -407,11 +418,18 @@ class DarkCloudCover(IndicatorInterface):
     opens above the prior high and closes below the midpoint of the
     prior body.
 
+    Args:
+        data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {
+            'min_penetration': float (default 0.5) - Minimum penetration into first candle body. Range: 0.3-0.8.
+            'require_gap': bool (default True) - If True, requires open above previous high (classic Nison definition). If False, requires open above previous close (relaxed for 24/7 crypto/forex markets).
+        }
+
     References: [NISON], [KB-07], [STOCKCHARTS], [TRENDSPIDER]
     """
 
     _data = ["open", "high", "low", "close"]
-    _params = ["min_penetration"]
+    _params = ["min_penetration", "require_gap"]
     _outputs = ["dark_cloud_cover"]
 
     @classmethod
@@ -422,7 +440,11 @@ class DarkCloudCover(IndicatorInterface):
 
         prev_bull = prev_c > prev_o
         curr_bear = c < o
-        gaps_above = o > prev_h
+        require_gap = params.get("require_gap", True)
+        if require_gap:
+            gaps_above = o > prev_h  # Classic Nison: open above previous high
+        else:
+            gaps_above = o > prev_c  # Relaxed: open above previous close (for 24/7 markets)
         penetrates = c < prev_c - (prev_c - prev_o) * pen
 
         detected = prev_bull & curr_bear & gaps_above & penetrates
@@ -785,11 +807,17 @@ class TwoBarReversal(IndicatorInterface):
     Two consecutive bars closing in opposite directions where the second
     bar takes out an extreme of the first. Returns 1 for bullish, -1 for bearish.
 
+    Args:
+        data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {
+            'close_proximity': float (default 0.25) - How close the close must be to the high/low, as a fraction of the bar's range. Range: 0.1-0.5. Lower values are stricter (close must be nearer the extreme).
+        }
+
     References: [KB-07], [TSR], [DAILYFOREX]
     """
 
     _data = ["open", "high", "low", "close"]
-    _params = []
+    _params = ["close_proximity"]
     _outputs = ["two_bar_reversal"]
 
     @classmethod
@@ -799,12 +827,12 @@ class TwoBarReversal(IndicatorInterface):
         prev_o, prev_h, prev_l, prev_c = o.shift(1), h.shift(1), l.shift(1), c.shift(1)
         prev_rng = rng.shift(1)
 
-        # Close near high/low: within 25% of the extreme
-        quarter = 0.25
-        prev_close_near_low = (prev_c - prev_l) <= prev_rng * quarter
-        prev_close_near_high = (prev_h - prev_c) <= prev_rng * quarter
-        close_near_high = (h - c) <= rng * quarter
-        close_near_low = (c - l) <= rng * quarter
+        # Close near high/low: within close_proximity fraction of the extreme
+        close_proximity = params.get("close_proximity", 0.25)
+        prev_close_near_low = (prev_c - prev_l) <= prev_rng * close_proximity
+        prev_close_near_high = (prev_h - prev_c) <= prev_rng * close_proximity
+        close_near_high = (h - c) <= rng * close_proximity
+        close_near_low = (c - l) <= rng * close_proximity
 
         prev_bear = prev_c < prev_o
         prev_bull = prev_c > prev_o
