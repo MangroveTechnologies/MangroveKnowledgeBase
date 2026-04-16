@@ -178,6 +178,8 @@ class TRIX(IndicatorInterface):
     Shows the percent rate of change of a triple exponentially smoothed moving
     average.
 
+    Note: Early bars (warmup period) produce NaN rather than approximated values.
+
     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:trix
 
     Args:
@@ -200,7 +202,7 @@ class TRIX(IndicatorInterface):
         ema2 = EMA.compute({'close': ema1}, {'window': window})['ema']
         ema3 = EMA.compute({'close': ema2}, {'window': window})['ema']
 
-        trix = (ema3 - ema3.shift(1, fill_value=ema3.mean())) / ema3.shift(1, fill_value=ema3.mean())
+        trix = (ema3 - ema3.shift(1)) / ema3.shift(1)
         trix *= 100
 
         return {'trix': pd.Series(trix, name=f'trix_{window}')}
@@ -301,6 +303,8 @@ class KST(IndicatorInterface):
     dominant time spans, in order to better reflect the primary swings of stock
     market cycle.
 
+    Note: Early bars (warmup period) produce NaN rather than approximated values.
+
     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:know_sure_thing_kst
 
     Args:
@@ -323,19 +327,19 @@ class KST(IndicatorInterface):
         nsig = params['nsig']
 
         rocma1 = (
-            ((close - close.shift(r1, fill_value=close.mean())) / close.shift(r1, fill_value=close.mean()))
+            ((close - close.shift(r1)) / close.shift(r1))
             .rolling(w1, min_periods=w1).mean()
         )
         rocma2 = (
-            ((close - close.shift(r2, fill_value=close.mean())) / close.shift(r2, fill_value=close.mean()))
+            ((close - close.shift(r2)) / close.shift(r2))
             .rolling(w2, min_periods=w2).mean()
         )
         rocma3 = (
-            ((close - close.shift(r3, fill_value=close.mean())) / close.shift(r3, fill_value=close.mean()))
+            ((close - close.shift(r3)) / close.shift(r3))
             .rolling(w3, min_periods=w3).mean()
         )
         rocma4 = (
-            ((close - close.shift(r4, fill_value=close.mean())) / close.shift(r4, fill_value=close.mean()))
+            ((close - close.shift(r4)) / close.shift(r4))
             .rolling(w4, min_periods=w4).mean()
         )
 
@@ -356,6 +360,8 @@ class DPO(IndicatorInterface):
     Is an indicator designed to remove trend from price and make it easier to
     identify cycles.
 
+    Note: Early bars (warmup period) produce NaN rather than approximated values.
+
     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:detrended_price_osci
 
     Args:
@@ -375,7 +381,7 @@ class DPO(IndicatorInterface):
         window = params['window']
 
         dpo = (
-            close.shift(int((0.5 * window) + 1), fill_value=close.mean())
+            close.shift(int((0.5 * window) + 1))
             - close.rolling(window, min_periods=window).mean()
         )
 
@@ -566,6 +572,8 @@ class Vortex(IndicatorInterface):
     movement. A bullish signal triggers when the positive trend indicator
     crosses above the negative trend indicator or a key level.
 
+    Note: Early bars (warmup period) produce NaN rather than approximated values.
+
     http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:vortex_indicator
 
     Args:
@@ -586,7 +594,7 @@ class Vortex(IndicatorInterface):
         close = data['close']
         window = params['window']
 
-        close_shift = close.shift(1, fill_value=close.mean())
+        close_shift = close.shift(1)
         tr = true_range(high, low, close)
         trn = tr.rolling(window, min_periods=window).sum()
         vmp = np.abs(high - low.shift(1))
@@ -687,7 +695,7 @@ class PSAR(IndicatorInterface):
                     high1 = high.iloc[i - 1]
                     high2 = high.iloc[i - 2]
                     if high2 > psar.iloc[i]:
-                        psar[i] = high2
+                        psar.iloc[i] = high2
                     elif high1 > psar.iloc[i]:
                         psar.iloc[i] = high1
 
@@ -703,7 +711,7 @@ class PSAR(IndicatorInterface):
         )
         psar_up_indicator = psar_up_indicator.where(psar_up_indicator == 0, 1)
 
-        psar_down_indicator = psar_up.where(
+        psar_down_indicator = psar_down.where(
             psar_down.notnull() & psar_down.shift(1).isnull(), 0
         )
         psar_down_indicator = psar_down_indicator.where(psar_down_indicator == 0, 1)

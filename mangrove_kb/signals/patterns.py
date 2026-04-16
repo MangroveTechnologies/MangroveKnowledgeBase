@@ -485,12 +485,15 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
 
 
 @RuleRegistry.register("piercing_line_trigger")
-def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5) -> bool:
+def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, require_gap: bool = True) -> bool:
     """
     Check if a piercing line pattern completed on the current bar.
 
     Bullish reversal: bearish candle followed by bullish candle opening below
-    prior low and closing above midpoint of prior body. References: [NISON], [KB-07].
+    prior low (classic) or prior close (relaxed) and closing above midpoint of
+    prior body. The classic definition requires a price gap, which is rare in
+    24/7 crypto/forex markets. Set require_gap=False for those markets.
+    References: [NISON], [KB-07].
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -498,23 +501,27 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5) -> boo
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         min_penetration (float): Minimum penetration into previous body. Range: 0.3-0.8. Default: 0.5.
+        require_gap (bool): If True, requires open below previous low (classic Nison). If False, requires open below previous close (relaxed for 24/7 markets). Range: true-false. Default: true.
 
     Returns:
         bool: True if piercing line detected on current bar, False otherwise.
     """
     if len(df) < 2:
         return False
-    result = PiercingLine.compute(data=_ohlc_data(df), params={"min_penetration": min_penetration})
+    result = PiercingLine.compute(data=_ohlc_data(df), params={"min_penetration": min_penetration, "require_gap": require_gap})
     return int(result["piercing_line"].iloc[-1]) == 1
 
 
 @RuleRegistry.register("dark_cloud_cover_trigger")
-def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5) -> bool:
+def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, require_gap: bool = True) -> bool:
     """
     Check if a dark cloud cover pattern completed on the current bar.
 
     Bearish reversal: bullish candle followed by bearish candle opening above
-    prior high and closing below midpoint of prior body. References: [NISON], [KB-07].
+    prior high (classic) or prior close (relaxed) and closing below midpoint of
+    prior body. The classic definition requires a price gap, which is rare in
+    24/7 crypto/forex markets. Set require_gap=False for those markets.
+    References: [NISON], [KB-07].
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -522,13 +529,14 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5) -> 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         min_penetration (float): Minimum penetration into previous body. Range: 0.3-0.8. Default: 0.5.
+        require_gap (bool): If True, requires open above previous high (classic Nison). If False, requires open above previous close (relaxed for 24/7 markets). Range: true-false. Default: true.
 
     Returns:
         bool: True if dark cloud cover detected on current bar, False otherwise.
     """
     if len(df) < 2:
         return False
-    result = DarkCloudCover.compute(data=_ohlc_data(df), params={"min_penetration": min_penetration})
+    result = DarkCloudCover.compute(data=_ohlc_data(df), params={"min_penetration": min_penetration, "require_gap": require_gap})
     return int(result["dark_cloud_cover"].iloc[-1]) == -1
 
 
@@ -837,48 +845,52 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 
 
 @RuleRegistry.register("two_bar_reversal_bullish_trigger")
-def two_bar_reversal_bullish_trigger(df: pd.DataFrame) -> bool:
+def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 0.25) -> bool:
     """
     Check if a bullish two-bar reversal completed on the current bar.
 
     Bearish bar followed by bullish bar that takes out the low then
-    closes above the prior open. References: [KB-07], [TSR], [DAILYFOREX].
+    closes above the prior open. The close_proximity parameter controls how
+    close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
+        close_proximity (float): How close the close must be to the extreme, as a fraction of range. Lower is stricter. Range: 0.1-0.5. Default: 0.25.
 
     Returns:
         bool: True if bullish two-bar reversal detected, False otherwise.
     """
     if len(df) < 2:
         return False
-    result = TwoBarReversal.compute(data=_ohlc_data(df), params={})
+    result = TwoBarReversal.compute(data=_ohlc_data(df), params={"close_proximity": close_proximity})
     return int(result["two_bar_reversal"].iloc[-1]) == 1
 
 
 @RuleRegistry.register("two_bar_reversal_bearish_trigger")
-def two_bar_reversal_bearish_trigger(df: pd.DataFrame) -> bool:
+def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 0.25) -> bool:
     """
     Check if a bearish two-bar reversal completed on the current bar.
 
     Bullish bar followed by bearish bar that takes out the high then
-    closes below the prior open. References: [KB-07], [TSR], [DAILYFOREX].
+    closes below the prior open. The close_proximity parameter controls how
+    close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
+        close_proximity (float): How close the close must be to the extreme, as a fraction of range. Lower is stricter. Range: 0.1-0.5. Default: 0.25.
 
     Returns:
         bool: True if bearish two-bar reversal detected, False otherwise.
     """
     if len(df) < 2:
         return False
-    result = TwoBarReversal.compute(data=_ohlc_data(df), params={})
+    result = TwoBarReversal.compute(data=_ohlc_data(df), params={"close_proximity": close_proximity})
     return int(result["two_bar_reversal"].iloc[-1]) == -1
 
 
