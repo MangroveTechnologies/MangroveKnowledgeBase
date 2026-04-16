@@ -953,7 +953,7 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"],
         Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0),
         Harami.compute(data=oc, params={})["harami"].clip(lower=0),
-        PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5})["piercing_line"],
+        PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"],
         DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"],
         TweezerBottoms.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_bottoms"],
         PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(lower=0),
@@ -1001,7 +1001,7 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"],
         Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(),
         Harami.compute(data=oc, params={})["harami"].clip(upper=0).abs(),
-        DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5})["dark_cloud_cover"].abs(),
+        DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(),
         GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"],
         TweezerTops.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_tops"].abs(),
         PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(upper=0).abs(),
@@ -1047,7 +1047,7 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
         Hammer.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hammer"],
         InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"],
         Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0),
-        PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5})["piercing_line"],
+        PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"],
         DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"],
     ]
     if len(df) >= 3:
@@ -1089,7 +1089,7 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
         HangingMan.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hanging_man"],
         ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"],
         Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(),
-        DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5})["dark_cloud_cover"].abs(),
+        DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(),
         GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"],
     ]
     if len(df) >= 3:
