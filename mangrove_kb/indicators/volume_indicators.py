@@ -300,15 +300,13 @@ class MFI(IndicatorInterface):
         )
         mfr = typical_price * volume * up_down
 
-        # Positive and negative money flow with n periods
-        n_positive_mf = mfr.rolling(window, min_periods=window).apply(
-            lambda x: np.sum(np.where(x >= 0.0, x, 0.0)), raw=True
-        )
-        n_negative_mf = abs(
-            mfr.rolling(window, min_periods=window).apply(
-                lambda x: np.sum(np.where(x < 0.0, x, 0.0)), raw=True
-            )
-        )
+        # Positive and negative money flow with n periods.
+        # Mask outside the roll so the window op is a plain vectorized sum.
+        mfr_arr = np.asarray(mfr, dtype=np.float64)
+        pos_mfr = pd.Series(np.where(mfr_arr >= 0.0, mfr_arr, 0.0), index=typical_price.index)
+        neg_mfr = pd.Series(np.where(mfr_arr < 0.0, mfr_arr, 0.0), index=typical_price.index)
+        n_positive_mf = pos_mfr.rolling(window, min_periods=window).sum()
+        n_negative_mf = neg_mfr.rolling(window, min_periods=window).sum().abs()
 
         # Money flow index
         mfi_ratio = n_positive_mf / n_negative_mf

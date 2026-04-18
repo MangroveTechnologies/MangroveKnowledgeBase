@@ -235,11 +235,7 @@ class UlcerIndex(IndicatorInterface):
         ui_max = close.rolling(window, min_periods=1).max()
         r_i = 100 * (close - ui_max) / ui_max
 
-        def ui_function():
-            def _ui_function(x):
-                return np.sqrt((x**2 / window).sum())
-            return _ui_function
-
-        ulcer_idx = r_i.rolling(window).apply(ui_function(), raw=True)
+        # sqrt(sum(r_i^2) / window) over the rolling window == sqrt(mean(r_i^2)).
+        ulcer_idx = np.sqrt((r_i ** 2).rolling(window, min_periods=window).mean())
 
         return {'ulcer_index': pd.Series(ulcer_idx, name="ui")}

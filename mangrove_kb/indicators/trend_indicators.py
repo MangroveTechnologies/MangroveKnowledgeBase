@@ -76,15 +76,18 @@ class WMA(IndicatorInterface):
         close = data['close']
         window = params['window']
 
-        weight = pd.Series(
-            [i * 2 / (window * (window + 1)) for i in range(1, window + 1)]
-        )
+        weights = np.arange(1, window + 1, dtype=np.float64) * (2.0 / (window * (window + 1)))
+        close_values = close.to_numpy(dtype=np.float64, copy=False)
 
-        def weighted_average(x):
-            return (weight * x).sum()
+        wma_values = np.empty(len(close_values), dtype=np.float64)
+        if len(close_values) < window:
+            wma_values[:] = np.nan
+        else:
+            # output[j] = sum(close[j:j+window] * weights); pad warmup with NaN
+            wma_values[: window - 1] = np.nan
+            wma_values[window - 1 :] = np.convolve(close_values, weights[::-1], mode='valid')
 
-        wma_values = close.rolling(window).apply(weighted_average, raw=True)
-        return {'wma': pd.Series(wma_values, name=f'wma_{window}')}
+        return {'wma': pd.Series(wma_values, index=close.index, name=f'wma_{window}')}
 
 
 class MACD(IndicatorInterface):
@@ -153,16 +156,21 @@ class Aroon(IndicatorInterface):
         low = data['low']
         window = params['window']
 
-        rolling_high = high.rolling(window + 1, min_periods=window + 1)
-        aroon_up = rolling_high.apply(
-            lambda x: float(np.argmax(x)) / window * 100, raw=True
-        )
+        w = window + 1
+        high_arr = high.to_numpy(dtype=np.float64, copy=False)
+        low_arr = low.to_numpy(dtype=np.float64, copy=False)
+        n = len(high_arr)
 
-        rolling_low = low.rolling(window + 1, min_periods=window + 1)
-        aroon_down = rolling_low.apply(
-            lambda x: float(np.argmin(x)) / window * 100, raw=True
-        )
+        aroon_up_arr = np.full(n, np.nan)
+        aroon_down_arr = np.full(n, np.nan)
+        if n >= w:
+            high_wins = np.lib.stride_tricks.sliding_window_view(high_arr, w)
+            low_wins = np.lib.stride_tricks.sliding_window_view(low_arr, w)
+            aroon_up_arr[w - 1 :] = high_wins.argmax(axis=-1).astype(np.float64) / window * 100.0
+            aroon_down_arr[w - 1 :] = low_wins.argmin(axis=-1).astype(np.float64) / window * 100.0
 
+        aroon_up = pd.Series(aroon_up_arr, index=high.index)
+        aroon_down = pd.Series(aroon_down_arr, index=low.index)
         aroon_diff = aroon_up - aroon_down
 
         return {
@@ -418,13 +426,24 @@ class CCI(IndicatorInterface):
         window = params['window']
         constant = params['constant']
 
-        def _mad(x):
-            return np.mean(np.abs(x - np.mean(x)))
-
         typical_price = (high + low + close) / 3.0
+        tp_arr = typical_price.to_numpy(dtype=np.float64, copy=False)
+        n = len(tp_arr)
+
+        # True rolling mean absolute deviation: for each window, deviations are
+        # measured against the window's OWN mean. Not the same as
+        # |tp - rolling_mean|.rolling(w).mean() (which uses each bar's own
+        # rolling mean as its reference point).
+        mad_arr = np.full(n, np.nan)
+        if n >= window:
+            tp_wins = np.lib.stride_tricks.sliding_window_view(tp_arr, window)
+            win_means = tp_wins.mean(axis=-1, keepdims=True)
+            mad_arr[window - 1 :] = np.abs(tp_wins - win_means).mean(axis=-1)
+        mad = pd.Series(mad_arr, index=typical_price.index)
+
         cci = (
             typical_price - typical_price.rolling(window, min_periods=window).mean()
-        ) / (constant * typical_price.rolling(window, min_periods=window).apply(_mad, True))
+        ) / (constant * mad)
 
         return {'cci': pd.Series(cci, name="cci")}
 
