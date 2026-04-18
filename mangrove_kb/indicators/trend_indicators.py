@@ -6,11 +6,21 @@ ADX, Aroon, Ichimoku, PSAR, and more.
 
 Originally from ta-master library by Dario Lopez Padial (Bukosabino).
 """
+from functools import lru_cache
+
 import numpy as np
 import pandas as pd
 
 from mangrove_kb.indicators.indicator_interface import IndicatorInterface
 from mangrove_kb.indicators.utils import get_min_max, true_range
+
+
+@lru_cache(maxsize=64)
+def _wma_weights(window: int) -> np.ndarray:
+    """Weighted-moving-average weights. Read-only; safe to reuse across calls."""
+    w = np.arange(1, window + 1, dtype=np.float64) * (2.0 / (window * (window + 1)))
+    w.flags.writeable = False
+    return w
 
 
 class SMA(IndicatorInterface):
@@ -76,7 +86,7 @@ class WMA(IndicatorInterface):
         close = data['close']
         window = params['window']
 
-        weights = np.arange(1, window + 1, dtype=np.float64) * (2.0 / (window * (window + 1)))
+        weights = _wma_weights(window)
         close_values = close.to_numpy(dtype=np.float64, copy=False)
 
         wma_values = np.empty(len(close_values), dtype=np.float64)

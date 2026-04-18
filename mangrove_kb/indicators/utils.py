@@ -30,22 +30,28 @@ def true_range(high: pd.Series, low: pd.Series, close: pd.Series) -> pd.Series:
         J. Welles Wilder Jr.
         Used by ATR, Ultimate Oscillator, Vortex, etc.
     """
-    prev_close = close.shift(1)
-    tr1 = high - low
-    tr2 = (high - prev_close).abs()
-    tr3 = (low - prev_close).abs()
-    return pd.DataFrame({"tr1": tr1, "tr2": tr2, "tr3": tr3}).max(axis=1)
+    high_arr = high.to_numpy(dtype=np.float64, copy=False)
+    low_arr = low.to_numpy(dtype=np.float64, copy=False)
+    prev_close = close.shift(1).to_numpy(dtype=np.float64, copy=False)
+    tr1 = high_arr - low_arr
+    tr2 = np.abs(high_arr - prev_close)
+    tr3 = np.abs(low_arr - prev_close)
+    # np.fmax ignores NaN (matches pandas DataFrame.max(skipna=True)); at index
+    # 0, tr2/tr3 are NaN because prev_close is NaN -- the original fell back to
+    # tr1 there, so we must do the same.
+    tr = np.fmax(tr1, np.fmax(tr2, tr3))
+    return pd.Series(tr, index=high.index)
 
 
 def get_min_max(series1: pd.Series, series2: pd.Series, function: str = "min") -> pd.Series:
     """Element-wise min/max between two series."""
-    arr1 = np.array(series1)
-    arr2 = np.array(series2)
+    arr1 = series1.to_numpy(copy=False)
+    arr2 = series2.to_numpy(copy=False)
 
     if function == "min":
-        output = np.amin([arr1, arr2], axis=0)
+        output = np.minimum(arr1, arr2)
     elif function == "max":
-        output = np.amax([arr1, arr2], axis=0)
+        output = np.maximum(arr1, arr2)
     else:
         raise ValueError('function must be "min" or "max"')
 
