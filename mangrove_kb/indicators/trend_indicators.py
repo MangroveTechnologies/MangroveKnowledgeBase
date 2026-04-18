@@ -496,95 +496,85 @@ class ADX(IndicatorInterface):
         if window == 0:
             raise ValueError("window may not be 0")
 
+        n = len(close)
         close_shift = close.shift(1)
 
+        # True-range equivalent: max(high, prev_close) - min(low, prev_close).
         pdm = get_min_max(high, close_shift, "max")
         pdn = get_min_max(low, close_shift, "min")
+        tr_arr = (pdm - pdn).to_numpy(dtype=np.float64)
 
-        diff_directional_movement = pdm - pdn
-
-        trs_initial = np.zeros(window - 1)
-        trs = np.zeros(len(close) - (window - 1))
-        trs[0] = diff_directional_movement.dropna().iloc[0:window].sum()
-        diff_directional_movement = diff_directional_movement.reset_index(drop=True)
-
-        for i in range(1, len(trs) - 1):
-            trs[i] = (
-                trs[i - 1] - (trs[i - 1] / float(window))
-                + diff_directional_movement[window + i]
-            )
-
+        # Directional movements. Preserve original NaN-at-index-0 semantics so
+        # nansum(...[:window+1]) matches dropna().iloc[0:window].sum().
         diff_up = high - high.shift(1)
         diff_down = low.shift(1) - low
-
         pos = abs(((diff_up > diff_down) & (diff_up > 0)) * diff_up)
         neg = abs(((diff_down > diff_up) & (diff_down > 0)) * diff_down)
+        pos_arr = pos.to_numpy(dtype=np.float64)
+        neg_arr = neg.to_numpy(dtype=np.float64)
 
-        dip = np.zeros(len(close) - (window - 1))
-        dip[0] = pos.dropna().iloc[0:window].sum()
-        pos = pos.reset_index(drop=True)
+        trs_len = n - window + 1
+        trs = np.zeros(trs_len)
+        dip = np.zeros(trs_len)
+        din = np.zeros(trs_len)
 
-        for i in range(1, len(dip) - 1):
-            dip[i] = dip[i - 1] - (dip[i - 1] / float(window)) + pos[window + i]
+        if trs_len >= 1:
+            trs[0] = np.nansum(tr_arr[: window + 1])
+            dip[0] = np.nansum(pos_arr[: window + 1])
+            din[0] = np.nansum(neg_arr[: window + 1])
 
-        din = np.zeros(len(close) - (window - 1))
-        din[0] = neg.dropna().iloc[0:window].sum()
-        neg = neg.reset_index(drop=True)
+        # Wilder running-sum recurrence:
+        #   x[i] = x[i-1] * (1 - 1/w) + raw[w + i]   for i = 1..trs_len-2
+        # The original loop stops one short, leaving trs[trs_len-1] at 0.
+        # Mean form y = x/w obeys ewm(alpha=1/w, adjust=False); scale back.
+        if trs_len >= 3:
+            alpha = 1.0 / window
+            last_inclusive = trs_len - 2
 
-        for i in range(1, len(din) - 1):
-            din[i] = din[i - 1] - (din[i - 1] / float(window)) + neg[window + i]
+            def _wilder_sum(seed_sum: float, raw: np.ndarray) -> np.ndarray:
+                # Convert the Wilder running-sum recurrence into the ewm mean
+                # form: y[i] = x[i]/w obeys ewm(alpha=1/w, adjust=False) when
+                # its input is inp[0]=seed_sum/w and inp[k>=1]=raw[w+k]. Then
+                # x = y * w. (Do NOT divide the tail by w -- that's the bug.)
+                inp = np.empty(last_inclusive + 1)
+                inp[0] = seed_sum / window
+                inp[1:] = raw[window + 1 : window + last_inclusive + 1]
+                y = pd.Series(inp).ewm(alpha=alpha, adjust=False).mean().to_numpy()
+                return y * window
 
-        # Calculate ADX
-        dip_percent = np.zeros(len(trs))
-        for idx, value in enumerate(trs):
-            if value != 0:
-                dip_percent[idx] = 100 * (dip[idx] / value)
-            else:
-                dip_percent[idx] = 0
+            trs[0 : last_inclusive + 1] = _wilder_sum(trs[0], tr_arr)
+            dip[0 : last_inclusive + 1] = _wilder_sum(dip[0], pos_arr)
+            din[0 : last_inclusive + 1] = _wilder_sum(din[0], neg_arr)
 
-        din_percent = np.zeros(len(trs))
-        for idx, value in enumerate(trs):
-            if value != 0:
-                din_percent[idx] = 100 * (din[idx] / value)
-            else:
-                din_percent[idx] = 0
+        # Percent directional indices + DX (zero-guarded to match original ifs).
+        with np.errstate(divide='ignore', invalid='ignore'):
+            dip_pct = np.where(trs != 0, 100.0 * dip / trs, 0.0)
+            din_pct = np.where(trs != 0, 100.0 * din / trs, 0.0)
+            denom = dip_pct + din_pct
+            dx = np.where(denom != 0, 100.0 * np.abs(dip_pct - din_pct) / denom, 0.0)
 
-        directional_index = np.zeros(len(trs))
-        for idx in range(len(trs)):
-            if dip_percent[idx] + din_percent[idx] != 0:
-                directional_index[idx] = 100 * np.abs(
-                    (dip_percent[idx] - din_percent[idx]) / (dip_percent[idx] + din_percent[idx])
-                )
-            else:
-                directional_index[idx] = 0
+        # ADX: Wilder smoothing of DX with a one-step lag.
+        #   adx[w]   = mean(DX[0:w])
+        #   adx[i]   = (adx[i-1]*(w-1) + DX[i-1]) / w    for i = w+1..trs_len-1
+        # Equivalent to ewm(alpha=1/w, adjust=False) on [seed, DX[w..trs_len-2]].
+        adx_local = np.zeros(trs_len)
+        if trs_len > window:
+            seed = dx[0:window].mean()
+            adx_input = np.concatenate(([seed], dx[window : trs_len - 1]))
+            adx_out = pd.Series(adx_input).ewm(alpha=1.0 / window, adjust=False).mean().to_numpy()
+            adx_local[window:trs_len] = adx_out
 
-        adx_series = np.zeros(len(trs))
-        adx_series[window] = directional_index[0:window].mean()
+        trs_initial = np.zeros(window - 1)
+        adx_series = pd.Series(np.concatenate((trs_initial, adx_local), axis=0), index=close.index)
 
-        for i in range(window + 1, len(adx_series)):
-            adx_series[i] = (
-                (adx_series[i - 1] * (window - 1)) + directional_index[i - 1]
-            ) / float(window)
-
-        adx_series = np.concatenate((trs_initial, adx_series), axis=0)
-        adx_series = pd.Series(data=adx_series, index=close.index)
-
-        # Calculate ADX pos
-        dip_output = np.zeros(len(close))
-        for i in range(1, len(trs) - 1):
-            if trs[i] != 0:
-                dip_output[i + window] = 100 * (dip[i] / trs[i])
-            else:
-                dip_output[i + window] = 0
+        # adx_pos / adx_neg: fill positions [window+1 .. n-1] with the
+        # percent directional indices for i = 1..trs_len-2 (original loop).
+        dip_output = np.zeros(n)
+        din_output = np.zeros(n)
+        if trs_len >= 3:
+            dip_output[window + 1 : n] = dip_pct[1 : trs_len - 1]
+            din_output[window + 1 : n] = din_pct[1 : trs_len - 1]
         adx_pos_series = pd.Series(dip_output, index=close.index)
-
-        # Calculate ADX neg
-        din_output = np.zeros(len(close))
-        for i in range(1, len(trs) - 1):
-            if trs[i] != 0:
-                din_output[i + window] = 100 * (din[i] / trs[i])
-            else:
-                din_output[i + window] = 0
         adx_neg_series = pd.Series(din_output, index=close.index)
 
         return {

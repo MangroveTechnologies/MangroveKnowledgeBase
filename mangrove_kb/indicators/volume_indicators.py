@@ -249,13 +249,18 @@ class NVI(IndicatorInterface):
 
         price_change = close.pct_change()
         vol_decrease = volume.shift(1) > volume
-        nvi = pd.Series(data=np.nan, index=close.index, dtype="float64", name="nvi")
-        nvi.iloc[0] = 1000
-        for i in range(1, len(nvi)):
-            if vol_decrease.iloc[i]:
-                nvi.iloc[i] = nvi.iloc[i - 1] * (1.0 + price_change.iloc[i])
-            else:
-                nvi.iloc[i] = nvi.iloc[i - 1]
+
+        # NVI is a compounding index: on volume-decrease bars, scale by
+        # (1 + pct_change); otherwise carry forward. Express as a cumulative
+        # product of per-bar factors. pct_change[0] is NaN by definition;
+        # vol_decrease[0] is False (prev_volume is NaN); so factor[0] is 1
+        # and nvi[0] = 1000 * 1 = 1000, matching the original's hand-seed.
+        pct_arr = price_change.to_numpy(dtype=np.float64)
+        dec_arr = vol_decrease.to_numpy(dtype=bool)
+        pct_clean = np.where(np.isnan(pct_arr), 0.0, pct_arr)
+        factor = np.where(dec_arr, 1.0 + pct_clean, 1.0)
+        nvi_arr = 1000.0 * np.cumprod(factor)
+        nvi = pd.Series(nvi_arr, index=close.index, name="nvi")
 
         nvi_ema = nvi.ewm(span=window, adjust=False).mean()
 

@@ -41,12 +41,23 @@ class ATR(IndicatorInterface):
         window = params['window']
 
         tr = true_range(high, low, close)
-        atr = np.zeros(len(close))
-        atr[window - 1] = tr[0:window].mean()
-        for i in range(window, len(atr)):
-            atr[i] = (atr[i - 1] * (window - 1) + tr.iloc[i]) / float(window)
+        tr_arr = tr.to_numpy(dtype=np.float64)
+        n = len(tr_arr)
 
-        return {'atr': pd.Series(atr, index=close.index, name='atr')}
+        # Original convention: atr[0..window-2] = 0 (from np.zeros warm-up),
+        # atr[window-1] = mean of the first `window` tr values (skipna; tr[0]
+        # is NaN so it's really mean of window-1 valid values), then Wilder
+        # smooth forward. Wilder's recurrence is identical to
+        # ewm(alpha=1/window, adjust=False) applied to
+        # [seed, tr[window], tr[window+1], ...].
+        atr_arr = np.zeros(n)
+        if n >= window:
+            seed = np.nanmean(tr_arr[:window])
+            tail = np.concatenate(([seed], tr_arr[window:]))
+            smoothed = pd.Series(tail).ewm(alpha=1.0 / window, adjust=False).mean().to_numpy()
+            atr_arr[window - 1 :] = smoothed
+
+        return {'atr': pd.Series(atr_arr, index=close.index, name='atr')}
 
 
 class BollingerBands(IndicatorInterface):
