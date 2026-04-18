@@ -43,6 +43,14 @@ def true_range(high: pd.Series, low: pd.Series, close: pd.Series) -> pd.Series:
     return pd.Series(tr, index=high.index)
 
 
+def typical_price(high: pd.Series, low: pd.Series, close: pd.Series) -> pd.Series:
+    """Typical price: (high + low + close) / 3.
+
+    Used by CCI, MFI, VWAP, and the original-formula KeltnerChannel.
+    """
+    return (high + low + close) / 3.0
+
+
 def get_min_max(series1: pd.Series, series2: pd.Series, function: str = "min") -> pd.Series:
     """Element-wise min/max between two series."""
     arr1 = series1.to_numpy(copy=False)

@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 from mangrove_kb.indicators.indicator_interface import IndicatorInterface
-from mangrove_kb.indicators.utils import get_min_max, true_range
+from mangrove_kb.indicators.utils import get_min_max, true_range, typical_price
 
 
 @lru_cache(maxsize=64)
@@ -436,8 +436,8 @@ class CCI(IndicatorInterface):
         window = params['window']
         constant = params['constant']
 
-        typical_price = (high + low + close) / 3.0
-        tp_arr = typical_price.to_numpy(dtype=np.float64, copy=False)
+        tp = typical_price(high, low, close)
+        tp_arr = tp.to_numpy(dtype=np.float64, copy=False)
         n = len(tp_arr)
 
         # True rolling mean absolute deviation: for each window, deviations are
@@ -449,10 +449,10 @@ class CCI(IndicatorInterface):
             tp_wins = np.lib.stride_tricks.sliding_window_view(tp_arr, window)
             win_means = tp_wins.mean(axis=-1, keepdims=True)
             mad_arr[window - 1 :] = np.abs(tp_wins - win_means).mean(axis=-1)
-        mad = pd.Series(mad_arr, index=typical_price.index)
+        mad = pd.Series(mad_arr, index=tp.index)
 
         cci = (
-            typical_price - typical_price.rolling(window, min_periods=window).mean()
+            tp - tp.rolling(window, min_periods=window).mean()
         ) / (constant * mad)
 
         return {'cci': pd.Series(cci, name="cci")}

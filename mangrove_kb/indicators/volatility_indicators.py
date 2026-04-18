@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from mangrove_kb.indicators.indicator_interface import IndicatorInterface
-from mangrove_kb.indicators.utils import true_range
+from mangrove_kb.indicators.utils import true_range, typical_price
 
 
 class ATR(IndicatorInterface):
@@ -143,7 +143,7 @@ class KeltnerChannel(IndicatorInterface):
         multiplier = params['multiplier']
 
         if original_version:
-            tp = ((high + low + close) / 3.0).rolling(window, min_periods=window).mean()
+            tp = typical_price(high, low, close).rolling(window, min_periods=window).mean()
             tp_high = (((4 * high) - (2 * low) + close) / 3.0).rolling(window, min_periods=window).mean()
             tp_low = (((-2 * high) + (4 * low) + close) / 3.0).rolling(window, min_periods=window).mean()
         else:

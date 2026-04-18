@@ -6,13 +6,12 @@ CMF, Force Index, ADI, VWAP, and more.
 
 Originally from ta-master library by Dario Lopez Padial (Bukosabino).
 """
-import typing as tp
-
 import numpy as np
 import pandas as pd
 
 from mangrove_kb.indicators.indicator_interface import IndicatorInterface
 from mangrove_kb.indicators.trend_indicators import EMA, SMA
+from mangrove_kb.indicators.utils import typical_price
 
 
 class ADI(IndicatorInterface):
@@ -297,19 +296,19 @@ class MFI(IndicatorInterface):
         volume = data['volume']
         window = params['window']
 
-        typical_price = (high + low + close) / 3.0
+        tp = typical_price(high, low, close)
         up_down = np.where(
-            typical_price > typical_price.shift(1),
+            tp > tp.shift(1),
             1,
-            np.where(typical_price < typical_price.shift(1), -1, 0),
+            np.where(tp < tp.shift(1), -1, 0),
         )
-        mfr = typical_price * volume * up_down
+        mfr = tp * volume * up_down
 
         # Positive and negative money flow with n periods.
         # Mask outside the roll so the window op is a plain vectorized sum.
         mfr_arr = np.asarray(mfr, dtype=np.float64)
-        pos_mfr = pd.Series(np.where(mfr_arr >= 0.0, mfr_arr, 0.0), index=typical_price.index)
-        neg_mfr = pd.Series(np.where(mfr_arr < 0.0, mfr_arr, 0.0), index=typical_price.index)
+        pos_mfr = pd.Series(np.where(mfr_arr >= 0.0, mfr_arr, 0.0), index=tp.index)
+        neg_mfr = pd.Series(np.where(mfr_arr < 0.0, mfr_arr, 0.0), index=tp.index)
         n_positive_mf = pos_mfr.rolling(window, min_periods=window).sum()
         n_negative_mf = neg_mfr.rolling(window, min_periods=window).sum().abs()
 
@@ -351,13 +350,13 @@ class VWAP(IndicatorInterface):
         window = params['window']
 
         # 1 typical price
-        typical_price = (high + low + close) / 3.0
+        tp = typical_price(high, low, close)
 
         # 2 typical price * volume
-        typical_price_volume = typical_price * volume
+        tp_volume = tp * volume
 
         # 3 total price * volume
-        total_pv = typical_price_volume.rolling(window, min_periods=window).sum()
+        total_pv = tp_volume.rolling(window, min_periods=window).sum()
 
         # 4 total volume
         total_volume = volume.rolling(window, min_periods=window).sum()
