@@ -31,6 +31,11 @@ from mangrove_kb.indicators import (
     EMA,
     SMA,
     WMA,
+    DEMA,
+    TEMA,
+    TRIMA,
+    SMMA,
+    EPMA,
     TRIX,
     MassIndex,
     Ichimoku,
@@ -1510,3 +1515,364 @@ def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23,
         return False
 
     return float(stc.iloc[-1]) < threshold
+
+
+# =============================================================================
+# Wave A Moving Average Signals (DEMA, TEMA, TRIMA, SMMA, EPMA)
+# =============================================================================
+# Pattern: for each MA, we register is_above_<ma>, <ma>_cross_up, <ma>_cross_down.
+# Each wraps a shared helper that handles NaN checks, warmup validation, and
+# crossover detection, so the logic is uniform across MA families.
+
+
+def _ma_is_above(df: pd.DataFrame, indicator_cls, output_key: str, window: int) -> bool:
+    """Helper: check if current close is above the given MA."""
+    closes = df["Close"]
+    if len(closes) < window:
+        return False
+    result = indicator_cls.compute(data={'close': closes}, params={'window': window})
+    ma = result[output_key]
+    if ma.empty or pd.isna(ma.iloc[-1]):
+        return False
+    return bool(closes.iloc[-1] > ma.iloc[-1])
+
+
+def _ma_crossover(
+    df: pd.DataFrame,
+    indicator_cls,
+    output_key: str,
+    window_fast: int,
+    window_slow: int,
+    direction: str,
+) -> bool:
+    """Helper: detect fast/slow MA crossover in the given direction."""
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+    fast = indicator_cls.compute(data={'close': closes}, params={'window': window_fast})[output_key]
+    slow = indicator_cls.compute(data={'close': closes}, params={'window': window_slow})[output_key]
+    if len(fast) < 2 or len(slow) < 2:
+        return False
+    prev_fast, curr_fast = fast.iloc[-2], fast.iloc[-1]
+    prev_slow, curr_slow = slow.iloc[-2], slow.iloc[-1]
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+    if direction == "bullish":
+        return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
+    return bool(prev_fast >= prev_slow and curr_fast < curr_slow)
+
+
+# --- DEMA signals ---
+
+@RuleRegistry.register("is_above_dema")
+def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
+    """
+    Check if the current price is above the Double Exponential Moving Average (DEMA).
+
+    DEMA reduces lag compared to a standard EMA by combining two EMA passes.
+    Useful for trend-following filters where responsiveness matters.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): DEMA window in bars. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if close > DEMA, False otherwise.
+    """
+    return _ma_is_above(df, DEMA, 'dema', window)
+
+
+@RuleRegistry.register("dema_cross_up")
+def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA).
+
+    Lower-lag equivalent of an SMA/EMA golden cross.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast DEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow DEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bullish DEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, DEMA, 'dema', window_fast, window_slow, "bullish")
+
+
+@RuleRegistry.register("dema_cross_down")
+def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA).
+
+    Lower-lag equivalent of an SMA/EMA death cross.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast DEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow DEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bearish DEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, DEMA, 'dema', window_fast, window_slow, "bearish")
+
+
+# --- TEMA signals ---
+
+@RuleRegistry.register("is_above_tema")
+def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
+    """
+    Check if the current price is above the Triple Exponential Moving Average (TEMA).
+
+    TEMA has even less lag than DEMA by combining three EMA passes.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): TEMA window in bars. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if close > TEMA, False otherwise.
+    """
+    return _ma_is_above(df, TEMA, 'tema', window)
+
+
+@RuleRegistry.register("tema_cross_up")
+def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA).
+
+    Very low-lag cross signal; expect more whipsaw in noisy markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow TEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bullish TEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TEMA, 'tema', window_fast, window_slow, "bullish")
+
+
+@RuleRegistry.register("tema_cross_down")
+def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA).
+
+    Very low-lag cross signal; expect more whipsaw in noisy markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow TEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bearish TEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TEMA, 'tema', window_fast, window_slow, "bearish")
+
+
+# --- TRIMA signals ---
+
+@RuleRegistry.register("is_above_trima")
+def is_above_trima(df: pd.DataFrame, window: int = 20) -> bool:
+    """
+    Check if the current price is above the Triangular Moving Average (TRIMA).
+
+    TRIMA is a double-smoothed SMA that weights the middle of the window more
+    heavily, producing a smoother trend line than SMA.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): TRIMA window in bars. Range: 2-200. Default: 20.
+
+    Returns:
+        bool: True if close > TRIMA, False otherwise.
+    """
+    return _ma_is_above(df, TRIMA, 'trima', window)
+
+
+@RuleRegistry.register("trima_cross_up")
+def trima_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TRIMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow TRIMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bullish TRIMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TRIMA, 'trima', window_fast, window_slow, "bullish")
+
+
+@RuleRegistry.register("trima_cross_down")
+def trima_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TRIMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow TRIMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bearish TRIMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TRIMA, 'trima', window_fast, window_slow, "bearish")
+
+
+# --- SMMA signals ---
+
+@RuleRegistry.register("is_above_smma")
+def is_above_smma(df: pd.DataFrame, window: int = 14) -> bool:
+    """
+    Check if the current price is above the Smoothed Moving Average (SMMA / Wilder's).
+
+    SMMA uses Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing
+    a slower, more stable trend line. Same family used inside RSI and ATR.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): SMMA window in bars. Range: 2-200. Default: 14.
+
+    Returns:
+        bool: True if close > SMMA, False otherwise.
+    """
+    return _ma_is_above(df, SMMA, 'smma', window)
+
+
+@RuleRegistry.register("smma_cross_up")
+def smma_cross_up(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50) -> bool:
+    """
+    Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA).
+
+    Slower, more stable crossover than EMA cross; fewer false triggers.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast SMMA window. Range: 2-100. Default: 14.
+        window_slow (int): Slow SMMA window. Range: 2-200. Default: 50.
+
+    Returns:
+        bool: True if bullish SMMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, SMMA, 'smma', window_fast, window_slow, "bullish")
+
+
+@RuleRegistry.register("smma_cross_down")
+def smma_cross_down(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50) -> bool:
+    """
+    Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA).
+
+    Slower, more stable crossover than EMA cross; fewer false triggers.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast SMMA window. Range: 2-100. Default: 14.
+        window_slow (int): Slow SMMA window. Range: 2-200. Default: 50.
+
+    Returns:
+        bool: True if bearish SMMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, SMMA, 'smma', window_fast, window_slow, "bearish")
+
+
+# --- EPMA signals ---
+
+@RuleRegistry.register("is_above_epma")
+def is_above_epma(df: pd.DataFrame, window: int = 20) -> bool:
+    """
+    Check if the current price is above the End Point Moving Average (EPMA / LSMA).
+
+    EPMA is the endpoint of a linear regression over the window, projecting the
+    trend to "now" rather than averaging past values.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): EPMA window in bars. Range: 2-200. Default: 20.
+
+    Returns:
+        bool: True if close > EPMA, False otherwise.
+    """
+    return _ma_is_above(df, EPMA, 'epma', window)
+
+
+@RuleRegistry.register("epma_cross_up")
+def epma_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EPMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow EPMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bullish EPMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, EPMA, 'epma', window_fast, window_slow, "bullish")
+
+
+@RuleRegistry.register("epma_cross_down")
+def epma_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EPMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow EPMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bearish EPMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, EPMA, 'epma', window_fast, window_slow, "bearish")

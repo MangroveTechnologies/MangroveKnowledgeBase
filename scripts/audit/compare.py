@@ -59,14 +59,16 @@ def compare_series(
     ref: pd.Series,
     tolerance: float,
     skip_warmup: int = 0,
+    relative: bool = False,
 ) -> OutputResult:
     """Compare two pandas Series element-wise.
 
     Args:
         ours: Our implementation's output series
         ref: Reference implementation's output series
-        tolerance: Maximum acceptable absolute error
+        tolerance: Maximum acceptable error (absolute unless relative=True)
         skip_warmup: Skip first N bars (different warmup handling)
+        relative: If True, tolerance is relative to |ref| (good for price-space indicators)
     """
     result = OutputResult(output_key="")
 
@@ -94,12 +96,20 @@ def compare_series(
     result.max_abs_error = float(np.max(abs_diff))
     result.mean_abs_error = float(np.mean(abs_diff))
 
+    if relative:
+        # Relative tolerance: |ours - ref| / max(|ref|, epsilon) <= tolerance
+        denom = np.maximum(np.abs(r_valid.values), 1e-12)
+        rel_diff = abs_diff / denom
+        divergent = rel_diff > tolerance
+        result.pass_fail = bool(rel_diff.max() <= tolerance)
+    else:
+        divergent = abs_diff > tolerance
+        result.pass_fail = result.max_abs_error <= tolerance
+
     # First divergence bar
-    divergent = abs_diff > tolerance
     if divergent.any():
         result.first_divergence_bar = int(np.argmax(divergent)) + skip_warmup
 
-    result.pass_fail = result.max_abs_error <= tolerance
     return result
 
 
@@ -115,6 +125,7 @@ def compare_indicator(
     skip_warmup: int = 0,
     reference_library: str = "Bukosabino ta",
     notes: str = "",
+    relative: bool = False,
 ) -> AuditResult:
     """Compare our indicator implementation against a reference.
 
@@ -172,6 +183,7 @@ def compare_indicator(
             ref_outputs[ref_key],
             tolerance=tolerance,
             skip_warmup=skip_warmup,
+            relative=relative,
         )
         output_result.output_key = our_key
         result.outputs[our_key] = output_result

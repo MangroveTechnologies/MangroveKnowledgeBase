@@ -47,6 +47,11 @@ from .trend_indicators import (
     SMA,
     EMA,
     WMA,
+    DEMA,
+    TEMA,
+    TRIMA,
+    SMMA,
+    EPMA,
     MACD,
     Aroon,
     TRIX,
@@ -72,6 +77,7 @@ from .volume_indicators import (
     NVI,
     MFI,
     VWAP,
+    VWMA,
 )
 
 # Return indicators
@@ -140,6 +146,11 @@ __all__ = [
     "SMA",
     "EMA",
     "WMA",
+    "DEMA",
+    "TEMA",
+    "TRIMA",
+    "SMMA",
+    "EPMA",
     "MACD",
     "Aroon",
     "TRIX",
@@ -162,6 +173,7 @@ __all__ = [
     "NVI",
     "MFI",
     "VWAP",
+    "VWMA",
     # Return indicators
     "DailyReturn",
     "DailyLogReturn",

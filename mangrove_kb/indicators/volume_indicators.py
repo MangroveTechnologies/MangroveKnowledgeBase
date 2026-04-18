@@ -364,3 +364,37 @@ class VWAP(IndicatorInterface):
         vwap = total_pv / total_volume
 
         return {'vwap': pd.Series(vwap, name=f"vwap_{window}")}
+
+class VWMA(IndicatorInterface):
+    """Volume-Weighted Moving Average (VWMA)
+
+    Weights each price by its bar's volume, emphasizing bars with heavy
+    participation. Unlike VWAP (which resets daily/session), VWMA is a true
+    rolling moving average over the last N bars.
+
+    Formula: VWMA(n) = sum(close * volume over n) / sum(volume over n)
+
+    Reference: Standard volume-weighted moving average.
+
+    Args:
+        data: {'close': pd.Series, 'volume': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'vwma': pd.Series}
+    """
+    _data = ["close", "volume"]
+    _params = ["window"]
+    _outputs = ["vwma"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        volume = data['volume']
+        window = params['window']
+
+        pv_sum = (close * volume).rolling(window, min_periods=window).sum()
+        vol_sum = volume.rolling(window, min_periods=window).sum()
+        vwma = pv_sum / vol_sum
+        return {'vwma': pd.Series(vwma.values, index=close.index, name=f'vwma_{window}')}
+

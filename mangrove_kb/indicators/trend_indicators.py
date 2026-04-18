@@ -23,6 +23,25 @@ def _wma_weights(window: int) -> np.ndarray:
     return w
 
 
+@lru_cache(maxsize=64)
+def _epma_weights(window: int) -> np.ndarray:
+    """Cached weight vector for End Point Moving Average (linear regression endpoint).
+
+    For a window of size n, the linear regression fitted to y values at x = [0..n-1]
+    projected to x = n-1 can be expressed as a weighted sum: EPMA = sum(w_i * y_i).
+
+    Derivation: with mean_x = (n-1)/2 and S_xx = n*(n^2-1)/12,
+        slope = sum((x_i - mean_x) * y_i) / S_xx
+        EPMA  = mean_y + slope * (n-1)/2
+              = sum( y_i * (1/n + (6*i + 4 - 2*n) / (n*(n+1))) )
+    which simplifies to: w_i = (6*i + 4 - 2*n) / (n*(n+1))
+    """
+    i = np.arange(window, dtype=np.float64)
+    w = (6.0 * i + 4.0 - 2.0 * window) / (window * (window + 1))
+    w.flags.writeable = False
+    return w
+
+
 class SMA(IndicatorInterface):
     """Simple Moving Average
 
@@ -98,6 +117,178 @@ class WMA(IndicatorInterface):
             wma_values[window - 1 :] = np.convolve(close_values, weights[::-1], mode='valid')
 
         return {'wma': pd.Series(wma_values, index=close.index, name=f'wma_{window}')}
+
+
+class DEMA(IndicatorInterface):
+    """Double Exponential Moving Average (DEMA)
+
+    Reduces lag of a traditional EMA by applying EMA twice and combining.
+
+    Formula: DEMA = 2 * EMA(n) - EMA(EMA(n))
+
+    Reference: Patrick Mulloy, "Smoothing Data with Less Lag",
+    Technical Analysis of Stocks & Commodities, Jan 1994.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'dema': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["dema"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        ema1 = EMA.compute({'close': close}, {'window': window})['ema']
+        ema2 = EMA.compute({'close': ema1}, {'window': window})['ema']
+        dema = 2.0 * ema1 - ema2
+        return {'dema': pd.Series(dema.values, index=close.index, name=f'dema_{window}')}
+
+
+class TEMA(IndicatorInterface):
+    """Triple Exponential Moving Average (TEMA)
+
+    Further reduces lag over DEMA by combining three EMA passes.
+
+    Formula: TEMA = 3 * EMA - 3 * EMA(EMA) + EMA(EMA(EMA))
+
+    Reference: Patrick Mulloy, "Smoothing Data with Less Lag",
+    Technical Analysis of Stocks & Commodities, Jan 1994.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'tema': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["tema"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        ema1 = EMA.compute({'close': close}, {'window': window})['ema']
+        ema2 = EMA.compute({'close': ema1}, {'window': window})['ema']
+        ema3 = EMA.compute({'close': ema2}, {'window': window})['ema']
+        tema = 3.0 * ema1 - 3.0 * ema2 + ema3
+        return {'tema': pd.Series(tema.values, index=close.index, name=f'tema_{window}')}
+
+
+class TRIMA(IndicatorInterface):
+    """Triangular Moving Average (TRIMA)
+
+    Double-smoothed SMA. More weight is placed on the middle of the window than
+    on the edges, reducing noise at both ends.
+
+    Formula (TA-Lib convention):
+      - if window is odd:  inner = SMA(window), outer = SMA((window+1)//2, inner)
+      - if window is even: inner = SMA(window//2), outer = SMA(window//2 + 1, inner)
+
+    Equivalently: TRIMA = SMA(SMA(close, n1), n2) where n1 + n2 - 1 = window.
+
+    Reference: TA-Lib canonical implementation.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'trima': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["trima"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        if window % 2 == 1:
+            n1 = (window + 1) // 2
+            n2 = n1
+        else:
+            n1 = window // 2
+            n2 = n1 + 1
+        inner = close.rolling(window=n1, min_periods=n1).mean()
+        trima = inner.rolling(window=n2, min_periods=n2).mean()
+        return {'trima': pd.Series(trima.values, index=close.index, name=f'trima_{window}')}
+
+
+class SMMA(IndicatorInterface):
+    """Smoothed Moving Average (SMMA), a.k.a. Wilder's Smoothing or RMA.
+
+    Exponential smoothing with alpha = 1/window (vs EMA's 2/(window+1)), giving
+    slower, more stable smoothing. Same family as used inside RSI and ATR.
+
+    Formula: SMMA[i] = (SMMA[i-1] * (n-1) + close[i]) / n
+             equivalent to ewm(alpha=1/n, adjust=False)
+
+    Reference: J. Welles Wilder Jr., "New Concepts in Technical Trading Systems" (1978).
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'smma': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["smma"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        smma = close.ewm(alpha=1.0 / window, min_periods=window, adjust=False).mean()
+        return {'smma': pd.Series(smma.values, index=close.index, name=f'smma_{window}')}
+
+
+class EPMA(IndicatorInterface):
+    """End Point Moving Average (EPMA), a.k.a. Linear Regression Moving Average (LSMA).
+
+    For each bar, fits a linear regression over the last `window` closes and returns
+    the regression value at the endpoint (most recent bar). Projects the trend
+    to "now" rather than averaging past values.
+
+    Implementation: Expressed as a FIR filter with precomputed weights
+      w_i = (6*i + 4 - 2*n) / (n*(n+1))
+    for i = 0..n-1, so that EPMA = sum(w_i * close_i) over each window.
+
+    Reference: Standard linear-regression-at-endpoint formulation.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'epma': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["epma"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+
+        weights = _epma_weights(window)
+        close_values = close.to_numpy(dtype=np.float64, copy=False)
+        n = len(close_values)
+        epma_values = np.full(n, np.nan)
+        if n >= window:
+            # np.convolve with reversed weights gives a rolling weighted sum.
+            epma_values[window - 1:] = np.convolve(close_values, weights[::-1], mode='valid')
+        return {'epma': pd.Series(epma_values, index=close.index, name=f'epma_{window}')}
 
 
 class MACD(IndicatorInterface):

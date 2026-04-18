@@ -4,6 +4,24 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [1.0.0] - Unreleased
+
+Comprehensive expansion to 95 indicators and 154+ signals. This release adds 25 standard
+indicators (Priority A from the v0.4.0 gap analysis) and 4 signal patterns, bringing the
+library to feature parity with production trading platforms. All new indicators follow
+the vectorization discipline established in prior optimization waves: no
+`.rolling().apply(python_callback)`, cached per-window constants, `np.fmax`/`sliding_window_view`
+where appropriate, stateless classmethods.
+
+### Added (Wave A -- Simple Moving Averages)
+- **DEMA** (Double Exponential Moving Average). Reference: Patrick Mulloy, *Technical Analysis of Stocks & Commodities*, Jan 1994.
+- **TEMA** (Triple Exponential Moving Average). Same Mulloy paper.
+- **TRIMA** (Triangular Moving Average). Double-smoothed SMA with TA-Lib even/odd window convention.
+- **SMMA** (Smoothed Moving Average / Wilder's / RMA). `ewm(alpha=1/n)`. Reference: Wilder 1978.
+- **VWMA** (Volume-Weighted Moving Average). `sum(close*vol)/sum(vol)` over window.
+- **EPMA** (End Point Moving Average / LSMA). Linear regression endpoint; implemented as FIR filter with cached weights via `np.convolve`.
+- 18 new signals: `is_above_<ma>`, `<ma>_cross_up`, `<ma>_cross_down` for each new MA.
+
 ## [0.4.0] - 2026-04-16
 
 ### Fixed
