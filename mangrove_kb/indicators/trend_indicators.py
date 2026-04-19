@@ -1271,3 +1271,298 @@ class STC(IndicatorInterface):
         stc = EMA.compute({'close': stoch_kd}, {'window': smooth2})['ema']
 
         return {'stc': pd.Series(stc, name="stc")}
+
+
+class HeikinAshi(IndicatorInterface):
+    """Heikin-Ashi candles.
+
+    Smoothed candlestick representation that averages across multiple bars,
+    making trends visually easier to identify. Japanese for "average bar".
+
+    Formulas:
+        HA_close = (open + high + low + close) / 4
+        HA_open  = (prev_HA_open + prev_HA_close) / 2   (first: (open + close) / 2)
+        HA_high  = max(high, HA_open, HA_close)
+        HA_low   = min(low,  HA_open, HA_close)
+
+    Implementation: HA_open requires the previous HA_open, so the open series
+    is computed in a sequential loop. HA_high / HA_low / HA_close are fully
+    vectorized.
+
+    Reference: Dan Valcu, "Heikin-Ashi: How to Trade Without Candlestick
+    Patterns" (2011); widely discussed earlier in the Japanese literature.
+
+    Args:
+        data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {}
+
+    Returns:
+        {'ha_open': pd.Series, 'ha_high': pd.Series, 'ha_low': pd.Series, 'ha_close': pd.Series}
+    """
+    _data = ["open", "high", "low", "close"]
+    _params = []
+    _outputs = ["ha_open", "ha_high", "ha_low", "ha_close"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        open_ = data['open']
+        high = data['high']
+        low = data['low']
+        close = data['close']
+
+        n = len(close)
+        o_arr = open_.to_numpy(dtype=np.float64, copy=False)
+        h_arr = high.to_numpy(dtype=np.float64, copy=False)
+        l_arr = low.to_numpy(dtype=np.float64, copy=False)
+        c_arr = close.to_numpy(dtype=np.float64, copy=False)
+
+        # HA_close is fully vectorized.
+        ha_close_arr = (o_arr + h_arr + l_arr + c_arr) / 4.0
+
+        # HA_open is state-dependent: needs prev HA_open and prev HA_close.
+        ha_open_arr = np.empty(n, dtype=np.float64)
+        if n > 0:
+            ha_open_arr[0] = (o_arr[0] + c_arr[0]) / 2.0
+        for i in range(1, n):
+            ha_open_arr[i] = (ha_open_arr[i - 1] + ha_close_arr[i - 1]) / 2.0
+
+        # HA_high / HA_low are vectorized: element-wise max/min of three series.
+        ha_high_arr = np.fmax(np.fmax(h_arr, ha_open_arr), ha_close_arr)
+        ha_low_arr = np.fmin(np.fmin(l_arr, ha_open_arr), ha_close_arr)
+
+        return {
+            'ha_open': pd.Series(ha_open_arr, index=close.index, name='ha_open'),
+            'ha_high': pd.Series(ha_high_arr, index=close.index, name='ha_high'),
+            'ha_low': pd.Series(ha_low_arr, index=close.index, name='ha_low'),
+            'ha_close': pd.Series(ha_close_arr, index=close.index, name='ha_close'),
+        }
+
+
+class ChandelierExit(IndicatorInterface):
+    """Chandelier Exit (Chuck LeBeau).
+
+    Volatility-scaled trailing stop using rolling extreme and ATR:
+        long_stop  = highest_high(window) - multiplier * ATR(window)
+        short_stop = lowest_low(window)   + multiplier * ATR(window)
+
+    Unlike ATRTrailingStop this is NOT a state machine -- long and short stops
+    are always computed, and the user picks which one applies based on their
+    current position. Use `long_stop` as a floor for long positions;
+    `short_stop` as a ceiling for shorts.
+
+    Reference: Chuck LeBeau, SmartTrader. Popularized in Chande's "Beyond
+    Technical Analysis" (1997).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int, 'multiplier': float}
+
+    Returns:
+        {'long_stop': pd.Series, 'short_stop': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window", "multiplier"]
+    _outputs = ["long_stop", "short_stop"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        # Local import -- ATR lives in volatility_indicators; avoids circular import at load time.
+        from mangrove_kb.indicators.volatility_indicators import ATR
+
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        window = params['window']
+        mult = float(params['multiplier'])
+
+        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
+        # Mask warmup to NaN: our ATR fills first window-1 bars with 0.
+        atr_vals = atr.to_numpy(dtype=np.float64, copy=False).copy()
+        atr_vals[: window - 1] = np.nan
+        atr_masked = pd.Series(atr_vals, index=close.index)
+
+        hh = high.rolling(window, min_periods=window).max()
+        ll = low.rolling(window, min_periods=window).min()
+
+        long_stop = hh - mult * atr_masked
+        short_stop = ll + mult * atr_masked
+
+        return {
+            'long_stop': pd.Series(long_stop.values, index=close.index, name='long_stop'),
+            'short_stop': pd.Series(short_stop.values, index=close.index, name='short_stop'),
+        }
+
+
+class WilliamsAlligator(IndicatorInterface):
+    """Williams Alligator (Bill Williams).
+
+    Three SMMA lines plotted on median price ((high + low) / 2) with forward
+    offsets:
+        Jaw   = SMMA(13) shifted forward 8 bars (slowest, "sleeping alligator")
+        Teeth = SMMA( 8) shifted forward 5 bars
+        Lips  = SMMA( 5) shifted forward 3 bars (fastest, "gator's lips")
+
+    The forward shift is applied via pandas .shift(+n), which is
+    lookahead-free in backtesting: the value at bar `t` in the output is the
+    SMMA computed at bar `t - n`.
+
+    Trend interpretation:
+      - Lips > Teeth > Jaw (all spreading upward): alligator is eating,
+        strong uptrend.
+      - Lips < Teeth < Jaw (all spreading downward): strong downtrend.
+      - Tangled (lines crossing/converging): alligator is sleeping, no trend.
+
+    Reference: Bill Williams, "New Trading Dimensions" (1998).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series}
+        params: {'jaw': int, 'teeth': int, 'lips': int,
+                 'jaw_offset': int, 'teeth_offset': int, 'lips_offset': int}
+
+    Returns:
+        {'jaw': pd.Series, 'teeth': pd.Series, 'lips': pd.Series}
+    """
+    _data = ["high", "low"]
+    _params = ["jaw", "teeth", "lips", "jaw_offset", "teeth_offset", "lips_offset"]
+    _outputs = ["jaw", "teeth", "lips"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        high = data['high']
+        low = data['low']
+        jaw_n = params['jaw']
+        teeth_n = params['teeth']
+        lips_n = params['lips']
+        jaw_off = params['jaw_offset']
+        teeth_off = params['teeth_offset']
+        lips_off = params['lips_offset']
+
+        median = (high + low) / 2.0
+        # Use our SMMA (Wave A) for Wilder smoothing on median price.
+        jaw_raw = SMMA.compute({'close': median}, {'window': jaw_n})['smma']
+        teeth_raw = SMMA.compute({'close': median}, {'window': teeth_n})['smma']
+        lips_raw = SMMA.compute({'close': median}, {'window': lips_n})['smma']
+
+        # Forward shifts -- lookahead-free: value at bar t is SMMA computed at
+        # bar t - offset. pandas .shift(+n) moves old values forward in time.
+        jaw = jaw_raw.shift(jaw_off)
+        teeth = teeth_raw.shift(teeth_off)
+        lips = lips_raw.shift(lips_off)
+
+        return {
+            'jaw': pd.Series(jaw.values, index=high.index, name='alligator_jaw'),
+            'teeth': pd.Series(teeth.values, index=high.index, name='alligator_teeth'),
+            'lips': pd.Series(lips.values, index=high.index, name='alligator_lips'),
+        }
+
+
+class SuperTrend(IndicatorInterface):
+    """SuperTrend (Olivier Seban).
+
+    ATR-scaled bands around hl2 with a trend-following flip rule. When close
+    crosses the opposite band, the trend flips; between flips, the active
+    band ratchets to preserve the trailing-stop property.
+
+    Formula:
+        hl2       = (high + low) / 2
+        basic_ub  = hl2 + multiplier * ATR(window)
+        basic_lb  = hl2 - multiplier * ATR(window)
+        # Then per-bar:
+        if close > prev_upper: dir = +1
+        elif close < prev_lower: dir = -1
+        else: dir stays; ratchet the active band
+        trend = lower if dir == +1 else upper
+
+    Outputs:
+      - supertrend: the active trend line (trailing stop level)
+      - direction:  +1 long, -1 short
+      - long_band:  the lower band (NaN when in short regime)
+      - short_band: the upper band (NaN when in long regime)
+
+    Reference: Olivier Seban (popularized via MetaTrader community, 2000s).
+
+    Implementation: state-dependent per-bar loop; same pattern as
+    ATRTrailingStop / MAMA / PSAR.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int, 'multiplier': float}
+
+    Returns:
+        {'supertrend': pd.Series, 'direction': pd.Series,
+         'long_band': pd.Series, 'short_band': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window", "multiplier"]
+    _outputs = ["supertrend", "direction", "long_band", "short_band"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        from mangrove_kb.indicators.volatility_indicators import ATR
+
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        window = params['window']
+        mult = float(params['multiplier'])
+
+        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
+        atr_vals = atr.to_numpy(dtype=np.float64, copy=False)
+        h_arr = high.to_numpy(dtype=np.float64, copy=False)
+        l_arr = low.to_numpy(dtype=np.float64, copy=False)
+        c_arr = close.to_numpy(dtype=np.float64, copy=False)
+        hl2 = (h_arr + l_arr) / 2.0
+
+        n = len(close)
+        lb = hl2 - mult * atr_vals  # "basic" lower band, mutated by ratchet
+        ub = hl2 + mult * atr_vals  # "basic" upper band, mutated by ratchet
+        # Work on copies so we don't accidentally mutate inputs.
+        lb = lb.copy()
+        ub = ub.copy()
+
+        direction = np.full(n, np.nan)
+        supertrend = np.full(n, np.nan)
+        long_band = np.full(n, np.nan)
+        short_band = np.full(n, np.nan)
+
+        if n == 0:
+            return {
+                'supertrend': pd.Series(supertrend, index=close.index, name='supertrend'),
+                'direction': pd.Series(direction, index=close.index, name='direction'),
+                'long_band': pd.Series(long_band, index=close.index, name='long_band'),
+                'short_band': pd.Series(short_band, index=close.index, name='short_band'),
+            }
+
+        # Start in long regime at bar 1 (convention used by pandas-ta; direction
+        # is NaN for the first `window` bars via the output mask below).
+        dir_curr = 1
+        for i in range(1, n):
+            if c_arr[i] > ub[i - 1]:
+                dir_curr = 1
+            elif c_arr[i] < lb[i - 1]:
+                dir_curr = -1
+            # else: direction unchanged; ratchet the active band toward the trend
+            else:
+                if dir_curr == 1 and lb[i] < lb[i - 1]:
+                    lb[i] = lb[i - 1]
+                if dir_curr == -1 and ub[i] > ub[i - 1]:
+                    ub[i] = ub[i - 1]
+
+            direction[i] = dir_curr
+            if dir_curr == 1:
+                supertrend[i] = long_band[i] = lb[i]
+            else:
+                supertrend[i] = short_band[i] = ub[i]
+
+        # Mask first `window` bars of direction to NaN (ATR warmup).
+        direction[:window] = np.nan
+        supertrend[:window] = np.nan
+        long_band[:window] = np.nan
+        short_band[:window] = np.nan
+
+        return {
+            'supertrend': pd.Series(supertrend, index=close.index, name='supertrend'),
+            'direction': pd.Series(direction, index=close.index, name='direction'),
+            'long_band': pd.Series(long_band, index=close.index, name='long_band'),
+            'short_band': pd.Series(short_band, index=close.index, name='short_band'),
+        }

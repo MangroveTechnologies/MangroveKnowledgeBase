@@ -40,6 +40,10 @@ from mangrove_kb.indicators import (
     ALMA,
     T3,
     MAMA,
+    HeikinAshi,
+    ChandelierExit,
+    WilliamsAlligator,
+    SuperTrend,
     TRIX,
     MassIndex,
     Ichimoku,
@@ -2265,3 +2269,366 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
     if pd.isna(mama.iloc[-2]) or pd.isna(fama.iloc[-2]):
         return False
     return bool(mama.iloc[-2] >= fama.iloc[-2] and mama.iloc[-1] < fama.iloc[-1])
+
+
+# =============================================================================
+# Wave E Trend Signals (HeikinAshi, Chandelier, Alligator, SuperTrend)
+# =============================================================================
+
+
+# --- HeikinAshi signals ---
+
+@RuleRegistry.register("heikin_ashi_bullish")
+def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
+    """
+    Check if the current Heikin-Ashi candle is bullish (HA_close > HA_open).
+
+    A bullish HA candle indicates buying pressure on the smoothed bar.
+    Strings of bullish HA candles indicate a sustained uptrend.
+
+    Type: FILTER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if HA_close > HA_open on the current bar.
+    """
+    if len(df) < 1:
+        return False
+    out = HeikinAshi.compute(
+        data={'open': df["Open"], 'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={}
+    )
+    if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
+        return False
+    return bool(out['ha_close'].iloc[-1] > out['ha_open'].iloc[-1])
+
+
+@RuleRegistry.register("heikin_ashi_bearish")
+def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
+    """
+    Check if the current Heikin-Ashi candle is bearish (HA_close < HA_open).
+
+    Type: FILTER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if HA_close < HA_open on the current bar.
+    """
+    if len(df) < 1:
+        return False
+    out = HeikinAshi.compute(
+        data={'open': df["Open"], 'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={}
+    )
+    if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
+        return False
+    return bool(out['ha_close'].iloc[-1] < out['ha_open'].iloc[-1])
+
+
+# --- ChandelierExit signals ---
+
+def _chandelier_stops(df: pd.DataFrame, window: int, multiplier: float):
+    """Helper: compute long and short stops, return None if insufficient data."""
+    if len(df) < window + 1:
+        return None
+    out = ChandelierExit.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'multiplier': multiplier},
+    )
+    return out['long_stop'], out['short_stop']
+
+
+@RuleRegistry.register("chandelier_long_stop_hit")
+def chandelier_long_stop_hit(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
+    """
+    Check if close has breached the Chandelier long stop (close < long_stop).
+
+    If holding a long position, this is your exit trigger.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling high/ATR window. Range: 5-100. Default: 22.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if close < long_stop, False otherwise.
+    """
+    stops = _chandelier_stops(df, window, multiplier)
+    if stops is None:
+        return False
+    long_stop, _ = stops
+    if pd.isna(long_stop.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] < long_stop.iloc[-1])
+
+
+@RuleRegistry.register("chandelier_short_stop_hit")
+def chandelier_short_stop_hit(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
+    """
+    Check if close has breached the Chandelier short stop (close > short_stop).
+
+    If holding a short position, this is your exit trigger.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling low/ATR window. Range: 5-100. Default: 22.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if close > short_stop, False otherwise.
+    """
+    stops = _chandelier_stops(df, window, multiplier)
+    if stops is None:
+        return False
+    _, short_stop = stops
+    if pd.isna(short_stop.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] > short_stop.iloc[-1])
+
+
+# --- WilliamsAlligator signals ---
+
+def _alligator_lines(df: pd.DataFrame, jaw: int, teeth: int, lips: int,
+                     jaw_offset: int, teeth_offset: int, lips_offset: int):
+    """Helper: compute alligator lines, return None if insufficient data."""
+    if len(df) < jaw + jaw_offset + 1:
+        return None
+    out = WilliamsAlligator.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={
+            'jaw': jaw, 'teeth': teeth, 'lips': lips,
+            'jaw_offset': jaw_offset, 'teeth_offset': teeth_offset, 'lips_offset': lips_offset,
+        },
+    )
+    return out['jaw'], out['teeth'], out['lips']
+
+
+@RuleRegistry.register("alligator_bullish")
+def alligator_bullish(
+    df: pd.DataFrame,
+    jaw: int = 13, teeth: int = 8, lips: int = 5,
+    jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
+) -> bool:
+    """
+    Check if Williams Alligator lines are in bullish alignment (lips > teeth > jaw).
+
+    Bill Williams's "hungry alligator" state: strong uptrend, all lines
+    spreading upward.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        jaw (int): Jaw SMMA period. Range: 5-50. Default: 13.
+        teeth (int): Teeth SMMA period. Range: 3-30. Default: 8.
+        lips (int): Lips SMMA period. Range: 2-20. Default: 5.
+        jaw_offset (int): Jaw forward shift. Range: 0-20. Default: 8.
+        teeth_offset (int): Teeth forward shift. Range: 0-15. Default: 5.
+        lips_offset (int): Lips forward shift. Range: 0-10. Default: 3.
+
+    Returns:
+        bool: True if lips > teeth > jaw on the current bar.
+    """
+    lines = _alligator_lines(df, jaw, teeth, lips, jaw_offset, teeth_offset, lips_offset)
+    if lines is None:
+        return False
+    jaw_s, teeth_s, lips_s = lines
+    if pd.isna(jaw_s.iloc[-1]) or pd.isna(teeth_s.iloc[-1]) or pd.isna(lips_s.iloc[-1]):
+        return False
+    return bool(lips_s.iloc[-1] > teeth_s.iloc[-1] > jaw_s.iloc[-1])
+
+
+@RuleRegistry.register("alligator_bearish")
+def alligator_bearish(
+    df: pd.DataFrame,
+    jaw: int = 13, teeth: int = 8, lips: int = 5,
+    jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
+) -> bool:
+    """
+    Check if Williams Alligator lines are in bearish alignment (lips < teeth < jaw).
+
+    Strong downtrend, all lines spreading downward.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        jaw (int): Jaw SMMA period. Range: 5-50. Default: 13.
+        teeth (int): Teeth SMMA period. Range: 3-30. Default: 8.
+        lips (int): Lips SMMA period. Range: 2-20. Default: 5.
+        jaw_offset (int): Jaw forward shift. Range: 0-20. Default: 8.
+        teeth_offset (int): Teeth forward shift. Range: 0-15. Default: 5.
+        lips_offset (int): Lips forward shift. Range: 0-10. Default: 3.
+
+    Returns:
+        bool: True if lips < teeth < jaw on the current bar.
+    """
+    lines = _alligator_lines(df, jaw, teeth, lips, jaw_offset, teeth_offset, lips_offset)
+    if lines is None:
+        return False
+    jaw_s, teeth_s, lips_s = lines
+    if pd.isna(jaw_s.iloc[-1]) or pd.isna(teeth_s.iloc[-1]) or pd.isna(lips_s.iloc[-1]):
+        return False
+    return bool(lips_s.iloc[-1] < teeth_s.iloc[-1] < jaw_s.iloc[-1])
+
+
+@RuleRegistry.register("alligator_sleeping")
+def alligator_sleeping(
+    df: pd.DataFrame,
+    jaw: int = 13, teeth: int = 8, lips: int = 5,
+    jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
+) -> bool:
+    """
+    Check if the Williams Alligator is sleeping (lines tangled, no trend).
+
+    True when lines are neither strictly bullish-aligned nor bearish-aligned.
+    Used as a no-trade filter during consolidation.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        jaw (int): Jaw SMMA period. Range: 5-50. Default: 13.
+        teeth (int): Teeth SMMA period. Range: 3-30. Default: 8.
+        lips (int): Lips SMMA period. Range: 2-20. Default: 5.
+        jaw_offset (int): Jaw forward shift. Range: 0-20. Default: 8.
+        teeth_offset (int): Teeth forward shift. Range: 0-15. Default: 5.
+        lips_offset (int): Lips forward shift. Range: 0-10. Default: 3.
+
+    Returns:
+        bool: True if lines are tangled (no strict bullish or bearish alignment).
+    """
+    lines = _alligator_lines(df, jaw, teeth, lips, jaw_offset, teeth_offset, lips_offset)
+    if lines is None:
+        return False
+    jaw_s, teeth_s, lips_s = lines
+    if pd.isna(jaw_s.iloc[-1]) or pd.isna(teeth_s.iloc[-1]) or pd.isna(lips_s.iloc[-1]):
+        return False
+    j, t, l = jaw_s.iloc[-1], teeth_s.iloc[-1], lips_s.iloc[-1]
+    bullish = l > t > j
+    bearish = l < t < j
+    return not (bullish or bearish)
+
+
+# --- SuperTrend signals ---
+
+def _supertrend_direction(df: pd.DataFrame, window: int, multiplier: float):
+    """Helper: compute SuperTrend direction series, return None if insufficient data."""
+    if len(df) < window + 1:
+        return None
+    out = SuperTrend.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'multiplier': multiplier},
+    )
+    return out['direction']
+
+
+@RuleRegistry.register("supertrend_long")
+def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """
+    Check if SuperTrend is in the long regime (+1 direction).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if SuperTrend direction == +1.
+    """
+    direction = _supertrend_direction(df, window, multiplier)
+    if direction is None or pd.isna(direction.iloc[-1]):
+        return False
+    return direction.iloc[-1] == 1
+
+
+@RuleRegistry.register("supertrend_short")
+def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """
+    Check if SuperTrend is in the short regime (-1 direction).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if SuperTrend direction == -1.
+    """
+    direction = _supertrend_direction(df, window, multiplier)
+    if direction is None or pd.isna(direction.iloc[-1]):
+        return False
+    return direction.iloc[-1] == -1
+
+
+@RuleRegistry.register("supertrend_flip_up")
+def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """
+    Detect SuperTrend flipping from short (-1) to long (+1).
+
+    Classic SuperTrend bullish entry signal.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if direction flipped -1 -> +1 on the current bar.
+    """
+    direction = _supertrend_direction(df, window, multiplier)
+    if direction is None or len(direction) < 2:
+        return False
+    prev, curr = direction.iloc[-2], direction.iloc[-1]
+    if pd.isna(prev) or pd.isna(curr):
+        return False
+    return bool(prev == -1 and curr == 1)
+
+
+@RuleRegistry.register("supertrend_flip_down")
+def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """
+    Detect SuperTrend flipping from long (+1) to short (-1).
+
+    Classic SuperTrend bearish entry signal.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if direction flipped +1 -> -1 on the current bar.
+    """
+    direction = _supertrend_direction(df, window, multiplier)
+    if direction is None or len(direction) < 2:
+        return False
+    prev, curr = direction.iloc[-2], direction.iloc[-1]
+    if pd.isna(prev) or pd.isna(curr):
+        return False
+    return bool(prev == 1 and curr == -1)

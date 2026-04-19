@@ -12,7 +12,7 @@ class TestSignalEndpoints:
         resp = client.get("/api/signals")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["total"] == 192
+        assert data["total"] == 203
 
     def test_list_signals_filter_category(self):
         resp = client.get("/api/signals?category=Momentum")
@@ -22,7 +22,7 @@ class TestSignalEndpoints:
     def test_list_signals_filter_type(self):
         resp = client.get("/api/signals?signal_type=TRIGGER")
         assert resp.status_code == 200
-        assert resp.json()["total"] == 96
+        assert resp.json()["total"] == 98
 
     def test_get_signal(self):
         resp = client.get("/api/signals/rsi_oversold")
@@ -40,7 +40,7 @@ class TestIndicatorEndpoints:
     def test_list_indicators(self):
         resp = client.get("/api/indicators")
         assert resp.status_code == 200
-        assert resp.json()["total"] == 89
+        assert resp.json()["total"] == 93
 
     def test_get_indicator(self):
         resp = client.get("/api/indicators/RSI")

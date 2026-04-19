@@ -36,6 +36,13 @@ where appropriate, stateless classmethods.
 - **CMO** (Chande Momentum Oscillator). Rolling-sum variant: `100 * (pos_sum - neg_sum) / (pos_sum + neg_sum)`. Ranges [-100, +100]. Reference: Tushar Chande, *The New Technical Trader* (1994).
 - 16 new signals: for each of MOM/BOP/APO (zero-centered): `<ind>_bullish`, `<ind>_bearish` (FILTER), `<ind>_cross_up`, `<ind>_cross_down` (zero-line crossover TRIGGER). For CMO: `cmo_overbought`, `cmo_oversold` (FILTER), `cmo_cross_up`, `cmo_cross_down` (threshold crossover TRIGGER, analogous to RSI).
 
+### Added (Wave E -- Trend)
+- **HeikinAshi**. Smoothed candlestick transform: HA_close = (O+H+L+C)/4; HA_open = avg of prev HA_open and HA_close (sequential, state-dependent). HA_high/low fully vectorized with `np.fmax`/`np.fmin`.
+- **ChandelierExit** (Chuck LeBeau). `highest_high(n) - k*ATR` (long_stop), `lowest_low(n) + k*ATR` (short_stop). Both always computed; user picks which applies to their position.
+- **WilliamsAlligator** (Bill Williams, 1998). Three SMMA lines on median price ((H+L)/2) with forward offsets (Jaw 13+8, Teeth 8+5, Lips 5+3). Offsets applied via `shift(+n)` -- lookahead-free in backtesting (value at bar t is SMMA computed at t-offset).
+- **SuperTrend** (Olivier Seban). ATR-scaled bands around hl2 with trend-flip rule: close crosses opposite band -> flip; between flips, active band ratchets. State-dependent loop; matches pandas-ta bit-exact.
+- 11 new signals: `heikin_ashi_bullish/bearish` (FILTER), `chandelier_long_stop_hit/short_stop_hit` (FILTER, exit triggers), `alligator_bullish/bearish/sleeping` (regime FILTER), `supertrend_long/short` (regime FILTER), `supertrend_flip_up/flip_down` (TRIGGER).
+
 ### Added (Wave D -- Volatility)
 - **TrueRange** (standalone Wilder TR). Raw per-bar volatility; building block for ATR/Vortex/UO but useful on its own. Reuses our existing `true_range()` helper. Reference: Wilder 1978.
 - **NATR** (Normalized ATR). `100 * ATR / close`. Scale-invariant volatility measure. Uses Wilder (RMA) smoothing -- matches TA-Lib canonical convention; pandas-ta defaults to EMA-smoothing which is non-standard.
