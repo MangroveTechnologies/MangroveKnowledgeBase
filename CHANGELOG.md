@@ -36,6 +36,11 @@ where appropriate, stateless classmethods.
 - **CMO** (Chande Momentum Oscillator). Rolling-sum variant: `100 * (pos_sum - neg_sum) / (pos_sum + neg_sum)`. Ranges [-100, +100]. Reference: Tushar Chande, *The New Technical Trader* (1994).
 - 16 new signals: for each of MOM/BOP/APO (zero-centered): `<ind>_bullish`, `<ind>_bearish` (FILTER), `<ind>_cross_up`, `<ind>_cross_down` (zero-line crossover TRIGGER). For CMO: `cmo_overbought`, `cmo_oversold` (FILTER), `cmo_cross_up`, `cmo_cross_down` (threshold crossover TRIGGER, analogous to RSI).
 
+### Added (Wave F -- Volume)
+- **ADOSC** (Chaikin A/D Oscillator). `EMA(AD, fast) - EMA(AD, slow)`. Reuses our ADI indicator for the AD line and our EMA for smoothing. Reference: Marc Chaikin, TA-Lib canonical.
+- **KVO** (Klinger Volume Oscillator). Simplified modern form matching pandas-ta/TradingView: `signed_volume = volume * sign(hlc3.diff())`, `KVO = EMA(signed_volume, fast) - EMA(signed_volume, slow)`, plus `KVO_signal = EMA(KVO, signal_window)`. Signed-volume computation is bit-exact vs pandas-ta.
+- 8 new signals: `adosc_bullish/bearish` (FILTER), `adosc_cross_up/down` (zero-line TRIGGER), `kvo_bullish/bearish` (vs signal line FILTER), `kvo_bullish_cross/bearish_cross` (signal-line cross TRIGGER).
+
 ### Added (Wave E -- Trend)
 - **HeikinAshi**. Smoothed candlestick transform: HA_close = (O+H+L+C)/4; HA_open = avg of prev HA_open and HA_close (sequential, state-dependent). HA_high/low fully vectorized with `np.fmax`/`np.fmin`.
 - **ChandelierExit** (Chuck LeBeau). `highest_high(n) - k*ATR` (long_stop), `lowest_low(n) + k*ATR` (short_stop). Both always computed; user picks which applies to their position.

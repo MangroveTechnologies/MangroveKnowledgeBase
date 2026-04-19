@@ -398,3 +398,113 @@ class VWMA(IndicatorInterface):
         vwma = pv_sum / vol_sum
         return {'vwma': pd.Series(vwma.values, index=close.index, name=f'vwma_{window}')}
 
+
+
+class ADOSC(IndicatorInterface):
+    """Chaikin Accumulation/Distribution Oscillator (ADOSC).
+
+    Momentum of the Accumulation/Distribution Line: difference of two EMAs
+    of the AD line. Positive values indicate accumulation; negative indicate
+    distribution. A classic Chaikin confirmation indicator.
+
+    Formula: ADOSC = EMA(AD, fast) - EMA(AD, slow)
+
+    Reference: Marc Chaikin. TA-Lib canonical. Reuses our ADI indicator for
+    the AD line and our EMA for smoothing.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}
+        params: {'fast': int, 'slow': int}
+
+    Returns:
+        {'adosc': pd.Series}
+    """
+    _data = ["high", "low", "close", "volume"]
+    _params = ["fast", "slow"]
+    _outputs = ["adosc"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        from mangrove_kb.indicators.trend_indicators import EMA
+
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        volume = data['volume']
+        fast = params['fast']
+        slow = params['slow']
+
+        ad = ADI.compute({'high': high, 'low': low, 'close': close, 'volume': volume}, {})['adi']
+        ema_fast = EMA.compute({'close': ad}, {'window': fast})['ema']
+        ema_slow = EMA.compute({'close': ad}, {'window': slow})['ema']
+        adosc = ema_fast - ema_slow
+        return {'adosc': pd.Series(adosc.values, index=close.index, name=f'adosc_{fast}_{slow}')}
+
+
+class KVO(IndicatorInterface):
+    """Klinger Volume Oscillator (KVO).
+
+    Volume-weighted momentum oscillator. pandas-ta / modern simplified form:
+    sign the volume by the direction of the typical price change, then take
+    the difference of a fast and slow EMA.
+
+        trend = sign(typical_price - prev_typical_price)
+        signed_volume = volume * trend
+        KVO = EMA(signed_volume, fast) - EMA(signed_volume, slow)
+        KVO_signal = EMA(KVO, signal_window)
+
+    Positive KVO with rising signal = bullish volume pressure; negative with
+    falling signal = bearish. Divergences from price are the classic
+    Klinger entry cue.
+
+    Reference: Stephen J. Klinger (simplified modern form as implemented in
+    pandas-ta / TradingView; Klinger's original 1997 formulation uses a
+    more elaborate cumulative-measurement reset that this does not
+    replicate).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}
+        params: {'fast': int, 'slow': int, 'signal_window': int}
+
+    Returns:
+        {'kvo': pd.Series, 'kvo_signal': pd.Series}
+    """
+    _data = ["high", "low", "close", "volume"]
+    _params = ["fast", "slow", "signal_window"]
+    _outputs = ["kvo", "kvo_signal"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        from mangrove_kb.indicators.trend_indicators import EMA
+        from mangrove_kb.indicators.utils import typical_price
+
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        volume = data['volume']
+        fast = params['fast']
+        slow = params['slow']
+        signal_window = params['signal_window']
+
+        tp = typical_price(high, low, close)
+        diff = tp.diff(1)
+        # Sign of the typical-price change: +1 / -1 / 0 (no change).
+        # np.sign gives 0.0 for no-change; we leave that as 0 to match
+        # pandas-ta behavior on flat bars.
+        trend = np.sign(diff.to_numpy(dtype=np.float64, copy=False))
+        # NaN-safe: diff[0] is NaN so sign[0] is NaN -- replace with 0
+        # (no prior bar, no trend direction).
+        trend = np.nan_to_num(trend, nan=0.0)
+
+        vol_arr = volume.to_numpy(dtype=np.float64, copy=False)
+        signed_volume = pd.Series(vol_arr * trend, index=close.index)
+
+        ema_fast = EMA.compute({'close': signed_volume}, {'window': fast})['ema']
+        ema_slow = EMA.compute({'close': signed_volume}, {'window': slow})['ema']
+        kvo = ema_fast - ema_slow
+        kvo_signal = EMA.compute({'close': kvo}, {'window': signal_window})['ema']
+
+        return {
+            'kvo': pd.Series(kvo.values, index=close.index, name=f'kvo_{fast}_{slow}'),
+            'kvo_signal': pd.Series(kvo_signal.values, index=close.index, name=f'kvo_signal_{signal_window}'),
+        }

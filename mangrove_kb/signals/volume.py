@@ -36,6 +36,8 @@ from mangrove_kb.indicators import (
     MFI,
     VWAP,
     VWMA,
+    ADOSC,
+    KVO,
     DailyReturn,
     CumulativeReturn,
 )
@@ -776,3 +778,244 @@ def vwma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
         return False
     return bool(prev_fast >= prev_slow and curr_fast < curr_slow)
+
+
+# =============================================================================
+# Wave F Volume Signals (ADOSC, KVO)
+# =============================================================================
+
+
+@RuleRegistry.register("adosc_bullish")
+def adosc_bullish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
+    """
+    Check if Chaikin A/D Oscillator is positive (accumulation regime).
+
+    Positive ADOSC = AD line's fast EMA above its slow EMA, indicating
+    short-term buying pressure relative to longer-term trend.
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period for AD. Range: 2-20. Default: 3.
+        slow (int): Slow EMA period for AD. Range: 5-50. Default: 10.
+
+    Returns:
+        bool: True if ADOSC > 0, False otherwise.
+    """
+    if len(df) < slow + 1:
+        return False
+    adosc = ADOSC.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        params={'fast': fast, 'slow': slow},
+    )['adosc']
+    if pd.isna(adosc.iloc[-1]):
+        return False
+    return bool(adosc.iloc[-1] > 0)
+
+
+@RuleRegistry.register("adosc_bearish")
+def adosc_bearish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
+    """
+    Check if Chaikin A/D Oscillator is negative (distribution regime).
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period for AD. Range: 2-20. Default: 3.
+        slow (int): Slow EMA period for AD. Range: 5-50. Default: 10.
+
+    Returns:
+        bool: True if ADOSC < 0, False otherwise.
+    """
+    if len(df) < slow + 1:
+        return False
+    adosc = ADOSC.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        params={'fast': fast, 'slow': slow},
+    )['adosc']
+    if pd.isna(adosc.iloc[-1]):
+        return False
+    return bool(adosc.iloc[-1] < 0)
+
+
+@RuleRegistry.register("adosc_cross_up")
+def adosc_cross_up(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
+    """
+    Detect ADOSC crossing above zero (accumulation onset).
+
+    Type: TRIGGER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period for AD. Range: 2-20. Default: 3.
+        slow (int): Slow EMA period for AD. Range: 5-50. Default: 10.
+
+    Returns:
+        bool: True if ADOSC crosses above zero on the current bar.
+    """
+    if len(df) < slow + 2:
+        return False
+    adosc = ADOSC.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        params={'fast': fast, 'slow': slow},
+    )['adosc']
+    if len(adosc) < 2 or pd.isna(adosc.iloc[-1]) or pd.isna(adosc.iloc[-2]):
+        return False
+    return bool(adosc.iloc[-2] <= 0 < adosc.iloc[-1])
+
+
+@RuleRegistry.register("adosc_cross_down")
+def adosc_cross_down(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
+    """
+    Detect ADOSC crossing below zero (distribution onset).
+
+    Type: TRIGGER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period for AD. Range: 2-20. Default: 3.
+        slow (int): Slow EMA period for AD. Range: 5-50. Default: 10.
+
+    Returns:
+        bool: True if ADOSC crosses below zero on the current bar.
+    """
+    if len(df) < slow + 2:
+        return False
+    adosc = ADOSC.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        params={'fast': fast, 'slow': slow},
+    )['adosc']
+    if len(adosc) < 2 or pd.isna(adosc.iloc[-1]) or pd.isna(adosc.iloc[-2]):
+        return False
+    return bool(adosc.iloc[-2] >= 0 > adosc.iloc[-1])
+
+
+def _kvo_lines(df: pd.DataFrame, fast: int, slow: int, signal_window: int):
+    """Helper: compute KVO + signal, return None if insufficient data."""
+    if len(df) < slow + signal_window + 1:
+        return None
+    out = KVO.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        params={'fast': fast, 'slow': slow, 'signal_window': signal_window},
+    )
+    return out['kvo'], out['kvo_signal']
+
+
+@RuleRegistry.register("kvo_bullish_cross")
+def kvo_bullish_cross(
+    df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
+) -> bool:
+    """
+    Detect KVO crossing above its signal line (bullish volume onset).
+
+    Classic Klinger entry trigger; often confirms a price divergence.
+
+    Type: TRIGGER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period for signed volume. Range: 5-100. Default: 34.
+        slow (int): Slow EMA period for signed volume. Range: 10-200. Default: 55.
+        signal_window (int): Signal-line EMA period. Range: 2-50. Default: 13.
+
+    Returns:
+        bool: True if KVO crosses above signal line on the current bar.
+    """
+    lines = _kvo_lines(df, fast, slow, signal_window)
+    if lines is None:
+        return False
+    kvo, sig = lines
+    if len(kvo) < 2 or pd.isna(kvo.iloc[-1]) or pd.isna(kvo.iloc[-2]) or pd.isna(sig.iloc[-1]) or pd.isna(sig.iloc[-2]):
+        return False
+    return bool(kvo.iloc[-2] <= sig.iloc[-2] and kvo.iloc[-1] > sig.iloc[-1])
+
+
+@RuleRegistry.register("kvo_bearish_cross")
+def kvo_bearish_cross(
+    df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
+) -> bool:
+    """
+    Detect KVO crossing below its signal line (bearish volume onset).
+
+    Type: TRIGGER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period. Range: 5-100. Default: 34.
+        slow (int): Slow EMA period. Range: 10-200. Default: 55.
+        signal_window (int): Signal-line EMA period. Range: 2-50. Default: 13.
+
+    Returns:
+        bool: True if KVO crosses below signal line on the current bar.
+    """
+    lines = _kvo_lines(df, fast, slow, signal_window)
+    if lines is None:
+        return False
+    kvo, sig = lines
+    if len(kvo) < 2 or pd.isna(kvo.iloc[-1]) or pd.isna(kvo.iloc[-2]) or pd.isna(sig.iloc[-1]) or pd.isna(sig.iloc[-2]):
+        return False
+    return bool(kvo.iloc[-2] >= sig.iloc[-2] and kvo.iloc[-1] < sig.iloc[-1])
+
+
+@RuleRegistry.register("kvo_bullish")
+def kvo_bullish(
+    df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
+) -> bool:
+    """
+    Check if KVO is above its signal line (bullish volume regime).
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period. Range: 5-100. Default: 34.
+        slow (int): Slow EMA period. Range: 10-200. Default: 55.
+        signal_window (int): Signal-line EMA period. Range: 2-50. Default: 13.
+
+    Returns:
+        bool: True if KVO > signal line on the current bar.
+    """
+    lines = _kvo_lines(df, fast, slow, signal_window)
+    if lines is None:
+        return False
+    kvo, sig = lines
+    if pd.isna(kvo.iloc[-1]) or pd.isna(sig.iloc[-1]):
+        return False
+    return bool(kvo.iloc[-1] > sig.iloc[-1])
+
+
+@RuleRegistry.register("kvo_bearish")
+def kvo_bearish(
+    df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
+) -> bool:
+    """
+    Check if KVO is below its signal line (bearish volume regime).
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast (int): Fast EMA period. Range: 5-100. Default: 34.
+        slow (int): Slow EMA period. Range: 10-200. Default: 55.
+        signal_window (int): Signal-line EMA period. Range: 2-50. Default: 13.
+
+    Returns:
+        bool: True if KVO < signal line on the current bar.
+    """
+    lines = _kvo_lines(df, fast, slow, signal_window)
+    if lines is None:
+        return False
+    kvo, sig = lines
+    if pd.isna(kvo.iloc[-1]) or pd.isna(sig.iloc[-1]):
+        return False
+    return bool(kvo.iloc[-1] < sig.iloc[-1])

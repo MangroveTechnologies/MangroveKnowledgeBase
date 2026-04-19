@@ -95,6 +95,8 @@ from .volume_indicators import (
     MFI,
     VWAP,
     VWMA,
+    ADOSC,
+    KVO,
 )
 
 # Return indicators
@@ -208,6 +210,8 @@ __all__ = [
     "MFI",
     "VWAP",
     "VWMA",
+    "ADOSC",
+    "KVO",
     # Return indicators
     "DailyReturn",
     "DailyLogReturn",
