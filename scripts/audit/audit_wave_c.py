@@ -29,6 +29,7 @@ from audit import load_btc_daily
 from audit.compare import (
     compare_indicator,
     verify_signal,
+    bench_indicator,
 )
 from mangrove_kb.indicators import MOM, BOP, APO, CMO
 
@@ -184,6 +185,20 @@ def run_signal_audit():
     return results
 
 
+def run_benchmark():
+    """Time each Wave C indicator on the full BTC daily fixture."""
+    df = load_btc_daily()
+    open_ = df['open']; high = df['high']; low = df['low']; close = df['close']
+    bars = len(df)
+
+    return [
+        bench_indicator('MOM(10)', lambda: MOM.compute({'close': close}, {'window': 10}), bars),
+        bench_indicator('BOP', lambda: BOP.compute({'open': open_, 'high': high, 'low': low, 'close': close}, {}), bars),
+        bench_indicator('APO(12,26)', lambda: APO.compute({'close': close}, {'window_fast': 12, 'window_slow': 26}), bars),
+        bench_indicator('CMO(14)', lambda: CMO.compute({'close': close}, {'window': 14}), bars),
+    ]
+
+
 if __name__ == '__main__':
     print('=== Wave C: Indicator audit ===')
     ind_results = run_audit()
@@ -201,6 +216,16 @@ if __name__ == '__main__':
         print(f'  {r.signal_name}: {status} (fires={r.fires}, expected={r.expected_fires}, '
               f'FP={r.false_positives}, FN={r.false_negatives})')
     sig_failed = sum(1 for r in sig_results if not r.pass_fail)
+
+    print('\n=== Wave C: Benchmark (1294-bar BTC daily) ===')
+    bench_results = run_benchmark()
+    for b in bench_results:
+        flag = ''
+        if b.tier == 'pathological':
+            flag = '  <- PATHOLOGICAL (likely has python loop / rolling.apply)'
+        elif b.tier == 'slow':
+            flag = '  <- slow (acceptable for state-dependent algos)'
+        print(f'  {b.indicator_name:25s}: {b.mean_ms:>7.3f} ms  [{b.tier}]{flag}')
 
     total_pass = (len(ind_results) - ind_failed) + (len(sig_results) - sig_failed)
     total = len(ind_results) + len(sig_results)

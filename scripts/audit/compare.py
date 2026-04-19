@@ -323,3 +323,76 @@ def truth_crossover(fast: pd.Series, slow: pd.Series, direction: str) -> np.ndar
     else:
         raise ValueError(f"direction must be 'up' or 'down', got {direction!r}")
     return cond.fillna(False).to_numpy()
+
+
+# =============================================================================
+# Performance Benchmark
+# =============================================================================
+
+
+@dataclass
+class BenchResult:
+    """Result of timing an indicator compute."""
+    indicator_name: str
+    mean_ms: float
+    min_ms: float
+    max_ms: float
+    runs: int
+    bars: int
+    tier: str = ""  # auto-classified: fast / moderate / slow / pathological
+
+    def to_dict(self) -> dict:
+        return {
+            "indicator": self.indicator_name,
+            "mean_ms": self.mean_ms,
+            "min_ms": self.min_ms,
+            "max_ms": self.max_ms,
+            "runs": self.runs,
+            "bars": self.bars,
+            "tier": self.tier,
+        }
+
+
+def bench_indicator(name: str, compute_fn: Callable, bars: int, runs: int = 100) -> BenchResult:
+    """Time a compute function and classify the result.
+
+    Tiers (per-compute on the given fixture):
+        fast:         mean < 0.5 ms
+        moderate:     0.5 <= mean < 2 ms
+        slow:         2 <= mean < 20 ms
+        pathological: mean >= 20 ms (almost certainly has a python-level loop
+                      or rolling.apply that could be vectorized)
+    """
+    import time
+
+    # Warmup to let JIT/pandas caches settle
+    for _ in range(3):
+        compute_fn()
+
+    samples = []
+    for _ in range(runs):
+        t0 = time.perf_counter()
+        compute_fn()
+        samples.append((time.perf_counter() - t0) * 1000.0)
+
+    arr = np.array(samples)
+    mean_ms = float(arr.mean())
+
+    if mean_ms < 0.5:
+        tier = "fast"
+    elif mean_ms < 2.0:
+        tier = "moderate"
+    elif mean_ms < 20.0:
+        tier = "slow"
+    else:
+        tier = "pathological"
+
+    return BenchResult(
+        indicator_name=name,
+        mean_ms=mean_ms,
+        min_ms=float(arr.min()),
+        max_ms=float(arr.max()),
+        runs=runs,
+        bars=bars,
+        tier=tier,
+    )

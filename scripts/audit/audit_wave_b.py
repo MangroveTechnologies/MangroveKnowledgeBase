@@ -30,6 +30,7 @@ from audit.compare import (
     verify_signal,
     truth_is_above,
     truth_crossover,
+    bench_indicator,
 )
 from mangrove_kb.indicators import HMA, ALMA, T3, MAMA
 
@@ -173,6 +174,21 @@ def run_signal_audit():
     return results
 
 
+def run_benchmark():
+    """Time each Wave B indicator on the full BTC daily fixture."""
+    df = load_btc_daily()
+    close = df['close']
+    bars = len(df)
+
+    return [
+        bench_indicator('HMA(16)', lambda: HMA.compute({'close': close}, {'window': 16}), bars),
+        bench_indicator('ALMA(21)', lambda: ALMA.compute({'close': close}, {'window': 21, 'offset': 0.85, 'sigma': 6.0}), bars),
+        bench_indicator('T3(10)', lambda: T3.compute({'close': close}, {'window': 10, 'volume_factor': 0.7}), bars),
+        # MAMA: state-dependent sequential loop; fewer runs to keep audit fast.
+        bench_indicator('MAMA', lambda: MAMA.compute({'close': close}, {'fast_limit': 0.5, 'slow_limit': 0.05}), bars, runs=10),
+    ]
+
+
 if __name__ == '__main__':
     print('=== Wave B: Indicator audit ===')
     ind_results = run_audit()
@@ -190,6 +206,16 @@ if __name__ == '__main__':
         print(f'  {r.signal_name}: {status} (fires={r.fires}, expected={r.expected_fires}, '
               f'FP={r.false_positives}, FN={r.false_negatives})')
     sig_failed = sum(1 for r in sig_results if not r.pass_fail)
+
+    print('\n=== Wave B: Benchmark (1294-bar BTC daily) ===')
+    bench_results = run_benchmark()
+    for b in bench_results:
+        flag = ''
+        if b.tier == 'pathological':
+            flag = '  <- PATHOLOGICAL'
+        elif b.tier == 'slow':
+            flag = '  <- slow (MAMA is state-dependent; future numba opt possible)'
+        print(f'  {b.indicator_name:25s}: {b.mean_ms:>7.3f} ms  [{b.tier}]{flag}')
 
     total_pass = (len(ind_results) - ind_failed) + (len(sig_results) - sig_failed)
     total = len(ind_results) + len(sig_results)

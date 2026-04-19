@@ -27,6 +27,7 @@ from audit.compare import (
     verify_signal,
     truth_is_above,
     truth_crossover,
+    bench_indicator,
 )
 from mangrove_kb.indicators import DEMA, TEMA, TRIMA, SMMA, EPMA, VWMA
 
@@ -163,6 +164,23 @@ def run_signal_audit():
     return results
 
 
+def run_benchmark():
+    """Time each Wave A indicator on the full BTC daily fixture."""
+    df = load_btc_daily()
+    close = df['close']
+    volume = df['volume']
+    bars = len(df)
+
+    return [
+        bench_indicator('DEMA(21)', lambda: DEMA.compute({'close': close}, {'window': 21}), bars),
+        bench_indicator('TEMA(21)', lambda: TEMA.compute({'close': close}, {'window': 21}), bars),
+        bench_indicator('TRIMA(20)', lambda: TRIMA.compute({'close': close}, {'window': 20}), bars),
+        bench_indicator('SMMA(14)', lambda: SMMA.compute({'close': close}, {'window': 14}), bars),
+        bench_indicator('EPMA(20)', lambda: EPMA.compute({'close': close}, {'window': 20}), bars),
+        bench_indicator('VWMA(20)', lambda: VWMA.compute({'close': close, 'volume': volume}, {'window': 20}), bars),
+    ]
+
+
 if __name__ == '__main__':
     print('=== Wave A: Indicator audit ===')
     ind_results = run_audit()
@@ -180,6 +198,16 @@ if __name__ == '__main__':
         print(f'  {r.signal_name}: {status} (fires={r.fires}, expected={r.expected_fires}, '
               f'FP={r.false_positives}, FN={r.false_negatives})')
     sig_failed = sum(1 for r in sig_results if not r.pass_fail)
+
+    print('\n=== Wave A: Benchmark (1294-bar BTC daily) ===')
+    bench_results = run_benchmark()
+    for b in bench_results:
+        flag = ''
+        if b.tier == 'pathological':
+            flag = '  <- PATHOLOGICAL'
+        elif b.tier == 'slow':
+            flag = '  <- slow'
+        print(f'  {b.indicator_name:25s}: {b.mean_ms:>7.3f} ms  [{b.tier}]{flag}')
 
     total_pass = (len(ind_results) - ind_failed) + (len(sig_results) - sig_failed)
     total = len(ind_results) + len(sig_results)
