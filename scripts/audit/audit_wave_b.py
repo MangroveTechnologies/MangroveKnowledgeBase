@@ -25,7 +25,12 @@ import pandas as pd
 import pandas_ta as ta
 
 from audit import load_btc_daily
-from audit.compare import compare_indicator
+from audit.compare import (
+    compare_indicator,
+    verify_signal,
+    truth_is_above,
+    truth_crossover,
+)
 from mangrove_kb.indicators import HMA, ALMA, T3, MAMA
 
 
@@ -119,8 +124,79 @@ def run_audit():
     return results
 
 
+def run_signal_audit():
+    """Verify every Wave B signal bar-by-bar against ground truth from indicators."""
+    df = load_btc_daily()
+    close = df['close']
+
+    results = []
+
+    # --- HMA, ALMA, T3: standard is_above + cross_up/down pattern ---
+    is_above_specs = [
+        ('is_above_hma', HMA, 'hma', {'window': 16}),
+        ('is_above_alma', ALMA, 'alma', {'window': 21, 'offset': 0.85, 'sigma': 6.0}),
+        ('is_above_t3', T3, 't3', {'window': 10, 'volume_factor': 0.7}),
+    ]
+    for name, cls, key, params in is_above_specs:
+        indicator = cls.compute({'close': close}, params)[key]
+        truth = truth_is_above(close, indicator)
+        results.append(verify_signal(name, params, df, truth))
+
+    cross_specs = [
+        ('hma', HMA, 'hma', {'window_fast': 9, 'window_slow': 25}, {}),
+        ('alma', ALMA, 'alma', {'window_fast': 9, 'window_slow': 21}, {'offset': 0.85, 'sigma': 6.0}),
+        ('t3', T3, 't3', {'window_fast': 5, 'window_slow': 10}, {'volume_factor': 0.7}),
+    ]
+    for ma_name, cls, key, window_params, extra in cross_specs:
+        wf = window_params['window_fast']
+        ws = window_params['window_slow']
+        fast = cls.compute({'close': close}, {'window': wf, **extra})[key]
+        slow = cls.compute({'close': close}, {'window': ws, **extra})[key]
+        params = {**window_params, **extra}
+        results.append(verify_signal(f"{ma_name}_cross_up", params, df, truth_crossover(fast, slow, 'up')))
+        results.append(verify_signal(f"{ma_name}_cross_down", params, df, truth_crossover(fast, slow, 'down')))
+
+    # --- MAMA: special -- MAMA vs FAMA crossover, not fast/slow window ---
+    mama_params = {'fast_limit': 0.5, 'slow_limit': 0.05}
+    mama_out = MAMA.compute({'close': close}, mama_params)
+    mama_series, fama_series = mama_out['mama'], mama_out['fama']
+
+    # is_above_mama: close > MAMA
+    results.append(verify_signal('is_above_mama', mama_params, df, truth_is_above(close, mama_series)))
+
+    # mama_cross_up: MAMA crosses above FAMA
+    results.append(verify_signal('mama_cross_up', mama_params, df, truth_crossover(mama_series, fama_series, 'up')))
+
+    # mama_cross_down: MAMA crosses below FAMA
+    results.append(verify_signal('mama_cross_down', mama_params, df, truth_crossover(mama_series, fama_series, 'down')))
+
+    return results
+
+
 if __name__ == '__main__':
-    results = run_audit()
+    print('=== Wave B: Indicator audit ===')
+    ind_results = run_audit()
+    for r in ind_results:
+        status = 'PASS' if r.pass_fail else 'FAIL'
+        errors = ', '.join(f'{k}={v.max_abs_error:.2e}' for k, v in r.outputs.items())
+        notes = f' [{r.notes}]' if r.notes else ''
+        print(f'  {r.indicator_name}: {status} ({errors}){notes}')
+    ind_failed = sum(1 for r in ind_results if not r.pass_fail)
+
+    print('\n=== Wave B: Signal audit (bar-by-bar ground truth) ===')
+    sig_results = run_signal_audit()
+    for r in sig_results:
+        status = 'PASS' if r.pass_fail else 'FAIL'
+        print(f'  {r.signal_name}: {status} (fires={r.fires}, expected={r.expected_fires}, '
+              f'FP={r.false_positives}, FN={r.false_negatives})')
+    sig_failed = sum(1 for r in sig_results if not r.pass_fail)
+
+    total_pass = (len(ind_results) - ind_failed) + (len(sig_results) - sig_failed)
+    total = len(ind_results) + len(sig_results)
+    print(f'\nWave B total: {total_pass}/{total} PASS '
+          f'(indicators {len(ind_results) - ind_failed}/{len(ind_results)}, '
+          f'signals {len(sig_results) - sig_failed}/{len(sig_results)})')
+    sys.exit(0 if (ind_failed + sig_failed) == 0 else 1)
     for r in results:
         status = 'PASS' if r.pass_fail else 'FAIL'
         errors = ', '.join(f'{k}={v.max_abs_error:.2e}' for k, v in r.outputs.items())

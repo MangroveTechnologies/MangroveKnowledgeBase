@@ -1,9 +1,9 @@
-"""Core comparison engine for indicator audit."""
+"""Core comparison engine for indicator and signal audit."""
 
 from dataclasses import dataclass, field
 import pandas as pd
 import numpy as np
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 
 @dataclass
@@ -192,3 +192,134 @@ def compare_indicator(
             result.pass_fail = False
 
     return result
+
+
+# =============================================================================
+# Signal Verification
+# =============================================================================
+# A signal passes verification if, for every bar in the dataset (after warmup),
+# its boolean output matches ground truth computed from the full-dataset
+# indicator output. Ground truth is built externally and passed in as a
+# boolean array; this module runs the signal bar-by-bar with a sliding window
+# and compares.
+
+
+@dataclass
+class SignalAuditResult:
+    """Result of verifying a signal's boolean output against ground truth."""
+    signal_name: str
+    params: dict
+    start_bar: int
+    evaluated_bars: int
+    fires: int
+    expected_fires: int
+    true_positives: int
+    false_positives: int
+    false_negatives: int
+    pass_fail: bool = True
+    notes: str = ""
+
+    def to_dict(self) -> dict:
+        return {
+            "signal": self.signal_name,
+            "params": self.params,
+            "start_bar": self.start_bar,
+            "evaluated_bars": self.evaluated_bars,
+            "fires": self.fires,
+            "expected_fires": self.expected_fires,
+            "true_positives": self.true_positives,
+            "false_positives": self.false_positives,
+            "false_negatives": self.false_negatives,
+            "pass": self.pass_fail,
+            "notes": self.notes,
+        }
+
+
+def verify_signal(
+    signal_name: str,
+    params: dict,
+    df: pd.DataFrame,
+    truth: np.ndarray,
+    start_bar: int = 100,
+) -> SignalAuditResult:
+    """Verify a registered signal's output matches ground truth bar-by-bar.
+
+    Runs the signal with a sliding window at every bar from `start_bar` to end,
+    then compares to the pre-computed ground truth boolean array. Zero false
+    positives AND zero false negatives are required to pass.
+
+    Args:
+        signal_name: Name of the signal registered in RuleRegistry.
+        params: Parameters to pass to the signal.
+        df: Full dataset DataFrame (with capitalized OHLCV column names).
+        truth: Boolean ndarray same length as df, True where signal should fire.
+        start_bar: Skip the warmup region; default 100 bars.
+    """
+    # Import here to avoid module-level cycles
+    from mangrove_kb.registry import RuleRegistry
+    import mangrove_kb.signals  # ensure registration
+
+    n = len(df)
+    if len(truth) != n:
+        raise ValueError(f"truth length {len(truth)} != df length {n}")
+
+    signal_out = np.zeros(n, dtype=bool)
+    for i in range(start_bar, n):
+        window_df = df.iloc[: i + 1]
+        try:
+            signal_out[i] = bool(RuleRegistry.evaluate({"name": signal_name, "params": params}, window_df))
+        except Exception as e:
+            return SignalAuditResult(
+                signal_name=signal_name,
+                params=params,
+                start_bar=start_bar,
+                evaluated_bars=i - start_bar,
+                fires=int(signal_out.sum()),
+                expected_fires=int(truth[start_bar:i].sum()),
+                true_positives=0,
+                false_positives=0,
+                false_negatives=0,
+                pass_fail=False,
+                notes=f"RAISED at bar {i}: {e}",
+            )
+
+    s = signal_out[start_bar:]
+    t = truth[start_bar:].astype(bool)
+    tp = int((s & t).sum())
+    fp = int((s & ~t).sum())
+    fn = int((~s & t).sum())
+
+    return SignalAuditResult(
+        signal_name=signal_name,
+        params=params,
+        start_bar=start_bar,
+        evaluated_bars=n - start_bar,
+        fires=int(s.sum()),
+        expected_fires=int(t.sum()),
+        true_positives=tp,
+        false_positives=fp,
+        false_negatives=fn,
+        pass_fail=(fp == 0 and fn == 0),
+    )
+
+
+def truth_is_above(series: pd.Series, indicator: pd.Series) -> np.ndarray:
+    """Ground truth for is_above_<ma> filter: price > indicator, NaN -> False."""
+    return (series > indicator).fillna(False).to_numpy()
+
+
+def truth_crossover(fast: pd.Series, slow: pd.Series, direction: str) -> np.ndarray:
+    """Ground truth for fast/slow crossover signals.
+
+    Args:
+        direction: "up" = fast crosses above slow; "down" = fast crosses below.
+    """
+    prev_f, curr_f = fast.shift(1), fast
+    prev_s, curr_s = slow.shift(1), slow
+    if direction == "up":
+        cond = (prev_f <= prev_s) & (curr_f > curr_s)
+    elif direction == "down":
+        cond = (prev_f >= prev_s) & (curr_f < curr_s)
+    else:
+        raise ValueError(f"direction must be 'up' or 'down', got {direction!r}")
+    return cond.fillna(False).to_numpy()

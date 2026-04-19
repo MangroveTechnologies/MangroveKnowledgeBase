@@ -22,7 +22,12 @@ import pandas as pd
 import pandas_ta as ta
 
 from audit import load_btc_daily
-from audit.compare import compare_indicator
+from audit.compare import (
+    compare_indicator,
+    verify_signal,
+    truth_is_above,
+    truth_crossover,
+)
 from mangrove_kb.indicators import DEMA, TEMA, TRIMA, SMMA, EPMA, VWMA
 
 
@@ -115,15 +120,70 @@ def run_audit():
     return results
 
 
+def run_signal_audit():
+    """Verify every Wave A signal bar-by-bar against ground truth from indicators."""
+    df = load_btc_daily()
+    # Signals expect capitalized OHLCV columns; load_btc_daily provides both.
+    close = df['close']
+    volume = df['volume']
+
+    results = []
+
+    # FILTER signals: is_above_<ma>
+    filter_specs = [
+        ('is_above_dema', DEMA, 'dema', {'window': 21}, {'close': close}),
+        ('is_above_tema', TEMA, 'tema', {'window': 21}, {'close': close}),
+        ('is_above_trima', TRIMA, 'trima', {'window': 20}, {'close': close}),
+        ('is_above_smma', SMMA, 'smma', {'window': 14}, {'close': close}),
+        ('is_above_epma', EPMA, 'epma', {'window': 20}, {'close': close}),
+        ('is_above_vwma', VWMA, 'vwma', {'window': 20}, {'close': close, 'volume': volume}),
+    ]
+    for name, cls, key, params, data in filter_specs:
+        indicator = cls.compute(data, params)[key]
+        truth = truth_is_above(close, indicator)
+        results.append(verify_signal(name, params, df, truth))
+
+    # TRIGGER signals: <ma>_cross_up / <ma>_cross_down
+    cross_specs = [
+        # (ma_name, cls, key, (window_fast, window_slow), extra_params, data)
+        ('dema', DEMA, 'dema', (9, 21), {}, {'close': close}),
+        ('tema', TEMA, 'tema', (9, 21), {}, {'close': close}),
+        ('trima', TRIMA, 'trima', (10, 30), {}, {'close': close}),
+        ('smma', SMMA, 'smma', (14, 50), {}, {'close': close}),
+        ('epma', EPMA, 'epma', (10, 30), {}, {'close': close}),
+        ('vwma', VWMA, 'vwma', (9, 21), {}, {'close': close, 'volume': volume}),
+    ]
+    for ma_name, cls, key, (wf, ws), extra, data in cross_specs:
+        fast = cls.compute(data, {'window': wf, **extra})[key]
+        slow = cls.compute(data, {'window': ws, **extra})[key]
+        params = {'window_fast': wf, 'window_slow': ws, **extra}
+        results.append(verify_signal(f"{ma_name}_cross_up", params, df, truth_crossover(fast, slow, 'up')))
+        results.append(verify_signal(f"{ma_name}_cross_down", params, df, truth_crossover(fast, slow, 'down')))
+
+    return results
+
+
 if __name__ == '__main__':
-    results = run_audit()
-    for r in results:
+    print('=== Wave A: Indicator audit ===')
+    ind_results = run_audit()
+    for r in ind_results:
         status = 'PASS' if r.pass_fail else 'FAIL'
         errors = ', '.join(f'{k}={v.max_abs_error:.2e}' for k, v in r.outputs.items())
         notes = f' [{r.notes}]' if r.notes else ''
         print(f'  {r.indicator_name}: {status} ({errors}){notes}')
+    ind_failed = sum(1 for r in ind_results if not r.pass_fail)
 
-    failed = sum(1 for r in results if not r.pass_fail)
-    total = len(results)
-    print(f'\nWave A: {total - failed}/{total} PASS')
-    sys.exit(0 if failed == 0 else 1)
+    print('\n=== Wave A: Signal audit (bar-by-bar ground truth) ===')
+    sig_results = run_signal_audit()
+    for r in sig_results:
+        status = 'PASS' if r.pass_fail else 'FAIL'
+        print(f'  {r.signal_name}: {status} (fires={r.fires}, expected={r.expected_fires}, '
+              f'FP={r.false_positives}, FN={r.false_negatives})')
+    sig_failed = sum(1 for r in sig_results if not r.pass_fail)
+
+    total_pass = (len(ind_results) - ind_failed) + (len(sig_results) - sig_failed)
+    total = len(ind_results) + len(sig_results)
+    print(f'\nWave A total: {total_pass}/{total} PASS '
+          f'(indicators {len(ind_results) - ind_failed}/{len(ind_results)}, '
+          f'signals {len(sig_results) - sig_failed}/{len(sig_results)})')
+    sys.exit(0 if (ind_failed + sig_failed) == 0 else 1)
