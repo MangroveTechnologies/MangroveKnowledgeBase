@@ -472,7 +472,8 @@ class TweezerTops(IndicatorInterface):
         prev_h = h.shift(1)
         prev_o, prev_c = o.shift(1), c.shift(1)
         rng = candle_range(h, l)
-        avg_rng = rng.rolling(window=20, min_periods=1).mean()
+        avg_window = params.get("avg_window", 20)
+        avg_rng = rng.rolling(window=avg_window, min_periods=1).mean()
         tol = params["tolerance"]
 
         matching_highs = (h - prev_h).abs() <= avg_rng * tol
@@ -504,7 +505,8 @@ class TweezerBottoms(IndicatorInterface):
         prev_l = l.shift(1)
         prev_o, prev_c = o.shift(1), c.shift(1)
         rng = candle_range(h, l)
-        avg_rng = rng.rolling(window=20, min_periods=1).mean()
+        avg_window = params.get("avg_window", 20)
+        avg_rng = rng.rolling(window=avg_window, min_periods=1).mean()
         tol = params["tolerance"]
 
         matching_lows = (l - prev_l).abs() <= avg_rng * tol

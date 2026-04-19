@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from mangrove_kb.indicators.indicator_interface import IndicatorInterface
-from mangrove_kb.indicators.utils import true_range
+from mangrove_kb.indicators.utils import true_range, typical_price
 
 
 class ATR(IndicatorInterface):
@@ -41,12 +41,23 @@ class ATR(IndicatorInterface):
         window = params['window']
 
         tr = true_range(high, low, close)
-        atr = np.zeros(len(close))
-        atr[window - 1] = tr[0:window].mean()
-        for i in range(window, len(atr)):
-            atr[i] = (atr[i - 1] * (window - 1) + tr.iloc[i]) / float(window)
+        tr_arr = tr.to_numpy(dtype=np.float64)
+        n = len(tr_arr)
 
-        return {'atr': pd.Series(atr, index=close.index, name='atr')}
+        # Original convention: atr[0..window-2] = 0 (from np.zeros warm-up),
+        # atr[window-1] = mean of the first `window` tr values (skipna; tr[0]
+        # is NaN so it's really mean of window-1 valid values), then Wilder
+        # smooth forward. Wilder's recurrence is identical to
+        # ewm(alpha=1/window, adjust=False) applied to
+        # [seed, tr[window], tr[window+1], ...].
+        atr_arr = np.zeros(n)
+        if n >= window:
+            seed = np.nanmean(tr_arr[:window])
+            tail = np.concatenate(([seed], tr_arr[window:]))
+            smoothed = pd.Series(tail).ewm(alpha=1.0 / window, adjust=False).mean().to_numpy()
+            atr_arr[window - 1 :] = smoothed
+
+        return {'atr': pd.Series(atr_arr, index=close.index, name='atr')}
 
 
 class BollingerBands(IndicatorInterface):
@@ -132,7 +143,7 @@ class KeltnerChannel(IndicatorInterface):
         multiplier = params['multiplier']
 
         if original_version:
-            tp = ((high + low + close) / 3.0).rolling(window, min_periods=window).mean()
+            tp = typical_price(high, low, close).rolling(window, min_periods=window).mean()
             tp_high = (((4 * high) - (2 * low) + close) / 3.0).rolling(window, min_periods=window).mean()
             tp_low = (((-2 * high) + (4 * low) + close) / 3.0).rolling(window, min_periods=window).mean()
         else:
@@ -235,11 +246,7 @@ class UlcerIndex(IndicatorInterface):
         ui_max = close.rolling(window, min_periods=1).max()
         r_i = 100 * (close - ui_max) / ui_max
 
-        def ui_function():
-            def _ui_function(x):
-                return np.sqrt((x**2 / window).sum())
-            return _ui_function
-
-        ulcer_idx = r_i.rolling(window).apply(ui_function(), raw=True)
+        # sqrt(sum(r_i^2) / window) over the rolling window == sqrt(mean(r_i^2)).
+        ulcer_idx = np.sqrt((r_i ** 2).rolling(window, min_periods=window).mean())
 
         return {'ulcer_index': pd.Series(ulcer_idx, name="ui")}
