@@ -78,6 +78,16 @@ def _hl_data(df: pd.DataFrame) -> dict:
     return {"high": df["High"], "low": df["Low"]}
 
 
+def _hit(series: pd.Series, window: int) -> bool:
+    """True if any value in the last `window` entries is > 0.
+
+    Used by the FILTER composites below to short-circuit the compute/check
+    loop: each pattern indicator is computed only until the first positive
+    hit is found in its last-`window` slice.
+    """
+    return bool((series.iloc[-window:] > 0).any())
+
+
 # =============================================================================
 # Single-Candle TRIGGER Signals
 # =============================================================================
@@ -947,28 +957,33 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     ohlc = _ohlc_data(df)
     oc = _oc_data(df)
+    w = window
 
-    checks = [
-        Hammer.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hammer"],
-        InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"],
-        Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0),
-        Harami.compute(data=oc, params={})["harami"].clip(lower=0),
-        PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"],
-        DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"],
-        TweezerBottoms.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_bottoms"],
-        PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(lower=0),
-    ]
+    if _hit(Hammer.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hammer"], w):
+        return True
+    if _hit(InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"], w):
+        return True
+    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0), w):
+        return True
+    if _hit(Harami.compute(data=oc, params={})["harami"].clip(lower=0), w):
+        return True
+    if _hit(PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"], w):
+        return True
+    if _hit(DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"], w):
+        return True
+    if _hit(TweezerBottoms.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_bottoms"], w):
+        return True
+    if _hit(PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(lower=0), w):
+        return True
+
     if len(df) >= 3:
-        checks.extend([
-            MorningStar.compute(data=ohlc, params={"body_threshold": 0.3})["morning_star"],
-            ThreeWhiteSoldiers.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_white_soldiers"],
-            ThreeInsideUp.compute(data=oc, params={})["three_inside_up"],
-        ])
-
-    for series in checks:
-        recent = series.iloc[-window:]
-        if (recent > 0).any():
+        if _hit(MorningStar.compute(data=ohlc, params={"body_threshold": 0.3})["morning_star"], w):
             return True
+        if _hit(ThreeWhiteSoldiers.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_white_soldiers"], w):
+            return True
+        if _hit(ThreeInsideUp.compute(data=oc, params={})["three_inside_up"], w):
+            return True
+
     return False
 
 
@@ -995,28 +1010,33 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     ohlc = _ohlc_data(df)
     oc = _oc_data(df)
+    w = window
 
-    checks = [
-        HangingMan.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hanging_man"],
-        ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"],
-        Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(),
-        Harami.compute(data=oc, params={})["harami"].clip(upper=0).abs(),
-        DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(),
-        GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"],
-        TweezerTops.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_tops"].abs(),
-        PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(upper=0).abs(),
-    ]
+    if _hit(HangingMan.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hanging_man"], w):
+        return True
+    if _hit(ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"], w):
+        return True
+    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(), w):
+        return True
+    if _hit(Harami.compute(data=oc, params={})["harami"].clip(upper=0).abs(), w):
+        return True
+    if _hit(DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(), w):
+        return True
+    if _hit(GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"], w):
+        return True
+    if _hit(TweezerTops.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_tops"].abs(), w):
+        return True
+    if _hit(PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(upper=0).abs(), w):
+        return True
+
     if len(df) >= 3:
-        checks.extend([
-            EveningStar.compute(data=ohlc, params={"body_threshold": 0.3})["evening_star"].abs(),
-            ThreeBlackCrows.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_black_crows"].abs(),
-            ThreeInsideDown.compute(data=oc, params={})["three_inside_down"].abs(),
-        ])
-
-    for series in checks:
-        recent = series.iloc[-window:]
-        if (recent > 0).any():
+        if _hit(EveningStar.compute(data=ohlc, params={"body_threshold": 0.3})["evening_star"].abs(), w):
             return True
+        if _hit(ThreeBlackCrows.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_black_crows"].abs(), w):
+            return True
+        if _hit(ThreeInsideDown.compute(data=oc, params={})["three_inside_down"].abs(), w):
+            return True
+
     return False
 
 
@@ -1042,23 +1062,23 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     ohlc = _ohlc_data(df)
     oc = _oc_data(df)
+    w = window
 
-    checks = [
-        Hammer.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hammer"],
-        InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"],
-        Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0),
-        PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"],
-        DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"],
-    ]
+    if _hit(Hammer.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hammer"], w):
+        return True
+    if _hit(InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"], w):
+        return True
+    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0), w):
+        return True
+    if _hit(PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"], w):
+        return True
+    if _hit(DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"], w):
+        return True
+
     if len(df) >= 3:
-        checks.append(
-            MorningStar.compute(data=ohlc, params={"body_threshold": 0.3})["morning_star"]
-        )
-
-    for series in checks:
-        recent = series.iloc[-window:]
-        if (recent > 0).any():
+        if _hit(MorningStar.compute(data=ohlc, params={"body_threshold": 0.3})["morning_star"], w):
             return True
+
     return False
 
 
@@ -1084,23 +1104,23 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     ohlc = _ohlc_data(df)
     oc = _oc_data(df)
+    w = window
 
-    checks = [
-        HangingMan.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hanging_man"],
-        ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"],
-        Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(),
-        DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(),
-        GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"],
-    ]
+    if _hit(HangingMan.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hanging_man"], w):
+        return True
+    if _hit(ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"], w):
+        return True
+    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(), w):
+        return True
+    if _hit(DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(), w):
+        return True
+    if _hit(GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"], w):
+        return True
+
     if len(df) >= 3:
-        checks.append(
-            EveningStar.compute(data=ohlc, params={"body_threshold": 0.3})["evening_star"].abs()
-        )
-
-    for series in checks:
-        recent = series.iloc[-window:]
-        if (recent > 0).any():
+        if _hit(EveningStar.compute(data=ohlc, params={"body_threshold": 0.3})["evening_star"].abs(), w):
             return True
+
     return False
 
 
@@ -1125,16 +1145,12 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     ohlc = _ohlc_data(df)
     oc = _oc_data(df)
+    w = window
 
-    checks = [
-        ThreeWhiteSoldiers.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_white_soldiers"],
-        ThreeInsideUp.compute(data=oc, params={})["three_inside_up"],
-    ]
-
-    for series in checks:
-        recent = series.iloc[-window:]
-        if (recent > 0).any():
-            return True
+    if _hit(ThreeWhiteSoldiers.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_white_soldiers"], w):
+        return True
+    if _hit(ThreeInsideUp.compute(data=oc, params={})["three_inside_up"], w):
+        return True
     return False
 
 
@@ -1159,16 +1175,12 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     ohlc = _ohlc_data(df)
     oc = _oc_data(df)
+    w = window
 
-    checks = [
-        ThreeBlackCrows.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_black_crows"].abs(),
-        ThreeInsideDown.compute(data=oc, params={})["three_inside_down"].abs(),
-    ]
-
-    for series in checks:
-        recent = series.iloc[-window:]
-        if (recent > 0).any():
-            return True
+    if _hit(ThreeBlackCrows.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_black_crows"].abs(), w):
+        return True
+    if _hit(ThreeInsideDown.compute(data=oc, params={})["three_inside_down"].abs(), w):
+        return True
     return False
 
 
@@ -1193,20 +1205,16 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     ohlc = _ohlc_data(df)
     hl = _hl_data(df)
+    w = window
 
-    checks = [
-        Doji.compute(data=ohlc, params={"body_threshold": 0.1})["doji"],
-        SpinningTop.compute(data=ohlc, params={"body_max": 0.3, "wick_min": 0.2})["spinning_top"],
-        InsideBar.compute(data=hl, params={})["inside_bar"],
-    ]
+    if _hit(Doji.compute(data=ohlc, params={"body_threshold": 0.1})["doji"], w):
+        return True
+    if _hit(SpinningTop.compute(data=ohlc, params={"body_max": 0.3, "wick_min": 0.2})["spinning_top"], w):
+        return True
+    if _hit(InsideBar.compute(data=hl, params={})["inside_bar"], w):
+        return True
     if len(df) >= 7:
-        checks.append(
-            NarrowRange.compute(data=hl, params={"window": 7})["narrow_range"]
-        )
-
-    for series in checks:
-        recent = series.iloc[-window:]
-        if (recent > 0).any():
+        if _hit(NarrowRange.compute(data=hl, params={"window": 7})["narrow_range"], w):
             return True
     return False
 

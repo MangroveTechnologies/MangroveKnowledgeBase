@@ -6,13 +6,12 @@ CMF, Force Index, ADI, VWAP, and more.
 
 Originally from ta-master library by Dario Lopez Padial (Bukosabino).
 """
-import typing as tp
-
 import numpy as np
 import pandas as pd
 
 from mangrove_kb.indicators.indicator_interface import IndicatorInterface
 from mangrove_kb.indicators.trend_indicators import EMA, SMA
+from mangrove_kb.indicators.utils import typical_price
 
 
 class ADI(IndicatorInterface):
@@ -249,13 +248,18 @@ class NVI(IndicatorInterface):
 
         price_change = close.pct_change()
         vol_decrease = volume.shift(1) > volume
-        nvi = pd.Series(data=np.nan, index=close.index, dtype="float64", name="nvi")
-        nvi.iloc[0] = 1000
-        for i in range(1, len(nvi)):
-            if vol_decrease.iloc[i]:
-                nvi.iloc[i] = nvi.iloc[i - 1] * (1.0 + price_change.iloc[i])
-            else:
-                nvi.iloc[i] = nvi.iloc[i - 1]
+
+        # NVI is a compounding index: on volume-decrease bars, scale by
+        # (1 + pct_change); otherwise carry forward. Express as a cumulative
+        # product of per-bar factors. pct_change[0] is NaN by definition;
+        # vol_decrease[0] is False (prev_volume is NaN); so factor[0] is 1
+        # and nvi[0] = 1000 * 1 = 1000, matching the original's hand-seed.
+        pct_arr = price_change.to_numpy(dtype=np.float64)
+        dec_arr = vol_decrease.to_numpy(dtype=bool)
+        pct_clean = np.where(np.isnan(pct_arr), 0.0, pct_arr)
+        factor = np.where(dec_arr, 1.0 + pct_clean, 1.0)
+        nvi_arr = 1000.0 * np.cumprod(factor)
+        nvi = pd.Series(nvi_arr, index=close.index, name="nvi")
 
         nvi_ema = nvi.ewm(span=window, adjust=False).mean()
 
@@ -292,23 +296,21 @@ class MFI(IndicatorInterface):
         volume = data['volume']
         window = params['window']
 
-        typical_price = (high + low + close) / 3.0
+        tp = typical_price(high, low, close)
         up_down = np.where(
-            typical_price > typical_price.shift(1),
+            tp > tp.shift(1),
             1,
-            np.where(typical_price < typical_price.shift(1), -1, 0),
+            np.where(tp < tp.shift(1), -1, 0),
         )
-        mfr = typical_price * volume * up_down
+        mfr = tp * volume * up_down
 
-        # Positive and negative money flow with n periods
-        n_positive_mf = mfr.rolling(window, min_periods=window).apply(
-            lambda x: np.sum(np.where(x >= 0.0, x, 0.0)), raw=True
-        )
-        n_negative_mf = abs(
-            mfr.rolling(window, min_periods=window).apply(
-                lambda x: np.sum(np.where(x < 0.0, x, 0.0)), raw=True
-            )
-        )
+        # Positive and negative money flow with n periods.
+        # Mask outside the roll so the window op is a plain vectorized sum.
+        mfr_arr = np.asarray(mfr, dtype=np.float64)
+        pos_mfr = pd.Series(np.where(mfr_arr >= 0.0, mfr_arr, 0.0), index=tp.index)
+        neg_mfr = pd.Series(np.where(mfr_arr < 0.0, mfr_arr, 0.0), index=tp.index)
+        n_positive_mf = pos_mfr.rolling(window, min_periods=window).sum()
+        n_negative_mf = neg_mfr.rolling(window, min_periods=window).sum().abs()
 
         # Money flow index
         mfi_ratio = n_positive_mf / n_negative_mf
@@ -348,13 +350,13 @@ class VWAP(IndicatorInterface):
         window = params['window']
 
         # 1 typical price
-        typical_price = (high + low + close) / 3.0
+        tp = typical_price(high, low, close)
 
         # 2 typical price * volume
-        typical_price_volume = typical_price * volume
+        tp_volume = tp * volume
 
         # 3 total price * volume
-        total_pv = typical_price_volume.rolling(window, min_periods=window).sum()
+        total_pv = tp_volume.rolling(window, min_periods=window).sum()
 
         # 4 total volume
         total_volume = volume.rolling(window, min_periods=window).sum()
