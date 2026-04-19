@@ -42,6 +42,24 @@ def _epma_weights(window: int) -> np.ndarray:
     return w
 
 
+@lru_cache(maxsize=256)
+def _alma_weights(window: int, offset: float, sigma: float) -> np.ndarray:
+    """Cached Gaussian weights for Arnaud Legoux Moving Average.
+
+    For a window of size n, offset in [0, 1], and sigma > 0:
+        k = floor(offset * (n - 1))
+        w_i = exp(-0.5 * ((sigma / n) * (i - k))^2) / Z
+    where Z normalizes weights to sum to 1. Higher offset (closer to 1)
+    weights more recent bars; higher sigma widens the Gaussian.
+    """
+    x = np.arange(window, dtype=np.float64)
+    k = np.floor(offset * (window - 1))
+    raw = np.exp(-0.5 * ((sigma / window) * (x - k)) ** 2)
+    w = raw / raw.sum()
+    w.flags.writeable = False
+    return w
+
+
 class SMA(IndicatorInterface):
     """Simple Moving Average
 
@@ -289,6 +307,277 @@ class EPMA(IndicatorInterface):
             # np.convolve with reversed weights gives a rolling weighted sum.
             epma_values[window - 1:] = np.convolve(close_values, weights[::-1], mode='valid')
         return {'epma': pd.Series(epma_values, index=close.index, name=f'epma_{window}')}
+
+
+class HMA(IndicatorInterface):
+    """Hull Moving Average (HMA)
+
+    Low-lag moving average designed to track price without sacrificing smoothness.
+    Reduces lag compared to EMA/SMA while remaining smoother than WMA.
+
+    Formula: HMA(n) = WMA(2 * WMA(n/2) - WMA(n), sqrt(n))
+
+    Reference: Alan Hull, "How to reduce lag in a moving average" (2005).
+    https://alanhull.com/hull-moving-average
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'hma': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["hma"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+
+        half = max(1, int(window / 2))
+        sqrt_n = max(1, int(np.sqrt(window)))
+
+        wma_fast = WMA.compute({'close': close}, {'window': half})['wma']
+        wma_slow = WMA.compute({'close': close}, {'window': window})['wma']
+        raw = 2.0 * wma_fast - wma_slow
+        hma = WMA.compute({'close': raw}, {'window': sqrt_n})['wma']
+        return {'hma': pd.Series(hma.values, index=close.index, name=f'hma_{window}')}
+
+
+class ALMA(IndicatorInterface):
+    """Arnaud Legoux Moving Average (ALMA)
+
+    Gaussian-weighted moving average where `offset` controls which part of the
+    window carries most weight and `sigma` controls spread. Offset near 1 reacts
+    faster to recent bars; offset near 0 resembles an SMA.
+
+    Weights: w_i = exp(-0.5 * ((sigma / n) * (i - floor(offset*(n-1))))^2), normalized.
+    Applied via np.convolve against cached weight vector.
+
+    Reference: Arnaud Legoux & Dimitrios Kouzis-Loukas, "ALMA" (2009).
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int, 'offset': float, 'sigma': float}
+
+    Returns:
+        {'alma': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window", "offset", "sigma"]
+    _outputs = ["alma"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        offset = float(params['offset'])
+        sigma = float(params['sigma'])
+
+        weights = _alma_weights(window, offset, sigma)
+        close_values = close.to_numpy(dtype=np.float64, copy=False)
+        n = len(close_values)
+        alma_values = np.full(n, np.nan)
+        if n >= window:
+            # ALMA uses "forward" weight orientation (weights[0] applies to oldest
+            # bar in each window), so reverse before convolve.
+            alma_values[window - 1:] = np.convolve(close_values, weights[::-1], mode='valid')
+        return {'alma': pd.Series(alma_values, index=close.index, name=f'alma_{window}')}
+
+
+class T3(IndicatorInterface):
+    """Tillson T3 Moving Average
+
+    Six chained EMAs combined via Tillson's volume-factor formula. Produces a
+    smooth, low-lag trend line. The `volume_factor` (a) controls smoothness:
+    a=0 collapses to a triple EMA; a=1 is the most responsive.
+
+    Formula:
+        T3 = c1*e6 + c2*e5 + c3*e4 + c4*e3
+        where e1..e6 are EMAs chained and c1-c4 are Tillson's coefficients:
+            c1 = -a^3
+            c2 = 3*a^2 + 3*a^3
+            c3 = -6*a^2 - 3*a - 3*a^3
+            c4 = 1 + 3*a + 3*a^2 + a^3
+
+    Reference: Tim Tillson, "Better Moving Averages",
+    Technical Analysis of Stocks & Commodities, Jan 1998.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int, 'volume_factor': float}
+
+    Returns:
+        {'t3': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window", "volume_factor"]
+    _outputs = ["t3"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        a = float(params['volume_factor'])
+
+        # Tillson coefficients (derived from a)
+        c1 = -a ** 3
+        c2 = 3.0 * a ** 2 + 3.0 * a ** 3
+        c3 = -6.0 * a ** 2 - 3.0 * a - 3.0 * a ** 3
+        c4 = 1.0 + 3.0 * a + 3.0 * a ** 2 + a ** 3
+
+        # Six chained EMAs via ewm (adjust=False, matches our EMA convention)
+        e1 = EMA.compute({'close': close}, {'window': window})['ema']
+        e2 = EMA.compute({'close': e1}, {'window': window})['ema']
+        e3 = EMA.compute({'close': e2}, {'window': window})['ema']
+        e4 = EMA.compute({'close': e3}, {'window': window})['ema']
+        e5 = EMA.compute({'close': e4}, {'window': window})['ema']
+        e6 = EMA.compute({'close': e5}, {'window': window})['ema']
+
+        t3 = c1 * e6 + c2 * e5 + c3 * e4 + c4 * e3
+        return {'t3': pd.Series(t3.values, index=close.index, name=f't3_{window}')}
+
+
+class MAMA(IndicatorInterface):
+    """MESA Adaptive Moving Average (MAMA) -- Ehlers.
+
+    Adaptive moving average that speeds up in trending markets and slows down
+    in consolidations, using a Hilbert Transform Discriminator to estimate the
+    dominant cycle period and adjust alpha dynamically. Also emits FAMA
+    (Following Adaptive MA), half-alpha of MAMA -- MAMA/FAMA crossovers are
+    used as trend signals.
+
+    Reference: John F. Ehlers, "MESA Adaptive Moving Averages",
+    Technical Analysis of Stocks & Commodities, Sept 2001.
+    http://traders.com/documentation/feedbk_docs/2014/01/traderstips.html
+
+    Implementation: genuinely sequential (per-bar Hilbert phase/period state).
+    Cannot be vectorized; loop is pure Python. Future optimization wave may
+    numba-accelerate this if it becomes a hot spot.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'fast_limit': float, 'slow_limit': float}
+
+    Returns:
+        {'mama': pd.Series, 'fama': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["fast_limit", "slow_limit"]
+    _outputs = ["mama", "fama"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        fast_limit = float(params['fast_limit'])
+        slow_limit = float(params['slow_limit'])
+
+        x = close.to_numpy(dtype=np.float64, copy=False)
+        n = len(x)
+
+        # Hilbert transform FIR coefficients (Ehlers)
+        a_h, b_h = 0.0962, 0.5769
+        # Smoothing weights (Ehlers): 0.2 for phase, 0.33/0.67 for period smoothing
+        p_w = 0.2
+        smp_w = 0.33
+        smp_w_c = 0.67
+
+        wma4 = np.zeros(n)
+        dt = np.zeros(n)
+        i1 = np.zeros(n)
+        i2 = np.zeros(n)
+        ji = np.zeros(n)
+        jq = np.zeros(n)
+        q1 = np.zeros(n)
+        q2 = np.zeros(n)
+        re = np.zeros(n)
+        im = np.zeros(n)
+        period = np.zeros(n)
+        phase = np.zeros(n)
+        mama = np.zeros(n)
+        fama = np.zeros(n)
+        smp = np.zeros(n)
+
+        # State-dependent loop -- cannot be vectorized; Hilbert discriminator
+        # requires per-bar phase/period feedback from previous bars.
+        for i in range(6, n):
+            adj_prev_period = 0.075 * period[i - 1] + 0.54
+
+            # WMA(x, 4) and detrended WMA(x, 4)
+            wma4[i] = 0.4 * x[i] + 0.3 * x[i - 1] + 0.2 * x[i - 2] + 0.1 * x[i - 3]
+            dt[i] = adj_prev_period * (a_h * wma4[i] + b_h * wma4[i - 2] - b_h * wma4[i - 4] - a_h * wma4[i - 6])
+
+            # Quadrature (detrender) and In-Phase component
+            q1[i] = adj_prev_period * (a_h * dt[i] + b_h * dt[i - 2] - b_h * dt[i - 4] - a_h * dt[i - 6])
+            i1[i] = dt[i - 3]
+
+            # Phase Q1 and I1 by 90 degrees
+            ji[i] = adj_prev_period * (a_h * i1[i] + b_h * i1[i - 2] - b_h * i1[i - 4] - a_h * i1[i - 6])
+            jq[i] = adj_prev_period * (a_h * q1[i] + b_h * q1[i - 2] - b_h * q1[i - 4] - a_h * q1[i - 6])
+
+            # Phasor addition for 3-bar averaging
+            i2[i] = i1[i] - jq[i]
+            q2[i] = q1[i] + ji[i]
+
+            # Smooth I2 and Q2
+            i2[i] = p_w * i2[i] + (1 - p_w) * i2[i - 1]
+            q2[i] = p_w * q2[i] + (1 - p_w) * q2[i - 1]
+
+            # Homodyne discriminator
+            re[i] = i2[i] * i2[i - 1] + q2[i] * q2[i - 1]
+            im[i] = i2[i] * q2[i - 1] - q2[i] * i2[i - 1]
+
+            # Smooth re and im
+            re[i] = p_w * re[i] + (1 - p_w) * re[i - 1]
+            im[i] = p_w * im[i] + (1 - p_w) * im[i - 1]
+
+            if im[i] != 0.0 and re[i] != 0.0:
+                period[i] = 360.0 / np.degrees(np.arctan(im[i] / re[i]))
+            else:
+                period[i] = 0.0
+
+            # Clamp period: no more than 1.5x previous, no less than 0.67x, bounds [6, 50]
+            if period[i] > 1.5 * period[i - 1]:
+                period[i] = 1.5 * period[i - 1]
+            if period[i] < 0.67 * period[i - 1]:
+                period[i] = 0.67 * period[i - 1]
+            if period[i] < 6.0:
+                period[i] = 6.0
+            if period[i] > 50.0:
+                period[i] = 50.0
+
+            period[i] = p_w * period[i] + (1 - p_w) * period[i - 1]
+            smp[i] = smp_w * period[i] + smp_w_c * smp[i - 1]
+
+            if i1[i] != 0.0:
+                phase[i] = np.degrees(np.arctan(q1[i] / i1[i]))
+
+            dphase = phase[i - 1] - phase[i]
+            if dphase < 1.0:
+                dphase = 1.0
+
+            alpha = fast_limit / dphase
+            if alpha > fast_limit:
+                alpha = fast_limit
+            if alpha < slow_limit:
+                alpha = slow_limit
+
+            mama[i] = alpha * x[i] + (1.0 - alpha) * mama[i - 1]
+            fama[i] = 0.5 * alpha * mama[i] + (1.0 - 0.5 * alpha) * fama[i - 1]
+
+        # First 6 bars are warmup (Ehlers's reference uses 3; we use 6 to match
+        # the full Hilbert FIR depth). Mark as NaN.
+        mama_out = mama.copy()
+        fama_out = fama.copy()
+        mama_out[:6] = np.nan
+        fama_out[:6] = np.nan
+
+        return {
+            'mama': pd.Series(mama_out, index=close.index, name='mama'),
+            'fama': pd.Series(fama_out, index=close.index, name='fama'),
+        }
 
 
 class MACD(IndicatorInterface):

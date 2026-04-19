@@ -22,6 +22,13 @@ where appropriate, stateless classmethods.
 - **EPMA** (End Point Moving Average / LSMA). Linear regression endpoint; implemented as FIR filter with cached weights via `np.convolve`.
 - 18 new signals: `is_above_<ma>`, `<ma>_cross_up`, `<ma>_cross_down` for each new MA.
 
+### Added (Wave B -- Complex Moving Averages)
+- **HMA** (Hull Moving Average). Formula: `WMA(2*WMA(n/2) - WMA(n), sqrt(n))`. Reuses our vectorized WMA. Reference: Alan Hull, 2005.
+- **ALMA** (Arnaud Legoux Moving Average). Gaussian-weighted FIR filter with `@lru_cache(maxsize=256)` keyed on `(window, offset, sigma)`, applied via `np.convolve`. Reference: Legoux & Kouzis-Loukas, 2009.
+- **T3** (Tillson T3). Six chained EMAs combined via Tillson's volume-factor formula `T3 = c1*e6 + c2*e5 + c3*e4 + c4*e3`. Reference: Tim Tillson, *Technical Analysis of Stocks & Commodities*, Jan 1998.
+- **MAMA** (MESA Adaptive Moving Average). Hilbert-transform-adaptive MA with FAMA follower output. Genuinely sequential (per-bar Hilbert phase/period state); pure-Python loop documented as state-dependent. Reference: John F. Ehlers, *Technical Analysis of Stocks & Commodities*, Sept 2001.
+- 12 new signals: `is_above_hma/alma/t3/mama` (FILTER), `{hma,alma,t3}_cross_up/down` (fast-vs-slow window crossover TRIGGERs), `mama_cross_up/down` (MAMA/FAMA crossover TRIGGERs).
+
 ## [0.4.0] - 2026-04-16
 
 ### Fixed
