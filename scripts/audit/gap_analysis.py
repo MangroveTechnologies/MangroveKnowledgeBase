@@ -1,6 +1,6 @@
 """Gap analysis: MangroveKnowledgeBase indicators/signals vs reference libraries.
 
-Compares our 70 indicators and 136 signals against:
+Compares our 99 indicators and 223 signals against:
   1. Bukosabino `ta` library (43 indicator classes)
   2. TA-Lib (158 functions across 8 groups)
   3. stock-indicators-python (85 indicator functions)

@@ -20,8 +20,8 @@ Whether you're a quant who can improve an RSI calculation, a trader who spots a 
 
 MangroveKnowledgeBase is a standalone repository providing:
 
-- **136 trading signal functions** across momentum, trend, volume, volatility, and pattern categories (66 TRIGGER, 70 FILTER)
-- **70 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
+- **223 trading signal functions** across momentum, trend, volume, volatility, and pattern categories (108 TRIGGER, 115 FILTER)
+- **99 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
 - **A unified server** with dual protocol access (REST API + MCP) serving 11 trading education documents with full-text search, signal/indicator metadata (free), and signal evaluation/indicator computation (x402 gated)
 - **Self-describing metadata** -- every signal carries its type, required data columns, and parameter ranges directly in its docstring
 - **A docstring parser** that extracts structured metadata from signal functions at runtime
@@ -140,8 +140,8 @@ MangroveKnowledgeBase/
   mangrove_kb/     # Python package (pip install)
     registry.py                # RuleRegistry for signal evaluation by name
     docstring_parser.py        # Extracts structured metadata from docstrings
-    signals/                   # 136 signal functions (5 categories)
-    indicators/                # 70 indicator classes
+    signals/                   # 223 signal functions (5 categories)
+    indicators/                # 99 indicator classes
   kb_server/                   # Unified server (REST + MCP)
     main.py                    # FastAPI + FastMCP on same port
     services/                  # Search, signals, indicators, cross-refs
@@ -150,19 +150,19 @@ MangroveKnowledgeBase/
   knowledge-base/              # 11 trading education markdown documents
   notebooks/                   # Signal explorer + validation notebooks
   data/                        # 7 sample OHLCV datasets (BTC, ETH, SOL, ...)
-  tests/                       # 102 tests
+  tests/                       # 87 tests (17 skipped)
 ```
 
 ## Signal Categories
 
 | Category | TRIGGER | FILTER | Total | Examples |
 |----------|---------|--------|-------|----------|
-| Momentum | 8 | 18 | 26 | RSI, Stochastic, Williams %R, TSI, KAMA, ROC, PPO, PVO |
-| Trend | 18 | 20 | 38 | SMA, EMA, MACD, ADX, Aroon, Ichimoku, PSAR, Vortex |
-| Volume | 2 | 20 | 22 | OBV, CMF, MFI, VWAP, ADI, Force Index, NVI |
-| Volatility | 6 | 4 | 10 | Bollinger Bands, ATR, Keltner, Donchian, Ulcer Index |
-| Patterns | 32 | 8 | 40 | Doji, Hammer, Engulfing, MorningStar, NR7, Inside Bar |
-| **Total** | **66** | **70** | **136** | |
+| Momentum | 18 | 24 | 42 | RSI, Stochastic, Williams %R, TSI, KAMA, ROC, PPO, PVO, MOM, BOP, APO, CMO |
+| Trend | 43 | 45 | 88 | SMA, EMA, MACD, ADX, Aroon, Ichimoku, PSAR, Vortex, DEMA, TEMA, HMA, ALMA, T3, MAMA, SuperTrend, Alligator, HeikinAshi |
+| Volume | 6 | 27 | 33 | OBV, CMF, MFI, VWAP, ADI, Force Index, NVI, VWMA, ADOSC, KVO |
+| Volatility | 9 | 11 | 20 | Bollinger Bands, ATR, Keltner, Donchian, Ulcer Index, NATR, STARC Bands, ATR Trailing Stop |
+| Patterns | 32 | 8 | 40 | Doji, Hammer, Engulfing, MorningStar, NR7, Inside Bar, TTM Squeeze, MA Ribbon, Divergence |
+| **Total** | **108** | **115** | **223** | |
 
 ## Knowledge Base Content
 
@@ -179,7 +179,7 @@ MangroveKnowledgeBase/
 | Chart Patterns | Candlestick, reversal, continuation patterns |
 | Quantitative Analysis | Statistical methods, mean reversion, momentum |
 | Glossary | 135 trading terms with abbreviations and cross-references |
-| Signals Quick Reference | Alphabetical index of all 136 signals |
+| Signals Quick Reference | Alphabetical index of all 223 signals |
 
 ## Contributing
 
