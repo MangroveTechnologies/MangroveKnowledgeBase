@@ -8,8 +8,8 @@ pip install mangrove-kb
 
 ## What You Get
 
-- **136 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
-- **70 technical indicators** -- stateless `compute()` API returning named Series
+- **223 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
+- **99 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
 
@@ -93,16 +93,16 @@ is_oversold = RuleRegistry.evaluate(rule, df)
 print(f"Available signals: {len(RuleRegistry._registry)}")
 ```
 
-### Signal Categories (136 total)
+### Signal Categories (223 total)
 
 | Category | TRIGGER | FILTER | Total |
 |----------|---------|--------|-------|
-| Momentum | 8 | 18 | 26 |
-| Trend | 18 | 20 | 38 |
-| Volume | 2 | 20 | 22 |
-| Volatility | 6 | 4 | 10 |
+| Momentum | 18 | 24 | 42 |
+| Trend | 43 | 45 | 88 |
+| Volume | 6 | 27 | 33 |
+| Volatility | 9 | 11 | 20 |
 | Patterns | 32 | 8 | 40 |
-| **Total** | **66** | **70** | **136** |
+| **Total** | **108** | **115** | **223** |
 
 ## Signal Metadata
 

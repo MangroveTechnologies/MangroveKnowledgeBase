@@ -39,7 +39,7 @@ This document provides a comprehensive index of the trading knowledge base, orga
 - Example: `kb_get_document(slug="04-strategy-design-modeling", max_chars=6000)`
 
 **kb_get_signal_quick_reference(max_chars)**
-- Get Chapter 10 signals quick reference (all 136 signals)
+- Get Chapter 10 signals quick reference (all 223 signals)
 - Example: `kb_get_signal_quick_reference(max_chars=6000)`
 
 **kb_list_sections(slug)**
@@ -563,7 +563,7 @@ Tags: glossary, terminology, definitions, abbreviations, reference, alphabetical
 
 # 10. Trading Signals Quick Reference
 
-Alphabetical index of all 136 trading signals available in MangroveKnowledgeBase. Each signal entry includes its parent indicator (with link to full documentation in Chapter 6), signal type (Entry, Exit, Filter, Confirmation), category, and a human-readable description. For detailed parameters, usage examples, trading strategies, and combinations, see the parent indicator section in Chapter 6.
+Alphabetical index of all 223 trading signals available in MangroveKnowledgeBase. Each signal entry includes its parent indicator (with link to full documentation in Chapter 6), signal type (Entry, Exit, Filter, Confirmation), category, and a human-readable description. For detailed parameters, usage examples, trading strategies, and combinations, see the parent indicator section in Chapter 6.
 
 **How to use this reference:**
 - Quick lookup by signal name alphabetically

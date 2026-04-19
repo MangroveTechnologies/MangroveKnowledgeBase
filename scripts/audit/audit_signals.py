@@ -1,4 +1,4 @@
-"""Signal audit: smoke test all 136 signals, crossover accuracy, FILTER code review.
+"""Signal audit: smoke test all 223 signals, crossover accuracy, FILTER code review.
 
 Run:
     cd MangroveKnowledgeBase

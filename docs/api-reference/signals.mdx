@@ -1,16 +1,16 @@
 ---
 title: "Signals API"
-description: "Discover, validate, and evaluate 136 trading signals across momentum, trend, volume, volatility, and patterns categories."
+description: "Discover, validate, and evaluate 223 trading signals across momentum, trend, volume, volatility, and patterns categories."
 ---
 
 # Signals API
 
-The Signals API provides endpoints for discovering, validating, and evaluating trading signals. MangroveAI includes 136 active signals (66 TRIGGER, 70 FILTER) organized by category.
+The Signals API provides endpoints for discovering, validating, and evaluating trading signals. MangroveAI includes 223 active signals (108 TRIGGER, 115 FILTER) organized by category.
 
 ## Signal Classification
 
-- **TRIGGER (66 signals)**: Event-based signals that fire when specific conditions occur (crossovers, breakouts, pattern completions)
-- **FILTER (70 signals)**: State-based signals describing ongoing market conditions (price above SMA, RSI in range)
+- **TRIGGER (108 signals)**: Event-based signals that fire when specific conditions occur (crossovers, breakouts, pattern completions)
+- **FILTER (115 signals)**: State-based signals describing ongoing market conditions (price above SMA, RSI in range)
 
 Entry conditions must include exactly one TRIGGER and exactly one FILTER.
 
@@ -65,7 +65,7 @@ signals = response.json()["signals"]
       }
     }
   ],
-  "total": 136,
+  "total": 223,
   "limit": 10,
   "offset": 0
 }
