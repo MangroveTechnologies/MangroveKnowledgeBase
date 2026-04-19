@@ -31,6 +31,10 @@ from .momentum_indicators import (
     StochRSI,
     PPO,
     PVO,
+    MOM,
+    BOP,
+    APO,
+    CMO,
 )
 
 # Volatility indicators
@@ -140,6 +144,10 @@ __all__ = [
     "StochRSI",
     "PPO",
     "PVO",
+    "MOM",
+    "BOP",
+    "APO",
+    "CMO",
     # Volatility indicators
     "ATR",
     "BollingerBands",

@@ -29,6 +29,13 @@ where appropriate, stateless classmethods.
 - **MAMA** (MESA Adaptive Moving Average). Hilbert-transform-adaptive MA with FAMA follower output. Genuinely sequential (per-bar Hilbert phase/period state); pure-Python loop documented as state-dependent. Reference: John F. Ehlers, *Technical Analysis of Stocks & Commodities*, Sept 2001.
 - 12 new signals: `is_above_hma/alma/t3/mama` (FILTER), `{hma,alma,t3}_cross_up/down` (fast-vs-slow window crossover TRIGGERs), `mama_cross_up/down` (MAMA/FAMA crossover TRIGGERs).
 
+### Added (Wave C -- Momentum)
+- **MOM** (Momentum). `close - close.shift(n)`. Absolute price change over lookback. TA-Lib canonical.
+- **BOP** (Balance of Power). `(close - open) / (high - low)`. Intrabar buying vs. selling pressure. Reference: Igor Livshin, TA-Lib canonical.
+- **APO** (Absolute Price Oscillator). `EMA(fast) - EMA(slow)` -- equivalent to the MACD line. Our implementation uses EMA; pandas-ta defaults to SMA.
+- **CMO** (Chande Momentum Oscillator). Rolling-sum variant: `100 * (pos_sum - neg_sum) / (pos_sum + neg_sum)`. Ranges [-100, +100]. Reference: Tushar Chande, *The New Technical Trader* (1994).
+- 16 new signals: for each of MOM/BOP/APO (zero-centered): `<ind>_bullish`, `<ind>_bearish` (FILTER), `<ind>_cross_up`, `<ind>_cross_down` (zero-line crossover TRIGGER). For CMO: `cmo_overbought`, `cmo_oversold` (FILTER), `cmo_cross_up`, `cmo_cross_down` (threshold crossover TRIGGER, analogous to RSI).
+
 ## [0.4.0] - 2026-04-16
 
 ### Fixed

@@ -8,15 +8,15 @@ class TestSignalServiceMetadata:
 
     def test_list_signals_returns_all(self):
         signals = self.service.list_signals()
-        assert len(signals) == 166
+        assert len(signals) == 182
 
     def test_list_signals_filter_by_category(self):
         momentum = self.service.list_signals(category="Momentum")
-        assert len(momentum) == 26
+        assert len(momentum) == 42
 
     def test_list_signals_filter_by_type(self):
         triggers = self.service.list_signals(signal_type="TRIGGER")
-        assert len(triggers) == 86
+        assert len(triggers) == 94
 
     def test_get_signal_exists(self):
         signal = self.service.get_signal("rsi_oversold")

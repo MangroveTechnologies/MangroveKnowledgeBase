@@ -508,3 +508,143 @@ class PVO(IndicatorInterface):
             'pvo_signal': pd.Series(pvo_signal, name=f"PVO_sign_{window_fast}_{window_slow}"),
             'pvo_hist': pd.Series(pvo_hist, name=f"PVO_hist_{window_fast}_{window_slow}")
         }
+
+
+class MOM(IndicatorInterface):
+    """Momentum (MOM)
+
+    Absolute price change over a lookback window: MOM = close - close[-n].
+    Distinct from ROC which expresses the same change as a percentage.
+
+    Reference: Standard TA-Lib definition.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'mom': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["mom"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        mom = close - close.shift(window)
+        return {'mom': pd.Series(mom.values, index=close.index, name=f'mom_{window}')}
+
+
+class BOP(IndicatorInterface):
+    """Balance of Power (BOP)
+
+    Measures buying vs. selling pressure within a single bar:
+        BOP = (close - open) / (high - low)
+    Returns a value in [-1, 1] where positive = buyers in control, negative =
+    sellers. NaN where high == low (no intrabar range).
+
+    Reference: Igor Livshin. TA-Lib canonical definition.
+
+    Args:
+        data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {}
+
+    Returns:
+        {'bop': pd.Series}
+    """
+    _data = ["open", "high", "low", "close"]
+    _params = []
+    _outputs = ["bop"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        open_ = data['open']
+        high = data['high']
+        low = data['low']
+        close = data['close']
+
+        # Element-wise, fully vectorized. Divide-by-zero yields NaN (correct).
+        numerator = (close - open_).to_numpy(dtype=np.float64, copy=False)
+        denom = (high - low).to_numpy(dtype=np.float64, copy=False)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            bop = np.where(denom != 0, numerator / denom, np.nan)
+        return {'bop': pd.Series(bop, index=close.index, name='bop')}
+
+
+class APO(IndicatorInterface):
+    """Absolute Price Oscillator (APO)
+
+    Difference between a fast and slow EMA of close:
+        APO = EMA(close, window_fast) - EMA(close, window_slow)
+    Same quantity as the MACD line (MACD without its signal line).
+
+    Reference: TA-Lib canonical definition.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window_fast': int, 'window_slow': int}
+
+    Returns:
+        {'apo': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window_fast", "window_slow"]
+    _outputs = ["apo"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window_fast = params['window_fast']
+        window_slow = params['window_slow']
+
+        ema_fast = EMA.compute({'close': close}, {'window': window_fast})['ema']
+        ema_slow = EMA.compute({'close': close}, {'window': window_slow})['ema']
+        apo = ema_fast - ema_slow
+        return {'apo': pd.Series(apo.values, index=close.index, name=f'apo_{window_fast}_{window_slow}')}
+
+
+class CMO(IndicatorInterface):
+    """Chande Momentum Oscillator (CMO)
+
+    Similar in spirit to RSI but uses the raw sum of gains and losses rather
+    than smoothed averages. Ranges from -100 (strongest down) to +100
+    (strongest up), with 0 as neutral.
+
+    Formula:
+        diff = close.diff(1)
+        pos_sum = sum(diff where diff > 0, over window)
+        neg_sum = sum(|diff| where diff < 0, over window)
+        CMO = 100 * (pos_sum - neg_sum) / (pos_sum + neg_sum)
+
+    Reference: Tushar S. Chande, "The New Technical Trader" (1994).
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'cmo': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["cmo"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+
+        diff = close.diff(1)
+        # np.where mask, then vanilla rolling().sum() -- avoids the rolling.apply anti-pattern.
+        diff_arr = diff.to_numpy(dtype=np.float64, copy=False)
+        positive = pd.Series(np.where(diff_arr > 0, diff_arr, 0.0), index=close.index)
+        negative = pd.Series(np.where(diff_arr < 0, -diff_arr, 0.0), index=close.index)
+
+        pos_sum = positive.rolling(window, min_periods=window).sum()
+        neg_sum = negative.rolling(window, min_periods=window).sum()
+
+        with np.errstate(divide='ignore', invalid='ignore'):
+            cmo = 100.0 * (pos_sum - neg_sum) / (pos_sum + neg_sum)
+        return {'cmo': pd.Series(cmo.values, index=close.index, name=f'cmo_{window}')}
