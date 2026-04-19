@@ -18,14 +18,14 @@ A signal takes a window of historical price data (OHLCV bars) and a set of param
 
 For example, the `rsi_oversold` signal checks whether the Relative Strength Index is below a given threshold. If RSI is at 25 and your threshold is 30, the signal returns `true`.
 
-MangroveAI provides **136 active signals** across five categories:
+MangroveAI provides **223 active signals** across five categories:
 
 | Category | Count | Examples |
 |----------|-------|---------|
-| Momentum | 26 | `rsi_oversold`, `stoch_oversold`, `williams_r_oversold` |
-| Trend | 38 | `sma_cross_up`, `ema_cross_up`, `macd_bullish_cross`, `adx_strong_trend` |
-| Volume | 22 | `obv_bullish`, `mfi_oversold`, `vwap_above` |
-| Volatility | 10 | `bb_upper_breakout`, `atr_high_volatility`, `kc_upper_breakout` |
+| Momentum | 42 | `rsi_oversold`, `stoch_oversold`, `williams_r_oversold`, `mom_bullish`, `cmo_cross_up` |
+| Trend | 88 | `sma_cross_up`, `ema_cross_up`, `macd_bullish_cross`, `adx_strong_trend`, `is_above_hma`, `supertrend_flip_up`, `rsi_bullish_divergence` |
+| Volume | 33 | `obv_bullish`, `mfi_oversold`, `vwap_above`, `adosc_cross_up`, `kvo_bullish_cross` |
+| Volatility | 20 | `bb_upper_breakout`, `atr_high_volatility`, `kc_upper_breakout`, `natr_high_volatility`, `atr_trailing_stop_flip_up` |
 | Patterns | 40 | `bullish_engulfing`, `hammer`, `doji`, `morning_star` |
 
 ## TRIGGER vs FILTER
@@ -189,6 +189,6 @@ Use the semantic match endpoint (`POST /api/v1/signals/match`) to describe your 
 
 ## Next steps
 
-- [Browse the signal catalog](/signals/catalog) for the full list of 136 signals
+- [Browse the signal catalog](/signals/catalog) for the full list of 223 signals
 - [Create your first strategy](/guides/creating-a-strategy) using the signals you have learned about
 - [Run a backtest](/guides/running-a-backtest) to test how your signal combination performs
