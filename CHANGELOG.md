@@ -36,6 +36,14 @@ where appropriate, stateless classmethods.
 - **CMO** (Chande Momentum Oscillator). Rolling-sum variant: `100 * (pos_sum - neg_sum) / (pos_sum + neg_sum)`. Ranges [-100, +100]. Reference: Tushar Chande, *The New Technical Trader* (1994).
 - 16 new signals: for each of MOM/BOP/APO (zero-centered): `<ind>_bullish`, `<ind>_bearish` (FILTER), `<ind>_cross_up`, `<ind>_cross_down` (zero-line crossover TRIGGER). For CMO: `cmo_overbought`, `cmo_oversold` (FILTER), `cmo_cross_up`, `cmo_cross_down` (threshold crossover TRIGGER, analogous to RSI).
 
+### Added (Wave D -- Volatility)
+- **TrueRange** (standalone Wilder TR). Raw per-bar volatility; building block for ATR/Vortex/UO but useful on its own. Reuses our existing `true_range()` helper. Reference: Wilder 1978.
+- **NATR** (Normalized ATR). `100 * ATR / close`. Scale-invariant volatility measure. Uses Wilder (RMA) smoothing -- matches TA-Lib canonical convention; pandas-ta defaults to EMA-smoothing which is non-standard.
+- **ATRTrailingStop** (Chuck LeBeau variant). Stateful trailing stop with long/short regimes; stop ratchets in trend direction and flips on opposite-side close cross. Returns trailing stop level and direction (+1/-1). Genuinely sequential (documented). Reference: Chuck LeBeau, popularized in Chande's *Beyond Technical Analysis* (1997).
+- **STARCBands** (Stoller Average Range Channels). `SMA +/- multiplier * ATR`, with independent windows for SMA and ATR. Similar to Keltner Channel but with configurable separate windows. Reference: Manning Stoller.
+- **VolatilityStop**. Stdev-of-returns envelope centered on prev close -- `prev_close +/- multiplier * stdev(returns) * prev_close`. Distinct from ATR Trailing Stop in both construction (stdev vs TR) and regime (static envelope vs ratcheting stop).
+- 10 new signals: `natr_high_volatility`, `natr_low_volatility` (FILTER), `atr_trailing_stop_long/short` (FILTER), `atr_trailing_stop_flip_up/down` (TRIGGER), `starc_upper_breakout`, `starc_lower_breakout` (FILTER), `volatility_stop_upper`, `volatility_stop_lower` (FILTER).
+
 ## [0.4.0] - 2026-04-16
 
 ### Fixed

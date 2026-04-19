@@ -21,6 +21,10 @@ from mangrove_kb.indicators import (
     KeltnerChannel,
     DonchianChannel,
     UlcerIndex,
+    NATR,
+    ATRTrailingStop,
+    STARCBands,
+    VolatilityStop,
 )
 
 logger = logging.getLogger(__name__)
@@ -438,3 +442,286 @@ def ulcer_low_risk(df: pd.DataFrame, window: int = 14, threshold: float = 5.0) -
         return False
 
     return float(ui.iloc[-1]) < threshold
+
+
+# =============================================================================
+# Wave D Volatility Signals (NATR, ATRTrailingStop, STARCBands, VolatilityStop)
+# =============================================================================
+
+
+@RuleRegistry.register("natr_high_volatility")
+def natr_high_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 2.0) -> bool:
+    """
+    Check if normalized ATR is above a high-volatility threshold.
+
+    NATR = 100 * ATR / close, so the threshold is a percentage. Values above
+    ~2-3% typically indicate elevated volatility in equities; crypto markets
+    can run 4-6%+ routinely.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): NATR window. Range: 5-100. Default: 14.
+        threshold (float): High volatility threshold as percentage. Range: 0.5-20.0. Default: 2.0.
+
+    Returns:
+        bool: True if NATR > threshold, False otherwise.
+    """
+    if len(df) < window + 1:
+        return False
+    natr = NATR.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={'window': window})['natr']
+    if pd.isna(natr.iloc[-1]):
+        return False
+    return bool(natr.iloc[-1] > threshold)
+
+
+@RuleRegistry.register("natr_low_volatility")
+def natr_low_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 1.0) -> bool:
+    """
+    Check if normalized ATR is below a low-volatility threshold.
+
+    Useful as a squeeze / consolidation filter.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): NATR window. Range: 5-100. Default: 14.
+        threshold (float): Low volatility threshold as percentage. Range: 0.1-5.0. Default: 1.0.
+
+    Returns:
+        bool: True if NATR < threshold, False otherwise.
+    """
+    if len(df) < window + 1:
+        return False
+    natr = NATR.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={'window': window})['natr']
+    if pd.isna(natr.iloc[-1]):
+        return False
+    return bool(natr.iloc[-1] < threshold)
+
+
+def _atr_trailing_stop_direction(df: pd.DataFrame, window: int, multiplier: float):
+    """Helper: compute ATRTrailingStop and return the direction series, or None if not enough data."""
+    if len(df) < window + 2:
+        return None
+    out = ATRTrailingStop.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'multiplier': multiplier},
+    )
+    return out['direction']
+
+
+@RuleRegistry.register("atr_trailing_stop_long")
+def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
+    """
+    Check if ATR Trailing Stop is in the long regime (+1 direction).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-100. Default: 14.
+        multiplier (float): ATR multiplier for stop distance. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if trailing stop is in long regime, False otherwise.
+    """
+    direction = _atr_trailing_stop_direction(df, window, multiplier)
+    if direction is None or pd.isna(direction.iloc[-1]):
+        return False
+    return direction.iloc[-1] == 1
+
+
+@RuleRegistry.register("atr_trailing_stop_short")
+def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
+    """
+    Check if ATR Trailing Stop is in the short regime (-1 direction).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-100. Default: 14.
+        multiplier (float): ATR multiplier for stop distance. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if trailing stop is in short regime, False otherwise.
+    """
+    direction = _atr_trailing_stop_direction(df, window, multiplier)
+    if direction is None or pd.isna(direction.iloc[-1]):
+        return False
+    return direction.iloc[-1] == -1
+
+
+@RuleRegistry.register("atr_trailing_stop_flip_up")
+def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
+    """
+    Detect ATR Trailing Stop flipping from short (-1) to long (+1).
+
+    Bullish trend-following entry signal.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-100. Default: 14.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if direction flipped from -1 to +1 on the current bar.
+    """
+    direction = _atr_trailing_stop_direction(df, window, multiplier)
+    if direction is None or len(direction) < 2:
+        return False
+    prev, curr = direction.iloc[-2], direction.iloc[-1]
+    if pd.isna(prev) or pd.isna(curr):
+        return False
+    return bool(prev == -1 and curr == 1)
+
+
+@RuleRegistry.register("atr_trailing_stop_flip_down")
+def atr_trailing_stop_flip_down(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
+    """
+    Detect ATR Trailing Stop flipping from long (+1) to short (-1).
+
+    Bearish trend-following entry signal.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-100. Default: 14.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if direction flipped from +1 to -1 on the current bar.
+    """
+    direction = _atr_trailing_stop_direction(df, window, multiplier)
+    if direction is None or len(direction) < 2:
+        return False
+    prev, curr = direction.iloc[-2], direction.iloc[-1]
+    if pd.isna(prev) or pd.isna(curr):
+        return False
+    return bool(prev == 1 and curr == -1)
+
+
+@RuleRegistry.register("starc_upper_breakout")
+def starc_upper_breakout(
+    df: pd.DataFrame, window: int = 20, window_atr: int = 15, multiplier: float = 2.0
+) -> bool:
+    """
+    Check if close is above the STARC upper band (breakout).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): SMA window. Range: 5-100. Default: 20.
+        window_atr (int): ATR window. Range: 5-100. Default: 15.
+        multiplier (float): ATR multiplier for band width. Range: 0.5-5.0. Default: 2.0.
+
+    Returns:
+        bool: True if close > upper band, False otherwise.
+    """
+    if len(df) < max(window, window_atr) + 1:
+        return False
+    out = STARCBands.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'window_atr': window_atr, 'multiplier': multiplier},
+    )
+    hband = out['starc_hband']
+    if pd.isna(hband.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] > hband.iloc[-1])
+
+
+@RuleRegistry.register("starc_lower_breakout")
+def starc_lower_breakout(
+    df: pd.DataFrame, window: int = 20, window_atr: int = 15, multiplier: float = 2.0
+) -> bool:
+    """
+    Check if close is below the STARC lower band (breakdown).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): SMA window. Range: 5-100. Default: 20.
+        window_atr (int): ATR window. Range: 5-100. Default: 15.
+        multiplier (float): ATR multiplier for band width. Range: 0.5-5.0. Default: 2.0.
+
+    Returns:
+        bool: True if close < lower band, False otherwise.
+    """
+    if len(df) < max(window, window_atr) + 1:
+        return False
+    out = STARCBands.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'window_atr': window_atr, 'multiplier': multiplier},
+    )
+    lband = out['starc_lband']
+    if pd.isna(lband.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] < lband.iloc[-1])
+
+
+@RuleRegistry.register("volatility_stop_upper")
+def volatility_stop_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
+    """
+    Check if close has reached or exceeded the stdev-based volatility upper stop.
+
+    Indicates the price has moved multiplier standard deviations above the
+    current bar -- a potential exhaustion / mean-reversion signal.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling stdev window. Range: 5-100. Default: 20.
+        multiplier (float): Stdev multiplier for stop distance. Range: 0.5-5.0. Default: 2.0.
+
+    Returns:
+        bool: True if close >= upper volatility stop, False otherwise.
+    """
+    if len(df) < window + 1:
+        return False
+    out = VolatilityStop.compute(data={'close': df["Close"]}, params={'window': window, 'multiplier': multiplier})
+    hband = out['vstop_hband']
+    if pd.isna(hband.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] >= hband.iloc[-1])
+
+
+@RuleRegistry.register("volatility_stop_lower")
+def volatility_stop_lower(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
+    """
+    Check if close has reached or fallen below the stdev-based volatility lower stop.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling stdev window. Range: 5-100. Default: 20.
+        multiplier (float): Stdev multiplier for stop distance. Range: 0.5-5.0. Default: 2.0.
+
+    Returns:
+        bool: True if close <= lower volatility stop, False otherwise.
+    """
+    if len(df) < window + 1:
+        return False
+    out = VolatilityStop.compute(data={'close': df["Close"]}, params={'window': window, 'multiplier': multiplier})
+    lband = out['vstop_lband']
+    if pd.isna(lband.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] <= lband.iloc[-1])

@@ -11,7 +11,7 @@ class TestIndicatorServiceMetadata:
 
     def test_list_indicators_returns_all(self):
         indicators = self.service.list_indicators()
-        assert len(indicators) == 84
+        assert len(indicators) == 89
 
     def test_list_indicators_filter_by_category(self):
         momentum = self.service.list_indicators(category="Momentum")

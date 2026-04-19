@@ -44,6 +44,11 @@ from .volatility_indicators import (
     KeltnerChannel,
     DonchianChannel,
     UlcerIndex,
+    TrueRange,
+    NATR,
+    ATRTrailingStop,
+    STARCBands,
+    VolatilityStop,
 )
 
 # Trend indicators
@@ -154,6 +159,11 @@ __all__ = [
     "KeltnerChannel",
     "DonchianChannel",
     "UlcerIndex",
+    "TrueRange",
+    "NATR",
+    "ATRTrailingStop",
+    "STARCBands",
+    "VolatilityStop",
     # Trend indicators
     "SMA",
     "EMA",

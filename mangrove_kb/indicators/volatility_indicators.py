@@ -250,3 +250,278 @@ class UlcerIndex(IndicatorInterface):
         ulcer_idx = np.sqrt((r_i ** 2).rolling(window, min_periods=window).mean())
 
         return {'ulcer_index': pd.Series(ulcer_idx, name="ui")}
+
+
+class TrueRange(IndicatorInterface):
+    """True Range (TR)
+
+    Welles Wilder's True Range: max of
+        (high - low), |high - prev_close|, |low - prev_close|
+    captures gap volatility that a simple high-low range misses.
+
+    This is the raw building block used inside ATR (and Vortex, UO, etc.).
+    Exposed as a standalone indicator for strategies that want the raw per-bar
+    range rather than a smoothed average.
+
+    Reference: J. Welles Wilder Jr., "New Concepts in Technical Trading
+    Systems" (1978).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {}
+
+    Returns:
+        {'true_range': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = []
+    _outputs = ["true_range"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        tr = true_range(high, low, close)
+        return {'true_range': pd.Series(tr.values, index=close.index, name='true_range')}
+
+
+class NATR(IndicatorInterface):
+    """Normalized Average True Range (NATR)
+
+    ATR expressed as a percentage of close: NATR = 100 * ATR / close. Useful
+    for comparing volatility across assets and timeframes where absolute ATR
+    scales with price.
+
+    Reference: TA-Lib canonical definition.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'natr': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window"]
+    _outputs = ["natr"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        window = params['window']
+
+        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
+        # ATR is zero during warmup (first window-1 bars); avoid 0/x artifacts
+        # by masking those to NaN.
+        atr_vals = atr.to_numpy(dtype=np.float64, copy=False)
+        close_vals = close.to_numpy(dtype=np.float64, copy=False)
+        natr = np.full_like(atr_vals, np.nan)
+        valid = np.arange(len(atr_vals)) >= (window - 1)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            natr[valid] = 100.0 * atr_vals[valid] / close_vals[valid]
+        return {'natr': pd.Series(natr, index=close.index, name=f'natr_{window}')}
+
+
+class ATRTrailingStop(IndicatorInterface):
+    """ATR Trailing Stop (Chuck LeBeau variant).
+
+    Stateful trailing stop that flips between long and short regimes:
+      - In long regime: stop = max(previous_stop, close - multiplier*ATR).
+        Flip to short when close crosses below the long stop.
+      - In short regime: stop = min(previous_stop, close + multiplier*ATR).
+        Flip to long when close crosses above the short stop.
+
+    Outputs:
+      - trailing_stop: the active stop level on each bar
+      - direction: +1 long, -1 short
+
+    Reference: Chuck LeBeau (Smart Trader), popularized in Chande's
+    "Beyond Technical Analysis" (1997).
+
+    Implementation: genuinely state-dependent (stop level accumulates forward);
+    pure-Python loop, same pattern as SuperTrend and PSAR.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int, 'multiplier': float}
+
+    Returns:
+        {'trailing_stop': pd.Series, 'direction': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window", "multiplier"]
+    _outputs = ["trailing_stop", "direction"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        window = params['window']
+        mult = float(params['multiplier'])
+
+        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
+        close_vals = close.to_numpy(dtype=np.float64, copy=False)
+        atr_vals = atr.to_numpy(dtype=np.float64, copy=False)
+        n = len(close_vals)
+
+        stop = np.full(n, np.nan)
+        direction = np.zeros(n, dtype=np.int64)
+
+        # Warmup: need valid ATR before starting. ATR becomes non-zero at
+        # index window-1 in our implementation.
+        start = window
+        if n <= start:
+            return {
+                'trailing_stop': pd.Series(stop, index=close.index, name='trailing_stop'),
+                'direction': pd.Series(direction.astype(np.float64), index=close.index, name='direction'),
+            }
+
+        # Initialize direction based on first bar after warmup using simple
+        # comparison to the previous close.
+        direction[start] = 1 if close_vals[start] >= close_vals[start - 1] else -1
+        if direction[start] == 1:
+            stop[start] = close_vals[start] - mult * atr_vals[start]
+        else:
+            stop[start] = close_vals[start] + mult * atr_vals[start]
+
+        # State-dependent loop: trailing stop ratchets in the trend direction
+        # and flips on the opposite-side close cross.
+        for i in range(start + 1, n):
+            prev_stop = stop[i - 1]
+            prev_dir = direction[i - 1]
+            candidate_long = close_vals[i] - mult * atr_vals[i]
+            candidate_short = close_vals[i] + mult * atr_vals[i]
+
+            if prev_dir == 1:
+                if close_vals[i] < prev_stop:
+                    # Flip to short
+                    direction[i] = -1
+                    stop[i] = candidate_short
+                else:
+                    # Ratchet long stop higher (never lower)
+                    direction[i] = 1
+                    stop[i] = max(prev_stop, candidate_long)
+            else:
+                if close_vals[i] > prev_stop:
+                    # Flip to long
+                    direction[i] = 1
+                    stop[i] = candidate_long
+                else:
+                    # Ratchet short stop lower (never higher)
+                    direction[i] = -1
+                    stop[i] = min(prev_stop, candidate_short)
+
+        return {
+            'trailing_stop': pd.Series(stop, index=close.index, name='trailing_stop'),
+            'direction': pd.Series(direction.astype(np.float64), index=close.index, name='direction'),
+        }
+
+
+class STARCBands(IndicatorInterface):
+    """Stoller Average Range Channels (STARC Bands).
+
+    SMA-centered ATR-scaled envelope:
+        upper = SMA(close, window) + multiplier * ATR(window_atr)
+        lower = SMA(close, window) - multiplier * ATR(window_atr)
+
+    Similar to Keltner Channel but with an explicitly separate window for the
+    SMA and ATR. Useful for breakout strategies.
+
+    Reference: Manning Stoller, popularized in "Beyond Candlesticks" (Steve
+    Nison, 1994 era).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int, 'window_atr': int, 'multiplier': float}
+
+    Returns:
+        {'starc_mid': pd.Series, 'starc_hband': pd.Series, 'starc_lband': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window", "window_atr", "multiplier"]
+    _outputs = ["starc_mid", "starc_hband", "starc_lband"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        # Local import to avoid a circular dependency with trend_indicators.
+        from mangrove_kb.indicators.trend_indicators import SMA
+
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        window = params['window']
+        window_atr = params['window_atr']
+        mult = float(params['multiplier'])
+
+        mid = SMA.compute({'close': close}, {'window': window})['sma']
+        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window_atr})['atr']
+        # Mask warmup bars of ATR to NaN so bands don't leak zero-ATR values.
+        atr_vals = atr.to_numpy(dtype=np.float64, copy=False).copy()
+        atr_vals[: window_atr - 1] = np.nan
+        atr_masked = pd.Series(atr_vals, index=close.index)
+
+        hband = mid + mult * atr_masked
+        lband = mid - mult * atr_masked
+
+        return {
+            'starc_mid': pd.Series(mid.values, index=close.index, name='starc_mid'),
+            'starc_hband': pd.Series(hband.values, index=close.index, name='starc_hband'),
+            'starc_lband': pd.Series(lband.values, index=close.index, name='starc_lband'),
+        }
+
+
+class VolatilityStop(IndicatorInterface):
+    """Standard-deviation-based volatility envelope.
+
+    Uses rolling standard deviation of returns to build an "expected range"
+    for the current bar around the previous close:
+        upper = prev_close + multiplier * stdev(returns, window) * prev_close
+        lower = prev_close - multiplier * stdev(returns, window) * prev_close
+
+    When the current close exceeds the upper band, price has moved more than
+    `multiplier` standard deviations up from yesterday -- a potential
+    exhaustion or breakout signal. Conversely for the lower band.
+
+    Distinct from ATR Trailing Stop: uses stdev of returns rather than
+    smoothed true range, and is not a state machine (no ratcheting).
+
+    Reference: Common stdev-envelope construction; variants appear in
+    Bollinger Bands and Cynthia Kase's stop loss methodology.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int, 'multiplier': float}
+
+    Returns:
+        {'vstop_hband': pd.Series, 'vstop_lband': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window", "multiplier"]
+    _outputs = ["vstop_hband", "vstop_lband"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        window = params['window']
+        mult = float(params['multiplier'])
+
+        # Rolling stdev of returns (not close), for a scale-invariant measure.
+        returns = close.pct_change()
+        vol = returns.rolling(window, min_periods=window).std()
+        # Use PREVIOUS close as the center: today's expected-range envelope
+        # given yesterday's close and recent volatility. If we used current
+        # close as the center, close would be trivially between the bands
+        # and the signals would never fire.
+        prev_close = close.shift(1)
+        offset = prev_close * vol * mult
+
+        hband = prev_close + offset
+        lband = prev_close - offset
+        return {
+            'vstop_hband': pd.Series(hband.values, index=close.index, name='vstop_hband'),
+            'vstop_lband': pd.Series(lband.values, index=close.index, name='vstop_lband'),
+        }
