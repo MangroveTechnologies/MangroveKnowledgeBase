@@ -1,9 +1,9 @@
-"""Core comparison engine for indicator audit."""
+"""Core comparison engine for indicator and signal audit."""
 
 from dataclasses import dataclass, field
 import pandas as pd
 import numpy as np
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 
 @dataclass
@@ -59,14 +59,16 @@ def compare_series(
     ref: pd.Series,
     tolerance: float,
     skip_warmup: int = 0,
+    relative: bool = False,
 ) -> OutputResult:
     """Compare two pandas Series element-wise.
 
     Args:
         ours: Our implementation's output series
         ref: Reference implementation's output series
-        tolerance: Maximum acceptable absolute error
+        tolerance: Maximum acceptable error (absolute unless relative=True)
         skip_warmup: Skip first N bars (different warmup handling)
+        relative: If True, tolerance is relative to |ref| (good for price-space indicators)
     """
     result = OutputResult(output_key="")
 
@@ -94,12 +96,20 @@ def compare_series(
     result.max_abs_error = float(np.max(abs_diff))
     result.mean_abs_error = float(np.mean(abs_diff))
 
+    if relative:
+        # Relative tolerance: |ours - ref| / max(|ref|, epsilon) <= tolerance
+        denom = np.maximum(np.abs(r_valid.values), 1e-12)
+        rel_diff = abs_diff / denom
+        divergent = rel_diff > tolerance
+        result.pass_fail = bool(rel_diff.max() <= tolerance)
+    else:
+        divergent = abs_diff > tolerance
+        result.pass_fail = result.max_abs_error <= tolerance
+
     # First divergence bar
-    divergent = abs_diff > tolerance
     if divergent.any():
         result.first_divergence_bar = int(np.argmax(divergent)) + skip_warmup
 
-    result.pass_fail = result.max_abs_error <= tolerance
     return result
 
 
@@ -115,6 +125,7 @@ def compare_indicator(
     skip_warmup: int = 0,
     reference_library: str = "Bukosabino ta",
     notes: str = "",
+    relative: bool = False,
 ) -> AuditResult:
     """Compare our indicator implementation against a reference.
 
@@ -172,6 +183,7 @@ def compare_indicator(
             ref_outputs[ref_key],
             tolerance=tolerance,
             skip_warmup=skip_warmup,
+            relative=relative,
         )
         output_result.output_key = our_key
         result.outputs[our_key] = output_result
@@ -180,3 +192,207 @@ def compare_indicator(
             result.pass_fail = False
 
     return result
+
+
+# =============================================================================
+# Signal Verification
+# =============================================================================
+# A signal passes verification if, for every bar in the dataset (after warmup),
+# its boolean output matches ground truth computed from the full-dataset
+# indicator output. Ground truth is built externally and passed in as a
+# boolean array; this module runs the signal bar-by-bar with a sliding window
+# and compares.
+
+
+@dataclass
+class SignalAuditResult:
+    """Result of verifying a signal's boolean output against ground truth."""
+    signal_name: str
+    params: dict
+    start_bar: int
+    evaluated_bars: int
+    fires: int
+    expected_fires: int
+    true_positives: int
+    false_positives: int
+    false_negatives: int
+    pass_fail: bool = True
+    notes: str = ""
+
+    def to_dict(self) -> dict:
+        return {
+            "signal": self.signal_name,
+            "params": self.params,
+            "start_bar": self.start_bar,
+            "evaluated_bars": self.evaluated_bars,
+            "fires": self.fires,
+            "expected_fires": self.expected_fires,
+            "true_positives": self.true_positives,
+            "false_positives": self.false_positives,
+            "false_negatives": self.false_negatives,
+            "pass": self.pass_fail,
+            "notes": self.notes,
+        }
+
+
+def verify_signal(
+    signal_name: str,
+    params: dict,
+    df: pd.DataFrame,
+    truth: np.ndarray,
+    start_bar: int = 100,
+) -> SignalAuditResult:
+    """Verify a registered signal's output matches ground truth bar-by-bar.
+
+    Runs the signal with a sliding window at every bar from `start_bar` to end,
+    then compares to the pre-computed ground truth boolean array. Zero false
+    positives AND zero false negatives are required to pass.
+
+    Args:
+        signal_name: Name of the signal registered in RuleRegistry.
+        params: Parameters to pass to the signal.
+        df: Full dataset DataFrame (with capitalized OHLCV column names).
+        truth: Boolean ndarray same length as df, True where signal should fire.
+        start_bar: Skip the warmup region; default 100 bars.
+    """
+    # Import here to avoid module-level cycles
+    from mangrove_kb.registry import RuleRegistry
+    import mangrove_kb.signals  # ensure registration
+
+    n = len(df)
+    if len(truth) != n:
+        raise ValueError(f"truth length {len(truth)} != df length {n}")
+
+    signal_out = np.zeros(n, dtype=bool)
+    for i in range(start_bar, n):
+        window_df = df.iloc[: i + 1]
+        try:
+            signal_out[i] = bool(RuleRegistry.evaluate({"name": signal_name, "params": params}, window_df))
+        except Exception as e:
+            return SignalAuditResult(
+                signal_name=signal_name,
+                params=params,
+                start_bar=start_bar,
+                evaluated_bars=i - start_bar,
+                fires=int(signal_out.sum()),
+                expected_fires=int(truth[start_bar:i].sum()),
+                true_positives=0,
+                false_positives=0,
+                false_negatives=0,
+                pass_fail=False,
+                notes=f"RAISED at bar {i}: {e}",
+            )
+
+    s = signal_out[start_bar:]
+    t = truth[start_bar:].astype(bool)
+    tp = int((s & t).sum())
+    fp = int((s & ~t).sum())
+    fn = int((~s & t).sum())
+
+    return SignalAuditResult(
+        signal_name=signal_name,
+        params=params,
+        start_bar=start_bar,
+        evaluated_bars=n - start_bar,
+        fires=int(s.sum()),
+        expected_fires=int(t.sum()),
+        true_positives=tp,
+        false_positives=fp,
+        false_negatives=fn,
+        pass_fail=(fp == 0 and fn == 0),
+    )
+
+
+def truth_is_above(series: pd.Series, indicator: pd.Series) -> np.ndarray:
+    """Ground truth for is_above_<ma> filter: price > indicator, NaN -> False."""
+    return (series > indicator).fillna(False).to_numpy()
+
+
+def truth_crossover(fast: pd.Series, slow: pd.Series, direction: str) -> np.ndarray:
+    """Ground truth for fast/slow crossover signals.
+
+    Args:
+        direction: "up" = fast crosses above slow; "down" = fast crosses below.
+    """
+    prev_f, curr_f = fast.shift(1), fast
+    prev_s, curr_s = slow.shift(1), slow
+    if direction == "up":
+        cond = (prev_f <= prev_s) & (curr_f > curr_s)
+    elif direction == "down":
+        cond = (prev_f >= prev_s) & (curr_f < curr_s)
+    else:
+        raise ValueError(f"direction must be 'up' or 'down', got {direction!r}")
+    return cond.fillna(False).to_numpy()
+
+
+# =============================================================================
+# Performance Benchmark
+# =============================================================================
+
+
+@dataclass
+class BenchResult:
+    """Result of timing an indicator compute."""
+    indicator_name: str
+    mean_ms: float
+    min_ms: float
+    max_ms: float
+    runs: int
+    bars: int
+    tier: str = ""  # auto-classified: fast / moderate / slow / pathological
+
+    def to_dict(self) -> dict:
+        return {
+            "indicator": self.indicator_name,
+            "mean_ms": self.mean_ms,
+            "min_ms": self.min_ms,
+            "max_ms": self.max_ms,
+            "runs": self.runs,
+            "bars": self.bars,
+            "tier": self.tier,
+        }
+
+
+def bench_indicator(name: str, compute_fn: Callable, bars: int, runs: int = 100) -> BenchResult:
+    """Time a compute function and classify the result.
+
+    Tiers (per-compute on the given fixture):
+        fast:         mean < 0.5 ms
+        moderate:     0.5 <= mean < 2 ms
+        slow:         2 <= mean < 20 ms
+        pathological: mean >= 20 ms (almost certainly has a python-level loop
+                      or rolling.apply that could be vectorized)
+    """
+    import time
+
+    # Warmup to let JIT/pandas caches settle
+    for _ in range(3):
+        compute_fn()
+
+    samples = []
+    for _ in range(runs):
+        t0 = time.perf_counter()
+        compute_fn()
+        samples.append((time.perf_counter() - t0) * 1000.0)
+
+    arr = np.array(samples)
+    mean_ms = float(arr.mean())
+
+    if mean_ms < 0.5:
+        tier = "fast"
+    elif mean_ms < 2.0:
+        tier = "moderate"
+    elif mean_ms < 20.0:
+        tier = "slow"
+    else:
+        tier = "pathological"
+
+    return BenchResult(
+        indicator_name=name,
+        mean_ms=mean_ms,
+        min_ms=float(arr.min()),
+        max_ms=float(arr.max()),
+        runs=runs,
+        bars=bars,
+        tier=tier,
+    )

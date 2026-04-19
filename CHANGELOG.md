@@ -4,6 +4,71 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [1.0.0] - Unreleased
+
+Comprehensive expansion to 99 indicators and 223 signals. This release adds 29 standard
+indicators (Priority A from the v0.4.0 gap analysis plus four signal-pattern indicators)
+and 87 signals, bringing the library to feature parity with production trading platforms.
+All new indicators follow the vectorization discipline established in prior optimization
+waves: no `.rolling().apply(python_callback)`, cached per-window constants,
+`np.fmax`/`sliding_window_view` where appropriate, stateless classmethods.
+
+Every new indicator is audited for numerical correctness against `pandas-ta` (indicator
+audit) and every new signal is verified bar-by-bar against a sliding-window ground truth
+(zero false positives, zero false negatives on a 1294-bar BTC daily fixture). Every
+indicator is benchmarked on the same fixture and tier-classified
+(fast < 0.5 ms, moderate 0.5-2 ms, slow 2-20 ms).
+
+### Added (Wave A -- Simple Moving Averages)
+- **DEMA** (Double Exponential Moving Average). Reference: Patrick Mulloy, *Technical Analysis of Stocks & Commodities*, Jan 1994.
+- **TEMA** (Triple Exponential Moving Average). Same Mulloy paper.
+- **TRIMA** (Triangular Moving Average). Double-smoothed SMA with TA-Lib even/odd window convention.
+- **SMMA** (Smoothed Moving Average / Wilder's / RMA). `ewm(alpha=1/n)`. Reference: Wilder 1978.
+- **VWMA** (Volume-Weighted Moving Average). `sum(close*vol)/sum(vol)` over window.
+- **EPMA** (End Point Moving Average / LSMA). Linear regression endpoint; implemented as FIR filter with cached weights via `np.convolve`.
+- 18 new signals: `is_above_<ma>`, `<ma>_cross_up`, `<ma>_cross_down` for each new MA.
+
+### Added (Wave B -- Complex Moving Averages)
+- **HMA** (Hull Moving Average). Formula: `WMA(2*WMA(n/2) - WMA(n), sqrt(n))`. Reuses our vectorized WMA. Reference: Alan Hull, 2005.
+- **ALMA** (Arnaud Legoux Moving Average). Gaussian-weighted FIR filter with `@lru_cache(maxsize=256)` keyed on `(window, offset, sigma)`, applied via `np.convolve`. Reference: Legoux & Kouzis-Loukas, 2009.
+- **T3** (Tillson T3). Six chained EMAs combined via Tillson's volume-factor formula `T3 = c1*e6 + c2*e5 + c3*e4 + c4*e3`. Reference: Tim Tillson, *Technical Analysis of Stocks & Commodities*, Jan 1998.
+- **MAMA** (MESA Adaptive Moving Average). Hilbert-transform-adaptive MA with FAMA follower output. Genuinely sequential (per-bar Hilbert phase/period state); pure-Python loop documented as state-dependent. Reference: John F. Ehlers, *Technical Analysis of Stocks & Commodities*, Sept 2001.
+- 12 new signals: `is_above_hma/alma/t3/mama` (FILTER), `{hma,alma,t3}_cross_up/down` (fast-vs-slow window crossover TRIGGERs), `mama_cross_up/down` (MAMA/FAMA crossover TRIGGERs).
+
+### Added (Wave C -- Momentum)
+- **MOM** (Momentum). `close - close.shift(n)`. Absolute price change over lookback. TA-Lib canonical.
+- **BOP** (Balance of Power). `(close - open) / (high - low)`. Intrabar buying vs. selling pressure. Reference: Igor Livshin, TA-Lib canonical.
+- **APO** (Absolute Price Oscillator). `EMA(fast) - EMA(slow)` -- equivalent to the MACD line. Our implementation uses EMA; pandas-ta defaults to SMA.
+- **CMO** (Chande Momentum Oscillator). Rolling-sum variant: `100 * (pos_sum - neg_sum) / (pos_sum + neg_sum)`. Ranges [-100, +100]. Reference: Tushar Chande, *The New Technical Trader* (1994).
+- 16 new signals: for each of MOM/BOP/APO (zero-centered): `<ind>_bullish`, `<ind>_bearish` (FILTER), `<ind>_cross_up`, `<ind>_cross_down` (zero-line crossover TRIGGER). For CMO: `cmo_overbought`, `cmo_oversold` (FILTER), `cmo_cross_up`, `cmo_cross_down` (threshold crossover TRIGGER, analogous to RSI).
+
+### Added (Wave F -- Volume)
+- **ADOSC** (Chaikin A/D Oscillator). `EMA(AD, fast) - EMA(AD, slow)`. Reuses our ADI indicator for the AD line and our EMA for smoothing. Reference: Marc Chaikin, TA-Lib canonical.
+- **KVO** (Klinger Volume Oscillator). Simplified modern form matching pandas-ta/TradingView: `signed_volume = volume * sign(hlc3.diff())`, `KVO = EMA(signed_volume, fast) - EMA(signed_volume, slow)`, plus `KVO_signal = EMA(KVO, signal_window)`. Signed-volume computation is bit-exact vs pandas-ta.
+- 8 new signals: `adosc_bullish/bearish` (FILTER), `adosc_cross_up/down` (zero-line TRIGGER), `kvo_bullish/bearish` (vs signal line FILTER), `kvo_bullish_cross/bearish_cross` (signal-line cross TRIGGER).
+
+### Added (Wave E -- Trend)
+- **HeikinAshi**. Smoothed candlestick transform: HA_close = (O+H+L+C)/4; HA_open = avg of prev HA_open and HA_close (sequential, state-dependent). HA_high/low fully vectorized with `np.fmax`/`np.fmin`.
+- **ChandelierExit** (Chuck LeBeau). `highest_high(n) - k*ATR` (long_stop), `lowest_low(n) + k*ATR` (short_stop). Both always computed; user picks which applies to their position.
+- **WilliamsAlligator** (Bill Williams, 1998). Three SMMA lines on median price ((H+L)/2) with forward offsets (Jaw 13+8, Teeth 8+5, Lips 5+3). Offsets applied via `shift(+n)` -- lookahead-free in backtesting (value at bar t is SMMA computed at t-offset).
+- **SuperTrend** (Olivier Seban). ATR-scaled bands around hl2 with trend-flip rule: close crosses opposite band -> flip; between flips, active band ratchets. State-dependent loop; matches pandas-ta bit-exact.
+- 11 new signals: `heikin_ashi_bullish/bearish` (FILTER), `chandelier_long_stop_hit/short_stop_hit` (FILTER, exit triggers), `alligator_bullish/bearish/sleeping` (regime FILTER), `supertrend_long/short` (regime FILTER), `supertrend_flip_up/flip_down` (TRIGGER).
+
+### Added (Wave D -- Volatility)
+- **TrueRange** (standalone Wilder TR). Raw per-bar volatility; building block for ATR/Vortex/UO but useful on its own. Reuses our existing `true_range()` helper. Reference: Wilder 1978.
+- **NATR** (Normalized ATR). `100 * ATR / close`. Scale-invariant volatility measure. Uses Wilder (RMA) smoothing -- matches TA-Lib canonical convention; pandas-ta defaults to EMA-smoothing which is non-standard.
+- **ATRTrailingStop** (Chuck LeBeau variant). Stateful trailing stop with long/short regimes; stop ratchets in trend direction and flips on opposite-side close cross. Returns trailing stop level and direction (+1/-1). Genuinely sequential (documented). Reference: Chuck LeBeau, popularized in Chande's *Beyond Technical Analysis* (1997).
+- **STARCBands** (Stoller Average Range Channels). `SMA +/- multiplier * ATR`, with independent windows for SMA and ATR. Similar to Keltner Channel but with configurable separate windows. Reference: Manning Stoller.
+- **VolatilityStop**. Stdev-of-returns envelope centered on prev close -- `prev_close +/- multiplier * stdev(returns) * prev_close`. Distinct from ATR Trailing Stop in both construction (stdev vs TR) and regime (static envelope vs ratcheting stop).
+- 10 new signals: `natr_high_volatility`, `natr_low_volatility` (FILTER), `atr_trailing_stop_long/short` (FILTER), `atr_trailing_stop_flip_up/down` (TRIGGER), `starc_upper_breakout`, `starc_lower_breakout` (FILTER), `volatility_stop_upper`, `volatility_stop_lower` (FILTER).
+
+### Added (Wave G -- Signal Patterns)
+- **MARibbon**. Generalized moving-average ribbon: computes N SMAs over user-supplied windows and returns three mutually-exclusive regime flags (`ribbon_bullish` = all windows monotonic descending in value, `ribbon_bearish` = monotonic ascending, `ribbon_tangled` = neither). Default windows are the 8-MA Fibonacci ribbon `[5, 8, 13, 21, 34, 55, 89, 144]`; any monotonically-increasing window list is accepted.
+- **TTMSqueeze** (John Carter, *Mastering the Trade*, 2005). Detects BB-inside-KC "squeeze" compression, squeeze release (prev bar on, current bar off), and Carter's linear-regression momentum histogram `LR_slope(close - (highest_high + lowest_low)/2 + SMA(close))/2`. Reuses our BollingerBands and KeltnerChannel; momentum via vectorized `sliding_window_view` + closed-form linear regression coefficients.
+- **Divergence** (Cardwell / Constance Brown, *Technical Analysis for the Trading Professional*, 2000). Generic four-way divergence detector between price and an arbitrary indicator series (RSI/MACD/OBV/...). Swing points detected via `scipy.signal.argrelextrema`; fire bar is `max(price_swing, indicator_swing) + swing_window` to guarantee lookahead-free evaluation (sliding-window and full-dataset verdicts match bit-exactly).
+- **MultiTFTrend**. Higher-timeframe confirmation indicator. Resamples OHLC to a higher timeframe (e.g., `1W`), computes `EMA(window)` slope direction on the higher TF, and forward-fills back to the base-TF index so every bar carries the enclosing higher-TF trend. Requires a DatetimeIndex; returns `0` for bars that cannot be confirmed.
+- 12 new signals: `ma_ribbon_bullish/bearish/tangled` (FILTER), `ttm_squeeze_active` (FILTER), `ttm_squeeze_fired_bullish/bearish` (TRIGGER), `rsi_bullish_divergence/bearish_divergence/hidden_bullish_divergence/hidden_bearish_divergence` (TRIGGER), `multi_tf_trend_bullish/bearish` (FILTER).
+
 ## [0.4.0] - 2026-04-16
 
 ### Fixed

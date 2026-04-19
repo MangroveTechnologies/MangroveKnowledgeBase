@@ -33,6 +33,10 @@ from mangrove_kb.indicators import (
     StochRSI,
     PPO,
     PVO,
+    MOM,
+    BOP,
+    APO,
+    CMO,
 )
 
 logger = logging.getLogger(__name__)
@@ -965,3 +969,433 @@ def pvo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
     curr_below = float(pvo.iloc[-1]) < float(signal.iloc[-1])
 
     return prev_above and curr_below
+
+
+# =============================================================================
+# Wave C Momentum Signals (MOM, BOP, APO, CMO)
+# =============================================================================
+# MOM, BOP, APO are zero-centered: positive = bullish, negative = bearish.
+# Each exposes bullish/bearish FILTER signals plus zero-line crossover TRIGGERs.
+# CMO is bounded [-100, +100] so uses overbought/oversold FILTERs and
+# threshold-crossover TRIGGERs, matching the RSI pattern.
+
+
+def _zero_cross_signal(series: pd.Series, direction: str) -> bool:
+    """Helper: detect zero-line crossover in the given direction on the last bar."""
+    if len(series) < 2:
+        return False
+    prev, curr = series.iloc[-2], series.iloc[-1]
+    if pd.isna(prev) or pd.isna(curr):
+        return False
+    if direction == "up":
+        return bool(prev <= 0 < curr)
+    return bool(prev >= 0 > curr)
+
+
+# --- MOM signals ---
+
+@RuleRegistry.register("mom_bullish")
+def mom_bullish(df: pd.DataFrame, window: int = 10) -> bool:
+    """
+    Check if Momentum (close - close[-n]) is positive.
+
+    Indicates upward price momentum over the lookback window.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Lookback period. Range: 1-200. Default: 10.
+
+    Returns:
+        bool: True if MOM > 0, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) <= window:
+        return False
+    mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
+    if pd.isna(mom.iloc[-1]):
+        return False
+    return bool(mom.iloc[-1] > 0)
+
+
+@RuleRegistry.register("mom_bearish")
+def mom_bearish(df: pd.DataFrame, window: int = 10) -> bool:
+    """
+    Check if Momentum (close - close[-n]) is negative.
+
+    Indicates downward price momentum over the lookback window.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Lookback period. Range: 1-200. Default: 10.
+
+    Returns:
+        bool: True if MOM < 0, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) <= window:
+        return False
+    mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
+    if pd.isna(mom.iloc[-1]):
+        return False
+    return bool(mom.iloc[-1] < 0)
+
+
+@RuleRegistry.register("mom_cross_up")
+def mom_cross_up(df: pd.DataFrame, window: int = 10) -> bool:
+    """
+    Detect Momentum crossing above zero (bullish zero-line cross).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Lookback period. Range: 1-200. Default: 10.
+
+    Returns:
+        bool: True if MOM crosses above zero on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) <= window + 1:
+        return False
+    mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
+    return _zero_cross_signal(mom, "up")
+
+
+@RuleRegistry.register("mom_cross_down")
+def mom_cross_down(df: pd.DataFrame, window: int = 10) -> bool:
+    """
+    Detect Momentum crossing below zero (bearish zero-line cross).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Lookback period. Range: 1-200. Default: 10.
+
+    Returns:
+        bool: True if MOM crosses below zero on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) <= window + 1:
+        return False
+    mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
+    return _zero_cross_signal(mom, "down")
+
+
+# --- BOP signals ---
+
+@RuleRegistry.register("bop_bullish")
+def bop_bullish(df: pd.DataFrame) -> bool:
+    """
+    Check if Balance of Power indicates buyers in control on the current bar.
+
+    BOP = (close - open) / (high - low). Positive = buyers dominated the bar.
+
+    Type: FILTER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if BOP > 0, False otherwise (including NaN when high==low).
+    """
+    if len(df) < 1:
+        return False
+    bop = BOP.compute(
+        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        params={},
+    )['bop']
+    if pd.isna(bop.iloc[-1]):
+        return False
+    return bool(bop.iloc[-1] > 0)
+
+
+@RuleRegistry.register("bop_bearish")
+def bop_bearish(df: pd.DataFrame) -> bool:
+    """
+    Check if Balance of Power indicates sellers in control on the current bar.
+
+    Type: FILTER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if BOP < 0, False otherwise.
+    """
+    if len(df) < 1:
+        return False
+    bop = BOP.compute(
+        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        params={},
+    )['bop']
+    if pd.isna(bop.iloc[-1]):
+        return False
+    return bool(bop.iloc[-1] < 0)
+
+
+@RuleRegistry.register("bop_cross_up")
+def bop_cross_up(df: pd.DataFrame) -> bool:
+    """
+    Detect Balance of Power crossing above zero (sellers -> buyers).
+
+    Type: TRIGGER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if BOP crosses above zero on the current bar.
+    """
+    if len(df) < 2:
+        return False
+    bop = BOP.compute(
+        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        params={},
+    )['bop']
+    return _zero_cross_signal(bop, "up")
+
+
+@RuleRegistry.register("bop_cross_down")
+def bop_cross_down(df: pd.DataFrame) -> bool:
+    """
+    Detect Balance of Power crossing below zero (buyers -> sellers).
+
+    Type: TRIGGER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if BOP crosses below zero on the current bar.
+    """
+    if len(df) < 2:
+        return False
+    bop = BOP.compute(
+        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        params={},
+    )['bop']
+    return _zero_cross_signal(bop, "down")
+
+
+# --- APO signals ---
+
+@RuleRegistry.register("apo_bullish")
+def apo_bullish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+    """
+    Check if the Absolute Price Oscillator (EMA fast - EMA slow) is positive.
+
+    Equivalent to the MACD line being above zero (bullish momentum regime).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA period. Range: 2-100. Default: 12.
+        window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
+
+    Returns:
+        bool: True if APO > 0, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow:
+        return False
+    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
+    if pd.isna(apo.iloc[-1]):
+        return False
+    return bool(apo.iloc[-1] > 0)
+
+
+@RuleRegistry.register("apo_bearish")
+def apo_bearish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+    """
+    Check if the Absolute Price Oscillator is negative (bearish regime).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA period. Range: 2-100. Default: 12.
+        window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
+
+    Returns:
+        bool: True if APO < 0, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow:
+        return False
+    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
+    if pd.isna(apo.iloc[-1]):
+        return False
+    return bool(apo.iloc[-1] < 0)
+
+
+@RuleRegistry.register("apo_cross_up")
+def apo_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+    """
+    Detect APO crossing above zero (bullish momentum onset).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA period. Range: 2-100. Default: 12.
+        window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
+
+    Returns:
+        bool: True if APO crosses above zero on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
+    return _zero_cross_signal(apo, "up")
+
+
+@RuleRegistry.register("apo_cross_down")
+def apo_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+    """
+    Detect APO crossing below zero (bearish momentum onset).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA period. Range: 2-100. Default: 12.
+        window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
+
+    Returns:
+        bool: True if APO crosses below zero on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
+    return _zero_cross_signal(apo, "down")
+
+
+# --- CMO signals ---
+
+@RuleRegistry.register("cmo_overbought")
+def cmo_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) -> bool:
+    """
+    Check if Chande Momentum Oscillator is above the overbought threshold.
+
+    CMO ranges from -100 to +100; default threshold of +50 is standard
+    (analogous to RSI 70).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CMO lookback. Range: 2-100. Default: 14.
+        threshold (float): Overbought threshold. Range: 20.0-90.0. Default: 50.0.
+
+    Returns:
+        bool: True if CMO >= threshold, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window + 1:
+        return False
+    cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
+    if pd.isna(cmo.iloc[-1]):
+        return False
+    return bool(cmo.iloc[-1] >= threshold)
+
+
+@RuleRegistry.register("cmo_oversold")
+def cmo_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -> bool:
+    """
+    Check if Chande Momentum Oscillator is below the oversold threshold.
+
+    Default threshold of -50 is standard (analogous to RSI 30).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CMO lookback. Range: 2-100. Default: 14.
+        threshold (float): Oversold threshold. Range: -90.0--20.0. Default: -50.0.
+
+    Returns:
+        bool: True if CMO <= threshold, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window + 1:
+        return False
+    cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
+    if pd.isna(cmo.iloc[-1]):
+        return False
+    return bool(cmo.iloc[-1] <= threshold)
+
+
+@RuleRegistry.register("cmo_cross_up")
+def cmo_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -> bool:
+    """
+    Detect CMO crossing above the oversold threshold (bullish momentum return).
+
+    Analogous to RSI crossing above 30.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CMO lookback. Range: 2-100. Default: 14.
+        threshold (float): Oversold threshold to cross above. Range: -90.0--20.0. Default: -50.0.
+
+    Returns:
+        bool: True if CMO crosses above threshold on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window + 2:
+        return False
+    cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
+    if len(cmo) < 2 or pd.isna(cmo.iloc[-1]) or pd.isna(cmo.iloc[-2]):
+        return False
+    return bool(cmo.iloc[-2] <= threshold < cmo.iloc[-1])
+
+
+@RuleRegistry.register("cmo_cross_down")
+def cmo_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) -> bool:
+    """
+    Detect CMO crossing below the overbought threshold (bearish momentum onset).
+
+    Analogous to RSI crossing below 70.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CMO lookback. Range: 2-100. Default: 14.
+        threshold (float): Overbought threshold to cross below. Range: 20.0-90.0. Default: 50.0.
+
+    Returns:
+        bool: True if CMO crosses below threshold on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window + 2:
+        return False
+    cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
+    if len(cmo) < 2 or pd.isna(cmo.iloc[-1]) or pd.isna(cmo.iloc[-2]):
+        return False
+    return bool(cmo.iloc[-2] >= threshold > cmo.iloc[-1])
