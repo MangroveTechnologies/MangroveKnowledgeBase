@@ -525,3 +525,98 @@ class VolatilityStop(IndicatorInterface):
             'vstop_hband': pd.Series(hband.values, index=close.index, name='vstop_hband'),
             'vstop_lband': pd.Series(lband.values, index=close.index, name='vstop_lband'),
         }
+
+
+class TTMSqueeze(IndicatorInterface):
+    """TTM Squeeze (John Carter).
+
+    Detects volatility contraction ("squeeze") when Bollinger Bands are
+    entirely inside Keltner Channels, and signals a volatility expansion
+    when the squeeze releases (BB exits KC). The momentum sub-output
+    indicates which direction the coiled volatility is likely to break.
+
+    State definition:
+      - squeeze_on: bb_hband < kc_hband  AND  bb_lband > kc_lband
+      - squeeze_fired: squeeze was on the previous bar, off on the current
+      - momentum: linear-regression slope of (close - midpoint) over the
+        momentum window, where midpoint = (highest_high + lowest_low +
+        SMA(close)) / 3. Positive = bullish coil; negative = bearish.
+
+    Reference: John Carter, "Mastering the Trade" (2005).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'bb_window': int, 'bb_std': float,
+                 'kc_window': int, 'kc_atr_mult': float,
+                 'mom_window': int}
+
+    Returns:
+        {'squeeze_on': pd.Series (bool),
+         'squeeze_fired': pd.Series (bool),
+         'momentum': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["bb_window", "bb_std", "kc_window", "kc_atr_mult", "mom_window"]
+    _outputs = ["squeeze_on", "squeeze_fired", "momentum"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        from mangrove_kb.indicators.trend_indicators import SMA, _epma_weights
+
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        bb_window = params['bb_window']
+        bb_std = float(params['bb_std'])
+        kc_window = params['kc_window']
+        kc_atr_mult = float(params['kc_atr_mult'])
+        mom_window = params['mom_window']
+
+        # Bollinger Bands
+        bb = BollingerBands.compute({'close': close}, {'window': bb_window, 'window_dev': bb_std})
+        bb_h, bb_l = bb['hband'], bb['lband']
+
+        # Keltner Channel (non-original: SMA + ATR)
+        kc = KeltnerChannel.compute(
+            data={'high': high, 'low': low, 'close': close},
+            params={'window': kc_window, 'window_atr': kc_window, 'original_version': False, 'multiplier': kc_atr_mult},
+        )
+        kc_h, kc_l = kc['hband'], kc['lband']
+
+        squeeze_on = (bb_h < kc_h) & (bb_l > kc_l)
+        # Squeeze fired: on -> off transition
+        squeeze_fired = squeeze_on.shift(1).fillna(False) & (~squeeze_on)
+
+        # Carter's momentum: close - ((highest_high + lowest_low)/2 + SMA)/2
+        # over mom_window; then fit linear regression over that, return slope*x.
+        # Concretely pandas-ta uses: source - midpoint, then linear regression
+        # forecast; we use EPMA-style endpoint projection which is the same
+        # linear-reg forecast expressed as a FIR filter.
+        hh = high.rolling(mom_window, min_periods=mom_window).max()
+        ll = low.rolling(mom_window, min_periods=mom_window).min()
+        sma_close = SMA.compute({'close': close}, {'window': mom_window})['sma']
+        midpoint = ((hh + ll) / 2.0 + sma_close) / 2.0
+        raw_momentum = close - midpoint
+
+        # Apply linear-regression endpoint projection to smooth (Carter uses
+        # "lsma" which is equivalent to EPMA of raw_momentum).
+        weights = _epma_weights(mom_window)
+        rm = raw_momentum.to_numpy(dtype=np.float64, copy=False)
+        n = len(rm)
+        momentum = np.full(n, np.nan)
+        if n >= mom_window:
+            # Need non-NaN input to convolve; manually handle warmup region
+            # by skipping bars where raw_momentum is NaN.
+            valid_mask = ~np.isnan(rm)
+            if valid_mask.any():
+                first_valid = int(np.argmax(valid_mask))
+                tail = rm[first_valid:]
+                if len(tail) >= mom_window:
+                    conv = np.convolve(tail, weights[::-1], mode='valid')
+                    momentum[first_valid + mom_window - 1:] = conv
+
+        return {
+            'squeeze_on': pd.Series(squeeze_on.values, index=close.index, name='squeeze_on'),
+            'squeeze_fired': pd.Series(squeeze_fired.values, index=close.index, name='squeeze_fired'),
+            'momentum': pd.Series(momentum, index=close.index, name='ttm_momentum'),
+        }

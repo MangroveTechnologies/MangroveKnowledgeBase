@@ -6,12 +6,18 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [1.0.0] - Unreleased
 
-Comprehensive expansion to 95 indicators and 154+ signals. This release adds 25 standard
-indicators (Priority A from the v0.4.0 gap analysis) and 4 signal patterns, bringing the
-library to feature parity with production trading platforms. All new indicators follow
-the vectorization discipline established in prior optimization waves: no
-`.rolling().apply(python_callback)`, cached per-window constants, `np.fmax`/`sliding_window_view`
-where appropriate, stateless classmethods.
+Comprehensive expansion to 99 indicators and 223 signals. This release adds 29 standard
+indicators (Priority A from the v0.4.0 gap analysis plus four signal-pattern indicators)
+and 87 signals, bringing the library to feature parity with production trading platforms.
+All new indicators follow the vectorization discipline established in prior optimization
+waves: no `.rolling().apply(python_callback)`, cached per-window constants,
+`np.fmax`/`sliding_window_view` where appropriate, stateless classmethods.
+
+Every new indicator is audited for numerical correctness against `pandas-ta` (indicator
+audit) and every new signal is verified bar-by-bar against a sliding-window ground truth
+(zero false positives, zero false negatives on a 1294-bar BTC daily fixture). Every
+indicator is benchmarked on the same fixture and tier-classified
+(fast < 0.5 ms, moderate 0.5-2 ms, slow 2-20 ms).
 
 ### Added (Wave A -- Simple Moving Averages)
 - **DEMA** (Double Exponential Moving Average). Reference: Patrick Mulloy, *Technical Analysis of Stocks & Commodities*, Jan 1994.
@@ -55,6 +61,13 @@ where appropriate, stateless classmethods.
 - **STARCBands** (Stoller Average Range Channels). `SMA +/- multiplier * ATR`, with independent windows for SMA and ATR. Similar to Keltner Channel but with configurable separate windows. Reference: Manning Stoller.
 - **VolatilityStop**. Stdev-of-returns envelope centered on prev close -- `prev_close +/- multiplier * stdev(returns) * prev_close`. Distinct from ATR Trailing Stop in both construction (stdev vs TR) and regime (static envelope vs ratcheting stop).
 - 10 new signals: `natr_high_volatility`, `natr_low_volatility` (FILTER), `atr_trailing_stop_long/short` (FILTER), `atr_trailing_stop_flip_up/down` (TRIGGER), `starc_upper_breakout`, `starc_lower_breakout` (FILTER), `volatility_stop_upper`, `volatility_stop_lower` (FILTER).
+
+### Added (Wave G -- Signal Patterns)
+- **MARibbon**. Generalized moving-average ribbon: computes N SMAs over user-supplied windows and returns three mutually-exclusive regime flags (`ribbon_bullish` = all windows monotonic descending in value, `ribbon_bearish` = monotonic ascending, `ribbon_tangled` = neither). Default windows are the 8-MA Fibonacci ribbon `[5, 8, 13, 21, 34, 55, 89, 144]`; any monotonically-increasing window list is accepted.
+- **TTMSqueeze** (John Carter, *Mastering the Trade*, 2005). Detects BB-inside-KC "squeeze" compression, squeeze release (prev bar on, current bar off), and Carter's linear-regression momentum histogram `LR_slope(close - (highest_high + lowest_low)/2 + SMA(close))/2`. Reuses our BollingerBands and KeltnerChannel; momentum via vectorized `sliding_window_view` + closed-form linear regression coefficients.
+- **Divergence** (Cardwell / Constance Brown, *Technical Analysis for the Trading Professional*, 2000). Generic four-way divergence detector between price and an arbitrary indicator series (RSI/MACD/OBV/...). Swing points detected via `scipy.signal.argrelextrema`; fire bar is `max(price_swing, indicator_swing) + swing_window` to guarantee lookahead-free evaluation (sliding-window and full-dataset verdicts match bit-exactly).
+- **MultiTFTrend**. Higher-timeframe confirmation indicator. Resamples OHLC to a higher timeframe (e.g., `1W`), computes `EMA(window)` slope direction on the higher TF, and forward-fills back to the base-TF index so every bar carries the enclosing higher-TF trend. Requires a DatetimeIndex; returns `0` for bars that cannot be confirmed.
+- 12 new signals: `ma_ribbon_bullish/bearish/tangled` (FILTER), `ttm_squeeze_active` (FILTER), `ttm_squeeze_fired_bullish/bearish` (TRIGGER), `rsi_bullish_divergence/bearish_divergence/hidden_bullish_divergence/hidden_bearish_divergence` (TRIGGER), `multi_tf_trend_bullish/bearish` (FILTER).
 
 ## [0.4.0] - 2026-04-16
 

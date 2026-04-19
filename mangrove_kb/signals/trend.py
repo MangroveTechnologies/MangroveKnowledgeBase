@@ -44,6 +44,10 @@ from mangrove_kb.indicators import (
     ChandelierExit,
     WilliamsAlligator,
     SuperTrend,
+    MARibbon,
+    MultiTFTrend,
+    Divergence,
+    RSI,
     TRIX,
     MassIndex,
     Ichimoku,
@@ -2632,3 +2636,413 @@ def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float =
     if pd.isna(prev) or pd.isna(curr):
         return False
     return bool(prev == 1 and curr == -1)
+
+
+# =============================================================================
+# Wave G Signal Patterns (MARibbon, TTMSqueeze, Divergence, MultiTFTrend)
+# =============================================================================
+
+from mangrove_kb.indicators import TTMSqueeze  # local import to avoid circular issues at module load
+
+
+# --- MA Ribbon signals ---
+
+_DEFAULT_RIBBON_WINDOWS = (5, 8, 13, 21, 34, 55, 89, 144)
+
+
+@RuleRegistry.register("ma_ribbon_bullish")
+def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
+    """
+    Check if all MAs in the ribbon are in strict bullish alignment (faster above slower).
+
+    Uses 8 Fibonacci-spaced SMAs by default. Strict alignment means
+    SMA(5) > SMA(8) > SMA(13) > ... > SMA(144). This is a strong trend filter
+    -- when true, the market is in a clear uptrend across all horizons.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+
+    Returns:
+        bool: True if ribbon is bullish-aligned on the current bar.
+    """
+    closes = df["Close"]
+    windows_list = list(windows)
+    if len(closes) < max(windows_list):
+        return False
+    out = MARibbon.compute(data={'close': closes}, params={'windows': windows_list})
+    if pd.isna(out['ribbon_bullish'].iloc[-1]):
+        return False
+    return bool(out['ribbon_bullish'].iloc[-1])
+
+
+@RuleRegistry.register("ma_ribbon_bearish")
+def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
+    """
+    Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+
+    Returns:
+        bool: True if ribbon is bearish-aligned on the current bar.
+    """
+    closes = df["Close"]
+    windows_list = list(windows)
+    if len(closes) < max(windows_list):
+        return False
+    out = MARibbon.compute(data={'close': closes}, params={'windows': windows_list})
+    if pd.isna(out['ribbon_bearish'].iloc[-1]):
+        return False
+    return bool(out['ribbon_bearish'].iloc[-1])
+
+
+@RuleRegistry.register("ma_ribbon_tangled")
+def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
+    """
+    Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter).
+
+    Useful as a no-trade filter during choppy markets.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+
+    Returns:
+        bool: True if ribbon is neither bullish nor bearish aligned.
+    """
+    closes = df["Close"]
+    windows_list = list(windows)
+    if len(closes) < max(windows_list):
+        return False
+    out = MARibbon.compute(data={'close': closes}, params={'windows': windows_list})
+    if pd.isna(out['ribbon_tangled'].iloc[-1]):
+        return False
+    return bool(out['ribbon_tangled'].iloc[-1])
+
+
+# --- TTM Squeeze signals ---
+
+_TTM_DEFAULTS = dict(bb_window=20, bb_std=2.0, kc_window=20, kc_atr_mult=1.5, mom_window=12)
+
+
+@RuleRegistry.register("ttm_squeeze_active")
+def ttm_squeeze_active(
+    df: pd.DataFrame,
+    bb_window: int = 20, bb_std: float = 2.0,
+    kc_window: int = 20, kc_atr_mult: float = 1.5,
+    mom_window: int = 12,
+) -> bool:
+    """
+    Check if the TTM Squeeze is active (BB inside KC -- volatility contraction).
+
+    Use as a no-breakout filter: when true, market is coiled and waiting
+    for a directional move.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        bb_window (int): Bollinger Band window. Range: 5-100. Default: 20.
+        bb_std (float): Bollinger std multiplier. Range: 1.0-4.0. Default: 2.0.
+        kc_window (int): Keltner Channel window (used for both EMA and ATR). Range: 5-100. Default: 20.
+        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-3.0. Default: 1.5.
+        mom_window (int): Momentum regression window. Range: 5-50. Default: 12.
+
+    Returns:
+        bool: True if squeeze is on.
+    """
+    if len(df) < max(bb_window, kc_window) + 1:
+        return False
+    out = TTMSqueeze.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
+                'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
+    )
+    if pd.isna(out['squeeze_on'].iloc[-1]):
+        return False
+    return bool(out['squeeze_on'].iloc[-1])
+
+
+@RuleRegistry.register("ttm_squeeze_fired_bullish")
+def ttm_squeeze_fired_bullish(
+    df: pd.DataFrame,
+    bb_window: int = 20, bb_std: float = 2.0,
+    kc_window: int = 20, kc_atr_mult: float = 1.5,
+    mom_window: int = 12,
+) -> bool:
+    """
+    Detect TTM Squeeze release with bullish momentum.
+
+    Fires when the squeeze just ended (was on previous bar, off now) AND
+    momentum is positive. Classic Carter entry signal.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        bb_window (int): Bollinger Band window. Range: 5-100. Default: 20.
+        bb_std (float): Bollinger std multiplier. Range: 1.0-4.0. Default: 2.0.
+        kc_window (int): Keltner Channel window. Range: 5-100. Default: 20.
+        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-3.0. Default: 1.5.
+        mom_window (int): Momentum regression window. Range: 5-50. Default: 12.
+
+    Returns:
+        bool: True on bar where squeeze fires with positive momentum.
+    """
+    if len(df) < max(bb_window, kc_window) + 2:
+        return False
+    out = TTMSqueeze.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
+                'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
+    )
+    fired = out['squeeze_fired'].iloc[-1]
+    mom = out['momentum'].iloc[-1]
+    if pd.isna(fired) or pd.isna(mom):
+        return False
+    return bool(fired and mom > 0)
+
+
+@RuleRegistry.register("ttm_squeeze_fired_bearish")
+def ttm_squeeze_fired_bearish(
+    df: pd.DataFrame,
+    bb_window: int = 20, bb_std: float = 2.0,
+    kc_window: int = 20, kc_atr_mult: float = 1.5,
+    mom_window: int = 12,
+) -> bool:
+    """
+    Detect TTM Squeeze release with bearish momentum.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        bb_window (int): Bollinger Band window. Range: 5-100. Default: 20.
+        bb_std (float): Bollinger std multiplier. Range: 1.0-4.0. Default: 2.0.
+        kc_window (int): Keltner Channel window. Range: 5-100. Default: 20.
+        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-3.0. Default: 1.5.
+        mom_window (int): Momentum regression window. Range: 5-50. Default: 12.
+
+    Returns:
+        bool: True on bar where squeeze fires with negative momentum.
+    """
+    if len(df) < max(bb_window, kc_window) + 2:
+        return False
+    out = TTMSqueeze.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
+                'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
+    )
+    fired = out['squeeze_fired'].iloc[-1]
+    mom = out['momentum'].iloc[-1]
+    if pd.isna(fired) or pd.isna(mom):
+        return False
+    return bool(fired and mom < 0)
+
+
+# --- Divergence signals (RSI-based by default; user supplies indicator via helper) ---
+
+def _rsi_divergence(df: pd.DataFrame, rsi_window: int, swing_window: int, min_swing_distance: int):
+    closes = df["Close"]
+    if len(closes) < rsi_window + 2 * swing_window + min_swing_distance:
+        return None
+    rsi = RSI.compute(data={'close': closes}, params={'window': rsi_window})['rsi']
+    out = Divergence.compute(
+        data={'price': closes, 'indicator': rsi},
+        params={'swing_window': swing_window, 'min_swing_distance': min_swing_distance},
+    )
+    return out
+
+
+@RuleRegistry.register("rsi_bullish_divergence")
+def rsi_bullish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a regular bullish RSI divergence: price lower low, RSI higher low.
+
+    Classic reversal signal indicating bearish momentum is weakening.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between the two swing points compared. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on bar where regular bullish divergence is confirmed.
+    """
+    out = _rsi_divergence(df, rsi_window, swing_window, min_swing_distance)
+    if out is None:
+        return False
+    return bool(out['regular_bullish'].iloc[-1])
+
+
+@RuleRegistry.register("rsi_bearish_divergence")
+def rsi_bearish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a regular bearish RSI divergence: price higher high, RSI lower high.
+
+    Classic reversal signal indicating bullish momentum is weakening.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between the two swing points compared. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on bar where regular bearish divergence is confirmed.
+    """
+    out = _rsi_divergence(df, rsi_window, swing_window, min_swing_distance)
+    if out is None:
+        return False
+    return bool(out['regular_bearish'].iloc[-1])
+
+
+@RuleRegistry.register("rsi_hidden_bullish_divergence")
+def rsi_hidden_bullish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a hidden bullish RSI divergence: price higher low, RSI lower low.
+
+    Continuation signal in an uptrend -- indicates the uptrend is still
+    intact despite a pullback.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between swings. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on bar where hidden bullish divergence is confirmed.
+    """
+    out = _rsi_divergence(df, rsi_window, swing_window, min_swing_distance)
+    if out is None:
+        return False
+    return bool(out['hidden_bullish'].iloc[-1])
+
+
+@RuleRegistry.register("rsi_hidden_bearish_divergence")
+def rsi_hidden_bearish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a hidden bearish RSI divergence: price lower high, RSI higher high.
+
+    Continuation signal in a downtrend.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between swings. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on bar where hidden bearish divergence is confirmed.
+    """
+    out = _rsi_divergence(df, rsi_window, swing_window, min_swing_distance)
+    if out is None:
+        return False
+    return bool(out['hidden_bearish'].iloc[-1])
+
+
+# --- Multi-Timeframe Trend signals ---
+
+@RuleRegistry.register("multi_tf_trend_bullish")
+def multi_tf_trend_bullish(
+    df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
+) -> bool:
+    """
+    Check if the higher-timeframe EMA is rising (trend confirmation filter).
+
+    Requires a DatetimeIndex. Resamples to the specified higher timeframe,
+    computes an EMA on the resampled closes, and returns True if the EMA
+    slope is positive. Broadcasts back to the current bar's timestamp so
+    lower-TF signals can be filtered by higher-TF trend.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
+        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1W.
+        window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
+        slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
+
+    Returns:
+        bool: True if higher-TF trend == +1 on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
+        return False
+    out = MultiTFTrend.compute(
+        data={'close': closes},
+        params={'higher_tf': higher_tf, 'window': window, 'slope_threshold': slope_threshold},
+    )
+    val = out['higher_tf_trend'].iloc[-1]
+    if pd.isna(val):
+        return False
+    return val == 1
+
+
+@RuleRegistry.register("multi_tf_trend_bearish")
+def multi_tf_trend_bearish(
+    df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
+) -> bool:
+    """
+    Check if the higher-timeframe EMA is falling.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
+        higher_tf (str): Pandas offset alias. Range: 1min-1Y. Default: 1W.
+        window (int): EMA period. Range: 2-100. Default: 10.
+        slope_threshold (float): Slope threshold for non-flat. Range: 0.0-0.5. Default: 0.0.
+
+    Returns:
+        bool: True if higher-TF trend == -1 on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
+        return False
+    out = MultiTFTrend.compute(
+        data={'close': closes},
+        params={'higher_tf': higher_tf, 'window': window, 'slope_threshold': slope_threshold},
+    )
+    val = out['higher_tf_trend'].iloc[-1]
+    if pd.isna(val):
+        return False
+    return val == -1

@@ -49,6 +49,7 @@ from .volatility_indicators import (
     ATRTrailingStop,
     STARCBands,
     VolatilityStop,
+    TTMSqueeze,
 )
 
 # Trend indicators
@@ -69,6 +70,9 @@ from .trend_indicators import (
     ChandelierExit,
     WilliamsAlligator,
     SuperTrend,
+    MARibbon,
+    MultiTFTrend,
+    Divergence,
     MACD,
     Aroon,
     TRIX,
@@ -170,6 +174,7 @@ __all__ = [
     "ATRTrailingStop",
     "STARCBands",
     "VolatilityStop",
+    "TTMSqueeze",
     # Trend indicators
     "SMA",
     "EMA",
@@ -187,6 +192,9 @@ __all__ = [
     "ChandelierExit",
     "WilliamsAlligator",
     "SuperTrend",
+    "MARibbon",
+    "MultiTFTrend",
+    "Divergence",
     "MACD",
     "Aroon",
     "TRIX",
