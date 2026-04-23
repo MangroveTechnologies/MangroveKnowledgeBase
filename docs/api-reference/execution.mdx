@@ -236,20 +236,21 @@ The execution engine reads `cooldown_config` from the strategy's `execution_conf
 
 ```json
 "cooldown_config": {
-  "5m":  {"max_hold_time_hours": 96, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
-  "15m": {"max_hold_time_hours": 48, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
-  "1h":  {"max_hold_time_hours": 24, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
-  "1d":  {"max_hold_time_hours": 10, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
+  "5m":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
+  "15m": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
+  "1h":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
+  "1d":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
 }
 ```
 
 | Key | Description |
 |-----|-------------|
-| `max_hold_time_hours` | Max position hold time in hours for this timeframe |
 | `short_loss_limit` | Losses in `short_window_bars` that trip the short-tier cooldown |
 | `long_loss_limit` | Losses in `long_window_bars` that trip the long-tier cooldown |
 | `short_window_bars` | Rolling lookback AND cooldown duration (bars) for the short tier |
 | `long_window_bars` | Rolling lookback AND cooldown duration (bars) for the long tier |
+
+Max hold time is controlled by `execution_config.time_based_exits.max_hold_bars`, not by `cooldown_config`.
 
 The engine selects the entry keyed to the strategy's primary timeframe. If `cooldown_config` is absent or the timeframe key is missing, it falls back to the legacy flat keys (`cooldown_bars`, `daily_momentum_limit`, `weekly_momentum_limit`) and emits a deprecation warning.
 

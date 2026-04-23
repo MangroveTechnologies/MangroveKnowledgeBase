@@ -54,7 +54,7 @@ curl -X POST http://localhost:5001/api/v1/backtesting/backtest \
     "volatility_mode": "stddev",
     "enable_volatility_adjustment": false,
     "cooldown_config": {
-      "1h": {"max_hold_time_hours": 24, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
+      "1h": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
     },
     "strategy_json": "{\"name\": \"ETH Strategy\", \"asset\": \"ETH\", \"entry\": [{\"name\": \"macd_bullish_cross\", \"timeframe\": \"1h\", \"signal_type\": \"TRIGGER\", \"params\": {\"window_fast\": 12, \"window_slow\": 26, \"window_sign\": 9}}, {\"name\": \"is_above_sma\", \"timeframe\": \"1h\", \"params\": {\"window\": 50}, \"signal_type\": \"FILTER\"}], \"exit\": []}"
   }'
@@ -83,7 +83,7 @@ response = requests.post(
         "volatility_mode": "stddev",
         "enable_volatility_adjustment": False,
         "cooldown_config": {
-            "1h": {"max_hold_time_hours": 24, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
+            "1h": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
         },
         "strategy_json": '{"name": "ETH Strategy", "asset": "ETH", "entry": [{"name": "macd_bullish_cross", "timeframe": "1h", "signal_type": "TRIGGER", "params": {"window_fast": 12, "window_slow": 26, "window_sign": 9}}, {"name": "is_above_sma", "timeframe": "1h", "params": {"window": 50}, "signal_type": "FILTER"}], "exit": []}'
     }
@@ -180,7 +180,7 @@ curl -X POST http://localhost:5001/api/v1/backtesting/backtest/bulk \
     "volatility_mode": "stddev",
     "enable_volatility_adjustment": false,
     "cooldown_config": {
-      "1h": {"max_hold_time_hours": 24, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
+      "1h": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
     }
   }'
 ```
@@ -193,20 +193,21 @@ Pass `cooldown_config` as a top-level key in the backtest request body to contro
 
 ```json
 "cooldown_config": {
-  "5m":  {"max_hold_time_hours": 96, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
-  "15m": {"max_hold_time_hours": 48, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
-  "1h":  {"max_hold_time_hours": 24, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
-  "1d":  {"max_hold_time_hours": 10, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
+  "5m":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
+  "15m": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
+  "1h":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
+  "1d":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
 }
 ```
 
 | Key | Description |
 |-----|-------------|
-| `max_hold_time_hours` | Max position hold time in hours for this timeframe |
 | `short_loss_limit` | Losses in `short_window_bars` that trip the short-tier cooldown |
 | `long_loss_limit` | Losses in `long_window_bars` that trip the long-tier cooldown |
 | `short_window_bars` | Rolling lookback AND cooldown duration (bars) for the short tier |
 | `long_window_bars` | Rolling lookback AND cooldown duration (bars) for the long tier |
+
+Max hold time is controlled by `execution_config.max_hold_bars`, not by `cooldown_config`.
 
 <Warning>
 **Deprecated parameters:** `cooldown_bars`, `daily_momentum_limit`, and `weekly_momentum_limit` are deprecated flat keys accepted for backward compatibility during the 90-day grace period. Migrate to `cooldown_config` before the next major version. The legacy keys are not shown in the examples above.
