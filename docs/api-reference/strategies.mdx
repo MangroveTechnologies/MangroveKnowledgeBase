@@ -258,8 +258,26 @@ Each strategy includes `execution_config` for risk management:
 | `atr_volatility_factor` | number | ATR multiplier for stop loss distance |
 | `max_open_positions` | integer | Maximum concurrent open positions |
 | `max_trades_per_day` | integer | Daily trade limit |
-| `cooldown_bars` | integer | Bars to wait between trades |
 | `max_hold_bars` | integer | Maximum bars to hold any position |
+| `cooldown_config` | object | Per-timeframe cooldown settings (see below) |
+| ~~`cooldown_bars`~~ | integer | **Deprecated.** Use `cooldown_config[tf].short_window_bars`. |
+| ~~`daily_momentum_limit`~~ | number | **Deprecated.** Use `cooldown_config[tf].short_loss_limit`. |
+| ~~`weekly_momentum_limit`~~ | number | **Deprecated.** Use `cooldown_config[tf].long_loss_limit`. |
+
+### cooldown_config
+
+`cooldown_config` is a nested object keyed by primary timeframe. Each entry controls loss-streak limits and the resulting cooldown duration for that timeframe. The window bar count is both the rolling lookback and the cooldown duration when the limit trips.
+
+```json
+"cooldown_config": {
+  "5m":  {"max_hold_time_hours": 96, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
+  "15m": {"max_hold_time_hours": 48, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
+  "1h":  {"max_hold_time_hours": 24, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
+  "1d":  {"max_hold_time_hours": 10, "short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
+}
+```
+
+See the [Risk Management guide](/guides/risk-management) for full tuning details and migration instructions.
 
 ## Error Codes
 
