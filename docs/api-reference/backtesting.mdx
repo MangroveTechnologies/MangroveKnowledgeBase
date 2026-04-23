@@ -53,9 +53,9 @@ curl -X POST http://localhost:5001/api/v1/backtesting/backtest \
     "target_volatility": 0.02,
     "volatility_mode": "stddev",
     "enable_volatility_adjustment": false,
-    "cooldown_bars": 24,
-    "daily_momentum_limit": 3.0,
-    "weekly_momentum_limit": 3.0,
+    "cooldown_config": {
+      "1h": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
+    },
     "strategy_json": "{\"name\": \"ETH Strategy\", \"asset\": \"ETH\", \"entry\": [{\"name\": \"macd_bullish_cross\", \"timeframe\": \"1h\", \"signal_type\": \"TRIGGER\", \"params\": {\"window_fast\": 12, \"window_slow\": 26, \"window_sign\": 9}}, {\"name\": \"is_above_sma\", \"timeframe\": \"1h\", \"params\": {\"window\": 50}, \"signal_type\": \"FILTER\"}], \"exit\": []}"
   }'
 ```
@@ -82,9 +82,9 @@ response = requests.post(
         "target_volatility": 0.02,
         "volatility_mode": "stddev",
         "enable_volatility_adjustment": False,
-        "cooldown_bars": 24,
-        "daily_momentum_limit": 3.0,
-        "weekly_momentum_limit": 3.0,
+        "cooldown_config": {
+            "1h": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
+        },
         "strategy_json": '{"name": "ETH Strategy", "asset": "ETH", "entry": [{"name": "macd_bullish_cross", "timeframe": "1h", "signal_type": "TRIGGER", "params": {"window_fast": 12, "window_slow": 26, "window_sign": 9}}, {"name": "is_above_sma", "timeframe": "1h", "params": {"window": 50}, "signal_type": "FILTER"}], "exit": []}'
     }
 )
@@ -179,10 +179,38 @@ curl -X POST http://localhost:5001/api/v1/backtesting/backtest/bulk \
     "target_volatility": 0.02,
     "volatility_mode": "stddev",
     "enable_volatility_adjustment": false,
-    "cooldown_bars": 24,
-    "daily_momentum_limit": 3.0,
-    "weekly_momentum_limit": 3.0
+    "cooldown_config": {
+      "1h": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48, "long_window_bars": 144}
+    }
   }'
 ```
 
 Individual strategy failures are captured per-result without aborting the batch. The `data_fetches` field shows how many unique API calls were made.
+
+## Cooldown Parameters
+
+Pass `cooldown_config` as a top-level key in the backtest request body to control loss-streak limits and cooldown durations. The engine selects the entry keyed to the `interval` value of the request.
+
+```json
+"cooldown_config": {
+  "5m":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
+  "15m": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
+  "1h":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
+  "1d":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
+}
+```
+
+| Key | Description |
+|-----|-------------|
+| `short_loss_limit` | Losses in `short_window_bars` that trip the short-tier cooldown |
+| `long_loss_limit` | Losses in `long_window_bars` that trip the long-tier cooldown |
+| `short_window_bars` | Rolling lookback AND cooldown duration (bars) for the short tier |
+| `long_window_bars` | Rolling lookback AND cooldown duration (bars) for the long tier |
+
+Max hold time is controlled by `execution_config.max_hold_bars`, not by `cooldown_config`.
+
+<Warning>
+**Deprecated parameters:** `cooldown_bars`, `daily_momentum_limit`, and `weekly_momentum_limit` are deprecated flat keys accepted for backward compatibility during the 90-day grace period. Migrate to `cooldown_config` before the next major version. The legacy keys are not shown in the examples above.
+</Warning>
+
+See the [Risk Management guide](/guides/risk-management) for full cooldown tuning details.
