@@ -32,7 +32,7 @@ MangroveAI provides **223 active signals** across five categories:
 
 Every signal is classified as exactly one of two types. This classification determines how the signal is used in a strategy.
 
-### TRIGGER signals (66 active)
+### TRIGGER signals (108 active)
 
 A TRIGGER detects a **discrete event** -- something that just happened at this specific bar.
 
@@ -45,7 +45,7 @@ Common patterns:
 
 TRIGGERs are typically `true` for only one or a few bars, then flip back to `false`. They fire at a specific moment.
 
-### FILTER signals (70 active)
+### FILTER signals (115 active)
 
 A FILTER checks an **ongoing condition** -- whether the market is currently in a certain state.
 
@@ -141,13 +141,13 @@ Every signal has configurable parameters with documented ranges and defaults. Yo
 
 <CodeGroup>
 ```bash cURL
-curl http://localhost:5001/api/v1/signals/rsi_oversold
+curl https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold
 ```
 
 ```python Python
 import requests
 
-response = requests.get("http://localhost:5001/api/v1/signals/rsi_oversold")
+response = requests.get("https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold")
 signal = response.json()
 
 for param_name, param_info in signal["metadata"]["params"].items():
@@ -156,7 +156,7 @@ for param_name, param_info in signal["metadata"]["params"].items():
 ```
 
 ```javascript JavaScript
-const response = await fetch("http://localhost:5001/api/v1/signals/rsi_oversold");
+const response = await fetch("https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold");
 const signal = await response.json();
 
 for (const [name, info] of Object.entries(signal.metadata.params)) {

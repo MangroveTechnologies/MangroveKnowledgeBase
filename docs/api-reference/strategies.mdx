@@ -10,7 +10,7 @@ The Strategies API provides CRUD operations for managing trading strategies. Str
 ## Base URL
 
 ```
-http://localhost:5001/api/v1/strategies
+https://api.mangrovedeveloper.ai/api/v1/strategies
 ```
 
 ## Authentication
@@ -63,14 +63,14 @@ List all strategies for the authenticated user and organization.
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/strategies?skip=0&limit=10"
+  "https://api.mangrovedeveloper.ai/api/v1/strategies?skip=0&limit=10"
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    "http://localhost:5001/api/v1/strategies",
+    "https://api.mangrovedeveloper.ai/api/v1/strategies",
     headers={"Authorization": f"Bearer {token}"},
     params={"skip": 0, "limit": 10}
 )
@@ -116,7 +116,7 @@ Create a new trading strategy.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST "http://localhost:5001/api/v1/strategies" \
+curl -X POST "https://api.mangrovedeveloper.ai/api/v1/strategies" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -143,7 +143,7 @@ curl -X POST "http://localhost:5001/api/v1/strategies" \
 
 ```python Python
 response = requests.post(
-    "http://localhost:5001/api/v1/strategies",
+    "https://api.mangrovedeveloper.ai/api/v1/strategies",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "name": "BTC RSI Strategy",
@@ -209,12 +209,12 @@ Retrieve a specific strategy by ID with full details including rules, execution_
 <CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/strategies/278bba9d-7f4c-476c-9dea-a1a44f1fcfba"
+  "https://api.mangrovedeveloper.ai/api/v1/strategies/278bba9d-7f4c-476c-9dea-a1a44f1fcfba"
 ```
 
 ```python Python
 response = requests.get(
-    f"http://localhost:5001/api/v1/strategies/{strategy_id}",
+    f"https://api.mangrovedeveloper.ai/api/v1/strategies/{strategy_id}",
     headers={"Authorization": f"Bearer {token}"}
 )
 strategy = response.json()["strategy"]
@@ -228,7 +228,7 @@ strategy = response.json()["strategy"]
 Delete a strategy by ID. Only the strategy owner can delete it.
 
 ```bash
-curl -X DELETE "http://localhost:5001/api/v1/strategies/278bba9d-7f4c-476c-9dea-a1a44f1fcfba" \
+curl -X DELETE "https://api.mangrovedeveloper.ai/api/v1/strategies/278bba9d-7f4c-476c-9dea-a1a44f1fcfba" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -239,7 +239,7 @@ curl -X DELETE "http://localhost:5001/api/v1/strategies/278bba9d-7f4c-476c-9dea-
 Update a strategy's deployment status. Valid values: `draft`, `inactive`, `paper`, `live`, `archived`.
 
 ```bash
-curl -X PATCH "http://localhost:5001/api/v1/strategies/278bba9d-7f4c-476c-9dea-a1a44f1fcfba/status" \
+curl -X PATCH "https://api.mangrovedeveloper.ai/api/v1/strategies/278bba9d-7f4c-476c-9dea-a1a44f1fcfba/status" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"status": "paper"}'

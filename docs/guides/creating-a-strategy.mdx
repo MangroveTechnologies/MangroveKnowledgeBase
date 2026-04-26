@@ -24,7 +24,7 @@ export TOKEN="your-jwt-token-here"
 ```python Python
 import requests
 
-BASE_URL = "http://localhost:5001"
+BASE_URL = "https://api.mangrovedeveloper.ai"
 TOKEN = "your-jwt-token-here"
 HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
@@ -33,7 +33,7 @@ HEADERS = {
 ```
 
 ```javascript JavaScript
-const BASE_URL = "http://localhost:5001";
+const BASE_URL = "https://api.mangrovedeveloper.ai";
 const TOKEN = "your-jwt-token-here";
 const headers = {
   Authorization: `Bearer ${TOKEN}`,
@@ -48,7 +48,7 @@ Start by exploring what signals are available. The signals endpoint returns all 
 
 <CodeGroup>
 ```bash cURL
-curl -s "http://localhost:5001/api/v1/signals?limit=100" | python3 -m json.tool
+curl -s "https://api.mangrovedeveloper.ai/api/v1/signals?limit=100" | python3 -m json.tool
 ```
 
 ```python Python
@@ -75,7 +75,7 @@ You can also search for signals by name or keyword:
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "http://localhost:5001/api/v1/signals/search" \
+curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/signals/search" \
   -H "Content-Type: application/json" \
   -d '{"query": "macd", "search_type": "name"}'
 ```
@@ -107,7 +107,7 @@ data.signals.forEach((sig) => {
 Not sure which signals to use? Describe your trading idea in plain English using the semantic match endpoint:
 
 ```bash
-curl -X POST "http://localhost:5001/api/v1/signals/match" \
+curl -X POST "https://api.mangrovedeveloper.ai/api/v1/signals/match" \
   -H "Content-Type: application/json" \
   -d '{"user_description": "I want to buy when momentum is turning bullish", "num_results": 5}'
 ```
@@ -129,10 +129,10 @@ First, inspect each signal to understand its parameters:
 <CodeGroup>
 ```bash cURL
 # Check the TRIGGER signal
-curl -s "http://localhost:5001/api/v1/signals/macd_bullish_cross" | python3 -m json.tool
+curl -s "https://api.mangrovedeveloper.ai/api/v1/signals/macd_bullish_cross" | python3 -m json.tool
 
 # Check the FILTER signal
-curl -s "http://localhost:5001/api/v1/signals/is_above_sma" | python3 -m json.tool
+curl -s "https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma" | python3 -m json.tool
 ```
 
 ```python Python
@@ -192,7 +192,7 @@ Now assemble everything into a `POST /api/v1/strategies` request. The canonical 
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "http://localhost:5001/api/v1/strategies" \
+curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/strategies" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -396,7 +396,7 @@ Retrieve your newly created strategy to confirm everything was saved correctly:
 <CodeGroup>
 ```bash cURL
 curl -s -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/strategies/a3f1b2c4-5678-4def-9abc-1234567890ab" \
+  "https://api.mangrovedeveloper.ai/api/v1/strategies/a3f1b2c4-5678-4def-9abc-1234567890ab" \
   | python3 -m json.tool
 ```
 

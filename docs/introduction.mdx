@@ -28,12 +28,12 @@ Mangrove is a trading strategy development and backtesting platform. It provides
 
 MangroveAI is built as a Flask REST API with 60+ endpoints across 16 domains:
 
-- **Signals** -- 223 technical indicator signals with parameter validation and semantic matching
+- **Signals** -- 223 trading signals (108 TRIGGER, 115 FILTER) built on a library of 99 technical indicators
 - **Strategies** -- CRUD operations with signal composition rules (1 TRIGGER + 1 FILTER per entry)
-- **Backtesting** -- Historical strategy testing with CoinAPI market data integration
+- **Backtesting** -- Historical strategy testing with market data integration
 - **Execution** -- Real-time strategy evaluation with position and order management
-- **AI Copilot** -- 5-state conversational workflow for guided strategy creation
-- **Crypto Assets** -- 19 endpoints for asset data, risk scoring, and on-chain analytics
+- **AI Copilot** -- Conversational workflow for guided strategy creation
+- **Crypto Assets** -- Asset data, risk scoring, and on-chain analytics
 - **Market Data** -- OHLCV, trades, and quotes from multiple providers
 
 ## Who This Is For
@@ -42,9 +42,7 @@ MangroveAI is built as a Flask REST API with 60+ endpoints across 16 domains:
 
 **AI Agents** consuming MangroveAI endpoints programmatically. You need structured, machine-readable API documentation with clear parameter schemas.
 
-**Traders and Researchers** exploring signals and indicators. The Knowledge Base covers market foundations, strategy design, risk management, and a comprehensive indicator reference.
-
-**Contributors** working on the platform. Architecture docs, development guides, and deployment instructions are in the Development section.
+**Traders and Researchers** exploring signals and indicators. The Knowledge Base covers market foundations, strategy design, risk management, and a comprehensive indicator reference. You can also use the open-source `mangrove-kb` Python package to compute signals and indicators locally without going through the API.
 
 ## Quick Links
 
@@ -74,7 +72,7 @@ MangroveAI is built as a Flask REST API with 60+ endpoints across 16 domains:
 All API endpoints use the following base URL pattern:
 
 ```
-http://localhost:5001/api/v1
+https://api.mangrovedeveloper.ai/api/v1
 ```
 
 For production deployments, replace with your configured domain.

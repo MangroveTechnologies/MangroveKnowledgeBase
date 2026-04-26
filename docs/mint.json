@@ -68,42 +68,27 @@
       "group": "Guides",
       "pages": [
         "guides/understanding-signals",
+        "guides/signal-architecture",
         "guides/creating-a-strategy",
         "guides/running-a-backtest",
+        "guides/backtesting-guide",
         "guides/using-the-ai-copilot",
         "guides/risk-management"
       ]
     },
     {
-      "group": "Architecture",
-      "pages": [
-        "architecture/overview",
-        "architecture/domain-driven-design"
-      ]
-    },
-    {
       "group": "Knowledge Base",
       "pages": [
-        "knowledge-base-source/01-market-foundations",
-        "knowledge-base-source/02-instruments-market-mechanics",
-        "knowledge-base-source/03-core-trading-concepts",
-        "knowledge-base-source/04-strategy-design-modeling",
-        "knowledge-base-source/05-risk-management",
-        "knowledge-base-source/06-indicators",
-        "knowledge-base-source/07-chart-patterns",
-        "knowledge-base-source/08-quantitative-analysis",
-        "knowledge-base-source/09-glossary",
-        "knowledge-base-source/10-signals-quick-reference"
-      ]
-    },
-    {
-      "group": "Development",
-      "pages": [
-        "development/getting-started",
-        "development/docker-setup",
-        "development/testing-guide",
-        "development/api-versioning",
-        "development/commit-standards"
+        "knowledge-base/market-foundations",
+        "knowledge-base/instruments",
+        "knowledge-base/trading-concepts",
+        "knowledge-base/strategy-design",
+        "knowledge-base/risk-management",
+        "knowledge-base/indicators",
+        "knowledge-base/chart-patterns",
+        "knowledge-base/quantitative-analysis",
+        "knowledge-base/signals-quick-reference",
+        "knowledge-base/glossary"
       ]
     }
   ],

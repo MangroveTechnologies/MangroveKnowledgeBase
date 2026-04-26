@@ -37,7 +37,7 @@ import requests
 import time
 import uuid
 
-BASE_URL = "http://localhost:5001"
+BASE_URL = "https://api.mangrovedeveloper.ai"
 TOKEN = "your-jwt-token-here"
 HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
@@ -47,7 +47,7 @@ SESSION_ID = f"session-{uuid.uuid4()}"
 ```
 
 ```javascript JavaScript
-const BASE_URL = "http://localhost:5001";
+const BASE_URL = "https://api.mangrovedeveloper.ai";
 const TOKEN = "your-jwt-token-here";
 const headers = {
   Authorization: `Bearer ${TOKEN}`,
@@ -63,7 +63,7 @@ Send your first message to the copilot. Describe your trading idea -- you do not
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID" \
+curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/chat/$SESSION_ID" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -115,7 +115,7 @@ After sending a message, poll the conversation endpoint until the copilot's resp
 ```bash cURL
 # Poll every 2 seconds until a new message appears
 while true; do
-  RESPONSE=$(curl -s "http://localhost:5001/api/v1/ai-copilot/conversations/$SESSION_ID" \
+  RESPONSE=$(curl -s "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/conversations/$SESSION_ID" \
     -H "Authorization: Bearer $TOKEN")
 
   MSG_COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(len(json.load(sys.stdin).get('conversation_history',[])))")
@@ -270,7 +270,7 @@ Continue the conversation by sending additional messages to the same session:
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID" \
+curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/chat/$SESSION_ID" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"message": "Can you explain why the win rate is only 52%?"}'
