@@ -1,0 +1,945 @@
+---
+title: "Volatility Signals"
+description: "20 volatility trading signals with parameters, descriptions, and examples."
+---
+
+# Volatility Signals
+
+_20 signals in this category._
+
+See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.
+
+### atr_high_volatility
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if ATR indicates high volatility relative to price. High volatility (ATR as % of close &gt; threshold) can indicate potential trading opportunities or increased risk.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | ATR period |
+| `threshold_pct` | `float` | 0.5 -- 10.0 | `3.0` | ATR as percentage of close threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "atr_high_volatility",
+    "parameters": {
+        "window": 14,
+        "threshold_pct": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "atr_high_volatility",
+  "parameters": {
+    "window": 14,
+    "threshold_pct": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### atr_trailing_stop_flip_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect ATR Trailing Stop flipping from long (+1) to short (-1). Bearish trend-following entry signal.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `14` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "atr_trailing_stop_flip_down",
+    "parameters": {
+        "window": 14,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "atr_trailing_stop_flip_down",
+  "parameters": {
+    "window": 14,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### atr_trailing_stop_flip_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect ATR Trailing Stop flipping from short (-1) to long (+1). Bullish trend-following entry signal.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `14` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "atr_trailing_stop_flip_up",
+    "parameters": {
+        "window": 14,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "atr_trailing_stop_flip_up",
+  "parameters": {
+    "window": 14,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### atr_trailing_stop_long
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if ATR Trailing Stop is in the long regime (+1 direction).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `14` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier for stop distance |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "atr_trailing_stop_long",
+    "parameters": {
+        "window": 14,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "atr_trailing_stop_long",
+  "parameters": {
+    "window": 14,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### atr_trailing_stop_short
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if ATR Trailing Stop is in the short regime (-1 direction).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `14` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier for stop distance |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "atr_trailing_stop_short",
+    "parameters": {
+        "window": 14,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "atr_trailing_stop_short",
+  "parameters": {
+    "window": 14,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### bb_lower_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect price breaking below the lower Bollinger Band. Fires on the bar where price crosses below the lower band, not while price remains below it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | MA period for center band |
+| `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "bb_lower_breakout",
+    "parameters": {
+        "window": 20,
+        "window_dev": 2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bb_lower_breakout",
+  "parameters": {
+    "window": 20,
+    "window_dev": 2
+  }
+}'
+```
+
+</CodeGroup>
+
+### bb_squeeze
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect Bollinger Band squeeze onset (low volatility, potential breakout). Fires on the bar where band width drops below the threshold, not while it remains below.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | MA period for center band |
+| `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
+| `threshold` | `float` | 1.0 -- 20.0 | `5.0` | Band width percentage threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "bb_squeeze",
+    "parameters": {
+        "window": 20,
+        "window_dev": 2,
+        "threshold": 5.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bb_squeeze",
+  "parameters": {
+    "window": 20,
+    "window_dev": 2,
+    "threshold": 5.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### bb_upper_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect price breaking above the upper Bollinger Band. Fires on the bar where price crosses above the upper band, not while price remains above it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | MA period for center band |
+| `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "bb_upper_breakout",
+    "parameters": {
+        "window": 20,
+        "window_dev": 2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "bb_upper_breakout",
+  "parameters": {
+    "window": 20,
+    "window_dev": 2
+  }
+}'
+```
+
+</CodeGroup>
+
+### dc_lower_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking below lower Donchian Channel (new low). Fires on the bar where close drops below the prior period's lower band. The channel is computed from the N bars BEFORE the current bar (offset=1) so the current bar's low doesn't deflate the band it's compared against.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | Lookback period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "dc_lower_breakout",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dc_lower_breakout",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### dc_upper_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking above upper Donchian Channel (new high). Fires on the bar where close exceeds the prior period's upper band. The channel is computed from the N bars BEFORE the current bar (offset=1) so the current bar's high doesn't inflate the band it's compared against.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | Lookback period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "dc_upper_breakout",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dc_upper_breakout",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### kc_lower_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking below lower Keltner Channel band. Fires on the bar where price crosses below the lower band.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | EMA period |
+| `window_atr` | `int` | 5 -- 30 | `10` | ATR period |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
+| `original_version` | `bool` | - | `False` | Use original Keltner Channel formula instead of EMA+ATR |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "kc_lower_breakout",
+    "parameters": {
+        "window": 20,
+        "window_atr": 10,
+        "multiplier": 2.0,
+        "original_version": false
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kc_lower_breakout",
+  "parameters": {
+    "window": 20,
+    "window_atr": 10,
+    "multiplier": 2.0,
+    "original_version": false
+  }
+}'
+```
+
+</CodeGroup>
+
+### kc_upper_breakout
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect price breaking above upper Keltner Channel band. Fires on the bar where price crosses above the upper band.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | EMA period |
+| `window_atr` | `int` | 5 -- 30 | `10` | ATR period |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
+| `original_version` | `bool` | - | `False` | Use original Keltner Channel formula instead of EMA+ATR |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "kc_upper_breakout",
+    "parameters": {
+        "window": 20,
+        "window_atr": 10,
+        "multiplier": 2.0,
+        "original_version": false
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kc_upper_breakout",
+  "parameters": {
+    "window": 20,
+    "window_atr": 10,
+    "multiplier": 2.0,
+    "original_version": false
+  }
+}'
+```
+
+</CodeGroup>
+
+### natr_high_volatility
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if normalized ATR is above a high-volatility threshold. NATR = 100 * ATR / close, so the threshold is a percentage. Values above ~2-3% typically indicate elevated volatility in equities; crypto markets can run 4-6%+ routinely.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `14` | NATR window |
+| `threshold` | `float` | 0.5 -- 20.0 | `2.0` | High volatility threshold as percentage |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "natr_high_volatility",
+    "parameters": {
+        "window": 14,
+        "threshold": 2.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "natr_high_volatility",
+  "parameters": {
+    "window": 14,
+    "threshold": 2.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### natr_low_volatility
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if normalized ATR is below a low-volatility threshold. Useful as a squeeze / consolidation filter.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `14` | NATR window |
+| `threshold` | `float` | 0.1 -- 5.0 | `1.0` | Low volatility threshold as percentage |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "natr_low_volatility",
+    "parameters": {
+        "window": 14,
+        "threshold": 1.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "natr_low_volatility",
+  "parameters": {
+    "window": 14,
+    "threshold": 1.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### starc_lower_breakout
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if close is below the STARC lower band (breakdown).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | SMA window |
+| `window_atr` | `int` | 5 -- 100 | `15` | ATR window |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "starc_lower_breakout",
+    "parameters": {
+        "window": 20,
+        "window_atr": 15,
+        "multiplier": 2.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "starc_lower_breakout",
+  "parameters": {
+    "window": 20,
+    "window_atr": 15,
+    "multiplier": 2.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### starc_upper_breakout
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if close is above the STARC upper band (breakout).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | SMA window |
+| `window_atr` | `int` | 5 -- 100 | `15` | ATR window |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "starc_upper_breakout",
+    "parameters": {
+        "window": 20,
+        "window_atr": 15,
+        "multiplier": 2.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "starc_upper_breakout",
+  "parameters": {
+    "window": 20,
+    "window_atr": 15,
+    "multiplier": 2.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### ulcer_high_risk
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Ulcer Index indicates high downside risk. Higher Ulcer Index values indicate greater downside volatility.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | Lookback period |
+| `threshold` | `float` | 5.0 -- 30.0 | `10.0` | High risk threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ulcer_high_risk",
+    "parameters": {
+        "window": 14,
+        "threshold": 10.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ulcer_high_risk",
+  "parameters": {
+    "window": 14,
+    "threshold": 10.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### ulcer_low_risk
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if Ulcer Index indicates low downside risk. Lower Ulcer Index values indicate lower downside volatility.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | Lookback period |
+| `threshold` | `float` | 1.0 -- 15.0 | `5.0` | Low risk threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ulcer_low_risk",
+    "parameters": {
+        "window": 14,
+        "threshold": 5.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ulcer_low_risk",
+  "parameters": {
+    "window": 14,
+    "threshold": 5.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### volatility_stop_lower
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if close has reached or fallen below the stdev-based volatility lower stop.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | Rolling stdev window |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | Stdev multiplier for stop distance |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "volatility_stop_lower",
+    "parameters": {
+        "window": 20,
+        "multiplier": 2.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "volatility_stop_lower",
+  "parameters": {
+    "window": 20,
+    "multiplier": 2.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### volatility_stop_upper
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if close has reached or exceeded the stdev-based volatility upper stop. Indicates the price has moved multiplier standard deviations above the current bar -- a potential exhaustion / mean-reversion signal.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `20` | Rolling stdev window |
+| `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | Stdev multiplier for stop distance |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "volatility_stop_upper",
+    "parameters": {
+        "window": 20,
+        "multiplier": 2.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "volatility_stop_upper",
+  "parameters": {
+    "window": 20,
+    "multiplier": 2.0
+  }
+}'
+```
+
+</CodeGroup>

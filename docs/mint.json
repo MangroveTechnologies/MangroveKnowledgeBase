@@ -31,8 +31,28 @@
   },
   "tabs": [
     {
+      "name": "SDKs",
+      "url": "sdks"
+    },
+    {
+      "name": "MCP Servers",
+      "url": "mcp-servers"
+    },
+    {
+      "name": "Plugins",
+      "url": "plugins"
+    },
+    {
+      "name": "Templates",
+      "url": "templates"
+    },
+    {
       "name": "API Reference",
       "url": "api-reference"
+    },
+    {
+      "name": "Signals",
+      "url": "signals"
     },
     {
       "name": "Knowledge Base",
@@ -42,7 +62,47 @@
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": ["introduction", "quickstart", "authentication"]
+      "pages": [
+        "introduction",
+        "quickstart",
+        "authentication",
+        "system-overview"
+      ]
+    },
+    {
+      "group": "SDKs",
+      "pages": [
+        "sdks/overview",
+        "sdks/mangroveai",
+        "sdks/mangrove-kb",
+        "sdks/mangrove-markets"
+      ]
+    },
+    {
+      "group": "MCP Servers",
+      "pages": [
+        "mcp-servers/overview",
+        "mcp-servers/mangrove-markets",
+        "mcp-servers/mangrove-trader",
+        "mcp-servers/mangrove-kb",
+        "mcp-servers/openclaw-executive-functions"
+      ]
+    },
+    {
+      "group": "Plugins",
+      "pages": [
+        "plugins/overview",
+        "plugins/claude-code",
+        "plugins/openclaw"
+      ]
+    },
+    {
+      "group": "Templates",
+      "pages": [
+        "templates/overview",
+        "templates/x402-app-template",
+        "templates/x402-plugin-template"
+      ]
     },
     {
       "group": "API Reference",
@@ -61,7 +121,17 @@
       "group": "Signals",
       "pages": [
         "signals/overview",
-        "signals/catalog"
+        "signals/catalog",
+        {
+          "group": "Catalog by category",
+          "pages": [
+            "signals/catalog/momentum",
+            "signals/catalog/trend",
+            "signals/catalog/volume",
+            "signals/catalog/volatility",
+            "signals/catalog/patterns"
+          ]
+        }
       ]
     },
     {

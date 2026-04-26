@@ -1,84 +1,72 @@
 ---
 title: "Introduction"
-description: "Welcome to the Mangrove developer documentation. Build, backtest, and deploy trading strategies with AI-powered tools."
+description: "The Mangrove developer ecosystem — REST APIs, SDKs, MCP servers, and agent plugins for building agentic trading and DEX-aggregation applications."
 ---
 
 # Welcome to Mangrove
 
-Mangrove is a trading strategy development and backtesting platform. It provides a complete toolkit for building, testing, and deploying algorithmic trading strategies -- from signal discovery through backtesting to live execution.
+Mangrove is a developer ecosystem for building **agent-native** trading, marketplace, and DEX-aggregation applications. Whether you are calling REST APIs, dropping in a Python SDK, integrating an MCP server, or shipping a Claude Code plugin, Mangrove gives you the primitives.
 
-## What Mangrove Provides
+The core building blocks are open: 223 trading signals and 99 technical indicators are MIT-licensed in the `mangrove-kb` Python package. The full platform — strategy management, backtesting, AI copilot, DEX aggregation, social trading — is exposed as a unified developer surface across REST, MCP, and SDKs.
+
+## What's in the ecosystem
 
 <CardGroup cols={2}>
-  <Card title="223 Trading Signals" icon="chart-line">
-    Pre-built technical indicators across momentum, trend, volume, volatility, and patterns categories. Each signal is classified as TRIGGER (event-based) or FILTER (state-based) for precise strategy composition.
+  <Card title="MangroveAI" icon="brain" href="/api-reference/overview">
+    The core trading strategy platform. Build, backtest, and run strategies with an AI copilot. REST API + Python SDK.
   </Card>
-  <Card title="AI Copilot" icon="robot">
-    Conversational AI that guides you through strategy creation. Describe your trading idea in natural language and the copilot maps it to signals, assembles a strategy, and runs a backtest.
+  <Card title="MangroveKnowledgeBase" icon="book" href="/sdks/mangrove-kb">
+    Open-source signals and indicators. 223 signals, 99 indicators, 11 trading-education docs. Python package.
   </Card>
-  <Card title="Backtesting Engine" icon="clock-rotate-left">
-    Test strategies against historical market data with comprehensive performance metrics including Sharpe ratio, max drawdown, win rate, and trade-by-trade analysis.
+  <Card title="MangroveMarkets" icon="store" href="/mcp-servers/mangrove-markets">
+    Agent marketplace + DEX aggregation. 56 MCP tools across marketplace, DEX, wallet, and CEX domains.
   </Card>
-  <Card title="Execution Engine" icon="bolt">
-    Stateful strategy execution with position management, stop-loss/take-profit orders, and risk controls. Supports both dry-run evaluation and persistent state tracking.
+  <Card title="MangroveTrader" icon="chart-line" href="/mcp-servers/mangrove-trader">
+    Social trading leaderboard with x402 micropayments. Tweet trades to @MangroveTrader; rankings on-chain.
   </Card>
-</CardGroup>
-
-## Platform Architecture
-
-MangroveAI is built as a Flask REST API with 60+ endpoints across 16 domains:
-
-- **Signals** -- 223 trading signals (108 TRIGGER, 115 FILTER) built on a library of 99 technical indicators
-- **Strategies** -- CRUD operations with signal composition rules (1 TRIGGER + 1 FILTER per entry)
-- **Backtesting** -- Historical strategy testing with market data integration
-- **Execution** -- Real-time strategy evaluation with position and order management
-- **AI Copilot** -- Conversational workflow for guided strategy creation
-- **Crypto Assets** -- Asset data, risk scoring, and on-chain analytics
-- **Market Data** -- OHLCV, trades, and quotes from multiple providers
-
-## Who This Is For
-
-**Developers** building integrations with the MangroveAI REST API. You need authentication guides, endpoint references, and code examples.
-
-**AI Agents** consuming MangroveAI endpoints programmatically. You need structured, machine-readable API documentation with clear parameter schemas.
-
-**Traders and Researchers** exploring signals and indicators. The Knowledge Base covers market foundations, strategy design, risk management, and a comprehensive indicator reference. You can also use the open-source `mangrove-kb` Python package to compute signals and indicators locally without going through the API.
-
-## Quick Links
-
-<CardGroup cols={3}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Get up and running in 5 minutes
+  <Card title="openclaw-executive-functions" icon="list-check" href="/mcp-servers/openclaw-executive-functions">
+    Persistent project management for agents. Projects → Goals → Objectives → Tasks. 27 MCP tools.
   </Card>
-  <Card title="Authentication" icon="lock" href="/authentication">
-    API keys and JWT tokens
-  </Card>
-  <Card title="Signals API" icon="wave-pulse" href="/api-reference/signals">
-    Discover available signals
-  </Card>
-  <Card title="Strategies API" icon="layer-group" href="/api-reference/strategies">
-    Create and manage strategies
-  </Card>
-  <Card title="Backtesting API" icon="chart-bar" href="/api-reference/backtesting">
-    Test against historical data
-  </Card>
-  <Card title="Knowledge Base" icon="book" href="/knowledge-base/market-foundations">
-    Trading education content
+  <Card title="x402 templates" icon="cube" href="/templates/x402-app-template">
+    Build your own x402-gated MCP server or Claude Code plugin from a production-ready scaffold.
   </Card>
 </CardGroup>
 
-## Base URL
+## Pick your integration path
 
-All API endpoints use the following base URL pattern:
+| If you are... | Start with |
+|---|---|
+| Calling REST endpoints from any language | [API Reference](/api-reference/overview) |
+| Writing Python | [`mangroveai` SDK](/sdks/mangroveai) (platform) or [`mangrove-kb`](/sdks/mangrove-kb) (signals/indicators) |
+| Writing TypeScript / Node | [`@mangrove-ai/sdk`](/sdks/mangrove-markets) (DEX + marketplace) |
+| Building an agent (Claude, OpenClaw, custom MCP client) | [MCP Servers](/mcp-servers/mangrove-markets) |
+| Using Claude Code interactively | [Claude Code plugins](/plugins/claude-code) |
+| Building your own x402-gated service | [x402 templates](/templates/x402-app-template) |
+| Researching strategies or learning markets | [Knowledge Base](/knowledge-base/market-foundations) |
 
-```
-https://api.mangrovedeveloper.ai/api/v1
-```
+## What's free vs. paid
 
-For production deployments, replace with your configured domain.
+- **Free, no auth:** signal/indicator metadata, knowledge-base search, public market education, MCP tool discovery, leaderboard previews.
+- **Free, requires account:** strategy CRUD, backtesting (limits apply), AI copilot conversations, signal evaluation up to your tier limit.
+- **x402 micropayments:** premium leaderboard data, signal evaluation beyond tier limit, indicator computation, trader history. Pay-per-call in USDC on Base. No subscription required for x402 endpoints.
 
-## Source Code
+## Source code
 
-Mangrove is developed by [Mangrove Technologies](https://github.com/MangroveTechnologies). The knowledge base and signal library are open source:
+Mangrove is built by [Mangrove Technologies](https://github.com/MangroveTechnologies). The signal library, knowledge base, and this documentation site are open source:
 
-- [MangroveKnowledgeBase](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) -- Signals, indicators, knowledge base, and this documentation
+- [`MangroveKnowledgeBase`](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) — `mangrove-kb` Python package, KB server, public docs source
+- [`x402-app-template`](https://github.com/MangroveTechnologies/x402-app-template) — scaffold for x402-gated MCP services
+- [`x402-plugin-template`](https://github.com/MangroveTechnologies/x402-plugin-template) — scaffold for x402-consuming agent plugins
+- [`openclaw-executive-functions`](https://github.com/MangroveTechnologies/openclaw-executive-functions) — agent project-management MCP server
+
+The MangroveAI platform itself is closed-source; you consume it via the [`mangroveai`](/sdks/mangroveai) PyPI package or the [REST API](/api-reference/overview).
+
+## Base URLs
+
+| Service | Production |
+|---|---|
+| MangroveAI REST API | `https://api.mangrovedeveloper.ai/api/v1` |
+| MangroveKnowledgeBase server | `https://kb.mangrovedeveloper.ai` |
+| MangroveMarkets MCP/REST | `https://api.mangrovemarkets.com` |
+| MangroveTrader MCP/REST | `https://api.mangrovetraders.com` |
+| Developer portal | `https://app.mangrovedeveloper.ai` |

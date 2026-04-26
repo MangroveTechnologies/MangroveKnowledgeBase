@@ -1,0 +1,147 @@
+---
+title: "Claude Code Plugins"
+description: "Slash-command plugins for Claude Code that wrap Mangrove MCP servers — swap, marketplace, social trading, project management."
+---
+
+# Claude Code Plugins
+
+If you live in [Claude Code](https://claude.com/claude-code), Mangrove ships first-class plugins that wrap each MCP server with ergonomic slash commands. The plugin handles MCP connection, x402 payment confirmation, and result formatting.
+
+## Available plugins
+
+| Plugin | Slash commands | Wraps |
+|---|---|---|
+| **mangrove-markets** | `/swap`, `/marketplace`, `/wallet`, `/portfolio`, `/mangrove-status`, `/mangrove-connect` | [MangroveMarkets MCP](/mcp-servers/mangrove-markets) |
+| **mangrove-trader** | `/mt-track`, `/mt-stats`, `/mt-report`, `/mt-leaderboard`, `/mt-search`, `/mt-watch`, `/mt-cancel`, `/mt-help` | [MangroveTrader MCP](/mcp-servers/mangrove-trader) |
+| **executive-functions** | `/ef:board`, `/ef:next`, `/ef:create`, `/ef:done`, `/ef:assign` | [openclaw-executive-functions](/mcp-servers/openclaw-executive-functions) |
+
+## Install
+
+The MangroveMarkets and MangroveTrader plugins are available via the Claude Code plugin marketplace:
+
+```
+claude plugin marketplace add mangrove-markets
+claude plugin install mangrove-markets
+
+claude plugin marketplace add mangrove-trader
+claude plugin install mangrove-trader
+```
+
+The executive-functions plugin currently installs from local clone (see the [server page](/mcp-servers/openclaw-executive-functions) for the `.mcp.json` recipe).
+
+## mangrove-markets — examples
+
+### Quote a swap
+
+```
+/swap quote USDC ETH 1000 --chain base
+```
+
+Returns the best route, expected output, slippage, and gas estimate. No payment required for quotes.
+
+### Execute a swap
+
+```
+/swap execute USDC ETH 1000 --chain base --slippage 0.5
+```
+
+Plugin shows the unsigned tx for confirmation, then signs and broadcasts using your configured signer.
+
+### Search the marketplace
+
+```
+/marketplace search "GPU compute" --limit 10
+```
+
+### Wallet ops
+
+```
+/wallet create --chain evm --chainId 8453
+/wallet balance --address 0xabc... --chain base
+```
+
+### Aggregate portfolio
+
+```
+/portfolio value --addresses 0xabc,0xdef
+```
+
+## mangrove-trader — examples
+
+### Track a trade (drafts the tweet)
+
+```
+/mt-track
+```
+
+Plugin asks you action, quantity, symbol, price, optional stops/targets. Outputs a properly-formatted tweet you copy-paste to `@MangroveTrader`.
+
+### See your stats
+
+```
+/mt-stats
+```
+
+Returns your composite score, rank, total trades, qualification status, open positions.
+
+### Performance report
+
+```
+/mt-report --timeframe 30d
+```
+
+Sharpe, max drawdown, win rate, return %.
+
+### Leaderboard (x402-gated)
+
+```
+/mt-leaderboard
+```
+
+Plugin shows the price (0.25 USDC on Base), asks for confirmation, signs the payment, fetches top 100. API-key tier holders skip the payment step.
+
+### Look up another trader (x402-gated)
+
+```
+/mt-search "@some_handle"
+```
+
+0.02 USDC. Returns rank, score, qualified status.
+
+## executive-functions — examples
+
+### Show the kanban
+
+```
+/ef:board
+```
+
+### Pick up the next task
+
+```
+/ef:next
+```
+
+### Create a task under the current objective
+
+```
+/ef:create
+```
+
+Plugin walks you through title, description, optional subagent assignment.
+
+### Mark current task done
+
+```
+/ef:done
+```
+
+Cascades closure if the parent objective's last task is now complete.
+
+## Source
+
+- mangrove-markets plugin: [MangroveMarkets/packages/claude-plugin](https://github.com/MangroveTechnologies/MangroveMarkets/tree/main/packages/claude-plugin)
+- mangrove-trader plugin: [mangrove-trader-plugins](https://github.com/MangroveTechnologies/mangrove-trader-plugins)
+- executive-functions plugin: [openclaw-executive-functions/cc-plugin](https://github.com/MangroveTechnologies/openclaw-executive-functions/tree/main/cc-plugin)
+
+To build your own plugin against an x402-gated MCP server, start from the [`x402-plugin-template`](/templates/x402-plugin-template).

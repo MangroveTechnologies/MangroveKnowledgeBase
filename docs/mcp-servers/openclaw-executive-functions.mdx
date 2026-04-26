@@ -1,0 +1,125 @@
+---
+title: "openclaw-executive-functions"
+description: "Persistent project management for AI agents. Projects → Goals → Objectives → Tasks. 27 MCP tools, local SQLite."
+---
+
+# openclaw-executive-functions
+
+`openclaw-executive-functions` (often shortened to `ef`) is an MCP server that gives agents persistent memory of work — Projects, Goals, Objectives, and Tasks. It runs locally over stdio against a SQLite database at `~/.executive-functions/ef.sqlite`, so an agent can pick up work across sessions, hand off to subagents, and keep an audit trail.
+
+It's compatible with both **Claude Code** and **OpenClaw** runtimes.
+
+## The hierarchy
+
+```
+Project          a distinct body of work
+  └── Goal       high-level outcome ("what do we want to achieve?")
+        └── Objective    measurable milestone
+              └── Task   atomic unit of work, kanban statuses
+```
+
+Statuses for tasks: `backlog → doing → review → done` (plus `blocked`).
+
+When all tasks under an objective are done, the objective auto-closes. Same cascade for goals → projects.
+
+## Install
+
+The server is currently distributed via repo. From your project root:
+
+```bash
+git clone https://github.com/MangroveTechnologies/openclaw-executive-functions.git
+cd openclaw-executive-functions
+# Add to .mcp.json at your project root, or use `claude mcp add`
+```
+
+For Claude Code, ensure your `.mcp.json` includes:
+
+```json
+{
+  "mcpServers": {
+    "executive-functions": {
+      "command": "python",
+      "args": ["-m", "executive_functions.server"]
+    }
+  }
+}
+```
+
+For OpenClaw, add the plugin path to `~/.openclaw/openclaw.json`:
+
+```json
+{ "plugins": { "paths": ["/path/to/openclaw-executive-functions/oc-plugin"] } }
+```
+
+A future release will support `claude plugin marketplace add` for one-shot install.
+
+## Tool catalog (27 tools)
+
+All tools are namespaced `ef_*`:
+
+| Domain | Count | Tools |
+|---|---|---|
+| Projects | 4 | `ef_list_projects`, `ef_create_project`, `ef_update_project`, `ef_delete_project` |
+| Goals | 4 | `ef_list_goals`, `ef_create_goal`, `ef_update_goal`, `ef_delete_goal` |
+| Objectives | 4 | `ef_list_objectives`, `ef_create_objective`, `ef_update_objective`, `ef_delete_objective` |
+| Tasks | 7 | `ef_list_tasks`, `ef_create_task`, `ef_update_task`, `ef_move_task`, `ef_assign_task`, `ef_delete_task`, `ef_log_activity`, `ef_get_activity` |
+| Subagents | 4 | `ef_register_subagent`, `ef_update_subagent`, `ef_heartbeat_subagent`, `ef_list_subagents` |
+| Views | 2 | `ef_board`, `ef_snapshot` |
+| Health | 1 | `ef_health_check` |
+
+## Top tools agents reach for
+
+### `ef_board`
+
+Returns the current kanban view grouped by status, with task counts and the active task for each.
+
+```typescript
+const board = await client.callTool({ name: "ef_board", arguments: {} });
+// -> { backlog: [...], doing: [...], review: [...], blocked: [...], done: [...] }
+```
+
+### `ef_create_task`
+
+Create an atomic unit of work under an objective. Logs an activity entry automatically.
+
+```typescript
+await client.callTool({
+  name: "ef_create_task",
+  arguments: {
+    objective_id: "obj_abc123",
+    title: "Wire generate-kb-docs into Dockerfile",
+    description: "Currently the script never runs in prod, so KB pages are blank.",
+  },
+});
+```
+
+### `ef_move_task`
+
+Transition a task through the pipeline. Cascades closure when an objective's last task hits `done`.
+
+```typescript
+await client.callTool({
+  name: "ef_move_task",
+  arguments: { task_id: "tsk_def456", new_status: "review" },
+});
+```
+
+## Slash commands (Claude Code plugin)
+
+Once installed, the Claude Code plugin exposes:
+
+- `/ef:board` — show the kanban
+- `/ef:next` — pick up the next task in `backlog`
+- `/ef:create` — guided task creation
+- `/ef:done` — mark current task done
+- `/ef:assign` — delegate to a subagent
+
+## Subagent coordination
+
+`ef` supports registering subagents (`ef_register_subagent`), assigning tasks to them, and tracking heartbeats. Useful for parent-orchestrator agents that fan out to specialized workers.
+
+## Source
+
+- Repo: [openclaw-executive-functions](https://github.com/MangroveTechnologies/openclaw-executive-functions) (MIT)
+- v1.0 shipped, marketplace install in progress
+- Database: SQLite at `~/.executive-functions/ef.sqlite`
