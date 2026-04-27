@@ -10,7 +10,7 @@ The AI Copilot API provides a conversational interface for trading strategy crea
 ## Base URL
 
 ```
-http://localhost:5001/api/v1/ai-copilot
+https://api.mangrovedeveloper.ai/api/v1/ai-copilot
 ```
 
 ## Workflow States
@@ -34,7 +34,7 @@ collect_user_input -> plan_signals -> assemble_strategy -> backtest -> done
 `POST /start_new_conversation`
 
 ```bash
-curl -X POST http://localhost:5001/api/v1/ai-copilot/start_new_conversation \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/ai-copilot/start_new_conversation \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -65,7 +65,7 @@ This is an asynchronous endpoint. It returns 202 Accepted immediately. Poll `GET
 </Note>
 
 ```bash
-curl -X POST http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/ai-copilot/chat/$SESSION_ID \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{
@@ -88,7 +88,7 @@ Returns the complete working context including conversation history and current 
 
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/ai-copilot/conversations/$SESSION_ID"
+  "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/conversations/$SESSION_ID"
 ```
 
 ### List Conversations
@@ -97,7 +97,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/ai-copilot/list_conversations"
+  "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/list_conversations"
 ```
 
 ### Get Latest Conversation
@@ -109,7 +109,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 `PUT /conversations/{session_id}/rename`
 
 ```bash
-curl -X PUT "http://localhost:5001/api/v1/ai-copilot/conversations/$SESSION_ID/rename" \
+curl -X PUT "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/conversations/$SESSION_ID/rename" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title": "BTC Momentum Strategy Discussion"}'
@@ -120,7 +120,7 @@ curl -X PUT "http://localhost:5001/api/v1/ai-copilot/conversations/$SESSION_ID/r
 `DELETE /conversations/{session_id}`
 
 ```bash
-curl -X DELETE "http://localhost:5001/api/v1/ai-copilot/conversations/$SESSION_ID" \
+curl -X DELETE "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/conversations/$SESSION_ID" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -143,7 +143,7 @@ Returns available configuration files for the AI agent.
 Refresh the RAG vector database. Requires management key.
 
 ```bash
-curl -X POST "http://localhost:5001/api/v1/ai-copilot/admin/refresh-vector-db" \
+curl -X POST "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/admin/refresh-vector-db" \
   -H "Authorization: Bearer $TOKEN" \
   -H "X-Management-Key: YOUR_MGMT_KEY"
 ```
@@ -152,13 +152,13 @@ curl -X POST "http://localhost:5001/api/v1/ai-copilot/admin/refresh-vector-db" \
 
 ```bash
 # Step 1: Create session
-SESSION_ID=$(curl -s -X POST http://localhost:5001/api/v1/ai-copilot/start_new_conversation \
+SESSION_ID=$(curl -s -X POST https://api.mangrovedeveloper.ai/api/v1/ai-copilot/start_new_conversation \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"org_id": "org-uuid", "user_id": "user-uuid"}' | jq -r '.conversation.session_id')
 
 # Step 2: Describe strategy
-curl -X POST http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/ai-copilot/chat/$SESSION_ID \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"message": "Buy BTC when 20-day RSI drops below 30, sell when it rises above 70"}'
@@ -166,10 +166,10 @@ curl -X POST http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID \
 # Step 3: Poll for response
 sleep 5
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/ai-copilot/conversations/$SESSION_ID"
+  "https://api.mangrovedeveloper.ai/api/v1/ai-copilot/conversations/$SESSION_ID"
 
 # Step 4: Provide additional details when asked
-curl -X POST http://localhost:5001/api/v1/ai-copilot/chat/$SESSION_ID \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/ai-copilot/chat/$SESSION_ID \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"message": "Use 4-hour timeframe, 2% stop loss"}'

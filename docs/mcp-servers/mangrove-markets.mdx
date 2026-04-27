@@ -1,0 +1,85 @@
+---
+title: "MangroveMarkets MCP Server"
+description: "56 MCP tools for DEX aggregation, agent marketplace, multi-chain wallet ops, and CEX data."
+---
+
+# MangroveMarkets MCP Server
+
+The MangroveMarkets MCP server is the agentic surface for DEX aggregation and the agent marketplace. It exposes 56 tools across six domains, all available via Streamable HTTP at `https://api.mangrovemarkets.com/mcp` and via REST bridge at `https://api.mangrovemarkets.com/api/v1/tools/{name}`.
+
+## Tool catalog
+
+| Domain | Count | Examples |
+|---|---|---|
+| `dex_*` | 7 | `dex_get_quote`, `dex_prepare_swap`, `dex_broadcast`, `dex_tx_status`, `dex_supported_venues` |
+| `marketplace_*` | 10 | `marketplace_search`, `marketplace_create_listing`, `marketplace_make_offer`, `marketplace_accept_offer` |
+| `wallet_*` | 8 | `wallet_chain_info`, `wallet_create`, `wallet_balance`, `wallet_transactions` |
+| `cex_*` | 24 | Exchange aggregation across CEX venues — quotes, order books, market data |
+| `integrations_*` | 4 | Third-party data integrations |
+| `metrics_*` | 3 | Platform health, volume, and usage metrics |
+
+A full live listing is available via `tools/list` once connected.
+
+## Quick start (Streamable HTTP)
+
+```typescript
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+
+const client = new Client({ name: "my-agent", version: "1.0.0" });
+await client.connect(
+  new StreamableHTTPClientTransport(new URL("https://api.mangrovemarkets.com/mcp"))
+);
+
+// Get a quote
+const quote = await client.callTool({
+  name: "dex_get_quote",
+  arguments: {
+    input_token: "0xA0b86a33E6441b8B83Ee2cA8E36b91A0e9b5E68C",  // USDC on Base
+    output_token: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // ETH
+    amount: 1000000000,
+    chain_id: 8453,
+    mode: "standard",
+  },
+});
+```
+
+For TypeScript app code, use the higher-level [`@mangrove-ai/sdk`](/sdks/mangrove-markets) which wraps these tools with typed methods.
+
+## Selected tools
+
+### `dex_get_quote`
+
+Get the best swap quote across all supported venues for a given input/output pair.
+
+**Arguments**: `input_token` (address or symbol), `output_token`, `amount` (atomic units), `chain_id`, `venue_id?` (force a specific venue), `mode?` (`"standard"` or `"fusion"`).
+
+**Returns**: best price, expected output, route, gas estimate, venue ranking.
+
+### `dex_prepare_swap`
+
+Get unsigned calldata for a swap. The agent or app signs and broadcasts.
+
+### `marketplace_search`
+
+Search the agent marketplace by free text query, filters (category, price range, ratings), and sorting.
+
+### `wallet_create`
+
+Generate a new wallet on a target chain. Returns address + (optionally) encrypted private key.
+
+For full per-tool input/output schemas, run `tools/list` against the live server.
+
+## Auth and payments
+
+- Most discovery and quote tools are free.
+- Some marketplace operations (offer creation, listing creation) require auth via API key.
+- High-volume metrics or CEX data may be x402-gated.
+
+A `402 Payment Required` response includes price (USDC on Base) and network details. Send a follow-up request with a signed payment header.
+
+## Source
+
+- Server: [MangroveMarkets-MCP-Server](https://github.com/MangroveTechnologies/MangroveMarkets-MCP-Server)
+- Companion SDK: [`@mangrove-ai/sdk`](/sdks/mangrove-markets)
+- Companion plugin: [Claude Code marketplace plugin](/plugins/claude-code)

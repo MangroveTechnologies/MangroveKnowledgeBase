@@ -1,0 +1,97 @@
+---
+title: "MangroveKnowledgeBase MCP Server"
+description: "MCP access to 223 signals, 99 indicators, full-text KB search. Free metadata, x402-gated computation."
+---
+
+# MangroveKnowledgeBase MCP Server
+
+The KB server gives agents structured access to the open-source Mangrove signal library and 11 trading-education documents. Metadata and search are free; signal evaluation and indicator computation are x402-gated.
+
+- **MCP**: `https://kb.mangrovedeveloper.ai/mcp`
+- **REST**: `https://kb.mangrovedeveloper.ai/api`
+
+The same content is available as the [`mangrove-kb`](/sdks/mangrove-kb) Python package for purely local use.
+
+## Tool catalog (12 tools)
+
+### Free
+
+| Tool | Purpose |
+|---|---|
+| `kb_search(q, limit)` | Full-text search across all KB documents (FTS5) |
+| `kb_list_documents()` | List the 11 KB docs |
+| `kb_get_document(slug)` | Fetch full document content |
+| `kb_list_glossary()` | List all glossary terms |
+| `kb_glossary_lookup(term)` | Definition + context for a single term |
+| `kb_list_tags()` | List all topic tags |
+| `kb_get_documents_by_tag(tag)` | Documents associated with a tag |
+| `kb_get_backlinks(anchor)` | Find what links to a given KB anchor |
+| `kb_list_signals(category?, signal_type?)` | List signals, filterable by category/type |
+| `kb_list_indicators()` | List the 99 indicator classes |
+| `kb_status()` | Server health + content counts |
+
+### x402-gated
+
+| Tool | Purpose |
+|---|---|
+| `evaluate_signal(name, params, ohlcv)` | Run a signal against your data, returns boolean fired/not |
+| `compute_indicator(name, params, inputs)` | Compute an indicator series, returns dict of series |
+
+## Free metadata example
+
+```typescript
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+
+const client = new Client({ name: "my-agent", version: "1.0.0" });
+await client.connect(
+  new StreamableHTTPClientTransport(new URL("https://kb.mangrovedeveloper.ai/mcp"))
+);
+
+const matches = await client.callTool({
+  name: "kb_search",
+  arguments: { q: "RSI mean reversion", limit: 5 },
+});
+
+const meta = await client.callTool({
+  name: "kb_list_signals",
+  arguments: { category: "momentum", signal_type: "TRIGGER" },
+});
+```
+
+## x402 computation example
+
+```typescript
+// First call returns 402 with price; sign and retry
+const result = await client.callTool({
+  name: "evaluate_signal",
+  arguments: {
+    name: "rsi_oversold",
+    params: { window: 14, threshold: 30 },
+    ohlcv: { Close: [100, 99, 98, 97, 96, 95] },
+  },
+});
+// -> { fired: true }
+```
+
+If you have an API key with a tier that includes signal evaluation, the x402 round-trip is skipped.
+
+## REST equivalents
+
+Every MCP tool has a REST counterpart, useful when MCP is not available.
+
+| Capability | REST | MCP |
+|---|---|---|
+| Search | `GET /api/search?q=...` | `kb_search` |
+| Get document | `GET /api/documents/{slug}` | `kb_get_document` |
+| Glossary | `GET /api/glossary/{term}` | `kb_glossary_lookup` |
+| List signals | `GET /api/signals` | `kb_list_signals` |
+| List indicators | `GET /api/indicators` | `kb_list_indicators` |
+| Evaluate signal (x402) | `POST /api/evaluate` | `evaluate_signal` |
+| Compute indicator (x402) | `POST /api/compute` | `compute_indicator` |
+
+## Source
+
+- Repo: [MangroveKnowledgeBase](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) (MIT)
+- Server source: `kb_server/` directory
+- Same content as: [`mangrove-kb`](/sdks/mangrove-kb) Python package

@@ -1,0 +1,19 @@
+---
+title: "Templates Overview"
+description: "Production-ready scaffolds for building your own x402-gated services and agent plugins."
+---
+
+# Templates
+
+Two GitHub template repos let you ship your own x402 services on day one.
+
+| Template | What you build |
+|---|---|
+| [`x402-app-template`](/templates/x402-app-template) | An x402-gated MCP service (FastAPI + FastMCP, GCP Cloud Run, Terraform) |
+| [`x402-plugin-template`](/templates/x402-plugin-template) | A Claude Code or OpenClaw plugin that consumes one |
+
+Both are MIT-licensed and used in production by Mangrove products themselves — MangroveTrader was built from `x402-app-template`, mangrove-trader-plugins from `x402-plugin-template`.
+
+## Why use them
+
+x402 has a non-trivial integration surface — handling the `402 → sign → retry` round-trip, settling on-chain, validating payment headers, splitting access tiers cleanly, deploying to Cloud Run with proper IAM. The templates encode the patterns Mangrove uses internally so you don't repeat the work.

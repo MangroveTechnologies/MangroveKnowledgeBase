@@ -1,0 +1,58 @@
+---
+title: "MCP Servers Overview"
+description: "Mangrove MCP servers — agentic interfaces to the platform. Streamable HTTP, tool catalogs, x402 micropayments."
+---
+
+# MCP Servers
+
+Every Mangrove product exposes a **Model Context Protocol** server over Streamable HTTP. MCP gives any compatible agent (Claude, OpenClaw, custom MCP client) typed access to tools, with payment, auth, and discovery built in.
+
+| Server | URL | Tools | Highlights |
+|---|---|---|---|
+| [MangroveMarkets](/mcp-servers/mangrove-markets) | `api.mangrovemarkets.com/mcp` | 56 | DEX aggregation, marketplace, wallet, CEX |
+| [MangroveTrader](/mcp-servers/mangrove-trader) | `api.mangrovetraders.com/mcp` | 9 | Social trading leaderboard, x402-gated |
+| [MangroveKnowledgeBase](/mcp-servers/mangrove-kb) | `kb.mangrovedeveloper.ai/mcp` | 12 | Signal/indicator metadata + computation |
+| [openclaw-executive-functions](/mcp-servers/openclaw-executive-functions) | local stdio / `.mcp.json` | 27 | Agent project management, sqlite |
+
+## How to connect
+
+Most MCP clients accept a Streamable HTTP URL. From a TypeScript client:
+
+```typescript
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+
+const client = new Client({ name: "my-agent", version: "1.0.0" });
+await client.connect(
+  new StreamableHTTPClientTransport(new URL("https://api.mangrovemarkets.com/mcp"))
+);
+
+const tools = await client.listTools();
+const result = await client.callTool({ name: "dex_get_quote", arguments: { /* ... */ } });
+```
+
+From Claude Code, add the server in `.mcp.json` at your project root or via `claude mcp add`.
+
+## REST bridge
+
+Each MCP server also exposes a REST bridge at `/api/v1/tools/{tool_name}` so non-MCP clients can call the same tools as plain HTTP. Same auth model, same x402 gating.
+
+## Auth
+
+- **Public tools** — no auth, no payment.
+- **Auth-gated tools** — Bearer API key in the `Authorization` header.
+- **x402-gated tools** — pay-per-call in USDC on Base. The server returns `402 Payment Required` with price/network details, you sign and resend with a payment header. SDKs and Claude Code plugins handle this automatically; with raw HTTP you need to implement the round-trip yourself or use the [x402 Python SDK](https://pypi.org/project/x402/).
+
+API keys can be used to bypass x402 for tools you have a paid tier for.
+
+## When to use MCP vs. SDK
+
+Use MCP when:
+- You're building an LLM agent or any system that benefits from tool discovery (`listTools()`).
+- You want a uniform interface across all Mangrove products.
+- You want x402 payment to be transparent to the calling code.
+
+Use an SDK when:
+- You're writing application code in Python or TypeScript.
+- You want IDE autocomplete and typed responses.
+- You want batched, paginated, or streaming patterns specific to that product.

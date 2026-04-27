@@ -1,0 +1,27 @@
+---
+title: "SDKs Overview"
+description: "Client libraries for the Mangrove ecosystem — Python and TypeScript."
+---
+
+# SDKs
+
+Three client libraries cover the Mangrove ecosystem.
+
+| SDK | Language | Distribution | Best for |
+|---|---|---|---|
+| [`mangroveai`](/sdks/mangroveai) | Python ≥3.10 | `pip install mangroveai` | The MangroveAI platform — strategies, backtesting, AI copilot |
+| [`mangrove-kb`](/sdks/mangrove-kb) | Python ≥3.10 | `pip install mangrove-kb` | Local signal evaluation and indicator computation, no API call |
+| [`@mangrove-ai/sdk`](/sdks/mangrove-markets) | TypeScript / Node | `npm install @mangrove-ai/sdk` | DEX aggregation, marketplace, wallet ops |
+
+## Choosing between `mangroveai` and `mangrove-kb`
+
+- Use **`mangroveai`** if you want managed strategies, backtests, the AI copilot, or any feature of the hosted platform. Requires an account and API key.
+- Use **`mangrove-kb`** if you want to compute indicators or evaluate signals on your own data, locally, with no network round-trip. Pure compute, MIT-licensed.
+- Use **both** if you want platform features for orchestration but local compute for hot loops.
+
+## Choosing between SDK and direct MCP
+
+- Use an **SDK** for backend code, notebooks, scripts.
+- Use the **MCP server** when an LLM agent or MCP-capable client is in the loop. The MCP servers expose the same capabilities (where they overlap) as tool calls.
+
+See [MCP Servers](/mcp-servers/overview) for the agent path.
