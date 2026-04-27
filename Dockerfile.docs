@@ -38,6 +38,14 @@ COPY --from=builder /root/.mintlify/mint/apps/client/ ./client/
 # Copy required node_modules (next.js runtime dependencies)
 COPY --from=builder /root/.mintlify/mint/node_modules/ ./node_modules/
 
+# Ensure SEO files (robots.txt, sitemap.xml, llms.txt) are present at the
+# canonical paths regardless of whether Mintlify's prebuild also copies them.
+# nginx-docs.conf serves these at /robots.txt, /sitemap.xml, /llms.txt, and
+# /.well-known/llms.txt.
+COPY --from=builder /docs-source/public/robots.txt /app/client/public/robots.txt
+COPY --from=builder /docs-source/public/sitemap.xml /app/client/public/sitemap.xml
+COPY --from=builder /docs-source/public/llms.txt /app/client/public/llms.txt
+
 # nginx config: serve _next/static directly, proxy rest to Next.js
 COPY nginx-docs.conf /etc/nginx/sites-available/default
 
