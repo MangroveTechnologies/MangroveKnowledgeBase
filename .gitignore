@@ -47,3 +47,7 @@ docs/knowledge-base-source/
 docs/mint.json
 docs/.mintlify/
 dist/
+
+# AppMap trace artifacts (generated locally, never commit)
+appmap.log
+*.appmap.json
