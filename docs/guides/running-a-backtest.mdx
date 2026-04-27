@@ -21,7 +21,7 @@ export TOKEN="your-jwt-token-here"
 import requests
 import json
 
-BASE_URL = "http://localhost:5001"
+BASE_URL = "https://api.mangrovedeveloper.ai"
 TOKEN = "your-jwt-token-here"
 HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
@@ -30,7 +30,7 @@ HEADERS = {
 ```
 
 ```javascript JavaScript
-const BASE_URL = "http://localhost:5001";
+const BASE_URL = "https://api.mangrovedeveloper.ai";
 const TOKEN = "your-jwt-token-here";
 const headers = {
   Authorization: `Bearer ${TOKEN}`,
@@ -47,7 +47,7 @@ This example backtests an ETH strategy using the MACD bullish cross + SMA filter
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "http://localhost:5001/api/v1/backtesting/backtest" \
+curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -352,7 +352,7 @@ Use the bulk backtest endpoint to test several strategies in a single request. M
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "http://localhost:5001/api/v1/backtesting/backtest/bulk" \
+curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/bulk" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -527,7 +527,7 @@ Backtests run through the AI Copilot are persisted with a `backtest_id`. You can
 <CodeGroup>
 ```bash cURL
 curl -s -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000" \
+  "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000" \
   | python3 -m json.tool
 ```
 

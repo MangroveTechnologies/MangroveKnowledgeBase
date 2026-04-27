@@ -31,8 +31,28 @@
   },
   "tabs": [
     {
+      "name": "SDKs",
+      "url": "sdks"
+    },
+    {
+      "name": "MCP Servers",
+      "url": "mcp-servers"
+    },
+    {
+      "name": "Plugins",
+      "url": "plugins"
+    },
+    {
+      "name": "Templates",
+      "url": "templates"
+    },
+    {
       "name": "API Reference",
       "url": "api-reference"
+    },
+    {
+      "name": "Signals",
+      "url": "signals"
     },
     {
       "name": "Knowledge Base",
@@ -42,7 +62,47 @@
   "navigation": [
     {
       "group": "Getting Started",
-      "pages": ["introduction", "quickstart", "authentication"]
+      "pages": [
+        "introduction",
+        "quickstart",
+        "authentication",
+        "system-overview"
+      ]
+    },
+    {
+      "group": "SDKs",
+      "pages": [
+        "sdks/overview",
+        "sdks/mangroveai",
+        "sdks/mangrove-kb",
+        "sdks/mangrove-markets"
+      ]
+    },
+    {
+      "group": "MCP Servers",
+      "pages": [
+        "mcp-servers/overview",
+        "mcp-servers/mangrove-markets",
+        "mcp-servers/mangrove-trader",
+        "mcp-servers/mangrove-kb",
+        "mcp-servers/openclaw-executive-functions"
+      ]
+    },
+    {
+      "group": "Plugins",
+      "pages": [
+        "plugins/overview",
+        "plugins/claude-code",
+        "plugins/openclaw"
+      ]
+    },
+    {
+      "group": "Templates",
+      "pages": [
+        "templates/overview",
+        "templates/x402-app-template",
+        "templates/x402-plugin-template"
+      ]
     },
     {
       "group": "API Reference",
@@ -61,49 +121,44 @@
       "group": "Signals",
       "pages": [
         "signals/overview",
-        "signals/catalog"
+        "signals/catalog",
+        {
+          "group": "Catalog by category",
+          "pages": [
+            "signals/catalog/momentum",
+            "signals/catalog/trend",
+            "signals/catalog/volume",
+            "signals/catalog/volatility",
+            "signals/catalog/patterns"
+          ]
+        }
       ]
     },
     {
       "group": "Guides",
       "pages": [
         "guides/understanding-signals",
+        "guides/signal-architecture",
         "guides/creating-a-strategy",
         "guides/running-a-backtest",
+        "guides/backtesting-guide",
         "guides/using-the-ai-copilot",
         "guides/risk-management"
       ]
     },
     {
-      "group": "Architecture",
-      "pages": [
-        "architecture/overview",
-        "architecture/domain-driven-design"
-      ]
-    },
-    {
       "group": "Knowledge Base",
       "pages": [
-        "knowledge-base-source/01-market-foundations",
-        "knowledge-base-source/02-instruments-market-mechanics",
-        "knowledge-base-source/03-core-trading-concepts",
-        "knowledge-base-source/04-strategy-design-modeling",
-        "knowledge-base-source/05-risk-management",
-        "knowledge-base-source/06-indicators",
-        "knowledge-base-source/07-chart-patterns",
-        "knowledge-base-source/08-quantitative-analysis",
-        "knowledge-base-source/09-glossary",
-        "knowledge-base-source/10-signals-quick-reference"
-      ]
-    },
-    {
-      "group": "Development",
-      "pages": [
-        "development/getting-started",
-        "development/docker-setup",
-        "development/testing-guide",
-        "development/api-versioning",
-        "development/commit-standards"
+        "knowledge-base/market-foundations",
+        "knowledge-base/instruments",
+        "knowledge-base/trading-concepts",
+        "knowledge-base/strategy-design",
+        "knowledge-base/risk-management",
+        "knowledge-base/indicators",
+        "knowledge-base/chart-patterns",
+        "knowledge-base/quantitative-analysis",
+        "knowledge-base/signals-quick-reference",
+        "knowledge-base/glossary"
       ]
     }
   ],

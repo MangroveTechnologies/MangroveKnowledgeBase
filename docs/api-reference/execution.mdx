@@ -10,7 +10,7 @@ The Execution API provides strategy evaluation against current market data. It s
 ## Base URL
 
 ```
-http://localhost:5001/api/v1/execution
+https://api.mangrovedeveloper.ai/api/v1/execution
 ```
 
 ## Endpoints
@@ -33,7 +33,7 @@ Evaluates a persisted strategy with current market data:
 
 <CodeGroup>
 ```bash cURL
-curl -X POST http://localhost:5001/api/v1/execution/evaluate/550e8400-e29b-41d4-a716-446655440000 \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate/550e8400-e29b-41d4-a716-446655440000 \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"persist": true}'
@@ -43,7 +43,7 @@ curl -X POST http://localhost:5001/api/v1/execution/evaluate/550e8400-e29b-41d4-
 import requests
 
 response = requests.post(
-    f"http://localhost:5001/api/v1/execution/evaluate/{strategy_id}",
+    f"https://api.mangrovedeveloper.ai/api/v1/execution/evaluate/{strategy_id}",
     headers={"Authorization": f"Bearer {token}"},
     json={"persist": True}
 )
@@ -93,7 +93,7 @@ Evaluate a strategy using a JSON object instead of a persisted strategy ID. Usef
 
 <CodeGroup>
 ```bash cURL
-curl -X POST http://localhost:5001/api/v1/execution/evaluate \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -129,7 +129,7 @@ curl -X POST http://localhost:5001/api/v1/execution/evaluate \
 
 ```python Python
 response = requests.post(
-    "http://localhost:5001/api/v1/execution/evaluate",
+    "https://api.mangrovedeveloper.ai/api/v1/execution/evaluate",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "strategy": {
@@ -158,7 +158,7 @@ response = requests.post(
 Evaluates multiple strategies in a single request. Market data is fetched once per unique `(asset, timeframe)` pair and shared across all strategies.
 
 ```bash
-curl -X POST http://localhost:5001/api/v1/execution/evaluate/bulk \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate/bulk \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -211,7 +211,7 @@ curl -X POST http://localhost:5001/api/v1/execution/evaluate/bulk \
 ```bash
 # Poll every 5 minutes for signals
 while true; do
-  curl -s -X POST http://localhost:5001/api/v1/execution/evaluate/$STRATEGY_ID \
+  curl -s -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate/$STRATEGY_ID \
     -H "Authorization: Bearer $TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"persist": true}' | jq '.new_orders'
@@ -224,7 +224,7 @@ done
 Test strategy signals without persisting changes:
 
 ```bash
-curl -s -X POST http://localhost:5001/api/v1/execution/evaluate/bulk \
+curl -s -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate/bulk \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"strategy_ids": ["$ID1", "$ID2"], "persist": false}' | jq '.'

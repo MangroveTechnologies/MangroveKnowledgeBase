@@ -1,0 +1,87 @@
+---
+title: "x402-app-template"
+description: "Production-ready scaffold for x402-gated FastAPI + FastMCP services. Three-tier access, GCP Cloud Run, Terraform."
+---
+
+# x402-app-template
+
+Use this template to build your own x402-gated MCP service in the same shape as MangroveTrader and the Mangrove KB server. It bundles every piece you need to ship: dual-protocol (REST + MCP) on one FastAPI app, three-tier access (free / auth / x402), Terraform IaC for GCP Cloud Run, GitHub Actions with OIDC, Docker build, local dev with `docker compose`.
+
+GitHub: [`x402-app-template`](https://github.com/MangroveTechnologies/x402-app-template) (public template repo).
+
+## Quickstart
+
+```bash
+# Clone or use as a GitHub template
+gh repo create my-service --template MangroveTechnologies/x402-app-template --public
+cd my-service
+
+# Local config
+cp src/config/local-example-config.json src/config/local-config.json
+# edit local-config.json: set wallet, network (base / base-sepolia), tool prices
+
+# Run locally
+docker compose up -d --build
+curl http://localhost:8080/health
+```
+
+The template ships with a few example tools so you can verify x402 end-to-end on Base Sepolia before customizing.
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Web framework | FastAPI + uvicorn |
+| Agent protocol | FastMCP (Streamable HTTP) |
+| Payments | [`x402`](https://pypi.org/project/x402/) Python SDK |
+| Database (optional) | PostgreSQL 16 |
+| Cache (optional) | Redis 7 |
+| IaC | Terraform (GCP Cloud Run) |
+| CI/CD | GitHub Actions with OIDC (no long-lived secrets) |
+
+## Three-tier access model
+
+Every endpoint declares its tier in code; the framework enforces the rule.
+
+| Tier | No credentials | API key | x402 payment |
+|---|---|---|---|
+| **Free** | ✓ | ✓ | ✓ |
+| **Auth-gated** | 401 | ✓ | 401 |
+| **x402-gated** | 402 (payment required) | ✓ (free for tier holders) | ✓ (paid) |
+
+In code:
+
+```python
+from src.framework import tool, Access
+
+@tool(name="my_free_tool", access=Access.FREE)
+async def my_free_tool(): ...
+
+@tool(name="my_premium_tool", access=Access.X402, price_usdc=0.10, network="base")
+async def my_premium_tool(): ...
+```
+
+The `@tool` decorator publishes to both REST (`/api/v1/tools/my_premium_tool`) and MCP (`my_premium_tool`) automatically.
+
+## Real-world example
+
+[MangroveTrader](https://github.com/MangroveTechnologies/MangroveTrader) is built directly from this template. Look at it for a reference implementation that includes a Twitter agent worker, x402 settlement, and a public leaderboard.
+
+## What you customize
+
+1. `src/config/` — wallet address, network, x402 facilitator URL, tool pricing
+2. `src/tools/` — add your `@tool`-decorated functions
+3. `terraform/` — set the GCP project ID, service name, and Cloud Run config
+4. `.github/workflows/` — wire your repo to your GCP project (OIDC, no secrets)
+
+## What you don't have to build
+
+- MCP `tools/list` and tool dispatch (handled)
+- REST bridge auto-generation (handled)
+- x402 facilitation: 402 response, payment header validation, settlement (handled)
+- Cloud Run deploy with rollout, health checks, traffic management (handled)
+- Local-vs-prod config split (handled)
+
+## License
+
+MIT. Use it for commercial products.

@@ -1,0 +1,115 @@
+---
+title: "mangroveai (Python SDK)"
+description: "Python client for the MangroveAI trading strategy platform. Strategies, backtests, AI copilot, execution."
+---
+
+# `mangroveai` — Python SDK
+
+The `mangroveai` package is the official Python client for the MangroveAI platform. It wraps every public REST endpoint with typed methods and handles auth, retries, and pagination.
+
+## Install
+
+```bash
+pip install mangroveai
+```
+
+Requires Python 3.10+. Current version: `0.3.0`.
+
+## Setup
+
+1. Create an account at the [Developer Portal](https://app.mangrovedeveloper.ai).
+2. Go to **Settings → API Keys** and generate a key.
+3. Set it as an environment variable:
+
+```bash
+export MANGROVE_API_KEY=prod_your_key_here
+```
+
+## Hello world
+
+```python
+from mangroveai import MangroveAI
+
+client = MangroveAI()  # reads MANGROVE_API_KEY from env
+
+# Discover signals
+signals = client.signals.list(category="momentum", limit=10)
+for s in signals:
+    print(s.name, s.signal_type, s.description)
+```
+
+## Service modules
+
+The client exposes these service attributes, each mapping to a domain in the REST API.
+
+| Module | Purpose |
+|---|---|
+| `client.signals` | List, validate, and evaluate trading signals |
+| `client.strategies` | CRUD for strategies; manage entry/exit rules |
+| `client.backtesting` | Run historical backtests, retrieve results |
+| `client.execution` | Real-time strategy evaluation, position state |
+| `client.ai_copilot` | Conversational strategy creation |
+| `client.crypto_assets` | Asset metadata, risk scoring, on-chain analytics |
+| `client.docs` | Search the knowledge base from your code |
+| `client.kb` | Signal and indicator metadata via the KB server |
+
+## Common patterns
+
+### Create a strategy and run a backtest
+
+```python
+strategy = client.strategies.create(
+    name="RSI mean reversion",
+    entry_rules={
+        "trigger": {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30}},
+        "filter":  {"name": "is_above_sma",  "params": {"window": 200}},
+    },
+    exit_rules={"take_profit_pct": 5, "stop_loss_pct": 2},
+)
+
+result = client.backtesting.run(
+    strategy_id=strategy.id,
+    symbol="BTC-USD",
+    timeframe="1h",
+    start="2025-01-01",
+    end="2026-01-01",
+)
+print(result.metrics.sharpe_ratio, result.metrics.max_drawdown)
+```
+
+### Evaluate a signal on the platform
+
+```python
+df = ...  # your OHLCV data as a pandas DataFrame
+fired = client.signals.evaluate(
+    name="macd_bullish_cross",
+    params={"window_fast": 12, "window_slow": 26, "window_sign": 9},
+    ohlcv=df,
+)
+```
+
+For local-only evaluation without an API call, use [`mangrove-kb`](/sdks/mangrove-kb) instead.
+
+### Use the AI copilot
+
+```python
+session = client.ai_copilot.start(prompt="I want to trade RSI reversals on ETH")
+while not session.done:
+    print(session.last_message)
+    response = input("> ")
+    session = client.ai_copilot.send(session.id, response)
+
+print("Strategy created:", session.strategy_id)
+```
+
+## Auth options
+
+- **API key** (recommended for backend code): `client = MangroveAI(api_key="prod_...")` or via env.
+- **JWT** (for short-lived tokens): `client = MangroveAI(jwt="...")`.
+
+See [Authentication](/authentication) for the full flow.
+
+## Source
+
+- PyPI: [`mangroveai`](https://pypi.org/project/mangroveai/)
+- License: MIT

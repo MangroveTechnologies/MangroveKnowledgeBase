@@ -1,0 +1,4198 @@
+---
+title: "Trend Signals"
+description: "88 trend trading signals with parameters, descriptions, and examples."
+---
+
+# Trend Signals
+
+_88 signals in this category._
+
+See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.
+
+### adx_bullish_di
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if +DI is greater than -DI (bullish directional movement). When +DI &gt; -DI, bulls have the upper hand.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | ADX period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "adx_bullish_di",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "adx_bullish_di",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### adx_strong_trend
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if ADX indicates a strong trend. ADX values above 25 typically indicate a strong trend (either up or down).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `14` | ADX period |
+| `threshold` | `float` | 15.0 -- 50.0 | `25.0` | Trend strength threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "adx_strong_trend",
+    "parameters": {
+        "window": 14,
+        "threshold": 25.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "adx_strong_trend",
+  "parameters": {
+    "window": 14,
+    "threshold": 25.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### alligator_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Williams Alligator lines are in bearish alignment (lips &lt; teeth &lt; jaw). Strong downtrend, all lines spreading downward.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `jaw` | `int` | 5 -- 50 | `13` | Jaw SMMA period |
+| `teeth` | `int` | 3 -- 30 | `8` | Teeth SMMA period |
+| `lips` | `int` | 2 -- 20 | `5` | Lips SMMA period |
+| `jaw_offset` | `int` | 0 -- 20 | `8` | Jaw forward shift |
+| `teeth_offset` | `int` | 0 -- 15 | `5` | Teeth forward shift |
+| `lips_offset` | `int` | 0 -- 10 | `3` | Lips forward shift |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "alligator_bearish",
+    "parameters": {
+        "jaw": 13,
+        "teeth": 8,
+        "lips": 5,
+        "jaw_offset": 8,
+        "teeth_offset": 5,
+        "lips_offset": 3
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "alligator_bearish",
+  "parameters": {
+    "jaw": 13,
+    "teeth": 8,
+    "lips": 5,
+    "jaw_offset": 8,
+    "teeth_offset": 5,
+    "lips_offset": 3
+  }
+}'
+```
+
+</CodeGroup>
+
+### alligator_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Williams Alligator lines are in bullish alignment (lips &gt; teeth &gt; jaw). Bill Williams's "hungry alligator" state: strong uptrend, all lines spreading upward.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `jaw` | `int` | 5 -- 50 | `13` | Jaw SMMA period |
+| `teeth` | `int` | 3 -- 30 | `8` | Teeth SMMA period |
+| `lips` | `int` | 2 -- 20 | `5` | Lips SMMA period |
+| `jaw_offset` | `int` | 0 -- 20 | `8` | Jaw forward shift |
+| `teeth_offset` | `int` | 0 -- 15 | `5` | Teeth forward shift |
+| `lips_offset` | `int` | 0 -- 10 | `3` | Lips forward shift |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "alligator_bullish",
+    "parameters": {
+        "jaw": 13,
+        "teeth": 8,
+        "lips": 5,
+        "jaw_offset": 8,
+        "teeth_offset": 5,
+        "lips_offset": 3
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "alligator_bullish",
+  "parameters": {
+    "jaw": 13,
+    "teeth": 8,
+    "lips": 5,
+    "jaw_offset": 8,
+    "teeth_offset": 5,
+    "lips_offset": 3
+  }
+}'
+```
+
+</CodeGroup>
+
+### alligator_sleeping
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if the Williams Alligator is sleeping (lines tangled, no trend). True when lines are neither strictly bullish-aligned nor bearish-aligned. Used as a no-trade filter during consolidation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `jaw` | `int` | 5 -- 50 | `13` | Jaw SMMA period |
+| `teeth` | `int` | 3 -- 30 | `8` | Teeth SMMA period |
+| `lips` | `int` | 2 -- 20 | `5` | Lips SMMA period |
+| `jaw_offset` | `int` | 0 -- 20 | `8` | Jaw forward shift |
+| `teeth_offset` | `int` | 0 -- 15 | `5` | Teeth forward shift |
+| `lips_offset` | `int` | 0 -- 10 | `3` | Lips forward shift |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "alligator_sleeping",
+    "parameters": {
+        "jaw": 13,
+        "teeth": 8,
+        "lips": 5,
+        "jaw_offset": 8,
+        "teeth_offset": 5,
+        "lips_offset": 3
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "alligator_sleeping",
+  "parameters": {
+    "jaw": 13,
+    "teeth": 8,
+    "lips": 5,
+    "jaw_offset": 8,
+    "teeth_offset": 5,
+    "lips_offset": 3
+  }
+}'
+```
+
+</CodeGroup>
+
+### alma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast ALMA window |
+| `window_slow` | `int` | 2 -- 200 | `21` | Slow ALMA window |
+| `offset` | `float` | 0.0 -- 1.0 | `0.85` | Weight center |
+| `sigma` | `float` | 0.1 -- 20.0 | `6.0` | Gaussian spread |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "alma_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21,
+        "offset": 0.85,
+        "sigma": 6.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "alma_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21,
+    "offset": 0.85,
+    "sigma": 6.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### alma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA). Both ALMAs use the same offset and sigma; only the window differs.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast ALMA window |
+| `window_slow` | `int` | 2 -- 200 | `21` | Slow ALMA window |
+| `offset` | `float` | 0.0 -- 1.0 | `0.85` | Weight center |
+| `sigma` | `float` | 0.1 -- 20.0 | `6.0` | Gaussian spread |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "alma_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21,
+        "offset": 0.85,
+        "sigma": 6.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "alma_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21,
+    "offset": 0.85,
+    "sigma": 6.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### aroon_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Aroon lines cross (trend change signal).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `25` | Lookback period |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "aroon_crossover",
+    "parameters": {
+        "window": 25,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "aroon_crossover",
+  "parameters": {
+    "window": 25,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### aroon_down_trend
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Aroon Down indicates strong downtrend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `25` | Lookback period |
+| `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Strong trend threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "aroon_down_trend",
+    "parameters": {
+        "window": 25,
+        "threshold": 70.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "aroon_down_trend",
+  "parameters": {
+    "window": 25,
+    "threshold": 70.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### aroon_up_trend
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Aroon Up indicates strong uptrend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `25` | Lookback period |
+| `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Strong trend threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "aroon_up_trend",
+    "parameters": {
+        "window": 25,
+        "threshold": 70.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "aroon_up_trend",
+  "parameters": {
+    "window": 25,
+    "threshold": 70.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### cci_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if CCI indicates overbought condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | CCI period |
+| `constant` | `float` | 0.001 -- 0.1 | `0.015` | CCI constant |
+| `threshold` | `float` | 50.0 -- 200.0 | `100.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "cci_overbought",
+    "parameters": {
+        "window": 20,
+        "constant": 0.015,
+        "threshold": 100.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cci_overbought",
+  "parameters": {
+    "window": 20,
+    "constant": 0.015,
+    "threshold": 100.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### cci_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if CCI indicates oversold condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | CCI period |
+| `constant` | `float` | 0.001 -- 0.1 | `0.015` | CCI constant |
+| `threshold` | `float` | -200.0 -- -50.0 | `-100.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "cci_oversold",
+    "parameters": {
+        "window": 20,
+        "constant": 0.015,
+        "threshold": -100.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "cci_oversold",
+  "parameters": {
+    "window": 20,
+    "constant": 0.015,
+    "threshold": -100.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### chandelier_long_stop_hit
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if close has breached the Chandelier long stop (close &lt; long_stop). If holding a long position, this is your exit trigger.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `22` | Rolling high/ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "chandelier_long_stop_hit",
+    "parameters": {
+        "window": 22,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "chandelier_long_stop_hit",
+  "parameters": {
+    "window": 22,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### chandelier_short_stop_hit
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if close has breached the Chandelier short stop (close &gt; short_stop). If holding a short position, this is your exit trigger.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 100 | `22` | Rolling low/ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "chandelier_short_stop_hit",
+    "parameters": {
+        "window": 22,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "chandelier_short_stop_hit",
+  "parameters": {
+    "window": 22,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### dema_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA). Lower-lag equivalent of an SMA/EMA death cross.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast DEMA window |
+| `window_slow` | `int` | 2 -- 200 | `21` | Slow DEMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "dema_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dema_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### dema_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA). Lower-lag equivalent of an SMA/EMA golden cross.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast DEMA window |
+| `window_slow` | `int` | 2 -- 200 | `21` | Slow DEMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "dema_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dema_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### dpo_negative
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if DPO is negative (price below detrended average).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | DPO period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "dpo_negative",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dpo_negative",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### dpo_positive
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if DPO is positive (price above detrended average).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 10 -- 50 | `20` | DPO period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "dpo_positive",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "dpo_positive",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### ema_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast EMA window |
+| `window_slow` | `int` | 5 -- 200 | `21` | Slow EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ema_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ema_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### ema_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast EMA window |
+| `window_slow` | `int` | 5 -- 200 | `21` | Slow EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ema_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ema_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### ema_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect an EMA crossover signal with configurable direction (bullish or bearish). Uses EMA indicator to calculate window_fast and window_slow EMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover: window_fast EMA crosses above window_slow EMA Bearish crossover: window_fast EMA crosses below window_slow EMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast &lt;= prev window_slow AND current window_fast &gt; current window_slow - Bearish: prev window_fast &gt;= prev window_slow AND current window_fast &lt; current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 200 | _required_ | Fast EMA window in bars |
+| `window_slow` | `int` | 1 -- 200 | _required_ | Slow EMA window in bars |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ema_crossover",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ema_crossover",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### epma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `10` | Fast EPMA window |
+| `window_slow` | `int` | 2 -- 200 | `30` | Slow EPMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "epma_cross_down",
+    "parameters": {
+        "window_fast": 10,
+        "window_slow": 30
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "epma_cross_down",
+  "parameters": {
+    "window_fast": 10,
+    "window_slow": 30
+  }
+}'
+```
+
+</CodeGroup>
+
+### epma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `10` | Fast EPMA window |
+| `window_slow` | `int` | 2 -- 200 | `30` | Slow EPMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "epma_cross_up",
+    "parameters": {
+        "window_fast": 10,
+        "window_slow": 30
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "epma_cross_up",
+  "parameters": {
+    "window_fast": 10,
+    "window_slow": 30
+  }
+}'
+```
+
+</CodeGroup>
+
+### heikin_ashi_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if the current Heikin-Ashi candle is bearish (HA_close &lt; HA_open).
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "heikin_ashi_bearish",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "heikin_ashi_bearish",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### heikin_ashi_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+
+Check if the current Heikin-Ashi candle is bullish (HA_close &gt; HA_open). A bullish HA candle indicates buying pressure on the smoothed bar. Strings of bullish HA candles indicate a sustained uptrend.
+
+_No configurable parameters._
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "heikin_ashi_bullish",
+    "parameters": {}
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "heikin_ashi_bullish",
+  "parameters": {}
+}'
+```
+
+</CodeGroup>
+
+### hma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish HMA crossover (fast HMA crosses below slow HMA). Low-lag crossover; fires earlier than SMA/EMA equivalents.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 4 -- 100 | `9` | Fast HMA window |
+| `window_slow` | `int` | 4 -- 200 | `25` | Slow HMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "hma_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 25
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "hma_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 25
+  }
+}'
+```
+
+</CodeGroup>
+
+### hma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish HMA crossover (fast HMA crosses above slow HMA). Low-lag crossover; fires earlier than SMA/EMA equivalents.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 4 -- 100 | `9` | Fast HMA window |
+| `window_slow` | `int` | 4 -- 200 | `25` | Slow HMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "hma_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 25
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "hma_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 25
+  }
+}'
+```
+
+</CodeGroup>
+
+### ichimoku_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Ichimoku indicates bearish signal (price below cloud).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_tenkan` | `int` | 5 -- 20 | `9` | Tenkan-sen (conversion line) window |
+| `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
+| `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ichimoku_bearish",
+    "parameters": {
+        "window_tenkan": 9,
+        "window_kijun": 26,
+        "window_senkou": 52
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ichimoku_bearish",
+  "parameters": {
+    "window_tenkan": 9,
+    "window_kijun": 26,
+    "window_senkou": 52
+  }
+}'
+```
+
+</CodeGroup>
+
+### ichimoku_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Ichimoku indicates bullish signal (price above cloud).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_tenkan` | `int` | 5 -- 20 | `9` | Tenkan-sen (conversion line) window |
+| `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
+| `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ichimoku_bullish",
+    "parameters": {
+        "window_tenkan": 9,
+        "window_kijun": 26,
+        "window_senkou": 52
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ichimoku_bullish",
+  "parameters": {
+    "window_tenkan": 9,
+    "window_kijun": 26,
+    "window_senkou": 52
+  }
+}'
+```
+
+</CodeGroup>
+
+### ichimoku_tk_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Tenkan-sen crosses Kijun-sen (TK cross).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_tenkan` | `int` | 5 -- 20 | `9` | Tenkan-sen (conversion line) window |
+| `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
+| `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ichimoku_tk_cross",
+    "parameters": {
+        "window_tenkan": 9,
+        "window_kijun": 26,
+        "window_senkou": 52,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ichimoku_tk_cross",
+  "parameters": {
+    "window_tenkan": 9,
+    "window_kijun": 26,
+    "window_senkou": 52,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_alma
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Arnaud Legoux Moving Average (ALMA). ALMA is a Gaussian-weighted MA that can be tuned to react faster (offset near 1, lower sigma) or smoother (offset near 0, higher sigma).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `21` | ALMA window in bars |
+| `offset` | `float` | 0.0 -- 1.0 | `0.85` | Weight center, 0=oldest, 1=newest |
+| `sigma` | `float` | 0.1 -- 20.0 | `6.0` | Gaussian spread. Higher = smoother |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_alma",
+    "parameters": {
+        "window": 21,
+        "offset": 0.85,
+        "sigma": 6.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_alma",
+  "parameters": {
+    "window": 21,
+    "offset": 0.85,
+    "sigma": 6.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_dema
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Double Exponential Moving Average (DEMA). DEMA reduces lag compared to a standard EMA by combining two EMA passes. Useful for trend-following filters where responsiveness matters.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `21` | DEMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_dema",
+    "parameters": {
+        "window": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_dema",
+  "parameters": {
+    "window": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_epma
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the End Point Moving Average (EPMA / LSMA). EPMA is the endpoint of a linear regression over the window, projecting the trend to "now" rather than averaging past values.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `20` | EPMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_epma",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_epma",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_hma
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Hull Moving Average (HMA). HMA tracks price with very low lag while remaining smoother than WMA. A common crypto trend filter.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 4 -- 200 | `16` | HMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_hma",
+    "parameters": {
+        "window": 16
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_hma",
+  "parameters": {
+    "window": 16
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_mama
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the MESA Adaptive Moving Average (MAMA). MAMA adapts its smoothing to volatility via a Hilbert transform.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `fast_limit` | `float` | 0.1 -- 1.0 | `0.5` | Upper alpha bound (fast response) |
+| `slow_limit` | `float` | 0.01 -- 0.5 | `0.05` | Lower alpha bound (slow response) |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_mama",
+    "parameters": {
+        "fast_limit": 0.5,
+        "slow_limit": 0.05
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_mama",
+  "parameters": {
+    "fast_limit": 0.5,
+    "slow_limit": 0.05
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_sma
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Simple Moving Average. Uses SMA indicator to calculate the SMA for the given window and returns True if the most recent close price is strictly greater than the SMA value. Returns False if insufficient data is available. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 1 -- 200 | _required_ | SMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_sma",
+    "parameters": {
+        "window": 1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_sma",
+  "parameters": {
+    "window": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_smma
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Smoothed Moving Average (SMMA / Wilder's). SMMA uses Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing a slower, more stable trend line. Same family used inside RSI and ATR.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `14` | SMMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_smma",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_smma",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_t3
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Tillson T3 moving average. T3 is a smooth low-lag MA that combines 6 EMAs via the volume factor.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `10` | T3 window in bars |
+| `volume_factor` | `float` | 0.0 -- 1.0 | `0.7` | Tillson volume factor, controls smoothness |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_t3",
+    "parameters": {
+        "window": 10,
+        "volume_factor": 0.7
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_t3",
+  "parameters": {
+    "window": 10,
+    "volume_factor": 0.7
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_tema
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Triple Exponential Moving Average (TEMA). TEMA has even less lag than DEMA by combining three EMA passes.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `21` | TEMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_tema",
+    "parameters": {
+        "window": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_tema",
+  "parameters": {
+    "window": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### is_above_trima
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the current price is above the Triangular Moving Average (TRIMA). TRIMA is a double-smoothed SMA that weights the middle of the window more heavily, producing a smoother trend line than SMA.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `20` | TRIMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "is_above_trima",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "is_above_trima",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### kst_bearish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if KST crosses below signal line (bearish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `roc1` | `int` | 1 -- 200 | `10` | ROC1 period |
+| `roc2` | `int` | 1 -- 200 | `15` | ROC2 period |
+| `roc3` | `int` | 1 -- 200 | `20` | ROC3 period |
+| `roc4` | `int` | 1 -- 200 | `30` | ROC4 period |
+| `window_sma1` | `int` | 2 -- 200 | `10` | SMA1 smoothing window for ROC1 |
+| `window_sma2` | `int` | 2 -- 200 | `10` | SMA2 smoothing window for ROC2 |
+| `window_sma3` | `int` | 2 -- 200 | `10` | SMA3 smoothing window for ROC3 |
+| `window_sma4` | `int` | 2 -- 200 | `15` | SMA4 smoothing window for ROC4 |
+| `nsig` | `int` | 1 -- 200 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "kst_bearish_cross",
+    "parameters": {
+        "roc1": 10,
+        "roc2": 15,
+        "roc3": 20,
+        "roc4": 30,
+        "window_sma1": 10,
+        "window_sma2": 10,
+        "window_sma3": 10,
+        "window_sma4": 15,
+        "nsig": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kst_bearish_cross",
+  "parameters": {
+    "roc1": 10,
+    "roc2": 15,
+    "roc3": 20,
+    "roc4": 30,
+    "window_sma1": 10,
+    "window_sma2": 10,
+    "window_sma3": 10,
+    "window_sma4": 15,
+    "nsig": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### kst_bullish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if KST crosses above signal line (bullish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `roc1` | `int` | 1 -- 200 | `10` | ROC1 period |
+| `roc2` | `int` | 1 -- 200 | `15` | ROC2 period |
+| `roc3` | `int` | 1 -- 200 | `20` | ROC3 period |
+| `roc4` | `int` | 1 -- 200 | `30` | ROC4 period |
+| `window_sma1` | `int` | 2 -- 200 | `10` | SMA1 smoothing window for ROC1 |
+| `window_sma2` | `int` | 2 -- 200 | `10` | SMA2 smoothing window for ROC2 |
+| `window_sma3` | `int` | 2 -- 200 | `10` | SMA3 smoothing window for ROC3 |
+| `window_sma4` | `int` | 2 -- 200 | `15` | SMA4 smoothing window for ROC4 |
+| `nsig` | `int` | 1 -- 200 | `9` | Signal line period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "kst_bullish_cross",
+    "parameters": {
+        "roc1": 10,
+        "roc2": 15,
+        "roc3": 20,
+        "roc4": 30,
+        "window_sma1": 10,
+        "window_sma2": 10,
+        "window_sma3": 10,
+        "window_sma4": 15,
+        "nsig": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "kst_bullish_cross",
+  "parameters": {
+    "roc1": 10,
+    "roc2": 15,
+    "roc3": 20,
+    "roc4": 30,
+    "window_sma1": 10,
+    "window_sma2": 10,
+    "window_sma3": 10,
+    "window_sma4": 15,
+    "nsig": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### ma_ribbon_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `windows` | `tuple` | 2.0 -- 1000.0 | `(5, 8, 13, 21, 34, 55, 89, 144)` | Strictly increasing tuple of SMA periods |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ma_ribbon_bearish",
+    "parameters": {
+        "windows": "(5, 8, 13, 21, 34, 55, 89, 144)"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ma_ribbon_bearish",
+  "parameters": {
+    "windows": "(5, 8, 13, 21, 34, 55, 89, 144)"
+  }
+}'
+```
+
+</CodeGroup>
+
+### ma_ribbon_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if all MAs in the ribbon are in strict bullish alignment (faster above slower). Uses 8 Fibonacci-spaced SMAs by default. Strict alignment means SMA(5) &gt; SMA(8) &gt; SMA(13) &gt; ... &gt; SMA(144). This is a strong trend filter -- when true, the market is in a clear uptrend across all horizons.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `windows` | `tuple` | 2.0 -- 1000.0 | `(5, 8, 13, 21, 34, 55, 89, 144)` | Strictly increasing tuple of SMA periods |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ma_ribbon_bullish",
+    "parameters": {
+        "windows": "(5, 8, 13, 21, 34, 55, 89, 144)"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ma_ribbon_bullish",
+  "parameters": {
+    "windows": "(5, 8, 13, 21, 34, 55, 89, 144)"
+  }
+}'
+```
+
+</CodeGroup>
+
+### ma_ribbon_tangled
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter). Useful as a no-trade filter during choppy markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `windows` | `tuple` | 2.0 -- 1000.0 | `(5, 8, 13, 21, 34, 55, 89, 144)` | Strictly increasing tuple of SMA periods |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ma_ribbon_tangled",
+    "parameters": {
+        "windows": "(5, 8, 13, 21, 34, 55, 89, 144)"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ma_ribbon_tangled",
+  "parameters": {
+    "windows": "(5, 8, 13, 21, 34, 55, 89, 144)"
+  }
+}'
+```
+
+</CodeGroup>
+
+### macd_bearish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect MACD bearish crossover (MACD line crosses below signal line). A bearish MACD crossover occurs when the MACD line crosses below the signal line, indicating potential downward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `12` | Fast EMA window |
+| `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
+| `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "macd_bearish_cross",
+    "parameters": {
+        "window_fast": 12,
+        "window_slow": 26,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "macd_bearish_cross",
+  "parameters": {
+    "window_fast": 12,
+    "window_slow": 26,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### macd_bullish_cross
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect MACD bullish crossover (MACD line crosses above signal line). A bullish MACD crossover occurs when the MACD line crosses above the signal line, indicating potential upward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `12` | Fast EMA window |
+| `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
+| `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "macd_bullish_cross",
+    "parameters": {
+        "window_fast": 12,
+        "window_slow": 26,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "macd_bullish_cross",
+  "parameters": {
+    "window_fast": 12,
+    "window_slow": 26,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### macd_positive
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `12` | Fast EMA window |
+| `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
+| `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "macd_positive",
+    "parameters": {
+        "window_fast": 12,
+        "window_slow": 26,
+        "window_sign": 9
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "macd_positive",
+  "parameters": {
+    "window_fast": 12,
+    "window_slow": 26,
+    "window_sign": 9
+  }
+}'
+```
+
+</CodeGroup>
+
+### mama_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA). Classic Ehlers exit signal: MAMA falling below FAMA signals a downtrend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `fast_limit` | `float` | 0.1 -- 1.0 | `0.5` | Upper alpha bound |
+| `slow_limit` | `float` | 0.01 -- 0.5 | `0.05` | Lower alpha bound |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "mama_cross_down",
+    "parameters": {
+        "fast_limit": 0.5,
+        "slow_limit": 0.05
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "mama_cross_down",
+  "parameters": {
+    "fast_limit": 0.5,
+    "slow_limit": 0.05
+  }
+}'
+```
+
+</CodeGroup>
+
+### mama_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA). Classic Ehlers entry signal: MAMA rising above FAMA signals an uptrend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `fast_limit` | `float` | 0.1 -- 1.0 | `0.5` | Upper alpha bound |
+| `slow_limit` | `float` | 0.01 -- 0.5 | `0.05` | Lower alpha bound |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "mama_cross_up",
+    "parameters": {
+        "fast_limit": 0.5,
+        "slow_limit": 0.05
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "mama_cross_up",
+  "parameters": {
+    "fast_limit": 0.5,
+    "slow_limit": 0.05
+  }
+}'
+```
+
+</CodeGroup>
+
+### mass_reversal_signal
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+
+Check if Mass Index signals potential reversal (reversal bulge). A reversal bulge occurs when Mass Index rises above 27 then falls below 26.5.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 5 -- 15 | `9` | Fast EMA period |
+| `window_slow` | `int` | 15 -- 40 | `25` | Sum period |
+| `threshold_high` | `float` | 25.0 -- 30.0 | `27.0` | Upper threshold |
+| `threshold_low` | `float` | 24.0 -- 27.0 | `26.5` | Lower threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "mass_reversal_signal",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 25,
+        "threshold_high": 27.0,
+        "threshold_low": 26.5
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "mass_reversal_signal",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 25,
+    "threshold_high": 27.0,
+    "threshold_low": 26.5
+  }
+}'
+```
+
+</CodeGroup>
+
+### multi_tf_trend_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the higher-timeframe EMA is falling.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `higher_tf` | `str` | - | `1W` | Pandas offset alias |
+| `window` | `int` | 2 -- 100 | `10` | EMA period |
+| `slope_threshold` | `float` | 0.0 -- 0.5 | `0.0` | Slope threshold for non-flat |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "multi_tf_trend_bearish",
+    "parameters": {
+        "higher_tf": "1W",
+        "window": 10,
+        "slope_threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "multi_tf_trend_bearish",
+  "parameters": {
+    "higher_tf": "1W",
+    "window": 10,
+    "slope_threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### multi_tf_trend_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if the higher-timeframe EMA is rising (trend confirmation filter). Requires a DatetimeIndex. Resamples to the specified higher timeframe, computes an EMA on the resampled closes, and returns True if the EMA slope is positive. Broadcasts back to the current bar's timestamp so lower-TF signals can be filtered by higher-TF trend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `higher_tf` | `str` | - | `1W` | Pandas offset alias for the higher timeframe |
+| `window` | `int` | 2 -- 100 | `10` | EMA period on the resampled close |
+| `slope_threshold` | `float` | 0.0 -- 0.5 | `0.0` | Relative slope threshold for non-flat classification |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "multi_tf_trend_bullish",
+    "parameters": {
+        "higher_tf": "1W",
+        "window": 10,
+        "slope_threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "multi_tf_trend_bullish",
+  "parameters": {
+    "higher_tf": "1W",
+    "window": 10,
+    "slope_threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### price_above_ema
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 2 -- 200 | `20` | EMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "price_above_ema",
+    "parameters": {
+        "window": 20
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "price_above_ema",
+  "parameters": {
+    "window": 20
+  }
+}'
+```
+
+</CodeGroup>
+
+### psar_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if PSAR indicates bearish trend (PSAR above price).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
+| `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "psar_bearish",
+    "parameters": {
+        "step": 0.02,
+        "max_step": 0.2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "psar_bearish",
+  "parameters": {
+    "step": 0.02,
+    "max_step": 0.2
+  }
+}'
+```
+
+</CodeGroup>
+
+### psar_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if PSAR indicates bullish trend (PSAR below price).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
+| `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "psar_bullish",
+    "parameters": {
+        "step": 0.02,
+        "max_step": 0.2
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "psar_bullish",
+  "parameters": {
+    "step": 0.02,
+    "max_step": 0.2
+  }
+}'
+```
+
+</CodeGroup>
+
+### psar_reversal
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if PSAR flips sides (potential reversal).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
+| `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
+| `direction` | `str` | - | `bullish` | Reversal direction, 'bullish' (flip to below price) or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "psar_reversal",
+    "parameters": {
+        "step": 0.02,
+        "max_step": 0.2,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "psar_reversal",
+  "parameters": {
+    "step": 0.02,
+    "max_step": 0.2,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_bearish_divergence
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a regular bearish RSI divergence: price higher high, RSI lower high. Classic reversal signal indicating bullish momentum is weakening.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `rsi_window` | `int` | 2 -- 100 | `14` | RSI period |
+| `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
+| `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between the two swing points compared |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "rsi_bearish_divergence",
+    "parameters": {
+        "rsi_window": 14,
+        "swing_window": 5,
+        "min_swing_distance": 10
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_bearish_divergence",
+  "parameters": {
+    "rsi_window": 14,
+    "swing_window": 5,
+    "min_swing_distance": 10
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_bullish_divergence
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a regular bullish RSI divergence: price lower low, RSI higher low. Classic reversal signal indicating bearish momentum is weakening.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `rsi_window` | `int` | 2 -- 100 | `14` | RSI period |
+| `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
+| `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between the two swing points compared |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "rsi_bullish_divergence",
+    "parameters": {
+        "rsi_window": 14,
+        "swing_window": 5,
+        "min_swing_distance": 10
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_bullish_divergence",
+  "parameters": {
+    "rsi_window": 14,
+    "swing_window": 5,
+    "min_swing_distance": 10
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_hidden_bearish_divergence
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a hidden bearish RSI divergence: price lower high, RSI higher high. Continuation signal in a downtrend.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `rsi_window` | `int` | 2 -- 100 | `14` | RSI period |
+| `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
+| `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between swings |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "rsi_hidden_bearish_divergence",
+    "parameters": {
+        "rsi_window": 14,
+        "swing_window": 5,
+        "min_swing_distance": 10
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_hidden_bearish_divergence",
+  "parameters": {
+    "rsi_window": 14,
+    "swing_window": 5,
+    "min_swing_distance": 10
+  }
+}'
+```
+
+</CodeGroup>
+
+### rsi_hidden_bullish_divergence
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a hidden bullish RSI divergence: price higher low, RSI lower low. Continuation signal in an uptrend -- indicates the uptrend is still intact despite a pullback.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `rsi_window` | `int` | 2 -- 100 | `14` | RSI period |
+| `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
+| `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between swings |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "rsi_hidden_bullish_divergence",
+    "parameters": {
+        "rsi_window": 14,
+        "swing_window": 5,
+        "min_swing_distance": 10
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "rsi_hidden_bullish_divergence",
+  "parameters": {
+    "rsi_window": 14,
+    "swing_window": 5,
+    "min_swing_distance": 10
+  }
+}'
+```
+
+</CodeGroup>
+
+### sma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish SMA crossover as an exit signal. Returns True when the window_fast SMA crosses below the window_slow SMA (death cross). This is a momentum-driven exit signal, indicating a transition from bullish to bearish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 200 | _required_ | Fast SMA window in bars |
+| `window_slow` | `int` | 1 -- 200 | _required_ | Slow SMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "sma_cross_down",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "sma_cross_down",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+### sma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish SMA crossover as an entry signal. Returns True when the window_fast SMA crosses above the window_slow SMA (golden cross). This is a momentum-driven entry signal, indicating a transition from bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 200 | _required_ | Fast SMA window in bars |
+| `window_slow` | `int` | 1 -- 200 | _required_ | Slow SMA window in bars |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "sma_cross_up",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "sma_cross_up",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1
+  }
+}'
+```
+
+</CodeGroup>
+
+### sma_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect an SMA crossover signal with configurable direction (bullish or bearish). Uses SMA indicator to calculate window_fast and window_slow SMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover (golden cross): window_fast SMA crosses above window_slow SMA Bearish crossover (death cross): window_fast SMA crosses below window_slow SMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast &lt;= prev window_slow AND current window_fast &gt; current window_slow - Bearish: prev window_fast &gt;= prev window_slow AND current window_fast &lt; current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 1 -- 200 | _required_ | Fast SMA window in bars |
+| `window_slow` | `int` | 1 -- 200 | _required_ | Slow SMA window in bars |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "sma_crossover",
+    "parameters": {
+        "window_fast": 1,
+        "window_slow": 1,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "sma_crossover",
+  "parameters": {
+    "window_fast": 1,
+    "window_slow": 1,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### smma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA). Slower, more stable crossover than EMA cross; fewer false triggers.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `14` | Fast SMMA window |
+| `window_slow` | `int` | 2 -- 200 | `50` | Slow SMMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "smma_cross_down",
+    "parameters": {
+        "window_fast": 14,
+        "window_slow": 50
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "smma_cross_down",
+  "parameters": {
+    "window_fast": 14,
+    "window_slow": 50
+  }
+}'
+```
+
+</CodeGroup>
+
+### smma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA). Slower, more stable crossover than EMA cross; fewer false triggers.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `14` | Fast SMMA window |
+| `window_slow` | `int` | 2 -- 200 | `50` | Slow SMMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "smma_cross_up",
+    "parameters": {
+        "window_fast": 14,
+        "window_slow": 50
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "smma_cross_up",
+  "parameters": {
+    "window_fast": 14,
+    "window_slow": 50
+  }
+}'
+```
+
+</CodeGroup>
+
+### stc_overbought
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if STC indicates overbought condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 2 -- 200 | `50` | Slow EMA period |
+| `window_fast` | `int` | 2 -- 200 | `23` | Fast EMA period |
+| `cycle` | `int` | 1 -- 200 | `10` | Cycle period |
+| `smooth1` | `int` | 1 -- 200 | `3` | First smoothing period |
+| `smooth2` | `int` | 1 -- 200 | `3` | Second smoothing period |
+| `threshold` | `float` | 0.0 -- 100.0 | `75.0` | Overbought threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "stc_overbought",
+    "parameters": {
+        "window_slow": 50,
+        "window_fast": 23,
+        "cycle": 10,
+        "smooth1": 3,
+        "smooth2": 3,
+        "threshold": 75.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stc_overbought",
+  "parameters": {
+    "window_slow": 50,
+    "window_fast": 23,
+    "cycle": 10,
+    "smooth1": 3,
+    "smooth2": 3,
+    "threshold": 75.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### stc_oversold
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if STC indicates oversold condition.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_slow` | `int` | 2 -- 200 | `50` | Slow EMA period |
+| `window_fast` | `int` | 2 -- 200 | `23` | Fast EMA period |
+| `cycle` | `int` | 1 -- 200 | `10` | Cycle period |
+| `smooth1` | `int` | 1 -- 200 | `3` | First smoothing period |
+| `smooth2` | `int` | 1 -- 200 | `3` | Second smoothing period |
+| `threshold` | `float` | 0.0 -- 100.0 | `25.0` | Oversold threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "stc_oversold",
+    "parameters": {
+        "window_slow": 50,
+        "window_fast": 23,
+        "cycle": 10,
+        "smooth1": 3,
+        "smooth2": 3,
+        "threshold": 25.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "stc_oversold",
+  "parameters": {
+    "window_slow": 50,
+    "window_fast": 23,
+    "cycle": 10,
+    "smooth1": 3,
+    "smooth2": 3,
+    "threshold": 25.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### supertrend_flip_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect SuperTrend flipping from long (+1) to short (-1). Classic SuperTrend bearish entry signal.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `10` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "supertrend_flip_down",
+    "parameters": {
+        "window": 10,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "supertrend_flip_down",
+  "parameters": {
+    "window": 10,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### supertrend_flip_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect SuperTrend flipping from short (-1) to long (+1). Classic SuperTrend bullish entry signal.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `10` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "supertrend_flip_up",
+    "parameters": {
+        "window": 10,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "supertrend_flip_up",
+  "parameters": {
+    "window": 10,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### supertrend_long
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if SuperTrend is in the long regime (+1 direction).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `10` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "supertrend_long",
+    "parameters": {
+        "window": 10,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "supertrend_long",
+  "parameters": {
+    "window": 10,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### supertrend_short
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if SuperTrend is in the short regime (-1 direction).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 50 | `10` | ATR window |
+| `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "supertrend_short",
+    "parameters": {
+        "window": 10,
+        "multiplier": 3.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "supertrend_short",
+  "parameters": {
+    "window": 10,
+    "multiplier": 3.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### t3_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish T3 crossover (fast T3 crosses below slow T3).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `5` | Fast T3 window |
+| `window_slow` | `int` | 2 -- 200 | `10` | Slow T3 window |
+| `volume_factor` | `float` | 0.0 -- 1.0 | `0.7` | Tillson volume factor |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "t3_cross_down",
+    "parameters": {
+        "window_fast": 5,
+        "window_slow": 10,
+        "volume_factor": 0.7
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "t3_cross_down",
+  "parameters": {
+    "window_fast": 5,
+    "window_slow": 10,
+    "volume_factor": 0.7
+  }
+}'
+```
+
+</CodeGroup>
+
+### t3_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish T3 crossover (fast T3 crosses above slow T3). Very smooth, low-lag crossover. Both T3s share the same volume_factor.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `5` | Fast T3 window |
+| `window_slow` | `int` | 2 -- 200 | `10` | Slow T3 window |
+| `volume_factor` | `float` | 0.0 -- 1.0 | `0.7` | Tillson volume factor |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "t3_cross_up",
+    "parameters": {
+        "window_fast": 5,
+        "window_slow": 10,
+        "volume_factor": 0.7
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "t3_cross_up",
+  "parameters": {
+    "window_fast": 5,
+    "window_slow": 10,
+    "volume_factor": 0.7
+  }
+}'
+```
+
+</CodeGroup>
+
+### tema_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA). Very low-lag cross signal; expect more whipsaw in noisy markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast TEMA window |
+| `window_slow` | `int` | 2 -- 200 | `21` | Slow TEMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "tema_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "tema_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### tema_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA). Very low-lag cross signal; expect more whipsaw in noisy markets.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `9` | Fast TEMA window |
+| `window_slow` | `int` | 2 -- 200 | `21` | Slow TEMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "tema_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "tema_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### trima_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `10` | Fast TRIMA window |
+| `window_slow` | `int` | 2 -- 200 | `30` | Slow TRIMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "trima_cross_down",
+    "parameters": {
+        "window_fast": 10,
+        "window_slow": 30
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "trima_cross_down",
+  "parameters": {
+    "window_fast": 10,
+    "window_slow": 30
+  }
+}'
+```
+
+</CodeGroup>
+
+### trima_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 100 | `10` | Fast TRIMA window |
+| `window_slow` | `int` | 2 -- 200 | `30` | Slow TRIMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "trima_cross_up",
+    "parameters": {
+        "window_fast": 10,
+        "window_slow": 30
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "trima_cross_up",
+  "parameters": {
+    "window_fast": 10,
+    "window_slow": 30
+  }
+}'
+```
+
+</CodeGroup>
+
+### trix_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if TRIX indicates bearish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `15` | TRIX period |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "trix_bearish",
+    "parameters": {
+        "window": 15,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "trix_bearish",
+  "parameters": {
+    "window": 15,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### trix_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if TRIX indicates bullish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `15` | TRIX period |
+| `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "trix_bullish",
+    "parameters": {
+        "window": 15,
+        "threshold": 0.0
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "trix_bullish",
+  "parameters": {
+    "window": 15,
+    "threshold": 0.0
+  }
+}'
+```
+
+</CodeGroup>
+
+### ttm_squeeze_active
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if the TTM Squeeze is active (BB inside KC -- volatility contraction). Use as a no-breakout filter: when true, market is coiled and waiting for a directional move.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `bb_window` | `int` | 5 -- 100 | `20` | Bollinger Band window |
+| `bb_std` | `float` | 1.0 -- 4.0 | `2.0` | Bollinger std multiplier |
+| `kc_window` | `int` | 5 -- 100 | `20` | Keltner Channel window (used for both EMA and ATR) |
+| `kc_atr_mult` | `float` | 0.5 -- 3.0 | `1.5` | Keltner ATR multiplier |
+| `mom_window` | `int` | 5 -- 50 | `12` | Momentum regression window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ttm_squeeze_active",
+    "parameters": {
+        "bb_window": 20,
+        "bb_std": 2.0,
+        "kc_window": 20,
+        "kc_atr_mult": 1.5,
+        "mom_window": 12
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ttm_squeeze_active",
+  "parameters": {
+    "bb_window": 20,
+    "bb_std": 2.0,
+    "kc_window": 20,
+    "kc_atr_mult": 1.5,
+    "mom_window": 12
+  }
+}'
+```
+
+</CodeGroup>
+
+### ttm_squeeze_fired_bearish
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect TTM Squeeze release with bearish momentum.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `bb_window` | `int` | 5 -- 100 | `20` | Bollinger Band window |
+| `bb_std` | `float` | 1.0 -- 4.0 | `2.0` | Bollinger std multiplier |
+| `kc_window` | `int` | 5 -- 100 | `20` | Keltner Channel window |
+| `kc_atr_mult` | `float` | 0.5 -- 3.0 | `1.5` | Keltner ATR multiplier |
+| `mom_window` | `int` | 5 -- 50 | `12` | Momentum regression window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ttm_squeeze_fired_bearish",
+    "parameters": {
+        "bb_window": 20,
+        "bb_std": 2.0,
+        "kc_window": 20,
+        "kc_atr_mult": 1.5,
+        "mom_window": 12
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ttm_squeeze_fired_bearish",
+  "parameters": {
+    "bb_window": 20,
+    "bb_std": 2.0,
+    "kc_window": 20,
+    "kc_atr_mult": 1.5,
+    "mom_window": 12
+  }
+}'
+```
+
+</CodeGroup>
+
+### ttm_squeeze_fired_bullish
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Detect TTM Squeeze release with bullish momentum. Fires when the squeeze just ended (was on previous bar, off now) AND momentum is positive. Classic Carter entry signal.
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `bb_window` | `int` | 5 -- 100 | `20` | Bollinger Band window |
+| `bb_std` | `float` | 1.0 -- 4.0 | `2.0` | Bollinger std multiplier |
+| `kc_window` | `int` | 5 -- 100 | `20` | Keltner Channel window |
+| `kc_atr_mult` | `float` | 0.5 -- 3.0 | `1.5` | Keltner ATR multiplier |
+| `mom_window` | `int` | 5 -- 50 | `12` | Momentum regression window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "ttm_squeeze_fired_bullish",
+    "parameters": {
+        "bb_window": 20,
+        "bb_std": 2.0,
+        "kc_window": 20,
+        "kc_atr_mult": 1.5,
+        "mom_window": 12
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "ttm_squeeze_fired_bullish",
+  "parameters": {
+    "bb_window": 20,
+    "bb_std": 2.0,
+    "kc_window": 20,
+    "kc_atr_mult": 1.5,
+    "mom_window": 12
+  }
+}'
+```
+
+</CodeGroup>
+
+### vortex_bearish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Vortex Indicator shows bearish trend (-VI &gt; +VI).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | Vortex period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "vortex_bearish",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vortex_bearish",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### vortex_bullish
+
+**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Vortex Indicator shows bullish trend (+VI &gt; -VI).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | Vortex period |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "vortex_bullish",
+    "parameters": {
+        "window": 14
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vortex_bullish",
+  "parameters": {
+    "window": 14
+  }
+}'
+```
+
+</CodeGroup>
+
+### vortex_crossover
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+
+Check if Vortex lines cross (trend change).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window` | `int` | 5 -- 30 | `14` | Vortex period |
+| `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish' |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "vortex_crossover",
+    "parameters": {
+        "window": 14,
+        "direction": "bullish"
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "vortex_crossover",
+  "parameters": {
+    "window": 14,
+    "direction": "bullish"
+  }
+}'
+```
+
+</CodeGroup>
+
+### wma_cross_down
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if fast WMA crosses below slow WMA (bearish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `9` | Fast WMA window |
+| `window_slow` | `int` | 10 -- 100 | `21` | Slow WMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "wma_cross_down",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "wma_cross_down",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>
+
+### wma_cross_up
+
+**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+
+Check if fast WMA crosses above slow WMA (bullish).
+
+#### Parameters
+
+| Name | Type | Range | Default | Description |
+|------|------|-------|---------|-------------|
+| `window_fast` | `int` | 2 -- 50 | `9` | Fast WMA window |
+| `window_slow` | `int` | 10 -- 100 | `21` | Slow WMA window |
+
+#### Example
+
+<CodeGroup>
+
+```python Python
+from mangrove_kb import RuleRegistry
+
+rule = {
+    "name": "wma_cross_up",
+    "parameters": {
+        "window_fast": 9,
+        "window_slow": 21
+    }
+}
+result = RuleRegistry.evaluate(rule, df)
+print(result)  # True or False
+```
+
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "name": "wma_cross_up",
+  "parameters": {
+    "window_fast": 9,
+    "window_slow": 21
+  }
+}'
+```
+
+</CodeGroup>

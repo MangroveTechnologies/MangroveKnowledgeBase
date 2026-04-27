@@ -34,7 +34,7 @@ Runs a synchronous backtest and returns metrics and trade history. Loads market 
 
 <CodeGroup>
 ```bash cURL
-curl -X POST http://localhost:5001/api/v1/backtesting/backtest \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -64,7 +64,7 @@ curl -X POST http://localhost:5001/api/v1/backtesting/backtest \
 import requests
 
 response = requests.post(
-    "http://localhost:5001/api/v1/backtesting/backtest",
+    "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "asset": "ETH",
@@ -148,7 +148,7 @@ Retrieves a previously executed backtest including full trade history.
 
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  "http://localhost:5001/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000"
+  "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000"
 ```
 
 ## Bulk Backtest
@@ -160,7 +160,7 @@ Evaluates multiple strategies over a shared date range. Market data is fetched o
 Provide either `strategy_ids` (UUIDs from database) or `strategy_configs` (inline strategy objects).
 
 ```bash
-curl -X POST http://localhost:5001/api/v1/backtesting/backtest/bulk \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/bulk \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{

@@ -1,0 +1,50 @@
+---
+title: "x402-plugin-template"
+description: "Scaffold for Claude Code + OpenClaw plugins that consume x402-gated MCP servers. Client-side companion to x402-app-template."
+---
+
+# x402-plugin-template
+
+Build a Claude Code (or OpenClaw) plugin that consumes an x402-gated MCP service. This template handles the messy parts: connection lifecycle, the `402 → sign → retry` round-trip, payment confirmation UX, and packaging for both runtimes.
+
+GitHub: [`x402-plugin-template`](https://github.com/MangroveTechnologies/x402-plugin-template).
+
+## Quickstart
+
+```bash
+git clone https://github.com/MangroveTechnologies/x402-plugin-template.git my-plugin
+cd my-plugin
+./init.sh my-plugin-name https://my-server.com/mcp
+```
+
+The init script:
+1. Renames the package and references.
+2. Wires the MCP server URL into `shared/config.ts`.
+3. Removes the example skills and gives you a stub.
+
+Then customize:
+- `.claude/skills/` — Claude Code slash commands
+- `openclaw-plugin/` — OpenClaw plugin manifest + handlers
+- `shared/` — code that both runtimes share (MCP client, x402 round-trip, formatting)
+
+## x402 round-trip — handled for you
+
+The template's MCP client wraps every tool call:
+
+1. Call tool without `payment` parameter.
+2. Server returns `402 Payment Required` with price and network details.
+3. Plugin prompts the user for confirmation.
+4. Plugin signs the payment with the configured wallet.
+5. Plugin re-calls the tool with the `payment` parameter (base64 signature).
+6. Server verifies, settles on-chain, returns the data.
+
+You write the slash command logic; the template handles steps 2-5.
+
+## Reference plugins built from this template
+
+- [mangrove-trader-plugins](https://github.com/MangroveTechnologies/mangrove-trader-plugins) — wraps MangroveTrader.
+- The MangroveMarkets plugin uses an evolved fork of this template that predates the public release.
+
+## License
+
+MIT.

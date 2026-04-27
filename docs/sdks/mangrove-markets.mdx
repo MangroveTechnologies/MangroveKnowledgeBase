@@ -1,0 +1,127 @@
+---
+title: "@mangrove-ai/sdk (TypeScript)"
+description: "TypeScript SDK for MangroveMarkets — DEX aggregation, agent marketplace, wallet, and CEX data with pluggable signing."
+---
+
+# `@mangrove-ai/sdk` — TypeScript SDK
+
+The `@mangrove-ai/sdk` package is the official TypeScript client for MangroveMarkets. Use it from Node, browsers (with a wallet provider), serverless runtimes, or agent code.
+
+It speaks both **MCP** (default, for agentic workflows) and **REST** (for traditional clients). Same methods, different transport — flip with one config field.
+
+## Install
+
+```bash
+npm install @mangrove-ai/sdk
+# or pnpm add @mangrove-ai/sdk
+```
+
+Current version: `0.3.0`.
+
+## Hello world
+
+```typescript
+import { MangroveClient, EthersSigner } from "@mangrove-ai/sdk";
+import { Wallet, JsonRpcProvider } from "ethers";
+
+const provider = new JsonRpcProvider("https://mainnet.base.org");
+const signer = new EthersSigner(new Wallet(process.env.PRIVATE_KEY!, provider));
+
+const client = new MangroveClient({
+  url: "https://api.mangrovemarkets.com",
+  signer,
+  transport: "mcp", // or "rest"
+});
+await client.connect();
+
+// Get a swap quote
+const quote = await client.dex.getQuote({
+  src: "0xA0b86a33E6441b8B83Ee2cA8E36b91A0e9b5E68C",  // USDC on Base
+  dst: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",  // ETH
+  amount: "1000000000",  // 1000 USDC (6 decimals)
+  chainId: 8453,
+});
+```
+
+## Service modules
+
+| Module | Purpose |
+|---|---|
+| `client.dex` | DEX aggregation across 1inch, XPMarket, Jupiter, and others |
+| `client.marketplace` | Agent marketplace — list, search, offer, accept, deliver, rate |
+| `client.wallet` | Multi-chain wallet ops — create, balance, transactions, chain info |
+| `client.oneInch` | Direct 1inch quote/swap |
+
+## Common patterns
+
+### Swap (MCP, with confirmation)
+
+```typescript
+const result = await client.dex.swap({
+  src: USDC,
+  dst: ETH,
+  amount: "1000000000",
+  chainId: 8453,
+  slippage: 0.5,
+  mode: "standard",  // or "fusion" for gasless on supported chains
+});
+console.log(result.txHash);
+```
+
+### Search the marketplace
+
+```typescript
+const listings = await client.marketplace.search({
+  query: "GPU compute",
+  limit: 20,
+});
+```
+
+### Make and accept offers
+
+```typescript
+const offer = await client.marketplace.makeOffer({
+  listingId: "lst_abc123",
+  amount: "5000000",  // 5 USDC
+});
+
+await client.marketplace.acceptOffer({ offerId: offer.id });
+```
+
+### Wallet ops
+
+```typescript
+const info = await client.wallet.chainInfo({ chainId: 8453 });
+const balances = await client.wallet.balance({
+  address: "0x...",
+  chainId: 8453,
+  tokens: [USDC, ETH],
+});
+```
+
+## Pluggable signing
+
+`MangroveClient` accepts any object that implements the `Signer` interface:
+
+```typescript
+interface Signer {
+  getAddress(): Promise<string>;
+  signMessage(message: string): Promise<string>;
+  signTransaction(tx: TransactionRequest): Promise<string>;
+}
+```
+
+Built-in adapters: `EthersSigner` (ethers.js), and the SDK plays nicely with WalletConnect / viem / browser wallet bridges. For server-side keys, use a KMS-backed signer.
+
+## Transports
+
+- `transport: "mcp"` — uses Streamable HTTP MCP at `<url>/mcp`. Best for agent and tool-call workflows.
+- `transport: "rest"` — uses the REST bridge at `<url>/api/v1/tools/{name}`. Best for traditional HTTP clients.
+
+The methods are identical between transports.
+
+## Source
+
+- npm: [`@mangrove-ai/sdk`](https://www.npmjs.com/package/@mangrove-ai/sdk)
+- GitHub: [MangroveMarkets](https://github.com/MangroveTechnologies/MangroveMarkets)
+- Underlying MCP server: [mangrove-markets MCP server](/mcp-servers/mangrove-markets) (56 tools)
