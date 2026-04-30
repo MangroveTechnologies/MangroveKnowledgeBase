@@ -277,9 +277,9 @@ async def home(
     all_tags = search_engine.get_all_tags()
 
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "title": "Table of Contents",
             "toc_html": toc_html,
             "all_docs": docs,
@@ -338,9 +338,9 @@ async def view_document(
     all_tags = search_engine.get_all_tags()
 
     return templates.TemplateResponse(
+        request,
         "document.html",
         {
-            "request": request,
             "title": doc['title'],
             "document": doc,
             "html_content": html_content,
@@ -392,9 +392,9 @@ async def search_page(
     all_docs = search_engine.get_all_documents()
 
     return templates.TemplateResponse(
+        request,
         "search.html",
         {
-            "request": request,
             "title": "Search" + (f" - {q}" if q else ""),
             "query": q or "",
             "selected_tags": selected_tags,
@@ -438,9 +438,9 @@ async def glossary_page(
     all_tags = search_engine.get_all_tags()
 
     return templates.TemplateResponse(
+        request,
         "glossary.html",
         {
-            "request": request,
             "title": "Glossary",
             "entries": entries,
             "grouped_entries": grouped,
@@ -493,9 +493,9 @@ async def tag_page(
     all_docs = search_engine.get_all_documents()
 
     return templates.TemplateResponse(
+        request,
         "tag.html",
         {
-            "request": request,
             "title": f"Tag: {tag_name}",
             "tag_name": tag_name,
             "documents": documents,
