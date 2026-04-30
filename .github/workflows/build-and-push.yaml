@@ -1,10 +1,26 @@
 name: Build and Push KB Image
 
+# Builds + pushes the KB Docker image ONLY off semver tags (vX.Y.Z). Main
+# pushes no longer auto-build -- the release pipeline is: PR -> merge to
+# main (CI runs in ci.yml) -> dispatch release.yml to cut the next tag ->
+# tag push fires this workflow. The pushed image is tagged with the version
+# (e.g. mangrove-ai-kb:v1.0.2), so `gcloud run services describe` shows
+# the human-readable release instead of a bare commit sha.
+#
+# Manual replays use workflow_dispatch with a `tag` input. A hard guard
+# refuses any non-tag ref so a misconfigured trigger can't silently put
+# main HEAD into prod.
+
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build + push (e.g. v1.0.2). Must already exist on origin."
+        required: true
+        type: string
 
 env:
   REGION: us-central1
@@ -17,18 +33,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Resolve target ref
+        id: target
+        env:
+          # Bind github-context values to env vars so semgrep's
+          # yaml.github-actions.security.run-shell-injection rule passes:
+          # never reference `${{ github.* }}` directly in a `run:` script body.
+          DISPATCH_TAG: ${{ github.event.inputs.tag }}
+          PUSH_REF_NAME: ${{ github.ref_name }}
+        run: |
+          # On tag push: PUSH_REF_NAME is the tag (e.g. v1.0.2).
+          # On workflow_dispatch: take the user-supplied tag input.
+          if [ -n "${DISPATCH_TAG}" ]; then
+            REF="${DISPATCH_TAG}"
+          else
+            REF="${PUSH_REF_NAME}"
+          fi
+          # Hard guard -- never build a non-tag ref.
+          case "$REF" in
+            v*) ;;
+            *) echo "ERROR: refusing to build non-tag ref: $REF"; exit 1 ;;
+          esac
+          echo "ref=${REF}" >> "$GITHUB_OUTPUT"
+          # Strip leading 'v' for SETUPTOOLS_SCM_PRETEND_VERSION.
+          echo "version=${REF#v}" >> "$GITHUB_OUTPUT"
+          echo "Building tag: ${REF}"
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: ${{ steps.target.outputs.ref }}
           fetch-depth: 0
           fetch-tags: true
-
-      - name: Get version from git tags
-        id: version
-        run: |
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Package version: ${VERSION}"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -44,24 +80,42 @@ jobs:
 
       - name: Build Docker image
         env:
-          PKG_VERSION: ${{ steps.version.outputs.version }}
+          IMAGE_BASE: ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}
+          VERSION_TAG: ${{ steps.target.outputs.ref }}
+          PKG_VERSION: ${{ steps.target.outputs.version }}
+          COMMIT_SHA: ${{ github.sha }}
         run: |
+          # Three image tags:
+          #   :v1.0.2    -- human-readable, what Cloud Run pulls from
+          #   :<sha>     -- immutable backup pinned to commit
+          #   :latest    -- convenience for local pulls (existing consumers)
           docker build \
             -f kb_server/Dockerfile \
             --build-arg SETUPTOOLS_SCM_PRETEND_VERSION="$PKG_VERSION" \
-            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:${{ github.sha }} \
-            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:latest \
+            -t "${IMAGE_BASE}:${VERSION_TAG}" \
+            -t "${IMAGE_BASE}:${COMMIT_SHA}" \
+            -t "${IMAGE_BASE}:latest" \
             .
 
       - name: Push Docker image
+        env:
+          IMAGE_BASE: ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}
+          VERSION_TAG: ${{ steps.target.outputs.ref }}
+          COMMIT_SHA: ${{ github.sha }}
         run: |
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:latest
+          docker push "${IMAGE_BASE}:${VERSION_TAG}"
+          docker push "${IMAGE_BASE}:${COMMIT_SHA}"
+          docker push "${IMAGE_BASE}:latest"
 
       - name: Summary
         if: success()
+        env:
+          IMAGE_BASE: ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}
+          VERSION_TAG: ${{ steps.target.outputs.ref }}
+          COMMIT_SHA: ${{ github.sha }}
         run: |
           echo "==================== KB IMAGE PUSHED ===================="
-          echo "Image: ${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_REPO_PROJECT }}/${{ env.REPO_NAME }}/${{ env.KB_IMAGE_NAME }}:${{ github.sha }}"
-          echo "Tag: latest"
+          echo "Tag: ${VERSION_TAG}"
+          echo "Image: ${IMAGE_BASE}:${VERSION_TAG}"
+          echo "Commit: ${COMMIT_SHA}"
           echo "========================================================="
