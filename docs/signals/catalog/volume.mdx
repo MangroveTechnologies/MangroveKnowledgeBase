@@ -9,19 +9,21 @@ _33 signals in this category._
 
 See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.
 
-### adi_bearish
+Click a signal to expand parameters and examples.
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<AccordionGroup>
+
+<Accordion title="adi_bearish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if ADI (Accumulation/Distribution) is falling (bearish volume).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -52,19 +54,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### adi_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="adi_bullish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if ADI (Accumulation/Distribution) is rising (bullish volume).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -95,20 +97,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### adosc_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="adosc_bearish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if Chaikin A/D Oscillator is negative (distribution regime).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `fast` | `int` | 2 -- 20 | `3` | Fast EMA period for AD |
 | `slow` | `int` | 5 -- 50 | `10` | Slow EMA period for AD |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -141,20 +143,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### adosc_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="adosc_bullish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if Chaikin A/D Oscillator is positive (accumulation regime). Positive ADOSC = AD line's fast EMA above its slow EMA, indicating short-term buying pressure relative to longer-term trend.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `fast` | `int` | 2 -- 20 | `3` | Fast EMA period for AD |
 | `slow` | `int` | 5 -- 50 | `10` | Slow EMA period for AD |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -187,20 +189,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### adosc_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="adosc_cross_down" description="TRIGGER - requires High, Low, Close, Volume">
 
 Detect ADOSC crossing below zero (distribution onset).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `fast` | `int` | 2 -- 20 | `3` | Fast EMA period for AD |
 | `slow` | `int` | 5 -- 50 | `10` | Slow EMA period for AD |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -233,20 +235,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### adosc_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="adosc_cross_up" description="TRIGGER - requires High, Low, Close, Volume">
 
 Detect ADOSC crossing above zero (accumulation onset).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `fast` | `int` | 2 -- 20 | `3` | Fast EMA period for AD |
 | `slow` | `int` | 5 -- 50 | `10` | Slow EMA period for AD |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -279,20 +281,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cmf_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="cmf_bearish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if CMF (Chaikin Money Flow) indicates selling pressure.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 10 -- 50 | `20` | CMF period |
 | `threshold` | `float` | -1.0 -- 1.0 | `0.0` | Bearish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -325,20 +327,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cmf_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="cmf_bullish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if CMF (Chaikin Money Flow) indicates buying pressure.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 10 -- 50 | `20` | CMF period |
 | `threshold` | `float` | -1.0 -- 1.0 | `0.0` | Bullish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -371,19 +373,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cumulative_return_positive
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="cumulative_return_positive" description="FILTER - requires Close">
 
 Check if cumulative return from start is positive.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Minimum cumulative return in percent |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -414,19 +416,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cumulative_return_target
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="cumulative_return_target" description="FILTER - requires Close">
 
 Check if cumulative return has reached target.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `target` | `float` | 1.0 -- 100.0 | `10.0` | Target cumulative return in percent |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -457,19 +459,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### daily_return_negative
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="daily_return_negative" description="FILTER - requires Close">
 
 Check if daily return is negative.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Maximum return threshold in percent |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -500,19 +502,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### daily_return_positive
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="daily_return_positive" description="FILTER - requires Close">
 
 Check if daily return is positive.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Minimum return threshold in percent |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -543,20 +545,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### eom_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Volume
+<Accordion title="eom_bearish" description="FILTER - requires High, Low, Volume">
 
 Check if Ease of Movement indicates bearish (easy downward movement).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `14` | EOM period |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -589,20 +591,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### eom_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Volume
+<Accordion title="eom_bullish" description="FILTER - requires High, Low, Volume">
 
 Check if Ease of Movement indicates bullish (easy upward movement).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `14` | EOM period |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -635,20 +637,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### force_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="force_bearish" description="FILTER - requires Close, Volume">
 
 Check if Force Index indicates bearish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `13` | EMA period for smoothing |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -681,20 +683,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### force_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="force_bullish" description="FILTER - requires Close, Volume">
 
 Check if Force Index indicates bullish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `13` | EMA period for smoothing |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -727,19 +729,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_vwma
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="is_above_vwma" description="FILTER - requires Close, Volume">
 
 Check if the current price is above the Volume-Weighted Moving Average (VWMA). VWMA weights each bar's close by its volume, emphasizing high-participation bars. Useful as a filter that incorporates conviction from volume.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `20` | VWMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -770,13 +772,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kvo_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="kvo_bearish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if KVO is below its signal line (bearish volume regime).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -784,7 +786,7 @@ Check if KVO is below its signal line (bearish volume regime).
 | `slow` | `int` | 10 -- 200 | `55` | Slow EMA period |
 | `signal_window` | `int` | 2 -- 50 | `13` | Signal-line EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -819,13 +821,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kvo_bearish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="kvo_bearish_cross" description="TRIGGER - requires High, Low, Close, Volume">
 
 Detect KVO crossing below its signal line (bearish volume onset).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -833,7 +835,7 @@ Detect KVO crossing below its signal line (bearish volume onset).
 | `slow` | `int` | 10 -- 200 | `55` | Slow EMA period |
 | `signal_window` | `int` | 2 -- 50 | `13` | Signal-line EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -868,13 +870,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kvo_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="kvo_bullish" description="FILTER - requires High, Low, Close, Volume">
 
 Check if KVO is above its signal line (bullish volume regime).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -882,7 +884,7 @@ Check if KVO is above its signal line (bullish volume regime).
 | `slow` | `int` | 10 -- 200 | `55` | Slow EMA period |
 | `signal_window` | `int` | 2 -- 50 | `13` | Signal-line EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -917,13 +919,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kvo_bullish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="kvo_bullish_cross" description="TRIGGER - requires High, Low, Close, Volume">
 
 Detect KVO crossing above its signal line (bullish volume onset). Classic Klinger entry trigger; often confirms a price divergence.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -931,7 +933,7 @@ Detect KVO crossing above its signal line (bullish volume onset). Classic Klinge
 | `slow` | `int` | 10 -- 200 | `55` | Slow EMA period for signed volume |
 | `signal_window` | `int` | 2 -- 50 | `13` | Signal-line EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -966,20 +968,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mfi_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="mfi_overbought" description="FILTER - requires High, Low, Close, Volume">
 
 Check if MFI (Money Flow Index) indicates overbought condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `14` | MFI period |
 | `threshold` | `float` | 70.0 -- 95.0 | `80.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1012,20 +1014,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mfi_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="mfi_oversold" description="FILTER - requires High, Low, Close, Volume">
 
 Check if MFI (Money Flow Index) indicates oversold condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `14` | MFI period |
 | `threshold` | `float` | 5.0 -- 30.0 | `20.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1058,19 +1060,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### nvi_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="nvi_bearish" description="FILTER - requires Close, Volume">
 
 Check if NVI (Negative Volume Index) indicates smart money selling. NVI below its moving average suggests smart money distribution.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 100 -- 200 | `255` | EMA period for signal |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1101,19 +1103,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### nvi_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="nvi_bullish" description="FILTER - requires Close, Volume">
 
 Check if NVI (Negative Volume Index) indicates smart money buying. NVI above its moving average suggests smart money accumulation.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 100 -- 200 | `255` | EMA period for signal |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1144,19 +1146,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### obv_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="obv_bearish" description="FILTER - requires Close, Volume">
 
 Check if OBV is falling (bearish volume confirmation).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1187,19 +1189,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### obv_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="obv_bullish" description="FILTER - requires Close, Volume">
 
 Check if OBV is rising (bullish volume confirmation).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `20` | Lookback for trend |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1230,19 +1232,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vpt_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="vpt_bearish" description="FILTER - requires Close, Volume">
 
 Check if VPT (Volume Price Trend) is falling.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `20` | Window for trend comparison |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1273,19 +1275,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vpt_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="vpt_bullish" description="FILTER - requires Close, Volume">
 
 Check if VPT (Volume Price Trend) is rising.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `20` | Window for trend comparison |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1316,19 +1318,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vwap_above
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="vwap_above" description="FILTER - requires High, Low, Close, Volume">
 
 Check if price is above VWAP (bullish bias).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | VWAP period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1359,19 +1361,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vwap_below
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close, Volume
+<Accordion title="vwap_below" description="FILTER - requires High, Low, Close, Volume">
 
 Check if price is below VWAP (bearish bias).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | VWAP period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1402,20 +1404,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vwma_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="vwma_cross_down" description="TRIGGER - requires Close, Volume">
 
 Detect a bearish VWMA crossover (fast VWMA crosses below slow VWMA). Volume-weighted version of the classic SMA death cross.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast VWMA window |
 | `window_slow` | `int` | 2 -- 200 | `21` | Slow VWMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1448,20 +1450,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vwma_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close, Volume
+<Accordion title="vwma_cross_up" description="TRIGGER - requires Close, Volume">
 
 Detect a bullish VWMA crossover (fast VWMA crosses above slow VWMA). Volume-weighted version of the classic SMA golden cross. High-volume bars carry more weight, so the signal is less susceptible to low-volume noise.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast VWMA window |
 | `window_slow` | `int` | 2 -- 200 | `21` | Slow VWMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1493,3 +1495,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 ```
 
 </CodeGroup>
+
+</Accordion>
+
+</AccordionGroup>

@@ -61,6 +61,24 @@
   ],
   "navigation": [
     {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/overview",
+        "api-reference/strategies",
+        "api-reference/signals",
+        "api-reference/backtesting",
+        "api-reference/ai-copilot",
+        "api-reference/execution",
+        "api-reference/crypto-assets",
+        "api-reference/market-data",
+        "api-reference/on-chain",
+        "api-reference/defi",
+        "api-reference/social",
+        "api-reference/config",
+        "api-reference/promo-codes"
+      ]
+    },
+    {
       "group": "Getting Started",
       "pages": [
         "introduction",
@@ -102,19 +120,6 @@
         "templates/overview",
         "templates/x402-app-template",
         "templates/x402-plugin-template"
-      ]
-    },
-    {
-      "group": "API Reference",
-      "pages": [
-        "api-reference/overview",
-        "api-reference/strategies",
-        "api-reference/signals",
-        "api-reference/backtesting",
-        "api-reference/ai-copilot",
-        "api-reference/execution",
-        "api-reference/crypto-assets",
-        "api-reference/market-data"
       ]
     },
     {

@@ -1,0 +1,111 @@
+---
+title: "Promo Codes API"
+description: "Admin-managed promotional codes for subscription discounts."
+---
+
+# Promo Codes API
+
+Admin-managed promotional codes for subscription discounts.
+
+## Base URL
+
+```
+https://api.mangrovedeveloper.ai/api/v1/promo-codes
+```
+
+## Authentication
+
+All endpoints require a JWT bearer token.
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Endpoints
+
+### Create a new promo code (admin only)
+
+`POST /api/v1/promo-codes`
+
+**Example**
+
+```bash cURL
+curl -X POST "https://api.mangrovedeveloper.ai/api/v1/promo-codes" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### List all promo codes (admin only)
+
+`GET /api/v1/promo-codes`
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/promo-codes"
+```
+
+### Validate a promo code against a prospective checkout
+
+`POST /api/v1/promo-codes/validate`
+
+Body: { code, tier_id, scope }  where scope is 'user' or 'org'.
+Returns ValidationResult (valid, trial_days, reason, message).
+
+**Example**
+
+```bash cURL
+curl -X POST "https://api.mangrovedeveloper.ai/api/v1/promo-codes/validate" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### List redemptions for a promo code (admin only)
+
+`GET /api/v1/promo-codes/{code}/redemptions`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `code` | path | `string` | yes |  |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/promo-codes/<code>/redemptions"
+```
+
+### Re-activate a previously revoked promo code
+
+`PATCH /api/v1/promo-codes/{code}/reinstate`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `code` | path | `string` | yes |  |
+
+**Example**
+
+```bash cURL
+curl -X PATCH "https://api.mangrovedeveloper.ai/api/v1/promo-codes/<code>/reinstate" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Revoke a promo code (soft -- active = false)
+
+`PATCH /api/v1/promo-codes/{code}/revoke`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `code` | path | `string` | yes |  |
+
+**Example**
+
+```bash cURL
+curl -X PATCH "https://api.mangrovedeveloper.ai/api/v1/promo-codes/<code>/revoke" \
+  -H "Authorization: Bearer $TOKEN"
+```

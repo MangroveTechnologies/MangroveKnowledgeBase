@@ -9,13 +9,15 @@ _42 signals in this category._
 
 See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.
 
-### ao_bearish
+Click a signal to expand parameters and examples.
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<AccordionGroup>
+
+<Accordion title="ao_bearish" description="FILTER - requires High, Low">
 
 Check if Awesome Oscillator indicates bearish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -23,7 +25,7 @@ Check if Awesome Oscillator indicates bearish momentum.
 | `window_slow` | `int` | 20 -- 60 | `34` | Slow SMA window |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -58,13 +60,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ao_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="ao_bullish" description="FILTER - requires High, Low">
 
 Check if Awesome Oscillator indicates bullish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -72,7 +74,7 @@ Check if Awesome Oscillator indicates bullish momentum.
 | `window_slow` | `int` | 20 -- 60 | `34` | Slow SMA window |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -107,13 +109,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ao_zero_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="ao_zero_cross" description="TRIGGER - requires High, Low">
 
 Check if Awesome Oscillator crosses zero line.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -121,7 +123,7 @@ Check if Awesome Oscillator crosses zero line.
 | `window_slow` | `int` | 20 -- 60 | `34` | Slow SMA window |
 | `direction` | `str` | - | `bullish` | Direction: 'bullish' for cross above, 'bearish' for cross below |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -156,20 +158,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### apo_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="apo_bearish" description="FILTER - requires Close">
 
 Check if the Absolute Price Oscillator is negative (bearish regime).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `12` | Fast EMA period |
 | `window_slow` | `int` | 5 -- 200 | `26` | Slow EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -202,20 +204,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### apo_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="apo_bullish" description="FILTER - requires Close">
 
 Check if the Absolute Price Oscillator (EMA fast - EMA slow) is positive. Equivalent to the MACD line being above zero (bullish momentum regime).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `12` | Fast EMA period |
 | `window_slow` | `int` | 5 -- 200 | `26` | Slow EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -248,20 +250,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### apo_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="apo_cross_down" description="TRIGGER - requires Close">
 
 Detect APO crossing below zero (bearish momentum onset).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `12` | Fast EMA period |
 | `window_slow` | `int` | 5 -- 200 | `26` | Slow EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -294,20 +296,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### apo_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="apo_cross_up" description="TRIGGER - requires Close">
 
 Detect APO crossing above zero (bullish momentum onset).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `12` | Fast EMA period |
 | `window_slow` | `int` | 5 -- 200 | `26` | Slow EMA period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -340,15 +342,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bop_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bop_bearish" description="FILTER - requires Open, High, Low, Close">
 
 Check if Balance of Power indicates sellers in control on the current bar.
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -375,15 +377,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bop_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bop_bullish" description="FILTER - requires Open, High, Low, Close">
 
 Check if Balance of Power indicates buyers in control on the current bar. BOP = (close - open) / (high - low). Positive = buyers dominated the bar.
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -410,15 +412,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bop_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bop_cross_down" description="TRIGGER - requires Open, High, Low, Close">
 
 Detect Balance of Power crossing below zero (buyers -&gt; sellers).
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -445,15 +447,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bop_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bop_cross_up" description="TRIGGER - requires Open, High, Low, Close">
 
 Detect Balance of Power crossing above zero (sellers -&gt; buyers).
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -480,20 +482,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cmo_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="cmo_cross_down" description="TRIGGER - requires Close">
 
 Detect CMO crossing below the overbought threshold (bearish momentum onset). Analogous to RSI crossing below 70.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | CMO lookback |
 | `threshold` | `float` | 20.0 -- 90.0 | `50.0` | Overbought threshold to cross below |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -526,20 +528,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cmo_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="cmo_cross_up" description="TRIGGER - requires Close">
 
 Detect CMO crossing above the oversold threshold (bullish momentum return). Analogous to RSI crossing above 30.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | CMO lookback |
 | `threshold` | `float` | -90.0 -- -20.0 | `-50.0` | Oversold threshold to cross above |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -572,20 +574,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cmo_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="cmo_overbought" description="FILTER - requires Close">
 
 Check if Chande Momentum Oscillator is above the overbought threshold. CMO ranges from -100 to +100; default threshold of +50 is standard (analogous to RSI 70).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | CMO lookback |
 | `threshold` | `float` | 20.0 -- 90.0 | `50.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -618,20 +620,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cmo_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="cmo_oversold" description="FILTER - requires Close">
 
 Check if Chande Momentum Oscillator is below the oversold threshold. Default threshold of -50 is standard (analogous to RSI 30).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | CMO lookback |
 | `threshold` | `float` | -90.0 -- -20.0 | `-50.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -664,13 +666,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kama_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="kama_cross_down" description="TRIGGER - requires Close">
 
 Check if price crosses below KAMA (bearish signal).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -678,7 +680,7 @@ Check if price crosses below KAMA (bearish signal).
 | `pow1` | `int` | 1 -- 10 | `2` | Fast smoothing constant |
 | `pow2` | `int` | 10 -- 50 | `30` | Slow smoothing constant |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -713,13 +715,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kama_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="kama_cross_up" description="TRIGGER - requires Close">
 
 Check if price crosses above KAMA (bullish signal).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -727,7 +729,7 @@ Check if price crosses above KAMA (bullish signal).
 | `pow1` | `int` | 1 -- 10 | `2` | Fast smoothing constant |
 | `pow2` | `int` | 10 -- 50 | `30` | Slow smoothing constant |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -762,19 +764,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mom_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="mom_bearish" description="FILTER - requires Close">
 
 Check if Momentum (close - close[-n]) is negative. Indicates downward price momentum over the lookback window.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 200 | `10` | Lookback period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -805,19 +807,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mom_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="mom_bullish" description="FILTER - requires Close">
 
 Check if Momentum (close - close[-n]) is positive. Indicates upward price momentum over the lookback window.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 200 | `10` | Lookback period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -848,19 +850,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mom_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="mom_cross_down" description="TRIGGER - requires Close">
 
 Detect Momentum crossing below zero (bearish zero-line cross).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 200 | `10` | Lookback period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -891,19 +893,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mom_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="mom_cross_up" description="TRIGGER - requires Close">
 
 Detect Momentum crossing above zero (bullish zero-line cross).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 200 | `10` | Lookback period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -934,13 +936,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ppo_bearish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ppo_bearish_cross" description="TRIGGER - requires Close">
 
 Check if PPO crosses below signal line (bearish).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -948,7 +950,7 @@ Check if PPO crosses below signal line (bearish).
 | `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
 | `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -983,13 +985,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ppo_bullish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ppo_bullish_cross" description="TRIGGER - requires Close">
 
 Check if PPO crosses above signal line (bullish).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -997,7 +999,7 @@ Check if PPO crosses above signal line (bullish).
 | `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
 | `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1032,13 +1034,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### pvo_bearish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Volume
+<Accordion title="pvo_bearish_cross" description="TRIGGER - requires Volume">
 
 Check if PVO crosses below signal line (bearish volume).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1046,7 +1048,7 @@ Check if PVO crosses below signal line (bearish volume).
 | `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
 | `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1081,13 +1083,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### pvo_bullish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Volume
+<Accordion title="pvo_bullish_cross" description="TRIGGER - requires Volume">
 
 Check if PVO crosses above signal line (bullish volume).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1095,7 +1097,7 @@ Check if PVO crosses above signal line (bullish volume).
 | `window_fast` | `int` | 5 -- 20 | `12` | Fast EMA period |
 | `window_sign` | `int` | 3 -- 15 | `9` | Signal line period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1130,20 +1132,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### roc_momentum_shift
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="roc_momentum_shift" description="TRIGGER - requires Close">
 
 Check if ROC crosses zero (momentum shift).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 50 | `12` | ROC period |
 | `direction` | `str` | - | `bullish` | Direction: 'bullish' for cross above zero, 'bearish' for cross below |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1176,20 +1178,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### roc_negative
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="roc_negative" description="FILTER - requires Close">
 
 Check if Rate of Change indicates negative momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 50 | `12` | ROC period |
 | `threshold` | `float` | -10.0 -- 10.0 | `0.0` | Negative momentum threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1222,20 +1224,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### roc_positive
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="roc_positive" description="FILTER - requires Close">
 
 Check if Rate of Change indicates positive momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 50 | `12` | ROC period |
 | `threshold` | `float` | -10.0 -- 10.0 | `0.0` | Positive momentum threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1268,20 +1270,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_cross_down" description="TRIGGER - requires Close">
 
 Check if RSI crosses below a threshold level. Returns True when RSI was at or above the threshold in the previous bar and is now below the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
 | `threshold` | `float` | 0.0 -- 100.0 | `50.0` | Threshold level to cross below |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1314,20 +1316,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_cross_up" description="TRIGGER - requires Close">
 
 Check if RSI crosses above a threshold level. Returns True when RSI was at or below the threshold in the previous bar and is now above the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
 | `threshold` | `float` | 0.0 -- 100.0 | `50.0` | Threshold level to cross above |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1360,20 +1362,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_overbought" description="FILTER - requires Close">
 
 Check if RSI is above the overbought threshold. RSI values above 70 typically indicate overbought conditions, suggesting the asset may be due for a pullback. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
 | `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1406,20 +1408,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_oversold" description="FILTER - requires Close">
 
 Check if RSI is below the oversold threshold. RSI values below 30 typically indicate oversold conditions, suggesting the asset may be due for a bounce. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 100 | `14` | RSI calculation window |
 | `threshold` | `float` | 0.0 -- 50.0 | `30.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1452,13 +1454,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### stoch_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="stoch_overbought" description="FILTER - requires High, Low, Close">
 
 Check if Stochastic %K is above the overbought threshold.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1466,7 +1468,7 @@ Check if Stochastic %K is above the overbought threshold.
 | `smooth_window` | `int` | 1 -- 10 | `3` | %K smoothing period |
 | `threshold` | `float` | 70.0 -- 100.0 | `80.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1501,13 +1503,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### stoch_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="stoch_oversold" description="FILTER - requires High, Low, Close">
 
 Check if Stochastic %K is below the oversold threshold.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1515,7 +1517,7 @@ Check if Stochastic %K is below the oversold threshold.
 | `smooth_window` | `int` | 1 -- 10 | `3` | %K smoothing period |
 | `threshold` | `float` | 0.0 -- 30.0 | `20.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1550,13 +1552,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### stochrsi_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="stochrsi_overbought" description="FILTER - requires Close">
 
 Check if Stochastic RSI indicates overbought condition. In crypto markets, consider adjusting thresholds during strong trends.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1565,7 +1567,7 @@ Check if Stochastic RSI indicates overbought condition. In crypto markets, consi
 | `smooth2` | `int` | 1 -- 10 | `3` | Stochastic %D smoothing |
 | `threshold` | `float` | 0.6 -- 1.0 | `0.8` | Overbought threshold (0-1 scale) |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1602,13 +1604,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### stochrsi_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="stochrsi_oversold" description="FILTER - requires Close">
 
 Check if Stochastic RSI indicates oversold condition. In crypto markets, consider adjusting thresholds during strong trends.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1617,7 +1619,7 @@ Check if Stochastic RSI indicates oversold condition. In crypto markets, conside
 | `smooth2` | `int` | 1 -- 10 | `3` | Stochastic %D smoothing |
 | `threshold` | `float` | 0.0 -- 0.4 | `0.2` | Oversold threshold (0-1 scale) |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1654,13 +1656,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### tsi_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="tsi_bearish" description="FILTER - requires Close">
 
 Check if True Strength Index indicates bearish momentum. TSI below zero indicates bearish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1668,7 +1670,7 @@ Check if True Strength Index indicates bearish momentum. TSI below zero indicate
 | `window_fast` | `int` | 5 -- 25 | `13` | Fast EMA period |
 | `threshold` | `float` | -50.0 -- 50.0 | `0.0` | Bearish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1703,13 +1705,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### tsi_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="tsi_bullish" description="FILTER - requires Close">
 
 Check if True Strength Index indicates bullish momentum. TSI above zero indicates bullish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1717,7 +1719,7 @@ Check if True Strength Index indicates bullish momentum. TSI above zero indicate
 | `window_fast` | `int` | 5 -- 25 | `13` | Fast EMA period |
 | `threshold` | `float` | -50.0 -- 50.0 | `0.0` | Bullish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1752,13 +1754,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### uo_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="uo_overbought" description="FILTER - requires High, Low, Close">
 
 Check if Ultimate Oscillator indicates overbought condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1767,7 +1769,7 @@ Check if Ultimate Oscillator indicates overbought condition.
 | `window_long` | `int` | 14 -- 50 | `28` | Long window |
 | `threshold` | `float` | 60.0 -- 90.0 | `70.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1804,13 +1806,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### uo_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="uo_oversold" description="FILTER - requires High, Low, Close">
 
 Check if Ultimate Oscillator indicates oversold condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1819,7 +1821,7 @@ Check if Ultimate Oscillator indicates oversold condition.
 | `window_long` | `int` | 14 -- 50 | `28` | Long window |
 | `threshold` | `float` | 10.0 -- 40.0 | `30.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1856,20 +1858,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### williams_r_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="williams_r_overbought" description="FILTER - requires High, Low, Close">
 
 Check if Williams %R is above the overbought threshold. Williams %R ranges from -100 to 0. Values above -20 indicate overbought.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | Lookback window |
 | `threshold` | `float` | -30.0 -- 0.0 | `-20.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1902,20 +1904,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### williams_r_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="williams_r_oversold" description="FILTER - requires High, Low, Close">
 
 Check if Williams %R is below the oversold threshold. Williams %R ranges from -100 to 0. Values below -80 indicate oversold.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | Lookback window |
 | `threshold` | `float` | -100.0 -- -70.0 | `-80.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1947,3 +1949,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 ```
 
 </CodeGroup>
+
+</Accordion>
+
+</AccordionGroup>

@@ -267,18 +267,6 @@
                     }
                 }
             ],
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    }
-                },
-                "summary": "Get an organization's current subscription (admin only)",
-                "operationId": "get_admin_org_subscription",
-                "tags": [
-                    "admin"
-                ]
-            },
             "patch": {
                 "responses": {
                     "200": {
@@ -290,6 +278,61 @@
                 "requestBody": {
                     "$ref": "#/components/requestBodies/ChangeTierRequest"
                 },
+                "tags": [
+                    "admin"
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Get an organization's current subscription (admin only)",
+                "operationId": "get_admin_org_subscription",
+                "tags": [
+                    "admin"
+                ]
+            }
+        },
+        "/admin/rate-limit/{provider}/reset": {
+            "parameters": [
+                {
+                    "name": "provider",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RateLimitResetResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Reset a provider's rate-limit bucket in Redis",
+                "description": "Clear MangroveRoots rate-limiter state for one provider.  Deletes the Redis token-bucket key so the next request starts fresh against the configured (max_tokens, window_seconds).  Useful after a deploy that bumps the rate limit — the bucket state carries over in Redis and only refills on the old schedule unless reset.",
+                "operationId": "post_rate_limit_reset",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "description": "An optional fields mask",
+                        "schema": {
+                            "type": "string",
+                            "format": "mask"
+                        }
+                    }
+                ],
                 "tags": [
                     "admin"
                 ]
@@ -833,38 +876,6 @@
                     }
                 }
             ],
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "Conversation retrieved"
-                    },
-                    "400": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Error"
-                                }
-                            }
-                        }
-                    }
-                },
-                "summary": "Get full conversation state with working context",
-                "operationId": "get_get_conversation",
-                "tags": [
-                    "ai-copilot"
-                ]
-            },
             "delete": {
                 "responses": {
                     "200": {
@@ -900,6 +911,38 @@
                 },
                 "summary": "Delete a conversation",
                 "operationId": "delete_get_conversation",
+                "tags": [
+                    "ai-copilot"
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Conversation retrieved"
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get full conversation state with working context",
+                "operationId": "get_get_conversation",
                 "tags": [
                     "ai-copilot"
                 ]
@@ -1471,50 +1514,6 @@
             }
         },
         "/auth/profile": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "Profile retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UserProfile"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "User not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ProfileErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error"
-                    }
-                },
-                "summary": "Get current user profile information",
-                "description": "Retrieves the profile information for the currently authenticated user.\nAuthentication is required via JWT token, API key, or Firebase token.\nThe user ID is extracted from the authentication context.\n\nReturns:\n    200 Success: User profile information\n    404 Error: If user record is not found\n    500 Error: If server error occurs during processing",
-                "operationId": "get_profile",
-                "parameters": [
-                    {
-                        "name": "X-Fields",
-                        "in": "header",
-                        "description": "An optional fields mask",
-                        "schema": {
-                            "type": "string",
-                            "format": "mask"
-                        }
-                    }
-                ],
-                "tags": [
-                    "auth"
-                ]
-            },
             "put": {
                 "responses": {
                     "200": {
@@ -1565,6 +1564,50 @@
                     },
                     "required": true
                 },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Profile retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserProfile"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "summary": "Get current user profile information",
+                "description": "Retrieves the profile information for the currently authenticated user.\nAuthentication is required via JWT token, API key, or Firebase token.\nThe user ID is extracted from the authentication context.\n\nReturns:\n    200 Success: User profile information\n    404 Error: If user record is not found\n    500 Error: If server error occurs during processing",
+                "operationId": "get_profile",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "description": "An optional fields mask",
+                        "schema": {
+                            "type": "string",
+                            "format": "mask"
+                        }
+                    }
+                ],
                 "tags": [
                     "auth"
                 ]
@@ -1921,6 +1964,36 @@
                 "operationId": "get_job_status",
                 "tags": [
                     "batch"
+                ]
+            }
+        },
+        "/config/execution-defaults": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Flattened execution config as applied by the server"
+                    }
+                },
+                "summary": "Return the flattened `execution_config` the server builds from defaults",
+                "description": "Matches exactly what `domains/strategies/services.py` uses when a\nrequest omits `execution_config`. Sections `risk_management`,\n`position_limits`, `volatility_settings`, `trading_rules`,\n`time_based_exits` are merged into one dict; `signal_defaults` and\n`backtest_defaults` are intentionally excluded (same as the legacy\nflattening).",
+                "operationId": "get_execution_defaults",
+                "tags": [
+                    "config"
+                ]
+            }
+        },
+        "/config/trading-defaults": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Full trading_defaults.json contents (nested sections intact)"
+                    }
+                },
+                "summary": "Return the full trading defaults, nested sections intact",
+                "description": "Shape mirrors `trading_defaults.json` one-to-one: `signal_defaults`,\n`backtest_defaults`, `risk_management`, `position_limits`,\n`volatility_settings`, `trading_rules`, `time_based_exits`, plus the\ntop-level `description` field.",
+                "operationId": "get_trading_defaults",
+                "tags": [
+                    "config"
                 ]
             }
         },
@@ -2342,6 +2415,7 @@
                         }
                     }
                 ],
+                "deprecated": true,
                 "tags": [
                     "crypto-assets"
                 ]
@@ -2597,6 +2671,7 @@
                         }
                     }
                 ],
+                "deprecated": true,
                 "tags": [
                     "crypto-assets"
                 ]
@@ -2666,6 +2741,7 @@
                         }
                     }
                 ],
+                "deprecated": true,
                 "tags": [
                     "crypto-assets"
                 ]
@@ -2850,6 +2926,7 @@
                 },
                 "summary": "Get token holder distribution for a specific crypto asset (Nansen)",
                 "operationId": "get_token_holders",
+                "deprecated": true,
                 "tags": [
                     "crypto-assets"
                 ]
@@ -2883,6 +2960,141 @@
                 "operationId": "get_trending_assets",
                 "tags": [
                     "crypto-assets"
+                ]
+            }
+        },
+        "/defi/chain/{chain}/tvl": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "Blockchain name (e.g. Ethereum, Solana, Arbitrum)",
+                    "name": "chain",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChainTVLResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Chain not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefiError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get TVL and top protocols for a blockchain",
+                "operationId": "get_chain_tvl",
+                "tags": [
+                    "defi"
+                ]
+            }
+        },
+        "/defi/protocol/{protocol}/tvl": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "Protocol name or slug (e.g. aave, uniswap, lido)",
+                    "name": "protocol",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProtocolTVLResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Protocol not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefiError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get TVL and chain breakdown for a DeFi protocol",
+                "operationId": "get_protocol_tvl",
+                "tags": [
+                    "defi"
+                ]
+            }
+        },
+        "/defi/stablecoins/metrics": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StablecoinMetricsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DefiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get stablecoin supply metrics with per-chain breakdown",
+                "operationId": "get_stablecoin_metrics",
+                "tags": [
+                    "defi"
                 ]
             }
         },
@@ -2979,6 +3191,9 @@
                     "401": {
                         "description": "Unauthorized"
                     },
+                    "429": {
+                        "description": "Rate limit exceeded"
+                    },
                     "500": {
                         "description": "Internal server error"
                     }
@@ -3029,6 +3244,9 @@
                     "401": {
                         "description": "Unauthorized"
                     },
+                    "429": {
+                        "description": "Rate limit exceeded"
+                    },
                     "500": {
                         "description": "Internal server error"
                     }
@@ -3078,6 +3296,9 @@
                     },
                     "404": {
                         "description": "Account not found"
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded"
                     },
                     "500": {
                         "description": "Internal server error"
@@ -3130,6 +3351,9 @@
                     "401": {
                         "description": "Unauthorized"
                     },
+                    "429": {
+                        "description": "Rate limit exceeded"
+                    },
                     "500": {
                         "description": "Internal server error"
                     }
@@ -3171,6 +3395,9 @@
                     "401": {
                         "description": "Unauthorized"
                     },
+                    "429": {
+                        "description": "Rate limit exceeded"
+                    },
                     "500": {
                         "description": "Internal server error"
                     }
@@ -3211,6 +3438,9 @@
                     },
                     "401": {
                         "description": "Unauthorized"
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded"
                     },
                     "500": {
                         "description": "Internal server error"
@@ -3254,6 +3484,56 @@
                 ]
             }
         },
+        "/execution/portfolio": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Portfolio data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PortfolioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error (missing IDs or exceeds 100)"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                },
+                "summary": "Batch-read portfolio data for N strategies",
+                "description": "Batch-read portfolio data for multiple strategies in one call. Accepts a CSV of strategy IDs or repeated query params. Returns execution state, open position counts, and recent trades for each strategy. Max 100 IDs per request.\nDesigned for dashboard UIs that render multiple strategy cards.\nFetches all data in batched DB queries (strategies, open position\ncounts, recent trades) instead of N+1 individual calls.",
+                "operationId": "get_portfolio_read",
+                "parameters": [
+                    {
+                        "description": "Comma-separated strategy UUIDs, or repeated query param (?strategy_ids=a&strategy_ids=b). Max 100.",
+                        "name": "strategy_ids",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "description": "An optional fields mask",
+                        "schema": {
+                            "type": "string",
+                            "format": "mask"
+                        }
+                    }
+                ],
+                "tags": [
+                    "execution"
+                ]
+            }
+        },
         "/execution/positions": {
             "get": {
                 "responses": {
@@ -3272,6 +3552,9 @@
                     },
                     "401": {
                         "description": "Unauthorized"
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded"
                     },
                     "500": {
                         "description": "Internal server error"
@@ -3362,6 +3645,9 @@
                     },
                     "401": {
                         "description": "Unauthorized"
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded"
                     },
                     "500": {
                         "description": "Internal server error"
@@ -3455,6 +3741,333 @@
                 ],
                 "tags": [
                     "health"
+                ]
+            }
+        },
+        "/on-chain/exchange-flows": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExchangeFlowsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get aggregated exchange inflows/outflows, optionally filtered by token",
+                "operationId": "get_exchange_flows",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "description": "Lookback hours (default: 24)",
+                        "name": "hours_back",
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "description": "Token symbol (e.g. btc, eth). Omit for all currencies.",
+                        "name": "symbol",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "on-chain"
+                ]
+            }
+        },
+        "/on-chain/smart-money/screen": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmartMoneyScreenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Screen for tokens with high smart money activity",
+                "operationId": "screen_smart_money_tokens",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "description": "Max results (default: 50)",
+                        "name": "limit",
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "description": "5m, 1h, 6h, 24h, 7d, 30d (default: 24h)",
+                        "name": "timeframe",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "description": "Comma-separated chains (default: ethereum)",
+                        "name": "chains",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "on-chain"
+                ]
+            }
+        },
+        "/on-chain/smart-money/sentiment": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SmartMoneySentimentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get smart money sentiment (accumulation vs distribution) for a token",
+                "operationId": "get_smart_money_sentiment",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "description": "Blockchain (default: ethereum)",
+                        "name": "chain",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "required": true,
+                        "in": "query",
+                        "description": "Token symbol (e.g. ETH, UNI)",
+                        "name": "symbol",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "on-chain"
+                ]
+            }
+        },
+        "/on-chain/token-holders/{symbol}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "Token symbol (e.g. ETH, UNI)",
+                    "name": "symbol",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainTokenHoldersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get token holder distribution from Nansen",
+                "operationId": "get_token_holders",
+                "tags": [
+                    "on-chain"
+                ]
+            }
+        },
+        "/on-chain/whale-activity/{symbol}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "Token symbol (e.g. btc, eth)",
+                    "name": "symbol",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WhaleActivityResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get high-level whale activity summary for a token",
+                "operationId": "get_whale_activity",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "description": "Lookback hours (default: 24)",
+                        "name": "hours_back",
+                        "schema": {
+                            "type": "int"
+                        }
+                    }
+                ],
+                "tags": [
+                    "on-chain"
+                ]
+            }
+        },
+        "/on-chain/whale-transactions": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WhaleTransactionsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OnChainError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get recent large-value on-chain transactions",
+                "operationId": "get_whale_transactions",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "description": "Lookback hours (default: 24)",
+                        "name": "hours_back",
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "description": "Min USD value (default: 500000)",
+                        "name": "min_value",
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "description": "Filter by symbol (e.g. btc, eth)",
+                        "name": "symbol",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "on-chain"
                 ]
             }
         },
@@ -3625,49 +4238,6 @@
                     }
                 }
             ],
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Organization"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not found"
-                    },
-                    "500": {
-                        "description": "Server error"
-                    }
-                },
-                "summary": "Get organization details",
-                "description": "Get organization by ID",
-                "operationId": "get_organization_detail",
-                "parameters": [
-                    {
-                        "name": "X-Fields",
-                        "in": "header",
-                        "description": "An optional fields mask",
-                        "schema": {
-                            "type": "string",
-                            "format": "mask"
-                        }
-                    }
-                ],
-                "tags": [
-                    "organizations"
-                ]
-            },
             "put": {
                 "responses": {
                     "200": {
@@ -3717,6 +4287,49 @@
                     },
                     "required": true
                 },
+                "tags": [
+                    "organizations"
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Organization"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "summary": "Get organization details",
+                "description": "Get organization by ID",
+                "operationId": "get_organization_detail",
+                "parameters": [
+                    {
+                        "name": "X-Fields",
+                        "in": "header",
+                        "description": "An optional fields mask",
+                        "schema": {
+                            "type": "string",
+                            "format": "mask"
+                        }
+                    }
+                ],
                 "tags": [
                     "organizations"
                 ]
@@ -4007,6 +4620,119 @@
                 },
                 "tags": [
                     "organizations"
+                ]
+            }
+        },
+        "/promo-codes": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Create a new promo code (admin only)",
+                "operationId": "post_promo_codes_collection",
+                "tags": [
+                    "promo-codes"
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "List all promo codes (admin only)",
+                "operationId": "get_promo_codes_collection",
+                "tags": [
+                    "promo-codes"
+                ]
+            }
+        },
+        "/promo-codes/validate": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Validate a promo code against a prospective checkout",
+                "description": "Body: { code, tier_id, scope }  where scope is 'user' or 'org'.\nReturns ValidationResult (valid, trial_days, reason, message).",
+                "operationId": "post_validate_promo_code",
+                "tags": [
+                    "promo-codes"
+                ]
+            }
+        },
+        "/promo-codes/{code}/redemptions": {
+            "parameters": [
+                {
+                    "name": "code",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "List redemptions for a promo code (admin only)",
+                "operationId": "get_promo_code_redemptions",
+                "tags": [
+                    "promo-codes"
+                ]
+            }
+        },
+        "/promo-codes/{code}/reinstate": {
+            "parameters": [
+                {
+                    "name": "code",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "patch": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Re-activate a previously revoked promo code",
+                "operationId": "patch_reinstate_promo_code",
+                "tags": [
+                    "promo-codes"
+                ]
+            }
+        },
+        "/promo-codes/{code}/revoke": {
+            "parameters": [
+                {
+                    "name": "code",
+                    "in": "path",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "patch": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "summary": "Revoke a promo code (soft -- active = false)",
+                "operationId": "patch_revoke_promo_code",
+                "tags": [
+                    "promo-codes"
                 ]
             }
         },
@@ -4835,6 +5561,160 @@
                 ]
             }
         },
+        "/social/influence/{username}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "X/Twitter username (without @)",
+                    "name": "username",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InfluenceScoreResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SocialError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get influence score and follower metrics for a user",
+                "operationId": "get_influence",
+                "tags": [
+                    "social"
+                ]
+            }
+        },
+        "/social/mentions/{topic}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "Topic or keyword to search",
+                    "name": "topic",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MentionsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SocialError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get recent mentions for a topic",
+                "operationId": "get_mentions",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "description": "Max posts to return (default 20)",
+                        "name": "limit",
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "description": "Time window in hours (default 24)",
+                        "name": "hours_back",
+                        "schema": {
+                            "type": "int"
+                        }
+                    }
+                ],
+                "tags": [
+                    "social"
+                ]
+            }
+        },
+        "/social/sentiment/{topic}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "Topic or symbol to analyze (e.g. BTC, ETH, Solana)",
+                    "name": "topic",
+                    "required": true,
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SentimentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SocialError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get social sentiment score for a topic",
+                "operationId": "get_sentiment",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "description": "Time window in hours (default 24)",
+                        "name": "hours_back",
+                        "schema": {
+                            "type": "int"
+                        }
+                    }
+                ],
+                "tags": [
+                    "social"
+                ]
+            }
+        },
         "/strategies/": {
             "post": {
                 "responses": {
@@ -4896,25 +5776,6 @@
                     }
                 }
             ],
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetStrategyResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "summary": "Get strategy by ID",
-                "operationId": "get_strategy",
-                "tags": [
-                    "strategies"
-                ]
-            },
             "delete": {
                 "responses": {
                     "200": {
@@ -4955,6 +5816,25 @@
                 },
                 "summary": "Update a draft strategy (name, asset, rules, execution_config)",
                 "operationId": "update_strategy",
+                "tags": [
+                    "strategies"
+                ]
+            },
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetStrategyResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get strategy by ID",
+                "operationId": "get_strategy",
                 "tags": [
                     "strategies"
                 ]
@@ -5342,203 +6222,6 @@
                     "users"
                 ]
             }
-        },
-        "/wallets": {
-            "post": {
-                "responses": {
-                    "201": {
-                        "description": "Wallet created"
-                    },
-                    "400": {
-                        "description": "Validation error"
-                    },
-                    "403": {
-                        "description": "Wallet limit exceeded"
-                    },
-                    "500": {
-                        "description": "Server error"
-                    }
-                },
-                "summary": "Create a new wallet",
-                "description": "Create a new wallet",
-                "operationId": "post_wallet_list",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateWallet"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "tags": [
-                    "wallets"
-                ]
-            },
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Wallet"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "500": {
-                        "description": "Server error"
-                    }
-                },
-                "summary": "List user's wallets",
-                "description": "List wallets for the authenticated user",
-                "operationId": "get_wallet_list",
-                "parameters": [
-                    {
-                        "description": "Filter by active status (true/false)",
-                        "name": "is_active",
-                        "in": "query",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "X-Fields",
-                        "in": "header",
-                        "description": "An optional fields mask",
-                        "schema": {
-                            "type": "string",
-                            "format": "mask"
-                        }
-                    }
-                ],
-                "tags": [
-                    "wallets"
-                ]
-            }
-        },
-        "/wallets/{wallet_id}": {
-            "parameters": [
-                {
-                    "name": "wallet_id",
-                    "in": "path",
-                    "required": true,
-                    "schema": {
-                        "type": "string"
-                    }
-                }
-            ],
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Wallet"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Wallet not found"
-                    },
-                    "500": {
-                        "description": "Server error"
-                    }
-                },
-                "summary": "Get wallet by ID",
-                "description": "Get wallet by ID",
-                "operationId": "get_wallet_detail",
-                "parameters": [
-                    {
-                        "name": "X-Fields",
-                        "in": "header",
-                        "description": "An optional fields mask",
-                        "schema": {
-                            "type": "string",
-                            "format": "mask"
-                        }
-                    }
-                ],
-                "tags": [
-                    "wallets"
-                ]
-            },
-            "delete": {
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    },
-                    "404": {
-                        "description": "Wallet not found"
-                    },
-                    "500": {
-                        "description": "Server error"
-                    }
-                },
-                "summary": "Delete wallet (soft delete)",
-                "description": "Delete wallet",
-                "operationId": "delete_wallet_detail",
-                "tags": [
-                    "wallets"
-                ]
-            },
-            "put": {
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Wallet"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Wallet not found"
-                    },
-                    "500": {
-                        "description": "Server error"
-                    }
-                },
-                "summary": "Update wallet",
-                "description": "Update wallet",
-                "operationId": "put_wallet_detail",
-                "parameters": [
-                    {
-                        "name": "X-Fields",
-                        "in": "header",
-                        "description": "An optional fields mask",
-                        "schema": {
-                            "type": "string",
-                            "format": "mask"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateWallet"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "tags": [
-                    "wallets"
-                ]
-            }
         }
     },
     "info": {
@@ -5572,8 +6255,8 @@
             "description": "Subscription and usage limit operations"
         },
         {
-            "name": "wallets",
-            "description": "Wallet management operations"
+            "name": "promo-codes",
+            "description": "Promo code management and validation"
         },
         {
             "name": "ai-copilot",
@@ -5606,6 +6289,22 @@
         {
             "name": "batch",
             "description": "Batch job tracking and notifications"
+        },
+        {
+            "name": "defi",
+            "description": "DeFi analytics -- protocol TVL, chain TVL, stablecoin metrics (DeFiLlama)"
+        },
+        {
+            "name": "social",
+            "description": "Social signals -- sentiment, mentions, influence (X/Twitter)"
+        },
+        {
+            "name": "on-chain",
+            "description": "On-chain intelligence -- smart money, whale transactions, exchange flows (Nansen + WhaleAlert)"
+        },
+        {
+            "name": "config",
+            "description": "Read-only server configuration — trading defaults + flattened execution config. Source of truth for SDK consumers; closes issue #437."
         }
     ],
     "servers": [
@@ -5864,7 +6563,7 @@
                 },
                 "type": "object"
             },
-            "ProfileErrorResponse": {
+            "ProfileUpdateErrorResponse": {
                 "properties": {
                     "error": {
                         "type": "string",
@@ -5873,7 +6572,7 @@
                 },
                 "type": "object"
             },
-            "ProfileUpdateErrorResponse": {
+            "ProfileErrorResponse": {
                 "properties": {
                     "error": {
                         "type": "string",
@@ -6404,6 +7103,9 @@
                     "total_return": {
                         "type": "number"
                     },
+                    "irr_annualized": {
+                        "type": "number"
+                    },
                     "sharpe_ratio": {
                         "type": "number"
                     },
@@ -6705,6 +7407,27 @@
                 },
                 "type": "object"
             },
+            "RateLimitResetResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "Operation success"
+                    },
+                    "provider": {
+                        "type": "string",
+                        "description": "Provider whose bucket was cleared"
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "Redis key deleted"
+                    },
+                    "existed": {
+                        "type": "boolean",
+                        "description": "Whether the key existed before deletion"
+                    }
+                },
+                "type": "object"
+            },
             "ResourceUtilization": {
                 "properties": {
                     "strategies": {
@@ -6761,103 +7484,6 @@
                         "type": "string",
                         "format": "date-time",
                         "description": "Current billing period end"
-                    }
-                },
-                "type": "object"
-            },
-            "CreateWallet": {
-                "required": [
-                    "name",
-                    "wallet_type"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Wallet name"
-                    },
-                    "wallet_type": {
-                        "type": "string",
-                        "description": "Wallet type"
-                    },
-                    "address": {
-                        "type": "string",
-                        "description": "Wallet address"
-                    },
-                    "metadata": {
-                        "type": "object",
-                        "description": "Additional metadata"
-                    }
-                },
-                "type": "object"
-            },
-            "Wallet": {
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "Wallet UUID"
-                    },
-                    "org_id": {
-                        "type": "string",
-                        "description": "Organization UUID"
-                    },
-                    "user_id": {
-                        "type": "string",
-                        "description": "User UUID"
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "Wallet name"
-                    },
-                    "wallet_type": {
-                        "type": "string",
-                        "description": "Wallet type (exchange, hardware, self_custody, metamask, walletconnect, etc.)"
-                    },
-                    "address": {
-                        "type": "string",
-                        "description": "Wallet address"
-                    },
-                    "is_active": {
-                        "type": "boolean",
-                        "description": "Whether wallet is active"
-                    },
-                    "metadata": {
-                        "type": "object",
-                        "description": "Additional metadata"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Creation timestamp"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "Last update timestamp"
-                    }
-                },
-                "type": "object"
-            },
-            "UpdateWallet": {
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "description": "Wallet name"
-                    },
-                    "wallet_type": {
-                        "type": "string",
-                        "description": "Wallet type"
-                    },
-                    "address": {
-                        "type": "string",
-                        "description": "Wallet address"
-                    },
-                    "is_active": {
-                        "type": "boolean",
-                        "description": "Whether wallet is active"
-                    },
-                    "metadata": {
-                        "type": "object",
-                        "description": "Additional metadata"
                     }
                 },
                 "type": "object"
@@ -7185,11 +7811,11 @@
                     },
                     "slippage_pct": {
                         "type": "number",
-                        "description": "Max slippage per leg as decimal (e.g., 0.0075 = 0.75%). Random slippage drawn from uniform(0, slippage_pct) independently for entry and exit. Default from trading_defaults.json: 0.0075."
+                        "description": "Max slippage per leg as decimal (e.g., 0.004 = 0.4%). Random slippage drawn from uniform(0, slippage_pct) independently for entry and exit. Default from trading_defaults.json: 0.004."
                     },
                     "fee_pct": {
                         "type": "number",
-                        "description": "Fee as decimal (e.g., 0.0085 = 0.85%). Applied only to profitable trades, on sale proceeds. Default from trading_defaults.json: 0.0085."
+                        "description": "Max fee rate as decimal (default 0.0085 = 0.85%). Size-dependent linear schedule: $10K trades pay full rate, $1M+ trades pay 0.0589%. Applied only to profitable trades. Default from trading_defaults.json."
                     },
                     "hourly_data_file": {
                         "type": "string",
@@ -7357,11 +7983,11 @@
                     },
                     "slippage_pct": {
                         "type": "number",
-                        "description": "Max slippage per leg as decimal (default from trading_defaults.json: 0.0075)"
+                        "description": "Max slippage per leg as decimal (default from trading_defaults.json: 0.004)"
                     },
                     "fee_pct": {
                         "type": "number",
-                        "description": "Fee as decimal, applied only to profitable trades (default from trading_defaults.json: 0.0085)"
+                        "description": "Max fee rate as decimal (default 0.0085). Size-dependent linear schedule, profitable trades only."
                     }
                 },
                 "type": "object"
@@ -7448,14 +8074,14 @@
                     },
                     "entry": {
                         "type": "array",
-                        "description": "Entry rules array (must have 1 TRIGGER + 1 FILTER)",
+                        "description": "Entry rules array (exactly 1 TRIGGER, 0+ FILTERs)",
                         "items": {
                             "type": "object"
                         }
                     },
                     "exit": {
                         "type": "array",
-                        "description": "Exit rules array (optional, max 1 TRIGGER + 1 FILTER)",
+                        "description": "Exit rules array (optional, 0-1 TRIGGER + 0+ FILTERs)",
                         "items": {
                             "type": "object"
                         }
@@ -7490,6 +8116,14 @@
                     "parent_strategy_id": {
                         "type": "string",
                         "description": "Parent strategy ID for derived strategies (optional)"
+                    },
+                    "strategy_type": {
+                        "type": "string",
+                        "description": "Strategy type (trend_following, momentum, volatility, breakout, mean_reversion)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Human-readable strategy description"
                     }
                 },
                 "type": "object"
@@ -7558,6 +8192,22 @@
                     "content_hash": {
                         "type": "string",
                         "description": "Content hash for deduplication"
+                    },
+                    "strategy_type": {
+                        "type": "string",
+                        "description": "Strategy type (trend_following, momentum, volatility, breakout, mean_reversion)"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Human-readable strategy description"
+                    },
+                    "last_evaluated_at": {
+                        "type": "string",
+                        "description": "Timestamp of last evaluation (ISO format, null if never evaluated)"
+                    },
+                    "evaluation_count": {
+                        "type": "integer",
+                        "description": "Total number of evaluations performed"
                     }
                 },
                 "type": "object"
@@ -7606,17 +8256,14 @@
                     "created_at": {
                         "type": "string",
                         "description": "Creation timestamp"
-                    }
-                },
-                "type": "object"
-            },
-            "GetStrategyResponse": {
-                "properties": {
-                    "success": {
-                        "type": "boolean"
                     },
-                    "strategy": {
-                        "$ref": "#/components/schemas/StrategyDetail"
+                    "strategy_type": {
+                        "type": "string",
+                        "description": "Strategy type"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Human-readable strategy description"
                     }
                 },
                 "type": "object"
@@ -7633,6 +8280,17 @@
                 "type": "object"
             },
             "UpdateStrategyResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "strategy": {
+                        "$ref": "#/components/schemas/StrategyDetail"
+                    }
+                },
+                "type": "object"
+            },
+            "GetStrategyResponse": {
                 "properties": {
                     "success": {
                         "type": "boolean"
@@ -8852,6 +9510,111 @@
                 },
                 "type": "object"
             },
+            "PortfolioResponse": {
+                "properties": {
+                    "results": {
+                        "type": "array",
+                        "description": "Portfolio entries in the order requested (missing ones omitted)",
+                        "items": {
+                            "$ref": "#/components/schemas/PortfolioEntry"
+                        }
+                    },
+                    "missing": {
+                        "type": "array",
+                        "description": "Strategy IDs that were not found",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "PortfolioEntry": {
+                "properties": {
+                    "strategy_id": {
+                        "type": "string",
+                        "description": "Strategy UUID"
+                    },
+                    "strategy_name": {
+                        "type": "string",
+                        "description": "Strategy name"
+                    },
+                    "asset": {
+                        "type": "string",
+                        "description": "Asset symbol"
+                    },
+                    "execution_state": {
+                        "description": "Execution state snapshot",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/PortfolioExecutionState"
+                            }
+                        ]
+                    },
+                    "last_evaluated_at": {
+                        "type": "string",
+                        "description": "Last evaluation timestamp (ISO 8601, nullable)"
+                    },
+                    "open_positions_count": {
+                        "type": "integer",
+                        "description": "Number of currently open positions (from DB)"
+                    },
+                    "recent_trades": {
+                        "type": "array",
+                        "description": "Last 5 trades, newest first",
+                        "items": {
+                            "$ref": "#/components/schemas/RecentTradeEntry"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "PortfolioExecutionState": {
+                "properties": {
+                    "cash_balance": {
+                        "type": "number",
+                        "description": "Current cash balance"
+                    },
+                    "account_value": {
+                        "type": "number",
+                        "description": "Total account value"
+                    },
+                    "total_trades": {
+                        "type": "integer",
+                        "description": "Total completed trades"
+                    },
+                    "num_open_positions": {
+                        "type": "integer",
+                        "description": "Number of currently open positions"
+                    }
+                },
+                "type": "object"
+            },
+            "RecentTradeEntry": {
+                "properties": {
+                    "closed_at": {
+                        "type": "string",
+                        "description": "Trade close timestamp (ISO 8601, nullable)"
+                    },
+                    "outcome": {
+                        "type": "string",
+                        "description": "Trade outcome (win or loss)"
+                    },
+                    "profit_loss": {
+                        "type": "number",
+                        "description": "Profit/loss in dollars"
+                    },
+                    "profit_loss_pct": {
+                        "type": "number",
+                        "description": "Profit/loss as percentage"
+                    },
+                    "asset": {
+                        "type": "string",
+                        "description": "Asset symbol"
+                    }
+                },
+                "type": "object"
+            },
             "ExchangeListResponse": {
                 "properties": {
                     "success": {
@@ -9371,6 +10134,327 @@
                     "result_data": {
                         "type": "object",
                         "description": "Structured output from completed batch job"
+                    }
+                },
+                "type": "object"
+            },
+            "DefiError": {
+                "properties": {
+                    "error": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ProtocolTVLResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "protocol": {
+                        "type": "string"
+                    },
+                    "tvl_usd": {
+                        "type": "number"
+                    },
+                    "chains": {
+                        "type": "object",
+                        "description": "Chain name -> TVL breakdown"
+                    },
+                    "data": {
+                        "type": "object",
+                        "description": "Full provider response"
+                    }
+                },
+                "type": "object"
+            },
+            "ChainTVLResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "chain": {
+                        "type": "string"
+                    },
+                    "tvl_usd": {
+                        "type": "number"
+                    },
+                    "top_protocols": {
+                        "type": "array",
+                        "description": "Top 10 protocols on this chain",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "data": {
+                        "type": "object",
+                        "description": "Full provider response"
+                    }
+                },
+                "type": "object"
+            },
+            "StablecoinMetricsResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "total_supply_usd": {
+                        "type": "number"
+                    },
+                    "supply_by_chain": {
+                        "type": "object",
+                        "description": "Chain name -> stablecoin supply"
+                    },
+                    "data": {
+                        "type": "object",
+                        "description": "Top stablecoins and metadata"
+                    }
+                },
+                "type": "object"
+            },
+            "SocialError": {
+                "properties": {
+                    "error": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "SentimentResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "topic": {
+                        "type": "string"
+                    },
+                    "sentiment": {
+                        "type": "string",
+                        "description": "bullish, bearish, or neutral"
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "Sentiment score 0-100"
+                    },
+                    "mentions": {
+                        "type": "integer"
+                    },
+                    "data": {
+                        "type": "object",
+                        "description": "Full provider response"
+                    }
+                },
+                "type": "object"
+            },
+            "MentionsResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "topic": {
+                        "type": "string"
+                    },
+                    "count": {
+                        "type": "integer"
+                    },
+                    "posts": {
+                        "type": "array",
+                        "description": "Recent posts matching topic",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "InfluenceScoreResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "score": {
+                        "type": "number",
+                        "description": "Influence score 0-100"
+                    },
+                    "followers": {
+                        "type": "integer"
+                    },
+                    "data": {
+                        "type": "object",
+                        "description": "Full user metrics"
+                    }
+                },
+                "type": "object"
+            },
+            "OnChainError": {
+                "properties": {
+                    "error": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "SmartMoneySentimentResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "symbol": {
+                        "type": "string"
+                    },
+                    "chain": {
+                        "type": "string"
+                    },
+                    "sentiment": {
+                        "type": "string",
+                        "description": "accumulating, distributing, or neutral"
+                    },
+                    "smart_money_inflow_usd": {
+                        "type": "number"
+                    },
+                    "smart_money_outflow_usd": {
+                        "type": "number"
+                    },
+                    "net_flow_usd": {
+                        "type": "number"
+                    },
+                    "trend_7d": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "SmartMoneyScreenResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "count": {
+                        "type": "integer"
+                    },
+                    "chains": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "timeframe": {
+                        "type": "string"
+                    },
+                    "tokens": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "OnChainTokenHoldersResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "symbol": {
+                        "type": "string"
+                    },
+                    "holder_count": {
+                        "type": "integer"
+                    },
+                    "top_10_holders_pct": {
+                        "type": "number"
+                    },
+                    "concentration_score": {
+                        "type": "number"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "WhaleTransactionsResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "count": {
+                        "type": "integer"
+                    },
+                    "min_value_usd": {
+                        "type": "number"
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ExchangeFlowsResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "symbol": {
+                        "type": "string"
+                    },
+                    "timeframe": {
+                        "type": "string"
+                    },
+                    "net_flow_usd": {
+                        "type": "number"
+                    },
+                    "flows": {
+                        "type": "array",
+                        "description": "Per-exchange flow data",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "WhaleActivityResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "symbol": {
+                        "type": "string"
+                    },
+                    "hours_back": {
+                        "type": "integer"
+                    },
+                    "summary": {
+                        "type": "object",
+                        "description": "Aggregated whale activity metrics"
                     }
                 },
                 "type": "object"
