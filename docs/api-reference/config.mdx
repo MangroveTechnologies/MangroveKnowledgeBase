@@ -1,0 +1,58 @@
+---
+title: "Config API"
+description: "Trading defaults and execution-config endpoints used by the strategy engine."
+---
+
+# Config API
+
+Trading defaults and execution-config endpoints used by the strategy engine.
+
+## Base URL
+
+```
+https://api.mangrovedeveloper.ai/api/v1/config
+```
+
+## Authentication
+
+All endpoints require a JWT bearer token.
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Endpoints
+
+### Return the flattened `execution_config` the server builds from defaults
+
+`GET /api/v1/config/execution-defaults`
+
+Matches exactly what `domains/strategies/services.py` uses when a
+request omits `execution_config`. Sections `risk_management`,
+`position_limits`, `volatility_settings`, `trading_rules`,
+`time_based_exits` are merged into one dict; `signal_defaults` and
+`backtest_defaults` are intentionally excluded (same as the legacy
+flattening).
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/config/execution-defaults"
+```
+
+### Return the full trading defaults, nested sections intact
+
+`GET /api/v1/config/trading-defaults`
+
+Shape mirrors `trading_defaults.json` one-to-one: `signal_defaults`,
+`backtest_defaults`, `risk_management`, `position_limits`,
+`volatility_settings`, `trading_rules`, `time_based_exits`, plus the
+top-level `description` field.
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/config/trading-defaults"
+```

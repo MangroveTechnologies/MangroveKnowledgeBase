@@ -9,15 +9,17 @@ _40 signals in this category._
 
 See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.
 
-### bearish_engulfing_trigger
+Click a signal to expand parameters and examples.
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+<AccordionGroup>
+
+<Accordion title="bearish_engulfing_trigger" description="TRIGGER - requires Open, Close">
 
 Check if a bearish engulfing pattern completed on the current bar. Current bearish candle's body completely contains the previous bullish candle's body. Strong bearish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -44,15 +46,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bearish_harami_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+<Accordion title="bearish_harami_trigger" description="TRIGGER - requires Open, Close">
 
 Check if a bearish harami pattern completed on the current bar. Current small bearish candle's body is inside the previous large bullish candle's body. Potential bearish reversal. References: [NISON], [STOCKCHARTS].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -79,19 +81,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bearish_pattern_recent
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bearish_pattern_recent" description="FILTER - requires Open, High, Low, Close">
 
 Check if any bearish candlestick pattern was detected within recent window. Scans for hanging man, shooting star, bearish engulfing, bearish harami, dark cloud cover, evening star, gravestone doji, three black crows, three inside down, tweezer tops, and bearish pin bar within the recent window.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -122,20 +124,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bearish_pin_bar_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bearish_pin_bar_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a bearish pin bar is detected on the current bar. Long upper wick with body in the lower portion of the range. Bearish reversal at resistance. References: [KB-07], [TSR], [PRICEACTION].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum dominant wick to body ratio |
 | `body_position` | `float` | 0.1 -- 0.5 | `0.33` | Maximum body distance from end as fraction of range |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -168,15 +170,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bullish_engulfing_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+<Accordion title="bullish_engulfing_trigger" description="TRIGGER - requires Open, Close">
 
 Check if a bullish engulfing pattern completed on the current bar. Current bullish candle's body completely contains the previous bearish candle's body. Strong bullish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -203,15 +205,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bullish_harami_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+<Accordion title="bullish_harami_trigger" description="TRIGGER - requires Open, Close">
 
 Check if a bullish harami pattern completed on the current bar. Current small bullish candle's body is inside the previous large bearish candle's body. Potential bullish reversal. References: [NISON], [STOCKCHARTS].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -238,19 +240,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bullish_pattern_recent
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bullish_pattern_recent" description="FILTER - requires Open, High, Low, Close">
 
 Check if any bullish candlestick pattern was detected within recent window. Scans for hammer, inverted hammer, bullish engulfing, bullish harami, piercing line, morning star, dragonfly doji, three white soldiers, three inside up, tweezer bottoms, and bullish pin bar within the recent window.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -281,20 +283,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bullish_pin_bar_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="bullish_pin_bar_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a bullish pin bar is detected on the current bar. Long lower wick with body in the upper portion of the range. Bullish reversal at support. References: [KB-07], [TSR], [PRICEACTION].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum dominant wick to body ratio |
 | `body_position` | `float` | 0.1 -- 0.5 | `0.33` | Maximum body distance from end as fraction of range |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -327,19 +329,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### continuation_pattern_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="continuation_pattern_bearish" description="FILTER - requires Open, High, Low, Close">
 
 Check if a bearish continuation pattern was detected within recent window. Scans for three black crows and three inside down.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -370,19 +372,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### continuation_pattern_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="continuation_pattern_bullish" description="FILTER - requires Open, High, Low, Close">
 
 Check if a bullish continuation pattern was detected within recent window. Scans for three white soldiers and three inside up.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -413,20 +415,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dark_cloud_cover_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="dark_cloud_cover_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a dark cloud cover pattern completed on the current bar. Bearish reversal: bullish candle followed by bearish candle opening above prior high (classic) or prior close (relaxed) and closing below midpoint of prior body. The classic definition requires a price gap, which is rare in 24/7 crypto/forex markets. Set require_gap=False for those markets. References: [NISON], [KB-07].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `min_penetration` | `float` | 0.3 -- 0.8 | `0.5` | Minimum penetration into previous body |
 | `require_gap` | `bool` | - | `True` | If True, requires open above previous high (classic Nison). If False, requires open above previous close (relaxed for 24/7 markets) |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -459,19 +461,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### doji_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="doji_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a doji pattern is detected on the current bar. A doji forms when open and close are nearly equal relative to the candle's range, signaling indecision. References: [NISON], [KB-07], [CM45T3R].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -502,20 +504,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dragonfly_doji_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="dragonfly_doji_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a dragonfly doji is detected on the current bar. A doji with open/close near the high and a long lower shadow. Bullish signal at support. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
 | `upper_wick_max` | `float` | 0.01 -- 0.2 | `0.1` | Maximum upper wick-to-range ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -548,19 +550,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### evening_star_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="evening_star_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if an evening star pattern completed on the current bar. Three-candle bearish reversal: bullish candle, small-bodied star, then bearish candle closing below midpoint of first. References: [NISON], [KB-07].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `body_threshold` | `float` | 0.1 -- 0.5 | `0.3` | Maximum body-to-range ratio for middle candle |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -591,20 +593,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### gravestone_doji_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="gravestone_doji_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a gravestone doji is detected on the current bar. A doji with open/close near the low and a long upper shadow. Bearish signal at resistance. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
 | `lower_wick_max` | `float` | 0.01 -- 0.2 | `0.1` | Maximum lower wick-to-range ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -637,20 +639,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### hammer_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="hammer_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a hammer shape is detected on the current bar. Small body at upper end with long lower wick and minimal upper wick. Bullish reversal after downtrend. References: [NISON], [KB-07], [CM45T3R].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum lower wick to body ratio |
 | `upper_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum upper wick to body ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -683,20 +685,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### hanging_man_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="hanging_man_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body, long lower wick) but interpreted as a bearish reversal when appearing after an uptrend. References: [NISON], [STOCKCHARTS].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum lower wick to body ratio |
 | `upper_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum upper wick to body ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -729,19 +731,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### indecision_pattern_recent
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="indecision_pattern_recent" description="FILTER - requires Open, High, Low, Close">
 
 Check if an indecision pattern was detected within recent window. Scans for doji, spinning top, inside bar, and NR7.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -772,15 +774,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### inside_bar_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="inside_bar_trigger" description="TRIGGER - requires High, Low">
 
 Check if an inside bar is detected on the current bar. Current bar's range is completely contained within the previous bar's range. Signals consolidation and potential breakout. References: [KB-07], [TSR].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -807,20 +809,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### inverted_hammer_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="inverted_hammer_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if an inverted hammer shape is detected on the current bar. Same shape as shooting star (small body, long upper wick) but interpreted as a bullish reversal when appearing after a downtrend. References: [NISON], [STOCKCHARTS].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum upper wick to body ratio |
 | `lower_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum lower wick to body ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -853,20 +855,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### long_legged_doji_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="long_legged_doji_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a long-legged doji is detected on the current bar. A doji with both upper and lower wicks at least wick_threshold of the total range, indicating extreme indecision. References: [NISON], [STOCKCHARTS].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `body_threshold` | `float` | 0.01 -- 0.3 | `0.1` | Maximum body-to-range ratio |
 | `wick_threshold` | `float` | 0.1 -- 0.5 | `0.25` | Minimum wick-to-range ratio for both wicks |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -899,19 +901,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### marubozu_bearish_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="marubozu_bearish_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a bearish marubozu is detected on the current bar. Full-bodied bearish candle with minimal or no wicks. Signals strong selling conviction. References: [NISON], [KB-07], [CM45T3R].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_tolerance` | `float` | 0.0 -- 0.1 | `0.05` | Maximum wick-to-range ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -942,19 +944,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### marubozu_bullish_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="marubozu_bullish_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a bullish marubozu is detected on the current bar. Full-bodied bullish candle with minimal or no wicks. Signals strong buying conviction. References: [NISON], [KB-07], [CM45T3R].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_tolerance` | `float` | 0.0 -- 0.1 | `0.05` | Maximum wick-to-range ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -985,19 +987,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### morning_star_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="morning_star_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a morning star pattern completed on the current bar. Three-candle bullish reversal: bearish candle, small-bodied star, then bullish candle closing above midpoint of first. References: [NISON], [KB-07].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `body_threshold` | `float` | 0.1 -- 0.5 | `0.3` | Maximum body-to-range ratio for middle candle |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1028,19 +1030,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### nr7_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="nr7_trigger" description="TRIGGER - requires High, Low">
 
 Check if a narrow range day is detected on the current bar. Current bar has the smallest range within the window period. Signals volatility compression and imminent breakout. Default window=7 for NR7; use 4 for NR4. References: [CRABEL], [KB-07], [BULKOWSKI].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 4 -- 20 | `7` | Number of bars to compare range against |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1071,15 +1073,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### outside_bar_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="outside_bar_trigger" description="TRIGGER - requires High, Low">
 
 Check if an outside bar is detected on the current bar. Current bar's range completely engulfs the previous bar's range. Signals increased volatility. References: [KB-07], [TSR].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1106,20 +1108,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### piercing_line_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="piercing_line_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a piercing line pattern completed on the current bar. Bullish reversal: bearish candle followed by bullish candle opening below prior low (classic) or prior close (relaxed) and closing above midpoint of prior body. The classic definition requires a price gap, which is rare in 24/7 crypto/forex markets. Set require_gap=False for those markets. References: [NISON], [KB-07].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `min_penetration` | `float` | 0.3 -- 0.8 | `0.5` | Minimum penetration into previous body |
 | `require_gap` | `bool` | - | `True` | If True, requires open below previous low (classic Nison). If False, requires open below previous close (relaxed for 24/7 markets) |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1152,19 +1154,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### reversal_pattern_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="reversal_pattern_bearish" description="FILTER - requires Open, High, Low, Close">
 
 Check if a bearish reversal pattern was detected within recent window. Scans for hanging man, shooting star, bearish engulfing, evening star, dark cloud cover, and gravestone doji -- the classic bearish reversal patterns.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1195,19 +1197,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### reversal_pattern_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="reversal_pattern_bullish" description="FILTER - requires Open, High, Low, Close">
 
 Check if a bullish reversal pattern was detected within recent window. Scans for hammer, inverted hammer, bullish engulfing, morning star, piercing line, and dragonfly doji -- the classic bullish reversal patterns.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1238,20 +1240,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### shooting_star_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="shooting_star_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a shooting star shape is detected on the current bar. Small body at lower end with long upper wick and minimal lower wick. Bearish reversal after uptrend. References: [NISON], [STOCKCHARTS].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `wick_ratio` | `float` | 1.5 -- 5.0 | `2.0` | Minimum upper wick to body ratio |
 | `lower_wick_max` | `float` | 0.01 -- 0.5 | `0.1` | Maximum lower wick to body ratio |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1284,20 +1286,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### spinning_top_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="spinning_top_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a spinning top is detected on the current bar. Small body with significant wicks on both sides, signaling indecision. References: [NISON], [CM45T3R], [STOCKCHARTS].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `body_max` | `float` | 0.1 -- 0.5 | `0.3` | Maximum body-to-range ratio |
 | `wick_min` | `float` | 0.1 -- 0.5 | `0.2` | Minimum wick-to-range ratio for both wicks |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1330,19 +1332,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### strong_body_recent
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="strong_body_recent" description="FILTER - requires Open, High, Low, Close">
 
 Check if a marubozu (strong body) was detected within recent window. Scans for both bullish and bearish marubozu patterns.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 20 | `5` | Number of recent bars to check |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1373,19 +1375,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### three_black_crows_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="three_black_crows_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if three black crows pattern completed on the current bar. Three consecutive bearish candles with lower closes, each opening within the previous body. Strong bearish signal. References: [NISON], [KB-07], [STOCKCHARTS].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `min_body_ratio` | `float` | 0.3 -- 0.8 | `0.5` | Minimum body-to-range ratio per candle |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1416,15 +1418,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### three_inside_down_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+<Accordion title="three_inside_down_trigger" description="TRIGGER - requires Open, Close">
 
 Check if three inside down pattern completed on the current bar. Bullish candle, bearish harami, then bearish close below first candle's open. Confirmed bearish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1451,15 +1453,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### three_inside_up_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, Close
+<Accordion title="three_inside_up_trigger" description="TRIGGER - requires Open, Close">
 
 Check if three inside up pattern completed on the current bar. Bearish candle, bullish harami, then bullish close above first candle's open. Confirmed bullish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1486,19 +1488,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### three_white_soldiers_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="three_white_soldiers_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if three white soldiers pattern completed on the current bar. Three consecutive bullish candles with higher closes, each opening within the previous body. Strong bullish signal. References: [NISON], [KB-07], [STOCKCHARTS].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `min_body_ratio` | `float` | 0.3 -- 0.8 | `0.5` | Minimum body-to-range ratio per candle |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1529,19 +1531,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### tweezer_bottoms_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="tweezer_bottoms_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a tweezer bottoms pattern completed on the current bar. Two consecutive candles with approximately equal lows, first bearish and second bullish. Bullish reversal. References: [NISON], [CM45T3R].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `tolerance` | `float` | 0.001 -- 0.05 | `0.01` | Maximum low-to-low difference as fraction of average range |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1572,19 +1574,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### tweezer_tops_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="tweezer_tops_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a tweezer tops pattern completed on the current bar. Two consecutive candles with approximately equal highs, first bullish and second bearish. Bearish reversal. References: [NISON], [CM45T3R].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `tolerance` | `float` | 0.001 -- 0.05 | `0.01` | Maximum high-to-high difference as fraction of average range |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1615,19 +1617,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### two_bar_reversal_bearish_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="two_bar_reversal_bearish_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a bearish two-bar reversal completed on the current bar. Bullish bar followed by bearish bar that takes out the high then closes below the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `close_proximity` | `float` | 0.1 -- 0.5 | `0.25` | How close the close must be to the extreme, as a fraction of range. Lower is stricter |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1658,19 +1660,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### two_bar_reversal_bullish_trigger
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="two_bar_reversal_bullish_trigger" description="TRIGGER - requires Open, High, Low, Close">
 
 Check if a bullish two-bar reversal completed on the current bar. Bearish bar followed by bullish bar that takes out the low then closes above the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `close_proximity` | `float` | 0.1 -- 0.5 | `0.25` | How close the close must be to the extreme, as a fraction of range. Lower is stricter |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1700,3 +1702,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 ```
 
 </CodeGroup>
+
+</Accordion>
+
+</AccordionGroup>

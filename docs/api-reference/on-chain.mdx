@@ -1,0 +1,133 @@
+---
+title: "On Chain API"
+description: "On-chain analytics — wallet activity, transaction flows, holders, network metrics."
+---
+
+# On Chain API
+
+On-chain analytics — wallet activity, transaction flows, holders, network metrics.
+
+## Base URL
+
+```
+https://api.mangrovedeveloper.ai/api/v1/on-chain
+```
+
+## Authentication
+
+All endpoints require a JWT bearer token.
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Endpoints
+
+### Get aggregated exchange inflows/outflows, optionally filtered by token
+
+`GET /api/v1/on-chain/exchange-flows`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `hours_back` | query | `int` | no | Lookback hours (default: 24) |
+| `symbol` | query | `string` | no | Token symbol (e.g. btc, eth). Omit for all currencies. |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/exchange-flows?hours_back=<hours_back>&symbol=<symbol>"
+```
+
+### Screen for tokens with high smart money activity
+
+`GET /api/v1/on-chain/smart-money/screen`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `limit` | query | `int` | no | Max results (default: 50) |
+| `timeframe` | query | `string` | no | 5m, 1h, 6h, 24h, 7d, 30d (default: 24h) |
+| `chains` | query | `string` | no | Comma-separated chains (default: ethereum) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/screen?limit=<limit>&timeframe=<timeframe>&chains=<chains>"
+```
+
+### Get smart money sentiment (accumulation vs distribution) for a token
+
+`GET /api/v1/on-chain/smart-money/sentiment`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `chain` | query | `string` | no | Blockchain (default: ethereum) |
+| `symbol` | query | `string` | yes | Token symbol (e.g. ETH, UNI) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/sentiment?chain=<chain>&symbol=<symbol>"
+```
+
+### Get token holder distribution from Nansen
+
+`GET /api/v1/on-chain/token-holders/{symbol}`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `symbol` | path | `string` | yes | Token symbol (e.g. ETH, UNI) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/token-holders/<symbol>"
+```
+
+### Get high-level whale activity summary for a token
+
+`GET /api/v1/on-chain/whale-activity/{symbol}`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `symbol` | path | `string` | yes | Token symbol (e.g. btc, eth) |
+| `hours_back` | query | `int` | no | Lookback hours (default: 24) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-activity/<symbol>?hours_back=<hours_back>"
+```
+
+### Get recent large-value on-chain transactions
+
+`GET /api/v1/on-chain/whale-transactions`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `hours_back` | query | `int` | no | Lookback hours (default: 24) |
+| `min_value` | query | `int` | no | Min USD value (default: 500000) |
+| `symbol` | query | `string` | no | Filter by symbol (e.g. btc, eth) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-transactions?hours_back=<hours_back>&min_value=<min_value>&symbol=<symbol>"
+```

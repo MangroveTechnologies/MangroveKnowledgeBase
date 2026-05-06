@@ -188,6 +188,11 @@ def generate_catalog():
 
     # ---------------------------------------------------------------------------
     # Helpers to build per-signal MDX
+    #
+    # Each signal is wrapped in a Mintlify <Accordion> so the catalog page
+    # renders fast (~tens of KB instead of MBs) and users expand only the
+    # signals they care about. Mintlify wraps these inside an <AccordionGroup>
+    # at the per-category level.
     # ---------------------------------------------------------------------------
     def _signal_mdx(sig):
         out = []
@@ -197,16 +202,19 @@ def generate_catalog():
         description = sig.get("description", "")
         params = sig.get("params", {})
 
-        out.append(f"### {signal_name}")
-        out.append("")
-        out.append(f"**Type:** {_badge(signal_type)} &nbsp;&nbsp; **Requires:** {', '.join(requires) if requires else 'None'}")
+        requires_str = ", ".join(requires) if requires else "None"
+        # Build a short description label for the accordion header
+        # (visible while collapsed). Keep it terse.
+        header_desc = f"{signal_type} - requires {requires_str}"
+
+        out.append(f'<Accordion title="{signal_name}" description="{header_desc}">')
         out.append("")
         if description:
             safe_desc = description.replace("<", "&lt;").replace(">", "&gt;")
             out.append(safe_desc)
             out.append("")
         if params:
-            out.append("#### Parameters")
+            out.append("**Parameters**")
             out.append("")
             out.append("| Name | Type | Range | Default | Description |")
             out.append("|------|------|-------|---------|-------------|")
@@ -220,7 +228,7 @@ def generate_catalog():
         else:
             out.append("_No configurable parameters._")
             out.append("")
-        out.append("#### Example")
+        out.append("**Example**")
         out.append("")
         out.append("<CodeGroup>")
         out.append("")
@@ -233,6 +241,8 @@ def generate_catalog():
         out.append("```")
         out.append("")
         out.append("</CodeGroup>")
+        out.append("")
+        out.append("</Accordion>")
         out.append("")
         return out
 
@@ -269,7 +279,7 @@ def generate_catalog():
         sig_type = sig.get("type", "")
         slug = sig["category"].lower()
         index_lines.append(
-            f"| [`{sig['name']}`](/signals/catalog/{slug}#{_anchor_id(sig['name'])}) "
+            f"| [`{sig['name']}`](/signals/catalog/{slug}) "
             f"| {sig_type} | {sig['category']} | {requires_str} |"
         )
     index_lines.append("")
@@ -304,8 +314,14 @@ def generate_catalog():
         cat_lines.append("")
         cat_lines.append(f"See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.")
         cat_lines.append("")
+        cat_lines.append("Click a signal to expand parameters and examples.")
+        cat_lines.append("")
+        cat_lines.append("<AccordionGroup>")
+        cat_lines.append("")
         for sig in sigs:
             cat_lines.extend(_signal_mdx(sig))
+        cat_lines.append("</AccordionGroup>")
+        cat_lines.append("")
 
         cat_path = os.path.join(category_dir, f"{slug}.mdx")
         with open(cat_path, "w") as f:

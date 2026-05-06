@@ -9,20 +9,22 @@ _20 signals in this category._
 
 See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.
 
-### atr_high_volatility
+Click a signal to expand parameters and examples.
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<AccordionGroup>
+
+<Accordion title="atr_high_volatility" description="FILTER - requires High, Low, Close">
 
 Check if ATR indicates high volatility relative to price. High volatility (ATR as % of close &gt; threshold) can indicate potential trading opportunities or increased risk.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | ATR period |
 | `threshold_pct` | `float` | 0.5 -- 10.0 | `3.0` | ATR as percentage of close threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -55,20 +57,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### atr_trailing_stop_flip_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="atr_trailing_stop_flip_down" description="TRIGGER - requires High, Low, Close">
 
 Detect ATR Trailing Stop flipping from long (+1) to short (-1). Bearish trend-following entry signal.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `14` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -101,20 +103,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### atr_trailing_stop_flip_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="atr_trailing_stop_flip_up" description="TRIGGER - requires High, Low, Close">
 
 Detect ATR Trailing Stop flipping from short (-1) to long (+1). Bullish trend-following entry signal.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `14` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -147,20 +149,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### atr_trailing_stop_long
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="atr_trailing_stop_long" description="FILTER - requires High, Low, Close">
 
 Check if ATR Trailing Stop is in the long regime (+1 direction).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `14` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier for stop distance |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -193,20 +195,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### atr_trailing_stop_short
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="atr_trailing_stop_short" description="FILTER - requires High, Low, Close">
 
 Check if ATR Trailing Stop is in the short regime (-1 direction).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `14` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier for stop distance |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -239,20 +241,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bb_lower_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="bb_lower_breakout" description="TRIGGER - requires Close">
 
 Detect price breaking below the lower Bollinger Band. Fires on the bar where price crosses below the lower band, not while price remains below it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `20` | MA period for center band |
 | `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -285,13 +287,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bb_squeeze
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="bb_squeeze" description="TRIGGER - requires Close">
 
 Detect Bollinger Band squeeze onset (low volatility, potential breakout). Fires on the bar where band width drops below the threshold, not while it remains below.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -299,7 +301,7 @@ Detect Bollinger Band squeeze onset (low volatility, potential breakout). Fires 
 | `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
 | `threshold` | `float` | 1.0 -- 20.0 | `5.0` | Band width percentage threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -334,20 +336,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### bb_upper_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="bb_upper_breakout" description="TRIGGER - requires Close">
 
 Detect price breaking above the upper Bollinger Band. Fires on the bar where price crosses above the upper band, not while price remains above it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `20` | MA period for center band |
 | `window_dev` | `int` | 1 -- 5 | `2` | Standard deviation multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -380,19 +382,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dc_lower_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="dc_lower_breakout" description="TRIGGER - requires High, Low, Close">
 
 Detect price breaking below lower Donchian Channel (new low). Fires on the bar where close drops below the prior period's lower band. The channel is computed from the N bars BEFORE the current bar (offset=1) so the current bar's low doesn't deflate the band it's compared against.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `20` | Lookback period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -423,19 +425,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dc_upper_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="dc_upper_breakout" description="TRIGGER - requires High, Low, Close">
 
 Detect price breaking above upper Donchian Channel (new high). Fires on the bar where close exceeds the prior period's upper band. The channel is computed from the N bars BEFORE the current bar (offset=1) so the current bar's high doesn't inflate the band it's compared against.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `20` | Lookback period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -466,13 +468,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kc_lower_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="kc_lower_breakout" description="TRIGGER - requires High, Low, Close">
 
 Detect price breaking below lower Keltner Channel band. Fires on the bar where price crosses below the lower band.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -481,7 +483,7 @@ Detect price breaking below lower Keltner Channel band. Fires on the bar where p
 | `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
 | `original_version` | `bool` | - | `False` | Use original Keltner Channel formula instead of EMA+ATR |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -518,13 +520,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kc_upper_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="kc_upper_breakout" description="TRIGGER - requires High, Low, Close">
 
 Detect price breaking above upper Keltner Channel band. Fires on the bar where price crosses above the upper band.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -533,7 +535,7 @@ Detect price breaking above upper Keltner Channel band. Fires on the bar where p
 | `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
 | `original_version` | `bool` | - | `False` | Use original Keltner Channel formula instead of EMA+ATR |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -570,20 +572,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### natr_high_volatility
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="natr_high_volatility" description="FILTER - requires High, Low, Close">
 
 Check if normalized ATR is above a high-volatility threshold. NATR = 100 * ATR / close, so the threshold is a percentage. Values above ~2-3% typically indicate elevated volatility in equities; crypto markets can run 4-6%+ routinely.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `14` | NATR window |
 | `threshold` | `float` | 0.5 -- 20.0 | `2.0` | High volatility threshold as percentage |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -616,20 +618,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### natr_low_volatility
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="natr_low_volatility" description="FILTER - requires High, Low, Close">
 
 Check if normalized ATR is below a low-volatility threshold. Useful as a squeeze / consolidation filter.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `14` | NATR window |
 | `threshold` | `float` | 0.1 -- 5.0 | `1.0` | Low volatility threshold as percentage |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -662,13 +664,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### starc_lower_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="starc_lower_breakout" description="FILTER - requires High, Low, Close">
 
 Check if close is below the STARC lower band (breakdown).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -676,7 +678,7 @@ Check if close is below the STARC lower band (breakdown).
 | `window_atr` | `int` | 5 -- 100 | `15` | ATR window |
 | `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -711,13 +713,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### starc_upper_breakout
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="starc_upper_breakout" description="FILTER - requires High, Low, Close">
 
 Check if close is above the STARC upper band (breakout).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -725,7 +727,7 @@ Check if close is above the STARC upper band (breakout).
 | `window_atr` | `int` | 5 -- 100 | `15` | ATR window |
 | `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | ATR multiplier for band width |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -760,20 +762,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ulcer_high_risk
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ulcer_high_risk" description="FILTER - requires Close">
 
 Check if Ulcer Index indicates high downside risk. Higher Ulcer Index values indicate greater downside volatility.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | Lookback period |
 | `threshold` | `float` | 5.0 -- 30.0 | `10.0` | High risk threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -806,20 +808,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ulcer_low_risk
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ulcer_low_risk" description="FILTER - requires Close">
 
 Check if Ulcer Index indicates low downside risk. Lower Ulcer Index values indicate lower downside volatility.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | Lookback period |
 | `threshold` | `float` | 1.0 -- 15.0 | `5.0` | Low risk threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -852,20 +854,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### volatility_stop_lower
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="volatility_stop_lower" description="FILTER - requires Close">
 
 Check if close has reached or fallen below the stdev-based volatility lower stop.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `20` | Rolling stdev window |
 | `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | Stdev multiplier for stop distance |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -898,20 +900,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### volatility_stop_upper
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="volatility_stop_upper" description="FILTER - requires Close">
 
 Check if close has reached or exceeded the stdev-based volatility upper stop. Indicates the price has moved multiplier standard deviations above the current bar -- a potential exhaustion / mean-reversion signal.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `20` | Rolling stdev window |
 | `multiplier` | `float` | 0.5 -- 5.0 | `2.0` | Stdev multiplier for stop distance |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -943,3 +945,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 ```
 
 </CodeGroup>
+
+</Accordion>
+
+</AccordionGroup>
