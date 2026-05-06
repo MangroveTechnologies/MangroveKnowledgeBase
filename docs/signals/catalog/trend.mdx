@@ -9,19 +9,21 @@ _88 signals in this category._
 
 See the full [Signal Catalog](/signals/catalog) for the cross-category index, or the [Signals Overview](/signals/overview) for an introduction.
 
-### adx_bullish_di
+Click a signal to expand parameters and examples.
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<AccordionGroup>
+
+<Accordion title="adx_bullish_di" description="FILTER - requires High, Low, Close">
 
 Check if +DI is greater than -DI (bullish directional movement). When +DI &gt; -DI, bulls have the upper hand.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | ADX period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -52,20 +54,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### adx_strong_trend
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="adx_strong_trend" description="FILTER - requires High, Low, Close">
 
 Check if ADX indicates a strong trend. ADX values above 25 typically indicate a strong trend (either up or down).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `14` | ADX period |
 | `threshold` | `float` | 15.0 -- 50.0 | `25.0` | Trend strength threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -98,13 +100,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### alligator_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="alligator_bearish" description="FILTER - requires High, Low">
 
 Check if Williams Alligator lines are in bearish alignment (lips &lt; teeth &lt; jaw). Strong downtrend, all lines spreading downward.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -115,7 +117,7 @@ Check if Williams Alligator lines are in bearish alignment (lips &lt; teeth &lt;
 | `teeth_offset` | `int` | 0 -- 15 | `5` | Teeth forward shift |
 | `lips_offset` | `int` | 0 -- 10 | `3` | Lips forward shift |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -156,13 +158,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### alligator_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="alligator_bullish" description="FILTER - requires High, Low">
 
 Check if Williams Alligator lines are in bullish alignment (lips &gt; teeth &gt; jaw). Bill Williams's "hungry alligator" state: strong uptrend, all lines spreading upward.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -173,7 +175,7 @@ Check if Williams Alligator lines are in bullish alignment (lips &gt; teeth &gt;
 | `teeth_offset` | `int` | 0 -- 15 | `5` | Teeth forward shift |
 | `lips_offset` | `int` | 0 -- 10 | `3` | Lips forward shift |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -214,13 +216,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### alligator_sleeping
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="alligator_sleeping" description="FILTER - requires High, Low">
 
 Check if the Williams Alligator is sleeping (lines tangled, no trend). True when lines are neither strictly bullish-aligned nor bearish-aligned. Used as a no-trade filter during consolidation.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -231,7 +233,7 @@ Check if the Williams Alligator is sleeping (lines tangled, no trend). True when
 | `teeth_offset` | `int` | 0 -- 15 | `5` | Teeth forward shift |
 | `lips_offset` | `int` | 0 -- 10 | `3` | Lips forward shift |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -272,13 +274,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### alma_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="alma_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -287,7 +289,7 @@ Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).
 | `offset` | `float` | 0.0 -- 1.0 | `0.85` | Weight center |
 | `sigma` | `float` | 0.1 -- 20.0 | `6.0` | Gaussian spread |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -324,13 +326,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### alma_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="alma_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA). Both ALMAs use the same offset and sigma; only the window differs.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -339,7 +341,7 @@ Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA). Both ALMAs 
 | `offset` | `float` | 0.0 -- 1.0 | `0.85` | Weight center |
 | `sigma` | `float` | 0.1 -- 20.0 | `6.0` | Gaussian spread |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -376,20 +378,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### aroon_crossover
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="aroon_crossover" description="TRIGGER - requires High, Low">
 
 Check if Aroon lines cross (trend change signal).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 10 -- 50 | `25` | Lookback period |
 | `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -422,20 +424,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### aroon_down_trend
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="aroon_down_trend" description="FILTER - requires High, Low">
 
 Check if Aroon Down indicates strong downtrend.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 10 -- 50 | `25` | Lookback period |
 | `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Strong trend threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -468,20 +470,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### aroon_up_trend
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="aroon_up_trend" description="FILTER - requires High, Low">
 
 Check if Aroon Up indicates strong uptrend.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 10 -- 50 | `25` | Lookback period |
 | `threshold` | `float` | 50.0 -- 100.0 | `70.0` | Strong trend threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -514,13 +516,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cci_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="cci_overbought" description="FILTER - requires High, Low, Close">
 
 Check if CCI indicates overbought condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -528,7 +530,7 @@ Check if CCI indicates overbought condition.
 | `constant` | `float` | 0.001 -- 0.1 | `0.015` | CCI constant |
 | `threshold` | `float` | 50.0 -- 200.0 | `100.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -563,13 +565,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### cci_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="cci_oversold" description="FILTER - requires High, Low, Close">
 
 Check if CCI indicates oversold condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -577,7 +579,7 @@ Check if CCI indicates oversold condition.
 | `constant` | `float` | 0.001 -- 0.1 | `0.015` | CCI constant |
 | `threshold` | `float` | -200.0 -- -50.0 | `-100.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -612,20 +614,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### chandelier_long_stop_hit
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="chandelier_long_stop_hit" description="FILTER - requires High, Low, Close">
 
 Check if close has breached the Chandelier long stop (close &lt; long_stop). If holding a long position, this is your exit trigger.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `22` | Rolling high/ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -658,20 +660,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### chandelier_short_stop_hit
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="chandelier_short_stop_hit" description="FILTER - requires High, Low, Close">
 
 Check if close has breached the Chandelier short stop (close &gt; short_stop). If holding a short position, this is your exit trigger.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 100 | `22` | Rolling low/ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -704,20 +706,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dema_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="dema_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA). Lower-lag equivalent of an SMA/EMA death cross.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast DEMA window |
 | `window_slow` | `int` | 2 -- 200 | `21` | Slow DEMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -750,20 +752,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dema_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="dema_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA). Lower-lag equivalent of an SMA/EMA golden cross.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast DEMA window |
 | `window_slow` | `int` | 2 -- 200 | `21` | Slow DEMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -796,19 +798,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dpo_negative
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="dpo_negative" description="FILTER - requires Close">
 
 Check if DPO is negative (price below detrended average).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 10 -- 50 | `20` | DPO period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -839,19 +841,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### dpo_positive
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="dpo_positive" description="FILTER - requires Close">
 
 Check if DPO is positive (price above detrended average).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 10 -- 50 | `20` | DPO period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -882,20 +884,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ema_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ema_cross_down" description="TRIGGER - requires Close">
 
 Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast EMA window |
 | `window_slow` | `int` | 5 -- 200 | `21` | Slow EMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -928,20 +930,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ema_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ema_cross_up" description="TRIGGER - requires Close">
 
 Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast EMA window |
 | `window_slow` | `int` | 5 -- 200 | `21` | Slow EMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -974,13 +976,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ema_crossover
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ema_crossover" description="TRIGGER - requires Close">
 
 Detect an EMA crossover signal with configurable direction (bullish or bearish). Uses EMA indicator to calculate window_fast and window_slow EMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover: window_fast EMA crosses above window_slow EMA Bearish crossover: window_fast EMA crosses below window_slow EMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast &lt;= prev window_slow AND current window_fast &gt; current window_slow - Bearish: prev window_fast &gt;= prev window_slow AND current window_fast &lt; current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -988,7 +990,7 @@ Detect an EMA crossover signal with configurable direction (bullish or bearish).
 | `window_slow` | `int` | 1 -- 200 | _required_ | Slow EMA window in bars |
 | `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1023,20 +1025,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### epma_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="epma_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `10` | Fast EPMA window |
 | `window_slow` | `int` | 2 -- 200 | `30` | Slow EPMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1069,20 +1071,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### epma_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="epma_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `10` | Fast EPMA window |
 | `window_slow` | `int` | 2 -- 200 | `30` | Slow EPMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1115,15 +1117,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### heikin_ashi_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="heikin_ashi_bearish" description="FILTER - requires Open, High, Low, Close">
 
 Check if the current Heikin-Ashi candle is bearish (HA_close &lt; HA_open).
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1150,15 +1152,15 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### heikin_ashi_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Open, High, Low, Close
+<Accordion title="heikin_ashi_bullish" description="FILTER - requires Open, High, Low, Close">
 
 Check if the current Heikin-Ashi candle is bullish (HA_close &gt; HA_open). A bullish HA candle indicates buying pressure on the smoothed bar. Strings of bullish HA candles indicate a sustained uptrend.
 
 _No configurable parameters._
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1185,20 +1187,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### hma_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="hma_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish HMA crossover (fast HMA crosses below slow HMA). Low-lag crossover; fires earlier than SMA/EMA equivalents.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 4 -- 100 | `9` | Fast HMA window |
 | `window_slow` | `int` | 4 -- 200 | `25` | Slow HMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1231,20 +1233,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### hma_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="hma_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish HMA crossover (fast HMA crosses above slow HMA). Low-lag crossover; fires earlier than SMA/EMA equivalents.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 4 -- 100 | `9` | Fast HMA window |
 | `window_slow` | `int` | 4 -- 200 | `25` | Slow HMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1277,13 +1279,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ichimoku_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="ichimoku_bearish" description="FILTER - requires High, Low">
 
 Check if Ichimoku indicates bearish signal (price below cloud).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1291,7 +1293,7 @@ Check if Ichimoku indicates bearish signal (price below cloud).
 | `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
 | `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1326,13 +1328,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ichimoku_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="ichimoku_bullish" description="FILTER - requires High, Low">
 
 Check if Ichimoku indicates bullish signal (price above cloud).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1340,7 +1342,7 @@ Check if Ichimoku indicates bullish signal (price above cloud).
 | `window_kijun` | `int` | 15 -- 40 | `26` | Kijun-sen (base line) window |
 | `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1375,13 +1377,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ichimoku_tk_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="ichimoku_tk_cross" description="TRIGGER - requires High, Low">
 
 Check if Tenkan-sen crosses Kijun-sen (TK cross).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1390,7 +1392,7 @@ Check if Tenkan-sen crosses Kijun-sen (TK cross).
 | `window_senkou` | `int` | 30 -- 70 | `52` | Senkou Span B (leading span B) window |
 | `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1427,13 +1429,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_alma
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_alma" description="FILTER - requires Close">
 
 Check if the current price is above the Arnaud Legoux Moving Average (ALMA). ALMA is a Gaussian-weighted MA that can be tuned to react faster (offset near 1, lower sigma) or smoother (offset near 0, higher sigma).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1441,7 +1443,7 @@ Check if the current price is above the Arnaud Legoux Moving Average (ALMA). ALM
 | `offset` | `float` | 0.0 -- 1.0 | `0.85` | Weight center, 0=oldest, 1=newest |
 | `sigma` | `float` | 0.1 -- 20.0 | `6.0` | Gaussian spread. Higher = smoother |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1476,19 +1478,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_dema
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_dema" description="FILTER - requires Close">
 
 Check if the current price is above the Double Exponential Moving Average (DEMA). DEMA reduces lag compared to a standard EMA by combining two EMA passes. Useful for trend-following filters where responsiveness matters.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `21` | DEMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1519,19 +1521,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_epma
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_epma" description="FILTER - requires Close">
 
 Check if the current price is above the End Point Moving Average (EPMA / LSMA). EPMA is the endpoint of a linear regression over the window, projecting the trend to "now" rather than averaging past values.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `20` | EPMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1562,19 +1564,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_hma
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_hma" description="FILTER - requires Close">
 
 Check if the current price is above the Hull Moving Average (HMA). HMA tracks price with very low lag while remaining smoother than WMA. A common crypto trend filter.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 4 -- 200 | `16` | HMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1605,20 +1607,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_mama
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_mama" description="FILTER - requires Close">
 
 Check if the current price is above the MESA Adaptive Moving Average (MAMA). MAMA adapts its smoothing to volatility via a Hilbert transform.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `fast_limit` | `float` | 0.1 -- 1.0 | `0.5` | Upper alpha bound (fast response) |
 | `slow_limit` | `float` | 0.01 -- 0.5 | `0.05` | Lower alpha bound (slow response) |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1651,19 +1653,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_sma
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_sma" description="FILTER - requires Close">
 
 Check if the current price is above the Simple Moving Average. Uses SMA indicator to calculate the SMA for the given window and returns True if the most recent close price is strictly greater than the SMA value. Returns False if insufficient data is available. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 1 -- 200 | _required_ | SMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1694,19 +1696,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_smma
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_smma" description="FILTER - requires Close">
 
 Check if the current price is above the Smoothed Moving Average (SMMA / Wilder's). SMMA uses Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing a slower, more stable trend line. Same family used inside RSI and ATR.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `14` | SMMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1737,20 +1739,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_t3
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_t3" description="FILTER - requires Close">
 
 Check if the current price is above the Tillson T3 moving average. T3 is a smooth low-lag MA that combines 6 EMAs via the volume factor.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `10` | T3 window in bars |
 | `volume_factor` | `float` | 0.0 -- 1.0 | `0.7` | Tillson volume factor, controls smoothness |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1783,19 +1785,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_tema
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_tema" description="FILTER - requires Close">
 
 Check if the current price is above the Triple Exponential Moving Average (TEMA). TEMA has even less lag than DEMA by combining three EMA passes.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `21` | TEMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1826,19 +1828,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### is_above_trima
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="is_above_trima" description="FILTER - requires Close">
 
 Check if the current price is above the Triangular Moving Average (TRIMA). TRIMA is a double-smoothed SMA that weights the middle of the window more heavily, producing a smoother trend line than SMA.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `20` | TRIMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1869,13 +1871,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kst_bearish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="kst_bearish_cross" description="TRIGGER - requires Close">
 
 Check if KST crosses below signal line (bearish).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1889,7 +1891,7 @@ Check if KST crosses below signal line (bearish).
 | `window_sma4` | `int` | 2 -- 200 | `15` | SMA4 smoothing window for ROC4 |
 | `nsig` | `int` | 1 -- 200 | `9` | Signal line period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -1936,13 +1938,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### kst_bullish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="kst_bullish_cross" description="TRIGGER - requires Close">
 
 Check if KST crosses above signal line (bullish).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -1956,7 +1958,7 @@ Check if KST crosses above signal line (bullish).
 | `window_sma4` | `int` | 2 -- 200 | `15` | SMA4 smoothing window for ROC4 |
 | `nsig` | `int` | 1 -- 200 | `9` | Signal line period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2003,19 +2005,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ma_ribbon_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ma_ribbon_bearish" description="FILTER - requires Close">
 
 Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `windows` | `tuple` | 2.0 -- 1000.0 | `(5, 8, 13, 21, 34, 55, 89, 144)` | Strictly increasing tuple of SMA periods |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2046,19 +2048,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ma_ribbon_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ma_ribbon_bullish" description="FILTER - requires Close">
 
 Check if all MAs in the ribbon are in strict bullish alignment (faster above slower). Uses 8 Fibonacci-spaced SMAs by default. Strict alignment means SMA(5) &gt; SMA(8) &gt; SMA(13) &gt; ... &gt; SMA(144). This is a strong trend filter -- when true, the market is in a clear uptrend across all horizons.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `windows` | `tuple` | 2.0 -- 1000.0 | `(5, 8, 13, 21, 34, 55, 89, 144)` | Strictly increasing tuple of SMA periods |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2089,19 +2091,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ma_ribbon_tangled
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="ma_ribbon_tangled" description="FILTER - requires Close">
 
 Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter). Useful as a no-trade filter during choppy markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `windows` | `tuple` | 2.0 -- 1000.0 | `(5, 8, 13, 21, 34, 55, 89, 144)` | Strictly increasing tuple of SMA periods |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2132,13 +2134,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### macd_bearish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="macd_bearish_cross" description="TRIGGER - requires Close">
 
 Detect MACD bearish crossover (MACD line crosses below signal line). A bearish MACD crossover occurs when the MACD line crosses below the signal line, indicating potential downward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2146,7 +2148,7 @@ Detect MACD bearish crossover (MACD line crosses below signal line). A bearish M
 | `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
 | `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2181,13 +2183,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### macd_bullish_cross
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="macd_bullish_cross" description="TRIGGER - requires Close">
 
 Detect MACD bullish crossover (MACD line crosses above signal line). A bullish MACD crossover occurs when the MACD line crosses above the signal line, indicating potential upward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2195,7 +2197,7 @@ Detect MACD bullish crossover (MACD line crosses above signal line). A bullish M
 | `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
 | `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2230,13 +2232,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### macd_positive
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="macd_positive" description="FILTER - requires Close">
 
 Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2244,7 +2246,7 @@ Check if MACD histogram is positive (bullish momentum). Crypto's high volatility
 | `window_slow` | `int` | 10 -- 100 | `26` | Slow EMA window |
 | `window_sign` | `int` | 2 -- 50 | `9` | Signal line EMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2279,20 +2281,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mama_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="mama_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA). Classic Ehlers exit signal: MAMA falling below FAMA signals a downtrend.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `fast_limit` | `float` | 0.1 -- 1.0 | `0.5` | Upper alpha bound |
 | `slow_limit` | `float` | 0.01 -- 0.5 | `0.05` | Lower alpha bound |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2325,20 +2327,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mama_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="mama_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA). Classic Ehlers entry signal: MAMA rising above FAMA signals an uptrend.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `fast_limit` | `float` | 0.1 -- 1.0 | `0.5` | Upper alpha bound |
 | `slow_limit` | `float` | 0.01 -- 0.5 | `0.05` | Lower alpha bound |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2371,13 +2373,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### mass_reversal_signal
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low
+<Accordion title="mass_reversal_signal" description="TRIGGER - requires High, Low">
 
 Check if Mass Index signals potential reversal (reversal bulge). A reversal bulge occurs when Mass Index rises above 27 then falls below 26.5.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2386,7 +2388,7 @@ Check if Mass Index signals potential reversal (reversal bulge). A reversal bulg
 | `threshold_high` | `float` | 25.0 -- 30.0 | `27.0` | Upper threshold |
 | `threshold_low` | `float` | 24.0 -- 27.0 | `26.5` | Lower threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2423,13 +2425,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### multi_tf_trend_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="multi_tf_trend_bearish" description="FILTER - requires Close">
 
 Check if the higher-timeframe EMA is falling.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2437,7 +2439,7 @@ Check if the higher-timeframe EMA is falling.
 | `window` | `int` | 2 -- 100 | `10` | EMA period |
 | `slope_threshold` | `float` | 0.0 -- 0.5 | `0.0` | Slope threshold for non-flat |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2472,13 +2474,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### multi_tf_trend_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="multi_tf_trend_bullish" description="FILTER - requires Close">
 
 Check if the higher-timeframe EMA is rising (trend confirmation filter). Requires a DatetimeIndex. Resamples to the specified higher timeframe, computes an EMA on the resampled closes, and returns True if the EMA slope is positive. Broadcasts back to the current bar's timestamp so lower-TF signals can be filtered by higher-TF trend.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2486,7 +2488,7 @@ Check if the higher-timeframe EMA is rising (trend confirmation filter). Require
 | `window` | `int` | 2 -- 100 | `10` | EMA period on the resampled close |
 | `slope_threshold` | `float` | 0.0 -- 0.5 | `0.0` | Relative slope threshold for non-flat classification |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2521,19 +2523,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### price_above_ema
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="price_above_ema" description="FILTER - requires Close">
 
 Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 2 -- 200 | `20` | EMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2564,20 +2566,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### psar_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="psar_bearish" description="FILTER - requires High, Low, Close">
 
 Check if PSAR indicates bearish trend (PSAR above price).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
 | `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2610,20 +2612,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### psar_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="psar_bullish" description="FILTER - requires High, Low, Close">
 
 Check if PSAR indicates bullish trend (PSAR below price).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `step` | `float` | 0.01 -- 0.1 | `0.02` | PSAR acceleration factor step |
 | `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2656,13 +2658,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### psar_reversal
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="psar_reversal" description="TRIGGER - requires High, Low, Close">
 
 Check if PSAR flips sides (potential reversal).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2670,7 +2672,7 @@ Check if PSAR flips sides (potential reversal).
 | `max_step` | `float` | 0.1 -- 0.5 | `0.2` | PSAR max acceleration factor |
 | `direction` | `str` | - | `bullish` | Reversal direction, 'bullish' (flip to below price) or 'bearish' |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2705,13 +2707,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_bearish_divergence
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_bearish_divergence" description="TRIGGER - requires Close">
 
 Detect a regular bearish RSI divergence: price higher high, RSI lower high. Classic reversal signal indicating bullish momentum is weakening.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2719,7 +2721,7 @@ Detect a regular bearish RSI divergence: price higher high, RSI lower high. Clas
 | `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
 | `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between the two swing points compared |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2754,13 +2756,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_bullish_divergence
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_bullish_divergence" description="TRIGGER - requires Close">
 
 Detect a regular bullish RSI divergence: price lower low, RSI higher low. Classic reversal signal indicating bearish momentum is weakening.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2768,7 +2770,7 @@ Detect a regular bullish RSI divergence: price lower low, RSI higher low. Classi
 | `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
 | `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between the two swing points compared |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2803,13 +2805,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_hidden_bearish_divergence
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_hidden_bearish_divergence" description="TRIGGER - requires Close">
 
 Detect a hidden bearish RSI divergence: price lower high, RSI higher high. Continuation signal in a downtrend.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2817,7 +2819,7 @@ Detect a hidden bearish RSI divergence: price lower high, RSI higher high. Conti
 | `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
 | `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between swings |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2852,13 +2854,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### rsi_hidden_bullish_divergence
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="rsi_hidden_bullish_divergence" description="TRIGGER - requires Close">
 
 Detect a hidden bullish RSI divergence: price higher low, RSI lower low. Continuation signal in an uptrend -- indicates the uptrend is still intact despite a pullback.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -2866,7 +2868,7 @@ Detect a hidden bullish RSI divergence: price higher low, RSI lower low. Continu
 | `swing_window` | `int` | 2 -- 20 | `5` | Bars on each side to confirm swing extremum |
 | `min_swing_distance` | `int` | 3 -- 50 | `10` | Min bars between swings |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2901,20 +2903,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### sma_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="sma_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish SMA crossover as an exit signal. Returns True when the window_fast SMA crosses below the window_slow SMA (death cross). This is a momentum-driven exit signal, indicating a transition from bullish to bearish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 1 -- 200 | _required_ | Fast SMA window in bars |
 | `window_slow` | `int` | 1 -- 200 | _required_ | Slow SMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2947,20 +2949,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### sma_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="sma_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish SMA crossover as an entry signal. Returns True when the window_fast SMA crosses above the window_slow SMA (golden cross). This is a momentum-driven entry signal, indicating a transition from bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 1 -- 200 | _required_ | Fast SMA window in bars |
 | `window_slow` | `int` | 1 -- 200 | _required_ | Slow SMA window in bars |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -2993,13 +2995,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### sma_crossover
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="sma_crossover" description="TRIGGER - requires Close">
 
 Detect an SMA crossover signal with configurable direction (bullish or bearish). Uses SMA indicator to calculate window_fast and window_slow SMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover (golden cross): window_fast SMA crosses above window_slow SMA Bearish crossover (death cross): window_fast SMA crosses below window_slow SMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast &lt;= prev window_slow AND current window_fast &gt; current window_slow - Bearish: prev window_fast &gt;= prev window_slow AND current window_fast &lt; current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3007,7 +3009,7 @@ Detect an SMA crossover signal with configurable direction (bullish or bearish).
 | `window_slow` | `int` | 1 -- 200 | _required_ | Slow SMA window in bars |
 | `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' or 'bearish' |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3042,20 +3044,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### smma_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="smma_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA). Slower, more stable crossover than EMA cross; fewer false triggers.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `14` | Fast SMMA window |
 | `window_slow` | `int` | 2 -- 200 | `50` | Slow SMMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3088,20 +3090,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### smma_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="smma_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA). Slower, more stable crossover than EMA cross; fewer false triggers.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `14` | Fast SMMA window |
 | `window_slow` | `int` | 2 -- 200 | `50` | Slow SMMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3134,13 +3136,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### stc_overbought
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="stc_overbought" description="FILTER - requires Close">
 
 Check if STC indicates overbought condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3151,7 +3153,7 @@ Check if STC indicates overbought condition.
 | `smooth2` | `int` | 1 -- 200 | `3` | Second smoothing period |
 | `threshold` | `float` | 0.0 -- 100.0 | `75.0` | Overbought threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3192,13 +3194,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### stc_oversold
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="stc_oversold" description="FILTER - requires Close">
 
 Check if STC indicates oversold condition.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3209,7 +3211,7 @@ Check if STC indicates oversold condition.
 | `smooth2` | `int` | 1 -- 200 | `3` | Second smoothing period |
 | `threshold` | `float` | 0.0 -- 100.0 | `25.0` | Oversold threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3250,20 +3252,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### supertrend_flip_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="supertrend_flip_down" description="TRIGGER - requires High, Low, Close">
 
 Detect SuperTrend flipping from long (+1) to short (-1). Classic SuperTrend bearish entry signal.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `10` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3296,20 +3298,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### supertrend_flip_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="supertrend_flip_up" description="TRIGGER - requires High, Low, Close">
 
 Detect SuperTrend flipping from short (-1) to long (+1). Classic SuperTrend bullish entry signal.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `10` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3342,20 +3344,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### supertrend_long
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="supertrend_long" description="FILTER - requires High, Low, Close">
 
 Check if SuperTrend is in the long regime (+1 direction).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `10` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3388,20 +3390,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### supertrend_short
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="supertrend_short" description="FILTER - requires High, Low, Close">
 
 Check if SuperTrend is in the short regime (-1 direction).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 50 | `10` | ATR window |
 | `multiplier` | `float` | 0.5 -- 10.0 | `3.0` | ATR multiplier |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3434,13 +3436,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### t3_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="t3_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish T3 crossover (fast T3 crosses below slow T3).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3448,7 +3450,7 @@ Detect a bearish T3 crossover (fast T3 crosses below slow T3).
 | `window_slow` | `int` | 2 -- 200 | `10` | Slow T3 window |
 | `volume_factor` | `float` | 0.0 -- 1.0 | `0.7` | Tillson volume factor |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3483,13 +3485,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### t3_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="t3_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish T3 crossover (fast T3 crosses above slow T3). Very smooth, low-lag crossover. Both T3s share the same volume_factor.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3497,7 +3499,7 @@ Detect a bullish T3 crossover (fast T3 crosses above slow T3). Very smooth, low-
 | `window_slow` | `int` | 2 -- 200 | `10` | Slow T3 window |
 | `volume_factor` | `float` | 0.0 -- 1.0 | `0.7` | Tillson volume factor |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3532,20 +3534,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### tema_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="tema_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA). Very low-lag cross signal; expect more whipsaw in noisy markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast TEMA window |
 | `window_slow` | `int` | 2 -- 200 | `21` | Slow TEMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3578,20 +3580,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### tema_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="tema_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA). Very low-lag cross signal; expect more whipsaw in noisy markets.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `9` | Fast TEMA window |
 | `window_slow` | `int` | 2 -- 200 | `21` | Slow TEMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3624,20 +3626,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### trima_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="trima_cross_down" description="TRIGGER - requires Close">
 
 Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `10` | Fast TRIMA window |
 | `window_slow` | `int` | 2 -- 200 | `30` | Slow TRIMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3670,20 +3672,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### trima_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="trima_cross_up" description="TRIGGER - requires Close">
 
 Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 100 | `10` | Fast TRIMA window |
 | `window_slow` | `int` | 2 -- 200 | `30` | Slow TRIMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3716,20 +3718,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### trix_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="trix_bearish" description="FILTER - requires Close">
 
 Check if TRIX indicates bearish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `15` | TRIX period |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bearish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3762,20 +3764,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### trix_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="trix_bullish" description="FILTER - requires Close">
 
 Check if TRIX indicates bullish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `15` | TRIX period |
 | `threshold` | `float` | 0.0 -- 100.0 | `0.0` | Bullish threshold |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3808,13 +3810,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ttm_squeeze_active
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="ttm_squeeze_active" description="FILTER - requires High, Low, Close">
 
 Check if the TTM Squeeze is active (BB inside KC -- volatility contraction). Use as a no-breakout filter: when true, market is coiled and waiting for a directional move.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3824,7 +3826,7 @@ Check if the TTM Squeeze is active (BB inside KC -- volatility contraction). Use
 | `kc_atr_mult` | `float` | 0.5 -- 3.0 | `1.5` | Keltner ATR multiplier |
 | `mom_window` | `int` | 5 -- 50 | `12` | Momentum regression window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3863,13 +3865,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ttm_squeeze_fired_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="ttm_squeeze_fired_bearish" description="TRIGGER - requires High, Low, Close">
 
 Detect TTM Squeeze release with bearish momentum.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3879,7 +3881,7 @@ Detect TTM Squeeze release with bearish momentum.
 | `kc_atr_mult` | `float` | 0.5 -- 3.0 | `1.5` | Keltner ATR multiplier |
 | `mom_window` | `int` | 5 -- 50 | `12` | Momentum regression window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3918,13 +3920,13 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### ttm_squeeze_fired_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="ttm_squeeze_fired_bullish" description="TRIGGER - requires High, Low, Close">
 
 Detect TTM Squeeze release with bullish momentum. Fires when the squeeze just ended (was on previous bar, off now) AND momentum is positive. Classic Carter entry signal.
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
@@ -3934,7 +3936,7 @@ Detect TTM Squeeze release with bullish momentum. Fires when the squeeze just en
 | `kc_atr_mult` | `float` | 0.5 -- 3.0 | `1.5` | Keltner ATR multiplier |
 | `mom_window` | `int` | 5 -- 50 | `12` | Momentum regression window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -3973,19 +3975,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vortex_bearish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="vortex_bearish" description="FILTER - requires High, Low, Close">
 
 Check if Vortex Indicator shows bearish trend (-VI &gt; +VI).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `14` | Vortex period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -4016,19 +4018,19 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vortex_bullish
+</Accordion>
 
-**Type:** <span style={{color: "#3498db", fontWeight: "bold"}}>FILTER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="vortex_bullish" description="FILTER - requires High, Low, Close">
 
 Check if Vortex Indicator shows bullish trend (+VI &gt; -VI).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `14` | Vortex period |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -4059,20 +4061,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### vortex_crossover
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** High, Low, Close
+<Accordion title="vortex_crossover" description="TRIGGER - requires High, Low, Close">
 
 Check if Vortex lines cross (trend change).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window` | `int` | 5 -- 30 | `14` | Vortex period |
 | `direction` | `str` | - | `bullish` | Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish' |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -4105,20 +4107,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### wma_cross_down
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="wma_cross_down" description="TRIGGER - requires Close">
 
 Check if fast WMA crosses below slow WMA (bearish).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 50 | `9` | Fast WMA window |
 | `window_slow` | `int` | 10 -- 100 | `21` | Slow WMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -4151,20 +4153,20 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 
 </CodeGroup>
 
-### wma_cross_up
+</Accordion>
 
-**Type:** <span style={{color: "#e67e22", fontWeight: "bold"}}>TRIGGER</span> &nbsp;&nbsp; **Requires:** Close
+<Accordion title="wma_cross_up" description="TRIGGER - requires Close">
 
 Check if fast WMA crosses above slow WMA (bullish).
 
-#### Parameters
+**Parameters**
 
 | Name | Type | Range | Default | Description |
 |------|------|-------|---------|-------------|
 | `window_fast` | `int` | 2 -- 50 | `9` | Fast WMA window |
 | `window_slow` | `int` | 10 -- 100 | `21` | Slow WMA window |
 
-#### Example
+**Example**
 
 <CodeGroup>
 
@@ -4196,3 +4198,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/execution/evaluate \
 ```
 
 </CodeGroup>
+
+</Accordion>
+
+</AccordionGroup>
