@@ -1,0 +1,78 @@
+---
+title: "Social API"
+description: "Social-data endpoints — sentiment, mention volume, influence scoring."
+---
+
+# Social API
+
+Social-data endpoints — sentiment, mention volume, influence scoring.
+
+## Base URL
+
+```
+https://api.mangrovedeveloper.ai/api/v1/social
+```
+
+## Authentication
+
+All endpoints require a JWT bearer token.
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Endpoints
+
+### Get influence score and follower metrics for a user
+
+`GET /api/v1/social/influence/{username}`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `username` | path | `string` | yes | X/Twitter username (without @) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/social/influence/<username>"
+```
+
+### Get recent mentions for a topic
+
+`GET /api/v1/social/mentions/{topic}`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `topic` | path | `string` | yes | Topic or keyword to search |
+| `limit` | query | `int` | no | Max posts to return (default 20) |
+| `hours_back` | query | `int` | no | Time window in hours (default 24) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/social/mentions/<topic>?limit=<limit>&hours_back=<hours_back>"
+```
+
+### Get social sentiment score for a topic
+
+`GET /api/v1/social/sentiment/{topic}`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `topic` | path | `string` | yes | Topic or symbol to analyze (e.g. BTC, ETH, Solana) |
+| `hours_back` | query | `int` | no | Time window in hours (default 24) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/social/sentiment/<topic>?hours_back=<hours_back>"
+```

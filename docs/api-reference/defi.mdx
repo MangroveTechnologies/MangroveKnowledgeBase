@@ -1,0 +1,69 @@
+---
+title: "Defi API"
+description: "DeFi metrics — protocol TVL, chain TVL, stablecoin supply."
+---
+
+# Defi API
+
+DeFi metrics — protocol TVL, chain TVL, stablecoin supply.
+
+## Base URL
+
+```
+https://api.mangrovedeveloper.ai/api/v1/defi
+```
+
+## Authentication
+
+All endpoints require a JWT bearer token.
+
+```
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## Endpoints
+
+### Get TVL and top protocols for a blockchain
+
+`GET /api/v1/defi/chain/{chain}/tvl`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `chain` | path | `string` | yes | Blockchain name (e.g. Ethereum, Solana, Arbitrum) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/defi/chain/<chain>/tvl"
+```
+
+### Get TVL and chain breakdown for a DeFi protocol
+
+`GET /api/v1/defi/protocol/{protocol}/tvl`
+
+**Parameters**
+
+| Name | In | Type | Required | Description |
+|------|----|------|----------|-------------|
+| `protocol` | path | `string` | yes | Protocol name or slug (e.g. aave, uniswap, lido) |
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/defi/protocol/<protocol>/tvl"
+```
+
+### Get stablecoin supply metrics with per-chain breakdown
+
+`GET /api/v1/defi/stablecoins/metrics`
+
+**Example**
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/defi/stablecoins/metrics"
+```

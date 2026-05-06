@@ -70,7 +70,12 @@
         "api-reference/ai-copilot",
         "api-reference/execution",
         "api-reference/crypto-assets",
-        "api-reference/market-data"
+        "api-reference/market-data",
+        "api-reference/on-chain",
+        "api-reference/defi",
+        "api-reference/social",
+        "api-reference/config",
+        "api-reference/promo-codes"
       ]
     },
     {
