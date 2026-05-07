@@ -2290,7 +2290,7 @@
                         "description": "Maximum number of results",
                         "name": "limit",
                         "schema": {
-                            "type": "int",
+                            "type": "integer",
                             "default": 100
                         }
                     },
@@ -2300,7 +2300,7 @@
                         "description": "Minimum risk score (0-100)",
                         "name": "min_score",
                         "schema": {
-                            "type": "float"
+                            "type": "number"
                         }
                     },
                     {
@@ -2545,7 +2545,7 @@
                         "description": "Number of days (default: 30)",
                         "name": "days",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -2640,7 +2640,7 @@
                         "description": "Max results (default: 20)",
                         "name": "limit",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     },
                     {
@@ -2649,7 +2649,7 @@
                         "description": "Min position size in USD (default: 1000000)",
                         "name": "min_value",
                         "schema": {
-                            "type": "float"
+                            "type": "number"
                         }
                     },
                     {
@@ -2710,7 +2710,7 @@
                         "description": "Max results (default: 20)",
                         "name": "limit",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     },
                     {
@@ -3776,7 +3776,7 @@
                         "description": "Lookback hours (default: 24)",
                         "name": "hours_back",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     },
                     {
@@ -3825,7 +3825,7 @@
                         "description": "Max results (default: 50)",
                         "name": "limit",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     },
                     {
@@ -4005,7 +4005,7 @@
                         "description": "Lookback hours (default: 24)",
                         "name": "hours_back",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -4046,7 +4046,7 @@
                         "description": "Lookback hours (default: 24)",
                         "name": "hours_back",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     },
                     {
@@ -4054,7 +4054,7 @@
                         "description": "Min USD value (default: 500000)",
                         "name": "min_value",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     },
                     {
@@ -5646,7 +5646,7 @@
                         "description": "Max posts to return (default 20)",
                         "name": "limit",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     },
                     {
@@ -5654,7 +5654,7 @@
                         "description": "Time window in hours (default 24)",
                         "name": "hours_back",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     }
                 ],
@@ -5706,7 +5706,7 @@
                         "description": "Time window in hours (default 24)",
                         "name": "hours_back",
                         "schema": {
-                            "type": "int"
+                            "type": "integer"
                         }
                     }
                 ],
