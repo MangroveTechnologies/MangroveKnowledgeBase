@@ -38,6 +38,29 @@ COPY --from=builder /root/.mintlify/mint/apps/client/ ./client/
 # Copy required node_modules (next.js runtime dependencies)
 COPY --from=builder /root/.mintlify/mint/node_modules/ ./node_modules/
 
+# Mintlify's prebuild emits hashed package references (shiki-<hash>,
+# focus-visible-<hash>, @shikijs/<scoped>-<hash>, next-<hash>, etc.)
+# into /app/client/.next/node_modules/ as RELATIVE symlinks. They were
+# generated assuming the original layout
+# /root/.mintlify/mint/apps/client/.next/node_modules/ where
+# `../../../../node_modules/<pkg>` resolves to
+# /root/.mintlify/mint/node_modules/<pkg> and
+# `../../../../apps/client/node_modules/<pkg>` resolves to
+# /root/.mintlify/mint/apps/client/node_modules/<pkg>.
+#
+# At runtime in the new image, the same relative paths from
+# /app/client/.next/node_modules/ resolve to /node_modules/<pkg> and
+# /apps/client/node_modules/<pkg> -- neither of which exist by default.
+# Without the targets present, Next.js's standalone server fails
+# every request with ERR_MODULE_NOT_FOUND for the hashed packages,
+# producing site-wide HTTP 500s.
+#
+# Two root-level symlinks make every existing prebuild relative
+# symlink resolve correctly without rewriting them.
+RUN ln -s /app/node_modules /node_modules && \
+    mkdir -p /apps && \
+    ln -s /app/client /apps/client
+
 # Ensure SEO files (robots.txt, sitemap.xml, llms.txt) are present at the
 # canonical paths regardless of whether Mintlify's prebuild also copies them.
 # nginx-docs.conf serves these at /robots.txt, /sitemap.xml, /llms.txt, and
