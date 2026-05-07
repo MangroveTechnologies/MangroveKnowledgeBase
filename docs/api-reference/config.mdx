@@ -1,11 +1,15 @@
 ---
 title: "Config API"
-description: "Trading defaults and execution-config endpoints used by the strategy engine."
+description: "Read-only server defaults — trading defaults and the flattened execution config the engine applies when a request omits one."
 ---
 
 # Config API
 
-Trading defaults and execution-config endpoints used by the strategy engine.
+Read-only access to the server's trading defaults. SDK consumers use these to build strategies that match server behavior without maintaining a parallel copy of `trading_defaults.json`.
+
+Two views of the same source:
+- `/trading-defaults` returns the full nested structure (signal, backtest, risk, position, volatility, trading rules, time-based exits).
+- `/execution-defaults` returns the flattened `execution_config` exactly as the strategies service applies it when a `POST /strategies` request omits its own `execution_config`.
 
 ## Base URL
 
@@ -15,44 +19,146 @@ https://api.mangrovedeveloper.ai/api/v1/config
 
 ## Authentication
 
-All endpoints require a JWT bearer token.
-
-```
-Authorization: Bearer YOUR_JWT_TOKEN
-```
+These endpoints are public — no bearer token required.
 
 ## Endpoints
 
-### Return the flattened `execution_config` the server builds from defaults
-
-`GET /api/v1/config/execution-defaults`
-
-Matches exactly what `domains/strategies/services.py` uses when a
-request omits `execution_config`. Sections `risk_management`,
-`position_limits`, `volatility_settings`, `trading_rules`,
-`time_based_exits` are merged into one dict; `signal_defaults` and
-`backtest_defaults` are intentionally excluded (same as the legacy
-flattening).
-
-**Example**
-
-```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/config/execution-defaults"
-```
-
-### Return the full trading defaults, nested sections intact
+### Get trading defaults
 
 `GET /api/v1/config/trading-defaults`
 
-Shape mirrors `trading_defaults.json` one-to-one: `signal_defaults`,
-`backtest_defaults`, `risk_management`, `position_limits`,
-`volatility_settings`, `trading_rules`, `time_based_exits`, plus the
-top-level `description` field.
+Returns the complete `trading_defaults.json` structure, nested sections intact.
 
-**Example**
-
+<CodeGroup>
 ```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/config/trading-defaults"
+curl "https://api.mangrovedeveloper.ai/api/v1/config/trading-defaults"
 ```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/config/trading-defaults"
+)
+defaults = response.json()
+print(defaults["risk_management"]["max_risk_per_trade"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "description": "Default values for trading system configuration",
+  "signal_defaults": {},
+  "backtest_defaults": {
+    "slippage_pct": 0.004,
+    "fee_pct": 0.0085
+  },
+  "risk_management": {
+    "max_risk_per_trade": 0.01,
+    "reward_factor": 2,
+    "atr_period": 14,
+    "atr_volatility_factor": 2.0,
+    "atr_short_weight": 0.95,
+    "atr_long_weight": 0.05,
+    "atr_cap_multiplier": 2.1
+  },
+  "position_limits": {
+    "initial_balance": 10000,
+    "min_balance_threshold": 0.1,
+    "min_trade_amount": 25,
+    "max_open_positions": 10,
+    "max_trades_per_day": 50,
+    "max_units_per_trade": 1000000,
+    "max_trade_amount": 10000000
+  },
+  "volatility_settings": {
+    "volatility_window": 24,
+    "target_volatility": 0.10,
+    "volatility_mode": "stddev",
+    "enable_volatility_adjustment": false
+  },
+  "trading_rules": {
+    "max_hold_time_hours": null,
+    "cooldown_bars": 24,
+    "daily_momentum_limit": 3,
+    "weekly_momentum_limit": 3,
+    "cooldown_config": {
+      "5m":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
+      "15m": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
+      "1h":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
+      "1d":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
+    }
+  },
+  "time_based_exits": {
+    "max_hold_bars": 1000,
+    "exit_on_loss_after_bars": 1000,
+    "exit_on_profit_after_bars": 1000,
+    "profit_threshold_pct": 0.05
+  }
+}
+```
+
+### Get execution defaults (flattened)
+
+`GET /api/v1/config/execution-defaults`
+
+Returns the flattened `execution_config` the server applies when a strategy is created without one. Sections `risk_management`, `position_limits`, `volatility_settings`, `trading_rules`, and `time_based_exits` are merged into a single dict; `signal_defaults` and `backtest_defaults` are excluded by design.
+
+<CodeGroup>
+```bash cURL
+curl "https://api.mangrovedeveloper.ai/api/v1/config/execution-defaults"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/config/execution-defaults"
+)
+exec_config = response.json()
+print(exec_config["max_open_positions"], exec_config["atr_period"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "max_risk_per_trade": 0.01,
+  "reward_factor": 2,
+  "atr_period": 14,
+  "atr_volatility_factor": 2.0,
+  "atr_short_weight": 0.95,
+  "atr_long_weight": 0.05,
+  "atr_cap_multiplier": 2.1,
+  "initial_balance": 10000,
+  "min_balance_threshold": 0.1,
+  "min_trade_amount": 25,
+  "max_open_positions": 10,
+  "max_trades_per_day": 50,
+  "max_units_per_trade": 1000000,
+  "max_trade_amount": 10000000,
+  "volatility_window": 24,
+  "target_volatility": 0.10,
+  "volatility_mode": "stddev",
+  "enable_volatility_adjustment": false,
+  "max_hold_time_hours": null,
+  "cooldown_bars": 24,
+  "daily_momentum_limit": 3,
+  "weekly_momentum_limit": 3,
+  "cooldown_config": {
+    "5m":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
+    "15m": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
+    "1h":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
+    "1d":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
+  },
+  "max_hold_bars": 1000,
+  "exit_on_loss_after_bars": 1000,
+  "exit_on_profit_after_bars": 1000,
+  "profit_threshold_pct": 0.05
+}
+```
+
+This is exactly what `domains/strategies/services.py` substitutes into a new strategy when the request body omits `execution_config`.
