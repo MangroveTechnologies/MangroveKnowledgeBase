@@ -1,11 +1,11 @@
 ---
-title: "On Chain API"
-description: "On-chain analytics — wallet activity, transaction flows, holders, network metrics."
+title: "On-Chain API"
+description: "Smart-money sentiment, whale transactions, exchange flows, and token-holder analytics. Backed by Nansen and WhaleAlert."
 ---
 
-# On Chain API
+# On-Chain API
 
-On-chain analytics — wallet activity, transaction flows, holders, network metrics.
+On-chain intelligence endpoints sourced from Nansen (smart money, holders) and WhaleAlert (whale transactions, exchange flows).
 
 ## Base URL
 
@@ -23,111 +23,295 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 ## Endpoints
 
-### Get aggregated exchange inflows/outflows, optionally filtered by token
-
-`GET /api/v1/on-chain/exchange-flows`
-
-**Parameters**
-
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `hours_back` | query | `int` | no | Lookback hours (default: 24) |
-| `symbol` | query | `string` | no | Token symbol (e.g. btc, eth). Omit for all currencies. |
-
-**Example**
-
-```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/on-chain/exchange-flows?hours_back=<hours_back>&symbol=<symbol>"
-```
-
-### Screen for tokens with high smart money activity
-
-`GET /api/v1/on-chain/smart-money/screen`
-
-**Parameters**
-
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `limit` | query | `int` | no | Max results (default: 50) |
-| `timeframe` | query | `string` | no | 5m, 1h, 6h, 24h, 7d, 30d (default: 24h) |
-| `chains` | query | `string` | no | Comma-separated chains (default: ethereum) |
-
-**Example**
-
-```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/screen?limit=<limit>&timeframe=<timeframe>&chains=<chains>"
-```
-
-### Get smart money sentiment (accumulation vs distribution) for a token
+### Get smart-money sentiment
 
 `GET /api/v1/on-chain/smart-money/sentiment`
 
-**Parameters**
+Whether smart-money wallets are accumulating or distributing a given token, with net inflow/outflow figures.
 
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `chain` | query | `string` | no | Blockchain (default: ethereum) |
-| `symbol` | query | `string` | yes | Token symbol (e.g. ETH, UNI) |
+**Query Parameters:**
+- `symbol` (string, required): Token symbol. Examples: `ETH`, `UNI`.
+- `chain` (string, optional): Blockchain. Default: `ethereum`.
 
-**Example**
-
+<CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/sentiment?chain=<chain>&symbol=<symbol>"
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/sentiment?symbol=ETH&chain=ethereum"
 ```
 
-### Get token holder distribution from Nansen
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/sentiment",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"symbol": "ETH", "chain": "ethereum"},
+)
+data = response.json()
+print(data["sentiment"], data["net_flow_usd"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "symbol": "ETH",
+  "chain": "ethereum",
+  "sentiment": "accumulating",
+  "smart_money_inflow_usd": 18500000.0,
+  "smart_money_outflow_usd": 7200000.0,
+  "net_flow_usd": 11300000.0,
+  "trend_7d": "increasing",
+  "data": {}
+}
+```
+
+### Screen smart-money tokens
+
+`GET /api/v1/on-chain/smart-money/screen`
+
+Screen for tokens with the highest smart-money activity across one or more chains.
+
+**Query Parameters:**
+- `chains` (string, optional): Comma-separated chains. Default: `ethereum`.
+- `timeframe` (string, optional): One of `5m`, `1h`, `6h`, `24h`, `7d`, `30d`. Default: `24h`.
+- `limit` (integer, optional): Max results. Default: `50`.
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/screen?chains=ethereum,arbitrum&timeframe=24h&limit=10"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/screen",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"chains": "ethereum,arbitrum", "timeframe": "24h", "limit": 10},
+)
+for token in response.json()["tokens"]:
+    print(token["symbol"], token["smart_money_score"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "count": 10,
+  "chains": ["ethereum", "arbitrum"],
+  "timeframe": "24h",
+  "tokens": [
+    {
+      "symbol": "PEPE",
+      "chain": "ethereum",
+      "smart_money_score": 92.4,
+      "net_flow_usd": 4200000.0,
+      "wallet_count": 38
+    },
+    {
+      "symbol": "ARB",
+      "chain": "arbitrum",
+      "smart_money_score": 87.1,
+      "net_flow_usd": 2900000.0,
+      "wallet_count": 24
+    }
+  ]
+}
+```
+
+### Get token holders
 
 `GET /api/v1/on-chain/token-holders/{symbol}`
 
-**Parameters**
+Holder distribution for a token, including concentration of the top 10 holders.
 
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `symbol` | path | `string` | yes | Token symbol (e.g. ETH, UNI) |
+**Path Parameters:**
+- `symbol` (string, required): Token symbol. Examples: `ETH`, `UNI`.
 
-**Example**
-
+<CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/on-chain/token-holders/<symbol>"
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/token-holders/UNI"
 ```
 
-### Get high-level whale activity summary for a token
+```python Python
+import requests
 
-`GET /api/v1/on-chain/whale-activity/{symbol}`
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/on-chain/token-holders/UNI",
+    headers={"Authorization": f"Bearer {token}"},
+)
+data = response.json()
+print(data["holder_count"], data["concentration_score"])
+```
+</CodeGroup>
 
-**Parameters**
+**Response (200 OK):**
 
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `symbol` | path | `string` | yes | Token symbol (e.g. btc, eth) |
-| `hours_back` | query | `int` | no | Lookback hours (default: 24) |
-
-**Example**
-
-```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-activity/<symbol>?hours_back=<hours_back>"
+```json
+{
+  "success": true,
+  "symbol": "UNI",
+  "holder_count": 425000,
+  "top_10_holders_pct": 42.7,
+  "concentration_score": 0.61,
+  "data": {}
+}
 ```
 
-### Get recent large-value on-chain transactions
+### Get whale transactions
 
 `GET /api/v1/on-chain/whale-transactions`
 
-**Parameters**
+Recent large-value on-chain transactions, optionally filtered by symbol and minimum USD value.
 
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `hours_back` | query | `int` | no | Lookback hours (default: 24) |
-| `min_value` | query | `int` | no | Min USD value (default: 500000) |
-| `symbol` | query | `string` | no | Filter by symbol (e.g. btc, eth) |
+**Query Parameters:**
+- `symbol` (string, optional): Filter by token symbol. Examples: `btc`, `eth`.
+- `min_value` (integer, optional): Minimum USD value per transaction. Default: `500000`.
+- `hours_back` (integer, optional): Lookback window in hours. Default: `24`.
 
-**Example**
-
+<CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-transactions?hours_back=<hours_back>&min_value=<min_value>&symbol=<symbol>"
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-transactions?symbol=eth&min_value=1000000&hours_back=24"
 ```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-transactions",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"symbol": "eth", "min_value": 1_000_000, "hours_back": 24},
+)
+for tx in response.json()["transactions"][:5]:
+    print(tx["amount_usd"], tx["from"], "->", tx["to"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "count": 23,
+  "min_value_usd": 1000000.0,
+  "transactions": [
+    {
+      "hash": "0xabc123...",
+      "symbol": "ETH",
+      "amount": 2400.0,
+      "amount_usd": 7200000.0,
+      "from": "0xUNKNOWN_WALLET",
+      "to": "binance_hot_wallet",
+      "timestamp": "2026-05-06T18:41:22Z"
+    }
+  ]
+}
+```
+
+### Get exchange flows
+
+`GET /api/v1/on-chain/exchange-flows`
+
+Aggregated inflows/outflows across centralized exchanges, optionally filtered by token. Net positive = exchange inflows (often associated with sell pressure); net negative = outflows (often associated with accumulation/withdrawal).
+
+**Query Parameters:**
+- `symbol` (string, optional): Filter by token symbol. Examples: `btc`, `eth`. Omit for all currencies.
+- `hours_back` (integer, optional): Lookback hours. Default: `24`.
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/exchange-flows?symbol=btc&hours_back=24"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/on-chain/exchange-flows",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"symbol": "btc", "hours_back": 24},
+)
+data = response.json()
+print(data["net_flow_usd"], "across", len(data["flows"]), "exchanges")
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "symbol": "btc",
+  "timeframe": "24h",
+  "net_flow_usd": -125000000.0,
+  "flows": [
+    {"exchange": "Binance",  "inflow_usd": 42000000.0, "outflow_usd": 95000000.0, "net_usd": -53000000.0},
+    {"exchange": "Coinbase", "inflow_usd": 28000000.0, "outflow_usd": 72000000.0, "net_usd": -44000000.0}
+  ]
+}
+```
+
+### Get whale activity summary
+
+`GET /api/v1/on-chain/whale-activity/{symbol}`
+
+Aggregated whale activity for a single token over a lookback window.
+
+**Path Parameters:**
+- `symbol` (string, required): Token symbol. Examples: `btc`, `eth`.
+
+**Query Parameters:**
+- `hours_back` (integer, optional): Lookback hours. Default: `24`.
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-activity/btc?hours_back=24"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/on-chain/whale-activity/btc",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"hours_back": 24},
+)
+print(response.json()["summary"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "symbol": "btc",
+  "hours_back": 24,
+  "summary": {
+    "transaction_count": 142,
+    "total_volume_usd": 3800000000.0,
+    "largest_tx_usd": 215000000.0,
+    "to_exchanges_usd": 1200000000.0,
+    "from_exchanges_usd": 1450000000.0
+  }
+}
+```
+
+## Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `MISSING_FIELD` | 400 | Required parameter missing (e.g. `symbol` on smart-money sentiment) |
+| `AUTH_REQUIRED` | 401 | Missing or invalid bearer token |
+| `RESOURCE_NOT_FOUND` | 404 | Token symbol not tracked by upstream provider |
+| `INTERNAL_ERROR` | 500 | Upstream provider (Nansen / WhaleAlert) error |

@@ -1,11 +1,12 @@
 ---
-title: "Defi API"
-description: "DeFi metrics — protocol TVL, chain TVL, stablecoin supply."
+title: "DeFi API"
+description: "DeFi metrics — protocol TVL, chain TVL, and stablecoin supply via DeFiLlama."
 ---
 
-# Defi API
+# DeFi API
 
-DeFi metrics — protocol TVL, chain TVL, stablecoin supply.
+Read-only DeFi analytics endpoints. Backed by DeFiLlama; values reflect the
+provider's most recent snapshot.
 
 ## Base URL
 
@@ -23,47 +24,140 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 ## Endpoints
 
-### Get TVL and top protocols for a blockchain
-
-`GET /api/v1/defi/chain/{chain}/tvl`
-
-**Parameters**
-
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `chain` | path | `string` | yes | Blockchain name (e.g. Ethereum, Solana, Arbitrum) |
-
-**Example**
-
-```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/defi/chain/<chain>/tvl"
-```
-
-### Get TVL and chain breakdown for a DeFi protocol
+### Get protocol TVL
 
 `GET /api/v1/defi/protocol/{protocol}/tvl`
 
-**Parameters**
+Total Value Locked for a single DeFi protocol, broken down by chain.
 
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `protocol` | path | `string` | yes | Protocol name or slug (e.g. aave, uniswap, lido) |
+**Path Parameters:**
+- `protocol` (string, required): Protocol name or slug. Examples: `aave`, `uniswap`, `lido`.
 
-**Example**
-
+<CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/defi/protocol/<protocol>/tvl"
+  "https://api.mangrovedeveloper.ai/api/v1/defi/protocol/aave/tvl"
 ```
 
-### Get stablecoin supply metrics with per-chain breakdown
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/defi/protocol/aave/tvl",
+    headers={"Authorization": f"Bearer {token}"},
+)
+data = response.json()
+print(data["tvl_usd"], data["chains"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "protocol": "aave",
+  "tvl_usd": 12450000000.0,
+  "chains": {
+    "Ethereum": 8200000000.0,
+    "Polygon": 1800000000.0,
+    "Arbitrum": 1200000000.0,
+    "Avalanche": 850000000.0,
+    "Optimism": 400000000.0
+  },
+  "data": {}
+}
+```
+
+### Get chain TVL
+
+`GET /api/v1/defi/chain/{chain}/tvl`
+
+Total Value Locked across all protocols on a blockchain, plus the top 10 protocols on that chain.
+
+**Path Parameters:**
+- `chain` (string, required): Blockchain name. Examples: `Ethereum`, `Solana`, `Arbitrum`, `Polygon`.
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/defi/chain/Ethereum/tvl"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/defi/chain/Ethereum/tvl",
+    headers={"Authorization": f"Bearer {token}"},
+)
+data = response.json()
+for p in data["top_protocols"][:5]:
+    print(p["name"], p["tvl"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "chain": "Ethereum",
+  "tvl_usd": 64500000000.0,
+  "top_protocols": [
+    {"name": "Lido", "tvl": 22100000000.0, "category": "Liquid Staking"},
+    {"name": "EigenLayer", "tvl": 11800000000.0, "category": "Restaking"},
+    {"name": "Aave", "tvl": 8200000000.0, "category": "Lending"}
+  ],
+  "data": {}
+}
+```
+
+### Get stablecoin metrics
 
 `GET /api/v1/defi/stablecoins/metrics`
 
-**Example**
+Total stablecoin supply with per-chain breakdown.
 
+<CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
   "https://api.mangrovedeveloper.ai/api/v1/defi/stablecoins/metrics"
 ```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/defi/stablecoins/metrics",
+    headers={"Authorization": f"Bearer {token}"},
+)
+metrics = response.json()
+print(metrics["total_supply_usd"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "total_supply_usd": 215000000000.0,
+  "supply_by_chain": {
+    "Ethereum": 125000000000.0,
+    "Tron": 58000000000.0,
+    "BSC": 8500000000.0,
+    "Solana": 5200000000.0,
+    "Arbitrum": 4800000000.0
+  },
+  "data": {}
+}
+```
+
+## Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `AUTH_REQUIRED` | 401 | Missing or invalid bearer token |
+| `RESOURCE_NOT_FOUND` | 404 | Unknown protocol or chain slug |
+| `INTERNAL_ERROR` | 500 | Upstream provider (DeFiLlama) error |
