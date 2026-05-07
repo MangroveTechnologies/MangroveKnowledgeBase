@@ -1,11 +1,11 @@
 ---
 title: "Social API"
-description: "Social-data endpoints — sentiment, mention volume, influence scoring."
+description: "Social signals from X/Twitter — sentiment scoring, mention volume, and influence metrics."
 ---
 
 # Social API
 
-Social-data endpoints — sentiment, mention volume, influence scoring.
+Social-data endpoints sourced from X/Twitter. Use them to gauge sentiment around a topic, surface recent posts, or score the influence of a single account.
 
 ## Base URL
 
@@ -23,56 +23,151 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 ## Endpoints
 
-### Get influence score and follower metrics for a user
-
-`GET /api/v1/social/influence/{username}`
-
-**Parameters**
-
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `username` | path | `string` | yes | X/Twitter username (without @) |
-
-**Example**
-
-```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/social/influence/<username>"
-```
-
-### Get recent mentions for a topic
-
-`GET /api/v1/social/mentions/{topic}`
-
-**Parameters**
-
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `topic` | path | `string` | yes | Topic or keyword to search |
-| `limit` | query | `int` | no | Max posts to return (default 20) |
-| `hours_back` | query | `int` | no | Time window in hours (default 24) |
-
-**Example**
-
-```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/social/mentions/<topic>?limit=<limit>&hours_back=<hours_back>"
-```
-
-### Get social sentiment score for a topic
+### Get sentiment
 
 `GET /api/v1/social/sentiment/{topic}`
 
-**Parameters**
+Aggregated sentiment score for a topic or symbol over a lookback window.
 
-| Name | In | Type | Required | Description |
-|------|----|------|----------|-------------|
-| `topic` | path | `string` | yes | Topic or symbol to analyze (e.g. BTC, ETH, Solana) |
-| `hours_back` | query | `int` | no | Time window in hours (default 24) |
+**Path Parameters:**
+- `topic` (string, required): Topic, symbol, or keyword. Examples: `BTC`, `ETH`, `Solana`.
 
-**Example**
+**Query Parameters:**
+- `hours_back` (integer, optional): Time window in hours. Default: `24`.
 
+<CodeGroup>
 ```bash cURL
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/social/sentiment/<topic>?hours_back=<hours_back>"
+  "https://api.mangrovedeveloper.ai/api/v1/social/sentiment/BTC?hours_back=24"
 ```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/social/sentiment/BTC",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"hours_back": 24},
+)
+data = response.json()
+print(data["sentiment"], data["score"], "from", data["mentions"], "mentions")
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "topic": "BTC",
+  "sentiment": "bullish",
+  "score": 72.3,
+  "mentions": 18420,
+  "data": {}
+}
+```
+
+`sentiment` is one of `bullish`, `bearish`, or `neutral`. `score` is 0–100 (higher = more bullish).
+
+### Get mentions
+
+`GET /api/v1/social/mentions/{topic}`
+
+Recent posts matching a topic, ordered most recent first.
+
+**Path Parameters:**
+- `topic` (string, required): Topic or keyword. Examples: `BTC`, `defi`, `restaking`.
+
+**Query Parameters:**
+- `hours_back` (integer, optional): Time window in hours. Default: `24`.
+- `limit` (integer, optional): Max posts to return. Default: `20`.
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/social/mentions/restaking?hours_back=12&limit=5"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/social/mentions/restaking",
+    headers={"Authorization": f"Bearer {token}"},
+    params={"hours_back": 12, "limit": 5},
+)
+for post in response.json()["posts"]:
+    print(post["author"], "-", post["text"][:80])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "topic": "restaking",
+  "count": 5,
+  "posts": [
+    {
+      "id": "1788234567890123456",
+      "author": "@example_user",
+      "text": "Restaking TVL just crossed $20B...",
+      "likes": 128,
+      "reposts": 34,
+      "created_at": "2026-05-06T19:12:08Z"
+    }
+  ]
+}
+```
+
+### Get influence
+
+`GET /api/v1/social/influence/{username}`
+
+Influence score and follower metrics for a single X/Twitter account.
+
+**Path Parameters:**
+- `username` (string, required): X/Twitter handle without the `@`. Example: `VitalikButerin`.
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/social/influence/VitalikButerin"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/social/influence/VitalikButerin",
+    headers={"Authorization": f"Bearer {token}"},
+)
+data = response.json()
+print(data["username"], "score:", data["score"], "followers:", data["followers"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "username": "VitalikButerin",
+  "score": 98.7,
+  "followers": 5300000,
+  "data": {
+    "verified": true,
+    "engagement_rate_30d": 0.024
+  }
+}
+```
+
+`score` is 0–100. It blends follower count, engagement rate, and reach.
+
+## Error Codes
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `AUTH_REQUIRED` | 401 | Missing or invalid bearer token |
+| `INTERNAL_ERROR` | 500 | Upstream provider (X/Twitter) error |
