@@ -32,8 +32,10 @@ htmlcov/
 .env
 .env.*
 
-# Claude Code
-.claude/
+# Claude Code: ignore personal config, but ship shared skills with the repo
+.claude/*
+!.claude/skills/
+!.claude/skills/**
 
 # OS files
 .DS_Store
