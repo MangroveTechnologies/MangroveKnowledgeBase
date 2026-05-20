@@ -1,6 +1,14 @@
 # Stage 1: Build - Install mintlify CLI, run prebuild to generate content
 FROM node:22-slim AS builder
 
+# node:22-slim does not include curl. The readiness probe below uses curl
+# to detect when `mintlify dev` is serving; without it, every probe iteration
+# silently fails (the for-loop swallows stderr) and the READY assertion fires
+# at the 120s timeout looking like a Mintlify hang.
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && command -v curl >/dev/null
+
 # Install mintlify CLI globally
 RUN npm install -g mintlify@4.2.414
 
