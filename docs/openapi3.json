@@ -3062,6 +3062,249 @@
         ]
       }
     },
+    "/on-chain/smart-money/dex-trades": {
+      "post": {
+        "summary": "Get recent DEX trades from Smart Money wallets",
+        "operationId": "smart_money_dex_trades",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Nansen-shape body. All fields optional.",
+                "properties": {
+                  "chains": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Chain filter (default: ['ethereum'])"
+                  },
+                  "filters": {
+                    "type": "object",
+                    "description": "Nansen-shape filter dict (e.g. include_smart_money_labels, value_usd: {min, max})"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "Sort spec, e.g. [{field, direction}]"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartMoneyDexTradesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/on-chain/smart-money/historical-holdings": {
+      "post": {
+        "summary": "Get date-stamped Smart Money holdings snapshots",
+        "operationId": "smart_money_historical_holdings",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Nansen-shape body. All fields optional.",
+                "properties": {
+                  "chains": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Chain filter (default: ['ethereum'])"
+                  },
+                  "filters": {
+                    "type": "object",
+                    "description": "Nansen-shape filter dict (e.g. include_smart_money_labels, value_usd: {min, max})"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "Sort spec, e.g. [{field, direction}]"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  },
+                  "date_range": {
+                    "type": "object",
+                    "description": "{from: YYYY-MM-DD, to: YYYY-MM-DD}; default trailing 7 days",
+                    "properties": {
+                      "from": {
+                        "type": "string"
+                      },
+                      "to": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartMoneyHistoricalHoldingsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/on-chain/smart-money/perp-trades": {
+      "post": {
+        "summary": "Get perpetual-futures trades from Smart Money wallets on Hyperliquid",
+        "operationId": "smart_money_perp_trades",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Hyperliquid-only; no chains accepted",
+                "properties": {
+                  "filters": {
+                    "type": "object"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartMoneyPerpTradesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/on-chain/smart-money/screen": {
       "get": {
         "responses": {
@@ -3231,6 +3474,199 @@
         ]
       }
     },
+    "/on-chain/token/{symbol}/dex-trades": {
+      "post": {
+        "summary": "Get DEX trades for a single token across all participants in a date window",
+        "operationId": "token_dex_trades",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chain": {
+                    "type": "string",
+                    "description": "Blockchain (default: ethereum)"
+                  },
+                  "date_range": {
+                    "type": "object",
+                    "description": "{from: YYYY-MM-DD, to: YYYY-MM-DD}; default trailing 7 days",
+                    "properties": {
+                      "from": {
+                        "type": "string"
+                      },
+                      "to": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenDexTradesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Token symbol or CoinGecko ID"
+          }
+        ]
+      }
+    },
+    "/on-chain/token/{symbol}/flows": {
+      "post": {
+        "summary": "Get aggregated per-wallet-category flow data for a single token in a date window. Stablecoins not supported.",
+        "operationId": "token_flows",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chain": {
+                    "type": "string"
+                  },
+                  "date_range": {
+                    "type": "object",
+                    "description": "{from: YYYY-MM-DD, to: YYYY-MM-DD}; default trailing 7 days",
+                    "properties": {
+                      "from": {
+                        "type": "string"
+                      },
+                      "to": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenFlowsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Token symbol (stablecoins not supported)"
+          }
+        ]
+      }
+    },
     "/on-chain/whale-activity/{symbol}": {
       "parameters": [
         {
@@ -3337,6 +3773,52 @@
         ],
         "tags": [
           "on-chain"
+        ]
+      }
+    },
+    "/oracle/sieve/score": {
+      "post": {
+        "tags": [
+          "oracle"
+        ],
+        "summary": "Score strategies through Mangrove SIEVE",
+        "description": "Score candidate trading strategies through the Mangrove SIEVE classifier (binary go/no-go + 4-class outcome head). Reaches the live Oracle service via MangroveAI's reverse proxy. Accepts either MangroveAI-shaped Strategy objects (`strategies`) or raw run dicts (`runs`); exactly one, ≤99 items per request. Responses carry `model_version` and `code_version` for provenance.",
+        "operationId": "post_oracle_sieve_score",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SieveScoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SieveScoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Both or neither of `strategies` / `runs` provided, or empty"
+          },
+          "413": {
+            "description": "Per-request cap exceeded (>99 items)"
+          },
+          "503": {
+            "description": "SIEVE model unavailable (artifacts missing or load failed)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ]
       }
     },
@@ -5378,52 +5860,6 @@
           "users"
         ]
       }
-    },
-    "/oracle/sieve/score": {
-      "post": {
-        "tags": [
-          "oracle"
-        ],
-        "summary": "Score strategies through Mangrove SIEVE",
-        "description": "Score candidate trading strategies through the Mangrove SIEVE classifier (binary go/no-go + 4-class outcome head). Reaches the live Oracle service via MangroveAI's reverse proxy. Accepts either MangroveAI-shaped Strategy objects (`strategies`) or raw run dicts (`runs`); exactly one, \u226499 items per request. Responses carry `model_version` and `code_version` for provenance.",
-        "operationId": "post_oracle_sieve_score",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SieveScoreRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SieveScoreResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Both or neither of `strategies` / `runs` provided, or empty"
-          },
-          "413": {
-            "description": "Per-request cap exceeded (>99 items)"
-          },
-          "503": {
-            "description": "SIEVE model unavailable (artifacts missing or load failed)"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
     }
   },
   "info": {
@@ -5498,7 +5934,7 @@
     },
     {
       "name": "config",
-      "description": "Read-only server configuration \u2014 trading defaults + flattened execution config. Source of truth for SDK consumers; closes issue #437."
+      "description": "Read-only server configuration — trading defaults + flattened execution config. Source of truth for SDK consumers; closes issue #437."
     },
     {
       "name": "oracle",
@@ -9658,7 +10094,7 @@
         "type": "object"
       },
       "SieveScoreRequest": {
-        "description": "Score request \u2014 exactly one of ``strategies`` / ``runs`` must be set.\n\nThe per-request item cap is enforced in the route handler (HTTP 413\non overage); it lives there rather than here so error messages can\ncite the actual limit.",
+        "description": "Score request — exactly one of ``strategies`` / ``runs`` must be set.\n\nThe per-request item cap is enforced in the route handler (HTTP 413\non overage); it lives there rather than here so error messages can\ncite the actual limit.",
         "properties": {
           "strategies": {
             "default": null,
@@ -9898,6 +10334,179 @@
         ],
         "title": "SignalSpec",
         "type": "object"
+      },
+      "SmartMoneyHistoricalHoldingsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "chains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_range": {
+            "type": "object"
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SmartMoneyDexTradesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "chains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trades": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SmartMoneyPerpTradesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "venue": {
+            "type": "string",
+            "example": "hyperliquid"
+          },
+          "trades": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "TokenDexTradesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "contract_address": {
+            "type": "string"
+          },
+          "date_range": {
+            "type": "object"
+          },
+          "trades": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "TokenFlowsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "contract_address": {
+            "type": "string"
+          },
+          "date_range": {
+            "type": "object"
+          },
+          "flows": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
       }
     }
   }

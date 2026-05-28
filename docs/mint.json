@@ -80,7 +80,8 @@
       "pages": [
         "introduction",
         "quickstart",
-        "authentication"
+        "authentication",
+        "data-providers"
       ]
     },
     {

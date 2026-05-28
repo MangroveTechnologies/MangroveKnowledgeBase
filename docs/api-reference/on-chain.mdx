@@ -307,11 +307,237 @@ print(response.json()["summary"])
 }
 ```
 
+## Smart-money depth endpoints
+
+The next three endpoints expose the full Nansen Pro smart-money surface. All accept the same JSON body shape and forward `filters` + `order_by` straight through to the upstream Nansen API, so you get the entire Pro-plan capability (restrict by `include_smart_money_labels`, set `value_usd` min/max bounds, sort by any field).
+
+### Smart-money historical holdings
+
+`POST /api/v1/on-chain/smart-money/historical-holdings`
+
+Date-stamped snapshots of Smart Money token holdings across chains. Use this to track how aggregate Smart Money positions in a token evolve over time.
+
+**Body:**
+
+```json
+{
+  "chains": ["ethereum"],
+  "date_range": {"from": "2026-05-22", "to": "2026-05-28"},
+  "filters": {
+    "include_smart_money_labels": ["Fund", "Smart Trader"],
+    "value_usd": {"min": 100000}
+  },
+  "order_by": [{"field": "value_usd", "direction": "DESC"}],
+  "page": 1,
+  "per_page": 100
+}
+```
+
+All fields are optional. Defaults: `chains=["ethereum"]`, trailing 7-day `date_range`, no filters, no order_by, `page=1`, `per_page=100`.
+
+<CodeGroup>
+```bash cURL
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"chains":["ethereum"],"date_range":{"from":"2026-05-22","to":"2026-05-28"},"per_page":5}' \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/historical-holdings"
+```
+
+```python Python (via SDK)
+from mangrove_ai import MangroveAI
+
+client = MangroveAI()
+result = client.on_chain.get_smart_money_historical_holdings(
+    chains=["ethereum"],
+    date_from="2026-05-22",
+    date_to="2026-05-28",
+    filters={"include_smart_money_labels": ["Fund"]},
+    order_by=[{"field": "value_usd", "direction": "DESC"}],
+    per_page=5,
+)
+for row in result.holdings or []:
+    print(row["date"], row["token_symbol"], row["value_usd"])
+```
+</CodeGroup>
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true,
+  "chains": ["ethereum"],
+  "date_range": {"from": "2026-05-22", "to": "2026-05-28"},
+  "filters": {"include_smart_money_labels": ["Fund"]},
+  "order_by": [{"field": "value_usd", "direction": "DESC"}],
+  "count": 5,
+  "holdings": [
+    {
+      "date": "2026-05-28",
+      "chain": "ethereum",
+      "token_address": "0x...",
+      "token_symbol": "UNI",
+      "token_sectors": ["Decentralised Exchanges"],
+      "smart_money_labels": ["Fund", "180D Smart Trader"],
+      "value_usd": 24500000.0,
+      "holders_count": 38
+    }
+  ]
+}
+```
+
+### Smart-money DEX trades
+
+`POST /api/v1/on-chain/smart-money/dex-trades`
+
+Live DEX trades by Smart Money wallets across chains. Filter to specific labels (e.g. `Fund` only) and sort by recency.
+
+**Body:**
+
+```json
+{
+  "chains": ["ethereum"],
+  "filters": {
+    "include_smart_money_labels": ["Fund"],
+    "side": "buy",
+    "min_amount_usd": 10000
+  },
+  "order_by": [{"field": "block_timestamp", "direction": "DESC"}],
+  "page": 1,
+  "per_page": 100
+}
+```
+
+<CodeGroup>
+```bash cURL
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"chains":["ethereum"],"filters":{"include_smart_money_labels":["Fund"]},"per_page":5}' \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/smart-money/dex-trades"
+```
+
+```python Python (via SDK)
+result = client.on_chain.get_smart_money_dex_trades(
+    chains=["ethereum"],
+    filters={"include_smart_money_labels": ["Fund"]},
+    order_by=[{"field": "block_timestamp", "direction": "DESC"}],
+    per_page=5,
+)
+for t in result.trades or []:
+    print(t["block_timestamp"], t["trader_address_label"], t["action"], t["value_usd"])
+```
+</CodeGroup>
+
+**Response (200 OK):** Returns `success`, `chains`, `filters`, `order_by`, `count`, and a `trades` list. Each trade includes `chain`, `block_timestamp`, `transaction_hash`, `trader_address`, `trader_address_label`, `token_bought_address`, `token_sold_address`, `value_usd`, etc.
+
+### Smart-money perpetual-futures trades (Hyperliquid)
+
+`POST /api/v1/on-chain/smart-money/perp-trades`
+
+Perpetual-futures trades by Smart Money wallets on Hyperliquid. Hyperliquid-only at the upstream — no chain filter is accepted.
+
+**Body:**
+
+```json
+{
+  "filters": {
+    "side": "Long",
+    "token_symbol": "BTC",
+    "value_usd": {"min": 50000},
+    "only_new_positions": true
+  },
+  "order_by": [{"field": "block_timestamp", "direction": "DESC"}],
+  "page": 1,
+  "per_page": 100
+}
+```
+
+Valid `filters.action` values: `Buy - Add Long`, `Sell - Reduce Long`, `Sell - Add Short`, `Buy - Reduce Short`. Valid `filters.type` values: `Market`, `Limit`. Valid `order_by.field` values: `block_timestamp`, `token_amount`, `price_usd`, `value_usd`.
+
+```python Python (via SDK)
+result = client.on_chain.get_smart_money_perp_trades(
+    filters={"side": "Long", "token_symbol": "BTC"},
+    order_by=[{"field": "block_timestamp", "direction": "DESC"}],
+    per_page=5,
+)
+```
+
+**Response (200 OK):** `success`, `venue="hyperliquid"`, `filters`, `order_by`, `count`, and a `trades` list.
+
+## Token-scoped depth endpoints
+
+For when you want the full picture on a single token instead of broad smart-money reads. Both endpoints resolve `symbol` to an on-chain contract address via CoinGecko, so pass either the CoinGecko ID (`uniswap`) or a ticker.
+
+### Token DEX trades
+
+`POST /api/v1/on-chain/token/{symbol}/dex-trades`
+
+DEX trades for a single token across all participants in a date window.
+
+**Path:** `{symbol}` -- CoinGecko ID preferred (`uniswap`), or a ticker (`UNI`).
+
+**Body:**
+
+```json
+{
+  "chain": "ethereum",
+  "date_range": {"from": "2026-05-22", "to": "2026-05-28"},
+  "filters": {"action": "BUY", "min_amount_usd": 10000},
+  "order_by": [{"field": "block_timestamp", "direction": "DESC"}],
+  "page": 1,
+  "per_page": 100
+}
+```
+
+<CodeGroup>
+```bash cURL
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"chain":"ethereum","date_range":{"from":"2026-05-22","to":"2026-05-28"},"per_page":5}' \
+  "https://api.mangrovedeveloper.ai/api/v1/on-chain/token/uniswap/dex-trades"
+```
+
+```python Python (via SDK)
+result = client.on_chain.get_token_dex_trades(
+    "uniswap",
+    chain="ethereum",
+    date_from="2026-05-22",
+    date_to="2026-05-28",
+    order_by=[{"field": "block_timestamp", "direction": "DESC"}],
+    per_page=5,
+)
+```
+</CodeGroup>
+
+**Response (200 OK):** `success`, `symbol`, `chain`, `contract_address`, `date_range`, `filters`, `order_by`, `count`, and a `trades` list.
+
+### Token flows
+
+`POST /api/v1/on-chain/token/{symbol}/flows`
+
+Per-wallet-category flow aggregation (smart-money, whales, exchanges, fresh wallets, public figures) for a single token in a date window.
+
+**Note:** Nansen does not support stablecoins on this endpoint. Calls with stablecoin symbols return **404 RESOURCE_NOT_FOUND**.
+
+**Body:** same shape as `/token/{symbol}/dex-trades` above.
+
+```python Python (via SDK)
+result = client.on_chain.get_token_flows(
+    "uniswap",
+    chain="ethereum",
+    date_from="2026-05-22",
+    date_to="2026-05-28",
+    per_page=5,
+)
+for f in result.flows or []:
+    print(f["date"], f["price_usd"], f["holders_count"],
+          "in/out:", f["total_inflows_count"], "/", f["total_outflows_count"])
+```
+
+**Response (200 OK):** `success`, `symbol`, `chain`, `contract_address`, `date_range`, `filters`, `order_by`, `count`, and a `flows` list. Each row includes `date`, `price_usd`, `token_amount`, `value_usd`, `holders_count`, `total_inflows_count`, `total_outflows_count`, plus per-category aggregations.
+
 ## Error Codes
 
 | Code | HTTP Status | Description |
 |------|-------------|-------------|
 | `MISSING_FIELD` | 400 | Required parameter missing (e.g. `symbol` on smart-money sentiment) |
+| `INVALID_FIELD` | 400 | Invalid value for a constrained field (e.g. unsupported `timeframe` on flow-intelligence) |
 | `AUTH_REQUIRED` | 401 | Missing or invalid bearer token |
-| `RESOURCE_NOT_FOUND` | 404 | Token symbol not tracked by upstream provider |
+| `RESOURCE_NOT_FOUND` | 404 | Token symbol not tracked by upstream provider, or stablecoin on `/token/{symbol}/flows` |
 | `INTERNAL_ERROR` | 500 | Upstream provider (Nansen / WhaleAlert) error |

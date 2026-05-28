@@ -49,7 +49,10 @@ The client exposes these service attributes, each mapping to a domain in the RES
 | `client.backtesting` | Run historical backtests, retrieve results |
 | `client.execution` | Real-time strategy evaluation, position state |
 | `client.ai_copilot` | Conversational strategy creation |
-| `client.crypto_assets` | Asset metadata, risk scoring, on-chain analytics |
+| `client.crypto_assets` | Asset metadata, OHLCV, market data |
+| `client.on_chain` | Smart-money flows, DEX/perp trades, whale activity (Nansen + WhaleAlert) -- see [On-Chain API](/api-reference/on-chain) |
+| `client.defi` | Protocol/chain TVL, stablecoin metrics (DeFiLlama) -- see [DeFi API](/api-reference/defi) |
+| `client.social` | Topic sentiment, mentions, user influence (X / Twitter) -- see [Social API](/api-reference/social) |
 | `client.docs` | Search the knowledge base from your code |
 | `client.kb` | Signal and indicator metadata via the KB server |
 
@@ -101,6 +104,40 @@ while not session.done:
 
 print("Strategy created:", session.strategy_id)
 ```
+
+### Query on-chain smart-money activity
+
+`client.on_chain` covers Mangrove's full Nansen Pro plan + WhaleAlert Enterprise. Filters and sort orders pass straight through to the upstream provider, so you can use the same vocabulary the Nansen API itself accepts.
+
+```python
+# Smart-money DEX trades by Fund-labelled wallets, most recent first
+trades = client.on_chain.get_smart_money_dex_trades(
+    chains=["ethereum"],
+    filters={"include_smart_money_labels": ["Fund"]},
+    order_by=[{"field": "block_timestamp", "direction": "DESC"}],
+    per_page=10,
+)
+for t in trades.trades or []:
+    print(t["block_timestamp"], t["trader_address_label"], t["action"], t["value_usd"])
+
+# Token-scoped: every DEX trade on UNI in the last week
+uni_trades = client.on_chain.get_token_dex_trades(
+    "uniswap", chain="ethereum",
+    date_from="2026-05-22", date_to="2026-05-28",
+    per_page=20,
+)
+print(f"{uni_trades.count} trades on contract {uni_trades.contract_address}")
+
+# Per-wallet-category flows for UNI (not available for stablecoins)
+flows = client.on_chain.get_token_flows(
+    "uniswap", chain="ethereum",
+    date_from="2026-05-22", date_to="2026-05-28",
+)
+for f in flows.flows or []:
+    print(f["date"], "price:", f["price_usd"], "holders:", f["holders_count"])
+```
+
+See the full surface on the [On-Chain API reference](/api-reference/on-chain) and a runnable customer example at [`examples/on_chain_nansen.py`](https://github.com/MangroveTechnologies/MangroveAI-SDK/blob/main/examples/on_chain_nansen.py).
 
 ## Auth options
 
