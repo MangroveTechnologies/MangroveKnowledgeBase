@@ -39,8 +39,8 @@
       "url": "mcp-servers"
     },
     {
-      "name": "Templates",
-      "url": "templates"
+      "name": "Mangrove Agent",
+      "url": "mangrove-agent"
     },
     {
       "name": "API Reference",
@@ -90,8 +90,8 @@
         "sdks/overview",
         "sdks/mangroveai",
         "sdks/mangrove-kb",
-        "sdks/mangrove-markets",
-        "sdks/mangrove-agent"
+        "sdks/mangrovemarkets",
+        "sdks/mangrove-markets"
       ]
     },
     {
@@ -104,11 +104,13 @@
       ]
     },
     {
-      "group": "Templates",
+      "group": "Mangrove Agent",
       "pages": [
-        "templates/overview",
-        "templates/x402-app-template",
-        "templates/x402-plugin-template"
+        "mangrove-agent/overview",
+        "mangrove-agent/quickstart",
+        "mangrove-agent/mcp-tools",
+        "mangrove-agent/architecture",
+        "mangrove-agent/safety-model"
       ]
     },
     {

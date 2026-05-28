@@ -1,0 +1,101 @@
+---
+title: "Architecture"
+description: "How the agent processes requests, schedules strategies, and routes orders. What lives where."
+---
+
+# Architecture
+
+## Process shape
+
+```
+Claude Code (MCP) ─┐
+Python / curl (REST) ─┤
+                      ▼
+┌── mangrove-agent (single FastAPI process, port 9080) ─┐
+│   • auth middleware (X-API-Key)                       │
+│   • service layer (REST + MCP share it)               │
+│   • APScheduler in-process cron (SQLite jobstore)     │
+│   • local Fernet-encrypted wallets                    │
+└───────────────────────────────────────────────────────┘
+       │                              │
+       ▼                              ▼
+ SQLite agent.db          OS Keychain (Fernet master key)
+       │
+       ▼
+ mangroveai SDK        mangrovemarkets SDK
+ (strategies,          (DEX swaps, portfolio,
+  backtest, signals,    wallet ops)
+  market data, KB,
+  on-chain)
+```
+
+Both transports — MCP over Streamable HTTP and REST at `/api/v1/agent/*` — hit the same service layer. The agent doesn't have two code paths to keep in sync.
+
+## What the agent does NOT do
+
+Strategy evaluation happens inside `mangroveai.execution.evaluate()`. The agent does **not**:
+
+- Re-implement signal logic.
+- Re-implement risk gates.
+- Re-implement position sizing.
+- Re-implement cooldowns.
+
+It orchestrates: fetch strategy → call SDK → dispatch returned `OrderIntent[]` to the executor → log.
+
+This is deliberate. If signal semantics changed locally vs. on the platform, paper backtests and live results would diverge. By keeping evaluation upstream, what passes backtest is what runs in live execution.
+
+## Cron path
+
+APScheduler runs in-process with a SQLite jobstore so jobs survive restarts. When a strategy is promoted to `paper` or `live`, the executor registers a job on the strategy's timeframe:
+
+```
+APScheduler tick (e.g. every 1h)
+    └── evaluate_strategy(strategy_id)
+            └── mangroveai.execution.evaluate(strategy_id)
+                    ├── fetches current bar
+                    ├── applies the signal stack
+                    └── returns OrderIntent[] (possibly empty)
+            └── for each intent:
+                    ├── paper:  log_paper_fill(intent)
+                    └── live:   route via mangrovemarkets.dex.swap → sign locally → broadcast → log_trade
+```
+
+## Live trade path
+
+For `live` strategies the agent decrypts the wallet's secret in-process, signs the unsigned transaction returned by `mangrovemarkets`, broadcasts the signed bytes, and zeroes the secret. The SDK is never given the key — see the [safety model](/mangrove-agent/safety-model) for the full contract.
+
+## Storage
+
+| What | Where |
+|---|---|
+| Strategies, evaluations, trades, positions | `./agent-data/agent.db` (SQLite) |
+| Encrypted wallet secrets | `agent.db` `wallets` table |
+| Fernet master key (bare-metal) | OS keychain via `keyring` |
+| Fernet master key (Docker) | `./agent-data/master.key` (chmod 600, gitignored) |
+| Setup state | `./agent-data/` directory |
+
+## Project layout
+
+```
+mangrove-agent/
+├── .claude/                  # Claude Code framework (skills, agents, rules)
+├── server/
+│   ├── src/
+│   │   ├── app.py            # FastAPI factory
+│   │   ├── config/           # Per-env JSON configs
+│   │   ├── api/routes/       # REST routes — one file per resource
+│   │   ├── mcp/              # MCP tool registration
+│   │   ├── models/           # Pydantic domain + DB models
+│   │   ├── services/         # wallet, strategy, executor, scheduler, trade_log, …
+│   │   └── shared/           # auth, db/sqlite.py, crypto/fernet.py, clients/mangrove.py, errors, logging
+│   └── tests/                # unit / integration / e2e
+├── docs/                     # Design docs (requirements, spec, architecture, plan)
+├── scripts/verify_quickstart.sh
+├── docker-compose.yml
+├── .mcp.json.example         # Drop-in Claude Code MCP config
+└── CLAUDE.md                 # Project context
+```
+
+## Extending
+
+Adding a new endpoint, MCP tool, signal, or strategy follows the service-layer pattern. The repo's [`docs/contributing.md`](https://github.com/MangroveTechnologies/mangrove-agent/blob/main/docs/contributing.md) has the checklist; the trading-bot-specific skills (`/create-strategy`, `/backtest`, `/custom-signal`, `/audit-security`, `/check-alignment`, `/tool-spec`) live in `.claude/skills/`.

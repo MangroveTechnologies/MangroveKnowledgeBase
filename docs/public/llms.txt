@@ -13,8 +13,8 @@
 - [SDKs Overview](https://docs.mangrovedeveloper.ai/sdks/overview)
 - [mangroveai (Python SDK)](https://docs.mangrovedeveloper.ai/sdks/mangroveai)
 - [mangrove-kb (Python SDK)](https://docs.mangrovedeveloper.ai/sdks/mangrove-kb)
+- [mangrovemarkets (Python SDK)](https://docs.mangrovedeveloper.ai/sdks/mangrovemarkets)
 - [@mangrove-ai/sdk (TypeScript)](https://docs.mangrovedeveloper.ai/sdks/mangrove-markets)
-- [mangrove-agent (Python template)](https://docs.mangrovedeveloper.ai/sdks/mangrove-agent)
 
 ## MCP Servers
 
@@ -23,11 +23,13 @@
 - [MangroveTrader MCP Server](https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-trader)
 - [MangroveKnowledgeBase MCP Server](https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-kb)
 
-## Templates
+## Mangrove Agent
 
-- [Templates Overview](https://docs.mangrovedeveloper.ai/templates/overview)
-- [x402-app-template](https://docs.mangrovedeveloper.ai/templates/x402-app-template)
-- [x402-plugin-template](https://docs.mangrovedeveloper.ai/templates/x402-plugin-template)
+- [Overview](https://docs.mangrovedeveloper.ai/mangrove-agent/overview)
+- [Quickstart](https://docs.mangrovedeveloper.ai/mangrove-agent/quickstart)
+- [MCP Tools Catalog](https://docs.mangrovedeveloper.ai/mangrove-agent/mcp-tools)
+- [Architecture](https://docs.mangrovedeveloper.ai/mangrove-agent/architecture)
+- [Safety Model](https://docs.mangrovedeveloper.ai/mangrove-agent/safety-model)
 
 ## API Reference
 

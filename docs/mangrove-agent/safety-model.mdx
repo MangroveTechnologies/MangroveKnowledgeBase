@@ -1,0 +1,74 @@
+---
+title: "Safety model"
+description: "How keys are handled, where the master key lives, and what's gated behind explicit user actions."
+---
+
+# Safety model
+
+The agent runs trading code with access to your wallet's secret. The safety contract has four parts.
+
+## 1. Your private keys never enter the chat
+
+`create_wallet` returns a `vault_token` — a reference to the encrypted wallet entry in SQLite. It does **not** return the plaintext secret.
+
+To reveal a secret you saved at wallet-creation time, run a separate CLI:
+
+```bash
+./scripts/reveal-secret.sh <vault_token>
+```
+
+This prints the secret once to **your terminal only**. Save it to your password manager. The plaintext never travels through Claude Code's chat transport, never lands in an agent log, never appears in an MCP response.
+
+## 2. Hooks block key pastes in Claude Code
+
+If you try to paste a private key into Claude Code, `.claude/hooks/block-wallet-secrets.sh` refuses the prompt with an educational message. The hook is wired in `.claude/settings.json` — disabling it requires editing a tracked file (a deliberate friction).
+
+## 3. Live trading is gated on explicit backup confirmation
+
+After you save a wallet's secret off-agent, you must explicitly flip the backup gate:
+
+```bash
+./scripts/confirm-backup.sh <address>
+```
+
+This sets a flag on the wallet row in `agent.db`. Without it:
+
+- `execute_swap` refuses on that wallet.
+- `update_strategy_status` cannot promote a strategy to `live` against that wallet.
+
+The flag is per-wallet. New wallets default to un-confirmed.
+
+## 4. The master key stays local
+
+The Fernet master key encrypts every wallet's secret in SQLite. It never leaves your machine.
+
+| Install path | Where the master key lives |
+|---|---|
+| Bare-metal | OS keychain via the `keyring` library (macOS Keychain, Linux Secret Service, Windows Credential Manager) |
+| Docker | `./agent-data/master.key` (chmod 600, gitignored) — the container can't reach your OS keychain, so a file is the next-best fallback |
+
+## What signing actually looks like
+
+When a `live` strategy fires a trade:
+
+1. The agent calls `mangrovemarkets.dex.swap(...)` to get an **unsigned** transaction payload.
+2. The agent decrypts the wallet's secret in-process using the Fernet master key.
+3. The agent signs the transaction with that secret.
+4. The agent broadcasts the signed bytes through `mangrovemarkets.dex.broadcast(...)`.
+5. The agent zeroes the secret variable.
+
+The MangroveMarkets SDK is never given the key. Only the signed transaction crosses the network boundary.
+
+## What the agent logs
+
+| Logged | Not logged |
+|---|---|
+| Strategy evaluations (timestamp, outcome, intent) | Wallet secrets, ever |
+| Trade attempts (intent, tx hash, status) | The Fernet master key |
+| Errors with stack traces | Decrypted-but-pre-signing secret values |
+
+If you suspect a leak, the audit table is `evaluations` + `trades` in `agent.db`. Inspect with any SQLite client.
+
+## Real evidence
+
+The agent did this swap on Base mainnet (April 2026): [`0x5c126e...c5565`](https://basescan.org/tx/0x5c126e6be26fc736bcb3f11a8f4c699aeee754f6c0bf7e5b7aa2df6a859c5565). Quoted, signed locally, broadcast, settled. The wallet's secret never left the agent process.

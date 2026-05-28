@@ -24,11 +24,8 @@ The core building blocks are open: 223 trading signals and 99 technical indicato
   <Card title="MangroveTrader" icon="chart-line" href="/mcp-servers/mangrove-trader">
     Social trading leaderboard with x402 micropayments. Tweet trades to @MangroveTrader; rankings on-chain.
   </Card>
-  <Card title="mangrove-agent" icon="robot" href="/sdks/mangrove-agent">
+  <Card title="mangrove-agent" icon="robot" href="/mangrove-agent/overview">
     Production-ready AI trading bot. FastAPI + MCP, autonomous strategy generation, cron-driven execution, full audit trail. Clone, set API key, deploy.
-  </Card>
-  <Card title="x402 templates" icon="cube" href="/templates/x402-app-template">
-    Build your own x402-gated MCP server or Claude Code plugin from a production-ready scaffold.
   </Card>
 </CardGroup>
 
@@ -37,11 +34,11 @@ The core building blocks are open: 223 trading signals and 99 technical indicato
 | If you are... | Start with |
 |---|---|
 | Calling REST endpoints from any language | [API Reference](/api-reference/overview) |
-| Writing Python | [`mangroveai` SDK](/sdks/mangroveai) (platform) or [`mangrove-kb`](/sdks/mangrove-kb) (signals/indicators) |
+| Writing Python for the platform | [`mangroveai` SDK](/sdks/mangroveai) or [`mangrove-kb`](/sdks/mangrove-kb) for local signals |
+| Writing Python for DEX / wallet / portfolio | [`mangrovemarkets` Python SDK](/sdks/mangrovemarkets) |
 | Writing TypeScript / Node | [`@mangrove-ai/sdk`](/sdks/mangrove-markets) (DEX + marketplace) |
 | Building an agent (Claude, custom MCP client) | [MCP Servers](/mcp-servers/mangrove-markets) |
-| Standing up a turnkey trading bot | [`mangrove-agent`](/sdks/mangrove-agent) template (clone, set API key, deploy) |
-| Building your own x402-gated service | [x402 templates](/templates/x402-app-template) |
+| Standing up a turnkey trading bot | [Mangrove Agent](/mangrove-agent/overview) — clone, set API key, deploy |
 | Researching strategies or learning markets | [Knowledge Base](/knowledge-base/market-foundations) |
 
 ## What's free vs. paid
@@ -55,9 +52,7 @@ The core building blocks are open: 223 trading signals and 99 technical indicato
 Mangrove is built by [Mangrove Technologies](https://github.com/MangroveTechnologies). The signal library, knowledge base, agent template, and this documentation site are open source:
 
 - [`MangroveKnowledgeBase`](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) — `mangrove-kb` Python package, KB server, public docs source
-- [`mangrove-agent`](https://github.com/MangroveTechnologies/mangrove-agent) — FastAPI + MCP trading-bot template
-- [`x402-app-template`](https://github.com/MangroveTechnologies/x402-app-template) — scaffold for x402-gated MCP services
-- [`x402-plugin-template`](https://github.com/MangroveTechnologies/x402-plugin-template) — scaffold for x402-consuming agent plugins
+- [`mangrove-agent`](https://github.com/MangroveTechnologies/mangrove-agent) — FastAPI + MCP trading-bot template (MIT)
 
 The MangroveAI platform itself is closed-source; you consume it via the [`mangroveai`](/sdks/mangroveai) PyPI package or the [REST API](/api-reference/overview).
 
