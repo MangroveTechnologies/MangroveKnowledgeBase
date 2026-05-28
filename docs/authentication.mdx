@@ -202,15 +202,13 @@ async function refreshAccessToken(refreshToken) {
 | `POST` | `/api/v1/auth/api-keys` | Generate new API key |
 | `GET` | `/api/v1/auth/api-keys` | List all API keys |
 | `DELETE` | `/api/v1/auth/api-keys/{key_id}` | Revoke an API key |
-| `GET` | `/api/v1/auth/is-admin` | Check admin status |
 
 ## Authorization Levels
 
 | Level | Required | Access |
 |-------|----------|--------|
-| Authenticated User | Valid JWT or API key | Own data only (strategies, backtests, conversations) |
-| Management User | Management API key or admin email | All user data, platform administration |
-| Unauthenticated | None | Health checks and Swagger docs only |
+| Authenticated User | Valid JWT or API key | Own data (strategies, backtests, conversations) within your tier limits |
+| Unauthenticated | None | Health checks, Swagger docs, the x402-gated wallet-paid surface (no signup) |
 
 ## Error Responses
 

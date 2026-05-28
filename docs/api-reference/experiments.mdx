@@ -1,0 +1,92 @@
+---
+title: "Experiments (sweep runs)"
+description: "Kick off and consume parameter-sweep experiments. Up to 99 strategies per experiment; results materialize as the sweep completes."
+---
+
+# Experiments
+
+The experiment API turns a single strategy template plus a parameter grid into a fan-out of up to 99 individual backtests. Use it for hyperparameter sweeps, dataset comparisons, or signal-combination searches.
+
+All endpoints sit under `/api/v1/oracle/` on the MangroveAI gateway and are forwarded to the Oracle backtest engine with your identity attached. Auth: API key or JWT (same as the rest of `/api/v1/*`).
+
+## Endpoints
+
+| Method | Path | Purpose | Billable |
+|---|---|---|---|
+| `POST` | `/api/v1/oracle/experiments` | Create an experiment (the parameter grid + strategy template) | `oracle_experiment` (1 unit; x402 $0.25) |
+| `POST` | `/api/v1/oracle/experiments/{id}/launch` | Fan out the grid into up to 99 backtests | `oracle_experiment` |
+| `GET`  | `/api/v1/oracle/results` | Read results as they materialize | `oracle_results_read` (1 unit; x402 $0.01) |
+| `POST` | `/api/v1/oracle/simulate` | Simulate a single strategy run without persisting | `oracle_simulate` (1 unit; x402 $0.10) |
+| `GET`  | `/api/v1/oracle/datasets` | List the datasets the engine can run against | free (metadata) |
+| `GET`  | `/api/v1/oracle/signals` | List signals available to experiments | free (metadata) |
+| `GET`  | `/api/v1/oracle/exec-config` | Execution-defaults metadata (fees, slippage, etc.) | free (metadata) |
+| `GET`  | `/api/v1/oracle/templates` | Predefined strategy templates you can seed an experiment from | free (metadata) |
+| `GET`  | `/api/v1/oracle/leaderboard` | Best-performing strategies across recent experiments | free (metadata) |
+
+Each `POST /experiments` + subsequent `/launch` counts as ONE billable HTTP call against your tier, regardless of how many strategies the grid fans out to.
+
+## Typical flow
+
+<Steps>
+  <Step title="Pick a dataset and a template">
+    ```bash
+    curl -H "Authorization: Bearer $MANGROVE_API_KEY" \
+      https://api.mangrovedeveloper.ai/api/v1/oracle/datasets
+
+    curl -H "Authorization: Bearer $MANGROVE_API_KEY" \
+      https://api.mangrovedeveloper.ai/api/v1/oracle/templates
+    ```
+  </Step>
+  <Step title="Create an experiment">
+    Body shape: a strategy template (entry / exit rules) plus a `params_sweep` block that enumerates the grid.
+
+    ```bash
+    curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/experiments \
+      -H "Authorization: Bearer $MANGROVE_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "name": "rsi-momentum-sweep",
+        "dataset_id": "btc-1h-2024",
+        "template": {
+          "entry": {"trigger": {"name": "rsi_oversold"}, "filter": {"name": "is_above_sma"}},
+          "exit":  {"take_profit_pct": 5, "stop_loss_pct": 2}
+        },
+        "params_sweep": {
+          "entry.trigger.window":    {"min": 7,   "max": 21, "step": 7},
+          "entry.trigger.threshold": {"min": 25,  "max": 35, "step": 5},
+          "entry.filter.window":     {"min": 100, "max": 200, "step": 50}
+        }
+      }'
+    ```
+
+    Returns an experiment id and the cardinality of the grid (the engine refuses grids larger than 99 strategies).
+  </Step>
+  <Step title="Launch">
+    ```bash
+    curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/experiments/<id>/launch \
+      -H "Authorization: Bearer $MANGROVE_API_KEY"
+    ```
+
+    The engine starts evaluating the grid asynchronously.
+  </Step>
+  <Step title="Poll for results">
+    ```bash
+    curl "https://api.mangrovedeveloper.ai/api/v1/oracle/results?experiment_id=<id>" \
+      -H "Authorization: Bearer $MANGROVE_API_KEY"
+    ```
+
+    Results materialize as the sweep completes. The response is paginated; ranked metrics (Sharpe, max drawdown, etc.) come back per strategy.
+  </Step>
+</Steps>
+
+## Costs
+
+Per the developer pricing page, every `POST /experiments` + `/launch` HTTP call counts as 1 unit against your API quota. x402 callers pay $0.25 per kickoff. The engine fans out to up to 99 individual backtests internally; you are not charged per fanout child.
+
+`GET /results` is billed separately at 1 unit per call ($0.01 x402). Polling efficiently matters — prefer larger paged reads to short-interval polling.
+
+## Related
+
+- [SIEVE classifier](/api-reference/sieve) — score up to 99 strategy candidates before sending them through a full sweep. Use SIEVE to prune the grid first; pay for backtest compute only on the candidates that survive.
+- [Backtesting API](/api-reference/backtesting) — single-strategy synchronous and async backtests, useful when you already know the parameters you want to test.
+- [`mangroveai` Python SDK](/sdks/mangroveai) — `client.backtesting.run(...)` wraps the single-shot endpoint; experiment kickoff is exposed on the raw client today (a typed wrapper is on the roadmap).

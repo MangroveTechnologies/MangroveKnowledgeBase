@@ -10,19 +10,15 @@
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/authentication</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/system-overview</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-05-28</lastmod>
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/sdks/overview</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-05-28</lastmod>
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/sdks/mangroveai</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-05-28</lastmod>
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/sdks/mangrove-kb</loc>
@@ -33,47 +29,43 @@
     <lastmod>2026-04-26</lastmod>
   </url>
   <url>
+    <loc>https://docs.mangrovedeveloper.ai/sdks/mangrovemarkets</loc>
+    <lastmod>2026-05-28</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.mangrovedeveloper.ai/mangrove-agent/overview</loc>
+    <lastmod>2026-05-28</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.mangrovedeveloper.ai/mangrove-agent/quickstart</loc>
+    <lastmod>2026-05-28</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.mangrovedeveloper.ai/mangrove-agent/mcp-tools</loc>
+    <lastmod>2026-05-28</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.mangrovedeveloper.ai/mangrove-agent/architecture</loc>
+    <lastmod>2026-05-28</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.mangrovedeveloper.ai/mangrove-agent/safety-model</loc>
+    <lastmod>2026-05-28</lastmod>
+  </url>
+  <url>
     <loc>https://docs.mangrovedeveloper.ai/mcp-servers/overview</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-05-28</lastmod>
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-markets</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-05-28</lastmod>
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-trader</loc>
-    <lastmod>2026-04-26</lastmod>
+    <lastmod>2026-05-28</lastmod>
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-kb</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/mcp-servers/openclaw-executive-functions</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/plugins/overview</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/plugins/claude-code</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/plugins/openclaw</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/templates/overview</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/templates/x402-app-template</loc>
-    <lastmod>2026-04-26</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.mangrovedeveloper.ai/templates/x402-plugin-template</loc>
     <lastmod>2026-04-26</lastmod>
   </url>
   <url>
@@ -91,6 +83,14 @@
   <url>
     <loc>https://docs.mangrovedeveloper.ai/api-reference/backtesting</loc>
     <lastmod>2026-04-26</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.mangrovedeveloper.ai/api-reference/experiments</loc>
+    <lastmod>2026-05-28</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.mangrovedeveloper.ai/api-reference/sieve</loc>
+    <lastmod>2026-05-26</lastmod>
   </url>
   <url>
     <loc>https://docs.mangrovedeveloper.ai/api-reference/ai-copilot</loc>

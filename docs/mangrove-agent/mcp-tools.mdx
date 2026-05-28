@@ -1,0 +1,107 @@
+---
+title: "MCP tools catalog"
+description: "The 41 tools the agent exposes over MCP, with their REST mirrors at /api/v1/agent/*."
+---
+
+# MCP tools catalog
+
+The agent exposes **41 MCP tools** (plus the `hello_mangrove` x402 demo) over Streamable HTTP, plus a mirrored REST surface at `/api/v1/agent/*`. Both paths call the same service layer — pick whichever fits your caller.
+
+## Discovery (free, no auth)
+
+| Tool | Purpose |
+|---|---|
+| `status` | Health + version + capability snapshot. |
+| `list_tools` | Tool catalog (what you're reading, queryable). |
+| `hello_mangrove` | x402 payment demo. |
+
+## Wallet
+
+| Tool | Purpose |
+|---|---|
+| `create_wallet` | Generate a new wallet. Returns a `vault_token`, never the secret. |
+| `import_wallet` | Bring in an existing wallet by encrypted vault entry. |
+| `list_wallets` | Wallets registered with this agent. |
+| `get_balances` | Native + ERC-20 balances per chain. |
+| `portfolio_value` | USD value across all tracked addresses. |
+| `portfolio_pnl` | Realized + unrealized P&L. |
+
+## DEX
+
+| Tool | Purpose |
+|---|---|
+| `list_dex_venues` | Supported venues (1inch, XPMarket, Jupiter, …). |
+| `get_swap_quote` | Quote a swap — input/output token, amount, chain. |
+| `execute_swap` | Sign locally + broadcast. Refuses on un-backed-up wallets. |
+| `get_tx_status` | Tx confirmation status. |
+| `get_token_info` | Token metadata. |
+| `get_spot_price` | Spot price by chain. |
+| `get_gas_price` | Current gas. |
+| `get_oneinch_chart` | 1inch chart proxy. |
+
+## Market / on-chain
+
+| Tool | Purpose |
+|---|---|
+| `get_ohlcv` | OHLCV by symbol and timeframe. |
+| `get_market_data` | Aggregated market metadata. |
+| `get_crypto_assets` | Asset list with filters. |
+| `get_trending_coins` | Trending list. |
+| `search_crypto_assets` | Asset search. |
+| `get_smart_money_sentiment` | Smart-money sentiment summary. |
+
+## Signals
+
+| Tool | Purpose |
+|---|---|
+| `list_signals` | The 223-signal MangroveAI catalog. |
+| `kb_list_indicators` | The 99-indicator KB catalog. |
+
+## Strategy
+
+| Tool | Purpose |
+|---|---|
+| `create_strategy_autonomous` | Agent picks rules from a goal description. |
+| `create_strategy_manual` | You specify entry/exit rules. |
+| `list_strategies` | Strategies registered locally. |
+| `get_strategy` | Strategy detail. |
+| `update_strategy_status` | Promote between draft / paper / live. |
+| `delete_strategy` | Tombstone. |
+| `backtest_strategy` | Run the platform's backtest against this strategy. |
+| `evaluate_strategy` | One-shot evaluation against current bar. |
+| `search_reference_strategies` | Curated MangroveAI reference set. |
+| `build_strategy_from_reference` | Clone a reference + tune for your symbol/timeframe. |
+
+## Execution
+
+| Tool | Purpose |
+|---|---|
+| `list_positions` | Open positions. |
+| `get_position` | Position detail. |
+| `list_trade_history` | Per-wallet trade log. |
+
+## Logs
+
+| Tool | Purpose |
+|---|---|
+| `list_evaluations` | Per-strategy evaluation log. |
+| `list_trades` | Per-strategy trade log. |
+| `list_all_trades` | All trades across the agent. |
+
+## Knowledge Base
+
+| Tool | Purpose |
+|---|---|
+| `kb_search` | Full-text search over the MangroveKnowledgeBase docs. |
+| `list_docs` | KB document index. |
+| `get_doc` | Full markdown of a single doc. |
+
+## DeFi
+
+| Tool | Purpose |
+|---|---|
+| `get_protocol_tvl` | DeFiLlama TVL by protocol. |
+
+## REST mirror
+
+Every tool has a mirrored REST endpoint at `/api/v1/agent/<tool_name>` (POST with JSON body matching the MCP tool arguments). Same service layer, same auth, same response shape. Use REST when the caller isn't an MCP client.

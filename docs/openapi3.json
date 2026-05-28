@@ -1,737 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/admin/enterprise/organizations": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EnterpriseOrgResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (invalid limits or too many accounts)"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Create enterprise organization with service accounts and custom limits",
-        "description": "Create enterprise organization with service accounts and custom limits (admin only)",
-        "operationId": "post_admin_enterprise_organizations",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EnterpriseOrgRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/feedback": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Submit feedback (any authenticated user)",
-        "operationId": "post_admin_feedback",
-        "tags": [
-          "admin"
-        ]
-      },
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "List unacknowledged feedback (admin only)",
-        "operationId": "get_admin_feedback",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/feedback/{feedback_id}/acknowledge": {
-      "parameters": [
-        {
-          "name": "feedback_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Acknowledge feedback (admin only)",
-        "operationId": "post_admin_feedback_acknowledge",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/llm-models": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "List all LLM models in the catalog",
-        "operationId": "get_admin_llm_models",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/llm-models/{old_model_id}/rename": {
-      "parameters": [
-        {
-          "name": "old_model_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RenameModelResponse"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Rename a model in the catalog and update all references",
-        "operationId": "post_admin_llm_model_rename",
-        "parameters": [
-          {
-            "name": "X-Fields",
-            "in": "header",
-            "description": "An optional fields mask",
-            "schema": {
-              "type": "string",
-              "format": "mask"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RenameModelRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/model-configs": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "List all LLM model configurations",
-        "operationId": "get_admin_model_configs",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/model-configs/{call_site}": {
-      "parameters": [
-        {
-          "name": "call_site",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "put": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Update the model assigned to a call site",
-        "operationId": "put_admin_model_config_detail",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/organizations/{org_id}/custom-limits": {
-      "parameters": [
-        {
-          "name": "org_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "patch": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomLimitsUpdateResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "404": {
-            "description": "Organization not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Update custom limits for an organization",
-        "description": "Update custom limits for an organization (admin only)",
-        "operationId": "patch_admin_org_custom_limits",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CustomLimitsUpdateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/organizations/{org_id}/subscription": {
-      "parameters": [
-        {
-          "name": "org_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "patch": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Change an organization's subscription tier (admin only)",
-        "operationId": "patch_admin_org_subscription",
-        "requestBody": {
-          "$ref": "#/components/requestBodies/ChangeTierRequest"
-        },
-        "tags": [
-          "admin"
-        ]
-      },
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Get an organization's current subscription (admin only)",
-        "operationId": "get_admin_org_subscription",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/rate-limit/{provider}/reset": {
-      "parameters": [
-        {
-          "name": "provider",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RateLimitResetResponse"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Reset a provider's rate-limit bucket in Redis",
-        "description": "Clear MangroveRoots rate-limiter state for one provider.  Deletes the Redis token-bucket key so the next request starts fresh against the configured (max_tokens, window_seconds).  Useful after a deploy that bumps the rate limit \u2014 the bucket state carries over in Redis and only refills on the old schedule unless reset.",
-        "operationId": "post_rate_limit_reset",
-        "parameters": [
-          {
-            "name": "X-Fields",
-            "in": "header",
-            "description": "An optional fields mask",
-            "schema": {
-              "type": "string",
-              "format": "mask"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/subscription-tiers": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "List all subscription tiers grouped by scope (admin only)",
-        "operationId": "get_admin_subscription_tiers",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/token-analysis/{session_id}": {
-      "parameters": [
-        {
-          "name": "session_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "404": {
-            "description": "Session not found or no token data available"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Retrieve complete token breakdown for a conversation session",
-        "description": "Get complete token breakdown for a specific session (Phase 1: Token Traceability)\nReturns nested dictionary showing every token source:\n- System message breakdown by rule file\n- Context message breakdown by component\n- Tool schemas breakdown by tool name\n- User message tokens\n- Optimization opportunities\n\nThis implements Phase 1 of the v2 optimization plan: complete token traceability.",
-        "operationId": "get_admin_token_analysis",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/users": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsersListResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "List all users with subscription info (admin only)",
-        "description": "List all users with subscription info (admin only)",
-        "operationId": "get_admin_users_list",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/users/tokens/reset-all": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResetAllResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Reset token usage for all users (admin only)",
-        "description": "Reset token usage for ALL users (admin only)",
-        "operationId": "post_admin_reset_all_user_tokens",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/users/{user_id}/backtests": {
-      "parameters": [
-        {
-          "name": "user_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BacktestsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get backtests for any user (admin only)",
-        "description": "Get backtests for any user (admin only)",
-        "operationId": "get_admin_user_backtests",
-        "parameters": [
-          {
-            "description": "Filter by status",
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Filter by asset",
-            "name": "asset",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Filter from date",
-            "name": "date_from",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Filter to date",
-            "name": "date_to",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Page size",
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "description": "Page offset",
-            "name": "offset",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/users/{user_id}/metrics": {
-      "parameters": [
-        {
-          "name": "user_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserMetricsResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get metrics for any user (admin only)",
-        "description": "Get metrics for any user (admin only)",
-        "operationId": "get_admin_user_metrics",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/users/{user_id}/strategies": {
-      "parameters": [
-        {
-          "name": "user_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StrategiesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Get strategies for any user (admin only)",
-        "description": "Get strategies for any user (admin only)",
-        "operationId": "get_admin_user_strategies",
-        "parameters": [
-          {
-            "description": "Search by name or asset",
-            "name": "search",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Filter by status",
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Page size",
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "description": "Page offset",
-            "name": "offset",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/users/{user_id}/subscription": {
-      "parameters": [
-        {
-          "name": "user_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "patch": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Change a user's subscription tier (admin only)",
-        "operationId": "patch_admin_user_subscription",
-        "requestBody": {
-          "$ref": "#/components/requestBodies/ChangeTierRequest"
-        },
-        "tags": [
-          "admin"
-        ]
-      }
-    },
-    "/admin/users/{user_id}/tokens/reset": {
-      "parameters": [
-        {
-          "name": "user_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResetResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden - management key required"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        },
-        "summary": "Reset token usage for a specific user (admin only)",
-        "description": "Reset token usage for a specific user (admin only)",
-        "operationId": "post_admin_reset_user_tokens",
-        "tags": [
-          "admin"
-        ]
-      }
-    },
     "/ai-copilot/admin/refresh-vector-db": {
       "post": {
         "responses": {
@@ -3793,6 +3062,249 @@
         ]
       }
     },
+    "/on-chain/smart-money/dex-trades": {
+      "post": {
+        "summary": "Get recent DEX trades from Smart Money wallets",
+        "operationId": "smart_money_dex_trades",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Nansen-shape body. All fields optional.",
+                "properties": {
+                  "chains": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Chain filter (default: ['ethereum'])"
+                  },
+                  "filters": {
+                    "type": "object",
+                    "description": "Nansen-shape filter dict (e.g. include_smart_money_labels, value_usd: {min, max})"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "Sort spec, e.g. [{field, direction}]"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartMoneyDexTradesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/on-chain/smart-money/historical-holdings": {
+      "post": {
+        "summary": "Get date-stamped Smart Money holdings snapshots",
+        "operationId": "smart_money_historical_holdings",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Nansen-shape body. All fields optional.",
+                "properties": {
+                  "chains": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Chain filter (default: ['ethereum'])"
+                  },
+                  "filters": {
+                    "type": "object",
+                    "description": "Nansen-shape filter dict (e.g. include_smart_money_labels, value_usd: {min, max})"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "Sort spec, e.g. [{field, direction}]"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  },
+                  "date_range": {
+                    "type": "object",
+                    "description": "{from: YYYY-MM-DD, to: YYYY-MM-DD}; default trailing 7 days",
+                    "properties": {
+                      "from": {
+                        "type": "string"
+                      },
+                      "to": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartMoneyHistoricalHoldingsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/on-chain/smart-money/perp-trades": {
+      "post": {
+        "summary": "Get perpetual-futures trades from Smart Money wallets on Hyperliquid",
+        "operationId": "smart_money_perp_trades",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Hyperliquid-only; no chains accepted",
+                "properties": {
+                  "filters": {
+                    "type": "object"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmartMoneyPerpTradesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/on-chain/smart-money/screen": {
       "get": {
         "responses": {
@@ -3962,6 +3474,199 @@
         ]
       }
     },
+    "/on-chain/token/{symbol}/dex-trades": {
+      "post": {
+        "summary": "Get DEX trades for a single token across all participants in a date window",
+        "operationId": "token_dex_trades",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chain": {
+                    "type": "string",
+                    "description": "Blockchain (default: ethereum)"
+                  },
+                  "date_range": {
+                    "type": "object",
+                    "description": "{from: YYYY-MM-DD, to: YYYY-MM-DD}; default trailing 7 days",
+                    "properties": {
+                      "from": {
+                        "type": "string"
+                      },
+                      "to": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenDexTradesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Token symbol or CoinGecko ID"
+          }
+        ]
+      }
+    },
+    "/on-chain/token/{symbol}/flows": {
+      "post": {
+        "summary": "Get aggregated per-wallet-category flow data for a single token in a date window. Stablecoins not supported.",
+        "operationId": "token_flows",
+        "tags": [
+          "on-chain"
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "chain": {
+                    "type": "string"
+                  },
+                  "date_range": {
+                    "type": "object",
+                    "description": "{from: YYYY-MM-DD, to: YYYY-MM-DD}; default trailing 7 days",
+                    "properties": {
+                      "from": {
+                        "type": "string"
+                      },
+                      "to": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "order_by": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1
+                  },
+                  "per_page": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenFlowsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnChainError"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Token symbol (stablecoins not supported)"
+          }
+        ]
+      }
+    },
     "/on-chain/whale-activity/{symbol}": {
       "parameters": [
         {
@@ -4068,6 +3773,52 @@
         ],
         "tags": [
           "on-chain"
+        ]
+      }
+    },
+    "/oracle/sieve/score": {
+      "post": {
+        "tags": [
+          "oracle"
+        ],
+        "summary": "Score strategies through Mangrove SIEVE",
+        "description": "Score candidate trading strategies through the Mangrove SIEVE classifier (binary go/no-go + 4-class outcome head). Reaches the live Oracle service via MangroveAI's reverse proxy. Accepts either MangroveAI-shaped Strategy objects (`strategies`) or raw run dicts (`runs`); exactly one, ≤99 items per request. Responses carry `model_version` and `code_version` for provenance.",
+        "operationId": "post_oracle_sieve_score",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SieveScoreRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SieveScoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Both or neither of `strategies` / `runs` provided, or empty"
+          },
+          "413": {
+            "description": "Per-request cap exceeded (>99 items)"
+          },
+          "503": {
+            "description": "SIEVE model unavailable (artifacts missing or load failed)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ]
       }
     },
@@ -4620,119 +4371,6 @@
         },
         "tags": [
           "organizations"
-        ]
-      }
-    },
-    "/promo-codes": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Create a new promo code (admin only)",
-        "operationId": "post_promo_codes_collection",
-        "tags": [
-          "promo-codes"
-        ]
-      },
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "List all promo codes (admin only)",
-        "operationId": "get_promo_codes_collection",
-        "tags": [
-          "promo-codes"
-        ]
-      }
-    },
-    "/promo-codes/validate": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Validate a promo code against a prospective checkout",
-        "description": "Body: { code, tier_id, scope }  where scope is 'user' or 'org'.\nReturns ValidationResult (valid, trial_days, reason, message).",
-        "operationId": "post_validate_promo_code",
-        "tags": [
-          "promo-codes"
-        ]
-      }
-    },
-    "/promo-codes/{code}/redemptions": {
-      "parameters": [
-        {
-          "name": "code",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "get": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "List redemptions for a promo code (admin only)",
-        "operationId": "get_promo_code_redemptions",
-        "tags": [
-          "promo-codes"
-        ]
-      }
-    },
-    "/promo-codes/{code}/reinstate": {
-      "parameters": [
-        {
-          "name": "code",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "patch": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Re-activate a previously revoked promo code",
-        "operationId": "patch_reinstate_promo_code",
-        "tags": [
-          "promo-codes"
-        ]
-      }
-    },
-    "/promo-codes/{code}/revoke": {
-      "parameters": [
-        {
-          "name": "code",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "patch": {
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        },
-        "summary": "Revoke a promo code (soft -- active = false)",
-        "operationId": "patch_revoke_promo_code",
-        "tags": [
-          "promo-codes"
         ]
       }
     },
@@ -6222,52 +5860,6 @@
           "users"
         ]
       }
-    },
-    "/oracle/sieve/score": {
-      "post": {
-        "tags": [
-          "oracle"
-        ],
-        "summary": "Score strategies through Mangrove SIEVE",
-        "description": "Score candidate trading strategies through the Mangrove SIEVE classifier (binary go/no-go + 4-class outcome head). Reaches the live Oracle service via MangroveAI's reverse proxy. Accepts either MangroveAI-shaped Strategy objects (`strategies`) or raw run dicts (`runs`); exactly one, \u226499 items per request. Responses carry `model_version` and `code_version` for provenance.",
-        "operationId": "post_oracle_sieve_score",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SieveScoreRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SieveScoreResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Both or neither of `strategies` / `runs` provided, or empty"
-          },
-          "413": {
-            "description": "Per-request cap exceeded (>99 items)"
-          },
-          "503": {
-            "description": "SIEVE model unavailable (artifacts missing or load failed)"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
     }
   },
   "info": {
@@ -6293,16 +5885,8 @@
       "description": "User operations"
     },
     {
-      "name": "admin",
-      "description": "Admin operations (management access required)"
-    },
-    {
       "name": "subscriptions",
       "description": "Subscription and usage limit operations"
-    },
-    {
-      "name": "promo-codes",
-      "description": "Promo code management and validation"
     },
     {
       "name": "ai-copilot",
@@ -6350,7 +5934,7 @@
     },
     {
       "name": "config",
-      "description": "Read-only server configuration \u2014 trading defaults + flattened execution config. Source of truth for SDK consumers; closes issue #437."
+      "description": "Read-only server configuration — trading defaults + flattened execution config. Source of truth for SDK consumers; closes issue #437."
     },
     {
       "name": "oracle",
@@ -10510,7 +10094,7 @@
         "type": "object"
       },
       "SieveScoreRequest": {
-        "description": "Score request \u2014 exactly one of ``strategies`` / ``runs`` must be set.\n\nThe per-request item cap is enforced in the route handler (HTTP 413\non overage); it lives there rather than here so error messages can\ncite the actual limit.",
+        "description": "Score request — exactly one of ``strategies`` / ``runs`` must be set.\n\nThe per-request item cap is enforced in the route handler (HTTP 413\non overage); it lives there rather than here so error messages can\ncite the actual limit.",
         "properties": {
           "strategies": {
             "default": null,
@@ -10750,6 +10334,179 @@
         ],
         "title": "SignalSpec",
         "type": "object"
+      },
+      "SmartMoneyHistoricalHoldingsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "chains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_range": {
+            "type": "object"
+          },
+          "holdings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SmartMoneyDexTradesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "chains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trades": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "SmartMoneyPerpTradesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "venue": {
+            "type": "string",
+            "example": "hyperliquid"
+          },
+          "trades": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "TokenDexTradesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "contract_address": {
+            "type": "string"
+          },
+          "date_range": {
+            "type": "object"
+          },
+          "trades": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "TokenFlowsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "filters": {
+            "type": "object"
+          },
+          "order_by": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "count": {
+            "type": "integer"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "contract_address": {
+            "type": "string"
+          },
+          "date_range": {
+            "type": "object"
+          },
+          "flows": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
       }
     }
   }
