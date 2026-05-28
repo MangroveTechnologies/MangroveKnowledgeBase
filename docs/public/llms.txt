@@ -1,19 +1,19 @@
 # Mangrove Developer Docs
 
-> Developer documentation for the Mangrove ecosystem -- REST APIs, Python and TypeScript SDKs, MCP servers, Claude Code plugins, and x402-gated service templates for building agent-native trading and DEX-aggregation applications.
+> Developer documentation for the Mangrove ecosystem -- REST APIs, Python and TypeScript SDKs, MCP servers, and x402-gated service templates for building agent-native trading and DEX-aggregation applications.
 
 ## Getting Started
 
 - [Introduction](https://docs.mangrovedeveloper.ai/introduction)
 - [Quickstart](https://docs.mangrovedeveloper.ai/quickstart)
 - [Authentication](https://docs.mangrovedeveloper.ai/authentication)
-- [System Overview](https://docs.mangrovedeveloper.ai/system-overview)
 
 ## SDKs
 
 - [SDKs Overview](https://docs.mangrovedeveloper.ai/sdks/overview)
 - [mangroveai (Python SDK)](https://docs.mangrovedeveloper.ai/sdks/mangroveai)
 - [mangrove-kb (Python SDK)](https://docs.mangrovedeveloper.ai/sdks/mangrove-kb)
+- [mangrovemarkets (Python SDK)](https://docs.mangrovedeveloper.ai/sdks/mangrovemarkets)
 - [@mangrove-ai/sdk (TypeScript)](https://docs.mangrovedeveloper.ai/sdks/mangrove-markets)
 
 ## MCP Servers
@@ -22,19 +22,14 @@
 - [MangroveMarkets MCP Server](https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-markets)
 - [MangroveTrader MCP Server](https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-trader)
 - [MangroveKnowledgeBase MCP Server](https://docs.mangrovedeveloper.ai/mcp-servers/mangrove-kb)
-- [openclaw-executive-functions](https://docs.mangrovedeveloper.ai/mcp-servers/openclaw-executive-functions)
 
-## Plugins
+## Mangrove Agent
 
-- [Plugins Overview](https://docs.mangrovedeveloper.ai/plugins/overview)
-- [Claude Code Plugins](https://docs.mangrovedeveloper.ai/plugins/claude-code)
-- [OpenClaw Plugins](https://docs.mangrovedeveloper.ai/plugins/openclaw)
-
-## Templates
-
-- [Templates Overview](https://docs.mangrovedeveloper.ai/templates/overview)
-- [x402-app-template](https://docs.mangrovedeveloper.ai/templates/x402-app-template)
-- [x402-plugin-template](https://docs.mangrovedeveloper.ai/templates/x402-plugin-template)
+- [Overview](https://docs.mangrovedeveloper.ai/mangrove-agent/overview)
+- [Quickstart](https://docs.mangrovedeveloper.ai/mangrove-agent/quickstart)
+- [MCP Tools Catalog](https://docs.mangrovedeveloper.ai/mangrove-agent/mcp-tools)
+- [Architecture](https://docs.mangrovedeveloper.ai/mangrove-agent/architecture)
+- [Safety Model](https://docs.mangrovedeveloper.ai/mangrove-agent/safety-model)
 
 ## API Reference
 
@@ -42,10 +37,16 @@
 - [Strategies API](https://docs.mangrovedeveloper.ai/api-reference/strategies)
 - [Signals API](https://docs.mangrovedeveloper.ai/api-reference/signals)
 - [Backtesting API](https://docs.mangrovedeveloper.ai/api-reference/backtesting)
+- [Experiments API (sweep runs)](https://docs.mangrovedeveloper.ai/api-reference/experiments)
+- [SIEVE Classifier API](https://docs.mangrovedeveloper.ai/api-reference/sieve)
 - [AI Copilot API](https://docs.mangrovedeveloper.ai/api-reference/ai-copilot)
 - [Execution API](https://docs.mangrovedeveloper.ai/api-reference/execution)
 - [Crypto Assets API](https://docs.mangrovedeveloper.ai/api-reference/crypto-assets)
 - [Market Data API](https://docs.mangrovedeveloper.ai/api-reference/market-data)
+- [On-chain API](https://docs.mangrovedeveloper.ai/api-reference/on-chain)
+- [DeFi API](https://docs.mangrovedeveloper.ai/api-reference/defi)
+- [Social API](https://docs.mangrovedeveloper.ai/api-reference/social)
+- [Config API](https://docs.mangrovedeveloper.ai/api-reference/config)
 
 ## Signals
 
@@ -67,6 +68,7 @@
 - [Creating a Strategy](https://docs.mangrovedeveloper.ai/guides/creating-a-strategy)
 - [Running a Backtest](https://docs.mangrovedeveloper.ai/guides/running-a-backtest)
 - [Backtesting Guide](https://docs.mangrovedeveloper.ai/guides/backtesting-guide)
+- [Using the SIEVE Pre-filter](https://docs.mangrovedeveloper.ai/guides/using-sieve-prefilter)
 - [Using the AI Copilot](https://docs.mangrovedeveloper.ai/guides/using-the-ai-copilot)
 - [Risk Management](https://docs.mangrovedeveloper.ai/guides/risk-management)
 

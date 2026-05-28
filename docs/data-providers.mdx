@@ -1,0 +1,104 @@
+---
+title: "Data Providers"
+description: "One Mangrove subscription, many provider feeds. Coverage map of upstream data we expose through the Mangrove API."
+---
+
+# Data Providers
+
+A Mangrove subscription gives you unified access to data from multiple paid third-party providers behind a single API key, one SDK, one rate-limit ceiling, and one bill. This page lists the providers we resell, the surface we expose today, and what each provider contributes.
+
+We surface coverage honestly. Where we expose 100% of a provider's plan, we say so. Where coverage is still partial, the page lists what is and isn't available -- so you can decide whether to use Mangrove for that surface or subscribe to the upstream provider directly.
+
+## Coverage at a glance
+
+| Provider | Plan | Mangrove route prefix | Coverage |
+|---|---|---|---|
+| **Nansen** | Pro | `/on-chain/*` + `/crypto-assets/{token-holders,flow-intelligence,smart-money/*}` | **100% of plan** (11 routes) |
+| **WhaleAlert** | Enterprise REST | `/on-chain/{whale-transactions,exchange-flows,whale-activity}` | 100% of available surface |
+| **X (Twitter)** | Pro v2 | `/social/*` | partial -- sentiment, mentions, influence |
+| **DeFiLlama** | API tier | `/defi/*` | partial -- protocol TVL, chain TVL, stablecoin metrics |
+| **CoinAPI** | Startup | `/crypto-assets/{ohlcv,market-data,symbols,exchanges}` | partial -- OHLCV + market data |
+| **CoinGecko** | Analyst | `/crypto-assets/{trending,global-market,market-data}` | partial -- discovery + macro |
+| **Kraken** | Public REST | `/crypto-assets/ohlcv?provider=kraken` | OHLCV fallback |
+| **Coinbase CDP / x402** | Standard | `/api/v402/*` | x402 payment-gated micro-payments (stablecoin) |
+
+For an architectural deep-dive on per-route provider mappings, see the [billable endpoints reference](/api-reference/overview) and the on-chain endpoint catalog below.
+
+## Nansen -- 100% Pro plan coverage
+
+Nansen is the institutional standard for smart-money tracking, wallet labelling, and token-level on-chain flow intelligence. Our coverage on the Pro plan is complete: every endpoint family Mangrove pays for is exposed through `client.on_chain` and `client.crypto_assets`.
+
+| Capability | Mangrove route | SDK method |
+|---|---|---|
+| Smart-money sentiment (single token) | `GET /on-chain/smart-money/sentiment` | `client.on_chain.get_smart_money_sentiment(symbol)` |
+| Smart-money token screener | `GET /on-chain/smart-money/screen` | `client.on_chain.screen_smart_money(chains, timeframe)` |
+| Smart-money historical holdings | `POST /on-chain/smart-money/historical-holdings` | `client.on_chain.get_smart_money_historical_holdings(...)` |
+| Smart-money DEX trades | `POST /on-chain/smart-money/dex-trades` | `client.on_chain.get_smart_money_dex_trades(...)` |
+| Smart-money perp trades (Hyperliquid) | `POST /on-chain/smart-money/perp-trades` | `client.on_chain.get_smart_money_perp_trades(...)` |
+| Token holders + concentration | `GET /on-chain/token-holders/{symbol}` | `client.on_chain.get_token_holders(symbol)` |
+| Token DEX trades (all participants) | `POST /on-chain/token/{symbol}/dex-trades` | `client.on_chain.get_token_dex_trades(symbol, ...)` |
+| Token flows (per-wallet-category) | `POST /on-chain/token/{symbol}/flows` | `client.on_chain.get_token_flows(symbol, ...)` |
+| Flow intelligence (single token) | `GET /crypto-assets/flow-intelligence/{symbol}` | (via `crypto_assets`) |
+| Smart-money netflows (cross-token) | `GET /crypto-assets/smart-money/netflows` | (via `crypto_assets`) |
+| Smart-money holdings (cross-token) | `GET /crypto-assets/smart-money/holdings` | (via `crypto_assets`) |
+
+**Full passthrough of provider capability:** all five POST endpoints above accept the same `filters` and `order_by` shapes Nansen's own API accepts. You can restrict smart-money DEX trades to `Fund`-labelled wallets, bound `value_usd` min/max, sort by any supported field, etc.
+
+```python
+result = client.on_chain.get_smart_money_dex_trades(
+    chains=["ethereum"],
+    filters={"include_smart_money_labels": ["Fund"]},
+    order_by=[{"field": "block_timestamp", "direction": "DESC"}],
+    per_page=10,
+)
+```
+
+**Not in our Pro plan** (return 404 if called directly against the upstream): Wallet Profiler, Chain Analytics, NFT collection analytics, Hot Contracts. Contact us if any of these are critical -- they may be available on a higher Nansen tier.
+
+## WhaleAlert -- 100% of (narrow) surface
+
+WhaleAlert's REST surface is small by design: transactions and status. We expose all of it.
+
+| Capability | Mangrove route | SDK method |
+|---|---|---|
+| Whale transactions ($X+ threshold) | `GET /on-chain/whale-transactions` | `client.on_chain.get_whale_transactions(...)` |
+| Exchange inflows/outflows | `GET /on-chain/exchange-flows` | `client.on_chain.get_exchange_flows(...)` |
+| Whale activity summary | `GET /on-chain/whale-activity/{symbol}` | `client.on_chain.get_whale_activity(symbol, ...)` |
+
+WebSocket streaming for real-time alerts is on the upstream roadmap; we currently use REST polling and may move to streaming when customer demand warrants.
+
+## X (Twitter) -- partial
+
+Backed by X API v2 (Pro tier). We currently expose three derived surfaces.
+
+| Capability | Mangrove route | SDK method |
+|---|---|---|
+| Topic sentiment | `GET /social/sentiment/{topic}` | `client.social.get_sentiment(topic, ...)` |
+| Topic mentions | `GET /social/mentions/{topic}` | `client.social.get_mentions(topic, ...)` |
+| User influence score | `GET /social/influence/{username}` | `client.social.get_influence_score(username)` |
+
+Full-archive search (`tweets/search/all`) is available at our tier but not yet exposed as a dedicated route. Open an issue or contact us if it would unblock a use case.
+
+## DeFiLlama -- partial
+
+Three high-traffic endpoints from the DeFiLlama API tier. Full Pro-tier coverage (yields, options, hacks, raises, unlocks, liquidity-depth, active-users) is on the roadmap.
+
+| Capability | Mangrove route | SDK method |
+|---|---|---|
+| Protocol TVL | `GET /defi/protocol/{protocol}/tvl` | `client.defi.get_protocol_tvl(protocol)` |
+| Chain TVL | `GET /defi/chain/{chain}/tvl` | `client.defi.get_chain_tvl(chain)` |
+| Stablecoin metrics | `GET /defi/stablecoins/metrics` | `client.defi.get_stablecoin_metrics()` |
+
+## CoinAPI + CoinGecko -- price + market data
+
+Two providers cover crypto-asset price and market data through `client.crypto_assets`. The provider for OHLCV is configurable per request via `?provider=` (default: CoinAPI; fallback: Kraken public).
+
+See the [crypto-assets API reference](/api-reference/crypto-assets) for the full list.
+
+## Provider rate limits
+
+Mangrove enforces per-customer rate limits at our edge; upstream limits are absorbed transparently. If you see `429 Too Many Requests`, it's our limit -- contact us if you need a higher ceiling.
+
+## Suggesting a new provider or endpoint
+
+Open an issue on the [MangroveAI-SDK repo](https://github.com/MangroveTechnologies/MangroveAI-SDK/issues) describing the data you want to access. We track aggregate demand to prioritize the next provider integration.

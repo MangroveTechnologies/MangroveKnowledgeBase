@@ -63,7 +63,7 @@ const board = await client.callTool({
 });
 ```
 
-Use the [Claude Code plugin](/plugins/claude-code) to skip the manual MCP wiring — slash commands like `/mt-leaderboard` and `/mt-stats` handle the x402 round-trip for you.
+If you use Claude Code, the [`mangrove-trader-plugins`](https://github.com/MangroveTechnologies/mangrove-trader-plugins) repo bundles slash commands (`/mt-leaderboard`, `/mt-stats`) that wire the MCP connection and the x402 round-trip for you.
 
 ## Twitter format
 
@@ -81,10 +81,10 @@ For options, include strike, type, and expiry:
 @MangroveTrader long 5 NVDA 850C exp 2026-05-17 @ 4.20
 ```
 
-The full grammar is in the trader plugin's `/mt-track` command — see the [Claude Code plugin](/plugins/claude-code).
+The full grammar is in the trader plugin's `/mt-track` command — see [`mangrove-trader-plugins`](https://github.com/MangroveTechnologies/mangrove-trader-plugins) on GitHub.
 
 ## Source
 
 - Server: [MangroveTrader](https://github.com/MangroveTechnologies/MangroveTrader)
 - Plugin: [mangrove-trader-plugins](https://github.com/MangroveTechnologies/mangrove-trader-plugins)
-- Built on: [`x402-app-template`](/templates/x402-app-template)
+- Built on: the [x402-app-template](https://github.com/MangroveTechnologies/x402-app-template) scaffold (open source on GitHub)
