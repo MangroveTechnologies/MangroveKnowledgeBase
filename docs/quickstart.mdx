@@ -104,7 +104,7 @@ const quote = await client.callTool({
 });
 ```
 
-Available servers: [MangroveMarkets](/mcp-servers/mangrove-markets), [MangroveTrader](/mcp-servers/mangrove-trader), [MangroveKnowledgeBase](/mcp-servers/mangrove-kb), [openclaw-executive-functions](/mcp-servers/openclaw-executive-functions).
+Available servers: [MangroveMarkets](/mcp-servers/mangrove-markets), [MangroveTrader](/mcp-servers/mangrove-trader), [MangroveKnowledgeBase](/mcp-servers/mangrove-kb).
 
 ## Path E — TypeScript / DEX swaps (`@mangrove-ai/sdk`)
 
@@ -135,24 +135,20 @@ const result = await client.dex.swap({
 
 Full reference: [`@mangrove-ai/sdk`](/sdks/mangrove-markets).
 
-## Path F — Claude Code plugin
+## Path F — Turnkey agent template (`mangrove-agent`)
 
-If you live in the terminal, install a Mangrove plugin and use slash commands.
+If you want a working trading bot you can deploy rather than build from scratch, clone the [mangrove-agent](https://github.com/MangroveTechnologies/mangrove-agent) template. FastAPI + MCP, cron-driven execution, full audit trail.
 
-```
-claude plugin marketplace add mangrove-markets
-claude plugin install mangrove-markets
-
-# Then in Claude Code:
-/swap quote USDC ETH 1000 --chain base
-/marketplace search "GPU compute"
-/portfolio value --addresses 0xabc
+```bash
+git clone https://github.com/MangroveTechnologies/mangrove-agent.git
+cd mangrove-agent
+./scripts/setup.sh   # prompts for your MANGROVE_API_KEY, sets up venv, starts uvicorn
 ```
 
-See [Claude Code plugins](/plugins/claude-code) for the full plugin catalog.
+Full reference: [`mangrove-agent`](/sdks/mangrove-agent).
 
 ## Next steps
 
 - Read [Authentication](/authentication) to understand API keys, JWT, and x402.
 - Explore the [Knowledge Base](/knowledge-base/market-foundations) for trading concepts and signal taxonomy.
-- See the [System Overview](/system-overview) for how the pieces fit together.
+- Browse the full [API Reference](/api-reference/overview) by domain.

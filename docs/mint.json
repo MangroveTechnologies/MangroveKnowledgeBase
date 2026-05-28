@@ -39,10 +39,6 @@
       "url": "mcp-servers"
     },
     {
-      "name": "Plugins",
-      "url": "plugins"
-    },
-    {
       "name": "Templates",
       "url": "templates"
     },
@@ -67,6 +63,7 @@
         "api-reference/strategies",
         "api-reference/signals",
         "api-reference/backtesting",
+        "api-reference/experiments",
         "api-reference/sieve",
         "api-reference/ai-copilot",
         "api-reference/execution",
@@ -75,8 +72,7 @@
         "api-reference/on-chain",
         "api-reference/defi",
         "api-reference/social",
-        "api-reference/config",
-        "api-reference/promo-codes"
+        "api-reference/config"
       ]
     },
     {
@@ -84,8 +80,7 @@
       "pages": [
         "introduction",
         "quickstart",
-        "authentication",
-        "system-overview"
+        "authentication"
       ]
     },
     {
@@ -94,7 +89,8 @@
         "sdks/overview",
         "sdks/mangroveai",
         "sdks/mangrove-kb",
-        "sdks/mangrove-markets"
+        "sdks/mangrove-markets",
+        "sdks/mangrove-agent"
       ]
     },
     {
@@ -103,16 +99,7 @@
         "mcp-servers/overview",
         "mcp-servers/mangrove-markets",
         "mcp-servers/mangrove-trader",
-        "mcp-servers/mangrove-kb",
-        "mcp-servers/openclaw-executive-functions"
-      ]
-    },
-    {
-      "group": "Plugins",
-      "pages": [
-        "plugins/overview",
-        "plugins/claude-code",
-        "plugins/openclaw"
+        "mcp-servers/mangrove-kb"
       ]
     },
     {
