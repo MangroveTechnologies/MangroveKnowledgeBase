@@ -95,15 +95,39 @@ For local-only evaluation without an API call, use [`mangrove-kb`](/sdks/mangrov
 
 ### Use the AI copilot
 
-```python
-session = client.ai_copilot.start(prompt="I want to trade RSI reversals on ETH")
-while not session.done:
-    print(session.last_message)
-    response = input("> ")
-    session = client.ai_copilot.send(session.id, response)
+The Copilot is a stateful chat agent backed by OpenAI. Start a conversation, send messages until the agent has enough context, then save the generated strategy as a MangroveAI draft.
 
-print("Strategy created:", session.strategy_id)
+```python
+# 1. Start a session.
+conv = client.ai_copilot.start_new_conversation()
+
+# 2. Chat. `chat()` blocks until the assistant responds (default
+#    180s timeout — Copilot state-machine turns can run 60-180s).
+reply = client.ai_copilot.chat(
+    conv.session_id,
+    "I want a momentum strategy for ETH on the 1h timeframe.",
+)
+print(reply.content)
+
+# 3. Refine.
+reply = client.ai_copilot.chat(
+    conv.session_id,
+    "MACD bullish cross for entry, MACD bearish cross for exit.",
+    timeout=240.0,  # bump for backtest-heavy turns
+)
+
+# 4. Pull the rendered strategy_config and save it as a draft.
+ctx = client.ai_copilot.get_conversation(conv.session_id)
+if ctx.strategy_config:
+    saved = client.ai_copilot.save_strategy(
+        ctx.strategy_config, name="ETH 1h momentum"
+    )
+    print("strategy_id:", saved.result["strategy_id"])
 ```
+
+For callers that want to drive their own polling instead of blocking, use `client.ai_copilot.chat_async(session_id, message)` — it returns the raw 202 submission and you poll `get_conversation(session_id)` until `processing_status` flips to `"complete"`.
+
+See a runnable end-to-end demo at [`examples/ai_copilot_quickstart.py`](https://github.com/MangroveTechnologies/MangroveAI-SDK/blob/main/examples/ai_copilot_quickstart.py).
 
 ### Query on-chain smart-money activity
 
