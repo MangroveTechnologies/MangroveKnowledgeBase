@@ -1,11 +1,11 @@
 ---
 title: "MCP tools catalog"
-description: "The 41 tools the agent exposes over MCP, with their REST mirrors at /api/v1/agent/*."
+description: "The ~90 tools the agent exposes over MCP, with their REST mirrors at /api/v1/agent/*."
 ---
 
 # MCP tools catalog
 
-The agent exposes **41 MCP tools** (plus the `hello_mangrove` x402 demo) over Streamable HTTP, plus a mirrored REST surface at `/api/v1/agent/*`. Both paths call the same service layer — pick whichever fits your caller.
+The agent exposes **~90 MCP tools** (plus the `hello_mangrove` x402 demo) over Streamable HTTP, plus a mirrored REST surface at `/api/v1/agent/*`. Both paths call the same service layer — pick whichever fits your caller.
 
 ## Discovery (free, no auth)
 
@@ -39,7 +39,7 @@ The agent exposes **41 MCP tools** (plus the `hello_mangrove` x402 demo) over St
 | `get_gas_price` | Current gas. |
 | `get_oneinch_chart` | 1inch chart proxy. |
 
-## Market / on-chain
+## Market data
 
 | Tool | Purpose |
 |---|---|
@@ -48,7 +48,83 @@ The agent exposes **41 MCP tools** (plus the `hello_mangrove` x402 demo) over St
 | `get_crypto_assets` | Asset list with filters. |
 | `get_trending_coins` | Trending list. |
 | `search_crypto_assets` | Asset search. |
-| `get_smart_money_sentiment` | Smart-money sentiment summary. |
+
+## On-chain (Nansen + WhaleAlert)
+
+Pass-throughs to the `client.on_chain` SDK surface — full Nansen Pro plan + WhaleAlert Enterprise. Filters and sort orders pass straight through to the upstream provider, so you can use the same vocabulary the Nansen API itself accepts (e.g. `include_smart_money_labels: ["Fund"]`, `order_by: [{"field": "block_timestamp", "direction": "DESC"}]`).
+
+**Wallet-scoped (Smart Money):**
+
+| Tool | Purpose |
+|---|---|
+| `get_smart_money_sentiment` | Net accumulation vs. distribution by Smart Money on a token. |
+| `screen_smart_money` | Screen for tokens with highest Smart Money activity across chains. |
+| `get_smart_money_historical_holdings` | Date-stamped Smart Money holdings snapshots across chains. |
+| `get_smart_money_dex_trades` | Recent DEX trades from Smart Money wallets. |
+| `get_smart_money_perp_trades` | Smart Money perp trades on Hyperliquid (no chain filter — Hyperliquid-only). |
+
+**Token-scoped:**
+
+| Tool | Purpose |
+|---|---|
+| `get_token_holders` | Holder distribution + concentration for a token. |
+| `get_token_dex_trades` | All DEX trades on a token over a date window (every counterparty, not just Smart Money). |
+| `get_token_flows` | Per-wallet-category flow data for a token (stablecoins not supported — Nansen returns 404). |
+
+**Whale activity (WhaleAlert):**
+
+| Tool | Purpose |
+|---|---|
+| `get_whale_transactions` | Whale-tier transactions filtered by token + minimum USD. |
+| `get_whale_activity` | Whale activity summary for a token over N hours. |
+| `get_exchange_flows` | Net exchange inflows / outflows — risk-off vs. risk-on proxy. |
+
+## Oracle (sweep + corpus + backtest)
+
+Pass-throughs to the `client.oracle` SDK surface — score candidates through Mangrove SIEVE, query the curated Oracle corpus, run single or batch backtests, or drive full sweep experiments end-to-end.
+
+**Catalog discovery (free, non-billable):**
+
+| Tool | Purpose |
+|---|---|
+| `oracle_list_datasets` | Curated OHLCV datasets experiments can run against (~2,200 dataset entries across asset / timeframe pairs). |
+| `oracle_list_signals` | Signal catalog with typed param specs (223 signals: trend / momentum / patterns / volume / volatility). |
+| `oracle_list_templates` | Predefined strategy templates to seed experiments from. |
+
+**SIEVE scoring:**
+
+| Tool | Purpose |
+|---|---|
+| `sieve_score` | Score 1–99 strategies through the Mangrove SIEVE classifier (binary go / no-go + 4-class outcome probabilities + provenance). Run BEFORE paying for backtests. |
+
+**Backtests:**
+
+| Tool | Purpose |
+|---|---|
+| `oracle_backtest` | Synchronous single-strategy backtest. Blocks until engine finishes (typically 30–120s on multi-month windows). |
+| `oracle_backtest_async` | Submit a backtest for async execution. Returns a `backtest_id` to poll. |
+| `oracle_backtest_poll` | Poll status / full result of an async backtest by ID. |
+| `oracle_backtest_bulk` | Bulk-evaluate many strategies against a shared date range with shared OHLCV fetches. |
+
+**Data corpus query (BigQuery proxy):**
+
+| Tool | Purpose |
+|---|---|
+| `oracle_data_query` | Query the curated corpus (`results` / `ohlcv`). Columns + filter ops whitelisted server-side; tenancy enforced by Oracle. |
+
+**Experiments lifecycle (sweep authoring):**
+
+| Tool | Purpose |
+|---|---|
+| `oracle_create_experiment` | Create a draft experiment from a config dict (`name` required at minimum). |
+| `oracle_list_experiments` | List experiments for the calling org (compact summary view). |
+| `oracle_get_experiment` | Full experiment config + current progress (`completed_runs`). |
+| `oracle_update_experiment` | Replace a draft experiment's config (PUT — drafts only). |
+| `oracle_delete_experiment` | Delete an experiment + cancel any in-flight children. |
+| `oracle_validate_experiment` | Validate a draft — required transition before launch. Server returns structured `errors` if config is incomplete. |
+| `oracle_launch_experiment` | Fan out a validated experiment into up to 99 child backtests. Returns immediately; poll progress. |
+| `oracle_pause_experiment` | Halt a running experiment without losing completed results. |
+| `oracle_list_results` | Paginated read of materializing backtest results under an experiment. |
 
 ## Signals
 
@@ -104,4 +180,10 @@ The agent exposes **41 MCP tools** (plus the `hello_mangrove` x402 demo) over St
 
 ## REST mirror
 
-Every tool has a mirrored REST endpoint at `/api/v1/agent/<tool_name>` (POST with JSON body matching the MCP tool arguments). Same service layer, same auth, same response shape. Use REST when the caller isn't an MCP client.
+Every tool has a mirrored REST endpoint at `/api/v1/agent/<resource>/...` (HTTP method matches the underlying call — typically `POST` for action / `GET` for read). Same service layer, same auth, same response shape. Use REST when the caller isn't an MCP client.
+
+Examples:
+
+- `POST /api/v1/agent/oracle/experiments` mirrors the `oracle_create_experiment` MCP tool.
+- `POST /api/v1/agent/on-chain/smart-money/historical-holdings` mirrors `get_smart_money_historical_holdings`.
+- `GET /api/v1/agent/oracle/datasets` mirrors `oracle_list_datasets`.
