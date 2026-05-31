@@ -15,13 +15,17 @@ All endpoints sit under `/api/v1/oracle/` on the MangroveAI gateway and are forw
 |---|---|---|---|
 | `POST` | `/api/v1/oracle/experiments` | Create an experiment (the parameter grid + strategy template) | `oracle_experiment` (1 unit; x402 $0.25) |
 | `POST` | `/api/v1/oracle/experiments/{id}/launch` | Fan out the grid into up to 99 backtests | `oracle_experiment` |
-| `GET`  | `/api/v1/oracle/results` | Read results as they materialize | `oracle_results_read` (1 unit; x402 $0.01) |
-| `POST` | `/api/v1/oracle/simulate` | Simulate a single strategy run without persisting | `oracle_simulate` (1 unit; x402 $0.10) |
+| `GET`  | `/api/v1/oracle/results` | Read results as they materialize. Pass `?experiment_id=<id>` to scope to a single sweep, or omit it for the cross-experiment view. | `oracle_results_read` (1 unit; x402 $0.01) |
+| `POST` | `/api/v1/oracle/simulate/run` | Simulate a single strategy run without persisting | `oracle_simulate` (1 unit; x402 $0.10) |
+| `POST` | `/api/v1/oracle/simulate/generate` | LLM-backed strategy candidate generation | `oracle_simulate` |
+| `GET`  | `/api/v1/oracle/simulate/presets` | Ready-made simulate request templates | free (metadata) |
+| `GET`  | `/api/v1/oracle/simulate/history` | List recent simulate runs (caller-scoped) | free (metadata) |
 | `GET`  | `/api/v1/oracle/datasets` | List the datasets the engine can run against | free (metadata) |
 | `GET`  | `/api/v1/oracle/signals` | List signals available to experiments | free (metadata) |
-| `GET`  | `/api/v1/oracle/exec-config` | Execution-defaults metadata (fees, slippage, etc.) | free (metadata) |
+| `GET`  | `/api/v1/oracle/exec-config/defaults` | Execution-defaults metadata (fees, slippage, position sizing, risk limits) | free (metadata) |
 | `GET`  | `/api/v1/oracle/templates` | Predefined strategy templates you can seed an experiment from | free (metadata) |
-| `GET`  | `/api/v1/oracle/leaderboard` | Best-performing strategies across recent experiments | free (metadata) |
+| `GET`  | `/api/v1/oracle/leaderboard` | Curated persona roster — wrappers for the deployed strategies on the public dashboard. See [Deployed strategies](/api-reference/oracle-deployed) for live execution state. | free (metadata) |
+| `GET`  | `/api/v1/oracle/deployed/strategies` | List the live-running curated strategies with current account value, open positions, etc. | free (metadata) |
 
 Each `POST /experiments` + subsequent `/launch` counts as ONE billable HTTP call against your tier, regardless of how many strategies the grid fans out to.
 
@@ -89,4 +93,5 @@ Per the developer pricing page, every `POST /experiments` + `/launch` HTTP call 
 
 - [SIEVE classifier](/api-reference/sieve) — score up to 99 strategy candidates before sending them through a full sweep. Use SIEVE to prune the grid first; pay for backtest compute only on the candidates that survive.
 - [Backtesting API](/api-reference/backtesting) — single-strategy synchronous and async backtests, useful when you already know the parameters you want to test.
-- [`mangroveai` Python SDK](/sdks/mangroveai) — `client.backtesting.run(...)` wraps the single-shot endpoint; experiment kickoff is exposed on the raw client today (a typed wrapper is on the roadmap).
+- [Deployed strategies](/api-reference/oracle-deployed) — live execution state of curated paper-trading strategies (the surface formerly implied by "leaderboard").
+- [`mangroveai` Python SDK](/sdks/mangroveai) — `client.oracle.create_experiment(...)`, `client.oracle.simulate_run(...)`, `client.oracle.list_results(...)`, and the full deployed/leaderboard surface are typed wrappers as of SDK v1.4.0.
