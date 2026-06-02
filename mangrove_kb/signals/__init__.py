@@ -10,6 +10,7 @@ Signal Categories:
     - volume: OBV, CMF, MFI, VWAP, ADI, Force Index, etc.
     - volatility: Bollinger Bands, ATR, Keltner Channel, Donchian, etc.
     - patterns: Doji, Hammer, Engulfing, MorningStar, InsideBar, NR7, etc.
+    - onchain: smart-money flows, exchange flows, whale activity, holder distribution
 """
 
 # Import all signal modules to trigger registration with RuleRegistry
@@ -18,3 +19,4 @@ from mangrove_kb.signals import trend
 from mangrove_kb.signals import volume
 from mangrove_kb.signals import volatility
 from mangrove_kb.signals import patterns
+from mangrove_kb.signals import onchain

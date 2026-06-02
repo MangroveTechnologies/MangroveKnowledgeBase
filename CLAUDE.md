@@ -53,7 +53,7 @@ curl -X POST http://localhost:8081/api/evaluate \
 
 Open-source trading signals, technical indicators, and knowledge base. Three components:
 
-1. **Python Package** (`mangrove_kb`) -- 223 signal functions, 99 indicator classes (including 27 pattern indicators), RuleRegistry, docstring parser. Published on PyPI as `mangrove-kb`.
+1. **Python Package** (`mangrove_kb`) -- 235 signal functions, 99 indicator classes (including 27 pattern indicators), RuleRegistry, docstring parser. Published on PyPI as `mangrove-kb`.
 2. **KB Server** (`kb_server/`) -- Unified server with dual protocol access (REST + MCP) on the same port. FastAPI REST API + FastMCP tools. SQLite FTS5 full-text search, 11 trading education documents, glossary, cross-references, synonym expansion. Signal/indicator metadata (free) and computation (x402 gated).
 3. **Knowledge Base Content** (`knowledge-base/`) -- 11 markdown documents covering market foundations through quantitative analysis
 
@@ -161,8 +161,9 @@ Terraform module: `MangroveAI/infra/terraform/modules/app-mangroveai-kb/`
 - Every signal docstring must include `Type:` (TRIGGER or FILTER) and `Requires:` (comma-separated column names)
 - Every parameter must include `Range: min-max` and `Default: value` in the Args section
 - Use `window` for all windowing parameters (not `lookback`, `period`, `length`)
-- Signal counts: 223 signals (108 TRIGGER, 115 FILTER) across 5 categories
-- Categories: Momentum (42), Trend (88), Volume (33), Volatility (20), Patterns (40)
+- Signal counts: 235 signals (113 TRIGGER, 122 FILTER) across 6 categories
+- Categories: Momentum (42), Trend (88), Volume (33), Volatility (20), Patterns (40), On-Chain (12)
+- On-Chain signals consume alternative-data columns (SmartMoneyNetflow, SmartMoneyHoldings, ExchangeNetflow, WhaleNetInflow, TokenHolderCount, HolderConcentration) sourced from the Nansen/WhaleAlert feeds documented in docs/data-providers.mdx; the caller populates them time-aligned to OHLCV bars
 
 ## GitHub
 
