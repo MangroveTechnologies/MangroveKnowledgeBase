@@ -1,19 +1,19 @@
 ---
-title: "SIEVE → backtest → paper: end-to-end strategy adoption"
-description: "Combine SIEVE pre-filtering with an experiment sweep and the strategy lifecycle to go from 'list of candidates' to a paper-trading strategy in four phases."
+title: "End-to-end workflow with Mangrove SIEVE"
+description: "Combine SIEVE pre-filtering, bulk backtesting, and the strategy lifecycle to go from a signal mix to a running strategy in four phases."
 ---
 
-# SIEVE → backtest → paper
+# End-to-end workflow with Mangrove SIEVE
 
-This guide walks the full chain from "I have a signal mix I want to explore" to "I have a paper-trading strategy live in MangroveAI."
+This guide walks the full chain from "I have a signal mix I want to explore" to "I have a strategy registered and running on MangroveAI."
 
 Four phases:
 
 <Steps>
   <Step title="Discover the signal catalog" />
   <Step title="Generate candidates + SIEVE filter" />
-  <Step title="Bulk-backtest the top survivors via an experiment" />
-  <Step title="Adopt the winner to paper trading" />
+  <Step title="Bulk-backtest the top survivors" />
+  <Step title="Register the winner + run it" />
 </Steps>
 
 Each phase corresponds to one or two SDK calls. The Python tabs use the `mangroveai` SDK 1.4.0+; the cURL tabs hit the underlying `/api/v1/*` surface directly.
@@ -234,9 +234,9 @@ If your winner has `trade_count == 0`, the surviving candidates didn't fire entr
 
 For the full request/response shape see [Oracle backtest reference](/api-reference/oracle-backtest). For larger sweeps with a managed lifecycle, see [Experiments](/api-reference/experiments).
 
-## Phase 4 — Adopt the winner to paper trading
+## Phase 4 — Register the winner + run it
 
-The winning candidate (`top_10[i]` for the index `i` matching the experiment's best result) becomes a registered MangroveAI strategy. Paper trading runs the strategy against live OHLCV with simulated fills — no wallet, no capital, no on-chain risk.
+The winning candidate becomes a registered MangroveAI strategy. From there, you choose how to run it.
 
 ```python Python
 from mangrove_ai.models.strategies import CreateStrategyRequest
@@ -245,31 +245,38 @@ from mangrove_ai.models.strategies import CreateStrategyRequest
 # best_idx came from the bulk response — strategy_configs preserved input order
 winner_candidate = top_10[best_idx]  # the SIEVE candidate object
 
-# 1. Register the strategy
 created_strategy = client.strategies.create(CreateStrategyRequest(
     name=f"sieve-winner-{winner_candidate['asset']}-1h",
-    description="Top performer from SIEVE → experiment sweep, BTC 1h 2024",
+    description="Top performer from SIEVE + bulk backtest, BTC 1h 2024",
     asset=winner_candidate["asset"],
     entry=winner_candidate["entry"],
     exit=winner_candidate["exit"],
     execution_config=winner_candidate["execution_config"],
 ))
 print(f"Created strategy: {created_strategy.id}")
-
-# 2. Promote to paper trading
-client.strategies.update_status(created_strategy.id, "paper")
-print(f"Strategy {created_strategy.id} is now paper-trading.")
 ```
 
-The platform schedules an evaluation on the strategy's timeframe and accrues simulated fills as the signal fires.
+### Running it
 
-### Promoting to live
+`client.strategies.update_status(strategy_id, status)` transitions the strategy. Pick the path that matches your appetite:
 
-`paper` → `live` is gated server-side on a wallet with a confirmed backup, an allocation block (`wallet_address`, `token`, `amount`, `slippage_pct`), and an explicit confirmation flag — none of which are exposed by `strategies.update_status(strategy_id, status)` in SDK 1.4.0. The live promotion currently requires a raw PATCH against `/api/v1/strategies/{id}/status` with the allocation block in the body. See [Creating a strategy](/guides/creating-a-strategy) for the live-promotion contract and wallet-connect gating.
+```python Python
+# Option A — go live immediately (real capital, real fills via mangrovemarkets)
+client.strategies.update_status(created_strategy.id, "live")
+
+# Option B — paper trade first (simulated fills, no on-chain exposure)
+client.strategies.update_status(created_strategy.id, "paper")
+```
+
+Either way the platform schedules evaluations on the strategy's timeframe and the signal starts running. Paper mode lets you watch how the strategy behaves against live OHLCV before committing capital; live mode skips the simulation and trades on a real wallet from day one.
+
+### Live trading gating
+
+Going `live` is gated server-side on a wallet with a confirmed backup, an allocation block (`wallet_address`, `token`, `amount`, `slippage_pct`), and an explicit confirmation flag — none of which are exposed by `strategies.update_status(strategy_id, status)` in SDK 1.4.0. The live transition currently requires a raw PATCH against `/api/v1/strategies/{id}/status` with the allocation block in the body. See [Creating a strategy](/guides/creating-a-strategy) for the live contract and wallet-connect gating. Paper trading has no such gating and can run anywhere.
 
 ## Saving the provenance
 
-Every SIEVE response carries `model_version` and `code_version`; experiment results carry their own provenance stamps. Log them next to every adoption decision so a future you can tell which model + corpus snapshot drove the call.
+Every SIEVE response carries `model_version` and `code_version`; experiment results carry their own provenance stamps. Log them next to every decision so a future you can tell which model + corpus snapshot drove the call.
 
 ```python Python
 import datetime, json
@@ -277,7 +284,6 @@ import datetime, json
 decision_log = {
     "winner_strategy_id": created_strategy.id,
     "sieve_p_winning":    ranked[best_idx][1].four_class["winning"],
-    "experiment_id":      exp_id,
     "backtest_sortino":   best["metrics"]["sortino"],
     "backtest_sharpe":    best["metrics"]["sharpe"],
     "sieve_model_version": response.model_version,

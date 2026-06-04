@@ -239,7 +239,7 @@ print(status)
 
 Evaluates many strategies over a **shared date range** with shared OHLCV fetches. One HTTP call, one bill, up to 99 strategies.
 
-The right endpoint when you have a SIEVE-filtered shortlist and want to score the survivors quickly — see [SIEVE → live strategy](/guides/sieve-to-live-strategy) for the full workflow.
+The right endpoint when you have a SIEVE-filtered shortlist and want to score the survivors quickly — see [End-to-end workflow with SIEVE](/guides/sieve-end-to-end-workflow) for the full workflow.
 
 ### Required fields
 
@@ -376,5 +376,5 @@ See [Pricing](/api-reference/overview#pricing) for tier monthly caps. Source of 
 - [Experiments](/api-reference/experiments) — multi-strategy parameter sweeps with managed lifecycle (`create` → `validate` → `launch` → poll results). Use experiments when the parameter grid is larger than a single bulk request can hold.
 - [SIEVE classifier](/api-reference/sieve) — score 1-99 candidate strategies in milliseconds before paying for backtests.
 - [Deployed strategies](/api-reference/oracle-deployed) — live execution state for curated paper-trading strategies, not for ad-hoc backtests.
-- [SIEVE → live strategy walkthrough](/guides/sieve-to-live-strategy) — end-to-end demo: list-signals, SIEVE, sweep via experiments, adopt.
+- [End-to-end workflow with SIEVE](/guides/sieve-end-to-end-workflow) — end-to-end demo: list-signals, SIEVE, sweep via experiments, adopt.
 - [`mangroveai` Python SDK](/sdks/mangroveai) — typed wrappers exist as of SDK v1.4.0, but with caveats above. Until reconciled, raw HTTP examples are the source of truth.

@@ -141,7 +141,7 @@
         "guides/running-a-backtest",
         "guides/backtesting-guide",
         "guides/using-sieve-prefilter",
-        "guides/sieve-to-live-strategy",
+        "guides/sieve-end-to-end-workflow",
         "guides/using-the-ai-copilot",
         "guides/risk-management"
       ]
