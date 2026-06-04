@@ -267,8 +267,20 @@ def _escape_attr(text: str) -> str:
 
 
 def _md_escape(text: str) -> str:
-    """Escape pipes for use inside a Markdown table cell."""
-    return text.replace("|", "\\|").replace("\n", " ").strip()
+    """Escape pipes + JSX braces for use inside a Markdown table cell in MDX.
+
+    MDX treats `{` as the start of a JSX expression. Tool descriptions
+    that happen to contain example JSON (e.g. `[{'field': 'x'}]`) break
+    Mintlify's acorn parser. Replace `{` and `}` with their HTML entities
+    so the literal braces survive.
+    """
+    return (
+        text.replace("|", "\\|")
+        .replace("{", "&#123;")
+        .replace("}", "&#125;")
+        .replace("\n", " ")
+        .strip()
+    )
 
 
 def _render_tool_accordion(t: ToolEntry) -> list[str]:

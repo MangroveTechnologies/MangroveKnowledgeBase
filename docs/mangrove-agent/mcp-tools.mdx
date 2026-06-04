@@ -595,7 +595,7 @@ Smart Money historical holdings snapshots across chains (Nansen).
 | `date_from` | `string` | no | ISO date 'YYYY-MM-DD'. |
 | `date_to` | `string` | no | ISO date 'YYYY-MM-DD'. |
 | `filters` | `object` | no | Nansen filter dict (include_smart_money_labels, etc.) |
-| `order_by` | `array` | no | Sort spec, e.g. [{'field': 'block_timestamp', 'direction': 'DESC'}] |
+| `order_by` | `array` | no | Sort spec, e.g. [&#123;'field': 'block_timestamp', 'direction': 'DESC'&#125;] |
 | `page` | `integer` | no | Page (default 1) |
 | `per_page` | `integer` | no | Items per page (default 100) |
 | `api_key` | `string` | **yes** | Valid API key |
@@ -874,7 +874,7 @@ Query the curated Oracle corpus (results / ohlcv). Whitelist-enforced columns + 
 |---|---|---|---|
 | `table` | `string` | **yes** | 'results' \| 'ohlcv' |
 | `select` | `array<string>` | **yes** | Columns to return. |
-| `filters` | `array<{col,op,value}>` | no | Filter clauses. |
+| `filters` | `array<&#123;col,op,value&#125;>` | no | Filter clauses. |
 | `order_by` | `array<string>` | no | Optional ORDER BY clauses. |
 | `limit` | `integer` | no | Default 100, max 1000. |
 | `offset` | `integer` | no | Default 0. |
