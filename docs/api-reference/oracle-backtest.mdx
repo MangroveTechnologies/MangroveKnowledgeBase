@@ -14,7 +14,9 @@ This page covers the **single-strategy** subset of the Oracle engine plus the co
 All endpoints sit under `/api/v1/oracle/` on the MangroveAI gateway and are forwarded to the Oracle engine with your identity attached. Auth: API key or JWT, same as the rest of `/api/v1/*`.
 
 <Warning>
-**SDK ↔ server contract note.** The `mangroveai` Python SDK 1.4.0 types the risk-management fields on `OracleBacktestRequest` / `OracleBulkBacktestRequest` as `Optional` with `None` defaults. The **server requires every one of those fields explicitly** — the SDK comment "server-default-fillable" is currently aspirational, not honored. Pass them in full until the SDK typing is reconciled. The `DataQueryResponse` Pydantic model also defines a `table: str` field that the actual server response does NOT include; that wrapper will fail validation on every successful 200. The examples below use raw HTTP for these three endpoints so the demos actually run. SDK-typed examples will return once the SDK matches the server contract.
+**SDK ↔ server contract note (data query only).** The `DataQueryResponse` Pydantic model in `mangroveai` Python SDK 1.4.0 defines a `table: str` field that the actual server response does NOT include — the typed wrapper fails validation on every successful 200. Separately, `DataQueryRequest.order_by` is typed as a list of strings whereas the server expects `[{col, dir}]` dict shape. The `/data/query` Python example below uses raw HTTP for this reason. Tracking fixes: [SDK#16](https://github.com/MangroveTechnologies/MangroveAI-SDK/issues/16), [SDK#17](https://github.com/MangroveTechnologies/MangroveAI-SDK/issues/17).
+
+The historical `OracleBacktestRequest` / `OracleBulkBacktestRequest` gap (risk-mgmt fields typed `Optional` but server-rejected) was closed by MangroveAI v3.10.12 — the gateway proxy now fills missing risk-mgmt fields from canonical `trading_defaults.json`, so the `Optional` typing is honored end-to-end and the SDK calls below work with just `asset` + `strategy_json` + a date range.
 </Warning>
 
 ## Endpoints
@@ -51,7 +53,7 @@ Plus a top-level `execution_config` containing at least `position_size_calc: "v2
 
 Optional: `interval` (defaults to `"1h"`), `lookback_months`, `start_date`, `end_date` (provide one of: explicit start+end, start alone (defaults end to now), or `lookback_months`).
 
-Pull canonical defaults from `GET /api/v1/oracle/exec-config/defaults` to skip hand-rolling these.
+**Defaults filled by the gateway.** Since MangroveAI v3.10.12 the proxy merges canonical values from `trading_defaults.json` into any `/backtest*` request body before forwarding to Oracle — customer-supplied values always win (customer-wins-only `setdefault`). So in practice you can call `/backtest` with just `asset`, `strategy_json`, and a date range; the 15 risk-mgmt fields and a full `execution_config` will be populated for you. Pull the same canonical values explicitly via `GET /api/v1/oracle/exec-config/defaults` when you want to inspect or override them.
 
 ### Request
 
@@ -120,14 +122,12 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/backtest \
   -d @backtest_request.json
 ```
 
-```python Python (raw HTTP)
-import json, requests
+```python Python (SDK)
+import json
+from mangrove_ai import MangroveAI
+from mangrove_ai.models.oracle import OracleBacktestRequest
 
-# Fetch canonical defaults so we don't hand-roll execution_config
-defaults = requests.get(
-    "https://api.mangrovedeveloper.ai/api/v1/oracle/exec-config/defaults",
-    headers={"Authorization": f"Bearer {API_KEY}"},
-).json()
+client = MangroveAI(api_key=API_KEY)
 
 strategy = {
     "asset": "BTC", "interval": "1h",
@@ -137,44 +137,17 @@ strategy = {
                "params": {"window": 14, "threshold": 70}}],
 }
 
-body = {
-    "asset": "BTC", "interval": "1h",
-    "strategy_json": json.dumps(strategy),
-    "lookback_months": 3,
-    "execution_config": {
-        "position_size_calc": defaults["position_size_calc"],
-        "reward_factor":         defaults["reward_factor"],
-        "atr_period":            defaults["atr_period"],
-        "atr_volatility_factor": defaults["atr_volatility_factor"],
-        "atr_short_weight":      defaults["atr_short_weight"],
-        "atr_long_weight":       defaults["atr_long_weight"],
-        "atr_cap_multiplier":    defaults["atr_cap_multiplier"],
-    },
-    "initial_balance":      defaults["initial_balance"],
-    "min_balance_threshold": 100,
-    "min_trade_amount":      defaults["min_trade_amount"],
-    "max_open_positions":    1,
-    "max_trades_per_day":    5,
-    "max_risk_per_trade":    0.02,
-    "max_units_per_trade":   1.0,
-    "max_trade_amount":      5000,
-    "volatility_window":     14,
-    "target_volatility":     0.20,
-    "volatility_mode":       "off",
-    "enable_volatility_adjustment": False,
-    "cooldown_bars":         defaults["cooldown_bars"],
-    "daily_momentum_limit":  defaults["daily_momentum_limit"],
-    "weekly_momentum_limit": defaults["weekly_momentum_limit"],
-}
+# Risk-mgmt fields and execution_config are filled by the gateway from
+# trading_defaults.json — pass only what you want to override.
+result = client.oracle.backtest(OracleBacktestRequest(
+    asset="BTC",
+    interval="1h",
+    strategy_json=json.dumps(strategy),
+    lookback_months=3,
+))
 
-resp = requests.post(
-    "https://api.mangrovedeveloper.ai/api/v1/oracle/backtest",
-    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-    json=body, timeout=180,
-)
-result = resp.json()
-print(f"success={result['success']} trade_count={result['trade_count']}")
-print(f"metrics: {result['metrics']}")
+print(f"success={result.success} trade_count={result.trade_count}")
+print(f"metrics: {result.metrics}")
 ```
 </CodeGroup>
 
@@ -209,28 +182,30 @@ Same request body as the sync endpoint (same 18 required fields + top-level `exe
 
 ### Example
 
-```python Python (raw HTTP)
-import time, requests
+```python Python (SDK)
+import json, time
+from mangrove_ai import MangroveAI
+from mangrove_ai.models.oracle import OracleBacktestRequest
 
-# Submit (body shape identical to sync /backtest above)
-resp = requests.post(
-    "https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async",
-    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-    json=body,
-)
-backtest_id = resp.json()["backtest_id"]
+client = MangroveAI(api_key=API_KEY)
+
+# Submit (same request shape as sync /backtest — gateway fills defaults)
+submit = client.oracle.backtest_async(OracleBacktestRequest(
+    asset="BTC",
+    interval="1h",
+    strategy_json=json.dumps(strategy),
+    lookback_months=3,
+))
+backtest_id = submit.backtest_id
 
 # Poll
 while True:
-    status = requests.get(
-        f"https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async/{backtest_id}",
-        headers={"Authorization": f"Bearer {API_KEY}"},
-    ).json()
-    if status["status"] in ("completed", "failed"):
+    status = client.oracle.backtest_poll(backtest_id)
+    if status.status in ("completed", "failed"):
         break
     time.sleep(10)
 
-print(status)
+print(f"final status={status.status} trade_count={status.trade_count}")
 ```
 
 ## Bulk
@@ -290,6 +265,34 @@ The right endpoint when you have a SIEVE-filtered shortlist and want to score th
 ```
 
 Individual strategies fail soft — `results[i].success == false` carries an `error` field and an empty `metrics`, but the rest of the batch continues. Input order is preserved: `results[i]` corresponds to `strategy_configs[i]`. `data_fetches` reports how many unique OHLCV fetches the engine did across the strategy list (strategies sharing `(asset, interval)` reuse one fetch).
+
+### Example
+
+```python Python (SDK)
+import json
+from mangrove_ai import MangroveAI
+from mangrove_ai.models.oracle import OracleBulkBacktestRequest
+
+client = MangroveAI(api_key=API_KEY)
+
+# Risk-mgmt fields + execution_config filled by the gateway from
+# trading_defaults.json when omitted — bulk shares the same merge path.
+batch = client.oracle.backtest_bulk(OracleBulkBacktestRequest(
+    start_date="2024-01-01T00:00:00Z",
+    end_date="2024-12-31T00:00:00Z",
+    strategy_configs=[
+        {"asset": "BTC", "interval": "1h", "strategy_json": json.dumps(strategy_a)},
+        {"asset": "BTC", "interval": "1h", "strategy_json": json.dumps(strategy_b)},
+    ],
+))
+
+print(f"data_fetches={batch.data_fetches} total_time={batch.total_execution_time_seconds:.1f}s")
+for r in batch.results:
+    if r["success"]:
+        print(f"  {r['strategy_name']}: trades={r['trade_count']} sharpe={r['metrics'].get('sharpe')}")
+    else:
+        print(f"  {r['strategy_name']}: FAILED — {r['error']}")
+```
 
 ## Data query (corpus)
 
@@ -377,4 +380,4 @@ See [Pricing](/api-reference/overview#pricing) for tier monthly caps. Source of 
 - [SIEVE classifier](/api-reference/sieve) — score 1-99 candidate strategies in milliseconds before paying for backtests.
 - [Deployed strategies](/api-reference/oracle-deployed) — live execution state for curated paper-trading strategies, not for ad-hoc backtests.
 - [End-to-end workflow with SIEVE](/guides/sieve-end-to-end-workflow) — end-to-end demo: list-signals, SIEVE, sweep via experiments, adopt.
-- [`mangroveai` Python SDK](/sdks/mangroveai) — typed wrappers exist as of SDK v1.4.0, but with caveats above. Until reconciled, raw HTTP examples are the source of truth.
+- [`mangroveai` Python SDK](/sdks/mangroveai) — typed wrappers for all `/backtest*` endpoints land in SDK v1.4.0; the historical risk-mgmt gap is now closed at the gateway (MangroveAI v3.10.12). The `/data/query` Python example below still uses raw HTTP pending SDK#16 / SDK#17.
