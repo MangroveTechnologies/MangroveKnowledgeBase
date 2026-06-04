@@ -13,23 +13,45 @@ This page covers the **single-strategy** subset of the Oracle engine plus the co
 
 All endpoints sit under `/api/v1/oracle/` on the MangroveAI gateway and are forwarded to the Oracle engine with your identity attached. Auth: API key or JWT, same as the rest of `/api/v1/*`.
 
+<Warning>
+**SDK ↔ server contract note.** The `mangroveai` Python SDK 1.4.0 types the risk-management fields on `OracleBacktestRequest` / `OracleBulkBacktestRequest` as `Optional` with `None` defaults. The **server requires every one of those fields explicitly** — the SDK comment "server-default-fillable" is currently aspirational, not honored. Pass them in full until the SDK typing is reconciled. The `DataQueryResponse` Pydantic model also defines a `table: str` field that the actual server response does NOT include; that wrapper will fail validation on every successful 200. The examples below use raw HTTP for these three endpoints so the demos actually run. SDK-typed examples will return once the SDK matches the server contract.
+</Warning>
+
 ## Endpoints
 
-| Method | Path | SDK method | Billable |
-|---|---|---|---|
-| `POST` | `/api/v1/oracle/backtest` | `client.oracle.backtest(req)` | `oracle_backtest` (1 unit; x402 $0.10) |
-| `POST` | `/api/v1/oracle/backtest/async` | `client.oracle.backtest_async(req)` | `oracle_backtest` (1 unit; x402 $0.10) |
-| `GET`  | `/api/v1/oracle/backtest/async/{backtest_id}` | `client.oracle.backtest_poll(id)` | free (metadata) |
-| `POST` | `/api/v1/oracle/backtest/bulk` | `client.oracle.backtest_bulk(req)` | `oracle_backtest` (1 unit per call; x402 $0.10) |
-| `POST` | `/api/v1/oracle/data/query` | `client.oracle.data_query(req)` | `oracle_data_query` (1 unit; x402 $0.01) |
+| Method | Path | Meter | x402 price | Quota counter |
+|---|---|---|---|---|
+| `POST` | `/api/v1/oracle/backtest` | `oracle_backtest` | $0.10 | `api_calls` |
+| `POST` | `/api/v1/oracle/backtest/async` | `oracle_backtest` | $0.10 | `api_calls` |
+| `GET`  | `/api/v1/oracle/backtest/async/{backtest_id}` | `oracle_backtest` | $0.10 | `api_calls` |
+| `POST` | `/api/v1/oracle/backtest/bulk` | `oracle_backtest` | $0.10 | `api_calls` |
+| `POST` | `/api/v1/oracle/data/query` | `oracle_data_query` | $0.10 | `oracle_data_queries` |
 
-Each HTTP call counts as one billable unit regardless of how many trades the backtest produces or how many rows the query returns. The bulk endpoint runs up to 99 strategies in one call against shared OHLCV fetches — pay for the request, not for the fan-out.
+Every HTTP call counts as **1 billable unit**, regardless of how many strategies the bulk endpoint fans out to or how many rows the query returns. Async poll requests are billed at the same rate as the submit — design your polling loop accordingly (5-10s intervals are conventional). The bulk endpoint amortises efficiently: a single billed call can drive up to 99 strategies through shared OHLCV fetches.
+
+Pricing source-of-truth: `MangroveAI/src/MangroveAI/domains/backtesting/oracle_proxy.py::_PROXY_METERING`.
 
 ## Synchronous single-strategy backtest
 
 `POST /api/v1/oracle/backtest`
 
-Runs one strategy against one (asset, interval) pair and blocks until the engine returns the full result. Typical wall-clock is **30–120 seconds** depending on the date range and signal complexity; tune your HTTP client timeout accordingly (the SDK defaults to 180s).
+Runs one strategy against one (asset, interval) pair and blocks until the engine returns the full result. Typical wall-clock is **30–120 seconds** depending on the date range; the SDK default HTTP timeout is 180s.
+
+### Required fields
+
+18 top-level fields, enforced by `MangroveOracle/src/api/routes/backtest.py::run_backtest`:
+
+- `asset`, `strategy_json` — what to run
+- `initial_balance`, `min_balance_threshold`, `min_trade_amount` — account
+- `max_open_positions`, `max_trades_per_day`, `max_risk_per_trade`, `max_units_per_trade`, `max_trade_amount` — risk caps
+- `volatility_window`, `target_volatility`, `volatility_mode`, `enable_volatility_adjustment` — volatility-aware sizing
+- `cooldown_bars`, `daily_momentum_limit`, `weekly_momentum_limit` — circuit breakers
+
+Plus a top-level `execution_config` containing at least `position_size_calc: "v2"` (`v1` legacy also accepted). The engine raises `position_size_calc is required` if it's missing.
+
+Optional: `interval` (defaults to `"1h"`), `lookback_months`, `start_date`, `end_date` (provide one of: explicit start+end, start alone (defaults end to now), or `lookback_months`).
+
+Pull canonical defaults from `GET /api/v1/oracle/exec-config/defaults` to skip hand-rolling these.
 
 ### Request
 
@@ -37,14 +59,36 @@ Runs one strategy against one (asset, interval) pair and blocks until the engine
 {
   "asset": "BTC",
   "interval": "1h",
-  "strategy_json": "{ \"entry\": {...}, \"exit\": {...} }",
+  "strategy_json": "{ \"asset\": \"BTC\", \"interval\": \"1h\", \"entry\": [...], \"exit\": [...] }",
+  "lookback_months": 3,
+
+  "execution_config": {
+    "position_size_calc": "v2",
+    "reward_factor": 2,
+    "atr_period": 14,
+    "atr_volatility_factor": 2.0,
+    "atr_short_weight": 0.95,
+    "atr_long_weight": 0.05,
+    "atr_cap_multiplier": 2.1
+  },
+
   "initial_balance": 10000,
+  "min_balance_threshold": 100,
+  "min_trade_amount": 25,
   "max_open_positions": 1,
-  "max_risk_per_trade": 0.02
+  "max_trades_per_day": 5,
+  "max_risk_per_trade": 0.02,
+  "max_units_per_trade": 1.0,
+  "max_trade_amount": 5000,
+  "volatility_window": 14,
+  "target_volatility": 0.20,
+  "volatility_mode": "off",
+  "enable_volatility_adjustment": false,
+  "cooldown_bars": 24,
+  "daily_momentum_limit": 3,
+  "weekly_momentum_limit": 3
 }
 ```
-
-Required: `asset`, `interval`, `strategy_json` (a JSON-encoded MangroveAI Strategy object). All risk-management / execution fields are optional — the server fills any missing field from the canonical `trading_defaults.json`, so a minimal request is sufficient for exploratory work. See the SDK's `OracleBacktestRequest` model for the full surface.
 
 ### Response
 
@@ -58,13 +102,13 @@ Required: `asset`, `interval`, `strategy_json` (a JSON-encoded MangroveAI Strate
   },
   "execution_time_seconds": 42.1,
   "trade_count": 47,
-  "strategy_names": ["rsi_oversold + ema_uptrend / take_profit_5pct"],
+  "strategy_names": ["..."],
   "trade_history": [{"...": "..."}],
   "denied_signals": []
 }
 ```
 
-`denied_signals` lists signals the engine refused (e.g. unsupported columns, malformed params). Inspect this when `total_trades` comes back lower than expected.
+`denied_signals` lists signals the engine refused (unsupported columns, malformed params). Check this when `trade_count` is lower than expected.
 
 ### Example
 
@@ -73,41 +117,76 @@ Required: `asset`, `interval`, `strategy_json` (a JSON-encoded MangroveAI Strate
 curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/backtest \
   -H "Authorization: Bearer $MANGROVE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "asset": "BTC",
-    "interval": "1h",
-    "strategy_json": "{...}",
-    "initial_balance": 10000
-  }'
+  -d @backtest_request.json
 ```
 
-```python Python
-from mangrove_ai import MangroveAI
-from mangrove_ai.models.oracle import OracleBacktestRequest
+```python Python (raw HTTP)
+import json, requests
 
-client = MangroveAI(api_key="prod_…")
+# Fetch canonical defaults so we don't hand-roll execution_config
+defaults = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/oracle/exec-config/defaults",
+    headers={"Authorization": f"Bearer {API_KEY}"},
+).json()
 
-result = client.oracle.backtest(OracleBacktestRequest(
-    asset="BTC",
-    interval="1h",
-    strategy_json='{...}',
-    initial_balance=10000,
-))
+strategy = {
+    "asset": "BTC", "interval": "1h",
+    "entry": [{"name": "rsi_oversold", "signal_type": "TRIGGER", "timeframe": "1h",
+               "params": {"window": 14, "threshold": 30}}],
+    "exit":  [{"name": "rsi_overbought", "signal_type": "TRIGGER", "timeframe": "1h",
+               "params": {"window": 14, "threshold": 70}}],
+}
 
-print(f"Sharpe: {result.metrics['sharpe']:.2f}")
-print(f"Trades: {result.trade_count}")
+body = {
+    "asset": "BTC", "interval": "1h",
+    "strategy_json": json.dumps(strategy),
+    "lookback_months": 3,
+    "execution_config": {
+        "position_size_calc": defaults["position_size_calc"],
+        "reward_factor":         defaults["reward_factor"],
+        "atr_period":            defaults["atr_period"],
+        "atr_volatility_factor": defaults["atr_volatility_factor"],
+        "atr_short_weight":      defaults["atr_short_weight"],
+        "atr_long_weight":       defaults["atr_long_weight"],
+        "atr_cap_multiplier":    defaults["atr_cap_multiplier"],
+    },
+    "initial_balance":      defaults["initial_balance"],
+    "min_balance_threshold": 100,
+    "min_trade_amount":      defaults["min_trade_amount"],
+    "max_open_positions":    1,
+    "max_trades_per_day":    5,
+    "max_risk_per_trade":    0.02,
+    "max_units_per_trade":   1.0,
+    "max_trade_amount":      5000,
+    "volatility_window":     14,
+    "target_volatility":     0.20,
+    "volatility_mode":       "off",
+    "enable_volatility_adjustment": False,
+    "cooldown_bars":         defaults["cooldown_bars"],
+    "daily_momentum_limit":  defaults["daily_momentum_limit"],
+    "weekly_momentum_limit": defaults["weekly_momentum_limit"],
+}
+
+resp = requests.post(
+    "https://api.mangrovedeveloper.ai/api/v1/oracle/backtest",
+    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+    json=body, timeout=180,
+)
+result = resp.json()
+print(f"success={result['success']} trade_count={result['trade_count']}")
+print(f"metrics: {result['metrics']}")
 ```
 </CodeGroup>
 
 ## Async submit + poll
 
-When 30–120s of blocking is too long — for example, dispatching dozens of backtests from a worker that should remain responsive — use the async pair.
+When 30-120s of blocking is too long — dispatching dozens of backtests from a worker that should stay responsive — use the async pair.
 
 ### Submit
 
 `POST /api/v1/oracle/backtest/async`
 
-Same request body as the sync endpoint. Returns immediately:
+Same request body as the sync endpoint (same 18 required fields + top-level `execution_config`). Returns immediately:
 
 ```json
 { "backtest_id": "bkt_20260603T140212548Z", "status": "queued" }
@@ -126,76 +205,73 @@ Same request body as the sync endpoint. Returns immediately:
 }
 ```
 
-`status` transitions `queued` → `running` → `completed` (or `failed`). Once `completed`, the response carries the full `metrics`/`trade_history`/`trade_count` shape of the synchronous response. Polling the endpoint is **free** (metadata-tier); typical poll interval is 5–10 seconds.
+`status` transitions `queued` → `running` → `completed` (or `failed`). Once `completed`, the response carries the full `metrics`/`trade_history`/`trade_count` shape of the synchronous response. Polling is metered at the same rate as submit ($0.10 / api_calls unit per call); space your polls accordingly.
 
 ### Example
 
-<CodeGroup>
-```bash cURL
-# Submit
-ID=$(curl -s -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async \
-  -H "Authorization: Bearer $MANGROVE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"asset":"BTC","interval":"1h","strategy_json":"{...}"}' \
-  | jq -r .backtest_id)
+```python Python (raw HTTP)
+import time, requests
+
+# Submit (body shape identical to sync /backtest above)
+resp = requests.post(
+    "https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async",
+    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+    json=body,
+)
+backtest_id = resp.json()["backtest_id"]
 
 # Poll
-while true; do
-  status=$(curl -s -H "Authorization: Bearer $MANGROVE_API_KEY" \
-    https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async/$ID | jq -r .status)
-  [[ "$status" == "completed" || "$status" == "failed" ]] && break
-  sleep 5
-done
-```
-
-```python Python
-import time
-
-submission = client.oracle.backtest_async(OracleBacktestRequest(
-    asset="BTC", interval="1h", strategy_json='{...}',
-))
-
 while True:
-    status = client.oracle.backtest_poll(submission.backtest_id)
-    if status.status in ("completed", "failed"):
+    status = requests.get(
+        f"https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async/{backtest_id}",
+        headers={"Authorization": f"Bearer {API_KEY}"},
+    ).json()
+    if status["status"] in ("completed", "failed"):
         break
-    time.sleep(5)
+    time.sleep(10)
 
-print(status.metrics)
+print(status)
 ```
-</CodeGroup>
 
 ## Bulk
 
 `POST /api/v1/oracle/backtest/bulk`
 
-Evaluates many strategies over a **shared date range** with shared OHLCV fetches. One HTTP call, one bill. Up to 99 strategies per request.
+Evaluates many strategies over a **shared date range** with shared OHLCV fetches. One HTTP call, one bill, up to 99 strategies.
 
-This is the right endpoint when you have a SIEVE-filtered shortlist and want to score the survivors quickly — see [SIEVE → live strategy](/guides/sieve-to-live-strategy) for the full workflow.
+The right endpoint when you have a SIEVE-filtered shortlist and want to score the survivors quickly — see [SIEVE → live strategy](/guides/sieve-to-live-strategy) for the full workflow.
+
+### Required fields
+
+17 top-level fields + EXACTLY ONE of `strategy_ids` OR `strategy_configs` (not both), per `MangroveOracle/src/api/routes/backtest.py::run_bulk_backtest`:
+
+- `start_date`, `end_date` — required (no `lookback_months` shortcut on bulk)
+- The same 15 risk-mgmt fields as sync (sans `strategy_json` since each item carries its own)
+- Top-level `execution_config` with `position_size_calc`
+
+`strategy_configs` is `[{asset, interval, strategy_json}, …]`; `strategy_ids` is `[uuid, …]` referencing strategies already created via `client.strategies.create(...)` in MangroveAI.
 
 ### Request
 
 ```json
 {
-  "start_date": "2024-01-01",
-  "end_date":   "2024-12-31",
-  "initial_balance": 10000,
-  "min_balance_threshold": 100,
-  "min_trade_amount": 10,
-  "max_open_positions": 1,
-  "max_trades_per_day": 5,
-  "max_risk_per_trade": 0.02,
-  "max_units_per_trade": 1.0,
-  "max_trade_amount": 5000,
-  "volatility_window": 14,
-  "strategies": [
+  "start_date": "2024-01-01T00:00:00Z",
+  "end_date":   "2024-12-31T00:00:00Z",
+  "strategy_configs": [
     { "asset": "BTC", "interval": "1h", "strategy_json": "{...}" },
     { "asset": "BTC", "interval": "1h", "strategy_json": "{...}" }
-  ]
+  ],
+  "execution_config": { "position_size_calc": "v2" },
+
+  "initial_balance": 10000,
+  "min_balance_threshold": 100, "min_trade_amount": 25,
+  "max_open_positions": 1, "max_trades_per_day": 5,
+  "max_risk_per_trade": 0.02, "max_units_per_trade": 1.0, "max_trade_amount": 5000,
+  "volatility_window": 14, "target_volatility": 0.20,
+  "volatility_mode": "off", "enable_volatility_adjustment": false,
+  "cooldown_bars": 24, "daily_momentum_limit": 3, "weekly_momentum_limit": 3
 }
 ```
-
-All bulk-level execution / risk fields are required; per-strategy fields are not (the server uses the bulk-level defaults). Strategies that share an `(asset, interval)` pair reuse a single OHLCV fetch — the response's `data_fetches` field reports how many unique fetches the engine did.
 
 ### Response
 
@@ -203,88 +279,50 @@ All bulk-level execution / risk fields are required; per-strategy fields are not
 {
   "success": true,
   "results": [
-    { "metrics": {...}, "trade_count": 47,  "strategy_index": 0 },
-    { "metrics": {...}, "trade_count": 12,  "strategy_index": 1 }
+    {"success": true,  "strategy_name": "...", "strategy_id": "...",
+     "metrics": {...}, "trade_count": 47, "execution_time_seconds": 12.4},
+    {"success": false, "strategy_name": "...", "strategy_id": "...",
+     "error": "...", "trade_count": 0, "metrics": {}}
   ],
   "data_fetches": 1,
   "total_execution_time_seconds": 51.2
 }
 ```
 
-### Example
-
-<CodeGroup>
-```python Python
-from mangrove_ai.models.oracle import OracleBulkBacktestRequest
-
-result = client.oracle.backtest_bulk(OracleBulkBacktestRequest(
-    start_date="2024-01-01",
-    end_date="2024-12-31",
-    initial_balance=10000,
-    min_balance_threshold=100,
-    min_trade_amount=10,
-    max_open_positions=1,
-    max_trades_per_day=5,
-    max_risk_per_trade=0.02,
-    max_units_per_trade=1.0,
-    max_trade_amount=5000,
-    volatility_window=14,
-    strategies=[
-        {"asset": "BTC", "interval": "1h", "strategy_json": "{...}"},
-        {"asset": "BTC", "interval": "1h", "strategy_json": "{...}"},
-    ],
-))
-
-for i, r in enumerate(result.results):
-    print(f"Strategy {i}: sharpe={r['metrics'].get('sharpe'):.2f} trades={r['trade_count']}")
-```
-</CodeGroup>
+Individual strategies fail soft — `results[i].success == false` carries an `error` field and an empty `metrics`, but the rest of the batch continues. Input order is preserved: `results[i]` corresponds to `strategy_configs[i]`. `data_fetches` reports how many unique OHLCV fetches the engine did across the strategy list (strategies sharing `(asset, interval)` reuse one fetch).
 
 ## Data query (corpus)
 
 `POST /api/v1/oracle/data/query`
 
-Direct access to Oracle's BigQuery-backed corpus of historical backtest results and OHLCV bars. The proxy whitelists tables and filter operators server-side so the surface stays narrow.
-
-### Whitelist
-
-| Concern | Allowed values |
-|---|---|
-| Tables | `results`, `ohlcv` |
-| Filter ops | `=`, `!=`, `>`, `>=`, `<`, `<=`, `in`, `between` |
-| Tenancy | `WHERE org_id = <caller's org>` is injected by Oracle. Cross-tenant reads are not possible by construction. |
+A constrained DSL over Oracle's BigQuery-backed corpus of historical backtest results and OHLCV bars. The proxy enforces server-side: table whitelist, column whitelist, filter-op whitelist, tenancy injection (`WHERE org_id = <caller>`), and a per-query `maximum_bytes_billed` cap. Customers cannot send raw SQL.
 
 ### Request
 
-```json
-{
-  "table": "results",
-  "select": ["strategy_name", "asset", "interval", "metrics_sharpe", "trade_count"],
-  "filters": [
-    { "col": "asset", "op": "=", "value": "BTC" },
-    { "col": "interval", "op": "=", "value": "1h" },
-    { "col": "metrics_sharpe", "op": ">", "value": 1.0 }
-  ],
-  "order_by": ["metrics_sharpe DESC"],
-  "limit": 50,
-  "offset": 0
-}
-```
+| Field | Type | Notes |
+|---|---|---|
+| `table` | `"results" \| "ohlcv"` | required |
+| `select` | `list[str]` | required, 1-80 columns, whitelisted per table |
+| `filters` | `list[{col, op, value}]` | optional, ≤20 filters |
+| `order_by` | `list[{col, dir}]` | optional, ≤5 orderings; `dir` is `"asc"` or `"desc"` |
+| `limit` | `int` | optional, 1-1000, default 100 |
+| `page_token` | `str` | optional; opaque continuation token from a prior response |
 
-`select` is required; `filters` defaults to `[]`. `order_by` accepts SQL-style column expressions. Default `limit` is 100; the engine caps at 1000.
+`filters[].op` accepts: `"="`, `"!="`, `">"`, `">="`, `"<"`, `"<="`, `"in"`, `"between"` (per `MangroveOracle/src/models/data_query.py::FilterOp`).
 
 ### Response
 
 ```json
 {
-  "rows": [
-    {"strategy_name": "...", "asset": "BTC", "metrics_sharpe": 1.84, "trade_count": 91},
-    {"...": "..."}
-  ],
+  "rows": [{"...": "..."}],
   "row_count": 23,
-  "table": "results"
+  "total_bytes_billed": 10485760,
+  "cost_estimate_usd": 0.0000596,
+  "next_page_token": null
 }
 ```
+
+`total_bytes_billed` is the actual BigQuery-billed scan in bytes (used to compute the customer's invoice line for this call); `cost_estimate_usd` is that figure converted at GCP's published per-TB rate. `next_page_token` is non-null when more rows are available — pass it back as `page_token` to continue.
 
 ### Example
 
@@ -295,45 +333,48 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/data/query \
   -H "Content-Type: application/json" \
   -d '{
     "table": "results",
-    "select": ["strategy_name","metrics_sharpe","trade_count"],
-    "filters": [{"col":"asset","op":"=","value":"BTC"}],
-    "order_by": ["metrics_sharpe DESC"],
+    "select": ["strategy_name", "asset", "timeframe"],
+    "filters": [{"col": "asset", "op": "=", "value": "BTC"}],
+    "order_by": [{"col": "strategy_name", "dir": "desc"}],
     "limit": 20
   }'
 ```
 
-```python Python
-from mangrove_ai.models.oracle import DataQueryRequest, DataQueryFilter
+```python Python (raw HTTP)
+import requests
 
-result = client.oracle.data_query(DataQueryRequest(
-    table="results",
-    select=["strategy_name", "metrics_sharpe", "trade_count"],
-    filters=[DataQueryFilter(col="asset", op="=", value="BTC")],
-    order_by=["metrics_sharpe DESC"],
-    limit=20,
-))
-
-for row in result.rows:
+resp = requests.post(
+    "https://api.mangrovedeveloper.ai/api/v1/oracle/data/query",
+    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+    json={
+        "table": "results",
+        "select": ["strategy_name", "asset", "timeframe"],
+        "filters": [{"col": "asset", "op": "=", "value": "BTC"}],
+        "order_by": [{"col": "strategy_name", "dir": "desc"}],
+        "limit": 20,
+    },
+)
+data = resp.json()
+print(f"Got {data['row_count']} rows; billed {data['total_bytes_billed']:,} bytes "
+      f"(${data['cost_estimate_usd']:.6f})")
+for row in data["rows"]:
     print(row)
 ```
 </CodeGroup>
 
-## Costs
+## Costs (summary)
 
-| Action | Quota unit | x402 price |
+| Endpoint | Per-call | Quota counter |
 |---|---|---|
-| Each `POST /backtest`, `POST /backtest/async`, or `POST /backtest/bulk` call | `oracle_backtest` (1 unit) | $0.10 |
-| `POST /data/query` | `oracle_data_query` (1 unit) | $0.01 |
-| `GET /backtest/async/{id}` poll | free (metadata) | — |
+| All four `/backtest*` endpoints | $0.10 x402 / 1 unit | `api_calls` |
+| `/data/query` | $0.10 x402 / 1 unit | `oracle_data_queries` |
 
-The bulk endpoint amortises efficiently: one billed call fans out internally to up to 99 strategy evaluations. The async endpoint costs the same as sync — pick async when the wall-clock matters for your caller, not to save on billing.
-
-See [Pricing](/api-reference/overview#pricing) for tier monthly caps on `oracle_backtest` / `oracle_data_query` resource buckets.
+See [Pricing](/api-reference/overview#pricing) for tier monthly caps. Source of truth: `MangroveAI/src/MangroveAI/domains/backtesting/oracle_proxy.py::_PROXY_METERING`.
 
 ## Related
 
 - [Experiments](/api-reference/experiments) — multi-strategy parameter sweeps with managed lifecycle (`create` → `validate` → `launch` → poll results). Use experiments when the parameter grid is larger than a single bulk request can hold.
-- [SIEVE classifier](/api-reference/sieve) — score 1–99 candidate strategies in milliseconds before paying for backtests. Pre-filter aggressively when the candidate set is hundreds wide.
+- [SIEVE classifier](/api-reference/sieve) — score 1-99 candidate strategies in milliseconds before paying for backtests.
 - [Deployed strategies](/api-reference/oracle-deployed) — live execution state for curated paper-trading strategies, not for ad-hoc backtests.
-- [SIEVE → live strategy walkthrough](/guides/sieve-to-live-strategy) — end-to-end demo combining list-signals, SIEVE, bulk-backtest, and `update_status('paper')`.
-- [`mangroveai` Python SDK](/sdks/mangroveai) — `client.oracle.backtest(...)`, `backtest_async(...)`, `backtest_poll(...)`, `backtest_bulk(...)`, `data_query(...)` are typed wrappers as of SDK v1.4.0.
+- [SIEVE → live strategy walkthrough](/guides/sieve-to-live-strategy) — end-to-end demo: list-signals, SIEVE, sweep via experiments, adopt.
+- [`mangroveai` Python SDK](/sdks/mangroveai) — typed wrappers exist as of SDK v1.4.0, but with caveats above. Until reconciled, raw HTTP examples are the source of truth.
