@@ -1,0 +1,339 @@
+---
+title: "Oracle backtest & data query"
+description: "Single-strategy backtests (sync, async, and bulk) plus the BigQuery-backed corpus query for reading historical sweep results and OHLCV bars."
+---
+
+# Oracle backtest & data query
+
+This page covers the **single-strategy** subset of the Oracle engine plus the corpus query API. For multi-strategy parameter sweeps see [Experiments](/api-reference/experiments); for the curated paper-trading dashboard surface see [Deployed strategies](/api-reference/oracle-deployed).
+
+<Note>
+**Disambiguation.** `/api/v1/oracle/backtest*` (this page) runs through Mangrove Oracle — a faster engine optimised for batch and sweep workloads. `/api/v1/backtesting/run` (see [Backtesting](/api-reference/backtesting)) runs through the legacy MangroveAI strategy engine. New code should target the Oracle endpoints documented here.
+</Note>
+
+All endpoints sit under `/api/v1/oracle/` on the MangroveAI gateway and are forwarded to the Oracle engine with your identity attached. Auth: API key or JWT, same as the rest of `/api/v1/*`.
+
+## Endpoints
+
+| Method | Path | SDK method | Billable |
+|---|---|---|---|
+| `POST` | `/api/v1/oracle/backtest` | `client.oracle.backtest(req)` | `oracle_backtest` (1 unit; x402 $0.10) |
+| `POST` | `/api/v1/oracle/backtest/async` | `client.oracle.backtest_async(req)` | `oracle_backtest` (1 unit; x402 $0.10) |
+| `GET`  | `/api/v1/oracle/backtest/async/{backtest_id}` | `client.oracle.backtest_poll(id)` | free (metadata) |
+| `POST` | `/api/v1/oracle/backtest/bulk` | `client.oracle.backtest_bulk(req)` | `oracle_backtest` (1 unit per call; x402 $0.10) |
+| `POST` | `/api/v1/oracle/data/query` | `client.oracle.data_query(req)` | `oracle_data_query` (1 unit; x402 $0.01) |
+
+Each HTTP call counts as one billable unit regardless of how many trades the backtest produces or how many rows the query returns. The bulk endpoint runs up to 99 strategies in one call against shared OHLCV fetches — pay for the request, not for the fan-out.
+
+## Synchronous single-strategy backtest
+
+`POST /api/v1/oracle/backtest`
+
+Runs one strategy against one (asset, interval) pair and blocks until the engine returns the full result. Typical wall-clock is **30–120 seconds** depending on the date range and signal complexity; tune your HTTP client timeout accordingly (the SDK defaults to 180s).
+
+### Request
+
+```json
+{
+  "asset": "BTC",
+  "interval": "1h",
+  "strategy_json": "{ \"entry\": {...}, \"exit\": {...} }",
+  "initial_balance": 10000,
+  "max_open_positions": 1,
+  "max_risk_per_trade": 0.02
+}
+```
+
+Required: `asset`, `interval`, `strategy_json` (a JSON-encoded MangroveAI Strategy object). All risk-management / execution fields are optional — the server fills any missing field from the canonical `trading_defaults.json`, so a minimal request is sufficient for exploratory work. See the SDK's `OracleBacktestRequest` model for the full surface.
+
+### Response
+
+```json
+{
+  "success": true,
+  "metrics": {
+    "sharpe": 1.42, "sortino": 1.88, "calmar": 0.94,
+    "max_drawdown": 0.31, "win_rate": 0.58, "total_trades": 47,
+    "final_balance": 11820.5, "...": "..."
+  },
+  "execution_time_seconds": 42.1,
+  "trade_count": 47,
+  "strategy_names": ["rsi_oversold + ema_uptrend / take_profit_5pct"],
+  "trade_history": [{"...": "..."}],
+  "denied_signals": []
+}
+```
+
+`denied_signals` lists signals the engine refused (e.g. unsupported columns, malformed params). Inspect this when `total_trades` comes back lower than expected.
+
+### Example
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/backtest \
+  -H "Authorization: Bearer $MANGROVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "asset": "BTC",
+    "interval": "1h",
+    "strategy_json": "{...}",
+    "initial_balance": 10000
+  }'
+```
+
+```python Python
+from mangrove_ai import MangroveAI
+from mangrove_ai.models.oracle import OracleBacktestRequest
+
+client = MangroveAI(api_key="prod_…")
+
+result = client.oracle.backtest(OracleBacktestRequest(
+    asset="BTC",
+    interval="1h",
+    strategy_json='{...}',
+    initial_balance=10000,
+))
+
+print(f"Sharpe: {result.metrics['sharpe']:.2f}")
+print(f"Trades: {result.trade_count}")
+```
+</CodeGroup>
+
+## Async submit + poll
+
+When 30–120s of blocking is too long — for example, dispatching dozens of backtests from a worker that should remain responsive — use the async pair.
+
+### Submit
+
+`POST /api/v1/oracle/backtest/async`
+
+Same request body as the sync endpoint. Returns immediately:
+
+```json
+{ "backtest_id": "bkt_20260603T140212548Z", "status": "queued" }
+```
+
+### Poll
+
+`GET /api/v1/oracle/backtest/async/{backtest_id}`
+
+```json
+{
+  "backtest_id": "bkt_20260603T140212548Z",
+  "status": "running",
+  "metrics": null,
+  "trade_history": null
+}
+```
+
+`status` transitions `queued` → `running` → `completed` (or `failed`). Once `completed`, the response carries the full `metrics`/`trade_history`/`trade_count` shape of the synchronous response. Polling the endpoint is **free** (metadata-tier); typical poll interval is 5–10 seconds.
+
+### Example
+
+<CodeGroup>
+```bash cURL
+# Submit
+ID=$(curl -s -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async \
+  -H "Authorization: Bearer $MANGROVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"asset":"BTC","interval":"1h","strategy_json":"{...}"}' \
+  | jq -r .backtest_id)
+
+# Poll
+while true; do
+  status=$(curl -s -H "Authorization: Bearer $MANGROVE_API_KEY" \
+    https://api.mangrovedeveloper.ai/api/v1/oracle/backtest/async/$ID | jq -r .status)
+  [[ "$status" == "completed" || "$status" == "failed" ]] && break
+  sleep 5
+done
+```
+
+```python Python
+import time
+
+submission = client.oracle.backtest_async(OracleBacktestRequest(
+    asset="BTC", interval="1h", strategy_json='{...}',
+))
+
+while True:
+    status = client.oracle.backtest_poll(submission.backtest_id)
+    if status.status in ("completed", "failed"):
+        break
+    time.sleep(5)
+
+print(status.metrics)
+```
+</CodeGroup>
+
+## Bulk
+
+`POST /api/v1/oracle/backtest/bulk`
+
+Evaluates many strategies over a **shared date range** with shared OHLCV fetches. One HTTP call, one bill. Up to 99 strategies per request.
+
+This is the right endpoint when you have a SIEVE-filtered shortlist and want to score the survivors quickly — see [SIEVE → live strategy](/guides/sieve-to-live-strategy) for the full workflow.
+
+### Request
+
+```json
+{
+  "start_date": "2024-01-01",
+  "end_date":   "2024-12-31",
+  "initial_balance": 10000,
+  "min_balance_threshold": 100,
+  "min_trade_amount": 10,
+  "max_open_positions": 1,
+  "max_trades_per_day": 5,
+  "max_risk_per_trade": 0.02,
+  "max_units_per_trade": 1.0,
+  "max_trade_amount": 5000,
+  "volatility_window": 14,
+  "strategies": [
+    { "asset": "BTC", "interval": "1h", "strategy_json": "{...}" },
+    { "asset": "BTC", "interval": "1h", "strategy_json": "{...}" }
+  ]
+}
+```
+
+All bulk-level execution / risk fields are required; per-strategy fields are not (the server uses the bulk-level defaults). Strategies that share an `(asset, interval)` pair reuse a single OHLCV fetch — the response's `data_fetches` field reports how many unique fetches the engine did.
+
+### Response
+
+```json
+{
+  "success": true,
+  "results": [
+    { "metrics": {...}, "trade_count": 47,  "strategy_index": 0 },
+    { "metrics": {...}, "trade_count": 12,  "strategy_index": 1 }
+  ],
+  "data_fetches": 1,
+  "total_execution_time_seconds": 51.2
+}
+```
+
+### Example
+
+<CodeGroup>
+```python Python
+from mangrove_ai.models.oracle import OracleBulkBacktestRequest
+
+result = client.oracle.backtest_bulk(OracleBulkBacktestRequest(
+    start_date="2024-01-01",
+    end_date="2024-12-31",
+    initial_balance=10000,
+    min_balance_threshold=100,
+    min_trade_amount=10,
+    max_open_positions=1,
+    max_trades_per_day=5,
+    max_risk_per_trade=0.02,
+    max_units_per_trade=1.0,
+    max_trade_amount=5000,
+    volatility_window=14,
+    strategies=[
+        {"asset": "BTC", "interval": "1h", "strategy_json": "{...}"},
+        {"asset": "BTC", "interval": "1h", "strategy_json": "{...}"},
+    ],
+))
+
+for i, r in enumerate(result.results):
+    print(f"Strategy {i}: sharpe={r['metrics'].get('sharpe'):.2f} trades={r['trade_count']}")
+```
+</CodeGroup>
+
+## Data query (corpus)
+
+`POST /api/v1/oracle/data/query`
+
+Direct access to Oracle's BigQuery-backed corpus of historical backtest results and OHLCV bars. The proxy whitelists tables and filter operators server-side so the surface stays narrow.
+
+### Whitelist
+
+| Concern | Allowed values |
+|---|---|
+| Tables | `results`, `ohlcv` |
+| Filter ops | `=`, `!=`, `>`, `>=`, `<`, `<=`, `in`, `between` |
+| Tenancy | `WHERE org_id = <caller's org>` is injected by Oracle. Cross-tenant reads are not possible by construction. |
+
+### Request
+
+```json
+{
+  "table": "results",
+  "select": ["strategy_name", "asset", "interval", "metrics_sharpe", "trade_count"],
+  "filters": [
+    { "col": "asset", "op": "=", "value": "BTC" },
+    { "col": "interval", "op": "=", "value": "1h" },
+    { "col": "metrics_sharpe", "op": ">", "value": 1.0 }
+  ],
+  "order_by": ["metrics_sharpe DESC"],
+  "limit": 50,
+  "offset": 0
+}
+```
+
+`select` is required; `filters` defaults to `[]`. `order_by` accepts SQL-style column expressions. Default `limit` is 100; the engine caps at 1000.
+
+### Response
+
+```json
+{
+  "rows": [
+    {"strategy_name": "...", "asset": "BTC", "metrics_sharpe": 1.84, "trade_count": 91},
+    {"...": "..."}
+  ],
+  "row_count": 23,
+  "table": "results"
+}
+```
+
+### Example
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/data/query \
+  -H "Authorization: Bearer $MANGROVE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "table": "results",
+    "select": ["strategy_name","metrics_sharpe","trade_count"],
+    "filters": [{"col":"asset","op":"=","value":"BTC"}],
+    "order_by": ["metrics_sharpe DESC"],
+    "limit": 20
+  }'
+```
+
+```python Python
+from mangrove_ai.models.oracle import DataQueryRequest, DataQueryFilter
+
+result = client.oracle.data_query(DataQueryRequest(
+    table="results",
+    select=["strategy_name", "metrics_sharpe", "trade_count"],
+    filters=[DataQueryFilter(col="asset", op="=", value="BTC")],
+    order_by=["metrics_sharpe DESC"],
+    limit=20,
+))
+
+for row in result.rows:
+    print(row)
+```
+</CodeGroup>
+
+## Costs
+
+| Action | Quota unit | x402 price |
+|---|---|---|
+| Each `POST /backtest`, `POST /backtest/async`, or `POST /backtest/bulk` call | `oracle_backtest` (1 unit) | $0.10 |
+| `POST /data/query` | `oracle_data_query` (1 unit) | $0.01 |
+| `GET /backtest/async/{id}` poll | free (metadata) | — |
+
+The bulk endpoint amortises efficiently: one billed call fans out internally to up to 99 strategy evaluations. The async endpoint costs the same as sync — pick async when the wall-clock matters for your caller, not to save on billing.
+
+See [Pricing](/api-reference/overview#pricing) for tier monthly caps on `oracle_backtest` / `oracle_data_query` resource buckets.
+
+## Related
+
+- [Experiments](/api-reference/experiments) — multi-strategy parameter sweeps with managed lifecycle (`create` → `validate` → `launch` → poll results). Use experiments when the parameter grid is larger than a single bulk request can hold.
+- [SIEVE classifier](/api-reference/sieve) — score 1–99 candidate strategies in milliseconds before paying for backtests. Pre-filter aggressively when the candidate set is hundreds wide.
+- [Deployed strategies](/api-reference/oracle-deployed) — live execution state for curated paper-trading strategies, not for ad-hoc backtests.
+- [SIEVE → live strategy walkthrough](/guides/sieve-to-live-strategy) — end-to-end demo combining list-signals, SIEVE, bulk-backtest, and `update_status('paper')`.
+- [`mangroveai` Python SDK](/sdks/mangroveai) — `client.oracle.backtest(...)`, `backtest_async(...)`, `backtest_poll(...)`, `backtest_bulk(...)`, `data_query(...)` are typed wrappers as of SDK v1.4.0.

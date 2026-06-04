@@ -64,6 +64,7 @@
         "api-reference/signals",
         "api-reference/backtesting",
         "api-reference/experiments",
+        "api-reference/oracle-backtest",
         "api-reference/oracle-deployed",
         "api-reference/sieve",
         "api-reference/ai-copilot",
