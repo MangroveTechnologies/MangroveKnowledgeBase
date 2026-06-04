@@ -1,0 +1,303 @@
+---
+title: "End-to-end workflow with Mangrove SIEVE"
+description: "Combine SIEVE pre-filtering, bulk backtesting, and the strategy lifecycle to go from a signal mix to a running strategy in four phases."
+---
+
+# End-to-end workflow with Mangrove SIEVE
+
+This guide walks the full chain from "I have a signal mix I want to explore" to "I have a strategy registered and running on MangroveAI."
+
+Four phases:
+
+<Steps>
+  <Step title="Discover the signal catalog" />
+  <Step title="Generate candidates + SIEVE filter" />
+  <Step title="Bulk-backtest the top survivors" />
+  <Step title="Register the winner + run it" />
+</Steps>
+
+Each phase corresponds to one or two SDK calls. The Python tabs use the `mangroveai` SDK 1.4.0+; the cURL tabs hit the underlying `/api/v1/*` surface directly.
+
+<Note>
+**Tier note.** Beginner accounts cap at 10 SIEVE calls / month, 2 sweep launches / month, and quotas on backtests. This walkthrough fits inside those caps if you keep candidates ≤99 (one SIEVE call) and one experiment of ≤99 backtests. The Pro tier unlocks larger sweeps if you want to widen the candidate pool.
+</Note>
+
+## Prerequisites
+
+- A MangroveAI API key (`prod_…`). See [Authentication](/authentication).
+- The `mangroveai` Python SDK 1.4.0+ (`pip install -U mangroveai`).
+
+<CodeGroup>
+```bash cURL
+export TOKEN="prod_..."
+export BASE="https://api.mangrovedeveloper.ai"
+```
+
+```python Python
+from mangrove_ai import MangroveAI
+
+client = MangroveAI(api_key="prod_...")
+```
+</CodeGroup>
+
+## Phase 1 — Discover the signal catalog
+
+The Oracle catalog ships 223 signals across five categories (momentum, trend, volume, volatility, patterns). Each signal carries a type (`TRIGGER` or `FILTER`) and a `requires` list naming the OHLCV columns it consumes.
+
+`list_signals()` returns a list of plain dicts (one per signal) — keyed by `"name"`, `"type"`, `"params"`, `"requires"`, `"category"`, `"description"`.
+
+<CodeGroup>
+```python Python
+catalog = client.oracle.list_signals()
+print(f"{len(catalog)} signals")
+
+# Pick a small mix: one entry trigger + one entry filter + one exit trigger
+entry_trigger = next(s for s in catalog if s["name"] == "rsi_oversold")
+entry_filter  = next(s for s in catalog if s["name"] == "is_above_sma")
+exit_trigger  = next(s for s in catalog if s["name"] == "rsi_overbought")
+
+print(f"Entry trigger: {entry_trigger['name']}  (type={entry_trigger['type']})")
+print(f"Entry filter:  {entry_filter['name']}   (type={entry_filter['type']})")
+print(f"Exit trigger:  {exit_trigger['name']}   (type={exit_trigger['type']})")
+```
+
+```bash cURL
+curl -H "Authorization: Bearer $TOKEN" $BASE/api/v1/oracle/signals \
+  | jq '.[] | select(.name == "rsi_oversold" or .name == "is_above_sma" or .name == "rsi_overbought")'
+```
+</CodeGroup>
+
+For deeper inspection of any signal's parameters see [Signals reference](/signals).
+
+## Phase 2 — Generate candidates + SIEVE filter
+
+Build N parameter combinations of the chosen signal mix, then score them in one round-trip through [SIEVE](/api-reference/sieve). The 4-class head tells you which combinations are most likely to win.
+
+```python Python
+import itertools
+from mangrove_ai.models.oracle import SieveScoreRequest
+
+# Sweep three params (~24 candidates). Stay well under 99 per SIEVE call.
+candidates = []
+for rsi_window, oversold, sma_window in itertools.product(
+    [7, 14, 21],
+    [25, 30],
+    [50, 100, 200, 300],
+):
+    candidates.append({
+        "asset": "BTC",
+        "entry": [
+            {"name": "rsi_oversold",  "signal_type": "TRIGGER", "timeframe": "1h",
+             "params": {"window": rsi_window, "threshold": oversold}},
+            {"name": "is_above_sma",  "signal_type": "FILTER",  "timeframe": "1h",
+             "params": {"window": sma_window}},
+        ],
+        "exit": [
+            {"name": "rsi_overbought", "signal_type": "TRIGGER", "timeframe": "1h",
+             "params": {"window": rsi_window, "threshold": 70}},
+        ],
+        "execution_config": {"reward_factor": 2.0, "max_risk_per_trade": 0.01},
+    })
+
+print(f"Built {len(candidates)} candidates")
+```
+
+Score them all in one call (note: `sieve_score` takes a `SieveScoreRequest` object, not a bare `strategies=` keyword):
+
+```python Python
+response = client.oracle.sieve_score(SieveScoreRequest(strategies=candidates))
+
+scored = list(zip(candidates, response.predictions))
+
+# Drop strategies SIEVE thinks won't fire at all
+will_trade = [
+    (cand, pred) for cand, pred in scored
+    if pred.binary["p_no_trades"] < 0.5
+]
+print(f"After binary filter: {len(will_trade)} / {len(candidates)} survive")
+
+# Rank survivors by P(winning)
+ranked = sorted(
+    will_trade,
+    key=lambda sp: sp[1].four_class["winning"],
+    reverse=True,
+)
+top_10 = [cand for cand, _ in ranked[:10]]
+
+# Provenance is in the response
+print(f"model_version={response.model_version}")
+print(f"code_version={response.code_version}")
+```
+
+<Tip>
+**Each `sieve_score` call is one billable `oracle_sieve_calls` unit, regardless of how many strategies are in the batch.** Pack the batch as close to 99 as you can — it's the same cost as scoring 1.
+</Tip>
+
+## Phase 3 — Bulk-backtest the top survivors
+
+The cleanest endpoint for "backtest these specific N candidates with the same date range and risk config" is `POST /api/v1/oracle/backtest/bulk`. One HTTP call, shared OHLCV fetches across the batch, results in a single response.
+
+<Note>
+This guide uses raw HTTP (Python `requests`) for the bulk-backtest step. The `mangroveai` SDK 1.4.0 typed wrapper currently marks the 17 required risk-mgmt fields as `Optional` (`None` default), but the server requires every one explicitly — see the warning callout on [Oracle backtest](/api-reference/oracle-backtest) for the SDK ↔ server contract gap. Until the SDK Optional typing is reconciled, raw HTTP is the cleanest pattern.
+</Note>
+
+Convert each SIEVE-survived candidate into a `strategy_configs` entry, fetch canonical execution defaults, then issue one bulk call:
+
+```python Python
+import json
+import requests
+
+API_KEY = "prod_..."  # same key used for the SDK above
+BASE    = "https://api.mangrovedeveloper.ai"
+HEADERS = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+
+# Canonical execution_config defaults
+defaults = requests.get(f"{BASE}/api/v1/oracle/exec-config/defaults", headers=HEADERS).json()
+
+# Wrap each candidate into the bulk-backtest strategy_configs shape
+strategy_configs = [
+    {
+        "asset": cand["asset"],
+        "interval": "1h",
+        "strategy_json": json.dumps({
+            "asset":  cand["asset"],
+            "interval": "1h",
+            "entry":  cand["entry"],
+            "exit":   cand["exit"],
+        }),
+    }
+    for cand in top_10
+]
+
+body = {
+    "start_date": "2024-01-01T00:00:00Z",
+    "end_date":   "2024-12-31T00:00:00Z",
+    "strategy_configs": strategy_configs,
+    "execution_config": {
+        "position_size_calc": defaults["position_size_calc"],  # required: 'v2'
+    },
+    # 15 required risk-mgmt fields — populate from canonical defaults
+    "initial_balance":       defaults["initial_balance"],
+    "min_balance_threshold": 100,
+    "min_trade_amount":      defaults["min_trade_amount"],
+    "max_open_positions":    1,
+    "max_trades_per_day":    5,
+    "max_risk_per_trade":    0.02,
+    "max_units_per_trade":   1.0,
+    "max_trade_amount":      5000,
+    "volatility_window":     14,
+    "target_volatility":     0.20,
+    "volatility_mode":       "off",
+    "enable_volatility_adjustment": False,
+    "cooldown_bars":         defaults["cooldown_bars"],
+    "daily_momentum_limit":  defaults["daily_momentum_limit"],
+    "weekly_momentum_limit": defaults["weekly_momentum_limit"],
+}
+
+resp = requests.post(f"{BASE}/api/v1/oracle/backtest/bulk",
+                     headers=HEADERS, json=body, timeout=300)
+data = resp.json()
+print(f"Bulk: {len(data['results'])} results in "
+      f"{data['total_execution_time_seconds']:.1f}s, "
+      f"{data['data_fetches']} OHLCV fetch(es)")
+```
+
+Pick the winner. Rank by Sortino (downside-aware), fall back to Sharpe on ties:
+
+```python Python
+# Each entry in data["results"] has the shape:
+#   {"success": bool, "strategy_name": str, "strategy_id": str,
+#    "metrics": {...}, "trade_count": int,
+#    "execution_time_seconds": float, "error": str | None}
+# `strategy_configs` preserves input order — data["results"][i] corresponds
+# to strategy_configs[i] / top_10[i].
+successful = [(i, r) for i, r in enumerate(data["results"]) if r.get("success")]
+
+ranked_bt = sorted(
+    successful,
+    key=lambda ir: (
+        ir[1]["metrics"].get("sortino", 0),
+        ir[1]["metrics"].get("sharpe", 0),
+    ),
+    reverse=True,
+)
+best_idx, best = ranked_bt[0]
+print(f"Best by Sortino:")
+print(f"  sortino={best['metrics']['sortino']:.2f}")
+print(f"  sharpe={best['metrics']['sharpe']:.2f}")
+print(f"  win_rate={best['metrics']['win_rate']:.2%}")
+print(f"  max_drawdown={best['metrics']['max_drawdown']:.2%}")
+print(f"  trades={best['trade_count']}")
+```
+
+If your winner has `trade_count == 0`, the surviving candidates didn't fire entries in this window — widen the parameter ranges in Phase 2 and re-rank. SIEVE's `p_no_trades` is the cheaper place to catch that.
+
+For the full request/response shape see [Oracle backtest reference](/api-reference/oracle-backtest). For larger sweeps with a managed lifecycle, see [Experiments](/api-reference/experiments).
+
+## Phase 4 — Register the winner + run it
+
+The winning candidate becomes a registered MangroveAI strategy. From there, you choose how to run it.
+
+```python Python
+from mangrove_ai.models.strategies import CreateStrategyRequest
+
+# Match the winning configuration back to its candidate
+# best_idx came from the bulk response — strategy_configs preserved input order
+winner_candidate = top_10[best_idx]  # the SIEVE candidate object
+
+created_strategy = client.strategies.create(CreateStrategyRequest(
+    name=f"sieve-winner-{winner_candidate['asset']}-1h",
+    description="Top performer from SIEVE + bulk backtest, BTC 1h 2024",
+    asset=winner_candidate["asset"],
+    entry=winner_candidate["entry"],
+    exit=winner_candidate["exit"],
+    execution_config=winner_candidate["execution_config"],
+))
+print(f"Created strategy: {created_strategy.id}")
+```
+
+### Running it
+
+`client.strategies.update_status(strategy_id, status)` transitions the strategy. Pick the path that matches your appetite:
+
+```python Python
+# Option A — go live immediately (real capital, real fills via mangrovemarkets)
+client.strategies.update_status(created_strategy.id, "live")
+
+# Option B — paper trade first (simulated fills, no on-chain exposure)
+client.strategies.update_status(created_strategy.id, "paper")
+```
+
+Either way the platform schedules evaluations on the strategy's timeframe and the signal starts running. Paper mode lets you watch how the strategy behaves against live OHLCV before committing capital; live mode skips the simulation and trades on a real wallet from day one.
+
+### Live trading gating
+
+Going `live` is gated server-side on a wallet with a confirmed backup, an allocation block (`wallet_address`, `token`, `amount`, `slippage_pct`), and an explicit confirmation flag — none of which are exposed by `strategies.update_status(strategy_id, status)` in SDK 1.4.0. The live transition currently requires a raw PATCH against `/api/v1/strategies/{id}/status` with the allocation block in the body. See [Creating a strategy](/guides/creating-a-strategy) for the live contract and wallet-connect gating. Paper trading has no such gating and can run anywhere.
+
+## Saving the provenance
+
+Every SIEVE response carries `model_version` and `code_version`; experiment results carry their own provenance stamps. Log them next to every decision so a future you can tell which model + corpus snapshot drove the call.
+
+```python Python
+import datetime, json
+
+decision_log = {
+    "winner_strategy_id": created_strategy.id,
+    "sieve_p_winning":    ranked[best_idx][1].four_class["winning"],
+    "backtest_sortino":   best["metrics"]["sortino"],
+    "backtest_sharpe":    best["metrics"]["sharpe"],
+    "sieve_model_version": response.model_version,
+    "sieve_code_version":  response.code_version,
+    "decided_at":         datetime.datetime.utcnow().isoformat(),
+}
+print(json.dumps(decision_log, indent=2))
+```
+
+## See also
+
+- [Filtering Strategies with Mangrove SIEVE](/guides/using-sieve-prefilter) — deeper dive on the SIEVE prefilter step in isolation
+- [Oracle backtest reference](/api-reference/oracle-backtest) — full request/response shapes for the single-strategy backtest endpoints + data corpus query
+- [Experiments](/api-reference/experiments) — the sweep lifecycle used in Phase 3
+- [SIEVE API reference](/api-reference/sieve) — endpoint details for `sieve/score`
+- [Creating a strategy](/guides/creating-a-strategy) — strategy-object shape, status transitions, and the wallet/allocation gating for `live`
+- [`mangroveai` Python SDK](/sdks/mangroveai)
