@@ -1,12 +1,12 @@
 ---
 title: "Signal Catalog"
-description: "Index of all 223 trading signals across 5 categories."
+description: "Index of all 233 trading signals across 6 categories."
 ---
 
 # Signal Catalog
 
-Complete reference for all **223** trading signals 
-(108 TRIGGER, 115 FILTER) organized by category.
+Complete reference for all **233** trading signals 
+(112 TRIGGER, 121 FILTER) organized by category.
 
 See [Signals Overview](/signals/overview) for an introduction to how signals work.
 
@@ -19,6 +19,7 @@ See [Signals Overview](/signals/overview) for an introduction to how signals wor
 | Volume | 33 | [/signals/catalog/volume](/signals/catalog/volume) |
 | Volatility | 20 | [/signals/catalog/volatility](/signals/catalog/volatility) |
 | Patterns | 40 | [/signals/catalog/patterns](/signals/catalog/patterns) |
+| On-Chain | 10 | [/signals/catalog/on-chain](/signals/catalog/on-chain) |
 
 ## All signals
 
@@ -247,7 +248,17 @@ See [Signals Overview](/signals/overview) for an introduction to how signals wor
 | [`tweezer_tops_trigger`](/signals/catalog/patterns) | TRIGGER | Patterns | Open, High, Low, Close |
 | [`two_bar_reversal_bearish_trigger`](/signals/catalog/patterns) | TRIGGER | Patterns | Open, High, Low, Close |
 | [`two_bar_reversal_bullish_trigger`](/signals/catalog/patterns) | TRIGGER | Patterns | Open, High, Low, Close |
+| [`exchange_net_outflow`](/signals/catalog/on-chain) | FILTER | On-Chain | ExchangeNetflow |
+| [`exchange_outflow_spike`](/signals/catalog/on-chain) | TRIGGER | On-Chain | ExchangeNetflow |
+| [`holder_concentration_falling`](/signals/catalog/on-chain) | FILTER | On-Chain | HolderConcentration |
+| [`holder_concentration_low`](/signals/catalog/on-chain) | FILTER | On-Chain | HolderConcentration |
+| [`smart_money_holdings_cross`](/signals/catalog/on-chain) | TRIGGER | On-Chain | SmartMoneyHoldings |
+| [`smart_money_holdings_rising`](/signals/catalog/on-chain) | FILTER | On-Chain | SmartMoneyHoldings |
+| [`smart_money_inflow_spike`](/signals/catalog/on-chain) | TRIGGER | On-Chain | SmartMoneyNetflow |
+| [`smart_money_net_positive`](/signals/catalog/on-chain) | FILTER | On-Chain | SmartMoneyNetflow |
+| [`whale_accumulation_trigger`](/signals/catalog/on-chain) | TRIGGER | On-Chain | WhaleNetInflow |
+| [`whale_net_accumulation`](/signals/catalog/on-chain) | FILTER | On-Chain | WhaleNetInflow |
 
 ---
 
-_Generated from docstring metadata. 223 signals total (108 TRIGGER, 115 FILTER)._
+_Generated from docstring metadata. 233 signals total (112 TRIGGER, 121 FILTER)._

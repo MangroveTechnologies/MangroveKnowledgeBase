@@ -13,8 +13,8 @@ We surface coverage honestly. Where we expose 100% of a provider's plan, we say 
 
 | Provider | Plan | Mangrove route prefix | Coverage |
 |---|---|---|---|
-| **Nansen** | Pro | `/on-chain/*` + `/crypto-assets/{token-holders,flow-intelligence,smart-money/*}` | **100% of plan** (11 routes) |
-| **WhaleAlert** | Enterprise REST | `/on-chain/{whale-transactions,exchange-flows,whale-activity}` | 100% of available surface |
+| **Nansen** | Pro | `/on-chain/*` + `/crypto-assets/{token-holders,flow-intelligence,smart-money/*}` | Smart-money, Token God Mode (incl. hourly `tgm/flows` series), + `/v1beta1` backtesting family |
+| **WhaleAlert** | **Developer** | `/on-chain/{whale-transactions,exchange-flows,whale-activity}` | Full Developer surface; **30-day history cap**, ~10 req/min |
 | **X (Twitter)** | Pro v2 | `/social/*` | partial -- sentiment, mentions, influence |
 | **DeFiLlama** | API tier | `/defi/*` | partial -- protocol TVL, chain TVL, stablecoin metrics |
 | **CoinAPI** | Startup | `/crypto-assets/{ohlcv,market-data,symbols,exchanges}` | partial -- OHLCV + market data |
@@ -53,11 +53,38 @@ result = client.on_chain.get_smart_money_dex_trades(
 )
 ```
 
-**Not in our Pro plan** (return 404 if called directly against the upstream): Wallet Profiler, Chain Analytics, NFT collection analytics, Hot Contracts. Contact us if any of these are critical -- they may be available on a higher Nansen tier.
+**On-chain time series.** `tgm/flows` returns an hourly per-wallet-category series for a token
+over any date range, scoped by a top-level `label` (`smart_money`, `exchange`, `whale`,
+`public_figure`, `top_100_holders`). The same call serves a live trailing window (e.g. the last
+10 days, ending now) or a long historical range -- it is just a different `start`. For
+point-in-time historical state there is also a `/v1beta1` **backtesting** family
+(`historical-top-holders`, `historical-token-flow-summary`, `historical-token-balances`, ...).
 
-## WhaleAlert -- 100% of (narrow) surface
+**Not in our Pro plan** (return 404 if called directly against the upstream): Wallet Profiler,
+Chain Analytics, NFT collection analytics, Hot Contracts. Contact us if any of these are critical.
 
-WhaleAlert's REST surface is small by design: transactions and status. We expose all of it.
+## On-chain signal columns
+
+The KB On-Chain signals consume per-bar columns the caller supplies on the DataFrame,
+time-aligned to OHLCV bars (the MangroveAI data layer derives them from the series above):
+
+| Column | Source | Derivation |
+|---|---|---|
+| `SmartMoneyNetflow` | `tgm/flows` label=smart_money | Δ token_amount × price_usd (USD net flow) |
+| `SmartMoneyHoldings` | `tgm/flows` label=smart_money | `value_usd` level |
+| `ExchangeNetflow` | `tgm/flows` label=exchange | Δ token_amount × price_usd (+ = into exchanges) |
+| `WhaleNetInflow` | `tgm/flows` label=whale | Δ token_amount × price_usd (+ = accumulation) |
+| `HolderConcentration` | `historical-top-holders` | sum of top-N `ownership_percentage` (0.0-1.0) |
+
+A **total token-holder-count** series is not available upstream (Nansen exposes per-category
+holder counts only), so holder-count signals are intentionally not shipped.
+
+## WhaleAlert -- Developer tier (fallback source)
+
+WhaleAlert's REST surface is small by design: transactions and status. We are on the **Developer
+tier** (not Enterprise), which caps transaction history at **30 days** and ~10 req/min. It is used
+as a **fallback / cross-check** for `ExchangeNetflow` / `WhaleNetInflow` when the Nansen series is
+unavailable; Nansen `tgm/flows` is the primary (uncapped) source.
 
 | Capability | Mangrove route | SDK method |
 |---|---|---|

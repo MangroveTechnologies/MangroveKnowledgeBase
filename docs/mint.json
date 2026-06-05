@@ -127,7 +127,8 @@
             "signals/catalog/trend",
             "signals/catalog/volume",
             "signals/catalog/volatility",
-            "signals/catalog/patterns"
+            "signals/catalog/patterns",
+            "signals/catalog/on-chain"
           ]
         }
       ]
