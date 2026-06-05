@@ -27,7 +27,7 @@ sys.path.insert(0, PROJECT_ROOT)
 import mangrove_kb  # noqa: E402
 from mangrove_kb.registry import RuleRegistry  # noqa: E402
 from mangrove_kb.docstring_parser import parse_all_signals  # noqa: E402
-from mangrove_kb.signals import momentum, trend, volume, volatility, patterns  # noqa: E402
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns, onchain  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Category classification
@@ -39,6 +39,7 @@ MODULE_CATEGORY = {
     "volume": "Volume",
     "volatility": "Volatility",
     "patterns": "Patterns",
+    "onchain": "On-Chain",
 }
 
 
@@ -154,7 +155,7 @@ def generate_catalog():
     """Generate the docs/signals/catalog.mdx file."""
 
     # Parse all signals
-    signal_modules = [momentum, trend, volume, volatility, patterns]
+    signal_modules = [momentum, trend, volume, volatility, patterns, onchain]
     all_signals = parse_all_signals(signal_modules)
 
     # Attach category info
@@ -170,7 +171,7 @@ def generate_catalog():
         })
 
     # Sort by category then name
-    category_order = ["Momentum", "Trend", "Volume", "Volatility", "Patterns", "Other"]
+    category_order = ["Momentum", "Trend", "Volume", "Volatility", "Patterns", "On-Chain", "Other"]
     enriched.sort(key=lambda s: (category_order.index(s["category"]) if s["category"] in category_order else 99, s["name"]))
 
     # Group by category
@@ -252,7 +253,7 @@ def generate_catalog():
     index_lines = []
     index_lines.append("---")
     index_lines.append('title: "Signal Catalog"')
-    index_lines.append(f'description: "Index of all {total} trading signals across 5 categories."')
+    index_lines.append(f'description: "Index of all {total} trading signals across {len(grouped)} categories."')
     index_lines.append("---")
     index_lines.append("")
     index_lines.append("# Signal Catalog")
