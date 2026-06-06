@@ -26,6 +26,11 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+          # Push the release tag with GH_PAT (not the default GITHUB_TOKEN) so the
+          # tag push CASCADES to the tag-triggered workflows (build-and-push.yaml +
+          # build-docs.yml). GITHUB_TOKEN-pushed tags do NOT trigger other workflows,
+          # which is why the KB image/docs builds previously had to be dispatched by hand.
+          token: ${{ secrets.GH_PAT }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
