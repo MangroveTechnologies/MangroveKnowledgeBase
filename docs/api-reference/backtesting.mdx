@@ -115,10 +115,28 @@ metrics = response.json().get("metrics", {})
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `asset` | string | Asset symbol (e.g., "BTC", "ETH") |
+| `asset` | string | Asset symbol (e.g., "BTC", "ETH"). Optional when `strategy_id` is supplied (defaults from the saved strategy). |
 | `interval` | string | Time interval ("1h", "4h", "1d") |
 | `initial_balance` | number | Starting account balance |
-| `strategy_json` | string | Stringified JSON strategy configuration |
+| `strategy_json` | string | Stringified JSON strategy configuration. Provide this **or** `strategy_id`. |
+
+### Strategy Source: `strategy_json` or `strategy_id`
+
+Provide exactly one of:
+
+- **`strategy_json`** (string) -- the stringified strategy configuration shown below.
+- **`strategy_id`** (string) -- the UUID of a strategy you already created. The API loads its definition and defaults `asset` and `execution_config` from the saved strategy when you omit them.
+
+Sending both returns `400`; an unknown or inaccessible `strategy_id` returns `404`. The same `strategy_id` option is accepted by the async endpoint `POST /api/v2/backtests/`.
+
+```json
+{
+  "strategy_id": "550e8400-e29b-41d4-a716-446655440000",
+  "interval": "1h",
+  "lookback_months": 12,
+  "initial_balance": 10000.0
+}
+```
 
 ### Strategy JSON Format
 
