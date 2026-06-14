@@ -20,6 +20,23 @@ Entry conditions must include exactly one TRIGGER and exactly one FILTER.
 https://api.mangrovedeveloper.ai/api/v1/signals
 ```
 
+## Authentication
+
+All signals endpoints require a Bearer token (a JWT or an API key) in the `Authorization` header. Requests without it return `401 Unauthorized`. See the [Authentication guide](/authentication) for how to obtain a token. The examples below assume the token is available as `$TOKEN` (cURL) / `headers` (Python):
+
+<CodeGroup>
+```bash cURL
+export TOKEN="your-jwt-token-here"
+```
+
+```python Python
+import requests
+
+TOKEN = "your-jwt-token-here"
+headers = {"Authorization": f"Bearer {TOKEN}"}
+```
+</CodeGroup>
+
 ## Endpoints
 
 ### List All Signals
@@ -32,7 +49,8 @@ https://api.mangrovedeveloper.ai/api/v1/signals
 
 <CodeGroup>
 ```bash cURL
-curl -X GET "https://api.mangrovedeveloper.ai/api/v1/signals?limit=10&offset=0"
+curl -X GET "https://api.mangrovedeveloper.ai/api/v1/signals?limit=10&offset=0" \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 ```python Python
@@ -40,6 +58,7 @@ import requests
 
 response = requests.get(
     "https://api.mangrovedeveloper.ai/api/v1/signals",
+    headers=headers,
     params={"limit": 10, "offset": 0}
 )
 signals = response.json()["signals"]
@@ -76,7 +95,8 @@ signals = response.json()["signals"]
 `GET /api/v1/signals/{signal_name}`
 
 ```bash
-curl -X GET https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold
+curl -X GET https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Search Signals
@@ -88,6 +108,7 @@ Search for signals by name, parameters, or keywords.
 <CodeGroup>
 ```bash cURL
 curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/search \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "moving average",
@@ -99,6 +120,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/search \
 ```python Python
 response = requests.post(
     "https://api.mangrovedeveloper.ai/api/v1/signals/search",
+    headers=headers,
     json={"query": "moving average", "search_type": "keywords", "limit": 20}
 )
 ```
@@ -115,6 +137,7 @@ Intent-aware semantic signal matching using natural language descriptions.
 <CodeGroup>
 ```bash cURL
 curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/match \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "user_description": "I want to buy when RSI is low and showing oversold conditions",
@@ -126,6 +149,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/match \
 ```python Python
 response = requests.post(
     "https://api.mangrovedeveloper.ai/api/v1/signals/match",
+    headers=headers,
     json={
         "user_description": "I want to buy when RSI is low",
         "num_results": 3,
@@ -163,6 +187,7 @@ Evaluate a signal against provided market data. Returns a boolean result.
 <CodeGroup>
 ```bash cURL
 curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/evaluate \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "market_data": [
@@ -176,6 +201,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/evalua
 ```python Python
 response = requests.post(
     "https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/evaluate",
+    headers=headers,
     json={
         "market_data": [
             {"Close": 100}, {"Close": 102}, {"Close": 101},
@@ -196,6 +222,7 @@ Evaluate chart data for a date range with multiple signals across different time
 
 ```bash
 curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/evaluate-multiple-series \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "symbol": "BTC",
@@ -217,6 +244,7 @@ Validate parameters for a signal without evaluating it.
 
 ```bash
 curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/validate-params \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"parameters": {"window": 20}}'
 ```
