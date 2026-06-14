@@ -1,6 +1,7 @@
 # MangroveKnowledgeBase
 
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/xUcn4R6zJR)
+[![PyPI Downloads](https://static.pepy.tech/badge/mangrove-kb)](https://pepy.tech/projects/mangrove-kb)
 
 Open-source trading signals, technical indicators, and knowledge base for quantitative finance and algorithmic trading.
 
