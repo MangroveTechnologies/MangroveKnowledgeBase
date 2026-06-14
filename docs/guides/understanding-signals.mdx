@@ -137,17 +137,24 @@ An entry only occurs when `macd_bullish_cross` fires **and** `is_above_sma` is `
 
 ## Parameter tuning basics
 
-Every signal has configurable parameters with documented ranges and defaults. You can view these via the API:
+Every signal has configurable parameters with documented ranges and defaults. You can view these via the API. The signals endpoints require authentication, so include your Bearer token (see the [Authentication guide](/authentication) for how to obtain one):
 
 <CodeGroup>
 ```bash cURL
-curl https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold
+curl -H "Authorization: Bearer $TOKEN" \
+  https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold
 ```
 
 ```python Python
 import requests
 
-response = requests.get("https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold")
+TOKEN = "your-jwt-token-here"
+headers = {"Authorization": f"Bearer {TOKEN}"}
+
+response = requests.get(
+    "https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold",
+    headers=headers,
+)
 signal = response.json()
 
 for param_name, param_info in signal["metadata"]["params"].items():
@@ -156,7 +163,11 @@ for param_name, param_info in signal["metadata"]["params"].items():
 ```
 
 ```javascript JavaScript
-const response = await fetch("https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold");
+const TOKEN = "your-jwt-token-here";
+const response = await fetch(
+  "https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold",
+  { headers: { Authorization: `Bearer ${TOKEN}` } }
+);
 const signal = await response.json();
 
 for (const [name, info] of Object.entries(signal.metadata.params)) {
