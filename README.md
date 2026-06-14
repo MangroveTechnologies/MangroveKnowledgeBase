@@ -1,8 +1,10 @@
 # MangroveKnowledgeBase
 
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/xUcn4R6zJR)
+
 Open-source trading signals, technical indicators, and knowledge base for quantitative finance and algorithmic trading.
 
-Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem.
+Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem. Questions, ideas, or want to contribute? [Join us on Discord](https://discord.gg/xUcn4R6zJR).
 
 **If you find this useful, please star the repo** -- it helps others discover it and keeps the project growing.
 
