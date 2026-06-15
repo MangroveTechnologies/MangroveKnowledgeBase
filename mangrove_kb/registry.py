@@ -1,11 +1,44 @@
+import functools
+
+import numpy as np
+import pandas as pd
+
+
+def _to_native(value):
+    """Coerce numpy return types to native Python / pandas containers.
+
+    Signal functions compute their result by comparing numpy/pandas scalars
+    (e.g. ``close.iloc[-1] > sma.iloc[-1]``), which yields a ``numpy.bool_``
+    rather than a native Python ``bool``. ``numpy.bool_`` is not
+    JSON-serializable, so passing a signal result straight into
+    ``json.dumps()`` or a webhook payload raises
+    ``TypeError: Object of type bool_ is not JSON serializable`` and silently
+    halts downstream automation.
+
+    Normalizing here -- at the single point every signal is registered through
+    -- guarantees the public return-type contract (native ``bool`` or a native
+    ``pd.Series``) for every signal, whether it is called directly or via
+    :meth:`RuleRegistry.evaluate`.
+    """
+    if isinstance(value, np.generic):  # numpy scalar (bool_, int64, float64, ...)
+        return value.item()
+    if isinstance(value, np.ndarray):  # array result -> native boolean container
+        return pd.Series(value)
+    return value
+
+
 class RuleRegistry:
     _registry = {}
 
     @classmethod
     def register(cls, name):
         def wrapper(fn):
-            cls._registry[name] = fn
-            return fn
+            @functools.wraps(fn)
+            def coerced(*args, **kwargs):
+                return _to_native(fn(*args, **kwargs))
+
+            cls._registry[name] = coerced
+            return coerced
 
         return wrapper
 
