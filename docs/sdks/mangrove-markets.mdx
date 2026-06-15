@@ -25,7 +25,7 @@ import { MangroveClient, EthersSigner } from "@mangrove-ai/sdk";
 import { Wallet, JsonRpcProvider } from "ethers";
 
 const provider = new JsonRpcProvider("https://mainnet.base.org");
-const signer = new EthersSigner(new Wallet(process.env.PRIVATE_KEY!, provider));
+const signer = new EthersSigner(new Wallet(process.env.PRIVATE_KEY!, provider), [8453]); // supported chain IDs (8453 = Base)
 
 const client = new MangroveClient({
   url: "https://api.mangrovemarkets.com",
