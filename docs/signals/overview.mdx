@@ -161,7 +161,7 @@ curl https://api.mangrovedeveloper.ai/api/v1/signals/ \
 
 ## Signal Categories
 
-Signals are organized into five categories based on the underlying indicator type:
+Signals are organized into six categories based on the underlying indicator type:
 
 | Category | Count | Focus |
 |----------|-------|-------|
@@ -170,8 +170,27 @@ Signals are organized into five categories based on the underlying indicator typ
 | **Volume** | 33 | OBV, CMF, MFI, VWAP, ADI, Force Index, NVI, EOM, VPT, VWMA, ADOSC, KVO |
 | **Volatility** | 20 | Bollinger Bands, ATR, Keltner Channel, Donchian Channel, Ulcer Index, NATR, STARC Bands, ATR Trailing Stop, TTM Squeeze |
 | **Patterns** | 40 | Candlestick patterns (engulfing, hammer, doji, stars) and multi-bar pattern recognition |
+| **On-Chain** | 10 | Exchange netflow, smart-money flows, whale accumulation, holder concentration (consumes alternative-data columns alongside OHLCV) |
+
+## Scope & limitations
+
+The categories above describe what the library **can** express. Signals are
+stateless functions over OHLCV bars (plus, for On-Chain signals, the
+alternative-data columns the caller supplies) -- they carry no clock, calendar,
+or session context, and they do not model market-microstructure constructs. A
+few popular trading frameworks are therefore **not** currently available as
+built-in signals:
+
+| Not currently in the library | Why / closest in-library proxy |
+|------------------------------|--------------------------------|
+| **Session / time-of-day filters** -- London open, New York open, Asian session, etc. | Signals evaluate purely on bars and carry no time-of-day context, so a session window cannot be expressed. No proxy reproduces a calendar window. |
+| **ICT / Smart Money Concepts** -- Fair Value Gap (FVG), Order Block, Breaker Block, liquidity sweeps | Not implemented. For an institutional-reference price use `vwap_above` / `vwap_below`; for directional bias use `adx_strong_trend` or a moving-average filter such as `is_above_sma`; for price-action structure browse the **Patterns** category (engulfing, pin bar, inside/outside bar, ...). These approximate the intent but are not the same constructs. |
+
+Check this section **before** building a strategy so you know what is
+expressible. Adding session-based or ICT/SMC signals is a feature request, not a
+configuration the current library can satisfy.
 
 ## Full Reference
 
 See the [Signal Catalog](/signals/catalog) for the complete reference of all
-223 signals with parameters, descriptions, and usage examples.
+233 signals with parameters, descriptions, and usage examples.

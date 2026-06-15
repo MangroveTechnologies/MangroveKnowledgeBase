@@ -44,7 +44,17 @@ const headers = {
 
 ## Step 1: Browse available signals
 
-Start by exploring what signals are available. The signals endpoint returns all 223 active signals with their metadata, parameters, and valid ranges.
+Start by exploring what signals are available. The signals endpoint returns every
+active signal with its metadata, parameters, and valid ranges.
+
+<Note>
+Signals are organised into six categories -- Momentum, Trend, Volume, Volatility,
+Patterns, and On-Chain. Before building, skim [Signals Overview → Scope &
+limitations](/signals/overview#scope--limitations) to confirm your idea is
+expressible: the library is OHLCV/indicator-based, so **session / time-of-day
+filters** (London open, etc.) and **ICT / Smart Money Concepts** (Fair Value Gap,
+Order Block, Breaker Block) are **not** currently available as built-in signals.
+</Note>
 
 <CodeGroup>
 ```bash cURL
