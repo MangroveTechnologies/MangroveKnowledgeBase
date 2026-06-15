@@ -28,10 +28,11 @@ Browse the full signal list in the [Signal Catalog](/signals/catalog) and indica
 ## Hello world — evaluate a signal
 
 ```python
-import pandas as pd
-from mangrove_kb import RuleRegistry
+from mangrove_kb import RuleRegistry, sample_ohlcv
 
-df = pd.read_csv("ohlcv.csv")  # columns: Open, High, Low, Close, Volume
+# Self-contained sample data — no file or download needed.
+# Bring your own with: df = pd.read_csv("your_ohlcv.csv")  # columns: Open, High, Low, Close, Volume
+df = sample_ohlcv()
 
 fired = RuleRegistry.evaluate(
     {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30}},
