@@ -98,8 +98,10 @@ if hammer_trigger(df):
 Evaluate signals by name -- useful for strategy engines:
 
 ```python
-from mangrove_kb.registry import RuleRegistry
+from mangrove_kb import RuleRegistry, sample_ohlcv
 from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
+
+df = sample_ohlcv()  # self-contained sample data; or bring your own DataFrame
 
 rule = {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30.0}}
 is_oversold = RuleRegistry.evaluate(rule, df)
