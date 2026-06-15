@@ -28,14 +28,14 @@ export MANGROVE_API_KEY=prod_your_key_here
 ## Hello world
 
 ```python
-from mangroveai import MangroveAI
+from mangrove_ai import MangroveAI
 
 client = MangroveAI()  # reads MANGROVE_API_KEY from env
 
-# Discover signals
+# Discover signals (category is optional: momentum, trend, volume, volatility)
 signals = client.signals.list(category="momentum", limit=10)
-for s in signals:
-    print(s.name, s.signal_type, s.description)
+for s in signals.items:
+    print(s.name, s.signal_type, s.metadata.description)
 ```
 
 ## Service modules
