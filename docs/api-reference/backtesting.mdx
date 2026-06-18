@@ -21,6 +21,10 @@ The Backtesting API runs historical strategy testing with performance metrics an
 
 Runs a synchronous backtest and returns metrics and trade history. Loads market data from CoinAPI for the specified asset and date range.
 
+<Note>
+**One backtest at a time.** The engine processes a single synchronous backtest per worker. If another backtest is already running, this endpoint returns **`503 Service Unavailable`** with a `Retry-After` header instead of blocking until the gateway times out (`504`). Honor `Retry-After` and retry, run requests sequentially, or use the [bulk endpoint](#bulk-backtest) to evaluate many strategies in one request. See the [Running a Backtest guide](/guides/running-a-backtest#concurrency-and-limits).
+</Note>
+
 ### Date Range Modes
 
 | Mode | Parameters | Behavior |

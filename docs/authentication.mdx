@@ -212,14 +212,21 @@ async function refreshAccessToken(refreshToken) {
 
 ## Error Responses
 
-**401 Unauthorized** -- Token missing, invalid, or expired:
+**401 Unauthorized** -- Token missing, invalid, or expired. The response carries
+a `hint` with the expected header format and a `docs` link so the failure is
+self-explanatory:
 
 ```json
 {
   "error": "Unauthorized",
-  "message": "Invalid or expired token"
+  "message": "Invalid or expired token",
+  "hint": "Include 'Authorization: Bearer <API_KEY>' in the request header",
+  "docs": "https://docs.mangrovedeveloper.ai/authentication"
 }
 ```
+
+A request sent with no credentials returns the same shape with
+`"message": "Missing or invalid authentication token"`.
 
 **403 Forbidden** -- Insufficient permissions:
 
