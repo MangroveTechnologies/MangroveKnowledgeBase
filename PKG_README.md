@@ -21,9 +21,9 @@ All indicators use a stateless classmethod API. Pass data and params, get result
 
 ```python
 from mangrove_kb.indicators import RSI, MACD, BollingerBands, EMA
-import pandas as pd
+from mangrove_kb import sample_ohlcv
 
-df = pd.read_csv("your_ohlcv_data.csv")
+df = sample_ohlcv()  # self-contained sample data; or pd.read_csv("your_ohlcv_data.csv")
 
 # RSI
 result = RSI.compute(data={"close": df["Close"]}, params={"window": 14})
@@ -81,9 +81,11 @@ if macd_bullish_cross(df, window_fast=12, window_slow=26, window_sign=9):
 Evaluate signals by name -- useful for strategy engines and configuration-driven systems:
 
 ```python
-from mangrove_kb.registry import RuleRegistry
+from mangrove_kb import RuleRegistry, sample_ohlcv
 # Import signal modules to register them
 from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
+
+df = sample_ohlcv()  # self-contained sample data; or bring your own DataFrame
 
 # Evaluate by name
 rule = {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30.0}}

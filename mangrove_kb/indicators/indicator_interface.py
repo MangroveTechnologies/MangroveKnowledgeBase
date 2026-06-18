@@ -58,6 +58,39 @@ class IndicatorInterface:
         return cls._compute(data, params)
 
     @classmethod
+    def compute_frame(cls, data: dict[str, pd.Series], params: dict[str, any]) -> pd.DataFrame:
+        """
+        Compute the indicator and return its outputs as a single DataFrame.
+
+        Convenience wrapper over ``compute()``: assembles the
+        ``{output_name: pd.Series}`` result into one DataFrame whose columns
+        are the indicator's output names and whose index is the shared input
+        index. This is the uniform tabular surface for feature engineering --
+        because every indicator's output Series share the input index, frames
+        from different indicators outer-join cleanly into a feature matrix::
+
+            features = pd.concat(
+                [
+                    RSI.compute_frame(data, {"window": 14}),
+                    MACD.compute_frame(data, {"window_fast": 12, "window_slow": 26, "window_sign": 9}),
+                    OBV.compute_frame(data, {}),
+                ],
+                axis=1,
+            )
+
+        ``compute()`` (returning ``dict[str, pd.Series]``) remains the canonical
+        API; this method does not change it.
+
+        Args:
+            data: {'close': series, 'high': series, ...}
+            params: {'window': 14, ...}
+
+        Returns:
+            pd.DataFrame with one column per output name, indexed by the input index.
+        """
+        return pd.DataFrame(cls.compute(data=data, params=params))
+
+    @classmethod
     def _validate(cls, data: dict, params: dict):
         """Validate inputs."""
         missing_data = [f for f in cls._data if f not in data]

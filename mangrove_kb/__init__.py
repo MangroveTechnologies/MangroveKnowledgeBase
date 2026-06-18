@@ -25,5 +25,6 @@ except PackageNotFoundError:
     __version__ = "0.0.0.dev0"
 
 from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.sample_data import sample_ohlcv
 from mangrove_kb import indicators
 from mangrove_kb import signals
