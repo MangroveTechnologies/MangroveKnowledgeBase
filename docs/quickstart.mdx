@@ -67,11 +67,12 @@ pip install mangrove-kb
 ```
 
 ```python
-import pandas as pd
-from mangrove_kb import RuleRegistry
+from mangrove_kb import RuleRegistry, sample_ohlcv
 from mangrove_kb.indicators import RSI
 
-df = pd.read_csv("ohlcv.csv")  # columns: Open, High, Low, Close, Volume
+# Self-contained sample data — no file or download needed.
+# Bring your own with: df = pd.read_csv("your_ohlcv.csv")  # columns: Open, High, Low, Close, Volume
+df = sample_ohlcv()
 
 # Compute an indicator
 rsi = RSI.compute({"close": df["Close"]}, {"window": 14})["rsi"]
