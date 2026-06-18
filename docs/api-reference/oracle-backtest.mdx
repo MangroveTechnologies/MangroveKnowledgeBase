@@ -376,8 +376,8 @@ See [Pricing](/api-reference/overview#pricing) for tier monthly caps. Source of 
 
 ## Related
 
-- [Experiments](/api-reference/experiments) — multi-strategy parameter sweeps with managed lifecycle (`create` → `validate` → `launch` → poll results). Use experiments when the parameter grid is larger than a single bulk request can hold.
+- [Experiments](/api-reference/experiments) — parameter-space **sweeps** where the engine generates its own candidates (`create` → `validate` → `launch` → poll). Different from bulk: bulk backtests a list *you* supply; a sweep searches a space. Sweep size is tier-bounded, not capped at the bulk 99.
 - [SIEVE classifier](/api-reference/sieve) — score 1-99 candidate strategies in milliseconds before paying for backtests.
 - [Deployed strategies](/api-reference/oracle-deployed) — live execution state for curated paper-trading strategies, not for ad-hoc backtests.
-- [End-to-end workflow with SIEVE](/guides/sieve-end-to-end-workflow) — end-to-end demo: list-signals, SIEVE, sweep via experiments, adopt.
+- [End-to-end workflow with SIEVE](/guides/sieve-end-to-end-workflow) — end-to-end demo: list-signals, SIEVE screen, bulk-backtest the survivors, adopt.
 - [`mangroveai` Python SDK](/sdks/mangroveai) — typed wrappers for all `/backtest*` endpoints land in SDK v1.4.0; the historical risk-mgmt gap is now closed at the gateway (MangroveAI v3.10.12). The `/data/query` Python example below still uses raw HTTP pending SDK#16 / SDK#17.

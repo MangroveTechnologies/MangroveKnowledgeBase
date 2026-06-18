@@ -141,6 +141,7 @@
         "guides/creating-a-strategy",
         "guides/running-a-backtest",
         "guides/backtesting-guide",
+        "guides/oracle-sweep-quickstart",
         "guides/using-sieve-prefilter",
         "guides/sieve-end-to-end-workflow",
         "guides/using-the-ai-copilot",

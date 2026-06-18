@@ -12,7 +12,13 @@ SIEVE is a learned classifier trained on millions of historical Mangrove sweep r
 - **Binary** — `P(no_trades)` vs `P(trades)`. Filter out strategies that won't fire at all.
 - **4-class** — `losing` / `no_trades` / `wash` / `winning`. Rank what's left by expected outcome.
 
-This guide walks through using both heads to compress a 1,000-strategy search down to the ~50 worth a real backtest.
+Both heads are a **screen, not a verdict** — they cheaply order what's worth backtesting; only a real backtest decides whether a strategy is good.
+
+This guide walks through using both heads to compress a large fixed candidate list down to the ~50 worth a real backtest, then handing those to a [backtest](/api-reference/oracle-backtest).
+
+<Note>
+This is the **shortlist-screening** use of SIEVE (you supply the candidates). It is distinct from a parameter **sweep**, where the [Experiments engine](/api-reference/experiments) generates its own candidates and applies the *binary* head as an inline pre-filter. Don't feed a screened list into a sweep.
+</Note>
 
 ## Prerequisites
 
