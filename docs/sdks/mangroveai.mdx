@@ -32,7 +32,7 @@ from mangrove_ai import MangroveAI
 
 client = MangroveAI()  # reads MANGROVE_API_KEY from env
 
-# Discover signals (category is optional: momentum, trend, volume, volatility)
+# Discover signals (category is optional: momentum, trend, volume, volatility, patterns, onchain)
 signals = client.signals.list(category="momentum", limit=10)
 for s in signals.items:
     print(s.name, s.signal_type, s.metadata.description)
