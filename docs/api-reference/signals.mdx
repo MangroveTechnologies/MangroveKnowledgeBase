@@ -1,11 +1,11 @@
 ---
 title: "Signals API"
-description: "Discover, validate, and evaluate 223 trading signals across momentum, trend, volume, volatility, and patterns categories."
+description: "Discover, validate, and evaluate 233 trading signals across momentum, trend, volume, volatility, patterns, and on-chain categories."
 ---
 
 # Signals API
 
-The Signals API provides endpoints for discovering, validating, and evaluating trading signals. MangroveAI includes 223 active signals (108 TRIGGER, 115 FILTER) organized by category.
+The Signals API provides endpoints for discovering, validating, and evaluating trading signals. MangroveAI includes 233 active signals (112 TRIGGER, 121 FILTER) organized by category.
 
 ## Signal Classification
 
@@ -46,10 +46,11 @@ headers = {"Authorization": f"Bearer {TOKEN}"}
 **Query Parameters:**
 - `limit` (optional, int, default=50): Maximum number of signals (1-100)
 - `offset` (optional, int, default=0): Pagination offset
+- `category` (optional, str): Filter by category. One of `momentum`, `trend`, `volume`, `volatility`, `patterns`, `onchain`. When provided, `total` reflects the filtered count.
 
 <CodeGroup>
 ```bash cURL
-curl -X GET "https://api.mangrovedeveloper.ai/api/v1/signals?limit=10&offset=0" \
+curl -X GET "https://api.mangrovedeveloper.ai/api/v1/signals?category=momentum&limit=10&offset=0" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -59,7 +60,7 @@ import requests
 response = requests.get(
     "https://api.mangrovedeveloper.ai/api/v1/signals",
     headers=headers,
-    params={"limit": 10, "offset": 0}
+    params={"category": "momentum", "limit": 10, "offset": 0}
 )
 signals = response.json()["signals"]
 ```
