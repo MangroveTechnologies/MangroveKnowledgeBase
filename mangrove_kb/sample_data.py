@@ -22,7 +22,7 @@ def sample_ohlcv(
     trend: str = "down",
     start_price: float = 100.0,
     volatility: float = 0.02,
-    seed: int = 0,
+    seed: int = 10,
 ) -> pd.DataFrame:
     """Generate a deterministic synthetic OHLCV DataFrame for examples and tests.
 
@@ -39,7 +39,8 @@ def sample_ohlcv(
         volatility (float): Per-bar standard deviation of log-returns. Range: >=0.
             Default: 0.02.
         seed (int): Seed for the random generator so the data is reproducible.
-            Default: 0.
+            Default: 10 (a downtrend that makes the rsi_oversold quickstart
+            example actually fire).
 
     Returns:
         pd.DataFrame: ``rows`` rows indexed by a daily ``DatetimeIndex`` named
