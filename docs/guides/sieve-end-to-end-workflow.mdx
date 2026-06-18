@@ -1,11 +1,15 @@
 ---
 title: "End-to-end workflow with Mangrove SIEVE"
-description: "Combine SIEVE pre-filtering, bulk backtesting, and the strategy lifecycle to go from a signal mix to a running strategy in four phases."
+description: "Screen a fixed candidate shortlist with SIEVE, bulk-backtest the survivors, and register the winner — going from a signal mix to a running strategy in four phases."
 ---
 
 # End-to-end workflow with Mangrove SIEVE
 
-This guide walks the full chain from "I have a signal mix I want to explore" to "I have a strategy registered and running on MangroveAI."
+This guide walks the **shortlist-screening** chain: you build a fixed set of candidate strategies, cheaply screen them with SIEVE, bulk-backtest the survivors, and register the winner.
+
+<Note>
+**This is not a parameter sweep.** Here *you* generate a fixed candidate list and SIEVE screens it. If instead you want the **engine** to generate and search a parameter space for you, that's the [Experiments / sweep API](/api-reference/experiments) — a different tool. Screening a list ≠ searching a space.
+</Note>
 
 Four phases:
 
@@ -19,7 +23,7 @@ Four phases:
 Each phase corresponds to one or two SDK calls. The Python tabs use the `mangroveai` SDK 1.4.0+; the cURL tabs hit the underlying `/api/v1/*` surface directly.
 
 <Note>
-**Tier note.** Beginner accounts cap at 10 SIEVE calls / month, 2 sweep launches / month, and quotas on backtests. This walkthrough fits inside those caps if you keep candidates ≤99 (one SIEVE call) and one experiment of ≤99 backtests. The Pro tier unlocks larger sweeps if you want to widen the candidate pool.
+**Tier note.** This walkthrough uses two endpoints, each capped at **99 items per call**: `sieve_score` (the screen) and `backtest/bulk` (the backtest). Keep your candidate list ≤99 and it's one call of each. (That 99 is a per-call batch size for these two endpoints — it is unrelated to sweep-experiment sizing, which is governed by your tier's `max_backtests_per_sweep`.)
 </Note>
 
 ## Prerequisites
@@ -71,7 +75,7 @@ For deeper inspection of any signal's parameters see [Signals reference](/signal
 
 ## Phase 2 — Generate candidates + SIEVE filter
 
-Build N parameter combinations of the chosen signal mix, then score them in one round-trip through [SIEVE](/api-reference/sieve). The 4-class head tells you which combinations are most likely to win.
+Build N parameter combinations of the chosen signal mix (≤99), then score them in one round-trip through [SIEVE](/api-reference/sieve). Use the **binary head** to drop candidates that won't fire (`p_no_trades` high), then the **4-class head** to rank the survivors by `P(winning)`. Treat both as a cheap **screen that orders what's worth backtesting — not a verdict.** Only the backtest in Phase 3 decides whether a strategy is actually good.
 
 ```python Python
 import itertools
@@ -232,7 +236,7 @@ print(f"  trades={best['trade_count']}")
 
 If your winner has `trade_count == 0`, the surviving candidates didn't fire entries in this window — widen the parameter ranges in Phase 2 and re-rank. SIEVE's `p_no_trades` is the cheaper place to catch that.
 
-For the full request/response shape see [Oracle backtest reference](/api-reference/oracle-backtest). For larger sweeps with a managed lifecycle, see [Experiments](/api-reference/experiments).
+For the full request/response shape see [Oracle backtest reference](/api-reference/oracle-backtest). If instead of backtesting a fixed shortlist you want the engine to **search a parameter space** for you, that's the [Experiments / sweep API](/api-reference/experiments) — a different workflow, not a scaled-up version of this one.
 
 ## Phase 4 — Register the winner + run it
 
@@ -297,7 +301,7 @@ print(json.dumps(decision_log, indent=2))
 
 - [Filtering Strategies with Mangrove SIEVE](/guides/using-sieve-prefilter) — deeper dive on the SIEVE prefilter step in isolation
 - [Oracle backtest reference](/api-reference/oracle-backtest) — full request/response shapes for the single-strategy backtest endpoints + data corpus query
-- [Experiments](/api-reference/experiments) — the sweep lifecycle used in Phase 3
+- [Experiments](/api-reference/experiments) — the parameter-search sweep API (a separate workflow; Phase 3 here uses **bulk-backtest**, not a sweep)
 - [SIEVE API reference](/api-reference/sieve) — endpoint details for `sieve/score`
 - [Creating a strategy](/guides/creating-a-strategy) — strategy-object shape, status transitions, and the wallet/allocation gating for `live`
 - [`mangroveai` Python SDK](/sdks/mangroveai)

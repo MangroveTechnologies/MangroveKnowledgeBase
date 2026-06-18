@@ -1,11 +1,15 @@
 ---
 title: "Experiments (sweep runs)"
-description: "Kick off and consume parameter-sweep experiments. Up to 99 strategies per experiment; results materialize as the sweep completes."
+description: "Kick off and consume parameter-sweep experiments. The engine generates and backtests the candidates; sweep size is bounded by your tier, and results materialize as the sweep completes."
 ---
 
 # Experiments
 
-The experiment API turns a single strategy template plus a parameter grid into a fan-out of up to 99 individual backtests. Use it for hyperparameter sweeps, dataset comparisons, or signal-combination searches.
+The experiment API takes a strategy template plus a **parameter space** and the **engine generates its own candidates** — grid enumeration or random/Monte-Carlo sampling — backtests each, and ranks the results. Use it for hyperparameter sweeps, dataset comparisons, or signal-combination searches.
+
+You do not hand it a list of strategies; you describe the space and the engine searches it. (Screening a *fixed* candidate list is a different workflow — see [SIEVE](/api-reference/sieve) → [bulk backtest](/api-reference/oracle-backtest).)
+
+Sweep size is bounded by your subscription tier's `max_backtests_per_sweep` (enforced at validate), **not** a fixed limit — see [Limits & caps](#limits-and-caps).
 
 All endpoints sit under `/api/v1/oracle/` on the MangroveAI gateway and are forwarded to the Oracle backtest engine with your identity attached. Auth: API key or JWT (same as the rest of `/api/v1/*`).
 
@@ -14,7 +18,8 @@ All endpoints sit under `/api/v1/oracle/` on the MangroveAI gateway and are forw
 | Method | Path | Purpose | Billable |
 |---|---|---|---|
 | `POST` | `/api/v1/oracle/experiments` | Create an experiment (the parameter grid + strategy template) | `oracle_experiment` (1 unit; x402 $0.25) |
-| `POST` | `/api/v1/oracle/experiments/{id}/launch` | Fan out the grid into up to 99 backtests | `oracle_experiment` |
+| `POST` | `/api/v1/oracle/experiments/{id}/validate` | Validate a draft + return `total_runs` (required before launch; enforces the tier per-sweep cap) | free (metadata) |
+| `POST` | `/api/v1/oracle/experiments/{id}/launch` | Fan the validated parameter space out into backtests (async) | `oracle_experiment` |
 | `GET`  | `/api/v1/oracle/results` | Read results as they materialize. Pass `?experiment_id=<id>` to scope to a single sweep, or omit it for the cross-experiment view. | `oracle_results_read` (1 unit; x402 $0.01) |
 | `POST` | `/api/v1/oracle/simulate/run` | Simulate a single strategy run without persisting | `oracle_simulate` (1 unit; x402 $0.10) |
 | `POST` | `/api/v1/oracle/simulate/generate` | LLM-backed strategy candidate generation | `oracle_simulate` |
@@ -42,28 +47,52 @@ Each `POST /experiments` + subsequent `/launch` counts as ONE billable HTTP call
     ```
   </Step>
   <Step title="Create an experiment">
-    Body shape: a strategy template (entry / exit rules) plus a `params_sweep` block that enumerates the grid.
+    Body is the `ExperimentConfig`: a `datasets` array (whole dataset OBJECTS from `/datasets`, not filenames), `entry_signals` / `exit_signals` (each signal needs a `signal_type`; entry needs ≥1 filter), and a `params_sweep` on each signal defining the space (`values: [...]` or `{min, max, step}`). The binary SIEVE `pre_filter` skips configs predicted not to trade.
 
     ```bash
     curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/experiments \
       -H "Authorization: Bearer $MANGROVE_API_KEY" \
       -H "Content-Type: application/json" \
       -d '{
-        "name": "rsi-momentum-sweep",
-        "dataset_id": "btc-1h-2024",
-        "template": {
-          "entry": {"trigger": {"name": "rsi_oversold"}, "filter": {"name": "is_above_sma"}},
-          "exit":  {"take_profit_pct": 5, "stop_loss_pct": 2}
+        "name": "BTC 1h MACD momentum sweep",
+        "search_mode": "grid",
+        "kind": "single",
+        "datasets": [ { /* a whole object from GET /datasets */ } ],
+        "entry_signals": {
+          "triggers": [
+            {"name": "macd_bullish_cross", "signal_type": "TRIGGER",
+             "params": {"window_sign": 9},
+             "params_sweep": {"window_fast": {"values": [8, 12, 16]},
+                              "window_slow": {"values": [21, 26, 30]}}}
+          ],
+          "filters": [
+            {"name": "is_above_sma", "signal_type": "FILTER",
+             "params_sweep": {"window": {"values": [50, 100]}}}
+          ],
+          "min_filters": 1, "max_filters": 1
         },
-        "params_sweep": {
-          "entry.trigger.window":    {"min": 7,   "max": 21, "step": 7},
-          "entry.trigger.threshold": {"min": 25,  "max": 35, "step": 5},
-          "entry.filter.window":     {"min": 100, "max": 200, "step": 50}
-        }
+        "exit_signals": {
+          "triggers": [
+            {"name": "macd_bearish_cross", "signal_type": "TRIGGER",
+             "params": {"window_fast": 12, "window_slow": 26, "window_sign": 9}}
+          ],
+          "filters": []
+        },
+        "grid_signals": {"n_param_combos": 24},
+        "execution_config": {"base": {}, "sweep_axes": []},
+        "pre_filter": {"enabled": true, "confidence_threshold": 0.8}
       }'
     ```
 
-    Returns an experiment id and the cardinality of the grid (the engine refuses grids larger than 99 strategies).
+    Returns an `experiment_id` with `status: "draft"`. Sweep size is controlled by `grid_signals.n_param_combos` (grid) or `n_random` (random) — the engine samples up to that many configs from the space.
+  </Step>
+  <Step title="Validate">
+    ```bash
+    curl -X POST https://api.mangrovedeveloper.ai/api/v1/oracle/experiments/<id>/validate \
+      -H "Authorization: Bearer $MANGROVE_API_KEY"
+    ```
+
+    Returns `{ "valid": bool, "total_runs": int, "errors": [...], "warnings": [...] }`. **Required before launch.** This is where the tier per-sweep cap is enforced: if `total_runs` exceeds your tier's `max_backtests_per_sweep`, validate fails with HTTP 403 — shrink the size or upgrade. There is no fixed 99 limit.
   </Step>
   <Step title="Launch">
     ```bash
@@ -71,7 +100,7 @@ Each `POST /experiments` + subsequent `/launch` counts as ONE billable HTTP call
       -H "Authorization: Bearer $MANGROVE_API_KEY"
     ```
 
-    The engine starts evaluating the grid asynchronously.
+    The engine starts evaluating the space asynchronously (in the cloud). A 429 here means you've hit your tier's concurrent-sweep cap — wait for the running sweep to finish, then launch.
   </Step>
   <Step title="Poll for results">
     ```bash
@@ -85,13 +114,20 @@ Each `POST /experiments` + subsequent `/launch` counts as ONE billable HTTP call
 
 ## Costs
 
-Per the developer pricing page, every `POST /experiments` + `/launch` HTTP call counts as 1 unit against your API quota. x402 callers pay $0.25 per kickoff. The engine fans out to up to 99 individual backtests internally; you are not charged per fanout child.
+Per the developer pricing page, every `POST /experiments` + `/launch` HTTP call counts as 1 unit against your API quota. x402 callers pay $0.25 per kickoff. The engine fans out to many individual backtests internally; you are not charged per fanout child.
 
 `GET /results` is billed separately at 1 unit per call ($0.01 x402). Polling efficiently matters — prefer larger paged reads to short-interval polling.
 
+## Limits & caps
+
+Two tier-dependent caps govern sweeps (there is **no** fixed 99-strategy limit — that 99 is [SIEVE](/api-reference/sieve)'s per-call cap, a different feature):
+
+- **Per-sweep size** — `max_backtests_per_sweep` for your tier (e.g. Pro 5,000 / Startup 20,000 / Enterprise 100,000). Enforced at **validate** (HTTP 403 if `total_runs` exceeds it). Control your size with `grid_signals.n_param_combos` or `n_random`.
+- **Concurrent sweeps** — `concurrent_sweep_cap` (often 1 on lower tiers). Enforced at **launch** (HTTP 429). Wait for the in-flight sweep to finish, then launch the next.
+
 ## Related
 
-- [SIEVE classifier](/api-reference/sieve) — score up to 99 strategy candidates before sending them through a full sweep. Use SIEVE to prune the grid first; pay for backtest compute only on the candidates that survive.
+- [SIEVE classifier](/api-reference/sieve) — a **separate** workflow: cheaply score a *fixed* candidate shortlist (≤99 per call) and hand the survivors to a [bulk backtest](/api-reference/oracle-backtest). It does NOT gate or feed a sweep. (A sweep's *own* built-in binary SIEVE `pre_filter` is a different mechanism — it skips dead configs during the search.)
 - [Backtesting API](/api-reference/backtesting) — single-strategy synchronous and async backtests, useful when you already know the parameters you want to test.
 - [Deployed strategies](/api-reference/oracle-deployed) — live execution state of curated paper-trading strategies (the surface formerly implied by "leaderboard").
 - [`mangroveai` Python SDK](/sdks/mangroveai) — `client.oracle.create_experiment(...)`, `client.oracle.simulate_run(...)`, `client.oracle.list_results(...)`, and the full deployed/leaderboard surface are typed wrappers as of SDK v1.4.0.
