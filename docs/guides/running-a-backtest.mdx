@@ -43,6 +43,10 @@ const headers = {
 
 The backtesting endpoint takes your strategy configuration, a date range, and risk parameters. It runs synchronously and returns results in the response.
 
+<Warning>
+**Backtests run one at a time.** The engine processes a single synchronous backtest per worker at a time. If you fire many backtests **in parallel**, only one runs immediately; the others queue, and a request that waits too long is rejected with a `503` (see [Concurrency and limits](#concurrency-and-limits)). Run backtests **sequentially**, or use the [bulk endpoint](#compare-multiple-strategies-at-once) to test many strategies in a single request.
+</Warning>
+
 This example backtests an ETH strategy using the MACD bullish cross + SMA filter, looking back 12 months of 1-hour data:
 
 <CodeGroup>
@@ -654,6 +658,24 @@ console.log(`Metrics:`, savedResult.metrics);
 The standalone backtesting endpoint (`POST /api/v1/backtesting/backtest`) returns results directly but does not create a persistent `backtest_runs` record. Only backtests initiated through the AI Copilot are persisted and retrievable by ID.
 </Note>
 
+## Concurrency and limits
+
+The synchronous backtest endpoint runs **one backtest at a time per worker**. This keeps results deterministic, but it means you cannot speed things up by firing many single-backtest requests in parallel — they serialize behind the running one.
+
+| Behavior | What happens |
+|----------|--------------|
+| One request at a time | Runs immediately and returns results in the response. |
+| A second request while one is running | Waits briefly for the first to finish. If it completes in time, your request then runs normally. |
+| Too many in parallel / long-running run ahead of you | Your request is rejected with **`503 Service Unavailable`** and a `Retry-After` header instead of hanging until the gateway times out (`504`). |
+
+To run many backtests efficiently:
+
+- **Run sequentially** — wait for each response before sending the next request.
+- **Honor `Retry-After`** — on a `503`, wait the indicated number of seconds and retry (an exponential backoff also works). Official SDKs do this automatically.
+- **Use the [bulk endpoint](#compare-multiple-strategies-at-once)** to evaluate many strategies in a *single* request — market data is fetched once and shared, which is both faster and avoids contention.
+
+A `503` here is transient and means "busy, try again" — it is **not** a problem with your strategy or parameters.
+
 ## Common errors
 
 | Error | Cause | Fix |
@@ -662,6 +684,7 @@ The standalone backtesting endpoint (`POST /api/v1/backtesting/backtest`) return
 | Invalid strategy format | `strategy_json` is malformed or missing entry/exit | Verify the JSON structure has `entry` with 1 TRIGGER + 1 FILTER |
 | Invalid date format | Date not in `YYYY-MM-DD` | Use ISO format: `"2025-01-01"` |
 | Market data unavailable | CoinAPI has no data for the requested range | Try a different date range or asset |
+| `503` engine busy | Another backtest was already running (you sent requests in parallel) | Wait for the `Retry-After` delay and retry, run sequentially, or use the bulk endpoint. See [Concurrency and limits](#concurrency-and-limits). |
 
 ## Next steps
 
