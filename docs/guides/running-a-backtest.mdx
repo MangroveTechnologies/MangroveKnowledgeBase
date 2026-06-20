@@ -330,6 +330,17 @@ To use an explicit date range instead of lookback, replace `lookback_months` wit
 You must provide at least one date parameter. The API will reject requests with no date range specified. Dates use ISO format: `YYYY-MM-DD`.
 </Warning>
 
+<Note>
+**Data availability is the effective floor on the window.** The requested range
+is clipped to what the upstream market-data provider (CoinAPI) actually has for
+the asset and interval. If the provider only holds, say, the last few months for
+a symbol, then `lookback_months: 12` and an equivalent `start_date` resolve to
+the **same** backtest -- identical trade count and metrics -- because both are
+bounded by the available history, not by the parameter you sent. Treat the date
+parameters as an upper bound on the window, not a guarantee of its length, and
+check the returned date range / bar count to see what was actually used.
+</Note>
+
 ## Step 3: Review the results
 
 A successful backtest returns performance metrics and a trade count:
