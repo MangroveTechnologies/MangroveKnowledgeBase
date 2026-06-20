@@ -402,8 +402,30 @@ A successful response returns the full strategy object including auto-populated 
 ```
 
 <Note>
-You did not provide `execution_config` or `execution_state` in the request. The API automatically populates both with defaults from `trading_defaults.json`. You can override any field by including it in your request. See the [Risk Management guide](/guides/risk-management) for details on every field.
+You did not provide `execution_config` or `execution_state` in the request. The API automatically populates both with defaults from `trading_defaults.json`. You can override any field by including it in your request -- a partial `execution_config` you send is **merged over** the defaults, so omitting a field keeps its default rather than dropping it. See the [Risk Management guide](/guides/risk-management) for details on every field.
 </Note>
+
+### Sizing version (`position_size_calc`)
+
+Every strategy is created with a `position_size_calc` value -- `"v2"` by default
+(the canonical value from `trading_defaults.json`). It is **pinned at creation
+and immutable** thereafter. The v2 position-sizing engine reads a set of
+`execution_config` fields with no built-in fallback:
+
+```
+atr_short_weight, atr_long_weight, min_balance_threshold, min_trade_amount,
+max_open_positions, max_trades_per_day, volatility_window, target_volatility,
+volatility_mode, enable_volatility_adjustment, max_hold_bars,
+exit_on_loss_after_bars, exit_on_profit_after_bars, profit_threshold_pct
+```
+
+You do not need to set these yourself: because a provided `execution_config` is
+merged over the canon defaults (and an omitted one is filled entirely from
+canon), every created strategy carries the full v2 field set, and
+`POST /api/v1/execution/evaluate/{id}` works out of the box. To pin a strategy to
+the older v1 sizing math instead, pass `"position_size_calc": "v1"` in the create
+request. See the [Risk Management guide](/guides/risk-management) for what each
+field does.
 
 ## Step 5: Verify the strategy
 
@@ -451,6 +473,16 @@ You should see:
 - **Status**: `inactive` (the default for new strategies)
 - **Entry signals**: `macd_bullish_cross` (TRIGGER) + `is_above_sma` (FILTER)
 - **Exit signals**: `macd_bearish_cross` (TRIGGER)
+
+<Note>
+**Strategy visibility is scoped to your developer account.** `GET /api/v1/strategies`
+returns only the strategies created through the developer API under the same
+authenticated `user_id` and organization. A strategy created under a different
+account or organization -- or through a separate Mangrove product surface -- will
+not appear in your list and `total` may read `0`. To manage a strategy through
+this API (list it, evaluate it, back-test it by `strategy_id`), create it through
+this API.
+</Note>
 
 ## Common validation errors
 
