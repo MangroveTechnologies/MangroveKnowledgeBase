@@ -101,6 +101,10 @@ Each `POST /experiments` + subsequent `/launch` counts as ONE billable HTTP call
     ```
 
     The engine starts evaluating the space asynchronously (in the cloud). A 429 here means you've hit your tier's concurrent-sweep cap — wait for the running sweep to finish, then launch.
+
+    <Warning>
+      Launch is **non-idempotent** and can return a **504 gateway timeout even though the launch succeeded** server-side. Do **not** re-send the launch on a 504 (a retry can hit the single-flight 409 or the concurrent-cap 429). Instead, poll `GET /api/v1/oracle/experiments/{id}` and treat any status past `validated` (e.g. `preparing`/`running`) as success. The Python SDK's `oracle.launch_experiment_and_wait()` handles this for you; raw HTTP clients should not auto-retry the launch `POST`.
+    </Warning>
   </Step>
   <Step title="Poll for results">
     ```bash
