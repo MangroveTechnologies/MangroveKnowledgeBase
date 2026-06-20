@@ -112,7 +112,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/auth/api-keys \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Production Server Key",
-    "scopes": ["read:strategies", "write:backtests"],
+    "scopes": ["strategy:read", "strategy:create", "backtest:create"],
     "expires_days": 365
   }'
 ```
@@ -123,7 +123,7 @@ response = requests.post(
     headers={"Authorization": f"Bearer {access_token}"},
     json={
         "name": "Production Server Key",
-        "scopes": ["read:strategies", "write:backtests"],
+        "scopes": ["strategy:read", "strategy:create", "backtest:create"],
         "expires_days": 365
     }
 )
@@ -210,6 +210,53 @@ async function refreshAccessToken(refreshToken) {
 | Authenticated User | Valid JWT or API key | Own data (strategies, backtests, conversations) within your tier limits |
 | Unauthenticated | None | Health checks, Swagger docs, the x402-gated wallet-paid surface (no signup) |
 
+## API Key Scopes
+
+Every authenticated endpoint requires a specific scope. When you mint a key with
+a non-empty `scopes` array, each request is checked against that list and a
+missing scope returns **403 `INSUFFICIENT_PERMISSIONS`** with the exact scope it
+needed (for example, `API key does not have scope: strategy:update_status`).
+
+Two rules govern what a key can actually do:
+
+- **Empty `scopes: []` means full role-based access** -- the key inherits every
+  scope its organization role permits. Pass an explicit list only to restrict a
+  key below its role.
+- **Scopes are baked at mint time and your role gates them.** A `viewer` role
+  only ever gets the read scopes below, regardless of what you request; to write
+  you need a `member` (or higher) key. Changing a role later does not re-scope an
+  already-minted key -- revoke and re-mint.
+
+Scope strings use the `resource:action` form (note: `strategy:read`, **not**
+`read:strategies`). Required scope by endpoint:
+
+| Endpoint | Method | Required scope |
+|----------|--------|----------------|
+| `/api/v1/strategies` | `POST` | `strategy:create` |
+| `/api/v1/strategies`, `/api/v1/strategies/{id}` | `GET` | `strategy:read` |
+| `/api/v1/strategies/{id}` (update, incl. `execution_config`) | `PUT` | `strategy:update_status` |
+| `/api/v1/strategies/{id}/status` | `PATCH` | `strategy:update_status` |
+| `/api/v1/strategies/{id}/execution-state` | `PATCH` | `strategy:update_status` |
+| `/api/v1/strategies/{id}` | `DELETE` | `strategy:delete` |
+| `/api/v1/execution/evaluate/{id}`, `/evaluate`, `/evaluate/bulk` | `POST` | `strategy:read` |
+| `/api/v1/execution/portfolio` | `GET` | `strategy:read` |
+| `/api/v1/execution/accounts`, `/positions`, `/trades` | `GET` | `position:read` |
+| `/api/v1/execution/accounts` | `POST` | `position:create` |
+| `/api/v1/backtesting/backtest`, `/backtest/bulk` | `POST` | `backtest:create` |
+| `/api/v1/backtesting/backtest/{id}` | `GET` | `backtest:read` |
+| `/api/v1/signals/...` | `GET` | `signal:read` |
+| `/api/v1/signals/evaluate` | `POST` | `signal:evaluate` |
+| `/api/v1/oracle/backtest/...` | `POST` | `oracle:backtest` |
+| `/api/v1/oracle/experiments/...` | `POST` | `oracle:sweep` |
+| `/api/v1/oracle/data/query` | `POST` | `data:query` |
+
+<Note>
+Updating a strategy's `execution_config` (a `PUT /strategies/{id}`) requires the
+`strategy:update_status` scope -- the same scope that guards status changes. A
+read-only (`viewer`) key cannot perform it. If you only need to evaluate a saved
+strategy, `strategy:read` is sufficient.
+</Note>
+
 ## Error Responses
 
 **401 Unauthorized** -- Token missing, invalid, or expired. The response carries
@@ -228,12 +275,16 @@ self-explanatory:
 A request sent with no credentials returns the same shape with
 `"message": "Missing or invalid authentication token"`.
 
-**403 Forbidden** -- Insufficient permissions:
+**403 Forbidden** -- Insufficient permissions. The `code` is
+`INSUFFICIENT_PERMISSIONS` and the `message` names the exact scope (or role
+permission) that was missing, so you know which scope to add when re-minting the
+key (see [API Key Scopes](#api-key-scopes)):
 
 ```json
 {
-  "error": "Forbidden",
-  "message": "Insufficient permissions for this operation"
+  "error": "authorization_error",
+  "message": "API key does not have scope: strategy:update_status",
+  "code": "INSUFFICIENT_PERMISSIONS"
 }
 ```
 

@@ -232,7 +232,7 @@ Pass `cooldown_config` as a top-level key in the backtest request body to contro
 Max hold time is controlled by `execution_config.max_hold_bars`, not by `cooldown_config`.
 
 <Warning>
-**Deprecated parameters:** `cooldown_bars`, `daily_momentum_limit`, and `weekly_momentum_limit` are deprecated flat keys accepted for backward compatibility during the 90-day grace period. Migrate to `cooldown_config` before the next major version. The legacy keys are not shown in the examples above.
+**Deprecated parameters:** `cooldown_bars`, `daily_momentum_limit`, and `weekly_momentum_limit` are deprecated flat keys, kept for backward compatibility. They are **optional** -- omit them and they default from `trading_defaults.json` (`24`, `3`, `3`). You no longer need to supply them to call the backtest endpoints, so the examples above leave them out. Continue migrating any explicit cooldown tuning to `cooldown_config` before the next major version.
 </Warning>
 
 See the [Risk Management guide](/guides/risk-management) for full cooldown tuning details.
