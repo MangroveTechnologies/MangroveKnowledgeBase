@@ -51,7 +51,7 @@ create ──▶ validate ──▶ launch ──▶ poll ──▶ results
 1. **Orient** (free): `GET /api/v1/oracle/datasets`, `GET /api/v1/oracle/signals` (each signal carries a `category`), `GET /api/v1/oracle/exec-config/defaults`.
 2. **Create**: `POST /api/v1/oracle/experiments` with the `ExperimentConfig` — `datasets` holds whole dataset OBJECTS, each signal has a `signal_type`, entry needs ≥1 filter, and `params_sweep` defines the space. See [Experiments](/api-reference/experiments) for the full body.
 3. **Validate**: `POST /api/v1/oracle/experiments/{id}/validate` → `{ valid, total_runs, errors }`. **Required before launch.** Your tier's `max_backtests_per_sweep` is enforced here (403 if the size exceeds it) — there is **no fixed 99 limit** (that 99 is SIEVE's per-call cap, a different feature).
-4. **Launch**: `POST /api/v1/oracle/experiments/{id}/launch` (async, runs as a cloud job). A 429 means you've hit your tier's concurrent-sweep cap — wait, then launch.
+4. **Launch**: `POST /api/v1/oracle/experiments/{id}/launch` (async, runs as a cloud job). A 429 means you've hit your tier's concurrent-sweep cap — wait, then launch. Launch is non-idempotent and may return a **504 gateway timeout even though it succeeded** server-side — do **not** re-launch on a 504; poll `GET /api/v1/oracle/experiments/{id}` and treat any status past `validated` as success. (The SDK's `launch_experiment_and_wait()` does this for you.)
 5. **Read**: `GET /api/v1/oracle/results?experiment_id=<id>` — paginated, ranked metrics per strategy.
 
 ## 4. Control the sweep size
