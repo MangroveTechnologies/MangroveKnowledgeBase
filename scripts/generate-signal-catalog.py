@@ -27,7 +27,7 @@ sys.path.insert(0, PROJECT_ROOT)
 import mangrove_kb  # noqa: E402
 from mangrove_kb.registry import RuleRegistry  # noqa: E402
 from mangrove_kb.docstring_parser import parse_all_signals  # noqa: E402
-from mangrove_kb.signals import momentum, trend, volume, volatility, patterns, onchain  # noqa: E402
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns, onchain, defi_pro  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Category classification
@@ -40,6 +40,7 @@ MODULE_CATEGORY = {
     "volatility": "Volatility",
     "patterns": "Patterns",
     "onchain": "On-Chain",
+    "defi_pro": "DeFi Pro",
 }
 
 
@@ -155,7 +156,7 @@ def generate_catalog():
     """Generate the docs/signals/catalog.mdx file."""
 
     # Parse all signals
-    signal_modules = [momentum, trend, volume, volatility, patterns, onchain]
+    signal_modules = [momentum, trend, volume, volatility, patterns, onchain, defi_pro]
     all_signals = parse_all_signals(signal_modules)
 
     # Attach category info
@@ -171,7 +172,7 @@ def generate_catalog():
         })
 
     # Sort by category then name
-    category_order = ["Momentum", "Trend", "Volume", "Volatility", "Patterns", "On-Chain", "Other"]
+    category_order = ["Momentum", "Trend", "Volume", "Volatility", "Patterns", "On-Chain", "DeFi Pro", "Other"]
     enriched.sort(key=lambda s: (category_order.index(s["category"]) if s["category"] in category_order else 99, s["name"]))
 
     # Group by category
@@ -268,7 +269,7 @@ def generate_catalog():
     index_lines.append("| Category | Count | Page |")
     index_lines.append("|---|---|---|")
     for cat, sigs in grouped.items():
-        slug = cat.lower()
+        slug = cat.lower().replace(" ", "-")
         index_lines.append(f"| {cat} | {len(sigs)} | [/signals/catalog/{slug}](/signals/catalog/{slug}) |")
     index_lines.append("")
     index_lines.append("## All signals")
@@ -278,7 +279,7 @@ def generate_catalog():
     for sig in enriched:
         requires_str = ", ".join(sig.get("requires", [])) if sig.get("requires") else "None"
         sig_type = sig.get("type", "")
-        slug = sig["category"].lower()
+        slug = sig["category"].lower().replace(" ", "-")
         index_lines.append(
             f"| [`{sig['name']}`](/signals/catalog/{slug}) "
             f"| {sig_type} | {sig['category']} | {requires_str} |"
@@ -302,11 +303,11 @@ def generate_catalog():
     os.makedirs(category_dir, exist_ok=True)
 
     for cat, sigs in grouped.items():
-        slug = cat.lower()
+        slug = cat.lower().replace(" ", "-")
         cat_lines = []
         cat_lines.append("---")
         cat_lines.append(f'title: "{cat} Signals"')
-        cat_lines.append(f'description: "{len(sigs)} {cat.lower()} trading signals with parameters, descriptions, and examples."')
+        cat_lines.append(f'description: "{len(sigs)} {cat.lower().replace(" ", "-")} trading signals with parameters, descriptions, and examples."')
         cat_lines.append("---")
         cat_lines.append("")
         cat_lines.append(f"# {cat} Signals")

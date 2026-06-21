@@ -1,12 +1,12 @@
 ---
 title: "Signal Catalog"
-description: "Index of all 233 trading signals across 6 categories."
+description: "Index of all 243 trading signals across 7 categories."
 ---
 
 # Signal Catalog
 
-Complete reference for all **233** trading signals 
-(112 TRIGGER, 121 FILTER) organized by category.
+Complete reference for all **243** trading signals 
+(117 TRIGGER, 126 FILTER) organized by category.
 
 See [Signals Overview](/signals/overview) for an introduction to how signals work.
 
@@ -20,6 +20,7 @@ See [Signals Overview](/signals/overview) for an introduction to how signals wor
 | Volatility | 20 | [/signals/catalog/volatility](/signals/catalog/volatility) |
 | Patterns | 40 | [/signals/catalog/patterns](/signals/catalog/patterns) |
 | On-Chain | 10 | [/signals/catalog/on-chain](/signals/catalog/on-chain) |
+| DeFi Pro | 10 | [/signals/catalog/defi-pro](/signals/catalog/defi-pro) |
 
 ## All signals
 
@@ -258,7 +259,17 @@ See [Signals Overview](/signals/overview) for an introduction to how signals wor
 | [`smart_money_net_positive`](/signals/catalog/on-chain) | FILTER | On-Chain | SmartMoneyNetflow |
 | [`whale_accumulation_trigger`](/signals/catalog/on-chain) | TRIGGER | On-Chain | WhaleNetInflow |
 | [`whale_net_accumulation`](/signals/catalog/on-chain) | FILTER | On-Chain | WhaleNetInflow |
+| [`etf_inflow_spike`](/signals/catalog/defi-pro) | TRIGGER | DeFi Pro | EtfNetFlow |
+| [`etf_inflow_streak`](/signals/catalog/defi-pro) | FILTER | DeFi Pro | EtfNetFlow |
+| [`funding_flip_positive`](/signals/catalog/defi-pro) | TRIGGER | DeFi Pro | PerpFundingRate |
+| [`funding_negative_regime`](/signals/catalog/defi-pro) | FILTER | DeFi Pro | PerpFundingRate |
+| [`lending_spread_low`](/signals/catalog/defi-pro) | FILTER | DeFi Pro | LendingRateSpread |
+| [`lending_spread_widening`](/signals/catalog/defi-pro) | TRIGGER | DeFi Pro | LendingRateSpread |
+| [`token_unlock_cliff_ahead`](/signals/catalog/defi-pro) | TRIGGER | DeFi Pro | TokenUnlockPressure |
+| [`token_unlock_pressure_low`](/signals/catalog/defi-pro) | FILTER | DeFi Pro | TokenUnlockPressure |
+| [`treasury_accumulation_trigger`](/signals/catalog/defi-pro) | TRIGGER | DeFi Pro | TreasuryUsd |
+| [`treasury_growing`](/signals/catalog/defi-pro) | FILTER | DeFi Pro | TreasuryUsd |
 
 ---
 
-_Generated from docstring metadata. 233 signals total (112 TRIGGER, 121 FILTER)._
+_Generated from docstring metadata. 243 signals total (117 TRIGGER, 126 FILTER)._

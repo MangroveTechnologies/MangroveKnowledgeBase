@@ -8,7 +8,7 @@ import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.docstring_parser import parse_all_signals
-from mangrove_kb.signals import momentum, trend, volume, volatility, patterns, onchain
+from mangrove_kb.signals import momentum, trend, volume, volatility, patterns, onchain, defi_pro
 
 _MODULE_CATEGORY = {
     "momentum": "Momentum",
@@ -17,9 +17,10 @@ _MODULE_CATEGORY = {
     "volatility": "Volatility",
     "patterns": "Patterns",
     "onchain": "On-Chain",
+    "defi_pro": "DeFi Pro",
 }
 
-_SIGNAL_MODULES = [momentum, trend, volume, volatility, patterns, onchain]
+_SIGNAL_MODULES = [momentum, trend, volume, volatility, patterns, onchain, defi_pro]
 
 
 class SignalService:
