@@ -138,7 +138,7 @@ us-central1-docker.pkg.dev/mangroveai-platform/mangrove-ai-repo/mangrove-ai-kb
 ```
 Tags: `latest` + commit SHA.
 
-MangroveAI controls Cloud Run deployment separately (via its own `deploy-kb-dev` / `deploy-kb-prod` workflows).
+MangroveAI controls Cloud Run deployment separately (via its own `deploy-kb-prod` workflow). There is no cloud dev environment — dev was shut down (#271, 2026-06-15); everything runs in `mangroveai-prod`.
 
 ### CI
 On push/PR to main, the `ci` workflow runs pytest across Python 3.10, 3.11, 3.12.
@@ -150,8 +150,7 @@ KB server image is built and pushed to Artifact Registry by this repo. Cloud Run
 | Environment | URL | Managed By |
 |------------|-----|------------|
 | Local | http://localhost:8081 | docker-compose (this repo or MangroveAI) |
-| Dev | https://devkb.mangrove.trade | MangroveAI deploy-kb-dev workflow |
-| Prod | https://kb.mangrovedeveloper.ai | MangroveAI deploy-kb-prod workflow |
+| Prod | https://kb.mangrovedeveloper.ai | MangroveAI deploy-kb-prod workflow (`mangroveai-prod`) |
 
 Terraform module: `MangroveAI/infra/terraform/modules/app-mangroveai-kb/`
 
