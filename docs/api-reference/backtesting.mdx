@@ -15,6 +15,16 @@ The Backtesting API runs historical strategy testing with performance metrics an
 | `GET` | `/api/v1/backtesting/backtest/{id}` | Retrieve a historical backtest result |
 | `POST` | `/api/v1/backtesting/backtest/bulk` | Run backtests for multiple strategies |
 
+<Note>
+**Collection alias.** The same v1 sync endpoints are also served under the
+`/api/v1/backtests` collection path: `POST /api/v1/backtests`,
+`POST /api/v1/backtests/bulk`, `GET /api/v1/backtests/{id}`, and
+`GET /api/v1/backtests/{id}/trades`. This mirrors the async
+`POST /api/v2/backtests/` naming and dispatches to the identical handlers, so the
+request and response shapes (including `strategy_id`) are exactly the same on
+either path.
+</Note>
+
 ## Run a Backtest
 
 `POST /api/v1/backtesting/backtest`
@@ -131,7 +141,7 @@ Provide exactly one of:
 - **`strategy_json`** (string) -- the stringified strategy configuration shown below.
 - **`strategy_id`** (string) -- the UUID of a strategy you already created. The API loads its definition and defaults `asset` and `execution_config` from the saved strategy when you omit them.
 
-Sending both returns `400`; an unknown or inaccessible `strategy_id` returns `404`. The same `strategy_id` option is accepted by the async endpoint `POST /api/v2/backtests/`.
+Sending both returns `400`; an unknown or inaccessible `strategy_id` returns `404`. The same `strategy_id` option is accepted by the collection alias `POST /api/v1/backtests` and by the async endpoint `POST /api/v2/backtests/`.
 
 ```json
 {
