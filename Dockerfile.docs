@@ -91,6 +91,31 @@ ENV NODE_PATH=/app/node_modules
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 
+# --- Documentation search provisioning (see issue #85) -----------------------
+# Mintlify's search/assistant is a HOSTED feature backed by Mintlify's cloud
+# (a Trieve vector DB plus the site's content indexed into it). It is NOT part
+# of this self-hosted client bundle, so search is non-functional here until a
+# backend is provisioned. The downloaded client's search routes forward to:
+#
+#   * public search box           -> /_mintlify/api-public/search/<subdomain>
+#         forwards to ${API_ENDPOINT:-http://localhost:5000}/api/end-user-public/<subdomain>/search
+#   * "Ask a question" assistant  -> /_mintlify/api/search
+#         forwards to ${NEXT_PUBLIC_AI_MESSAGE_HOST}/api/end-user/search
+#         (authorized with the public assistant key NEXT_PUBLIC_TRIEVE_API_KEY,
+#          a Mintlify `mint_dsc_...` token)
+#
+# All are read at RUNTIME by the standalone server, so the real values belong in
+# deploy config (Cloud Run env/secret in MangroveAI), NOT baked here. These
+# declarations document the contract and give deploy an explicit override
+# surface. The defaults are no-ops: empty API_ENDPOINT falls back to the built-in
+# localhost default, and Mintlify's env schema treats the empty NEXT_PUBLIC_*
+# values as undefined -- so they preserve today's behavior exactly (no
+# regression). They do NOT by themselves enable search: that also requires the
+# docs content to be indexed into the chosen backend. See issue #85 for options.
+ENV API_ENDPOINT=""
+ENV NEXT_PUBLIC_AI_MESSAGE_HOST=""
+ENV NEXT_PUBLIC_TRIEVE_API_KEY=""
+
 EXPOSE 3000
 
 # Start nginx (background) then Next.js standalone server on port 3001
