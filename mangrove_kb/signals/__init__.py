@@ -11,6 +11,8 @@ Signal Categories:
     - volatility: Bollinger Bands, ATR, Keltner Channel, Donchian, etc.
     - patterns: Doji, Hammer, Engulfing, MorningStar, InsideBar, NR7, etc.
     - onchain: smart-money flows, exchange flows, whale activity, holder concentration
+    - defi_pro: token-unlock pressure, perp funding regime, ETF-flow momentum,
+      treasury accumulation, lending-rate spread (DeFiLlama Pro)
 """
 
 # Import all signal modules to trigger registration with RuleRegistry
@@ -20,3 +22,4 @@ from mangrove_kb.signals import volume
 from mangrove_kb.signals import volatility
 from mangrove_kb.signals import patterns
 from mangrove_kb.signals import onchain
+from mangrove_kb.signals import defi_pro
