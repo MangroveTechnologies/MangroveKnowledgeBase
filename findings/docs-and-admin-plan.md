@@ -1,5 +1,7 @@
 # Planning Document: Mintlify Public Docs + MangroveAdmin Extraction
 
+> ⚠️ **Historical — superseded by #271 (2026-06-15).** No cloud dev environment exists; everything runs in **`mangroveai-prod`** (deploy via `deploy-kb-prod`). Any `mangroveai-dev` / `*-dev` deploy reference below is historical.
+
 **Date:** 2026-02-22
 **Status:** Planning only -- no implementation
 **Author:** Claude (Opus 4.6)
