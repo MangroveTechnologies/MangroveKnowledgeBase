@@ -16,7 +16,7 @@ We surface coverage honestly. Where we expose 100% of a provider's plan, we say 
 | **Nansen** | Pro | `/on-chain/*` + `/crypto-assets/{token-holders,flow-intelligence,smart-money/*}` | Smart-money, Token God Mode (incl. hourly `tgm/flows` series), + `/v1beta1` backtesting family |
 | **WhaleAlert** | **Developer** | `/on-chain/{whale-transactions,exchange-flows,whale-activity}` | Full Developer surface; **30-day history cap**, ~10 req/min |
 | **X (Twitter)** | Pro v2 | `/social/*` | partial -- sentiment, mentions, influence |
-| **DeFiLlama** | API tier | `/defi/*` | partial -- protocol TVL, chain TVL, stablecoin metrics |
+| **DeFiLlama** | API tier | `/defi/*` | TVL/chain/stablecoins (any plan) + Pro: token unlocks, perp funding, treasuries, ETF flows, lending rates (Pro/Startup/Enterprise, capped 1k/mo) |
 | **CoinAPI** | Startup | `/crypto-assets/{ohlcv,market-data,symbols,exchanges}` | partial -- OHLCV + market data |
 | **CoinGecko** | Analyst | `/crypto-assets/{trending,global-market,market-data}` | partial -- discovery + macro |
 | **Kraken** | Public REST | `/crypto-assets/ohlcv?provider=kraken` | OHLCV fallback |
@@ -106,15 +106,28 @@ Backed by X API v2 (Pro tier). We currently expose three derived surfaces.
 
 Full-archive search (`tweets/search/all`) is available at our tier but not yet exposed as a dedicated route. Open an issue or contact us if it would unblock a use case.
 
-## DeFiLlama -- partial
+## DeFiLlama
 
-Three high-traffic endpoints from the DeFiLlama API tier. Full Pro-tier coverage (yields, options, hacks, raises, unlocks, liquidity-depth, active-users) is on the roadmap.
+Eight endpoints from the DeFiLlama API tier. The three TVL/stablecoin routes are
+available on any plan. The five **Pro** routes (token unlocks, perp funding,
+treasuries, ETF flows, lending rates) require a **Pro, Startup, or Enterprise**
+plan -- an unentitled plan gets `403 TIER_UPGRADE_REQUIRED` -- and share a
+**1,000 calls/account/month** budget (`429 quota_exceeded` past the cap). Agents
+paying per call via x402 are not subscription-gated.
 
-| Capability | Mangrove route | SDK method |
-|---|---|---|
-| Protocol TVL | `GET /defi/protocol/{protocol}/tvl` | `client.defi.get_protocol_tvl(protocol)` |
-| Chain TVL | `GET /defi/chain/{chain}/tvl` | `client.defi.get_chain_tvl(chain)` |
-| Stablecoin metrics | `GET /defi/stablecoins/metrics` | `client.defi.get_stablecoin_metrics()` |
+| Capability | Plan | Mangrove route | SDK method |
+|---|---|---|---|
+| Protocol TVL | any | `GET /defi/protocol/{protocol}/tvl` | `client.defi.get_protocol_tvl(protocol)` |
+| Chain TVL | any | `GET /defi/chain/{chain}/tvl` | `client.defi.get_chain_tvl(chain)` |
+| Stablecoin metrics | any | `GET /defi/stablecoins/metrics` | `client.defi.get_stablecoin_metrics()` |
+| Token unlocks | Pro | `GET /defi/token-unlocks` | `client.defi.get_token_unlocks()` |
+| Perp funding | Pro | `GET /defi/perp-funding` | `client.defi.get_perp_funding()` |
+| Treasuries | Pro | `GET /defi/treasuries` | `client.defi.get_treasuries()` |
+| ETF flows | Pro | `GET /defi/etf-flows` | `client.defi.get_etf_flows()` |
+| Lending rates | Pro | `GET /defi/lending-rates` | `client.defi.get_lending_borrow_rates()` |
+
+Remaining Pro families (yields, options, hacks, raises, liquidity-depth,
+active-users) are on the roadmap.
 
 ## CoinAPI + CoinGecko -- price + market data
 
