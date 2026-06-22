@@ -1,6 +1,6 @@
 ---
 title: "DeFi API"
-description: "DeFi metrics — protocol TVL, chain TVL, and stablecoin supply via DeFiLlama."
+description: "DeFi metrics via DeFiLlama — TVL, chain TVL, stablecoins (any plan); plus Pro: token unlocks, perp funding, treasuries, ETF flows, lending rates."
 ---
 
 # DeFi API
@@ -154,10 +154,46 @@ print(metrics["total_supply_usd"])
 }
 ```
 
+## Pro endpoints
+
+These five endpoints expose the paid DeFiLlama **Pro** tier. They require a
+**Pro, Startup, or Enterprise** plan (an unentitled plan returns `403`
+`TIER_UPGRADE_REQUIRED`) and share a **1,000 calls/account/month** budget
+(`429 quota_exceeded` once exhausted). Agents paying per call via x402 are not
+subscription-gated. Each returns a `{ "success": true, "count": N, "data": [...] }`
+envelope.
+
+| Endpoint | Returns | SDK method |
+|---|---|---|
+| `GET /defi/token-unlocks` | token unlock schedules + supply metrics | `client.defi.get_token_unlocks()` |
+| `GET /defi/perp-funding` | aggregated perpetual funding rates | `client.defi.get_perp_funding()` |
+| `GET /defi/treasuries` | protocol treasury holdings | `client.defi.get_treasuries()` |
+| `GET /defi/etf-flows` | crypto ETF net flows | `client.defi.get_etf_flows()` |
+| `GET /defi/lending-rates` | lending / borrow rates | `client.defi.get_lending_borrow_rates()` |
+
+<CodeGroup>
+```bash cURL
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  "https://api.mangrovedeveloper.ai/api/v1/defi/token-unlocks"
+```
+```python Python
+from mangrove_ai import MangroveAI
+
+client = MangroveAI()  # reads MANGROVE_API_KEY
+unlocks = client.defi.get_token_unlocks()
+print(unlocks.count)
+```
+</CodeGroup>
+
+The SDK ships a runnable quickstart for all five at `examples/defi_pro.py` (with
+403/429 handling).
+
 ## Error Codes
 
 | Code | HTTP Status | Description |
 |------|-------------|-------------|
 | `AUTH_REQUIRED` | 401 | Missing or invalid bearer token |
+| `TIER_UPGRADE_REQUIRED` | 403 | Pro endpoint requested on a plan without `defi_pro` (Pro/Startup/Enterprise required) |
 | `RESOURCE_NOT_FOUND` | 404 | Unknown protocol or chain slug |
+| `quota_exceeded` | 429 | Monthly DeFiLlama Pro cap reached (1,000 calls/account/month) |
 | `INTERNAL_ERROR` | 500 | Upstream provider (DeFiLlama) error |
