@@ -11,13 +11,30 @@ The Backtesting API runs historical strategy testing with performance metrics an
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/backtesting/backtest` | Run a new backtest |
-| `GET` | `/api/v1/backtesting/backtest/{id}` | Retrieve a historical backtest result |
-| `POST` | `/api/v1/backtesting/backtest/bulk` | Run backtests for multiple strategies |
+| `POST` | `/api/v1/backtests` | Run a new backtest |
+| `POST` | `/api/v1/backtests/bulk` | Run backtests for multiple strategies |
+| `GET` | `/api/v1/backtests/{id}` | Retrieve a historical backtest result |
+| `GET` | `/api/v1/backtests/{id}/trades` | Retrieve a run's trade history |
+| `POST` | `/api/v1/backtests/{id}/archive` | Archive a run (hide from the default view) |
+| `POST` | `/api/v1/backtests/{id}/unarchive` | Unarchive a run (restore to the default view) |
+
+<Note>
+**Backtests are never deleted.** A backtest is an immutable historical record;
+there is no delete endpoint. To remove a run from your default history view, use
+`POST /api/v1/backtests/{id}/archive` (reversible via `unarchive`). See
+[Archive a backtest](#archive-a-backtest).
+</Note>
+
+<Note>
+**Path.** `/api/v1/backtests` is the canonical path (mirroring the async
+`/api/v2/backtests/`). The older `/api/v1/backtesting/backtest*` paths still work
+as a **deprecated alias** and dispatch to the identical handlers, but new
+integrations should use `/api/v1/backtests`.
+</Note>
 
 ## Run a Backtest
 
-`POST /api/v1/backtesting/backtest`
+`POST /api/v1/backtests`
 
 Runs a synchronous backtest and returns metrics and trade history. Loads market data from CoinAPI for the specified asset and date range.
 
@@ -38,7 +55,7 @@ Runs a synchronous backtest and returns metrics and trade history. Loads market 
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/backtests \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -68,7 +85,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest \
 import requests
 
 response = requests.post(
-    "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest",
+    "https://api.mangrovedeveloper.ai/api/v1/backtests",
     headers={"Authorization": f"Bearer {token}"},
     json={
         "asset": "ETH",
@@ -164,25 +181,60 @@ Do NOT include `atr_period` or `atr_multiplier` in `strategy_json`. These belong
 
 ## Retrieve Backtest Result
 
-`GET /api/v1/backtesting/backtest/{backtest_id}`
+`GET /api/v1/backtests/{backtest_id}`
 
 Retrieves a previously executed backtest including full trade history.
 
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000"
+  "https://api.mangrovedeveloper.ai/api/v1/backtests/550e8400-e29b-41d4-a716-446655440000"
+```
+
+## Archive a Backtest
+
+Backtests are immutable and **cannot be deleted**. Archiving a run hides it from
+your default history view; it remains stored and can be restored at any time.
+
+`POST /api/v1/backtests/{backtest_id}/archive`
+`POST /api/v1/backtests/{backtest_id}/unarchive`
+
+```bash
+# Archive (hide from the default view)
+curl -X POST -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/backtests/550e8400-e29b-41d4-a716-446655440000/archive"
+
+# Unarchive (restore)
+curl -X POST -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/backtests/550e8400-e29b-41d4-a716-446655440000/unarchive"
+```
+
+```json
+{ "success": true, "backtest_id": "550e8400-e29b-41d4-a716-446655440000", "archived": true }
+```
+
+Archiving only affects a backtest you own; an unknown or inaccessible id returns `404`.
+
+### Listing archived runs
+
+Your backtest history (`GET /api/v1/users/me/backtests`) **excludes archived runs
+by default**. Pass `include_archived=true` to include them; each item carries an
+`archived` boolean and an `archived_at` timestamp (`null` when active).
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  "https://api.mangrovedeveloper.ai/api/v1/users/me/backtests?include_archived=true"
 ```
 
 ## Bulk Backtest
 
-`POST /api/v1/backtesting/backtest/bulk`
+`POST /api/v1/backtests/bulk`
 
 Evaluates multiple strategies over a shared date range. Market data is fetched once per unique `(asset, timeframe)` pair.
 
 Provide either `strategy_ids` (UUIDs from database) or `strategy_configs` (inline strategy objects).
 
 ```bash
-curl -X POST https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/bulk \
+curl -X POST https://api.mangrovedeveloper.ai/api/v1/backtests/bulk \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
