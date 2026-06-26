@@ -31,24 +31,8 @@
   },
   "tabs": [
     {
-      "name": "SDKs",
-      "url": "sdks"
-    },
-    {
-      "name": "MCP Servers",
-      "url": "mcp-servers"
-    },
-    {
-      "name": "Mangrove Agent",
-      "url": "mangrove-agent"
-    },
-    {
       "name": "API Reference",
       "url": "api-reference"
-    },
-    {
-      "name": "Signals",
-      "url": "signals"
     },
     {
       "name": "Knowledge Base",
@@ -57,110 +41,69 @@
   ],
   "navigation": [
     {
+      "group": "Getting Started",
+      "pages": ["introduction", "quickstart", "authentication"]
+    },
+    {
       "group": "API Reference",
       "pages": [
         "api-reference/overview",
         "api-reference/strategies",
         "api-reference/signals",
         "api-reference/backtesting",
-        "api-reference/experiments",
-        "api-reference/oracle-backtest",
-        "api-reference/oracle-deployed",
-        "api-reference/sieve",
         "api-reference/ai-copilot",
         "api-reference/execution",
         "api-reference/crypto-assets",
-        "api-reference/market-data",
-        "api-reference/on-chain",
-        "api-reference/defi",
-        "api-reference/social",
-        "api-reference/config"
-      ]
-    },
-    {
-      "group": "Getting Started",
-      "pages": [
-        "introduction",
-        "quickstart",
-        "authentication",
-        "data-providers"
-      ]
-    },
-    {
-      "group": "SDKs",
-      "pages": [
-        "sdks/overview",
-        "sdks/mangroveai",
-        "sdks/mangrove-kb",
-        "sdks/mangrovemarkets",
-        "sdks/mangrove-markets"
-      ]
-    },
-    {
-      "group": "MCP Servers",
-      "pages": [
-        "mcp-servers/overview",
-        "mcp-servers/mangrove-markets",
-        "mcp-servers/mangrove-trader",
-        "mcp-servers/mangrove-kb"
-      ]
-    },
-    {
-      "group": "Mangrove Agent",
-      "pages": [
-        "mangrove-agent/overview",
-        "mangrove-agent/quickstart",
-        "mangrove-agent/mcp-tools",
-        "mangrove-agent/architecture",
-        "mangrove-agent/safety-model"
+        "api-reference/market-data"
       ]
     },
     {
       "group": "Signals",
       "pages": [
         "signals/overview",
-        "signals/catalog",
-        {
-          "group": "Catalog by category",
-          "pages": [
-            "signals/catalog/momentum",
-            "signals/catalog/trend",
-            "signals/catalog/volume",
-            "signals/catalog/volatility",
-            "signals/catalog/patterns",
-            "signals/catalog/on-chain"
-          ]
-        }
+        "signals/catalog"
       ]
     },
     {
       "group": "Guides",
       "pages": [
         "guides/understanding-signals",
-        "guides/signal-architecture",
         "guides/creating-a-strategy",
         "guides/running-a-backtest",
-        "guides/backtesting-guide",
-        "guides/oracle-sweep-quickstart",
-        "guides/using-sieve-prefilter",
-        "guides/sieve-end-to-end-workflow",
         "guides/using-the-ai-copilot",
         "guides/risk-management"
       ]
     },
     {
+      "group": "Architecture",
+      "pages": [
+        "architecture/overview",
+        "architecture/domain-driven-design"
+      ]
+    },
+    {
       "group": "Knowledge Base",
       "pages": [
-        "knowledge-base/market-foundations",
-        "knowledge-base/instruments",
-        "knowledge-base/trading-concepts",
-        "knowledge-base/strategy-design",
-        "knowledge-base/risk-management",
-        "knowledge-base/indicators",
-        "knowledge-base/chart-patterns",
-        "knowledge-base/quantitative-analysis",
-        "knowledge-base/signals-quick-reference",
-        "knowledge-base/glossary"
+        "knowledge-base-source/01-market-foundations",
+        "knowledge-base-source/02-instruments-market-mechanics",
+        "knowledge-base-source/03-core-trading-concepts",
+        "knowledge-base-source/04-strategy-design-modeling",
+        "knowledge-base-source/05-risk-management",
+        "knowledge-base-source/06-indicators",
+        "knowledge-base-source/07-chart-patterns",
+        "knowledge-base-source/08-quantitative-analysis",
+        "knowledge-base-source/09-glossary",
+        "knowledge-base-source/10-signals-quick-reference"
+      ]
+    },
+    {
+      "group": "Development",
+      "pages": [
+        "development/getting-started",
+        "development/docker-setup",
+        "development/testing-guide",
+        "development/api-versioning",
+        "development/commit-standards"
       ]
     }
   ],

@@ -8,8 +8,8 @@ pip install mangrove-kb
 
 ## What You Get
 
-- **223 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
-- **99 technical indicators** -- stateless `compute()` API returning named Series
+- **136 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
+- **70 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
 
@@ -21,9 +21,9 @@ All indicators use a stateless classmethod API. Pass data and params, get result
 
 ```python
 from mangrove_kb.indicators import RSI, MACD, BollingerBands, EMA
-from mangrove_kb import sample_ohlcv
+import pandas as pd
 
-df = sample_ohlcv()  # self-contained sample data; or pd.read_csv("your_ohlcv_data.csv")
+df = pd.read_csv("your_ohlcv_data.csv")
 
 # RSI
 result = RSI.compute(data={"close": df["Close"]}, params={"window": 14})
@@ -81,11 +81,9 @@ if macd_bullish_cross(df, window_fast=12, window_slow=26, window_sign=9):
 Evaluate signals by name -- useful for strategy engines and configuration-driven systems:
 
 ```python
-from mangrove_kb import RuleRegistry, sample_ohlcv
+from mangrove_kb.registry import RuleRegistry
 # Import signal modules to register them
 from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
-
-df = sample_ohlcv()  # self-contained sample data; or bring your own DataFrame
 
 # Evaluate by name
 rule = {"name": "rsi_oversold", "params": {"window": 14, "threshold": 30.0}}
@@ -95,16 +93,16 @@ is_oversold = RuleRegistry.evaluate(rule, df)
 print(f"Available signals: {len(RuleRegistry._registry)}")
 ```
 
-### Signal Categories (223 total)
+### Signal Categories (136 total)
 
 | Category | TRIGGER | FILTER | Total |
 |----------|---------|--------|-------|
-| Momentum | 18 | 24 | 42 |
-| Trend | 43 | 45 | 88 |
-| Volume | 6 | 27 | 33 |
-| Volatility | 9 | 11 | 20 |
+| Momentum | 8 | 18 | 26 |
+| Trend | 18 | 20 | 38 |
+| Volume | 2 | 20 | 22 |
+| Volatility | 6 | 4 | 10 |
 | Patterns | 32 | 8 | 40 |
-| **Total** | **108** | **115** | **223** |
+| **Total** | **66** | **70** | **136** |
 
 ## Signal Metadata
 

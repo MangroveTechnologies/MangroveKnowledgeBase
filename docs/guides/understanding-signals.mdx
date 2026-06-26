@@ -18,21 +18,21 @@ A signal takes a window of historical price data (OHLCV bars) and a set of param
 
 For example, the `rsi_oversold` signal checks whether the Relative Strength Index is below a given threshold. If RSI is at 25 and your threshold is 30, the signal returns `true`.
 
-MangroveAI provides **223 active signals** across five categories:
+MangroveAI provides **136 active signals** across five categories:
 
 | Category | Count | Examples |
 |----------|-------|---------|
-| Momentum | 42 | `rsi_oversold`, `stoch_oversold`, `williams_r_oversold`, `mom_bullish`, `cmo_cross_up` |
-| Trend | 88 | `sma_cross_up`, `ema_cross_up`, `macd_bullish_cross`, `adx_strong_trend`, `is_above_hma`, `supertrend_flip_up`, `rsi_bullish_divergence` |
-| Volume | 33 | `obv_bullish`, `mfi_oversold`, `vwap_above`, `adosc_cross_up`, `kvo_bullish_cross` |
-| Volatility | 20 | `bb_upper_breakout`, `atr_high_volatility`, `kc_upper_breakout`, `natr_high_volatility`, `atr_trailing_stop_flip_up` |
+| Momentum | 26 | `rsi_oversold`, `stoch_oversold`, `williams_r_oversold` |
+| Trend | 38 | `sma_cross_up`, `ema_cross_up`, `macd_bullish_cross`, `adx_strong_trend` |
+| Volume | 22 | `obv_bullish`, `mfi_oversold`, `vwap_above` |
+| Volatility | 10 | `bb_upper_breakout`, `atr_high_volatility`, `kc_upper_breakout` |
 | Patterns | 40 | `bullish_engulfing`, `hammer`, `doji`, `morning_star` |
 
 ## TRIGGER vs FILTER
 
 Every signal is classified as exactly one of two types. This classification determines how the signal is used in a strategy.
 
-### TRIGGER signals (108 active)
+### TRIGGER signals (66 active)
 
 A TRIGGER detects a **discrete event** -- something that just happened at this specific bar.
 
@@ -45,7 +45,7 @@ Common patterns:
 
 TRIGGERs are typically `true` for only one or a few bars, then flip back to `false`. They fire at a specific moment.
 
-### FILTER signals (115 active)
+### FILTER signals (70 active)
 
 A FILTER checks an **ongoing condition** -- whether the market is currently in a certain state.
 
@@ -137,24 +137,17 @@ An entry only occurs when `macd_bullish_cross` fires **and** `is_above_sma` is `
 
 ## Parameter tuning basics
 
-Every signal has configurable parameters with documented ranges and defaults. You can view these via the API. The signals endpoints require authentication, so include your Bearer token (see the [Authentication guide](/authentication) for how to obtain one):
+Every signal has configurable parameters with documented ranges and defaults. You can view these via the API:
 
 <CodeGroup>
 ```bash cURL
-curl -H "Authorization: Bearer $TOKEN" \
-  https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold
+curl http://localhost:5001/api/v1/signals/rsi_oversold
 ```
 
 ```python Python
 import requests
 
-TOKEN = "your-jwt-token-here"
-headers = {"Authorization": f"Bearer {TOKEN}"}
-
-response = requests.get(
-    "https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold",
-    headers=headers,
-)
+response = requests.get("http://localhost:5001/api/v1/signals/rsi_oversold")
 signal = response.json()
 
 for param_name, param_info in signal["metadata"]["params"].items():
@@ -163,11 +156,7 @@ for param_name, param_info in signal["metadata"]["params"].items():
 ```
 
 ```javascript JavaScript
-const TOKEN = "your-jwt-token-here";
-const response = await fetch(
-  "https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold",
-  { headers: { Authorization: `Bearer ${TOKEN}` } }
-);
+const response = await fetch("http://localhost:5001/api/v1/signals/rsi_oversold");
 const signal = await response.json();
 
 for (const [name, info] of Object.entries(signal.metadata.params)) {
@@ -200,6 +189,6 @@ Use the semantic match endpoint (`POST /api/v1/signals/match`) to describe your 
 
 ## Next steps
 
-- [Browse the signal catalog](/signals/catalog) for the full list of 223 signals
+- [Browse the signal catalog](/signals/catalog) for the full list of 136 signals
 - [Create your first strategy](/guides/creating-a-strategy) using the signals you have learned about
 - [Run a backtest](/guides/running-a-backtest) to test how your signal combination performs

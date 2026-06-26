@@ -53,7 +53,7 @@ curl -X POST http://localhost:8081/api/evaluate \
 
 Open-source trading signals, technical indicators, and knowledge base. Three components:
 
-1. **Python Package** (`mangrove_kb`) -- 233 signal functions, 99 indicator classes (including 27 pattern indicators), RuleRegistry, docstring parser. Published on PyPI as `mangrove-kb`.
+1. **Python Package** (`mangrove_kb`) -- 136 signal functions, 70 indicator classes (including 27 pattern indicators), RuleRegistry, docstring parser. Published on PyPI as `mangrove-kb`.
 2. **KB Server** (`kb_server/`) -- Unified server with dual protocol access (REST + MCP) on the same port. FastAPI REST API + FastMCP tools. SQLite FTS5 full-text search, 11 trading education documents, glossary, cross-references, synonym expansion. Signal/indicator metadata (free) and computation (x402 gated).
 3. **Knowledge Base Content** (`knowledge-base/`) -- 11 markdown documents covering market foundations through quantitative analysis
 
@@ -138,7 +138,7 @@ us-central1-docker.pkg.dev/mangroveai-platform/mangrove-ai-repo/mangrove-ai-kb
 ```
 Tags: `latest` + commit SHA.
 
-MangroveAI controls Cloud Run deployment separately (via its own `deploy-kb-prod` workflow). There is no cloud dev environment — dev was shut down (#271, 2026-06-15); everything runs in `mangroveai-prod`.
+MangroveAI controls Cloud Run deployment separately (via its own `deploy-kb-dev` / `deploy-kb-prod` workflows).
 
 ### CI
 On push/PR to main, the `ci` workflow runs pytest across Python 3.10, 3.11, 3.12.
@@ -150,7 +150,8 @@ KB server image is built and pushed to Artifact Registry by this repo. Cloud Run
 | Environment | URL | Managed By |
 |------------|-----|------------|
 | Local | http://localhost:8081 | docker-compose (this repo or MangroveAI) |
-| Prod | https://kb.mangrovedeveloper.ai | MangroveAI deploy-kb-prod workflow (`mangroveai-prod`) |
+| Dev | https://devkb.mangrove.trade | MangroveAI deploy-kb-dev workflow |
+| Prod | https://kb.mangrovedeveloper.ai | MangroveAI deploy-kb-prod workflow |
 
 Terraform module: `MangroveAI/infra/terraform/modules/app-mangroveai-kb/`
 
@@ -160,9 +161,8 @@ Terraform module: `MangroveAI/infra/terraform/modules/app-mangroveai-kb/`
 - Every signal docstring must include `Type:` (TRIGGER or FILTER) and `Requires:` (comma-separated column names)
 - Every parameter must include `Range: min-max` and `Default: value` in the Args section
 - Use `window` for all windowing parameters (not `lookback`, `period`, `length`)
-- Signal counts: 233 signals (112 TRIGGER, 121 FILTER) across 6 categories
-- Categories: Momentum (42), Trend (88), Volume (33), Volatility (20), Patterns (40), On-Chain (10)
-- On-Chain signals consume alternative-data columns (SmartMoneyNetflow, SmartMoneyHoldings, ExchangeNetflow, WhaleNetInflow, HolderConcentration) the caller populates time-aligned to OHLCV bars; sourced from Nansen tgm/flows + historical-top-holders via the MangroveAI data layer. There is no total-holder-count series upstream, so holder-count signals are intentionally not shipped.
+- Signal counts: 136 signals (66 TRIGGER, 70 FILTER) across 5 categories
+- Categories: Momentum (26), Trend (38), Volume (22), Volatility (10), Patterns (40)
 
 ## GitHub
 

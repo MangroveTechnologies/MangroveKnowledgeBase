@@ -21,7 +21,7 @@ export TOKEN="your-jwt-token-here"
 import requests
 import json
 
-BASE_URL = "https://api.mangrovedeveloper.ai"
+BASE_URL = "http://localhost:5001"
 TOKEN = "your-jwt-token-here"
 HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
@@ -30,7 +30,7 @@ HEADERS = {
 ```
 
 ```javascript JavaScript
-const BASE_URL = "https://api.mangrovedeveloper.ai";
+const BASE_URL = "http://localhost:5001";
 const TOKEN = "your-jwt-token-here";
 const headers = {
   Authorization: `Bearer ${TOKEN}`,
@@ -43,15 +43,11 @@ const headers = {
 
 The backtesting endpoint takes your strategy configuration, a date range, and risk parameters. It runs synchronously and returns results in the response.
 
-<Warning>
-**Backtests run one at a time.** The engine processes a single synchronous backtest per worker at a time. If you fire many backtests **in parallel**, only one runs immediately; the others queue, and a request that waits too long is rejected with a `503` (see [Concurrency and limits](#concurrency-and-limits)). Run backtests **sequentially**, or use the [bulk endpoint](#compare-multiple-strategies-at-once) to test many strategies in a single request.
-</Warning>
-
 This example backtests an ETH strategy using the MACD bullish cross + SMA filter, looking back 12 months of 1-hour data:
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest" \
+curl -s -X POST "http://localhost:5001/api/v1/backtesting/backtest" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -210,102 +206,6 @@ const result = await response.json();
 The `strategy_json` field must be a **stringified** JSON object, not a nested object. Use `JSON.stringify()` in JavaScript or `json.dumps()` in Python.
 </Note>
 
-### Reuse a saved strategy by ID
-
-If you already [created a strategy](/guides/creating-a-strategy) and have its `strategy_id`, you can backtest it directly instead of re-supplying the full `strategy_json`. Pass `strategy_id` and the run parameters (date range, account, and risk settings); the API loads the strategy's definition for you and defaults `asset` and `execution_config` from the saved strategy when you omit them.
-
-<CodeGroup>
-```bash cURL
-curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "strategy_id": "550e8400-e29b-41d4-a716-446655440000",
-    "interval": "1h",
-    "lookback_months": 12,
-    "initial_balance": 10000.0,
-    "min_balance_threshold": 0.1,
-    "min_trade_amount": 25.0,
-    "max_open_positions": 5,
-    "max_trades_per_day": 50,
-    "max_risk_per_trade": 0.01,
-    "max_units_per_trade": 100.0,
-    "max_trade_amount": 10000.0,
-    "volatility_window": 24,
-    "target_volatility": 0.02,
-    "volatility_mode": "stddev",
-    "enable_volatility_adjustment": false,
-    "cooldown_bars": 24,
-    "daily_momentum_limit": 3.0,
-    "weekly_momentum_limit": 3.0
-  }' | python3 -m json.tool
-```
-
-```python Python
-backtest_payload = {
-    "strategy_id": "550e8400-e29b-41d4-a716-446655440000",
-    "interval": "1h",
-    "lookback_months": 12,
-    "initial_balance": 10000.0,
-    "min_balance_threshold": 0.1,
-    "min_trade_amount": 25.0,
-    "max_open_positions": 5,
-    "max_trades_per_day": 50,
-    "max_risk_per_trade": 0.01,
-    "max_units_per_trade": 100.0,
-    "max_trade_amount": 10000.0,
-    "volatility_window": 24,
-    "target_volatility": 0.02,
-    "volatility_mode": "stddev",
-    "enable_volatility_adjustment": False,
-    "cooldown_bars": 24,
-    "daily_momentum_limit": 3.0,
-    "weekly_momentum_limit": 3.0,
-}
-
-response = requests.post(
-    f"{BASE_URL}/api/v1/backtesting/backtest",
-    headers=HEADERS,
-    json=backtest_payload,
-)
-result = response.json()
-```
-
-```javascript JavaScript
-const backtestPayload = {
-  strategy_id: "550e8400-e29b-41d4-a716-446655440000",
-  interval: "1h",
-  lookback_months: 12,
-  initial_balance: 10000.0,
-  min_balance_threshold: 0.1,
-  min_trade_amount: 25.0,
-  max_open_positions: 5,
-  max_trades_per_day: 50,
-  max_risk_per_trade: 0.01,
-  max_units_per_trade: 100.0,
-  max_trade_amount: 10000.0,
-  volatility_window: 24,
-  target_volatility: 0.02,
-  volatility_mode: "stddev",
-  enable_volatility_adjustment: false,
-  cooldown_bars: 24,
-  daily_momentum_limit: 3.0,
-  weekly_momentum_limit: 3.0,
-};
-
-const response = await fetch(`${BASE_URL}/api/v1/backtesting/backtest`, {
-  method: "POST",
-  headers,
-  body: JSON.stringify(backtestPayload),
-});
-const result = await response.json();
-```
-</CodeGroup>
-
-<Note>
-Provide **either** `strategy_id` **or** `strategy_json`, not both. Sending both returns a `400`; an unknown or inaccessible `strategy_id` returns a `404`. To override the saved strategy's market, include `asset` (and `execution_config`) explicitly alongside `strategy_id`.
-</Note>
-
 ## Step 2: Choose your date range
 
 The backtesting API supports four modes for specifying the time window:
@@ -329,17 +229,6 @@ To use an explicit date range instead of lookback, replace `lookback_months` wit
 <Warning>
 You must provide at least one date parameter. The API will reject requests with no date range specified. Dates use ISO format: `YYYY-MM-DD`.
 </Warning>
-
-<Note>
-**Data availability is the effective floor on the window.** The requested range
-is clipped to what the upstream market-data provider (CoinAPI) actually has for
-the asset and interval. If the provider only holds, say, the last few months for
-a symbol, then `lookback_months: 12` and an equivalent `start_date` resolve to
-the **same** backtest -- identical trade count and metrics -- because both are
-bounded by the available history, not by the parameter you sent. Treat the date
-parameters as an upper bound on the window, not a guarantee of its length, and
-check the returned date range / bar count to see what was actually used.
-</Note>
 
 ## Step 3: Review the results
 
@@ -463,7 +352,7 @@ Use the bulk backtest endpoint to test several strategies in a single request. M
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/bulk" \
+curl -s -X POST "http://localhost:5001/api/v1/backtesting/backtest/bulk" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -638,7 +527,7 @@ Backtests run through the AI Copilot are persisted with a `backtest_id`. You can
 <CodeGroup>
 ```bash cURL
 curl -s -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000" \
+  "http://localhost:5001/api/v1/backtesting/backtest/550e8400-e29b-41d4-a716-446655440000" \
   | python3 -m json.tool
 ```
 
@@ -669,24 +558,6 @@ console.log(`Metrics:`, savedResult.metrics);
 The standalone backtesting endpoint (`POST /api/v1/backtesting/backtest`) returns results directly but does not create a persistent `backtest_runs` record. Only backtests initiated through the AI Copilot are persisted and retrievable by ID.
 </Note>
 
-## Concurrency and limits
-
-The synchronous backtest endpoint runs **one backtest at a time per worker**. This keeps results deterministic, but it means you cannot speed things up by firing many single-backtest requests in parallel — they serialize behind the running one.
-
-| Behavior | What happens |
-|----------|--------------|
-| One request at a time | Runs immediately and returns results in the response. |
-| A second request while one is running | Waits briefly for the first to finish. If it completes in time, your request then runs normally. |
-| Too many in parallel / long-running run ahead of you | Your request is rejected with **`503 Service Unavailable`** and a `Retry-After` header instead of hanging until the gateway times out (`504`). |
-
-To run many backtests efficiently:
-
-- **Run sequentially** — wait for each response before sending the next request.
-- **Honor `Retry-After`** — on a `503`, wait the indicated number of seconds and retry (an exponential backoff also works). Official SDKs do this automatically.
-- **Use the [bulk endpoint](#compare-multiple-strategies-at-once)** to evaluate many strategies in a *single* request — market data is fetched once and shared, which is both faster and avoids contention.
-
-A `503` here is transient and means "busy, try again" — it is **not** a problem with your strategy or parameters.
-
 ## Common errors
 
 | Error | Cause | Fix |
@@ -695,7 +566,6 @@ A `503` here is transient and means "busy, try again" — it is **not** a proble
 | Invalid strategy format | `strategy_json` is malformed or missing entry/exit | Verify the JSON structure has `entry` with 1 TRIGGER + 1 FILTER |
 | Invalid date format | Date not in `YYYY-MM-DD` | Use ISO format: `"2025-01-01"` |
 | Market data unavailable | CoinAPI has no data for the requested range | Try a different date range or asset |
-| `503` engine busy | Another backtest was already running (you sent requests in parallel) | Wait for the `Retry-After` delay and retry, run sequentially, or use the bulk endpoint. See [Concurrency and limits](#concurrency-and-limits). |
 
 ## Next steps
 

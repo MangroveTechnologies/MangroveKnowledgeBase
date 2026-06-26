@@ -1,24 +1,11 @@
 ---
 title: "Risk Management"
-description: "Understand how stop losses, position sizing, cooldown controls, and risk limits work in MangroveAI's execution_config."
+description: "Understand how stop losses, position sizing, and risk controls work in MangroveAI's execution_config."
 ---
 
 # Risk Management
 
 Every strategy in MangroveAI has an `execution_config` that controls risk management, position sizing, and trade lifecycle rules. This guide explains each field, how they interact, and how to tune them for your trading style.
-
-<Warning>
-**Deprecation notice:** The legacy cooldown keys `cooldown_bars`, `daily_momentum_limit`, `weekly_momentum_limit`, and the top-level `max_hold_time_hours` are deprecated as of the v2 cooldown redesign. They continue to work during the 90-day grace period but will be removed in a future major version. Migrate to the `cooldown_config` block described below.
-
-Migration summary:
-
-| Legacy key | Replacement |
-|------------|-------------|
-| `cooldown_bars` | `cooldown_config[tf].short_window_bars` (also drives cooldown duration) |
-| `daily_momentum_limit` | `cooldown_config[tf].short_loss_limit` |
-| `weekly_momentum_limit` | `cooldown_config[tf].long_loss_limit` |
-| `max_hold_time_hours` (top-level) | `time_based_exits.max_hold_bars` (max hold is now in `execution_config.max_hold_bars`) |
-</Warning>
 
 ## How risk management works
 
@@ -45,16 +32,14 @@ Here is the complete `execution_config` with default values. Each field is expla
   "target_volatility": 0.02,
   "volatility_mode": "stddev",
   "enable_volatility_adjustment": false,
+  "max_hold_time_hours": null,
+  "cooldown_bars": 24,
+  "daily_momentum_limit": 3,
+  "weekly_momentum_limit": 3,
   "max_hold_bars": 50,
   "exit_on_loss_after_bars": 50,
   "exit_on_profit_after_bars": 60,
-  "profit_threshold_pct": 0.05,
-  "cooldown_config": {
-    "5m":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
-    "15m": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
-    "1h":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
-    "1d":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
-  }
+  "profit_threshold_pct": 0.05
 }
 ```
 
@@ -179,67 +164,21 @@ These fields prevent over-concentration and overtrading:
 | Moderate | 5 - 10 | 20 - 50 |
 | Active | 10 - 20 | 50 - 100 |
 
-## Cooldown system
+## Cooldown bars
 
-The cooldown system prevents a strategy from entering new positions after a losing streak. It uses a two-tier design -- a short tier that catches acute streaks, and a long tier that catches sustained underperformance. Both tiers operate independently per asset.
+After a trade closes (win or loss), the `cooldown_bars` setting prevents the strategy from immediately re-entering.
 
-### Two-tier design
+| Field | Default | Description |
+|-------|---------|-------------|
+| `cooldown_bars` | `24` | Number of bars to wait after a trade before the next entry is allowed. |
 
-| Tier | Purpose | Trips when... |
-|------|---------|---------------|
-| Short | Detects an acute losing streak | `short_loss_limit` losses occur within the last `short_window_bars` bars |
-| Long | Detects sustained underperformance | `long_loss_limit` losses occur within the last `long_window_bars` bars |
+On a 1-hour timeframe, the default of 24 means the strategy waits 24 hours between trades. This prevents:
 
-When a tier trips, the strategy enters a cooldown. The cooldown duration equals the window itself: tripping the short tier blocks entries for `short_window_bars` bars; tripping the long tier blocks entries for `long_window_bars` bars. This means the window bar count serves double duty -- it is both the rolling lookback and the cooldown duration.
+- Whipsaw entries in choppy markets
+- Excessive trading around the same price level
+- Emotional re-entry after a stop-out
 
-If a short-tier trip occurs while a long cooldown is already active, the longer cooldown is preserved. Cooldowns never shorten an already-active block.
-
-### The cooldown_config block
-
-`cooldown_config` is a dict keyed by primary timeframe. Each timeframe has four values:
-
-| Key | Description |
-|-----|-------------|
-| `short_loss_limit` | Number of losses in the short window that trips the short-tier cooldown |
-| `long_loss_limit` | Number of losses in the long window that trips the long-tier cooldown |
-| `short_window_bars` | Rolling lookback for the short tier AND the cooldown duration when short trips |
-| `long_window_bars` | Rolling lookback for the long tier AND the cooldown duration when long trips |
-
-Max hold time is controlled separately via `time_based_exits.max_hold_bars` in `execution_config`.
-
-```json
-"cooldown_config": {
-  "5m":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 180, "long_window_bars": 480},
-  "15m": {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 120, "long_window_bars": 320},
-  "1h":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 48,  "long_window_bars": 144},
-  "1d":  {"short_loss_limit": 4, "long_loss_limit": 6, "short_window_bars": 20,  "long_window_bars": 60}
-}
-```
-
-### Reading the defaults
-
-For a 1h strategy with the defaults above:
-- Short tier: 4 losses in the last 48 bars (2 days) trips a 48-bar cooldown
-- Long tier: 6 losses in the last 144 bars (6 days) trips a 144-bar cooldown
-- Max hold is set separately via `execution_config.max_hold_bars` (see Time-based exits below)
-
-For a 5m strategy:
-- Short tier: 4 losses in the last 180 bars (15 hours) trips a 180-bar cooldown
-- Long tier: 6 losses in the last 480 bars (40 hours) trips a 480-bar cooldown
-- Max hold is set separately via `execution_config.max_hold_bars` (see Time-based exits below)
-
-### Tuning guidance
-
-The defaults are calibrated for standard multi-timeframe use. Adjust based on your strategy's expected win rate and trade frequency:
-
-- **Higher `short_loss_limit`**: more tolerance for short losing streaks before cooling off
-- **Lower `short_window_bars`**: narrower lookback -- only very recent losses count
-- **Larger `long_window_bars`**: spread the long-tier assessment over a wider history
-- **Smaller `max_hold_bars`** (in `execution_config`): force position turnover faster regardless of timeframe
-
-### Fallback (legacy keys)
-
-If `cooldown_config` is absent from `execution_config`, or if the strategy's primary timeframe is not a key in `cooldown_config`, the engine falls back to the legacy flat keys and emits a structured deprecation warning in the logs. See the deprecation notice at the top of this page for the migration mapping.
+**Tuning:** Set `cooldown_bars` relative to your timeframe. For 4h bars, a cooldown of 6 (24 hours) might make sense. For daily bars, a cooldown of 1-3 is typical.
 
 ## Time-based exits
 
@@ -248,6 +187,7 @@ These fields force positions to close after a certain number of bars, regardless
 | Field | Default | Description |
 |-------|---------|-------------|
 | `max_hold_bars` | `50` | Maximum bars to hold any position. Forces exit after this limit. |
+| `max_hold_time_hours` | `null` | Maximum hold time in hours. `null` means no time limit (uses `max_hold_bars` instead). |
 | `exit_on_loss_after_bars` | `50` | Force-exit losing positions after this many bars. |
 | `exit_on_profit_after_bars` | `60` | Force-exit winning positions after this many bars. |
 | `profit_threshold_pct` | `0.05` | What counts as "winning" for `exit_on_profit_after_bars`. 0.05 = 5% unrealized profit. |
@@ -261,13 +201,22 @@ With defaults on a 1h timeframe:
 - A winning trade (5%+ profit) is forced closed after 60 bars (about 2.5 days)
 - Any position, regardless of P&L, closes after 50 bars (`max_hold_bars`)
 
+## Momentum limits
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `daily_momentum_limit` | `3` | Daily momentum threshold. |
+| `weekly_momentum_limit` | `3` | Weekly momentum threshold. |
+
+These thresholds limit entry signals in extreme momentum conditions, preventing the strategy from chasing moves that have already played out.
+
 ## Putting it all together
 
-Here is a complete example that creates a strategy with custom risk parameters -- tighter stops, smaller position sizes, fewer concurrent positions, and explicit cooldown config for a 1h timeframe:
+Here is a complete example that creates a strategy with custom risk parameters -- tighter stops, smaller position sizes, and fewer concurrent positions:
 
 <CodeGroup>
 ```bash cURL
-curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/strategies" \
+curl -s -X POST "http://localhost:5001/api/v1/strategies" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -277,13 +226,13 @@ curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/strategies" \
       {
         "name": "sma_cross_up",
         "signal_type": "TRIGGER",
-        "timeframe": "1h",
+        "timeframe": "4h",
         "params": {"window_fast": 10, "window_slow": 50}
       },
       {
         "name": "adx_strong_trend",
         "signal_type": "FILTER",
-        "timeframe": "1h",
+        "timeframe": "4h",
         "params": {"window": 14, "threshold": 25}
       }
     ],
@@ -303,13 +252,14 @@ curl -s -X POST "https://api.mangrovedeveloper.ai/api/v1/strategies" \
       "target_volatility": 0.02,
       "volatility_mode": "stddev",
       "enable_volatility_adjustment": false,
+      "max_hold_time_hours": null,
+      "cooldown_bars": 12,
+      "daily_momentum_limit": 3,
+      "weekly_momentum_limit": 3,
       "max_hold_bars": 30,
       "exit_on_loss_after_bars": 24,
       "exit_on_profit_after_bars": 36,
-      "profit_threshold_pct": 0.03,
-      "cooldown_config": {
-        "1h": {"short_loss_limit": 3, "long_loss_limit": 5, "short_window_bars": 48, "long_window_bars": 144}
-      }
+      "profit_threshold_pct": 0.03
     }
   }' | python3 -m json.tool
 ```
@@ -322,13 +272,13 @@ conservative_strategy = {
         {
             "name": "sma_cross_up",
             "signal_type": "TRIGGER",
-            "timeframe": "1h",
+            "timeframe": "4h",
             "params": {"window_fast": 10, "window_slow": 50},
         },
         {
             "name": "adx_strong_trend",
             "signal_type": "FILTER",
-            "timeframe": "1h",
+            "timeframe": "4h",
             "params": {"window": 14, "threshold": 25},
         },
     ],
@@ -348,18 +298,14 @@ conservative_strategy = {
         "target_volatility": 0.02,
         "volatility_mode": "stddev",
         "enable_volatility_adjustment": False,
-        "max_hold_bars": 30,                # Max 30 bars = 30 hours on 1h
+        "max_hold_time_hours": None,
+        "cooldown_bars": 12,                # 12 bars = 2 days on 4h
+        "daily_momentum_limit": 3,
+        "weekly_momentum_limit": 3,
+        "max_hold_bars": 30,                # Max 30 bars = 5 days on 4h
         "exit_on_loss_after_bars": 24,
         "exit_on_profit_after_bars": 36,
         "profit_threshold_pct": 0.03,       # 3% counts as "winning"
-        "cooldown_config": {
-            "1h": {
-                "short_loss_limit": 3,      # Trip short cooldown after 3 losses in 48 bars
-                "long_loss_limit": 5,       # Trip long cooldown after 5 losses in 144 bars
-                "short_window_bars": 48,    # 48-bar lookback AND 48-bar cooldown on short trip
-                "long_window_bars": 144,    # 144-bar lookback AND 144-bar cooldown on long trip
-            }
-        },
     },
 }
 
@@ -382,44 +328,40 @@ const conservativeStrategy = {
     {
       name: "sma_cross_up",
       signal_type: "TRIGGER",
-      timeframe: "1h",
+      timeframe: "4h",
       params: { window_fast: 10, window_slow: 50 },
     },
     {
       name: "adx_strong_trend",
       signal_type: "FILTER",
-      timeframe: "1h",
+      timeframe: "4h",
       params: { window: 14, threshold: 25 },
     },
   ],
   exit: [],
   reward_factor: 2.5,
   execution_config: {
-    max_risk_per_trade: 0.005,         // 0.5% risk per trade
-    reward_factor: 2.5,                 // Higher reward target
+    max_risk_per_trade: 0.005,        // 0.5% risk per trade
+    reward_factor: 2.5,                // Higher reward target
     stop_loss_calculation: "dynamic_atr",
     atr_period: 14,
-    atr_volatility_factor: 1.5,         // Tighter stops
+    atr_volatility_factor: 1.5,        // Tighter stops
     min_balance_threshold: 0.1,
     min_trade_amount: 50,
-    max_open_positions: 3,              // Max 3 concurrent positions
+    max_open_positions: 3,             // Max 3 concurrent positions
     max_trades_per_day: 10,
     volatility_window: 24,
     target_volatility: 0.02,
     volatility_mode: "stddev",
     enable_volatility_adjustment: false,
-    max_hold_bars: 30,                  // Max 30 bars = 30 hours on 1h
+    max_hold_time_hours: null,
+    cooldown_bars: 12,                 // 12 bars = 2 days on 4h
+    daily_momentum_limit: 3,
+    weekly_momentum_limit: 3,
+    max_hold_bars: 30,                 // Max 30 bars = 5 days on 4h
     exit_on_loss_after_bars: 24,
     exit_on_profit_after_bars: 36,
-    profit_threshold_pct: 0.03,         // 3% counts as "winning"
-    cooldown_config: {
-      "1h": {
-        short_loss_limit: 3,
-        long_loss_limit: 5,
-        short_window_bars: 48,
-        long_window_bars: 144,
-      },
-    },
+    profit_threshold_pct: 0.03,        // 3% counts as "winning"
   },
 };
 
@@ -440,7 +382,7 @@ Key differences from defaults:
 - **1.5x ATR** stops instead of 2x -- tighter exit on losses
 - **2.5x reward** factor -- requires more upside before taking profit
 - **3 max positions** instead of 10 -- less capital at risk simultaneously
-- **Explicit 1h cooldown_config** -- 3-loss short trip, 5-loss long trip, both tuned for conservative operation
+- **12-bar cooldown** -- waits 2 days between entries on 4h bars
 
 ## Quick reference: all fields
 
@@ -459,15 +401,14 @@ Key differences from defaults:
 | `target_volatility` | number | 0.02 | Target portfolio volatility |
 | `volatility_mode` | string | `"stddev"` | Volatility method (`"stddev"` or `"atr"`) |
 | `enable_volatility_adjustment` | bool | false | Scale position sizes by volatility |
+| `max_hold_time_hours` | number/null | null | Max hold time in hours (null = no limit) |
+| `cooldown_bars` | int | 24 | Bars between trades |
+| `daily_momentum_limit` | number | 3 | Daily momentum cap |
+| `weekly_momentum_limit` | number | 3 | Weekly momentum cap |
 | `max_hold_bars` | int | 50 | Max bars for any position |
 | `exit_on_loss_after_bars` | int | 50 | Force-exit losers after N bars |
 | `exit_on_profit_after_bars` | int | 60 | Force-exit winners after N bars |
 | `profit_threshold_pct` | number | 0.05 | Threshold for "winning" (0.05 = 5%) |
-| `cooldown_config` | object | see defaults | Per-timeframe cooldown settings (see above) |
-| ~~`cooldown_bars`~~ | int | 24 | **Deprecated.** Use `cooldown_config[tf].short_window_bars`. |
-| ~~`daily_momentum_limit`~~ | number | 3 | **Deprecated.** Use `cooldown_config[tf].short_loss_limit`. |
-| ~~`weekly_momentum_limit`~~ | number | 3 | **Deprecated.** Use `cooldown_config[tf].long_loss_limit`. |
-| ~~`max_hold_time_hours`~~ | number/null | null | **Deprecated.** Use `execution_config.max_hold_bars` (bars) instead of hours. |
 
 ## Next steps
 

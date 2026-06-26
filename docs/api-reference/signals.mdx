@@ -1,41 +1,24 @@
 ---
 title: "Signals API"
-description: "Discover, validate, and evaluate 233 trading signals across momentum, trend, volume, volatility, patterns, and on-chain categories."
+description: "Discover, validate, and evaluate 136 trading signals across momentum, trend, volume, volatility, and patterns categories."
 ---
 
 # Signals API
 
-The Signals API provides endpoints for discovering, validating, and evaluating trading signals. MangroveAI includes 233 active signals (112 TRIGGER, 121 FILTER) organized by category.
+The Signals API provides endpoints for discovering, validating, and evaluating trading signals. MangroveAI includes 136 active signals (66 TRIGGER, 70 FILTER) organized by category.
 
 ## Signal Classification
 
-- **TRIGGER (108 signals)**: Event-based signals that fire when specific conditions occur (crossovers, breakouts, pattern completions)
-- **FILTER (115 signals)**: State-based signals describing ongoing market conditions (price above SMA, RSI in range)
+- **TRIGGER (66 signals)**: Event-based signals that fire when specific conditions occur (crossovers, breakouts, pattern completions)
+- **FILTER (70 signals)**: State-based signals describing ongoing market conditions (price above SMA, RSI in range)
 
 Entry conditions must include exactly one TRIGGER and exactly one FILTER.
 
 ## Base URL
 
 ```
-https://api.mangrovedeveloper.ai/api/v1/signals
+http://localhost:5001/api/v1/signals
 ```
-
-## Authentication
-
-All signals endpoints require a Bearer token (a JWT or an API key) in the `Authorization` header. Requests without it return `401 Unauthorized`. See the [Authentication guide](/authentication) for how to obtain a token. The examples below assume the token is available as `$TOKEN` (cURL) / `headers` (Python):
-
-<CodeGroup>
-```bash cURL
-export TOKEN="your-jwt-token-here"
-```
-
-```python Python
-import requests
-
-TOKEN = "your-jwt-token-here"
-headers = {"Authorization": f"Bearer {TOKEN}"}
-```
-</CodeGroup>
 
 ## Endpoints
 
@@ -46,21 +29,18 @@ headers = {"Authorization": f"Bearer {TOKEN}"}
 **Query Parameters:**
 - `limit` (optional, int, default=50): Maximum number of signals (1-100)
 - `offset` (optional, int, default=0): Pagination offset
-- `category` (optional, str): Filter by category. One of `momentum`, `trend`, `volume`, `volatility`, `patterns`, `onchain`. When provided, `total` reflects the filtered count.
 
 <CodeGroup>
 ```bash cURL
-curl -X GET "https://api.mangrovedeveloper.ai/api/v1/signals?category=momentum&limit=10&offset=0" \
-  -H "Authorization: Bearer $TOKEN"
+curl -X GET "http://localhost:5001/api/v1/signals?limit=10&offset=0"
 ```
 
 ```python Python
 import requests
 
 response = requests.get(
-    "https://api.mangrovedeveloper.ai/api/v1/signals",
-    headers=headers,
-    params={"category": "momentum", "limit": 10, "offset": 0}
+    "http://localhost:5001/api/v1/signals",
+    params={"limit": 10, "offset": 0}
 )
 signals = response.json()["signals"]
 ```
@@ -85,7 +65,7 @@ signals = response.json()["signals"]
       }
     }
   ],
-  "total": 223,
+  "total": 136,
   "limit": 10,
   "offset": 0
 }
@@ -96,8 +76,7 @@ signals = response.json()["signals"]
 `GET /api/v1/signals/{signal_name}`
 
 ```bash
-curl -X GET https://api.mangrovedeveloper.ai/api/v1/signals/rsi_oversold \
-  -H "Authorization: Bearer $TOKEN"
+curl -X GET http://localhost:5001/api/v1/signals/rsi_oversold
 ```
 
 ### Search Signals
@@ -108,8 +87,7 @@ Search for signals by name, parameters, or keywords.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/search \
-  -H "Authorization: Bearer $TOKEN" \
+curl -X POST http://localhost:5001/api/v1/signals/search \
   -H "Content-Type: application/json" \
   -d '{
     "query": "moving average",
@@ -120,8 +98,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/search \
 
 ```python Python
 response = requests.post(
-    "https://api.mangrovedeveloper.ai/api/v1/signals/search",
-    headers=headers,
+    "http://localhost:5001/api/v1/signals/search",
     json={"query": "moving average", "search_type": "keywords", "limit": 20}
 )
 ```
@@ -137,8 +114,7 @@ Intent-aware semantic signal matching using natural language descriptions.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/match \
-  -H "Authorization: Bearer $TOKEN" \
+curl -X POST http://localhost:5001/api/v1/signals/match \
   -H "Content-Type: application/json" \
   -d '{
     "user_description": "I want to buy when RSI is low and showing oversold conditions",
@@ -149,8 +125,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/match \
 
 ```python Python
 response = requests.post(
-    "https://api.mangrovedeveloper.ai/api/v1/signals/match",
-    headers=headers,
+    "http://localhost:5001/api/v1/signals/match",
     json={
         "user_description": "I want to buy when RSI is low",
         "num_results": 3,
@@ -187,8 +162,7 @@ Evaluate a signal against provided market data. Returns a boolean result.
 
 <CodeGroup>
 ```bash cURL
-curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/evaluate \
-  -H "Authorization: Bearer $TOKEN" \
+curl -X POST http://localhost:5001/api/v1/signals/is_above_sma/evaluate \
   -H "Content-Type: application/json" \
   -d '{
     "market_data": [
@@ -201,8 +175,7 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/evalua
 
 ```python Python
 response = requests.post(
-    "https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/evaluate",
-    headers=headers,
+    "http://localhost:5001/api/v1/signals/is_above_sma/evaluate",
     json={
         "market_data": [
             {"Close": 100}, {"Close": 102}, {"Close": 101},
@@ -222,8 +195,7 @@ result = response.json()["result"]  # True or False
 Evaluate chart data for a date range with multiple signals across different timeframes.
 
 ```bash
-curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/evaluate-multiple-series \
-  -H "Authorization: Bearer $TOKEN" \
+curl -X POST http://localhost:5001/api/v1/signals/evaluate-multiple-series \
   -H "Content-Type: application/json" \
   -d '{
     "symbol": "BTC",
@@ -244,33 +216,32 @@ curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/evaluate-multiple-s
 Validate parameters for a signal without evaluating it.
 
 ```bash
-curl -X POST https://api.mangrovedeveloper.ai/api/v1/signals/is_above_sma/validate-params \
-  -H "Authorization: Bearer $TOKEN" \
+curl -X POST http://localhost:5001/api/v1/signals/is_above_sma/validate-params \
   -H "Content-Type: application/json" \
   -d '{"parameters": {"window": 20}}'
 ```
 
 ## Signal Categories
 
-### Momentum (42 signals)
+### Momentum (26 signals)
 
 RSI, Stochastic, Williams %R, TSI, and related oscillators.
 
 Examples: `rsi_oversold`, `rsi_overbought`, `stoch_oversold`, `williams_r_oversold`
 
-### Trend (88 signals)
+### Trend (38 signals)
 
 SMA, EMA, MACD, ADX, and moving average crossovers.
 
 Examples: `sma_cross_up`, `sma_cross_down`, `ema_cross_up`, `macd_bullish_cross`, `adx_strong_trend`
 
-### Volume (33 signals)
+### Volume (22 signals)
 
 OBV, MFI, CMF, VWAP, and volume-based indicators.
 
 Examples: `obv_bullish`, `mfi_oversold`, `cmf_bullish`, `vwap_above`
 
-### Volatility (20 signals)
+### Volatility (10 signals)
 
 Bollinger Bands, ATR, Keltner Channel, and volatility measures.
 

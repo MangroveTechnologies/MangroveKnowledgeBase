@@ -1,0 +1,47 @@
+---
+title: "Commit Standards"
+description: "Conventional Commits format and scope conventions for MangroveAI."
+---
+
+# Commit Standards
+
+MangroveAI uses [Conventional Commits](https://www.conventionalcommits.org/). A Husky `commit-msg` hook enforces compliance automatically.
+
+## Format
+
+```
+<type>(<scope>): <subject>
+```
+
+## Valid Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature | `feat(ai-copilot): add state machine integration` |
+| `fix` | Bug fix | `fix(backtesting): resolve calculation error` |
+| `docs` | Documentation | `docs(readme): update setup instructions` |
+| `style` | Formatting | `style: format code with black` |
+| `refactor` | Code restructure | `refactor(strategies): reorganize strategy loader` |
+| `perf` | Performance | `perf(database): optimize query performance` |
+| `test` | Tests | `test(api): add integration tests` |
+| `chore` | Build/tooling | `chore: update dependencies` |
+| `ci` | CI/CD changes | `ci: fix commitlint workflow` |
+| `revert` | Revert commit | `revert: revert previous feature` |
+
+## Common Scopes
+
+### Domain Scopes
+
+`ai-copilot`, `backtesting`, `strategies`, `signals`, `positions`, `crypto-assets`, `auth`
+
+### Infrastructure Scopes
+
+`docker`, `ci`, `config`, `api`, `database`, `tests`, `docs`
+
+## Rules
+
+1. Type and subject are required; scope is optional
+2. Subject must be lowercase and not end with a period
+3. Use imperative mood: "add feature" not "added feature"
+4. Keep the subject line under 72 characters
+5. Use the body for detailed explanations when needed

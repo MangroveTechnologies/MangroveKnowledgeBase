@@ -7,7 +7,7 @@ description: "Asset data, risk scoring, exchange listings, market intelligence, 
 
 The Crypto Assets API provides access to curated crypto asset data, risk scores, exchange listings, and real-time market intelligence with 19 endpoints across four categories.
 
-**Base URL:** `https://api.mangrovedeveloper.ai/api/v1/crypto-assets`
+**Base URL:** `http://localhost:5001/api/v1/crypto-assets`
 
 ## Endpoint Categories
 
@@ -28,7 +28,7 @@ Query approved assets with risk scores, optimized for frontend dropdowns.
 
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/crypto-assets/query?approved_only=true&min_score=70&limit=50"
+  "http://localhost:5001/api/v1/crypto-assets/query?approved_only=true&min_score=70&limit=50"
 ```
 
 ### List All Assets
@@ -37,7 +37,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  "https://api.mangrovedeveloper.ai/api/v1/crypto-assets/all?approved=true&min_score=70&limit=100"
+  "http://localhost:5001/api/v1/crypto-assets/all?approved=true&min_score=70&limit=100"
 ```
 
 **Response:**
