@@ -1,0 +1,25 @@
+name: Add new issues to Web Team board
+
+# Automatically adds any newly opened or reopened issue in this repo to the
+# org-level "Mangrove Platform Web Team Planning" project board (Project #6).
+# Requires an org/repo secret ADD_TO_PROJECT_PAT: a token with "Projects: read
+# and write" on the MangroveTechnologies org. The default GITHUB_TOKEN cannot
+# write to org-level Projects, so a PAT (or GitHub App token) is required.
+
+on:
+  issues:
+    types: [opened, reopened, transferred]
+
+permissions:
+  contents: read
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/orgs/MangroveTechnologies/projects/6
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          # To limit which issues get added, uncomment and set labels:
+          # labeled: web-team
