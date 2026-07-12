@@ -839,6 +839,18 @@ def time_based_exit(entry_time, current_time, max_holding_period):
 - Don't let winners turn into losers (use break-even stops)
 - Test different exit strategies with same entry to find optimal
 - Document reason for each exit in trade log
+- **Always define at least one exit signal before backtesting.** A strategy
+  with entry signals but no exit signal still runs, but it never closes a
+  position on its own -- the Mangrove backtester force-closes every open
+  position at the end of the simulation window. That end-of-sim liquidation
+  understates drawdown and can overstate returns and Sharpe, so the reported
+  metrics will not reflect how the strategy would trade live.
+
+> **Backtest Warning:** When a strategy defines entry signals but an empty
+> `exit` list, the backtest is not rejected -- it returns a non-fatal
+> `NO_EXIT_SIGNAL` warning in the response `warnings` array (and the AI copilot
+> flags it). Treat the resulting metrics with caution until you add an exit
+> rule.
 
 ---
 
