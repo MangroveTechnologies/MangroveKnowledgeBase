@@ -23,13 +23,6 @@ python -m pytest tests/ -v
 # Local fallback:
 ./scripts/publish.sh patch   # or minor, major
 
-# Generate Mintlify docs
-python scripts/generate-mint-config.py
-python scripts/generate-kb-docs.py
-python scripts/generate-signal-catalog.py
-
-# Preview Mintlify docs (port 3000)
-cd docs && mintlify dev --port 3000 --host 0.0.0.0
 ```
 
 **Verify it works:**
@@ -51,7 +44,7 @@ curl -X POST http://localhost:8081/api/evaluate \
 
 ## What This Is
 
-Open-source trading signals, technical indicators, and knowledge base. Three components:
+Open-source trading signals, technical indicators, and knowledge base. Public developer docs now live in mangrove-platform-frontend-web (`content/docs/`), not here. Components:
 
 1. **Python Package** (`mangrove_kb`) -- 233 signal functions, 99 indicator classes (including 27 pattern indicators), RuleRegistry, docstring parser. Published on PyPI as `mangrove-kb`.
 2. **KB Server** (`kb_server/`) -- Unified server with dual protocol access (REST + MCP) on the same port. FastAPI REST API + FastMCP tools. SQLite FTS5 full-text search, 11 trading education documents, glossary, cross-references, synonym expansion. Signal/indicator metadata (free) and computation (x402 gated).
@@ -81,7 +74,6 @@ kb_server/                     # unified server (REST + MCP)
     middleware.py              # payment validation
     pricing.py                 # per-tool pricing
 knowledge-base/                # 11 trading education markdown documents
-docs/                          # Mintlify public docs site
 notebooks/                     # Signal explorer notebook
 data/                          # 7 sample OHLCV datasets
 tests/                         # 102 tests
@@ -119,7 +111,6 @@ x402 payment is enforced on both HTTP and MCP via shared middleware.
 - **MangroveAI imports signals/indicators from `mangrove-kb` PyPI package** -- no embedded copy, no toggle.
 - **5 social signals stay private** in MangroveAI. They are not in this open-source repo.
 - **KB server is standalone** -- zero code dependencies on MangroveAI.
-- **Public documentation** via Mintlify. No authentication required.
 - **Signal parameter naming** -- standardized to `window` (not `lookback`, `period`, `length`). Backward compat mapping in `RuleRegistry.evaluate()`.
 
 ## CI/CD
