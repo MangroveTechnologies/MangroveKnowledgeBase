@@ -216,7 +216,7 @@ docker compose up -d mkb-knowledge-base
 
 - [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase)
 - [PyPI Package](https://pypi.org/project/mangrove-kb/)
-- [Documentation](https://docs.mangrovedeveloper.ai)
+- [Documentation](https://mangrove.io/docs)
 - [Mangrove](https://mangrove.ai)
 
 ## License
