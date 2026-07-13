@@ -494,6 +494,19 @@ def check_exit(data, position):
 - Should be defined before trade entry
 - Examples: `sma_cross_down`, `macd_bearish_cross`, `rsi_overbought`
 
+> **Exit signals are OPTIONAL on Mangrove.** Every position automatically
+> carries system exits from `execution_config`, independent of exit signals:
+> a dynamic-ATR **stop-loss** and a reward-factor **take-profit** bracket
+> attached at entry, plus time-based exits (`exit_on_loss_after_bars`,
+> `exit_on_profit_after_bars`, `max_hold_bars`). An entry-only strategy
+> (empty `exit` list) is a first-class configuration — the majority of the
+> reference strategy library is built this way — and its positions close
+> normally via those brackets. Defining exit signals adds a strategy-driven
+> exit path *on top of* the system brackets; it does not replace them.
+> The engine's close priority per bar: stop-loss → take-profit → exit
+> signal (if defined) → time-based exits; anything still open on the final
+> bar closes at end-of-simulation.
+
 **Filter Signals:**
 - Provide ongoing context rather than discrete triggers
 - Answer: "Should we be trading in this direction at all?"
