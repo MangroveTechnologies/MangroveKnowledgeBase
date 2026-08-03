@@ -55,6 +55,7 @@ def rsi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 70.0) 
     suggesting the asset may be due for a pullback. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -86,6 +87,7 @@ def rsi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 30.0) ->
     suggesting the asset may be due for a bounce. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -117,6 +119,7 @@ def rsi_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) ->
     and is now above the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -156,6 +159,7 @@ def rsi_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     and is now below the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -198,6 +202,7 @@ def stoch_overbought(
     Check if Stochastic %K is above the overbought threshold.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -232,6 +237,7 @@ def stoch_oversold(
     Check if Stochastic %K is below the oversold threshold.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -270,6 +276,7 @@ def williams_r_overbought(df: pd.DataFrame, window: int = 14, threshold: float =
     Williams %R ranges from -100 to 0. Values above -20 indicate overbought.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -303,6 +310,7 @@ def williams_r_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -
     Williams %R ranges from -100 to 0. Values below -80 indicate oversold.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -340,6 +348,7 @@ def tsi_bullish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
     TSI above zero indicates bullish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -374,6 +383,7 @@ def tsi_bearish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
     TSI below zero indicates bearish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -410,6 +420,7 @@ def uo_overbought(df: pd.DataFrame, window_short: int = 7, window_medium: int = 
     Check if Ultimate Oscillator indicates overbought condition.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -444,6 +455,7 @@ def uo_oversold(df: pd.DataFrame, window_short: int = 7, window_medium: int = 14
     Check if Ultimate Oscillator indicates oversold condition.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -482,6 +494,7 @@ def kama_cross_up(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int =
     Check if price crosses above KAMA (bullish signal).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -518,6 +531,7 @@ def kama_cross_down(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int
     Check if price crosses below KAMA (bearish signal).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -558,6 +572,7 @@ def roc_positive(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
     Check if Rate of Change indicates positive momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -586,6 +601,7 @@ def roc_negative(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
     Check if Rate of Change indicates negative momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -614,6 +630,7 @@ def roc_momentum_shift(df: pd.DataFrame, window: int = 12, direction: str = "bul
     Check if ROC crosses zero (momentum shift).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -651,6 +668,7 @@ def ao_bullish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
     Check if Awesome Oscillator indicates bullish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: High, Low
 
     Args:
@@ -683,6 +701,7 @@ def ao_bearish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
     Check if Awesome Oscillator indicates bearish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: High, Low
 
     Args:
@@ -715,6 +734,7 @@ def ao_zero_cross(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34,
     Check if Awesome Oscillator crosses zero line.
 
     Type: TRIGGER
+    Family: momentum
     Requires: High, Low
 
     Args:
@@ -759,6 +779,7 @@ def stochrsi_overbought(df: pd.DataFrame, window: int = 14, smooth1: int = 3, sm
     Check if Stochastic RSI indicates overbought condition. In crypto markets, consider adjusting thresholds during strong trends.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -792,6 +813,7 @@ def stochrsi_oversold(df: pd.DataFrame, window: int = 14, smooth1: int = 3, smoo
     Check if Stochastic RSI indicates oversold condition. In crypto markets, consider adjusting thresholds during strong trends.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -829,6 +851,7 @@ def ppo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
     Check if PPO crosses above signal line (bullish).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -865,6 +888,7 @@ def ppo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
     Check if PPO crosses below signal line (bearish).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -905,6 +929,7 @@ def pvo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
     Check if PVO crosses above signal line (bullish volume).
 
     Type: TRIGGER
+    Family: volatility
     Requires: Volume
 
     Args:
@@ -941,6 +966,7 @@ def pvo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
     Check if PVO crosses below signal line (bearish volume).
 
     Type: TRIGGER
+    Family: volatility
     Requires: Volume
 
     Args:
@@ -1002,6 +1028,7 @@ def mom_bullish(df: pd.DataFrame, window: int = 10) -> bool:
     Indicates upward price momentum over the lookback window.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1028,6 +1055,7 @@ def mom_bearish(df: pd.DataFrame, window: int = 10) -> bool:
     Indicates downward price momentum over the lookback window.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1052,6 +1080,7 @@ def mom_cross_up(df: pd.DataFrame, window: int = 10) -> bool:
     Detect Momentum crossing above zero (bullish zero-line cross).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1074,6 +1103,7 @@ def mom_cross_down(df: pd.DataFrame, window: int = 10) -> bool:
     Detect Momentum crossing below zero (bearish zero-line cross).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1100,6 +1130,7 @@ def bop_bullish(df: pd.DataFrame) -> bool:
     BOP = (close - open) / (high - low). Positive = buyers dominated the bar.
 
     Type: FILTER
+    Family: momentum
     Requires: Open, High, Low, Close
 
     Args:
@@ -1125,6 +1156,7 @@ def bop_bearish(df: pd.DataFrame) -> bool:
     Check if Balance of Power indicates sellers in control on the current bar.
 
     Type: FILTER
+    Family: momentum
     Requires: Open, High, Low, Close
 
     Args:
@@ -1150,6 +1182,7 @@ def bop_cross_up(df: pd.DataFrame) -> bool:
     Detect Balance of Power crossing above zero (sellers -> buyers).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Open, High, Low, Close
 
     Args:
@@ -1173,6 +1206,7 @@ def bop_cross_down(df: pd.DataFrame) -> bool:
     Detect Balance of Power crossing below zero (buyers -> sellers).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Open, High, Low, Close
 
     Args:
@@ -1200,6 +1234,7 @@ def apo_bullish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) 
     Equivalent to the MACD line being above zero (bullish momentum regime).
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1225,6 +1260,7 @@ def apo_bearish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) 
     Check if the Absolute Price Oscillator is negative (bearish regime).
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1250,6 +1286,7 @@ def apo_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26)
     Detect APO crossing above zero (bullish momentum onset).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1273,6 +1310,7 @@ def apo_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 2
     Detect APO crossing below zero (bearish momentum onset).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1301,6 +1339,7 @@ def cmo_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     (analogous to RSI 70).
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -1328,6 +1367,7 @@ def cmo_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
     Default threshold of -50 is standard (analogous to RSI 30).
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -1355,6 +1395,7 @@ def cmo_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
     Analogous to RSI crossing above 30.
 
     Type: TRIGGER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -1382,6 +1423,7 @@ def cmo_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     Analogous to RSI crossing below 70.
 
     Type: TRIGGER
+    Family: mean_reversion
     Requires: Close
 
     Args:

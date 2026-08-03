@@ -102,6 +102,7 @@ def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
     candle's range, signaling indecision. References: [NISON], [KB-07], [CM45T3R].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -127,6 +128,7 @@ def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     the total range, indicating extreme indecision. References: [NISON], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -156,6 +158,7 @@ def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     Bullish signal at support. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -185,6 +188,7 @@ def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     Bearish signal at resistance. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -214,6 +218,7 @@ def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Bullish reversal after downtrend. References: [NISON], [KB-07], [CM45T3R].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -243,6 +248,7 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Bearish reversal after uptrend. References: [NISON], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -272,6 +278,7 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     bearish reversal when appearing after an uptrend. References: [NISON], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -301,6 +308,7 @@ def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     bullish reversal when appearing after a downtrend. References: [NISON], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -329,6 +337,7 @@ def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     Signals strong buying conviction. References: [NISON], [KB-07], [CM45T3R].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -353,6 +362,7 @@ def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     Signals strong selling conviction. References: [NISON], [KB-07], [CM45T3R].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -378,6 +388,7 @@ def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
     References: [NISON], [CM45T3R], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -411,6 +422,7 @@ def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
     candle's body. Strong bullish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, Close
 
     Args:
@@ -434,6 +446,7 @@ def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
     candle's body. Strong bearish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, Close
 
     Args:
@@ -457,6 +470,7 @@ def bullish_harami_trigger(df: pd.DataFrame) -> bool:
     candle's body. Potential bullish reversal. References: [NISON], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, Close
 
     Args:
@@ -480,6 +494,7 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
     candle's body. Potential bearish reversal. References: [NISON], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, Close
 
     Args:
@@ -506,6 +521,7 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
     References: [NISON], [KB-07].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -534,6 +550,7 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
     References: [NISON], [KB-07].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -559,6 +576,7 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     and second bearish. Bearish reversal. References: [NISON], [CM45T3R].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -583,6 +601,7 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     and second bullish. Bullish reversal. References: [NISON], [CM45T3R].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -612,6 +631,7 @@ def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     bullish candle closing above midpoint of first. References: [NISON], [KB-07].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -636,6 +656,7 @@ def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     bearish candle closing below midpoint of first. References: [NISON], [KB-07].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -660,6 +681,7 @@ def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) 
     the previous body. Strong bullish signal. References: [NISON], [KB-07], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -684,6 +706,7 @@ def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> 
     the previous body. Strong bearish signal. References: [NISON], [KB-07], [STOCKCHARTS].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -708,6 +731,7 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
     Confirmed bullish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, Close
 
     Args:
@@ -731,6 +755,7 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
     Confirmed bearish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, Close
 
     Args:
@@ -759,6 +784,7 @@ def inside_bar_trigger(df: pd.DataFrame) -> bool:
     Signals consolidation and potential breakout. References: [KB-07], [TSR].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: High, Low
 
     Args:
@@ -782,6 +808,7 @@ def outside_bar_trigger(df: pd.DataFrame) -> bool:
     Signals increased volatility. References: [KB-07], [TSR].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: High, Low
 
     Args:
@@ -806,6 +833,7 @@ def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Bullish reversal at support. References: [KB-07], [TSR], [PRICEACTION].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -835,6 +863,7 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Bearish reversal at resistance. References: [KB-07], [TSR], [PRICEACTION].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -864,6 +893,7 @@ def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 
     close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -889,6 +919,7 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 
     close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -914,6 +945,7 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
     Default window=7 for NR7; use 4 for NR4. References: [CRABEL], [KB-07], [BULKOWSKI].
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: High, Low
 
     Args:
@@ -944,6 +976,7 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     three inside up, tweezer bottoms, and bullish pin bar within the recent window.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -997,6 +1030,7 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     three inside down, tweezer tops, and bearish pin bar within the recent window.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -1049,6 +1083,7 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     piercing line, and dragonfly doji -- the classic bullish reversal patterns.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -1091,6 +1126,7 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     dark cloud cover, and gravestone doji -- the classic bearish reversal patterns.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -1132,6 +1168,7 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     Scans for three white soldiers and three inside up.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -1162,6 +1199,7 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     Scans for three black crows and three inside down.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -1192,6 +1230,7 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Scans for doji, spinning top, inside bar, and NR7.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:
@@ -1227,6 +1266,7 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Scans for both bullish and bearish marubozu patterns.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: Open, High, Low, Close
 
     Args:

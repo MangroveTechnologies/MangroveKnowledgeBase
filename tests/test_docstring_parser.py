@@ -523,6 +523,101 @@ class TestIndividualParsing:
 
 
 # ---------------------------------------------------------------------------
+# Test: Family field parsing (added in the signal-family-metadata rollout)
+# ---------------------------------------------------------------------------
+
+class TestFamilyParsing:
+    """Verify the new `Family:` docstring tag is parsed correctly.
+
+    Rollout note: `Family:` is currently optional so that signals not yet
+    tagged still parse. A follow-up release will make it required after
+    the TODO(review) entries have been assigned real family values.
+    """
+
+    def test_family_field_extracted_when_present(self):
+        """A signal with `Family: mean_reversion` -> result carries family='mean_reversion'."""
+        def _sample():
+            """
+            Sample signal for testing.
+
+            Type: FILTER
+            Family: mean_reversion
+            Requires: Close
+            """
+        result = parse_signal_docstring(_sample)
+        assert result.get("family") == "mean_reversion"
+
+    def test_family_field_absent_omits_key(self):
+        """A signal without `Family:` -> result has no 'family' key.
+
+        This preserves backwards compatibility so untagged signals still
+        parse cleanly during the rollout window.
+        """
+        def _sample():
+            """
+            Sample signal for testing.
+
+            Type: FILTER
+            Requires: Close
+            """
+        result = parse_signal_docstring(_sample)
+        assert "family" not in result
+
+    def test_family_ignores_inline_todo_comment(self):
+        """`Family: none   # TODO(review)` -> result carries family='none'.
+
+        The parser must ignore inline comments so the review-marker
+        pattern used for signals pending family assignment doesn't
+        break parsing.
+        """
+        def _sample():
+            """
+            Sample signal for testing.
+
+            Type: TRIGGER
+            Family: none   # TODO(review)
+            Requires: Open, Close
+            """
+        result = parse_signal_docstring(_sample)
+        assert result.get("family") == "none"
+
+    def test_family_does_not_leak_into_description(self):
+        """The description-extraction stop pattern must include `Family:`,
+        otherwise the Family line ends up in the description string.
+        """
+        def _sample():
+            """
+            First line of description.
+            Second line of description.
+
+            Type: TRIGGER
+            Family: momentum
+            Requires: Close
+            """
+        result = parse_signal_docstring(_sample)
+        assert "Family" not in result["description"]
+        assert "First line of description" in result["description"]
+
+    def test_family_value_accepts_all_taxonomy_values(self):
+        """Any lowercase snake_case value is accepted by the parser.
+        Value validation is a consumer concern, not a parser concern."""
+        taxonomy = ["trend_following", "momentum", "mean_reversion", "breakout", "volatility", "none"]
+        for family_value in taxonomy:
+            def _sample():
+                pass
+            _sample.__doc__ = (
+                f"Sample.\n\n"
+                f"Type: FILTER\n"
+                f"Family: {family_value}\n"
+                f"Requires: Close\n"
+            )
+            result = parse_signal_docstring(_sample)
+            assert result.get("family") == family_value, (
+                f"Failed to parse family={family_value!r}"
+            )
+
+
+# ---------------------------------------------------------------------------
 # Test: parse_all_signals integration
 # ---------------------------------------------------------------------------
 

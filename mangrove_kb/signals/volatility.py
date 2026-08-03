@@ -45,6 +45,7 @@ def bb_upper_breakout(
     not while price remains above it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
 
     Type: TRIGGER
+    Family: breakout
     Requires: Close
 
     Args:
@@ -87,6 +88,7 @@ def bb_lower_breakout(
     not while price remains below it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
 
     Type: TRIGGER
+    Family: breakout
     Requires: Close
 
     Args:
@@ -129,6 +131,7 @@ def bb_squeeze(
     not while it remains below.
 
     Type: TRIGGER
+    Family: volatility
     Requires: Close
 
     Args:
@@ -176,6 +179,7 @@ def atr_high_volatility(
     potential trading opportunities or increased risk.
 
     Type: FILTER
+    Family: volatility
     Requires: High, Low, Close
 
     Args:
@@ -220,6 +224,7 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
     Fires on the bar where price crosses above the upper band.
 
     Type: TRIGGER
+    Family: breakout
     Requires: High, Low, Close
 
     Args:
@@ -260,6 +265,7 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
     Fires on the bar where price crosses below the lower band.
 
     Type: TRIGGER
+    Family: breakout
     Requires: High, Low, Close
 
     Args:
@@ -306,6 +312,7 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     so the current bar's high doesn't inflate the band it's compared against.
 
     Type: TRIGGER
+    Family: breakout
     Requires: High, Low, Close
 
     Args:
@@ -345,6 +352,7 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     so the current bar's low doesn't deflate the band it's compared against.
 
     Type: TRIGGER
+    Family: breakout
     Requires: High, Low, Close
 
     Args:
@@ -386,6 +394,7 @@ def ulcer_high_risk(df: pd.DataFrame, window: int = 14, threshold: float = 10.0)
     Higher Ulcer Index values indicate greater downside volatility.
 
     Type: FILTER
+    Family: volatility
     Requires: Close
 
     Args:
@@ -419,6 +428,7 @@ def ulcer_low_risk(df: pd.DataFrame, window: int = 14, threshold: float = 5.0) -
     Lower Ulcer Index values indicate lower downside volatility.
 
     Type: FILTER
+    Family: volatility
     Requires: Close
 
     Args:
@@ -459,6 +469,7 @@ def natr_high_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 
     can run 4-6%+ routinely.
 
     Type: FILTER
+    Family: volatility
     Requires: High, Low, Close
 
     Args:
@@ -485,6 +496,7 @@ def natr_low_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 1
     Useful as a squeeze / consolidation filter.
 
     Type: FILTER
+    Family: volatility
     Requires: High, Low, Close
 
     Args:
@@ -520,6 +532,7 @@ def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float
     Check if ATR Trailing Stop is in the long regime (+1 direction).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -542,6 +555,7 @@ def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: floa
     Check if ATR Trailing Stop is in the short regime (-1 direction).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -566,6 +580,7 @@ def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: fl
     Bullish trend-following entry signal.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -593,6 +608,7 @@ def atr_trailing_stop_flip_down(df: pd.DataFrame, window: int = 14, multiplier: 
     Bearish trend-following entry signal.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -620,6 +636,7 @@ def starc_upper_breakout(
     Check if close is above the STARC upper band (breakout).
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -651,6 +668,7 @@ def starc_lower_breakout(
     Check if close is below the STARC lower band (breakdown).
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -683,6 +701,7 @@ def volatility_stop_upper(df: pd.DataFrame, window: int = 20, multiplier: float 
     current bar -- a potential exhaustion / mean-reversion signal.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -708,6 +727,7 @@ def volatility_stop_lower(df: pd.DataFrame, window: int = 20, multiplier: float 
     Check if close has reached or fallen below the stdev-based volatility lower stop.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: Close
 
     Args:

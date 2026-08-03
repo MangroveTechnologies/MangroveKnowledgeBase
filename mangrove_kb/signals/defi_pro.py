@@ -52,6 +52,7 @@ def token_unlock_pressure_low(df: pd.DataFrame, threshold: float = 0.02) -> bool
     Confirm there is little near-term unlock dilution ahead.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: TokenUnlockPressure
 
     Args:
@@ -78,6 +79,7 @@ def token_unlock_cliff_ahead(
     Detect a large upcoming unlock cliff (supply-shock warning).
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: TokenUnlockPressure
 
     Args:
@@ -116,6 +118,7 @@ def funding_negative_regime(df: pd.DataFrame, window: int = 14) -> bool:
     Check for a persistently negative funding regime (shorts pay longs).
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: PerpFundingRate
 
     Args:
@@ -138,6 +141,7 @@ def funding_flip_positive(df: pd.DataFrame) -> bool:
     Detect funding crossing from non-positive to positive on the latest bar.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: PerpFundingRate
 
     Args:
@@ -163,6 +167,7 @@ def etf_inflow_streak(df: pd.DataFrame, window: int = 5) -> bool:
     Confirm sustained net ETF inflows.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: EtfNetFlow
 
     Args:
@@ -186,6 +191,7 @@ def etf_inflow_spike(df: pd.DataFrame, window: int = 20, z_threshold: float = 2.
     Detect an unusually large net ETF inflow on the latest bar.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: EtfNetFlow
 
     Args:
@@ -221,6 +227,7 @@ def treasury_growing(df: pd.DataFrame, window: int = 14) -> bool:
     Check whether the protocol treasury is growing over the window.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: TreasuryUsd
 
     Args:
@@ -243,6 +250,7 @@ def treasury_accumulation_trigger(df: pd.DataFrame, window: int = 20) -> bool:
     Detect treasury value crossing above its moving average.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: TreasuryUsd
 
     Args:
@@ -274,6 +282,7 @@ def lending_spread_low(df: pd.DataFrame, threshold: float = 0.02) -> bool:
     Confirm a calm lending market (narrow borrow-supply spread).
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: LendingRateSpread
 
     Args:
@@ -298,6 +307,7 @@ def lending_spread_widening(df: pd.DataFrame, window: int = 20) -> bool:
     Detect the borrow-supply spread crossing above its moving average.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: LendingRateSpread
 
     Args:

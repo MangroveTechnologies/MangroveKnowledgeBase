@@ -55,6 +55,7 @@ def adi_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     Check if ADI (Accumulation/Distribution) is rising (bullish volume).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close, Volume
 
     Args:
@@ -83,6 +84,7 @@ def adi_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     Check if ADI (Accumulation/Distribution) is falling (bearish volume).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close, Volume
 
     Args:
@@ -111,6 +113,7 @@ def obv_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     Check if OBV is rising (bullish volume confirmation).
 
     Type: FILTER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -139,6 +142,7 @@ def obv_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     Check if OBV is falling (bearish volume confirmation).
 
     Type: FILTER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -167,6 +171,7 @@ def cmf_bullish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
     Check if CMF (Chaikin Money Flow) indicates buying pressure.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close, Volume
 
     Args:
@@ -196,6 +201,7 @@ def cmf_bearish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
     Check if CMF (Chaikin Money Flow) indicates selling pressure.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close, Volume
 
     Args:
@@ -225,6 +231,7 @@ def force_bullish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
     Check if Force Index indicates bullish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close, Volume
 
     Args:
@@ -254,6 +261,7 @@ def force_bearish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
     Check if Force Index indicates bearish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close, Volume
 
     Args:
@@ -283,6 +291,7 @@ def eom_bullish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
     Check if Ease of Movement indicates bullish (easy upward movement).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Volume
 
     Args:
@@ -316,6 +325,7 @@ def eom_bearish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
     Check if Ease of Movement indicates bearish (easy downward movement).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Volume
 
     Args:
@@ -348,6 +358,7 @@ def vpt_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     Check if VPT (Volume Price Trend) is rising.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -376,6 +387,7 @@ def vpt_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     Check if VPT (Volume Price Trend) is falling.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -406,6 +418,7 @@ def nvi_bullish(df: pd.DataFrame, window: int = 255) -> bool:
     NVI above its moving average suggests smart money accumulation.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -436,6 +449,7 @@ def nvi_bearish(df: pd.DataFrame, window: int = 255) -> bool:
     NVI below its moving average suggests smart money distribution.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -464,6 +478,7 @@ def mfi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 80.0) 
     Check if MFI (Money Flow Index) indicates overbought condition.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close, Volume
 
     Args:
@@ -493,6 +508,7 @@ def mfi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 20.0) ->
     Check if MFI (Money Flow Index) indicates oversold condition.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close, Volume
 
     Args:
@@ -522,6 +538,7 @@ def vwap_above(df: pd.DataFrame, window: int = 14) -> bool:
     Check if price is above VWAP (bullish bias).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close, Volume
 
     Args:
@@ -549,6 +566,7 @@ def vwap_below(df: pd.DataFrame, window: int = 14) -> bool:
     Check if price is below VWAP (bearish bias).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close, Volume
 
     Args:
@@ -580,6 +598,7 @@ def daily_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool:
     Check if daily return is positive.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -607,6 +626,7 @@ def daily_return_negative(df: pd.DataFrame, threshold: float = 0.0) -> bool:
     Check if daily return is negative.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -634,6 +654,7 @@ def cumulative_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool
     Check if cumulative return from start is positive.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -661,6 +682,7 @@ def cumulative_return_target(df: pd.DataFrame, target: float = 10.0) -> bool:
     Check if cumulative return has reached target.
 
     Type: FILTER
+    Family: none
     Requires: Close
 
     Args:
@@ -695,6 +717,7 @@ def is_above_vwma(df: pd.DataFrame, window: int = 20) -> bool:
     bars. Useful as a filter that incorporates conviction from volume.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -724,6 +747,7 @@ def vwma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     carry more weight, so the signal is less susceptible to low-volume noise.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -756,6 +780,7 @@ def vwma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     Volume-weighted version of the classic SMA death cross.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close, Volume
 
     Args:
@@ -794,6 +819,7 @@ def adosc_bullish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     short-term buying pressure relative to longer-term trend.
 
     Type: FILTER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:
@@ -821,6 +847,7 @@ def adosc_bearish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     Check if Chaikin A/D Oscillator is negative (distribution regime).
 
     Type: FILTER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:
@@ -848,6 +875,7 @@ def adosc_cross_up(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     Detect ADOSC crossing above zero (accumulation onset).
 
     Type: TRIGGER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:
@@ -875,6 +903,7 @@ def adosc_cross_down(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     Detect ADOSC crossing below zero (distribution onset).
 
     Type: TRIGGER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:
@@ -917,6 +946,7 @@ def kvo_bullish_cross(
     Classic Klinger entry trigger; often confirms a price divergence.
 
     Type: TRIGGER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:
@@ -945,6 +975,7 @@ def kvo_bearish_cross(
     Detect KVO crossing below its signal line (bearish volume onset).
 
     Type: TRIGGER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:
@@ -973,6 +1004,7 @@ def kvo_bullish(
     Check if KVO is above its signal line (bullish volume regime).
 
     Type: FILTER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:
@@ -1001,6 +1033,7 @@ def kvo_bearish(
     Check if KVO is below its signal line (bearish volume regime).
 
     Type: FILTER
+    Family: momentum
     Requires: High, Low, Close, Volume
 
     Args:

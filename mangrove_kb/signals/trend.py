@@ -73,6 +73,7 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
     Returns False if insufficient data is available. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -113,6 +114,7 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
     Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -170,6 +172,7 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
     Note: This is a backwards-compatible wrapper around sma_crossover.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -195,6 +198,7 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
     Note: This is a backwards-compatible wrapper around sma_crossover.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -224,6 +228,7 @@ def macd_bullish_cross(
     the signal line, indicating potential upward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -273,6 +278,7 @@ def macd_bearish_cross(
     the signal line, indicating potential downward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -319,6 +325,7 @@ def macd_positive(
     Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -358,6 +365,7 @@ def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
     Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -397,6 +405,7 @@ def ema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
     Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -448,6 +457,7 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
     Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -497,6 +507,7 @@ def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
     Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -532,6 +543,7 @@ def adx_strong_trend(df: pd.DataFrame, window: int = 14, threshold: float = 25.0
     ADX values above 25 typically indicate a strong trend (either up or down).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -565,6 +577,7 @@ def adx_bullish_di(df: pd.DataFrame, window: int = 14) -> bool:
     When +DI > -DI, bulls have the upper hand.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -601,6 +614,7 @@ def aroon_up_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) 
     Check if Aroon Up indicates strong uptrend.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -632,6 +646,7 @@ def aroon_down_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0
     Check if Aroon Down indicates strong downtrend.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -663,6 +678,7 @@ def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullis
     Check if Aroon lines cross (trend change signal).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -711,6 +727,7 @@ def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
     Check if fast WMA crosses above slow WMA (bullish).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -744,6 +761,7 @@ def wma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
     Check if fast WMA crosses below slow WMA (bearish).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -781,6 +799,7 @@ def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
     Check if TRIX indicates bullish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -809,6 +828,7 @@ def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
     Check if TRIX indicates bearish momentum.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -843,6 +863,7 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
     A reversal bulge occurs when Mass Index rises above 27 then falls below 26.5.
 
     Type: TRIGGER
+    Family: volatility
     Requires: High, Low
 
     Args:
@@ -885,6 +906,7 @@ def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
     Check if Ichimoku indicates bullish signal (price above cloud).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -921,6 +943,7 @@ def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
     Check if Ichimoku indicates bearish signal (price below cloud).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -957,6 +980,7 @@ def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: in
     Check if Tenkan-sen crosses Kijun-sen (TK cross).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -1004,6 +1028,7 @@ def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
     Check if KST crosses above signal line (bullish).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1056,6 +1081,7 @@ def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
     Check if KST crosses below signal line (bearish).
 
     Type: TRIGGER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1106,6 +1132,7 @@ def dpo_positive(df: pd.DataFrame, window: int = 20) -> bool:
     Check if DPO is positive (price above detrended average).
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1133,6 +1160,7 @@ def dpo_negative(df: pd.DataFrame, window: int = 20) -> bool:
     Check if DPO is negative (price below detrended average).
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1164,6 +1192,7 @@ def cci_overbought(df: pd.DataFrame, window: int = 20, constant: float = 0.015, 
     Check if CCI indicates overbought condition.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -1196,6 +1225,7 @@ def cci_oversold(df: pd.DataFrame, window: int = 20, constant: float = 0.015, th
     Check if CCI indicates oversold condition.
 
     Type: FILTER
+    Family: mean_reversion
     Requires: High, Low, Close
 
     Args:
@@ -1232,6 +1262,7 @@ def vortex_bullish(df: pd.DataFrame, window: int = 14) -> bool:
     Check if Vortex Indicator shows bullish trend (+VI > -VI).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -1263,6 +1294,7 @@ def vortex_bearish(df: pd.DataFrame, window: int = 14) -> bool:
     Check if Vortex Indicator shows bearish trend (-VI > +VI).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -1294,6 +1326,7 @@ def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bulli
     Check if Vortex lines cross (trend change).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -1342,6 +1375,7 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Check if PSAR indicates bullish trend (PSAR below price).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -1373,6 +1407,7 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Check if PSAR indicates bearish trend (PSAR above price).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -1404,6 +1439,7 @@ def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, d
     Check if PSAR flips sides (potential reversal).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -1453,6 +1489,7 @@ def stc_overbought(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 2
     Check if STC indicates overbought condition.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1494,6 +1531,7 @@ def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23,
     Check if STC indicates oversold condition.
 
     Type: FILTER
+    Family: momentum
     Requires: Close
 
     Args:
@@ -1585,6 +1623,7 @@ def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
     Useful for trend-following filters where responsiveness matters.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1605,6 +1644,7 @@ def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     Lower-lag equivalent of an SMA/EMA golden cross.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1626,6 +1666,7 @@ def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     Lower-lag equivalent of an SMA/EMA death cross.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1649,6 +1690,7 @@ def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
     TEMA has even less lag than DEMA by combining three EMA passes.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1669,6 +1711,7 @@ def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     Very low-lag cross signal; expect more whipsaw in noisy markets.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1690,6 +1733,7 @@ def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     Very low-lag cross signal; expect more whipsaw in noisy markets.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1714,6 +1758,7 @@ def is_above_trima(df: pd.DataFrame, window: int = 20) -> bool:
     heavily, producing a smoother trend line than SMA.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1732,6 +1777,7 @@ def trima_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 3
     Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1751,6 +1797,7 @@ def trima_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int =
     Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1775,6 +1822,7 @@ def is_above_smma(df: pd.DataFrame, window: int = 14) -> bool:
     a slower, more stable trend line. Same family used inside RSI and ATR.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1795,6 +1843,7 @@ def smma_cross_up(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50
     Slower, more stable crossover than EMA cross; fewer false triggers.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1816,6 +1865,7 @@ def smma_cross_down(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 
     Slower, more stable crossover than EMA cross; fewer false triggers.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1840,6 +1890,7 @@ def is_above_epma(df: pd.DataFrame, window: int = 20) -> bool:
     trend to "now" rather than averaging past values.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1858,6 +1909,7 @@ def epma_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30
     Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1877,6 +1929,7 @@ def epma_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 
     Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1910,6 +1963,7 @@ def is_above_hma(df: pd.DataFrame, window: int = 16) -> bool:
     A common crypto trend filter.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1930,6 +1984,7 @@ def hma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) 
     Low-lag crossover; fires earlier than SMA/EMA equivalents.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1951,6 +2006,7 @@ def hma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25
     Low-lag crossover; fires earlier than SMA/EMA equivalents.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -1975,6 +2031,7 @@ def is_above_alma(df: pd.DataFrame, window: int = 21, offset: float = 0.85, sigm
     near 1, lower sigma) or smoother (offset near 0, higher sigma).
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2010,6 +2067,7 @@ def alma_cross_up(
     Both ALMAs use the same offset and sigma; only the window differs.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2049,6 +2107,7 @@ def alma_cross_down(
     Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2086,6 +2145,7 @@ def is_above_t3(df: pd.DataFrame, window: int = 10, volume_factor: float = 0.7) 
     T3 is a smooth low-lag MA that combines 6 EMAs via the volume factor.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2119,6 +2179,7 @@ def t3_cross_up(
     Very smooth, low-lag crossover. Both T3s share the same volume_factor.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2156,6 +2217,7 @@ def t3_cross_down(
     Detect a bearish T3 crossover (fast T3 crosses below slow T3).
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2204,6 +2266,7 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
     MAMA adapts its smoothing to volatility via a Hilbert transform.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2229,6 +2292,7 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
     Classic Ehlers entry signal: MAMA rising above FAMA signals an uptrend.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2256,6 +2320,7 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
     Classic Ehlers exit signal: MAMA falling below FAMA signals a downtrend.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2291,6 +2356,7 @@ def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
     Strings of bullish HA candles indicate a sustained uptrend.
 
     Type: FILTER
+    Family: trend_following
     Requires: Open, High, Low, Close
 
     Args:
@@ -2315,6 +2381,7 @@ def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
     Check if the current Heikin-Ashi candle is bearish (HA_close < HA_open).
 
     Type: FILTER
+    Family: trend_following
     Requires: Open, High, Low, Close
 
     Args:
@@ -2354,6 +2421,7 @@ def chandelier_long_stop_hit(df: pd.DataFrame, window: int = 22, multiplier: flo
     If holding a long position, this is your exit trigger.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -2381,6 +2449,7 @@ def chandelier_short_stop_hit(df: pd.DataFrame, window: int = 22, multiplier: fl
     If holding a short position, this is your exit trigger.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -2430,6 +2499,7 @@ def alligator_bullish(
     spreading upward.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -2465,6 +2535,7 @@ def alligator_bearish(
     Strong downtrend, all lines spreading downward.
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low
 
     Args:
@@ -2501,6 +2572,7 @@ def alligator_sleeping(
     Used as a no-trade filter during consolidation.
 
     Type: FILTER
+    Family: none
     Requires: High, Low
 
     Args:
@@ -2546,6 +2618,7 @@ def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0)
     Check if SuperTrend is in the long regime (+1 direction).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -2568,6 +2641,7 @@ def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0
     Check if SuperTrend is in the short regime (-1 direction).
 
     Type: FILTER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -2592,6 +2666,7 @@ def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3
     Classic SuperTrend bullish entry signal.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -2619,6 +2694,7 @@ def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float =
     Classic SuperTrend bearish entry signal.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: High, Low, Close
 
     Args:
@@ -2660,6 +2736,7 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     -- when true, the market is in a clear uptrend across all horizons.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2685,6 +2762,7 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2712,6 +2790,7 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Useful as a no-trade filter during choppy markets.
 
     Type: FILTER
+    Family: none
     Requires: Close
 
     Args:
@@ -2750,6 +2829,7 @@ def ttm_squeeze_active(
     for a directional move.
 
     Type: FILTER
+    Family: volatility
     Requires: High, Low, Close
 
     Args:
@@ -2789,6 +2869,7 @@ def ttm_squeeze_fired_bullish(
     momentum is positive. Classic Carter entry signal.
 
     Type: TRIGGER
+    Family: breakout
     Requires: High, Low, Close
 
     Args:
@@ -2827,6 +2908,7 @@ def ttm_squeeze_fired_bearish(
     Detect TTM Squeeze release with bearish momentum.
 
     Type: TRIGGER
+    Family: breakout
     Requires: High, Low, Close
 
     Args:
@@ -2878,6 +2960,7 @@ def rsi_bullish_divergence(
     Classic reversal signal indicating bearish momentum is weakening.
 
     Type: TRIGGER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -2905,6 +2988,7 @@ def rsi_bearish_divergence(
     Classic reversal signal indicating bullish momentum is weakening.
 
     Type: TRIGGER
+    Family: mean_reversion
     Requires: Close
 
     Args:
@@ -2933,6 +3017,7 @@ def rsi_hidden_bullish_divergence(
     intact despite a pullback.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2960,6 +3045,7 @@ def rsi_hidden_bearish_divergence(
     Continuation signal in a downtrend.
 
     Type: TRIGGER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -2992,6 +3078,7 @@ def multi_tf_trend_bullish(
     lower-TF signals can be filtered by higher-TF trend.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:
@@ -3024,6 +3111,7 @@ def multi_tf_trend_bearish(
     Check if the higher-timeframe EMA is falling.
 
     Type: FILTER
+    Family: trend_following
     Requires: Close
 
     Args:

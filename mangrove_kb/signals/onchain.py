@@ -71,6 +71,7 @@ def smart_money_inflow_spike(df: pd.DataFrame, window: int = 20, z_threshold: fl
     Detect an unusually large smart-money inflow on the latest bar.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: SmartMoneyNetflow
 
     Args:
@@ -105,6 +106,7 @@ def smart_money_holdings_cross(df: pd.DataFrame, window: int = 20) -> bool:
     Detect smart-money holdings crossing above their moving average.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: SmartMoneyHoldings
 
     Args:
@@ -135,6 +137,7 @@ def smart_money_net_positive(df: pd.DataFrame, window: int = 14) -> bool:
     Check whether smart money has been a net buyer over the window.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: SmartMoneyNetflow
 
     Args:
@@ -157,6 +160,7 @@ def smart_money_holdings_rising(df: pd.DataFrame, window: int = 14) -> bool:
     Check whether smart-money holdings are higher than window bars ago.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: SmartMoneyHoldings
 
     Args:
@@ -186,6 +190,7 @@ def exchange_outflow_spike(df: pd.DataFrame, window: int = 20, z_threshold: floa
     typically read as bullish.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: ExchangeNetflow
 
     Args:
@@ -221,6 +226,7 @@ def exchange_net_outflow(df: pd.DataFrame, window: int = 14) -> bool:
     Check whether exchanges saw net outflows over the window.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: ExchangeNetflow
 
     Args:
@@ -248,6 +254,7 @@ def whale_accumulation_trigger(df: pd.DataFrame, window: int = 7) -> bool:
     Detect whale net flow flipping to accumulation.
 
     Type: TRIGGER
+    Family: none   # TODO(review)
     Requires: WhaleNetInflow
 
     Args:
@@ -277,6 +284,7 @@ def whale_net_accumulation(df: pd.DataFrame, window: int = 14) -> bool:
     Check whether whales were net accumulators over the window.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: WhaleNetInflow
 
     Args:
@@ -306,6 +314,7 @@ def holder_concentration_low(df: pd.DataFrame, threshold: float = 0.5) -> bool:
     exposed to a single-wallet dump.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: HolderConcentration
 
     Args:
@@ -329,6 +338,7 @@ def holder_concentration_falling(df: pd.DataFrame, window: int = 14) -> bool:
     Check whether top-holder concentration is declining over the window.
 
     Type: FILTER
+    Family: none   # TODO(review)
     Requires: HolderConcentration
 
     Args:

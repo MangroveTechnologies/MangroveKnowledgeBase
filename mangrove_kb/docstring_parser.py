@@ -7,6 +7,11 @@ matches the schema of signals_metadata.json.
 
 Structured docstring tags parsed:
     Type:             TRIGGER or FILTER
+    Family:           Strategy archetype -- one of trend_following, momentum,
+                      mean_reversion, breakout, volatility, or none. Optional
+                      for backwards compatibility during rollout; signals
+                      without a Family tag omit the field from the returned
+                      metadata. A future release will make this required.
     Requires:         Comma-separated column names, or "None"
     Disabled:         True (only present when the signal is disabled)
     Disabled-Reason:  Explanation text (only present when Disabled: True)
@@ -31,6 +36,16 @@ from typing import Any, Optional
 
 # Matches "Type: TRIGGER" or "Type: FILTER"
 _TYPE_RE = re.compile(r"^\s*Type:\s*(TRIGGER|FILTER)\s*$", re.MULTILINE)
+
+# Matches "Family: trend_following" / "Family: momentum" / ...
+# Values are lowercase snake_case; the closed set of accepted values is
+# validated by consumers, not the parser -- we accept any identifier here so
+# that adding a new family in the future doesn't require a parser change.
+# "none" is a valid literal meaning "no strategy family" (used for signals
+# like ETF-flow indicators that don't fit a strategy archetype).
+# Trailing `# ...` inline comment is allowed (used for TODO(review) markers
+# during the Wave 2 rollout; ignored by the parser).
+_FAMILY_RE = re.compile(r"^\s*Family:\s*([a-z][a-z0-9_]*)\s*(?:#.*)?$", re.MULTILINE)
 
 # Matches "Requires: Close" or "Requires: High, Low, Close" or "Requires: None"
 _REQUIRES_RE = re.compile(r"^\s*Requires:\s*(.+)$", re.MULTILINE)
@@ -142,7 +157,7 @@ def _extract_description(docstring: str) -> str:
     for line in lines:
         stripped = line.strip()
         # Stop at the first structured tag
-        if re.match(r"^(Type|Requires|Disabled|Disabled-Reason|Args|Returns):", stripped):
+        if re.match(r"^(Type|Family|Requires|Disabled|Disabled-Reason|Args|Returns):", stripped):
             break
         desc_lines.append(stripped)
 
@@ -386,6 +401,12 @@ def parse_signal_docstring(func) -> dict:
         )
     signal_type = type_match.group(1)
 
+    # Extract Family (optional during rollout — will become required later).
+    # See module docstring for the accepted taxonomy; the parser accepts any
+    # lowercase snake_case identifier, consumers validate the value.
+    family_match = _FAMILY_RE.search(docstring)
+    family = family_match.group(1) if family_match else None
+
     # Extract Requires
     requires_match = _REQUIRES_RE.search(docstring)
     if not requires_match:
@@ -412,6 +433,11 @@ def parse_signal_docstring(func) -> dict:
         "requires": requires,
         "params": params,
     }
+    # Only include `family` when actually present in the docstring, so
+    # signals not yet tagged during rollout continue to parse cleanly. Once
+    # every signal has been tagged we can flip this to raise when missing.
+    if family is not None:
+        result["family"] = family
 
     # Extract Disabled flag
     disabled_match = _DISABLED_RE.search(docstring)
