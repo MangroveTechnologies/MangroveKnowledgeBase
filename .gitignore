@@ -32,8 +32,11 @@ htmlcov/
 .env
 .env.*
 
-# Claude Code
-.claude/
+# Claude Code -- local agent state stays out, but skills are shared tooling and are tracked.
+# Must be `.claude/*` rather than `.claude/`: git does not descend into an excluded directory, so a
+# negation for something inside it can never re-include the file.
+.claude/*
+!.claude/skills/
 
 # OS files
 .DS_Store
