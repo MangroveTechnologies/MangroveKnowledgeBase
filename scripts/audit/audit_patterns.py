@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Audit pattern indicators using synthetic OHLC tests and BTC daily data.
+"""OBSOLETE -- will not import: the 27 pattern indicator classes it depends on were
+removed, and pattern detection now lives as private detectors in
+`mangrove_kb.signals.patterns`; this needs rewriting against the signals.
+
+Audit pattern indicators using synthetic OHLC tests and BTC daily data.
 
 Since pattern indicators output discrete values (0, 1, -1) and have no
 numerical reference library, this audit uses:

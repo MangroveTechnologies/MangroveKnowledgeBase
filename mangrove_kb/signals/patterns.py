@@ -24,58 +24,18 @@ import logging
 
 import pandas as pd
 
+import numpy as np
+
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.indicators.pattern_indicators import (
-    Doji,
-    LongLeggedDoji,
-    DragonflyDoji,
-    GravestoneDoji,
-    Hammer,
-    HangingMan,
-    InvertedHammer,
-    ShootingStar,
-    Marubozu,
-    SpinningTop,
-    Engulfing,
-    Harami,
-    PiercingLine,
-    DarkCloudCover,
-    TweezerTops,
-    TweezerBottoms,
-    MorningStar,
-    EveningStar,
-    ThreeWhiteSoldiers,
-    ThreeBlackCrows,
-    ThreeInsideUp,
-    ThreeInsideDown,
-    InsideBar,
-    OutsideBar,
-    PinBar,
-    TwoBarReversal,
-    NarrowRange,
-)
+from mangrove_kb.indicators.pattern_indicators import CandleGeometry, CandleRelation
 
 logger = logging.getLogger(__name__)
 
 
-def _ohlc_data(df: pd.DataFrame) -> dict:
-    """Extract OHLC data dict from DataFrame."""
-    return {
-        "open": df["Open"],
-        "high": df["High"],
-        "low": df["Low"],
-        "close": df["Close"],
-    }
 
 
-def _oc_data(df: pd.DataFrame) -> dict:
-    """Extract Open/Close data dict from DataFrame."""
-    return {"open": df["Open"], "close": df["Close"]}
 
 
-def _hl_data(df: pd.DataFrame) -> dict:
-    """Extract High/Low data dict from DataFrame."""
-    return {"high": df["High"], "low": df["Low"]}
 
 
 def _hit(series: pd.Series, window: int) -> bool:
@@ -113,8 +73,8 @@ def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
     """
     if len(df) < 1:
         return False
-    result = Doji.compute(data=_ohlc_data(df), params={"body_threshold": body_threshold})
-    return int(result["doji"].iloc[-1]) == 1
+    result = _doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("long_legged_doji_trigger")
@@ -139,11 +99,8 @@ def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     """
     if len(df) < 1:
         return False
-    result = LongLeggedDoji.compute(
-        data=_ohlc_data(df),
-        params={"body_threshold": body_threshold, "wick_threshold": wick_threshold},
-    )
-    return int(result["long_legged_doji"].iloc[-1]) == 1
+    result = _long_legged_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold, wick_threshold=wick_threshold)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("dragonfly_doji_trigger")
@@ -168,11 +125,8 @@ def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     """
     if len(df) < 1:
         return False
-    result = DragonflyDoji.compute(
-        data=_ohlc_data(df),
-        params={"body_threshold": body_threshold, "upper_wick_max": upper_wick_max},
-    )
-    return int(result["dragonfly_doji"].iloc[-1]) == 1
+    result = _dragonfly_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold, upper_wick_max=upper_wick_max)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("gravestone_doji_trigger")
@@ -197,11 +151,8 @@ def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     """
     if len(df) < 1:
         return False
-    result = GravestoneDoji.compute(
-        data=_ohlc_data(df),
-        params={"body_threshold": body_threshold, "lower_wick_max": lower_wick_max},
-    )
-    return int(result["gravestone_doji"].iloc[-1]) == 1
+    result = _gravestone_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold, lower_wick_max=lower_wick_max)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("hammer_trigger")
@@ -226,11 +177,8 @@ def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = Hammer.compute(
-        data=_ohlc_data(df),
-        params={"wick_ratio": wick_ratio, "upper_wick_max": upper_wick_max},
-    )
-    return int(result["hammer"].iloc[-1]) == 1
+    result = _hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, upper_wick_max=upper_wick_max)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("shooting_star_trigger")
@@ -255,11 +203,8 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = ShootingStar.compute(
-        data=_ohlc_data(df),
-        params={"wick_ratio": wick_ratio, "lower_wick_max": lower_wick_max},
-    )
-    return int(result["shooting_star"].iloc[-1]) == 1
+    result = _shooting_star(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, lower_wick_max=lower_wick_max)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("hanging_man_trigger")
@@ -284,11 +229,8 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = HangingMan.compute(
-        data=_ohlc_data(df),
-        params={"wick_ratio": wick_ratio, "upper_wick_max": upper_wick_max},
-    )
-    return int(result["hanging_man"].iloc[-1]) == 1
+    result = _hanging_man(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, upper_wick_max=upper_wick_max)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("inverted_hammer_trigger")
@@ -313,11 +255,8 @@ def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = InvertedHammer.compute(
-        data=_ohlc_data(df),
-        params={"wick_ratio": wick_ratio, "lower_wick_max": lower_wick_max},
-    )
-    return int(result["inverted_hammer"].iloc[-1]) == 1
+    result = _inverted_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, lower_wick_max=lower_wick_max)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("marubozu_bullish_trigger")
@@ -340,8 +279,8 @@ def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     """
     if len(df) < 1:
         return False
-    result = Marubozu.compute(data=_ohlc_data(df), params={"wick_tolerance": wick_tolerance})
-    return int(result["marubozu"].iloc[-1]) == 1
+    result = _marubozu(df["Open"], df["High"], df["Low"], df["Close"], wick_tolerance=wick_tolerance)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("marubozu_bearish_trigger")
@@ -364,8 +303,8 @@ def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     """
     if len(df) < 1:
         return False
-    result = Marubozu.compute(data=_ohlc_data(df), params={"wick_tolerance": wick_tolerance})
-    return int(result["marubozu"].iloc[-1]) == -1
+    result = _marubozu(df["Open"], df["High"], df["Low"], df["Close"], wick_tolerance=wick_tolerance)
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("spinning_top_trigger")
@@ -390,11 +329,8 @@ def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
     """
     if len(df) < 1:
         return False
-    result = SpinningTop.compute(
-        data=_ohlc_data(df),
-        params={"body_max": body_max, "wick_min": wick_min},
-    )
-    return int(result["spinning_top"].iloc[-1]) == 1
+    result = _spinning_top(df["Open"], df["High"], df["Low"], df["Close"], body_max=body_max, wick_min=wick_min)
+    return int(result.iloc[-1]) == 1
 
 
 # =============================================================================
@@ -421,8 +357,8 @@ def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = Engulfing.compute(data=_oc_data(df), params={})
-    return int(result["engulfing"].iloc[-1]) == 1
+    result = _engulfing(df["Open"], df["High"], df["Low"], df["Close"])
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("bearish_engulfing_trigger")
@@ -444,8 +380,8 @@ def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = Engulfing.compute(data=_oc_data(df), params={})
-    return int(result["engulfing"].iloc[-1]) == -1
+    result = _engulfing(df["Open"], df["High"], df["Low"], df["Close"])
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("bullish_harami_trigger")
@@ -467,8 +403,8 @@ def bullish_harami_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = Harami.compute(data=_oc_data(df), params={})
-    return int(result["harami"].iloc[-1]) == 1
+    result = _harami(df["Open"], df["High"], df["Low"], df["Close"])
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("bearish_harami_trigger")
@@ -490,8 +426,8 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = Harami.compute(data=_oc_data(df), params={})
-    return int(result["harami"].iloc[-1]) == -1
+    result = _harami(df["Open"], df["High"], df["Low"], df["Close"])
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("piercing_line_trigger")
@@ -518,8 +454,8 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
     """
     if len(df) < 2:
         return False
-    result = PiercingLine.compute(data=_ohlc_data(df), params={"min_penetration": min_penetration, "require_gap": require_gap})
-    return int(result["piercing_line"].iloc[-1]) == 1
+    result = _piercing_line(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=min_penetration, require_gap=require_gap)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("dark_cloud_cover_trigger")
@@ -546,8 +482,8 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
     """
     if len(df) < 2:
         return False
-    result = DarkCloudCover.compute(data=_ohlc_data(df), params={"min_penetration": min_penetration, "require_gap": require_gap})
-    return int(result["dark_cloud_cover"].iloc[-1]) == -1
+    result = _dark_cloud_cover(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=min_penetration, require_gap=require_gap)
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("tweezer_tops_trigger")
@@ -570,8 +506,8 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     """
     if len(df) < 2:
         return False
-    result = TweezerTops.compute(data=_ohlc_data(df), params={"tolerance": tolerance})
-    return int(result["tweezer_tops"].iloc[-1]) == -1
+    result = _tweezer_tops(df["Open"], df["High"], df["Low"], df["Close"], tolerance=tolerance)
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("tweezer_bottoms_trigger")
@@ -594,8 +530,8 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     """
     if len(df) < 2:
         return False
-    result = TweezerBottoms.compute(data=_ohlc_data(df), params={"tolerance": tolerance})
-    return int(result["tweezer_bottoms"].iloc[-1]) == 1
+    result = _tweezer_bottoms(df["Open"], df["High"], df["Low"], df["Close"], tolerance=tolerance)
+    return int(result.iloc[-1]) == 1
 
 
 # =============================================================================
@@ -623,8 +559,8 @@ def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     """
     if len(df) < 3:
         return False
-    result = MorningStar.compute(data=_ohlc_data(df), params={"body_threshold": body_threshold})
-    return int(result["morning_star"].iloc[-1]) == 1
+    result = _morning_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("evening_star_trigger")
@@ -647,8 +583,8 @@ def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     """
     if len(df) < 3:
         return False
-    result = EveningStar.compute(data=_ohlc_data(df), params={"body_threshold": body_threshold})
-    return int(result["evening_star"].iloc[-1]) == -1
+    result = _evening_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold)
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("three_white_soldiers_trigger")
@@ -671,8 +607,8 @@ def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) 
     """
     if len(df) < 3:
         return False
-    result = ThreeWhiteSoldiers.compute(data=_ohlc_data(df), params={"min_body_ratio": min_body_ratio})
-    return int(result["three_white_soldiers"].iloc[-1]) == 1
+    result = _three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=min_body_ratio)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("three_black_crows_trigger")
@@ -695,8 +631,8 @@ def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> 
     """
     if len(df) < 3:
         return False
-    result = ThreeBlackCrows.compute(data=_ohlc_data(df), params={"min_body_ratio": min_body_ratio})
-    return int(result["three_black_crows"].iloc[-1]) == -1
+    result = _three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=min_body_ratio)
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("three_inside_up_trigger")
@@ -718,8 +654,8 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 3:
         return False
-    result = ThreeInsideUp.compute(data=_oc_data(df), params={})
-    return int(result["three_inside_up"].iloc[-1]) == 1
+    result = _three_inside_up(df["Open"], df["Close"])
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("three_inside_down_trigger")
@@ -741,8 +677,8 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 3:
         return False
-    result = ThreeInsideDown.compute(data=_oc_data(df), params={})
-    return int(result["three_inside_down"].iloc[-1]) == -1
+    result = _three_inside_down(df["Open"], df["Close"])
+    return int(result.iloc[-1]) == -1
 
 
 # =============================================================================
@@ -769,8 +705,8 @@ def inside_bar_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = InsideBar.compute(data=_hl_data(df), params={})
-    return int(result["inside_bar"].iloc[-1]) == 1
+    result = _inside_bar(df["Open"], df["High"], df["Low"], df["Close"])
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("outside_bar_trigger")
@@ -792,8 +728,8 @@ def outside_bar_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = OutsideBar.compute(data=_hl_data(df), params={})
-    return int(result["outside_bar"].iloc[-1]) == 1
+    result = _outside_bar(df["Open"], df["High"], df["Low"], df["Close"])
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("bullish_pin_bar_trigger")
@@ -818,11 +754,8 @@ def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = PinBar.compute(
-        data=_ohlc_data(df),
-        params={"wick_ratio": wick_ratio, "body_position": body_position},
-    )
-    return int(result["pin_bar"].iloc[-1]) == 1
+    result = _pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, body_position=body_position)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("bearish_pin_bar_trigger")
@@ -847,11 +780,8 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = PinBar.compute(
-        data=_ohlc_data(df),
-        params={"wick_ratio": wick_ratio, "body_position": body_position},
-    )
-    return int(result["pin_bar"].iloc[-1]) == -1
+    result = _pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, body_position=body_position)
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("two_bar_reversal_bullish_trigger")
@@ -875,8 +805,8 @@ def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 
     """
     if len(df) < 2:
         return False
-    result = TwoBarReversal.compute(data=_ohlc_data(df), params={"close_proximity": close_proximity})
-    return int(result["two_bar_reversal"].iloc[-1]) == 1
+    result = _two_bar_reversal(df["Open"], df["High"], df["Low"], df["Close"], close_proximity=close_proximity)
+    return int(result.iloc[-1]) == 1
 
 
 @RuleRegistry.register("two_bar_reversal_bearish_trigger")
@@ -900,8 +830,8 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 
     """
     if len(df) < 2:
         return False
-    result = TwoBarReversal.compute(data=_ohlc_data(df), params={"close_proximity": close_proximity})
-    return int(result["two_bar_reversal"].iloc[-1]) == -1
+    result = _two_bar_reversal(df["Open"], df["High"], df["Low"], df["Close"], close_proximity=close_proximity)
+    return int(result.iloc[-1]) == -1
 
 
 @RuleRegistry.register("nr7_trigger")
@@ -925,8 +855,8 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
     """
     if len(df) < window:
         return False
-    result = NarrowRange.compute(data=_hl_data(df), params={"window": window})
-    return int(result["narrow_range"].iloc[-1]) == 1
+    result = _narrow_range(df["Open"], df["High"], df["Low"], df["Close"], window=window)
+    return int(result.iloc[-1]) == 1
 
 
 # =============================================================================
@@ -955,33 +885,31 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 2:
         return False
-    ohlc = _ohlc_data(df)
-    oc = _oc_data(df)
     w = window
 
-    if _hit(Hammer.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hammer"], w):
+    if _hit(_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"], w):
+    if _hit(_inverted_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0), w):
+    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(lower=0), w):
         return True
-    if _hit(Harami.compute(data=oc, params={})["harami"].clip(lower=0), w):
+    if _hit(_harami(df["Open"], df["High"], df["Low"], df["Close"]).clip(lower=0), w):
         return True
-    if _hit(PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"], w):
+    if _hit(_piercing_line(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False), w):
         return True
-    if _hit(DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"], w):
+    if _hit(_dragonfly_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, upper_wick_max=0.1), w):
         return True
-    if _hit(TweezerBottoms.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_bottoms"], w):
+    if _hit(_tweezer_bottoms(df["Open"], df["High"], df["Low"], df["Close"], tolerance=0.01), w):
         return True
-    if _hit(PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(lower=0), w):
+    if _hit(_pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, body_position=0.33).clip(lower=0), w):
         return True
 
     if len(df) >= 3:
-        if _hit(MorningStar.compute(data=ohlc, params={"body_threshold": 0.3})["morning_star"], w):
+        if _hit(_morning_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3), w):
             return True
-        if _hit(ThreeWhiteSoldiers.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_white_soldiers"], w):
+        if _hit(_three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5), w):
             return True
-        if _hit(ThreeInsideUp.compute(data=oc, params={})["three_inside_up"], w):
+        if _hit(_three_inside_up(df["Open"], df["Close"]), w):
             return True
 
     return False
@@ -1008,33 +936,31 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 2:
         return False
-    ohlc = _ohlc_data(df)
-    oc = _oc_data(df)
     w = window
 
-    if _hit(HangingMan.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hanging_man"], w):
+    if _hit(_hanging_man(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"], w):
+    if _hit(_shooting_star(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(), w):
+    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(upper=0).abs(), w):
         return True
-    if _hit(Harami.compute(data=oc, params={})["harami"].clip(upper=0).abs(), w):
+    if _hit(_harami(df["Open"], df["High"], df["Low"], df["Close"]).clip(upper=0).abs(), w):
         return True
-    if _hit(DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(), w):
+    if _hit(_dark_cloud_cover(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False).abs(), w):
         return True
-    if _hit(GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"], w):
+    if _hit(_gravestone_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, lower_wick_max=0.1), w):
         return True
-    if _hit(TweezerTops.compute(data=ohlc, params={"tolerance": 0.01})["tweezer_tops"].abs(), w):
+    if _hit(_tweezer_tops(df["Open"], df["High"], df["Low"], df["Close"], tolerance=0.01).abs(), w):
         return True
-    if _hit(PinBar.compute(data=ohlc, params={"wick_ratio": 2.0, "body_position": 0.33})["pin_bar"].clip(upper=0).abs(), w):
+    if _hit(_pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, body_position=0.33).clip(upper=0).abs(), w):
         return True
 
     if len(df) >= 3:
-        if _hit(EveningStar.compute(data=ohlc, params={"body_threshold": 0.3})["evening_star"].abs(), w):
+        if _hit(_evening_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3).abs(), w):
             return True
-        if _hit(ThreeBlackCrows.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_black_crows"].abs(), w):
+        if _hit(_three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5).abs(), w):
             return True
-        if _hit(ThreeInsideDown.compute(data=oc, params={})["three_inside_down"].abs(), w):
+        if _hit(_three_inside_down(df["Open"], df["Close"]).abs(), w):
             return True
 
     return False
@@ -1060,23 +986,21 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 2:
         return False
-    ohlc = _ohlc_data(df)
-    oc = _oc_data(df)
     w = window
 
-    if _hit(Hammer.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hammer"], w):
+    if _hit(_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(InvertedHammer.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["inverted_hammer"], w):
+    if _hit(_inverted_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(lower=0), w):
+    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(lower=0), w):
         return True
-    if _hit(PiercingLine.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["piercing_line"], w):
+    if _hit(_piercing_line(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False), w):
         return True
-    if _hit(DragonflyDoji.compute(data=ohlc, params={"body_threshold": 0.1, "upper_wick_max": 0.1})["dragonfly_doji"], w):
+    if _hit(_dragonfly_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, upper_wick_max=0.1), w):
         return True
 
     if len(df) >= 3:
-        if _hit(MorningStar.compute(data=ohlc, params={"body_threshold": 0.3})["morning_star"], w):
+        if _hit(_morning_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3), w):
             return True
 
     return False
@@ -1102,23 +1026,21 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 2:
         return False
-    ohlc = _ohlc_data(df)
-    oc = _oc_data(df)
     w = window
 
-    if _hit(HangingMan.compute(data=ohlc, params={"wick_ratio": 2.0, "upper_wick_max": 0.1})["hanging_man"], w):
+    if _hit(_hanging_man(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(ShootingStar.compute(data=ohlc, params={"wick_ratio": 2.0, "lower_wick_max": 0.1})["shooting_star"], w):
+    if _hit(_shooting_star(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(Engulfing.compute(data=oc, params={})["engulfing"].clip(upper=0).abs(), w):
+    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(upper=0).abs(), w):
         return True
-    if _hit(DarkCloudCover.compute(data=ohlc, params={"min_penetration": 0.5, "require_gap": False})["dark_cloud_cover"].abs(), w):
+    if _hit(_dark_cloud_cover(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False).abs(), w):
         return True
-    if _hit(GravestoneDoji.compute(data=ohlc, params={"body_threshold": 0.1, "lower_wick_max": 0.1})["gravestone_doji"], w):
+    if _hit(_gravestone_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, lower_wick_max=0.1), w):
         return True
 
     if len(df) >= 3:
-        if _hit(EveningStar.compute(data=ohlc, params={"body_threshold": 0.3})["evening_star"].abs(), w):
+        if _hit(_evening_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3).abs(), w):
             return True
 
     return False
@@ -1143,13 +1065,11 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 3:
         return False
-    ohlc = _ohlc_data(df)
-    oc = _oc_data(df)
     w = window
 
-    if _hit(ThreeWhiteSoldiers.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_white_soldiers"], w):
+    if _hit(_three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5), w):
         return True
-    if _hit(ThreeInsideUp.compute(data=oc, params={})["three_inside_up"], w):
+    if _hit(_three_inside_up(df["Open"], df["Close"]), w):
         return True
     return False
 
@@ -1173,13 +1093,11 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 3:
         return False
-    ohlc = _ohlc_data(df)
-    oc = _oc_data(df)
     w = window
 
-    if _hit(ThreeBlackCrows.compute(data=ohlc, params={"min_body_ratio": 0.5})["three_black_crows"].abs(), w):
+    if _hit(_three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5).abs(), w):
         return True
-    if _hit(ThreeInsideDown.compute(data=oc, params={})["three_inside_down"].abs(), w):
+    if _hit(_three_inside_down(df["Open"], df["Close"]).abs(), w):
         return True
     return False
 
@@ -1203,18 +1121,16 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 2:
         return False
-    ohlc = _ohlc_data(df)
-    hl = _hl_data(df)
     w = window
 
-    if _hit(Doji.compute(data=ohlc, params={"body_threshold": 0.1})["doji"], w):
+    if _hit(_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1), w):
         return True
-    if _hit(SpinningTop.compute(data=ohlc, params={"body_max": 0.3, "wick_min": 0.2})["spinning_top"], w):
+    if _hit(_spinning_top(df["Open"], df["High"], df["Low"], df["Close"], body_max=0.3, wick_min=0.2), w):
         return True
-    if _hit(InsideBar.compute(data=hl, params={})["inside_bar"], w):
+    if _hit(_inside_bar(df["Open"], df["High"], df["Low"], df["Close"]), w):
         return True
     if len(df) >= 7:
-        if _hit(NarrowRange.compute(data=hl, params={"window": 7})["narrow_range"], w):
+        if _hit(_narrow_range(df["Open"], df["High"], df["Low"], df["Close"], window=7), w):
             return True
     return False
 
@@ -1238,6 +1154,517 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 1:
         return False
-    result = Marubozu.compute(data=_ohlc_data(df), params={"wick_tolerance": 0.05})
-    recent = result["marubozu"].iloc[-window:]
+    result = _marubozu(df["Open"], df["High"], df["Low"], df["Close"], wick_tolerance=0.05)
+    recent = result.iloc[-window:]
     return (recent != 0).any()
+
+
+# ===========================================================================
+# Pattern detection -- per-bar series, PRIVATE to this module
+# ===========================================================================
+#
+# Each returns a pd.Series aligned to the input index, not a decision. The
+# registered signals above reduce that series to a bool over a window.
+#
+# These were IndicatorInterface subclasses in indicators/pattern_indicators.py,
+# which put boolean-valued outputs in the indicator layer. An indicator
+# measures; these decide. The numeric substrate -- body, range, wicks, and the
+# relationship of one bar to the previous -- stays there as CandleGeometry and
+# CandleRelation.
+
+
+def _dark_cloud_cover(open_, high, low, close, min_penetration, require_gap) -> pd.Series:
+    """DarkCloudCover detection. Per-bar series, not a decision."""
+    o, h, l, c = open_, high, low, close
+    prev_o, prev_c, prev_h = o.shift(1), c.shift(1), h.shift(1)
+    pen = min_penetration
+
+    prev_bull = prev_c > prev_o
+    curr_bear = c < o
+
+    if require_gap:
+        gaps_above = o > prev_h  # Classic Nison: open above previous high
+    else:
+        gaps_above = o > prev_c  # Relaxed: open above previous close (for 24/7 markets)
+    penetrates = c < prev_c - (prev_c - prev_o) * pen
+
+    detected = prev_bull & curr_bear & gaps_above & penetrates
+    result = pd.Series(0, index=o.index, name="dark_cloud_cover")
+    result[detected] = -1
+    return result
+
+
+def _doji(open_, high, low, close, body_threshold) -> pd.Series:
+    """Doji detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    rng = _g["range"]
+    threshold = body_threshold
+
+    detected = ((rng > 0) & (body <= rng * threshold)).astype(int)
+    return pd.Series(detected, index=o.index, name="doji")
+
+
+def _dragonfly_doji(open_, high, low, close, body_threshold, upper_wick_max) -> pd.Series:
+    """DragonflyDoji detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    rng = _g["range"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+
+    is_doji = (rng > 0) & (body <= rng * body_threshold)
+    small_upper = uw <= rng * upper_wick_max
+    long_lower = lw > body
+
+    detected = (is_doji & small_upper & long_lower).astype(int)
+    return pd.Series(detected, index=o.index, name="dragonfly_doji")
+
+
+def _engulfing(open_, high, low, close) -> pd.Series:
+    """Engulfing detection. Per-bar series, not a decision."""
+    _r = CandleRelation.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, c = open_, close
+    prev_o, prev_c = o.shift(1), c.shift(1)
+
+    prev_bear = prev_c < prev_o
+    prev_bull = prev_c > prev_o
+    curr_bull = c > o
+    curr_bear = c < o
+
+    engulfs = (_r["body_low_delta"] < 0) & (_r["body_high_delta"] > 0)
+    bullish = prev_bear & curr_bull & engulfs
+    bearish = prev_bull & curr_bear & engulfs
+
+    result = pd.Series(0, index=o.index, name="engulfing")
+    result[bullish] = 1
+    result[bearish] = -1
+    return result
+
+
+def _evening_star(open_, high, low, close, body_threshold) -> pd.Series:
+    """EveningStar detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    rng = _g["range"]
+
+    o2, c2 = o.shift(2), c.shift(2)
+    o1, c1 = o.shift(1), c.shift(1)
+    rng1 = rng.shift(1)
+
+    first_bullish = c2 > o2
+    star_small = _g["body"].shift(1) <= rng1 * body_threshold
+    third_bearish = c < o
+    midpoint = (o2 + c2) / 2
+    closes_below_mid = c < midpoint
+
+    detected = (first_bullish & star_small & third_bearish & closes_below_mid)
+    result = pd.Series(0, index=o.index, name="evening_star")
+    result[detected] = -1
+    return result
+
+
+def _gravestone_doji(open_, high, low, close, body_threshold, lower_wick_max) -> pd.Series:
+    """GravestoneDoji detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    rng = _g["range"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+
+    is_doji = (rng > 0) & (body <= rng * body_threshold)
+    small_lower = lw <= rng * lower_wick_max
+    long_upper = uw > body
+
+    detected = (is_doji & small_lower & long_upper).astype(int)
+    return pd.Series(detected, index=o.index, name="gravestone_doji")
+
+
+def _hammer(open_, high, low, close, wick_ratio, upper_wick_max) -> pd.Series:
+    """Hammer detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+
+    has_body = body > 0
+    long_lower = lw >= body * wick_ratio
+    small_upper = uw <= body * upper_wick_max
+
+    detected = (has_body & long_lower & small_upper).astype(int)
+    return pd.Series(detected, index=o.index, name="hammer")
+
+
+def _hanging_man(open_, high, low, close, wick_ratio, upper_wick_max) -> pd.Series:
+    """HangingMan detection. Per-bar series, not a decision."""
+    # Identical computation to _hammer: what distinguishes a hanging man from a
+    # hammer is the PRIOR TREND, which this bar-local geometry does not encode.
+    return pd.Series(
+        _hammer(open_, high, low, close, wick_ratio, upper_wick_max).values,
+        index=open_.index, name="hanging_man")
+
+
+def _harami(open_, high, low, close) -> pd.Series:
+    """Harami detection. Per-bar series, not a decision."""
+    _r = CandleRelation.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, c = open_, close
+    prev_o, prev_c = o.shift(1), c.shift(1)
+
+    prev_bear = prev_c < prev_o
+    prev_bull = prev_c > prev_o
+    curr_bull = c > o
+    curr_bear = c < o
+
+    contained = (_r["body_low_delta"] > 0) & (_r["body_high_delta"] < 0)
+    bullish = prev_bear & curr_bull & contained
+    bearish = prev_bull & curr_bear & contained
+
+    result = pd.Series(0, index=o.index, name="harami")
+    result[bullish] = 1
+    result[bearish] = -1
+    return result
+
+
+def _inside_bar(open_, high, low, close) -> pd.Series:
+    """InsideBar detection. Per-bar series, not a decision."""
+    _r = CandleRelation.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    # nested inside the previous bar: upper edge below it, lower edge above it
+    detected = ((_r["range_high_delta"] < 0) & (_r["range_low_delta"] > 0)).astype(int)
+    return pd.Series(detected, index=high.index, name="inside_bar")
+
+
+def _inverted_hammer(open_, high, low, close, wick_ratio, lower_wick_max) -> pd.Series:
+    """InvertedHammer detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+
+    has_body = body > 0
+    long_upper = uw >= body * wick_ratio
+    small_lower = lw <= body * lower_wick_max
+
+    detected = (has_body & long_upper & small_lower).astype(int)
+    return pd.Series(detected, index=o.index, name="inverted_hammer")
+
+
+def _long_legged_doji(open_, high, low, close, body_threshold, wick_threshold) -> pd.Series:
+    """LongLeggedDoji detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    rng = _g["range"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+
+    is_doji = (rng > 0) & (body <= rng * body_threshold)
+    long_wicks = (uw >= rng * wick_threshold) & (lw >= rng * wick_threshold)
+
+    detected = (is_doji & long_wicks).astype(int)
+    return pd.Series(detected, index=o.index, name="long_legged_doji")
+
+
+def _marubozu(open_, high, low, close, wick_tolerance) -> pd.Series:
+    """Marubozu detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    rng = _g["range"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+    tol = wick_tolerance
+
+    small_wicks = (rng > 0) & (uw <= rng * tol) & (lw <= rng * tol)
+    bull = (_g["signed_body"] > 0)
+    bear = (_g["signed_body"] < 0)
+
+    result = pd.Series(0, index=o.index, name="marubozu")
+    result[small_wicks & bull] = 1
+    result[small_wicks & bear] = -1
+    return result
+
+
+def _morning_star(open_, high, low, close, body_threshold) -> pd.Series:
+    """MorningStar detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    rng = _g["range"]
+
+    o2, c2 = o.shift(2), c.shift(2)
+    o1, c1 = o.shift(1), c.shift(1)
+    rng1 = rng.shift(1)
+
+    first_bearish = c2 < o2
+    star_small = _g["body"].shift(1) <= rng1 * body_threshold
+    third_bullish = c > o
+    midpoint = (o2 + c2) / 2
+    closes_above_mid = c > midpoint
+
+    detected = (first_bearish & star_small & third_bullish & closes_above_mid).astype(int)
+    return pd.Series(detected, index=o.index, name="morning_star")
+
+
+def _narrow_range(open_, high, low, close, window) -> pd.Series:
+    """NarrowRange detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    h, l = high, low
+    rng = _g["range"]
+
+    # Current range must be strictly less than all previous N ranges
+    rolling_min = rng.shift(1).rolling(window=window - 1, min_periods=window - 1).min()
+    detected = (rng < rolling_min).astype(int)
+    # NaN rows get 0
+    detected = detected.fillna(0).astype(int)
+    return pd.Series(detected, index=h.index, name="narrow_range")
+
+
+def _outside_bar(open_, high, low, close) -> pd.Series:
+    """OutsideBar detection. Per-bar series, not a decision."""
+    _r = CandleRelation.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    # contains the previous bar: upper edge above it, lower edge below it
+    detected = ((_r["range_high_delta"] > 0) & (_r["range_low_delta"] < 0)).astype(int)
+    return pd.Series(detected, index=high.index, name="outside_bar")
+
+
+def _piercing_line(open_, high, low, close, min_penetration, require_gap) -> pd.Series:
+    """PiercingLine detection. Per-bar series, not a decision."""
+    o, h, l, c = open_, high, low, close
+    prev_o, prev_c, prev_l = o.shift(1), c.shift(1), l.shift(1)
+    pen = min_penetration
+
+    prev_bear = prev_c < prev_o
+    curr_bull = c > o
+
+    if require_gap:
+        gaps_below = o < prev_l  # Classic Nison: open below previous low
+    else:
+        gaps_below = o < prev_c  # Relaxed: open below previous close (for 24/7 markets)
+    penetrates = c > prev_c + (prev_o - prev_c) * pen
+
+    detected = (prev_bear & curr_bull & gaps_below & penetrates).astype(int)
+    return pd.Series(detected, index=o.index, name="piercing_line")
+
+
+def _pin_bar(open_, high, low, close, wick_ratio, body_position) -> pd.Series:
+    """PinBar detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    rng = _g["range"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+    wr = wick_ratio
+    bp = body_position
+
+    has_body = body > 0
+    body_bottom = pd.concat([o, c], axis=1).min(axis=1)
+    body_top = pd.concat([o, c], axis=1).max(axis=1)
+
+    bullish = has_body & (lw >= body * wr) & (body_bottom > l + rng * (1 - bp))
+    bearish = has_body & (uw >= body * wr) & (body_top < h - rng * (1 - bp))
+
+    result = pd.Series(0, index=o.index, name="pin_bar")
+    result[bullish] = 1
+    result[bearish] = -1
+    return result
+
+
+def _shooting_star(open_, high, low, close, wick_ratio, lower_wick_max) -> pd.Series:
+    """ShootingStar detection. Per-bar series, not a decision."""
+    # Identical computation to _inverted_hammer, distinguished only by prior
+    # trend, which is not encoded here. See the note on _hanging_man.
+    return pd.Series(
+        _inverted_hammer(open_, high, low, close, wick_ratio, lower_wick_max).values,
+        index=open_.index, name="shooting_star")
+
+
+def _spinning_top(open_, high, low, close, body_max, wick_min) -> pd.Series:
+    """SpinningTop detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    body = _g["body"]
+    rng = _g["range"]
+    uw = _g["upper_wick"]
+    lw = _g["lower_wick"]
+
+    small_body = (rng > 0) & (body <= rng * body_max)
+    both_wicks = (uw >= rng * wick_min) & (lw >= rng * wick_min)
+
+    detected = (small_body & both_wicks).astype(int)
+    return pd.Series(detected, index=o.index, name="spinning_top")
+
+
+def _three_black_crows(open_, high, low, close, min_body_ratio) -> pd.Series:
+    """ThreeBlackCrows detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    rng = _g["range"]
+    body = _g["body"]
+    min_ratio = min_body_ratio
+
+    o2, c2, rng2, body2 = o.shift(2), c.shift(2), rng.shift(2), body.shift(2)
+    o1, c1, rng1, body1 = o.shift(1), c.shift(1), rng.shift(1), body.shift(1)
+
+    all_bearish = (c2 < o2) & (c1 < o1) & (c < o)
+    lower_closes = (c1 < c2) & (c < c1)
+    opens_within = (o1 <= o2) & (o1 >= c2) & (o <= o1) & (o >= c1)
+    strong_bodies = (
+        (body2 >= rng2 * min_ratio)
+        & (body1 >= rng1 * min_ratio)
+        & (body >= rng * min_ratio)
+    )
+
+    detected = (all_bearish & lower_closes & opens_within & strong_bodies)
+    result = pd.Series(0, index=o.index, name="three_black_crows")
+    result[detected] = -1
+    return result
+
+
+def _three_inside_down(open_, close) -> pd.Series:
+    """ThreeInsideDown detection. Per-bar series, not a decision."""
+    o, c = open_, close
+    o2, c2 = o.shift(2), c.shift(2)
+    o1, c1 = o.shift(1), c.shift(1)
+
+    first_bullish = c2 > o2
+    harami = (c1 < o1) & (o1 < c2) & (c1 > o2)
+    third_bearish = (c < o) & (c < o2)
+
+    detected = (first_bullish & harami & third_bearish)
+    result = pd.Series(0, index=o.index, name="three_inside_down")
+    result[detected] = -1
+    return result
+
+
+def _three_inside_up(open_, close) -> pd.Series:
+    """ThreeInsideUp detection. Per-bar series, not a decision."""
+    o, c = open_, close
+    o2, c2 = o.shift(2), c.shift(2)
+    o1, c1 = o.shift(1), c.shift(1)
+
+    first_bearish = c2 < o2
+    harami = (c1 > o1) & (o1 > c2) & (c1 < o2)
+    third_bullish = (c > o) & (c > o2)
+
+    detected = (first_bearish & harami & third_bullish).astype(int)
+    return pd.Series(detected, index=o.index, name="three_inside_up")
+
+
+def _three_white_soldiers(open_, high, low, close, min_body_ratio) -> pd.Series:
+    """ThreeWhiteSoldiers detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    rng = _g["range"]
+    body = _g["body"]
+    min_ratio = min_body_ratio
+
+    o2, c2, rng2, body2 = o.shift(2), c.shift(2), rng.shift(2), body.shift(2)
+    o1, c1, rng1, body1 = o.shift(1), c.shift(1), rng.shift(1), body.shift(1)
+
+    all_bullish = (c2 > o2) & (c1 > o1) & (c > o)
+    higher_closes = (c1 > c2) & (c > c1)
+    opens_within = (o1 >= o2) & (o1 <= c2) & (o >= o1) & (o <= c1)
+    strong_bodies = (
+        (body2 >= rng2 * min_ratio)
+        & (body1 >= rng1 * min_ratio)
+        & (body >= rng * min_ratio)
+    )
+
+    detected = (all_bullish & higher_closes & opens_within & strong_bodies).astype(int)
+    return pd.Series(detected, index=o.index, name="three_white_soldiers")
+
+
+def _tweezer_bottoms(open_, high, low, close, tolerance, avg_window=20) -> pd.Series:
+    """TweezerBottoms detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    prev_l = l.shift(1)
+    prev_o, prev_c = o.shift(1), c.shift(1)
+    rng = _g["range"]
+
+    avg_rng = rng.rolling(window=avg_window, min_periods=1).mean()
+    tol = tolerance
+
+    matching_lows = (l - prev_l).abs() <= avg_rng * tol
+    prev_bear = prev_c < prev_o
+    curr_bull = c > o
+
+    detected = (matching_lows & prev_bear & curr_bull).astype(int)
+    return pd.Series(detected, index=o.index, name="tweezer_bottoms")
+
+
+def _tweezer_tops(open_, high, low, close, tolerance, avg_window=20) -> pd.Series:
+    """TweezerTops detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    prev_h = h.shift(1)
+    prev_o, prev_c = o.shift(1), c.shift(1)
+    rng = _g["range"]
+
+    avg_rng = rng.rolling(window=avg_window, min_periods=1).mean()
+    tol = tolerance
+
+    matching_highs = (h - prev_h).abs() <= avg_rng * tol
+    prev_bull = prev_c > prev_o
+    curr_bear = c < o
+
+    detected = (matching_highs & prev_bull & curr_bear)
+    result = pd.Series(0, index=o.index, name="tweezer_tops")
+    result[detected] = -1
+    return result
+
+
+def _two_bar_reversal(open_, high, low, close, close_proximity) -> pd.Series:
+    """TwoBarReversal detection. Per-bar series, not a decision."""
+    _g = CandleGeometry.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = open_, high, low, close
+    rng = _g["range"]
+    prev_o, prev_h, prev_l, prev_c = o.shift(1), h.shift(1), l.shift(1), c.shift(1)
+    prev_rng = rng.shift(1)
+
+    # Close near high/low: within close_proximity fraction of the extreme
+
+    prev_close_near_low = (prev_c - prev_l) <= prev_rng * close_proximity
+    prev_close_near_high = (prev_h - prev_c) <= prev_rng * close_proximity
+    close_near_high = (h - c) <= rng * close_proximity
+    close_near_low = (c - l) <= rng * close_proximity
+
+    prev_bear = prev_c < prev_o
+    prev_bull = prev_c > prev_o
+    curr_bull = c > o
+    curr_bear = c < o
+
+    bullish = (prev_bear & prev_close_near_low & curr_bull & close_near_high
+               & (l <= prev_l) & (c > prev_o))
+    bearish = (prev_bull & prev_close_near_high & curr_bear & close_near_low
+               & (h >= prev_h) & (c < prev_o))
+
+    result = pd.Series(0, index=o.index, name="two_bar_reversal")
+    result[bullish] = 1
+    result[bearish] = -1
+    return result
