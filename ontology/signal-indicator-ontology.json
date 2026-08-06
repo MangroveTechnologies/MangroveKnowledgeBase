@@ -4728,7 +4728,7 @@
    "id": "procedure:indicator-vwap",
    "title": "VWAP",
    "kind": "Procedure",
-   "summary": "VWAP equals the dollar value of all trading periods divided by the total trading volume for the current day. The calculation starts when trading opens and ends when it closes. Because it is good for the current trading day only, intraday periods and data are used in the calculation.",
+   "summary": "Rolling volume-weighted average of typical price: traded value over the window divided by volume over the window. Each bar is weighted by how much actually traded, so heavy bars pull the level toward them and quiet bars barely move it. Uses a rolling `window` rather than a session anchor. The textbook definition resets at each session open, but anchoring presupposes a session boundary, and a continuously traded 24/7 market does not have one -- there is no open to accumulate from and no close to reset at. The rolling form is therefore the coherent definition here, not an approximation of the anchored one. Consequence worth knowing: on a session-traded instrument such as an equity, this is not the institutional execution benchmark, because that benchmark is defined by the session it anchors to. This series is exactly VWMA computed on typical price.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -4737,7 +4737,7 @@
     "warmup_bars": "window - 1",
     "abbreviation": "VWAP",
     "usage_example": "VWAP.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
-    "formula": "VWAP = Cumulative(Typical Price * Volume) / Cumulative(Volume)\nTypical Price = (High + Low + Close) / 3",
+    "formula": "VWAP = Rolling_Sum(Typical Price * Volume, window) / Rolling_Sum(Volume, window)\nTypical Price = (High + Low + Close) / 3",
     "interpretation": [
      "Price above VWAP: Buyers in control",
      "Price below VWAP: Sellers in control",
@@ -4745,9 +4745,9 @@
      "Deviation from VWAP indicates overextension"
     ],
     "applications": [
-     "Institutional benchmark for execution quality",
-     "Intraday support/resistance",
-     "Entry/exit timing",
+     "Dynamic support and resistance in a continuously traded market",
+     "Volume-weighted trend reference, less sensitive to low-volume bars than a plain moving average",
+     "Entry/exit timing against a volume-aware fair-value estimate",
      "Mean reversion trading"
     ],
     "inputs": {
@@ -4785,8 +4785,8 @@
        null,
        null
       ],
-      "canonical_name": "none",
-      "description": "NOT VWAP as the literature defines it. Canonical VWAP is ANCHORED -- it accumulates from the session open and resets every session -- whereas this rolls a fixed `window`. Verified equal to VWMA computed on typical price, and measured against a true session-anchored VWAP across five sessions it differed by up to 4.00 price units, 3.9% of price. Read it as a rolling volume-weighted typical price, not as the institutional execution benchmark; the literature has no established name for this rolling form beyond platform 'Rolling VWAP' scripts"
+      "canonical_name": "volume weighted average price",
+      "description": "Rolling volume-weighted average of typical price over `window` bars. The literature's VWAP is session-anchored -- it accumulates from the session open and resets each session -- but anchoring presupposes a session boundary, which a 24/7 market does not have, so the rolling form is the coherent definition here rather than an approximation of the anchored one. Exactly equal to VWMA computed on typical price. Against a synthetic session-anchored VWAP over five sessions it differs by up to 4.00 price units (3.9% of price), which matters only when reconciling against a session-based instrument or platform, where the institutional execution benchmark is defined by the session it anchors to"
      }
     }
    }

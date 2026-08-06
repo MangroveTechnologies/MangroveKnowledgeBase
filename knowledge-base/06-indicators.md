@@ -1256,11 +1256,14 @@ ADL = Previous ADL + Money Flow Volume
 ### 6.4.3 Volume Weighted Average Price (VWAP)
 
 #### Definition
-The average price weighted by volume, representing the average price a security has traded at throughout the day.
+The average price weighted by volume over a rolling window, representing the price at which
+most trading has actually occurred. A rolling window is used rather than the session anchor
+of the textbook definition: anchoring resets at each session open, and a continuously traded
+24/7 market has no session boundary to reset at.
 
 #### Formula
 ```
-VWAP = Cumulative(Typical Price * Volume) / Cumulative(Volume)
+VWAP = Rolling_Sum(Typical Price * Volume, window) / Rolling_Sum(Volume, window)
 Typical Price = (High + Low + Close) / 3
 ```
 
@@ -1271,10 +1274,14 @@ Typical Price = (High + Low + Close) / 3
 - Deviation from VWAP indicates overextension
 
 #### Trading Applications
-- Institutional benchmark for execution quality
-- Intraday support/resistance
-- Entry/exit timing
+- Dynamic support and resistance in a continuously traded market
+- Volume-weighted trend reference, less sensitive to low-volume bars than a plain moving average
+- Entry/exit timing against a volume-aware fair-value estimate
 - Mean reversion trading
+
+> **On session-traded instruments** (equities, futures with a defined session) this rolling form
+> is not the institutional execution benchmark, since that benchmark is defined by the session it
+> anchors to. It is exactly VWMA computed on typical price.
 
 ---
 

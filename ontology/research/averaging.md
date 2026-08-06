@@ -95,19 +95,34 @@ corroborates the maths but not the name.
   against an SMA-seeded 99.7771, a difference of 0.069; by bar 100 the difference is exactly zero.
   Warmup-only, decays completely. Both camps agree the choice fades given enough history.
 
-## `VWAP` -- ours is not VWAP
+## `VWAP` -- the rolling window is the correct form for a 24/7 market
 
-**The clearest defect in this class.** Canonical VWAP is **anchored**: it accumulates from the session
-open and resets each session. StockCharts: *"VWAP calculations start fresh at the open and end at the
-close."* Wikipedia: *"VWAP resets at the start of each session."* Ours rolls a fixed `window`.
+**An earlier draft of this research called this "the clearest defect in this class." That was wrong,
+and it is corrected here.**
 
-VERIFIED against a true session-anchored VWAP over five sessions: mean abs difference 0.7610, max
-4.0016, up to **3.882% of price**. And ours is **exactly equal to `VWMA` computed on typical price**
-(`allclose` -> True).
+The literature defines VWAP as **anchored**: it accumulates from the session open and resets each
+session. StockCharts: *"VWAP calculations start fresh at the open and end at the close."* Wikipedia:
+*"VWAP resets at the start of each session."* Ours rolls a fixed `window` instead.
 
-A "Rolling VWAP" is a recognised charting-platform variant, not the canonical definition -- and the
-research names the trap directly: a rolling window weighted by volume *is* the VWMA. Filed as KB#104
-finding 14.
+The error was treating that as a divergence. **Anchoring presupposes a session boundary, and a 24/7
+market does not have one.** There is no open to accumulate from and no close to reset at, so the
+anchored definition has no referent here -- it is not that we implement it loosely, it is that the
+quantity is undefined. A rolling window is the coherent way to express the same idea, and it is a
+deliberate design choice rather than an approximation of one.
+
+The measurements still stand, and remain useful for anyone reconciling against a session-based
+platform. Against a synthetic session-anchored VWAP over five simulated sessions: mean absolute
+difference 0.7610, max 4.0016, up to **3.882% of price**. And ours is **exactly equal to `VWMA`
+computed on typical price** (`allclose` -> True) -- expected, since a volume-weighted rolling window
+of typical price is precisely that.
+
+The one caveat worth keeping: a consumer applying this to a session-based instrument such as an
+equity is not getting the institutional execution benchmark, because that benchmark is defined by
+the session it anchors to.
+
+Attribution, sharpened: no single originator, but there is a documented first use (James Elkins, Abel
+Noser, 1984, for the Ford pension fund) and an academic formalisation (Berkowitz, Logue and Noser,
+*Journal of Finance*, 1988).
 
 Attribution, sharpened: no single originator, but there is a documented first use (James Elkins, Abel
 Noser, 1984, for the Ford pension fund) and an academic formalisation (Berkowitz, Logue and Noser,

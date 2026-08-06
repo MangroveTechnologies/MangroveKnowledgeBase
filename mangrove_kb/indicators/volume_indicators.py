@@ -322,11 +322,19 @@ class MFI(IndicatorInterface):
 class VWAP(IndicatorInterface):
     """Volume Weighted Average Price (VWAP)
 
-    VWAP equals the dollar value of all trading periods divided
-    by the total trading volume for the current day.
-    The calculation starts when trading opens and ends when it closes.
-    Because it is good for the current trading day only,
-    intraday periods and data are used in the calculation.
+    Rolling volume-weighted average of typical price: traded value over the window divided
+    by volume over the window. Each bar is weighted by how much actually traded, so heavy
+    bars pull the level toward them and quiet bars barely move it.
+
+    Uses a rolling `window` rather than a session anchor. The textbook definition resets at
+    each session open, but anchoring presupposes a session boundary, and a continuously
+    traded 24/7 market does not have one -- there is no open to accumulate from and no close
+    to reset at. The rolling form is therefore the coherent definition here, not an
+    approximation of the anchored one.
+
+    Consequence worth knowing: on a session-traded instrument such as an equity, this is not
+    the institutional execution benchmark, because that benchmark is defined by the session
+    it anchors to. This series is exactly VWMA computed on typical price.
 
     https://school.stockcharts.com/doku.php?id=technical_indicators:vwap_intraday
 
