@@ -3638,7 +3638,7 @@
        100
       ],
       "canonical_name": "Relative Strength Index",
-      "description": "Wilder's momentum index, 100 - 100/(1 + avg_gain/avg_loss), with both averages Wilder-smoothed at alpha=1/window. Hard-bounded 0..100 by construction, not by convention: the ratio is non-negative so the expression cannot leave the range. Explicitly returns 100 when average loss is zero, the limit case. 70/30 and 80/20 are conventional thresholds, NOT bounds; the traversed range shifts with regime (roughly 40-90 in bull markets, 10-60 in bear)"
+      "description": "Wilder's momentum index, 100 - 100/(1 + avg_gain/avg_loss), with both averages Wilder-smoothed at alpha=1/window. Hard-bounded 0..100 by construction, not by convention: the ratio is non-negative so the expression cannot leave the range. Returns 100 where average loss is zero AND there are gains -- a genuine limit, since the ratio diverges. Returns NaN where there are neither gains nor losses (a perfectly flat window), which is 0/0 with no limit to take; an earlier guard tested only the denominator and returned 100 there, the all-gains answer for a market with no gains. That NaN convention matches StochasticOscillator, WilliamsR and StochRSI. 70/30 and 80/20 are conventional thresholds, NOT bounds; the traversed range shifts with regime (roughly 40-90 in bull markets, 10-60 in bear)"
      }
     }
    }
