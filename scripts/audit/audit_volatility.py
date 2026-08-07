@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Audit volatility indicators against Bukosabino ta reference."""
+"""Audit volatility indicators against Bukosabino ta reference, and the band-state signals.
+
+The band-state signals (bb_above_upper / bb_below_lower / kc_above_upper / kc_below_lower)
+carry what used to be the `hband_indicator` / `lband_indicator` outputs on BollingerBands and
+KeltnerChannel. They are verified bar-by-bar against the band comparison they encode, to the
+same zero-false-positive / zero-false-negative standard as every other signal in the package.
+"""
 import sys
 sys.path.insert(0, "scripts")
 
 from audit import load_btc_daily
-from audit.compare import compare_indicator
+from audit.compare import compare_indicator, verify_signal
 from audit.config import get_tolerance
 
 from mangrove_kb.indicators.volatility_indicators import (
@@ -73,6 +79,9 @@ def run_audit():
 
     # --- KeltnerChannel (original_version=True) ---
     kc_window = 20
+    # Both are None on our side: the original_version branch derives its bands from SMA(high - low)
+    # and never reads them, and passing a value is now rejected instead of silently ignored. The
+    # reference library still accepts them and ignores them just the same, so the comparison holds.
     kc_window_atr = 10
     kc_multiplier = 2
     tol, tier = get_tolerance("KeltnerChannel")
@@ -82,18 +91,18 @@ def run_audit():
         our_fn=lambda: {
             'kc_hband': KeltnerChannel.compute(
                 {'high': high, 'low': low, 'close': close},
-                {'window': kc_window, 'window_atr': kc_window_atr,
-                 'original_version': True, 'multiplier': kc_multiplier},
+                {'window': kc_window, 'window_atr': None,
+                 'original_version': True, 'multiplier': None},
             )['hband'],
             'kc_lband': KeltnerChannel.compute(
                 {'high': high, 'low': low, 'close': close},
-                {'window': kc_window, 'window_atr': kc_window_atr,
-                 'original_version': True, 'multiplier': kc_multiplier},
+                {'window': kc_window, 'window_atr': None,
+                 'original_version': True, 'multiplier': None},
             )['lband'],
             'kc_mband': KeltnerChannel.compute(
                 {'high': high, 'low': low, 'close': close},
-                {'window': kc_window, 'window_atr': kc_window_atr,
-                 'original_version': True, 'multiplier': kc_multiplier},
+                {'window': kc_window, 'window_atr': None,
+                 'original_version': True, 'multiplier': None},
             )['mband'],
         },
         ref_fn=lambda: {
@@ -120,6 +129,10 @@ def run_audit():
     ))
 
     # --- DonchianChannel ---
+    # include_current_bar=True to match the reference: bukosabino/ta's DonchianChannel is a generic
+    # rolling max/min that folds in the current bar. That is NOT the Donchian convention -- every
+    # source specifies the preceding N bars, and including the current one makes a breakout
+    # arithmetically impossible -- so our default is the opposite. Comparing like with like here.
     dc_window = 20
     tol, tier = get_tolerance("DonchianChannel")
     results.append(compare_indicator(
@@ -128,15 +141,15 @@ def run_audit():
         our_fn=lambda: {
             'dc_hband': DonchianChannel.compute(
                 {'high': high, 'low': low, 'close': close},
-                {'window': dc_window, 'offset': 0},
+                {'window': dc_window, 'include_current_bar': True},
             )['hband'],
             'dc_lband': DonchianChannel.compute(
                 {'high': high, 'low': low, 'close': close},
-                {'window': dc_window, 'offset': 0},
+                {'window': dc_window, 'include_current_bar': True},
             )['lband'],
             'dc_mband': DonchianChannel.compute(
                 {'high': high, 'low': low, 'close': close},
-                {'window': dc_window, 'offset': 0},
+                {'window': dc_window, 'include_current_bar': True},
             )['mband'],
         },
         ref_fn=lambda: {
@@ -181,10 +194,54 @@ def run_audit():
     return results
 
 
+def run_signal_audit():
+    """Verify the band-state signals bar-by-bar over the real BTC daily fixture.
+
+    Ground truth is the band comparison itself -- `close > hband` / `close < lband` -- computed on the
+    full series, against which each signal is replayed through a sliding window. These signals hold
+    for as long as price sits outside the band, unlike the *_breakout signals, which fire only on the
+    crossing bar.
+    """
+    df = load_btc_daily()
+    close = df['close']
+
+    bb = BollingerBands.compute({'close': close}, {'window': 20, 'window_dev': 2})
+    kc = KeltnerChannel.compute(
+        {'high': df['high'], 'low': df['low'], 'close': close},
+        {'window': 20, 'window_atr': 10, 'original_version': False, 'multiplier': 2.0},
+    )
+
+    bb_params = {'window': 20, 'window_dev': 2}
+    kc_params = {'window': 20, 'window_atr': 10, 'multiplier': 2.0}
+    cases = [
+        ('bb_above_upper', bb_params, close > bb['hband']),
+        ('bb_below_lower', bb_params, close < bb['lband']),
+        ('kc_above_upper', kc_params, close > kc['hband']),
+        ('kc_below_lower', kc_params, close < kc['lband']),
+    ]
+    return [
+        verify_signal(name, params, df, truth.fillna(False).to_numpy(dtype=bool))
+        for name, params, truth in cases
+    ]
+
+
 if __name__ == "__main__":
+    print("=== Volatility: Indicator audit ===")
     results = run_audit()
     for r in results:
         status = "PASS" if r.pass_fail else "FAIL"
         errors = ", ".join(f"{k}={v.max_abs_error:.2e}" for k, v in r.outputs.items())
         notes = f" [{r.notes}]" if r.notes else ""
         print(f"  {r.indicator_name}: {status} ({errors}){notes}")
+
+    print("\n=== Volatility: Band-state signal audit (bar-by-bar ground truth) ===")
+    sig_results = run_signal_audit()
+    for r in sig_results:
+        status = "PASS" if r.pass_fail else "FAIL"
+        print(f"  {r.signal_name}: {status} (fires={r.fires}, expected={r.expected_fires}, "
+              f"FP={r.false_positives}, FN={r.false_negatives})")
+
+    failed = sum(1 for r in results + sig_results if not r.pass_fail)
+    total = len(results) + len(sig_results)
+    print(f"\nVolatility total: {total - failed}/{total} PASS")
+    sys.exit(0 if failed == 0 else 1)

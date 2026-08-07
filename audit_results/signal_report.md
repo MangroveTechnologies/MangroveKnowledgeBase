@@ -1,16 +1,16 @@
 # Signal Audit Report
 
-**Date**: 2026-04-15 22:37
+**Date**: 2026-08-07 09:53
 **Data**: BTC/USD Daily, 1294 bars (2022-08-01 to 2026-02-14)
 
 ## 1. Smoke Test Summary
 
-**136/136** signals run without error and return bool.
+**247/247** signals run without error and return bool.
 
 | Metric | Count |
 |--------|-------|
-| Total signals tested | 136 |
-| Passed (no error + returns bool) | 136 |
+| Total signals tested | 247 |
+| Passed (no error + returns bool) | 247 |
 | Errored (raised exception) | 0 |
 | Bad return type (not bool) | 0 |
 
@@ -18,8 +18,8 @@
 
 | Type | Count |
 |------|-------|
-| FILTER | 70 |
-| TRIGGER | 66 |
+| FILTER | 130 |
+| TRIGGER | 117 |
 | UNKNOWN | 0 |
 
 ### No signals crashed.
@@ -70,21 +70,45 @@ with sliding window from bar 50 onward.
 
 ## 4. FILTER Signal Code Review
 
-**70/70** FILTER signals pass code review.
+**109/130** FILTER signals pass code review.
 
 Checks for standard FILTER signals: uses `iloc[-1]`, handles NaN, has early return for insufficient data.
 
-- Standard indicator FILTERs: 62/62 pass
+- Standard indicator FILTERs: 101/122 pass
 - Pattern scan FILTERs: 8/8 pass
 
 Pattern scan FILTERs (e.g. `bullish_pattern_recent`) check for any pattern within a recent
 window of bars using `.iloc[-window:]` and `.any()`. They are architecturally different from
 standard indicator FILTERs that read `iloc[-1]` and compare against a threshold.
 
-### All FILTER signals pass code review.
+### FILTER Signals With Issues
+
+| Signal | Type | Issues |
+|--------|------|--------|
+| `etf_inflow_streak` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
+| `exchange_net_outflow` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
+| `funding_negative_regime` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
+| `holder_concentration_falling` | Standard | No NaN handling detected |
+| `holder_concentration_low` | Standard | No NaN handling detected |
+| `is_above_dema` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected; No early return False for insufficient data |
+| `is_above_epma` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected; No early return False for insufficient data |
+| `is_above_hma` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected; No early return False for insufficient data |
+| `is_above_mama` | Standard | No NaN handling detected |
+| `is_above_smma` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected; No early return False for insufficient data |
+| `is_above_tema` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected; No early return False for insufficient data |
+| `is_above_trima` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected; No early return False for insufficient data |
+| `lending_spread_low` | Standard | No NaN handling detected |
+| `ma_ribbon_bearish` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
+| `ma_ribbon_bullish` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
+| `ma_ribbon_tangled` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
+| `smart_money_holdings_rising` | Standard | No NaN handling detected |
+| `smart_money_net_positive` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
+| `token_unlock_pressure_low` | Standard | No NaN handling detected |
+| `treasury_growing` | Standard | No NaN handling detected |
+| `whale_net_accumulation` | Standard | Does not use iloc[-1] -- may not read last bar; No NaN handling detected |
 
 ## 5. Conclusion
 
-- **Smoke test**: 136/136 signals pass (no crashes, return bool)
+- **Smoke test**: 247/247 signals pass (no crashes, return bool)
 - **Crossover accuracy**: 10/10 tested signals match ground truth
-- **FILTER code review**: 70/70 pass static checks
+- **FILTER code review**: 109/130 pass static checks
