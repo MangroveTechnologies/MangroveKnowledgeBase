@@ -361,7 +361,7 @@ def vpt_bullish(df: pd.DataFrame, window: int = 20) -> bool:
         return False
 
     result = VPT.compute(data={'close': df["Close"], 'volume': df["Volume"],
-    }, params={'smoothing_factor': None, 'dropnans': False})
+    }, params={'smoothing_factor': None})
     vpt = result['vpt']
 
     if len(vpt) < window or pd.isna(vpt.iloc[-1]) or pd.isna(vpt.iloc[-window]):
@@ -389,7 +389,7 @@ def vpt_bearish(df: pd.DataFrame, window: int = 20) -> bool:
         return False
 
     result = VPT.compute(data={'close': df["Close"], 'volume': df["Volume"],
-    }, params={'smoothing_factor': None, 'dropnans': False})
+    }, params={'smoothing_factor': None})
     vpt = result['vpt']
 
     if len(vpt) < window or pd.isna(vpt.iloc[-1]) or pd.isna(vpt.iloc[-window]):

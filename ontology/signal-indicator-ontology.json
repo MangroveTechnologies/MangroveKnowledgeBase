@@ -4691,7 +4691,7 @@
     "reference": "https://en.wikipedia.org/wiki/Volume-price_trend",
     "warmup_bars": "smoothing_factor - 1",
     "abbreviation": "VPT",
-    "usage_example": "VPT.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'smoothing_factor': value, 'dropnans': value})",
+    "usage_example": "VPT.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'smoothing_factor': value})",
     "formula": "VPT = Previous VPT + Volume * ((Close - Previous Close) / Previous Close)",
     "interpretation": [
      "Rising VPT: Accumulation / bullish volume-price relationship",
@@ -4718,13 +4718,6 @@
     "params": {
      "smoothing_factor": {
       "type": "Optional",
-      "default": null,
-      "min": null,
-      "max": null,
-      "description": null
-     },
-     "dropnans": {
-      "type": "bool",
       "default": null,
       "min": null,
       "max": null,
@@ -5836,7 +5829,7 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 732,
+  "carried_forward_from_previous_build": 742,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],

@@ -469,7 +469,7 @@ class MAMA(IndicatorInterface):
     _outputs = ["mama", "fama"]
 
     # See the warmup note in `_compute`: measured seed dependence, not a guess.
-    _WARMUP_BARS = 40
+    _WARMUP_BARS = 64
 
     @classmethod
     def _compute(cls, data, params):
@@ -580,9 +580,16 @@ class MAMA(IndicatorInterface):
         #
         # The ramp itself is faithful to Ehlers' EasyLanguage, which gates on CurrentBar > 5 and
         # lets the recursion start from zero -- so the fix is to mask longer, not to reseed.
-        # Measured by comparing a cold start against a warm start (600 bars prepended) across 15
-        # synthetic series at three price levels: seed dependence falls below 1% by bar 19 and
-        # below 0.1% by bar 34. 40 is that bound with margin.
+        #
+        # Measured by comparing a cold start against a warm start (800 bars prepended), across
+        # seven regimes -- random walk, trending, mean-reverting, low and high volatility, gappy,
+        # and cyclical -- at three price levels and three seeds each. Seed dependence clears 1% by
+        # bar 19 but does not clear 0.1% until bar 57, with the trending regime worst. 64 is that
+        # bound with margin.
+        #
+        # An earlier revision used 40, derived from random walks alone; that sample understated the
+        # tail by more than 20 bars, which is why the regimes above are enumerated rather than
+        # summarised.
         mama_out = mama.copy()
         fama_out = fama.copy()
         mama_out[:cls._WARMUP_BARS] = np.nan

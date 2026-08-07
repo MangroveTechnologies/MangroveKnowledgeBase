@@ -78,9 +78,12 @@ class OBV(IndicatorInterface):
         # flat closes are common. OBV is read by its direction, so a spurious drift is precisely
         # the failure mode that matters.
         direction = np.sign(close.diff())
-        # Bar 0 has no prior close. StockCharts seeds at the first bar's signed volume; sign() of
-        # NaN is NaN, so seed it explicitly as +volume to preserve that convention.
-        direction.iloc[0] = 1.0
+        # Bar 0 has no prior close, so its direction is undefined and it contributes nothing --
+        # the same reasoning as the flat-close branch. Seeding it with +volume (as an earlier
+        # revision did) offsets the whole series by one bar's volume. That offset is harmless for
+        # reading OBV, whose level is an artefact of where the data begins, but it is an invented
+        # value rather than a measured one.
+        direction = direction.fillna(0.0)
 
         obv = (direction * volume).cumsum()
 
@@ -209,13 +212,19 @@ class VPT(IndicatorInterface):
 
     Args:
         data: {'close': pd.Series, 'volume': pd.Series}
-        params: {'smoothing_factor': Optional[int], 'dropnans': bool}
+        params: {'smoothing_factor': Optional[int]}
 
     Returns:
         {'vpt': pd.Series}
     """
     _data = ["close", "volume"]
-    _params = ["smoothing_factor", "dropnans"]
+    # `dropnans` is REMOVED, not repaired. It returned a shorter series starting at a later index,
+    # silently breaking the aligned-index guarantee `compute_frame` documents. Filling the warmup
+    # instead would have been worse: VPT is a running cumulative total, so 0 is a real reading, and
+    # substituting it makes warmup indistinguishable from a genuinely flat stretch -- the same
+    # defect corrected in ATR and ADX. Warmup is NaN here, as it is everywhere else, and no
+    # indicator in this package carries an escape hatch from that.
+    _params = ["smoothing_factor"]
     _outputs = ["vpt"]
 
     @classmethod
@@ -223,21 +232,10 @@ class VPT(IndicatorInterface):
         close = data['close']
         volume = data['volume']
         smoothing_factor = params['smoothing_factor']
-        dropnans = params['dropnans']
 
         vpt = (close.pct_change() * volume).cumsum()
         if smoothing_factor:
             vpt = vpt.rolling(smoothing_factor, min_periods=smoothing_factor).mean()
-        if dropnans:
-            # Deliberately NOT `.dropna()`. Every indicator in this package returns a series
-            # aligned to the full input index, NaN-padded through warmup -- `compute_frame`'s
-            # contract depends on it ("because every indicator's output Series share the input
-            # index, frames from different indicators outer-join cleanly into a feature matrix").
-            # Dropping rows silently shortened the series and broke that join for any caller who
-            # set this flag, which was invisible at the call site. Zero-fill instead: same intent
-            # (no NaNs), index preserved.
-            vpt = vpt.fillna(0.0)
-
         return {'vpt': pd.Series(vpt, index=close.index, name="vpt")}
 
 

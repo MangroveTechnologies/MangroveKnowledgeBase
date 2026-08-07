@@ -53,20 +53,33 @@ def test_obv_leaves_unchanged_closes_alone():
     close = pd.Series([100.0, 100, 100, 101, 100, 100], index=idx)
     volume = pd.Series([1000.0] * 6, index=idx)
     obv = OBV.compute({"close": close, "volume": volume}, {})["obv"]
-    assert obv.tolist() == [1000.0, 1000.0, 1000.0, 2000.0, 1000.0, 1000.0]
+    # Bar 0 contributes nothing: with no prior close its direction is undefined, the same reasoning
+    # as the flat-close branch. This is the canonical series from the research note.
+    assert obv.tolist() == [0.0, 0.0, 0.0, 1000.0, 0.0, 0.0]
 
 
 # --- 23: VPT keeps the full index ------------------------------------------ #
-def test_vpt_dropnans_preserves_the_index(ohlcv):
+def test_vpt_has_no_index_shortening_escape_hatch(ohlcv):
     """`compute_frame` guarantees every indicator shares the input index so frames outer-join
-    cleanly. `dropnans=True` used to shorten the series and silently break that."""
-    data = {"close": ohlcv["close"], "volume": ohlcv["volume"]}
-    kept = VPT.compute(data, {"smoothing_factor": 5, "dropnans": False})["vpt"]
-    dropped = VPT.compute(data, {"smoothing_factor": 5, "dropnans": True})["vpt"]
+    cleanly. `dropnans=True` returned a shorter series starting later, silently breaking that.
 
-    assert len(dropped) == len(kept) == len(ohlcv["close"])
-    assert dropped.index.equals(ohlcv["close"].index)
-    assert dropped.isna().sum() == 0
+    The parameter is removed rather than redefined. Zero-filling instead would have been the same
+    defect corrected in ATR and ADX: VPT is a running cumulative total, so 0 is a real reading and
+    substituting it makes warmup indistinguishable from a genuinely flat stretch.
+    """
+    assert "dropnans" not in VPT._params
+
+    data = {"close": ohlcv["close"], "volume": ohlcv["volume"]}
+    out = VPT.compute(data, {"smoothing_factor": 5})["vpt"]
+
+    assert len(out) == len(ohlcv["close"])
+    assert out.index.equals(ohlcv["close"].index)
+
+    # Warmup is a contiguous NaN block at the head, and nothing after it is NaN -- the shape every
+    # other indicator in the package has.
+    warmup = int(out.isna().sum())
+    assert warmup > 0, "warmup is being filled rather than left undefined"
+    assert out.iloc[:warmup].isna().all() and out.iloc[warmup:].notna().all()
 
 
 # --- 3 / 18: warmup is NaN, never a zero-fill ------------------------------ #
