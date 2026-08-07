@@ -455,10 +455,10 @@ class MAMA(IndicatorInterface):
 
     Input is MEDIAN PRICE, (high + low) / 2, per Ehlers: "Inputs: Price = (H+L)/2".
 
-    Warmup: the first `_WARMUP_BARS` (64) values are NaN. Unlike a moving average, MAMA has no
-    window to fill -- it is a recursion seeded at zero, so it emits a number from the first bar and
-    those numbers are contaminated by the seed rather than absent. The count is therefore MEASURED,
-    not calculated, and it depends on a tolerance we choose:
+    Warmup is the `warmup_bars` parameter, default 64. Unlike a moving average, MAMA has no window
+    to fill -- it is a recursion seeded at zero, so it emits a number from the first bar and those
+    numbers are contaminated by the seed rather than absent. There is no structural count to
+    derive, so this is MEASURED, and what it measures depends on a tolerance the caller chooses:
 
         tolerance    bars until the seed is forgotten
         1%           19
@@ -470,8 +470,8 @@ class MAMA(IndicatorInterface):
     and three seeds each. Trending is the worst case. Sampling random walks alone understates the
     tail by more than 20 bars.
 
-    Widening to a 1% tolerance would make this 24 bars. That is a legitimate trade and the constant
-    is the single place to change it.
+    The default is the 0.1% figure. Set `warmup_bars` lower to trade seed contamination for usable
+    history -- 24 corresponds to the 1% tolerance -- or higher to be stricter.
 
     Implementation: genuinely sequential (per-bar Hilbert phase/period state).
     Cannot be vectorized; loop is pure Python. Future optimization wave may
@@ -479,17 +479,14 @@ class MAMA(IndicatorInterface):
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series}
-        params: {'fast_limit': float, 'slow_limit': float}
+        params: {'fast_limit': float, 'slow_limit': float, 'warmup_bars': int}
 
     Returns:
         {'mama': pd.Series, 'fama': pd.Series}
     """
     _data = ["high", "low"]
-    _params = ["fast_limit", "slow_limit"]
+    _params = ["fast_limit", "slow_limit", "warmup_bars"]
     _outputs = ["mama", "fama"]
-
-    # See the warmup note in `_compute`: measured seed dependence, not a guess.
-    _WARMUP_BARS = 64
 
     @classmethod
     def _compute(cls, data, params):
@@ -500,6 +497,7 @@ class MAMA(IndicatorInterface):
         price = (data['high'] + data['low']) / 2.0
         fast_limit = float(params['fast_limit'])
         slow_limit = float(params['slow_limit'])
+        warmup_bars = int(params['warmup_bars'])
 
         x = price.to_numpy(dtype=np.float64, copy=False)
         n = len(x)
@@ -612,8 +610,8 @@ class MAMA(IndicatorInterface):
         # summarised.
         mama_out = mama.copy()
         fama_out = fama.copy()
-        mama_out[:cls._WARMUP_BARS] = np.nan
-        fama_out[:cls._WARMUP_BARS] = np.nan
+        mama_out[:warmup_bars] = np.nan
+        fama_out[:warmup_bars] = np.nan
 
         return {
             'mama': pd.Series(mama_out, index=price.index, name='mama'),

@@ -187,7 +187,7 @@ def test_mama_consumes_median_price(ohlcv):
     n = 300
     idx = _idx(n)
     mid = pd.Series(100 + rs.normal(0, 1.0, n).cumsum(), index=idx)
-    params = {"fast_limit": 0.5, "slow_limit": 0.05}
+    params = {"fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": 64}
 
     narrow = MAMA.compute({"high": mid + 0.5, "low": mid - 0.5}, params)
     wide = MAMA.compute({"high": mid + 7.5, "low": mid - 7.5}, params)
@@ -206,11 +206,19 @@ def test_mama_consumes_median_price(ohlcv):
 def test_mama_masks_the_unconverged_recursion(ohlcv):
     """The recursion starts from an uninitialised zero. Six bars covered the Hilbert FIR depth but
     not the ramp, so bar 6 published a value ~50% below price as an ordinary reading."""
+    # warmup is a PARAMETER, not a constant: the count is a tolerance the caller chooses, so it is
+    # tunable like every other knob in this package. Asserted at two settings.
+    assert "warmup_bars" in MAMA._params
+
+    for warmup in (64, 24):
+        out = MAMA.compute({"high": ohlcv["high"], "low": ohlcv["low"]},
+                           {"fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": warmup})
+        for key in ("mama", "fama"):
+            assert out[key].iloc[:warmup].isna().all()
+            assert out[key].iloc[warmup:].notna().all()
+
     out = MAMA.compute({"high": ohlcv["high"], "low": ohlcv["low"]},
-                       {"fast_limit": 0.5, "slow_limit": 0.05})
-    for key in ("mama", "fama"):
-        assert out[key].iloc[: MAMA._WARMUP_BARS].isna().all()
-        assert out[key].iloc[MAMA._WARMUP_BARS:].notna().all()
+                       {"fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": 64})
 
     median = (ohlcv["high"] + ohlcv["low"]) / 2.0
     first = out["mama"].dropna()

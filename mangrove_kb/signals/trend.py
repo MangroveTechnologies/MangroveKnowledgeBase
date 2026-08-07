@@ -2184,14 +2184,18 @@ def t3_cross_down(
 
 # --- MAMA signals ---
 
-def _mama_compute(df: pd.DataFrame, fast_limit: float, slow_limit: float):
-    """Helper: compute MAMA+FAMA once for signal evaluation."""
-    closes = df["Close"]
-    # MAMA now consumes median price per Ehlers, and masks 40 warmup bars rather than 6.
-    if len(closes) <= MAMA._WARMUP_BARS:
+def _mama_compute(df: pd.DataFrame, fast_limit: float, slow_limit: float, warmup_bars: int = 64):
+    """Helper: compute MAMA+FAMA once for signal evaluation.
+
+    MAMA consumes median price per Ehlers. `warmup_bars` is how many leading values are discarded
+    as contaminated by the zero seed -- see the indicator docstring for the measurement behind the
+    default.
+    """
+    if len(df) <= warmup_bars:
         return None
     result = MAMA.compute(data={'high': df["High"], 'low': df["Low"]},
-                          params={'fast_limit': fast_limit, 'slow_limit': slow_limit})
+                          params={'fast_limit': fast_limit, 'slow_limit': slow_limit,
+                                  'warmup_bars': warmup_bars})
     mama, fama = result['mama'], result['fama']
     if len(mama) < 2 or pd.isna(mama.iloc[-1]) or pd.isna(fama.iloc[-1]):
         return None
@@ -2199,7 +2203,7 @@ def _mama_compute(df: pd.DataFrame, fast_limit: float, slow_limit: float):
 
 
 @RuleRegistry.register("is_above_mama")
-def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05) -> bool:
+def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
     """
     Check if the current price is above the MESA Adaptive Moving Average (MAMA).
 
@@ -2212,11 +2216,12 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
         df (pd.DataFrame): DataFrame with OHLCV data.
         fast_limit (float): Upper alpha bound (fast response). Range: 0.1-1.0. Default: 0.5.
         slow_limit (float): Lower alpha bound (slow response). Range: 0.01-0.5. Default: 0.05.
+        warmup_bars (int): Leading bars discarded as contaminated by the zero seed. Range: 6-200. Default: 64.
 
     Returns:
         bool: True if close > MAMA, False otherwise.
     """
-    out = _mama_compute(df, fast_limit, slow_limit)
+    out = _mama_compute(df, fast_limit, slow_limit, warmup_bars)
     if out is None:
         return False
     mama, _ = out
@@ -2224,7 +2229,7 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
 
 
 @RuleRegistry.register("mama_cross_up")
-def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05) -> bool:
+def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
     """
     Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA).
 
@@ -2241,7 +2246,7 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
     Returns:
         bool: True if bullish MAMA/FAMA crossover detected on the current bar.
     """
-    out = _mama_compute(df, fast_limit, slow_limit)
+    out = _mama_compute(df, fast_limit, slow_limit, warmup_bars)
     if out is None:
         return False
     mama, fama = out
@@ -2251,7 +2256,7 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
 
 
 @RuleRegistry.register("mama_cross_down")
-def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05) -> bool:
+def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
     """
     Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA).
 
@@ -2268,7 +2273,7 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
     Returns:
         bool: True if bearish MAMA/FAMA crossover detected on the current bar.
     """
-    out = _mama_compute(df, fast_limit, slow_limit)
+    out = _mama_compute(df, fast_limit, slow_limit, warmup_bars)
     if out is None:
         return False
     mama, fama = out

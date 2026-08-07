@@ -2726,9 +2726,9 @@
    "props": {
     "source_module": "trend_indicators",
     "reference": "http://traders.com/documentation/feedbk_docs/2014/01/traderstips.html",
-    "warmup_bars": "64",
+    "warmup_bars": "warmup_bars",
     "abbreviation": "MAMA",
-    "usage_example": "MAMA.compute(data={'high': df['High'], 'low': df['Low']}, params={'fast_limit': value, 'slow_limit': value})",
+    "usage_example": "MAMA.compute(data={'high': df['High'], 'low': df['Low']}, params={'fast_limit': value, 'slow_limit': value, 'warmup_bars': value})",
     "formula": "Hilbert-transform discriminator measures the dominant cycle period and phase.\n\n  DeltaPhase = Phase[1] - Phase        (floored at 1)\n  alpha      = FastLimit / DeltaPhase  (clamped to [SlowLimit, FastLimit])\n\n  MAMA = alpha*Price + (1 - alpha)*MAMA[1]\n  FAMA = 0.5*alpha*MAMA + (1 - 0.5*alpha)*FAMA[1]\n\nDefaults: FastLimit 0.5, SlowLimit 0.05. Canonical input: median price (H+L)/2.\nInternal period clamped to [6, 50] bars, rate-limited to [0.67x, 1.5x].",
     "interpretation": [
      "Adapts to the cycle PHASE RATE OF CHANGE, not volatility -- the difference from KAMA and VIDYA",
@@ -2767,6 +2767,13 @@
       "min": 0.01,
       "max": null,
       "description": "Lower alpha bound (slow response)"
+     },
+     "warmup_bars": {
+      "type": "int",
+      "default": 64,
+      "min": 6,
+      "max": 200,
+      "description": "Leading bars discarded as contaminated by the zero seed"
      }
     },
     "outputs": {
