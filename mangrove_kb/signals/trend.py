@@ -794,7 +794,7 @@ def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
     if len(df) < window * 3:
         return False
 
-    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window})
+    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window, 'window_sign': 9})
     trix = result['trix']
 
     if pd.isna(trix.iloc[-1]):
@@ -822,7 +822,7 @@ def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
     if len(df) < window * 3:
         return False
 
-    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window})
+    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window, 'window_sign': 9})
     trix = result['trix']
 
     if pd.isna(trix.iloc[-1]):
@@ -2187,9 +2187,11 @@ def t3_cross_down(
 def _mama_compute(df: pd.DataFrame, fast_limit: float, slow_limit: float):
     """Helper: compute MAMA+FAMA once for signal evaluation."""
     closes = df["Close"]
-    if len(closes) < 8:
+    # MAMA now consumes median price per Ehlers, and masks 40 warmup bars rather than 6.
+    if len(closes) <= MAMA._WARMUP_BARS:
         return None
-    result = MAMA.compute(data={'close': closes}, params={'fast_limit': fast_limit, 'slow_limit': slow_limit})
+    result = MAMA.compute(data={'high': df["High"], 'low': df["Low"]},
+                          params={'fast_limit': fast_limit, 'slow_limit': slow_limit})
     mama, fama = result['mama'], result['fama']
     if len(mama) < 2 or pd.isna(mama.iloc[-1]) or pd.isna(fama.iloc[-1]):
         return None

@@ -688,7 +688,7 @@
    "id": "procedure:indicator-bop",
    "title": "BOP",
    "kind": "Procedure",
-   "summary": "Measures buying vs. selling pressure within a single bar: BOP = (close - open) / (high - low) Returns a value in [-1, 1] where positive = buyers in control, negative = sellers. NaN where high == low (no intrabar range).",
+   "summary": "Measures buying vs. selling pressure within a single bar: BOP = (close - open) / (high - low) Returns a value in [-1, 1] where positive = buyers in control, negative = sellers. NaN where high == low (no intrabar range). SMOOTHING: this is the RAW single-bar series, which the literature does not use directly. Livshin writes \"I typically plot a 14-day moving average of the balance of power indicator\", and TradingView notes the raw series is \"quite choppy\". Every source plots a 14-period moving average of it. A consumer wanting the indicator as published must smooth this themselves.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -2728,7 +2728,7 @@
     "reference": "http://traders.com/documentation/feedbk_docs/2014/01/traderstips.html",
     "warmup_bars": "6",
     "abbreviation": "MAMA",
-    "usage_example": "MAMA.compute(data={'close': df['Close']}, params={'fast_limit': value, 'slow_limit': value})",
+    "usage_example": "MAMA.compute(data={'high': df['High'], 'low': df['Low']}, params={'fast_limit': value, 'slow_limit': value})",
     "formula": "Hilbert-transform discriminator measures the dominant cycle period and phase.\n\n  DeltaPhase = Phase[1] - Phase        (floored at 1)\n  alpha      = FastLimit / DeltaPhase  (clamped to [SlowLimit, FastLimit])\n\n  MAMA = alpha*Price + (1 - alpha)*MAMA[1]\n  FAMA = 0.5*alpha*MAMA + (1 - 0.5*alpha)*FAMA[1]\n\nDefaults: FastLimit 0.5, SlowLimit 0.05. Canonical input: median price (H+L)/2.\nInternal period clamped to [6, 50] bars, rate-limited to [0.67x, 1.5x].",
     "interpretation": [
      "Adapts to the cycle PHASE RATE OF CHANGE, not volatility -- the difference from KAMA and VIDYA",
@@ -2744,9 +2744,13 @@
      "Dominant-cycle measurement as a by-product of the discriminator"
     ],
     "inputs": {
-     "close": {
+     "high": {
       "type": "series",
-      "description": "closing price"
+      "description": "bar high, half of the median price Ehlers specifies as the input"
+     },
+     "low": {
+      "type": "series",
+      "description": "bar low, half of the median price Ehlers specifies as the input"
      }
     },
     "params": {
@@ -3898,7 +3902,7 @@
    "id": "procedure:indicator-stochrsi",
    "title": "StochRSI",
    "kind": "Procedure",
-   "summary": "The StochRSI oscillator was developed to take advantage of both momentum indicators in order to create a more sensitive indicator that is attuned to a specific security's historical performance rather than a generalized analysis of price change.",
+   "summary": "The StochRSI oscillator was developed to take advantage of both momentum indicators in order to create a more sensitive indicator that is attuned to a specific security's historical performance rather than a generalized analysis of price change. SCALE: this emits 0..1, the canonical Chande-Kroll / StockCharts form. The literature is genuinely split -- Fidelity and many platforms render the same quantity x100, and TradingView is internally inconsistent (its docs say 0-1, its plotted indicator renders 0-100). The conventional 20/80 overbought/oversold levels are therefore **0.20 / 0.80** here. Applying 20 and 80 directly to this series can never produce a signal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -3988,7 +3992,7 @@
    "id": "procedure:indicator-stochasticoscillator",
    "title": "StochasticOscillator",
    "kind": "Procedure",
-   "summary": "Developed in the late 1950s by George Lane. The stochastic oscillator presents the location of the closing price of a stock in relation to the high and low range of the price of a stock over a period of time, typically a 14-day period.",
+   "summary": "Developed in the late 1950s by George Lane. The stochastic oscillator presents the location of the closing price of a stock in relation to the high and low range of the price of a stock over a period of time, typically a 14-day period. VARIANT: this is the **Fast** stochastic. `stoch_k` is the raw %K and `stoch_d` is an SMA of it. The literature distinguishes Fast, Slow (%K itself smoothed, %D an SMA of that) and Full (user-specified smoothing on both); they produce materially different series, and neither the class name nor the parameters say which one this is.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -4250,7 +4254,7 @@
     "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:trix",
     "warmup_bars": "3 * (window - 1) + 1",
     "abbreviation": "TRIX",
-    "usage_example": "TRIX.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "TRIX.compute(data={'close': df['Close']}, params={'window': value, 'window_sign': value})",
     "formula": "EMA1 = EMA(Close, period)\nEMA2 = EMA(EMA1, period)\nEMA3 = EMA(EMA2, period)\nTRIX = (EMA3 - Previous EMA3) / Previous EMA3 * 100",
     "interpretation": [
      "Positive TRIX: Bullish momentum",
@@ -4277,6 +4281,13 @@
       "min": 5,
       "max": 30,
       "description": "TRIX period"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 50,
+      "description": "Period of the EMA applied to TRIX to form the signal line. 9 is canonical"
      }
     },
     "outputs": {
@@ -4289,6 +4300,16 @@
       ],
       "canonical_name": "TRIX",
       "description": "1-period percent change OF a triple-smoothed EMA -- the three EMAs are applied in sequence first, and the rate of change is taken last, on the final series only. Triple smoothing is a noise filter: it takes more than a one-day move to turn it. Percent-normalised, so unlike MACD its magnitude does not scale with price level, but it is unbounded above. NOTE the canonical TRIX also carries a signal line (a 9-period EMA of this series), and signal-line crossovers are its primary documented use -- that second series is NOT emitted here"
+     },
+     "trix_signal": {
+      "type": "series",
+      "units": "percent",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "signal line",
+      "description": "9-period EMA of TRIX. Signal-line crossovers are the primary documented TRIX signal: TRIX crossing above it is bullish, below it bearish. Same units and unbounded domain as TRIX itself, since it is a moving average of that series"
      }
     }
    }
@@ -5815,7 +5836,7 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 733,
+  "carried_forward_from_previous_build": 732,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],

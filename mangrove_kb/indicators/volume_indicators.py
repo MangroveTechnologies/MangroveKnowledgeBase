@@ -71,10 +71,20 @@ class OBV(IndicatorInterface):
         close = data['close']
         volume = data['volume']
 
-        obv = np.where(close < close.shift(1), -volume, volume)
-        obv = pd.Series(obv, index=close.index).cumsum()
+        # Granville's rule has THREE branches, and the third one matters: an unchanged close
+        # contributes nothing. A two-way test folds flat bars into the up-branch, so every flat
+        # close adds volume that should have been ignored and the line drifts upward independently
+        # of price -- worst on illiquid instruments, coarse tick sizes, and resampled series where
+        # flat closes are common. OBV is read by its direction, so a spurious drift is precisely
+        # the failure mode that matters.
+        direction = np.sign(close.diff())
+        # Bar 0 has no prior close. StockCharts seeds at the first bar's signed volume; sign() of
+        # NaN is NaN, so seed it explicitly as +volume to preserve that convention.
+        direction.iloc[0] = 1.0
 
-        return {'obv': pd.Series(obv, name="obv")}
+        obv = (direction * volume).cumsum()
+
+        return {'obv': pd.Series(obv, index=close.index, name="obv")}
 
 
 class CMF(IndicatorInterface):
@@ -219,9 +229,16 @@ class VPT(IndicatorInterface):
         if smoothing_factor:
             vpt = vpt.rolling(smoothing_factor, min_periods=smoothing_factor).mean()
         if dropnans:
-            vpt = vpt.dropna()
+            # Deliberately NOT `.dropna()`. Every indicator in this package returns a series
+            # aligned to the full input index, NaN-padded through warmup -- `compute_frame`'s
+            # contract depends on it ("because every indicator's output Series share the input
+            # index, frames from different indicators outer-join cleanly into a feature matrix").
+            # Dropping rows silently shortened the series and broke that join for any caller who
+            # set this flag, which was invisible at the call site. Zero-fill instead: same intent
+            # (no NaNs), index preserved.
+            vpt = vpt.fillna(0.0)
 
-        return {'vpt': pd.Series(vpt, name="vpt")}
+        return {'vpt': pd.Series(vpt, index=close.index, name="vpt")}
 
 
 class NVI(IndicatorInterface):

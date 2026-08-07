@@ -44,13 +44,19 @@ class ATR(IndicatorInterface):
         tr_arr = tr.to_numpy(dtype=np.float64)
         n = len(tr_arr)
 
-        # Original convention: atr[0..window-2] = 0 (from np.zeros warm-up),
-        # atr[window-1] = mean of the first `window` tr values (skipna; tr[0]
-        # is NaN so it's really mean of window-1 valid values), then Wilder
-        # smooth forward. Wilder's recurrence is identical to
-        # ewm(alpha=1/window, adjust=False) applied to
+        # Warmup is NaN, not zero. Zero is a meaningful ATR reading -- it means no observed range
+        # -- so filling warmup with it makes the first window-1 bars indistinguishable from a
+        # genuinely flat market, with nothing in the series to mark them. No source proposes a
+        # zero-fill; the convention is universally that warmup is undefined.
+        #
+        # atr[window-1] = mean of the first `window` true-range values, then Wilder smoothing
+        # forward. Wilder's recurrence is identical to ewm(alpha=1/window, adjust=False) applied to
         # [seed, tr[window], tr[window+1], ...].
-        atr_arr = np.zeros(n)
+        #
+        # Note tr[0] is FINITE: true_range uses np.fmax, which ignores NaN and falls back to
+        # high - low. An earlier comment here claimed tr[0] was NaN and the seed therefore a
+        # window-1 mean; it is a true `window`-value mean, matching Wilder.
+        atr_arr = np.full(n, np.nan)
         if n >= window:
             seed = np.nanmean(tr_arr[:window])
             tail = np.concatenate(([seed], tr_arr[window:]))
@@ -143,6 +149,18 @@ class KeltnerChannel(IndicatorInterface):
         multiplier = params['multiplier']
 
         if original_version:
+            # Chester Keltner's 1960 construction: SMA(typical price) +/- SMA(high - low). It uses
+            # neither `window_atr` nor `multiplier`, but both are declared in `_params` and
+            # surfaced through the metadata API as though they were live, so a caller tuning them
+            # saw no effect and no error. Fail loudly instead of ignoring them silently.
+            _defaults = {'window_atr': 10, 'multiplier': 2.0}
+            inert = [p for p, d in _defaults.items() if float(params[p]) != d]
+            if inert:
+                raise ValueError(
+                    f"KeltnerChannel(original_version=True) does not use {sorted(inert)}: the "
+                    "original formulation derives its bands from SMA(high - low), not from ATR. "
+                    "Pass original_version=False to use them."
+                )
             tp = typical_price(high, low, close).rolling(window, min_periods=window).mean()
             tp_high = (((4 * high) - (2 * low) + close) / 3.0).rolling(window, min_periods=window).mean()
             tp_low = (((-2 * high) + (4 * low) + close) / 3.0).rolling(window, min_periods=window).mean()
@@ -153,7 +171,11 @@ class KeltnerChannel(IndicatorInterface):
             tp_low = tp - (multiplier * atr)
 
         wband = ((tp_high - tp_low) / tp) * 100
-        pband = (close - tp_low) / (tp_high - tp_low)
+
+        # Guard the zero-width case, matching BollingerBands. Coincident bands make this 0/0 or
+        # x/0; without the guard it yields inf.
+        width = tp_high - tp_low
+        pband = ((close - tp_low) / width).where(width != 0, np.nan)
 
         hband_indicator = pd.Series(
             np.where(close > tp_high, 1.0, 0.0), index=close.index
@@ -162,14 +184,17 @@ class KeltnerChannel(IndicatorInterface):
             np.where(close < tp_low, 1.0, 0.0), index=close.index
         )
 
+        # Series names are this indicator's own. They were copy-pasted from BollingerBands
+        # ("mavg", "bbiwband", "bbipband") and DonchianChannel ("dcihband", "dcilband"), which is
+        # cosmetic but actively misleading when debugging a frame of stacked indicators.
         return {
-            'mband': pd.Series(tp, name="mavg"),
+            'mband': pd.Series(tp, name="kc_mband"),
             'hband': pd.Series(tp_high, name="kc_hband"),
             'lband': pd.Series(tp_low, name="kc_lband"),
-            'wband': pd.Series(wband, name="bbiwband"),
-            'pband': pd.Series(pband, name="bbipband"),
-            'hband_indicator': pd.Series(hband_indicator, name="dcihband"),
-            'lband_indicator': pd.Series(lband_indicator, name="dcilband")
+            'wband': pd.Series(wband, name="kc_wband"),
+            'pband': pd.Series(pband, name="kc_pband"),
+            'hband_indicator': pd.Series(hband_indicator, name="kc_hband_indicator"),
+            'lband_indicator': pd.Series(lband_indicator, name="kc_lband_indicator")
         }
 
 
@@ -204,14 +229,23 @@ class DonchianChannel(IndicatorInterface):
 
         mavg = close.rolling(window, min_periods=window).mean()
         wband = ((hband - lband) / mavg) * 100
-        pband = (close - lband) / (hband - lband)
 
+        # The offset is applied to the BANDS first, and pband is computed from the shifted bands.
+        # It used to be computed from the unshifted bands and then shifted alongside them, so for
+        # offset != 0 it described where close sat relative to the bands at t - offset, not
+        # relative to the bands this indicator actually reports at t. The visible consequence was
+        # that pband could never leave 0..1 and so could never signal a breakout -- on exactly the
+        # offset=1 configuration both Donchian signals use.
         if offset != 0:
             hband = hband.shift(offset)
             lband = lband.shift(offset)
             mband = mband.shift(offset)
             wband = wband.shift(offset)
-            pband = pband.shift(offset)
+
+        # Guard the zero-width case, matching BollingerBands. Coincident bands make this 0/0 or
+        # x/0; without the guard it yields inf.
+        width = hband - lband
+        pband = ((close - lband) / width).where(width != 0, np.nan)
 
         return {
             'hband': pd.Series(hband, name="dchband"),
@@ -313,16 +347,13 @@ class NATR(IndicatorInterface):
         close = data['close']
         window = params['window']
 
+        # ATR now emits NaN through warmup rather than zero, so the local mask this used to carry
+        # is gone -- the NaN propagates on its own.
         atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
-        # ATR is zero during warmup (first window-1 bars); avoid 0/x artifacts
-        # by masking those to NaN.
-        atr_vals = atr.to_numpy(dtype=np.float64, copy=False)
-        close_vals = close.to_numpy(dtype=np.float64, copy=False)
-        natr = np.full_like(atr_vals, np.nan)
-        valid = np.arange(len(atr_vals)) >= (window - 1)
         with np.errstate(divide='ignore', invalid='ignore'):
-            natr[valid] = 100.0 * atr_vals[valid] / close_vals[valid]
-        return {'natr': pd.Series(natr, index=close.index, name=f'natr_{window}')}
+            natr = 100.0 * atr / close
+        return {'natr': pd.Series(natr.to_numpy(dtype=np.float64), index=close.index,
+                                  name=f'natr_{window}')}
 
 
 class ATRTrailingStop(IndicatorInterface):
@@ -458,14 +489,12 @@ class STARCBands(IndicatorInterface):
         mult = float(params['multiplier'])
 
         mid = SMA.compute({'close': close}, {'window': window})['sma']
+        # ATR now emits NaN through warmup rather than zero, so the local mask this used to carry
+        # is gone -- zero-ATR bands can no longer leak.
         atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window_atr})['atr']
-        # Mask warmup bars of ATR to NaN so bands don't leak zero-ATR values.
-        atr_vals = atr.to_numpy(dtype=np.float64, copy=False).copy()
-        atr_vals[: window_atr - 1] = np.nan
-        atr_masked = pd.Series(atr_vals, index=close.index)
 
-        hband = mid + mult * atr_masked
-        lband = mid - mult * atr_masked
+        hband = mid + mult * atr
+        lband = mid - mult * atr
 
         return {
             'starc_mid': pd.Series(mid.values, index=close.index, name='starc_mid'),

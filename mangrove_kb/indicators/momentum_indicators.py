@@ -175,6 +175,11 @@ class StochasticOscillator(IndicatorInterface):
     stock in relation to the high and low range of the price
     of a stock over a period of time, typically a 14-day period.
 
+    VARIANT: this is the **Fast** stochastic. `stoch_k` is the raw %K and `stoch_d` is an SMA of
+    it. The literature distinguishes Fast, Slow (%K itself smoothed, %D an SMA of that) and Full
+    (user-specified smoothing on both); they produce materially different series, and neither the
+    class name nor the parameters say which one this is.
+
     https://school.stockcharts.com/doku.php?id=technical_indicators:stochastic_oscillator_fast_slow_and_full
 
     Args:
@@ -262,7 +267,11 @@ class KAMA(IndicatorInterface):
             if np.isnan(smoothing_constant[i]):
                 kama_values[i] = np.nan
             elif first_value:
-                kama_values[i] = close_values[i]
+                # Seed with the SMA of the trailing `window` closes, per the documented
+                # construction (StockCharts step 3). This used to seed with the bar's own close --
+                # a warmup-only divergence that decays, but the seed bar is exactly where it is
+                # largest, and it is a divergence from the reference.
+                kama_values[i] = np.mean(close_values[max(0, i - window + 1): i + 1])
                 first_value = False
             else:
                 kama_values[i] = kama_values[i - 1] + smoothing_constant[i] * (
@@ -396,6 +405,12 @@ class StochRSI(IndicatorInterface):
     indicators in order to create a more sensitive indicator that is attuned to
     a specific security's historical performance rather than a generalized analysis
     of price change.
+
+    SCALE: this emits 0..1, the canonical Chande-Kroll / StockCharts form. The literature is
+    genuinely split -- Fidelity and many platforms render the same quantity x100, and TradingView
+    is internally inconsistent (its docs say 0-1, its plotted indicator renders 0-100). The
+    conventional 20/80 overbought/oversold levels are therefore **0.20 / 0.80** here. Applying 20
+    and 80 directly to this series can never produce a signal.
 
     https://school.stockcharts.com/doku.php?id=technical_indicators:stochrsi
     https://www.investopedia.com/terms/s/stochrsi.asp
@@ -544,6 +559,11 @@ class BOP(IndicatorInterface):
         BOP = (close - open) / (high - low)
     Returns a value in [-1, 1] where positive = buyers in control, negative =
     sellers. NaN where high == low (no intrabar range).
+
+    SMOOTHING: this is the RAW single-bar series, which the literature does not use directly.
+    Livshin writes "I typically plot a 14-day moving average of the balance of power indicator",
+    and TradingView notes the raw series is "quite choppy". Every source plots a 14-period moving
+    average of it. A consumer wanting the indicator as published must smooth this themselves.
 
     Reference: Igor Livshin. TA-Lib canonical definition.
 
