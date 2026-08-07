@@ -63,7 +63,7 @@ CLASSES_DEF = {
  'unclassed': "No class determined yet. Deliberately named so the gap stays visible.",
 }
 ASSIGN = {
- 'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator MARibbon",
+ 'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator",
  'momentum': "ROC MOM TRIX MACD PPO KST AwesomeOscillator DPO PVO ForceIndex EaseOfMovement "
              "ADOSC KVO KlingerVolumeOscillator DailyReturn DailyLogReturn MassIndex ADX Aroon "
              "Vortex MultiTFTrend",

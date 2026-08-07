@@ -8,7 +8,7 @@ class TestSignalServiceMetadata:
 
     def test_list_signals_returns_all(self):
         signals = self.service.list_signals()
-        assert len(signals) == 243
+        assert len(signals) == 247
 
     def test_list_signals_filter_by_category(self):
         momentum = self.service.list_signals(category="Momentum")

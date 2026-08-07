@@ -414,3 +414,181 @@ def test_cumulative_flow_indicators_answer_zero_on_a_zero_range_bar(ohlcv):
     high_gap = high.copy()
     high_gap.iloc[200] = np.nan
     assert pd.isna(ADI.compute({**data, "high": high_gap}, {})["adi"].iloc[200])
+
+
+# --- Boolean outputs live in the signal layer, not the indicator layer ----- #
+#
+# The ontology's type boundary: an Indicator emits a numeric measurement, a Signal emits a boolean
+# predicate. Design: ontology/signal-indicator-ontology.md, "Boolean outputs leave the indicator
+# layer". Nothing is dropped in the move -- each boolean lands in a signal.
+
+def test_band_indicators_emit_measurements_only(ohlcv):
+    """BollingerBands and KeltnerChannel emitted `hband_indicator` / `lband_indicator`:
+    `np.where(close > hband, 1.0, 0.0)`, a decision over a numeric series they already emit."""
+    from mangrove_kb.indicators import BollingerBands, KeltnerChannel
+
+    assert BollingerBands._outputs == ["mavg", "hband", "lband", "wband", "pband"]
+    assert KeltnerChannel._outputs == ["mband", "hband", "lband", "wband", "pband"]
+
+    bb = BollingerBands.compute({"close": ohlcv["close"]}, {"window": 20, "window_dev": 2})
+    kc = KeltnerChannel.compute(
+        {k: ohlcv[k] for k in ("high", "low", "close")},
+        {"window": 20, "window_atr": 10, "original_version": False, "multiplier": 2.0},
+    )
+    for out in (bb, kc):
+        assert not [k for k in out if k.endswith("_indicator")]
+        # Nothing left is a two-valued flag masquerading as a measurement.
+        for series in out.values():
+            vals = series.dropna()
+            assert not set(np.unique(vals.to_numpy())) <= {0.0, 1.0}
+
+
+def test_band_state_filters_carry_the_removed_flags(ohlcv):
+    """The flags became FILTER signals -- state, not crossings. Verified equal to the expression the
+    indicators used to evaluate, on the same data."""
+    import mangrove_kb.signals  # noqa: F401
+    from mangrove_kb.indicators import BollingerBands, KeltnerChannel
+    from mangrove_kb.registry import RuleRegistry
+
+    registered = set(RuleRegistry._registry)
+    assert {"bb_above_upper", "bb_below_lower",
+            "kc_above_upper", "kc_below_lower"} <= registered
+
+    df = pd.DataFrame({"High": ohlcv["high"], "Low": ohlcv["low"], "Close": ohlcv["close"],
+                       "Volume": ohlcv["volume"]})
+    close = ohlcv["close"]
+
+    bb = BollingerBands.compute({"close": close}, {"window": 20, "window_dev": 2})
+    kc = KeltnerChannel.compute(
+        {k: ohlcv[k] for k in ("high", "low", "close")},
+        {"window": 20, "window_atr": 10, "original_version": False, "multiplier": 2.0},
+    )
+    cases = [
+        ("bb_above_upper", close > bb["hband"]),
+        ("bb_below_lower", close < bb["lband"]),
+        ("kc_above_upper", close > kc["hband"]),
+        ("kc_below_lower", close < kc["lband"]),
+    ]
+    for name, expected in cases:
+        fn = RuleRegistry._registry[name]
+        got = [bool(fn(df.iloc[:i + 1])) for i in range(len(df))]
+        want = [bool(v) for v in expected]
+        assert got == want, f"{name} diverged from the expression it replaced"
+        assert any(got), f"{name} never fires, so the comparison proves nothing"
+
+
+def test_band_state_filters_are_states_not_crossings(ohlcv):
+    """The distinction from bb_upper_breakout, which is a TRIGGER. A state must be able to hold on
+    consecutive bars; a crossing fires once."""
+    import mangrove_kb.signals  # noqa: F401
+    from mangrove_kb.registry import RuleRegistry
+
+    df = pd.DataFrame({"High": ohlcv["high"], "Low": ohlcv["low"], "Close": ohlcv["close"],
+                       "Volume": ohlcv["volume"]})
+    state = [bool(RuleRegistry._registry["bb_above_upper"](df.iloc[:i + 1])) for i in range(len(df))]
+    trig = [bool(RuleRegistry._registry["bb_upper_breakout"](df.iloc[:i + 1])) for i in range(len(df))]
+
+    assert sum(state) > sum(trig), "the state signal is no broader than the crossing"
+    # Every crossing bar is also a bar on which price sits outside the band.
+    assert all(state[i] for i in range(len(df)) if trig[i])
+
+
+def test_ma_ribbon_is_a_signal_not_an_indicator():
+    """All three of MARibbon's outputs were boolean, so it had no numeric output at all. The class
+    is gone and the alignment test lives in the three signals that were its only consumer -- whose
+    registered names MangroveOracle's plan_generator references."""
+    import mangrove_kb.indicators as indicators
+    import mangrove_kb.signals  # noqa: F401
+    from mangrove_kb.registry import RuleRegistry
+
+    assert not hasattr(indicators, "MARibbon")
+    assert {"ma_ribbon_bullish", "ma_ribbon_bearish",
+            "ma_ribbon_tangled"} <= set(RuleRegistry._registry)
+
+
+def test_ma_ribbon_states_are_mutually_exclusive_and_exhaustive():
+    """The property the removed indicator guaranteed by construction, now a property of the three
+    signals: exactly one holds wherever alignment is defined.
+
+    A sustained up-leg then down-leg rather than a random walk: strict 8-deep alignment is rare on
+    noise, so a random series exercises `tangled` and almost nothing else, and the reachability
+    assertion below would be vacuous for the other two.
+    """
+    import mangrove_kb.signals  # noqa: F401
+    from mangrove_kb.registry import RuleRegistry
+
+    n = 500
+    rs = np.random.RandomState(23)
+    trend = np.concatenate([np.linspace(0, 60, n // 2), np.linspace(60, -10, n - n // 2)])
+    close = pd.Series(100 + trend + rs.normal(0, 0.3, n), index=_idx(n))
+    df = pd.DataFrame({"Close": close})
+    windows = (5, 8, 13, 21, 34, 55, 89, 144)
+    reg = RuleRegistry._registry
+    fired = {
+        name: [bool(reg[name](df.iloc[:i + 1], windows=windows)) for i in range(len(df))]
+        for name in ("ma_ribbon_bullish", "ma_ribbon_bearish", "ma_ribbon_tangled")
+    }
+    warmup = max(windows)
+    for i in range(warmup, len(df)):
+        assert sum(fired[n][i] for n in fired) == 1, f"bar {i} is in {sum(fired[n][i] for n in fired)} states"
+
+    # And each state is actually reachable on this data, so the above is not vacuous.
+    for name, series in fired.items():
+        assert any(series), f"{name} never fires"
+
+
+def test_no_indicator_emits_a_boolean_series_except_the_two_held():
+    """The invariant this step establishes, asserted over the whole corpus rather than the classes
+    that happened to be touched. TTMSqueeze and Divergence are the known exceptions: both are
+    `unclassed` and deliberately held, and both are wholly boolean, so both likely leave the
+    indicator layer entirely when that decision lands.
+    """
+    import mangrove_kb.indicators as I
+
+    n = 200
+    idx = pd.date_range("2024-01-01", periods=n, freq="h")
+    rs = np.random.RandomState(11)
+    close = pd.Series(100 + rs.normal(0, 1, n).cumsum(), index=idx)
+    # `open` gets its own noise rather than being the previous close. With open == close.shift(1)
+    # there is never a gap, so CandleRelation.gap is identically 0.0 and this sweep reads a genuine
+    # numeric measurement as a boolean flag.
+    open_ = close.shift(1).bfill() + rs.normal(0, 0.5, n)
+    series = {"open": open_,
+              "high": np.maximum(close, open_) + np.abs(rs.normal(0, .6, n)),
+              "low": np.minimum(close, open_) - np.abs(rs.normal(0, .6, n)),
+              "close": close,
+              "volume": pd.Series(rs.randint(1000, 9000, n).astype(float), index=idx),
+              "price": close, "indicator": close}
+    defaults = {"window": 14, "window_fast": 10, "window_slow": 30, "window_sign": 9,
+                "window_dev": 2, "window_atr": 10, "smooth_window": 3, "smooth1": 3, "smooth2": 3,
+                "fast": 34, "slow": 55, "signal_window": 13, "pow1": 2, "pow2": 30,
+                "multiplier": 2.0, "original_version": False, "include_current_bar": False,
+                "offset": 0.85, "sigma": 6, "constant": 0.015, "volume_factor": 0.7,
+                "fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": 64, "window1": 7,
+                "window2": 14, "window3": 28, "window4": 30, "weight1": 4.0, "weight2": 2.0,
+                "weight3": 1.0, "roc1": 10, "roc2": 15, "roc3": 20, "roc4": 30, "nsig": 9,
+                "smoothing_factor": 5, "cycle": 10, "jaw": 13, "teeth": 8, "lips": 5,
+                "jaw_offset": 8, "teeth_offset": 5, "lips_offset": 3, "visual": False,
+                "higher_tf": "4h", "slope_threshold": 0.0, "mom_window": 12, "bb_std": 2.0,
+                "kc_atr_mult": 1.5, "bb_window": 20, "kc_window": 20, "swing_window": 5,
+                "min_swing_distance": 3}
+
+    HELD = {"TTMSqueeze", "Divergence"}
+    offenders, checked = [], 0
+    for name in I.__all__:
+        cls = getattr(I, name, None)
+        if not hasattr(cls, "_compute") or name in HELD:
+            continue
+        try:
+            out = cls.compute({k: series[k] for k in cls._data},
+                              {p: defaults[p] for p in cls._params})
+        except (KeyError, ValueError, TypeError, NotImplementedError):
+            continue
+        checked += 1
+        for key, s in out.items():
+            vals = pd.Series(s).dropna()
+            if len(vals) and set(np.unique(vals.to_numpy())) <= {0.0, 1.0, True, False}:
+                offenders.append(f"{name}.{key}")
+
+    assert checked > 50, f"only {checked} indicators exercised -- the sweep is not covering the corpus"
+    assert offenders == [], f"boolean outputs still in the indicator layer: {offenders}"

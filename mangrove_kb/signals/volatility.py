@@ -159,6 +159,159 @@ def bb_squeeze(
     return prev_width >= threshold and curr_width < threshold
 
 
+# --- Band-state filters -----------------------------------------------------
+#
+# These four were `hband_indicator` / `lband_indicator` outputs on BollingerBands and
+# KeltnerChannel: `np.where(close > hband, 1.0, 0.0)`, a boolean decision over a numeric series the
+# indicator already emitted. An indicator emits a numeric measurement; a signal emits a boolean
+# predicate. They are signals, so they live here.
+#
+# They are STATE, not crossings -- deliberately distinct from bb_upper_breakout / bb_lower_breakout
+# above, which are TRIGGERs firing only on the bar that crosses. These stay True for as long as
+# close sits outside the band, which is what a regime filter needs. Before this move nothing in the
+# package answered "is price outside the band right now"; the flags carried that meaning but no
+# consumer could reach it, since an indicator output is not addressable as a rule.
+#
+# The strict inequality is carried over unchanged from the indicator: touching the band is not
+# outside it.
+
+
+@RuleRegistry.register("bb_above_upper")
+def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> bool:
+    """
+    Check if price is currently above the upper Bollinger Band.
+
+    A state, not an event: true for every bar close sits above the band, unlike
+    bb_upper_breakout which fires only on the bar that crosses it.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): MA period for center band. Range: 5-100. Default: 20.
+        window_dev (int): Standard deviation multiplier. Range: 1-5. Default: 2.
+
+    Returns:
+        bool: True if close > upper band on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window:
+        return False
+
+    upper = BollingerBands.compute(
+        data={'close': closes}, params={'window': window, 'window_dev': window_dev}
+    )['hband']
+
+    if pd.isna(upper.iloc[-1]):
+        return False
+    return bool(float(closes.iloc[-1]) > float(upper.iloc[-1]))
+
+
+@RuleRegistry.register("bb_below_lower")
+def bb_below_lower(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> bool:
+    """
+    Check if price is currently below the lower Bollinger Band.
+
+    A state, not an event: true for every bar close sits below the band, unlike
+    bb_lower_breakout which fires only on the bar that crosses it.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): MA period for center band. Range: 5-100. Default: 20.
+        window_dev (int): Standard deviation multiplier. Range: 1-5. Default: 2.
+
+    Returns:
+        bool: True if close < lower band on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window:
+        return False
+
+    lower = BollingerBands.compute(
+        data={'close': closes}, params={'window': window, 'window_dev': window_dev}
+    )['lband']
+
+    if pd.isna(lower.iloc[-1]):
+        return False
+    return bool(float(closes.iloc[-1]) < float(lower.iloc[-1]))
+
+
+@RuleRegistry.register("kc_above_upper")
+def kc_above_upper(
+    df: pd.DataFrame, window: int = 20, window_atr: int = 10, multiplier: float = 2.0
+) -> bool:
+    """
+    Check if price is currently above the upper Keltner Channel band.
+
+    A state, not an event: true for every bar close sits above the band.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): EMA period for the center band. Range: 10-50. Default: 20.
+        window_atr (int): ATR period. Range: 5-30. Default: 10.
+        multiplier (float): ATR multiplier for band width. Range: 0.5-5. Default: 2.0.
+
+    Returns:
+        bool: True if close > upper band on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < max(window, window_atr):
+        return False
+
+    upper = KeltnerChannel.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': closes},
+        params={'window': window, 'window_atr': window_atr,
+                'original_version': False, 'multiplier': multiplier},
+    )['hband']
+
+    if pd.isna(upper.iloc[-1]):
+        return False
+    return bool(float(closes.iloc[-1]) > float(upper.iloc[-1]))
+
+
+@RuleRegistry.register("kc_below_lower")
+def kc_below_lower(
+    df: pd.DataFrame, window: int = 20, window_atr: int = 10, multiplier: float = 2.0
+) -> bool:
+    """
+    Check if price is currently below the lower Keltner Channel band.
+
+    A state, not an event: true for every bar close sits below the band.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): EMA period for the center band. Range: 10-50. Default: 20.
+        window_atr (int): ATR period. Range: 5-30. Default: 10.
+        multiplier (float): ATR multiplier for band width. Range: 0.5-5. Default: 2.0.
+
+    Returns:
+        bool: True if close < lower band on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < max(window, window_atr):
+        return False
+
+    lower = KeltnerChannel.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': closes},
+        params={'window': window, 'window_atr': window_atr,
+                'original_version': False, 'multiplier': multiplier},
+    )['lband']
+
+    if pd.isna(lower.iloc[-1]):
+        return False
+    return bool(float(closes.iloc[-1]) < float(lower.iloc[-1]))
+
+
 
 
 # =============================================================================

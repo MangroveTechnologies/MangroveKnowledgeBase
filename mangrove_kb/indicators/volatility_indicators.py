@@ -75,14 +75,19 @@ class BollingerBands(IndicatorInterface):
         data: {'close': pd.Series}
         params: {'window': int, 'window_dev': int}
 
+    Emits measurements only. `hband_indicator` and `lband_indicator` were removed: they were
+    `np.where(close > hband, 1.0, 0.0)` -- a boolean decision over a numeric series this indicator
+    already emits, which is a signal, not a measurement. An indicator emits a numeric series; a
+    signal emits a boolean predicate. That content now lives where it belongs, as the `bb_above_upper`
+    and `bb_below_lower` FILTER signals in `signals/volatility.py`.
+
     Returns:
         {'mavg': pd.Series, 'hband': pd.Series, 'lband': pd.Series,
-         'wband': pd.Series, 'pband': pd.Series,
-         'hband_indicator': pd.Series, 'lband_indicator': pd.Series}
+         'wband': pd.Series, 'pband': pd.Series}
     """
     _data = ["close"]
     _params = ["window", "window_dev"]
-    _outputs = ["mavg", "hband", "lband", "wband", "pband", "hband_indicator", "lband_indicator"]
+    _outputs = ["mavg", "hband", "lband", "wband", "pband"]
 
     @classmethod
     def _compute(cls, data, params):
@@ -98,21 +103,12 @@ class BollingerBands(IndicatorInterface):
         wband = ((hband - lband) / mavg) * 100
         pband = (close - lband) / (hband - lband).where(hband != lband, np.nan)
 
-        hband_indicator = pd.Series(
-            np.where(close > hband, 1.0, 0.0), index=close.index
-        )
-        lband_indicator = pd.Series(
-            np.where(close < lband, 1.0, 0.0), index=close.index
-        )
-
         return {
             'mavg': pd.Series(mavg, name="mavg"),
             'hband': pd.Series(hband, name="hband"),
             'lband': pd.Series(lband, name="lband"),
             'wband': pd.Series(wband, name="bbiwband"),
             'pband': pd.Series(pband, name="bbipband"),
-            'hband_indicator': pd.Series(hband_indicator, name="bbihband"),
-            'lband_indicator': pd.Series(lband_indicator, name="bbilband")
         }
 
 
@@ -129,14 +125,18 @@ class KeltnerChannel(IndicatorInterface):
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
         params: {'window': int, 'window_atr': int, 'original_version': bool, 'multiplier': int}
 
+    Emits measurements only. `hband_indicator` and `lband_indicator` were removed for the same
+    reason as BollingerBands': they were a boolean decision over a numeric series this indicator
+    already emits, which is a signal rather than a measurement. That content is now the
+    `kc_above_upper` and `kc_below_lower` FILTER signals in `signals/volatility.py`.
+
     Returns:
         {'mband': pd.Series, 'hband': pd.Series, 'lband': pd.Series,
-         'wband': pd.Series, 'pband': pd.Series,
-         'hband_indicator': pd.Series, 'lband_indicator': pd.Series}
+         'wband': pd.Series, 'pband': pd.Series}
     """
     _data = ["high", "low", "close"]
     _params = ["window", "window_atr", "original_version", "multiplier"]
-    _outputs = ["mband", "hband", "lband", "wband", "pband", "hband_indicator", "lband_indicator"]
+    _outputs = ["mband", "hband", "lband", "wband", "pband"]
 
     @classmethod
     def _compute(cls, data, params):
@@ -184,13 +184,6 @@ class KeltnerChannel(IndicatorInterface):
         width = tp_high - tp_low
         pband = ((close - tp_low) / width).where(width != 0, np.nan)
 
-        hband_indicator = pd.Series(
-            np.where(close > tp_high, 1.0, 0.0), index=close.index
-        )
-        lband_indicator = pd.Series(
-            np.where(close < tp_low, 1.0, 0.0), index=close.index
-        )
-
         # Series names are this indicator's own. They were copy-pasted from BollingerBands
         # ("mavg", "bbiwband", "bbipband") and DonchianChannel ("dcihband", "dcilband"), which is
         # cosmetic but actively misleading when debugging a frame of stacked indicators.
@@ -200,8 +193,6 @@ class KeltnerChannel(IndicatorInterface):
             'lband': pd.Series(tp_low, name="kc_lband"),
             'wband': pd.Series(wband, name="kc_wband"),
             'pband': pd.Series(pband, name="kc_pband"),
-            'hband_indicator': pd.Series(hband_indicator, name="kc_hband_indicator"),
-            'lband_indicator': pd.Series(lband_indicator, name="kc_lband_indicator")
         }
 
 

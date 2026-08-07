@@ -783,26 +783,6 @@
       ],
       "canonical_name": "%B",
       "description": "position of close between the bands, (close - lband) / (hband - lband). 0 at the lower band, 1 at the upper, but NOT clamped -- exceeds 1 above hband and drops below 0 under lband, which the literature treats as significant rather than as an edge case. NaN when the bands coincide, explicitly guarded here unlike Keltner and Donchian"
-     },
-     "hband_indicator": {
-      "type": "series",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "1.0 where close is above hband, else 0.0. A decision over a series rather than a measurement; parked pending the move to the signal layer"
-     },
-     "lband_indicator": {
-      "type": "series",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "1.0 where close is below lband, else 0.0. A decision over a series rather than a measurement; parked pending the move to the signal layer"
      }
     }
    }
@@ -2466,7 +2446,7 @@
       "default": 20,
       "min": 10,
       "max": 50,
-      "description": "EMA period"
+      "description": "EMA period for the center band"
      },
      "window_atr": {
       "type": "int",
@@ -2486,7 +2466,7 @@
       "type": "int",
       "default": 2,
       "min": 0.5,
-      "max": null,
+      "max": 5,
       "description": "ATR multiplier for band width"
      }
     },
@@ -2540,26 +2520,6 @@
       ],
       "canonical_name": "none",
       "description": "position of close between the channel lines, (close - lband) / (hband - lband). Unclamped, so it exceeds 1 above the upper line and drops below 0 under the lower. NOT guarded against coinciding bands, unlike BollingerBands, so a zero-width channel can produce inf rather than NaN. No established literature name"
-     },
-     "hband_indicator": {
-      "type": "series",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "1.0 where close is above hband, else 0.0. A decision over a series rather than a measurement; parked pending the move to the signal layer"
-     },
-     "lband_indicator": {
-      "type": "series",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "1.0 where close is below lband, else 0.0. A decision over a series rather than a measurement; parked pending the move to the signal layer"
      }
     }
    }
@@ -2826,82 +2786,6 @@
       ],
       "canonical_name": "FAMA",
       "description": "Following Adaptive Moving Average -- the same recursion driven at half MAMA's alpha, so it steps in time with MAMA but moves less dramatically. The pair is the point: MAMA and FAMA do not cross unless market direction has genuinely changed, which is what makes the crossover system resistant to whipsaw. Same input and warmup caveats as MAMA"
-     }
-    }
-   }
-  },
-  {
-   "id": "procedure:indicator-maribbon",
-   "title": "MARibbon",
-   "kind": "Procedure",
-   "summary": "Computes N simple moving averages and flags the bar as in a \"bullish ribbon\" (all MAs stacked in descending-period order, fastest on top), \"bearish ribbon\" (ascending-period order, slowest on top), or \"tangled\" (neither strict alignment). A strict bullish ribbon means every pair (MA[i], MA[i+1]) for ascending periods satisfies MA[fast] > MA[slow]. This is a strong trend filter. Default windows use Fibonacci-spaced periods [5, 8, 13, 21, 34, 55, 89, 144] which is a common choice for long-horizon ribbons.",
-   "epistemic": "ratified",
-   "status": "ratified",
-   "props": {
-    "source_module": "trend_indicators",
-    "reference": null,
-    "warmup_bars": "max(windows) - 1",
-    "abbreviation": "MA Ribbon",
-    "usage_example": "MARibbon.compute(data={'close': df['Close']}, params={'windows': value})",
-    "formula": "Ribbon = { SMA(w_1), SMA(w_2), ..., SMA(w_k) },  w_1 < w_2 < ... < w_k\n\nThis implementation reduces the ribbon to three mutually exclusive boolean\nstates -- fully ordered, fully inverted, or interwoven. That reduction is\nAUTHORED; the literature plots the lines and names neither them nor the states.",
-    "interpretation": [
-     "A generic charting technique, not a canonical named indicator -- no standard period set, count or average type",
-     "All lines moving uniformly and ordered indicates a strong trend",
-     "Shorter periods crossing above longer ones signal an uptrend; below, a downtrend",
-     "Ribbon width encodes trend strength: parallel is strong, expanding may signal exhaustion",
-     "Compressed or interwoven lines indicate range or consolidation"
-    ],
-    "applications": [
-     "Trend identification and trend-strength grading",
-     "Crossover signal generation",
-     "Spotting reversals when the ordering breaks down",
-     "Visual multi-timeframe confluence on a single chart"
-    ],
-    "inputs": {
-     "close": {
-      "type": "series",
-      "description": "closing price"
-     }
-    },
-    "params": {
-     "windows": {
-      "type": "list",
-      "default": null,
-      "min": 2,
-      "max": 1000,
-      "description": "Strictly increasing tuple of SMA periods"
-     }
-    },
-    "outputs": {
-     "ribbon_bullish": {
-      "type": "series",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "1 where every faster (shorter-window) SMA sits above the next slower one, i.e. the ribbon is ordered for an uptrend. A decision over a set of series rather than a measurement; parked pending the move to the signal layer. AUTHORED, not literature -- the moving-average ribbon is a generic charting technique with no canonical period set and no named lines, so these three flags are our construction"
-     },
-     "ribbon_bearish": {
-      "type": "series",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "1 where every faster SMA sits below the next slower one, the inverted ordering. Same authored-not-literature caveat as ribbon_bullish"
-     },
-     "ribbon_tangled": {
-      "type": "series",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "1 where the SMAs are neither fully ordered nor fully inverted -- the interwoven state that indicates range or consolidation. Mutually exclusive with the other two flags, and all three are 0 during warmup. Same authored-not-literature caveat"
      }
     }
    }
@@ -5583,14 +5467,6 @@
    "to_id": "concept:indicator-class-averaging"
   },
   {
-   "from": "MARibbon",
-   "rel": "instance-of",
-   "to": "averaging",
-   "why": "class membership",
-   "from_id": "procedure:indicator-maribbon",
-   "to_id": "concept:indicator-class-averaging"
-  },
-  {
    "from": "MFI",
    "rel": "instance-of",
    "to": "oscillator",
@@ -5857,7 +5733,7 @@
  ],
  "meta": {
   "scope": "indicator class ontology",
-  "indicators": 69,
+  "indicators": 68,
   "classes": 7,
   "removed_not_indicators": [
    "ATRTrailingStop",
@@ -5866,7 +5742,7 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 770,
+  "carried_forward_from_previous_build": 736,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],

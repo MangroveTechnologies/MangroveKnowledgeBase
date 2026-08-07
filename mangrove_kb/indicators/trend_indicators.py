@@ -1623,66 +1623,15 @@ class SuperTrend(IndicatorInterface):
         }
 
 
-class MARibbon(IndicatorInterface):
-    """Moving Average Ribbon -- multi-MA alignment detector.
-
-    Computes N simple moving averages and flags the bar as in a "bullish
-    ribbon" (all MAs stacked in descending-period order, fastest on top),
-    "bearish ribbon" (ascending-period order, slowest on top), or "tangled"
-    (neither strict alignment).
-
-    A strict bullish ribbon means every pair (MA[i], MA[i+1]) for ascending
-    periods satisfies MA[fast] > MA[slow]. This is a strong trend filter.
-
-    Default windows use Fibonacci-spaced periods [5, 8, 13, 21, 34, 55, 89, 144]
-    which is a common choice for long-horizon ribbons.
-
-    Reference: TradingView Pine Script community standard.
-
-    Args:
-        data: {'close': pd.Series}
-        params: {'windows': list[int]} -- MA periods; must be strictly increasing.
-
-    Returns:
-        {'ribbon_bullish': pd.Series (bool),
-         'ribbon_bearish': pd.Series (bool),
-         'ribbon_tangled': pd.Series (bool)}
-    """
-    _data = ["close"]
-    _params = ["windows"]
-    _outputs = ["ribbon_bullish", "ribbon_bearish", "ribbon_tangled"]
-
-    @classmethod
-    def _compute(cls, data, params):
-        close = data['close']
-        windows = list(params['windows'])
-        if sorted(windows) != windows:
-            raise ValueError(f"windows must be strictly increasing; got {windows}")
-
-        # Stack N MAs into a 2D array (rows = bars, cols = windows ascending).
-        n = len(close)
-        close_vals = close.to_numpy(dtype=np.float64, copy=False)
-        mas = np.full((n, len(windows)), np.nan)
-        for j, w in enumerate(windows):
-            mas[:, j] = SMA.compute({'close': close}, {'window': w})['sma'].to_numpy(dtype=np.float64)
-
-        # Bullish: for every adjacent pair, faster (smaller window) MA > slower (larger window) MA.
-        # i.e., row is strictly DECREASING across columns.
-        diffs = np.diff(mas, axis=1)  # diffs[i, j] = mas[i, j+1] - mas[i, j]
-        bullish = np.all(diffs < 0, axis=1)
-        bearish = np.all(diffs > 0, axis=1)
-
-        # Rows with any NaN in diffs are undefined -- mark as not bullish, not bearish.
-        any_nan = np.any(np.isnan(diffs), axis=1)
-        bullish = bullish & ~any_nan
-        bearish = bearish & ~any_nan
-        tangled = (~bullish) & (~bearish) & (~any_nan)
-
-        return {
-            'ribbon_bullish': pd.Series(bullish, index=close.index, name='ribbon_bullish'),
-            'ribbon_bearish': pd.Series(bearish, index=close.index, name='ribbon_bearish'),
-            'ribbon_tangled': pd.Series(tangled, index=close.index, name='ribbon_tangled'),
-        }
+# MARibbon (Moving Average Ribbon) was removed here. It stacked N simple moving averages and asked
+# three ordering questions, emitting `ribbon_bullish` / `ribbon_bearish` / `ribbon_tangled` -- all
+# three boolean, which was ALL of its outputs. An indicator emits a numeric measurement and a signal
+# emits a boolean predicate, so it was not an indicator under our own definition; it was three
+# signals wearing an indicator's clothes, and it had no numeric output left once they moved.
+#
+# The ordering test now lives in `signals/trend.py`, in the `ma_ribbon_bullish` / `ma_ribbon_bearish`
+# / `ma_ribbon_tangled` signals that were always its only consumer. Those names are unchanged --
+# MangroveOracle's plan_generator references all three. The SMAs come straight from `SMA`.
 
 
 class MultiTFTrend(IndicatorInterface):

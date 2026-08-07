@@ -20,6 +20,7 @@ This module contains signal functions based on trend indicators including:
 
 import logging
 
+import numpy as np
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
@@ -44,7 +45,6 @@ from mangrove_kb.indicators import (
     ChandelierExit,
     WilliamsAlligator,
     SuperTrend,
-    MARibbon,
     MultiTFTrend,
     Divergence,
     RSI,
@@ -2646,15 +2646,52 @@ def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float =
 
 
 # =============================================================================
-# Wave G Signal Patterns (MARibbon, TTMSqueeze, Divergence, MultiTFTrend)
+# Wave G Signal Patterns (MA Ribbon, TTMSqueeze, Divergence, MultiTFTrend)
 # =============================================================================
 
 from mangrove_kb.indicators import TTMSqueeze  # local import to avoid circular issues at module load
 
 
 # --- MA Ribbon signals ---
+#
+# These used to read three boolean outputs off an `MARibbon` indicator. That class emitted nothing
+# BUT booleans -- it stacked N SMAs and asked three ordering questions -- so under our own
+# definition it was not an indicator at all: an indicator emits a numeric measurement, a signal
+# emits a boolean predicate. It was three signals wearing an indicator's clothes, and it is gone.
+#
+# The ordering test now lives here, in the signals that always were its only consumer. The SMAs come
+# straight from the SMA indicator, which is what the design allows: a signal is a predicate over
+# series, and those series may be indicator outputs or raw OHLC. Nothing new is computed and no
+# registered signal name changed -- MangroveOracle's plan_generator references all three by name.
 
 _DEFAULT_RIBBON_WINDOWS = (5, 8, 13, 21, 34, 55, 89, 144)
+
+
+def _ribbon_alignment(closes: pd.Series, windows: list) -> str | None:
+    """Classify the ribbon on the latest bar as 'bullish', 'bearish' or 'tangled'.
+
+    Returns None where the alignment is undefined -- any SMA still in warmup on that bar.
+
+    Bullish is strict alignment fastest-above-slowest, i.e. the row of SMAs read shortest window to
+    longest is strictly DECREASING. Bearish is the strict opposite. Tangled is defined as neither,
+    so the three are mutually exclusive and, wherever alignment is defined, exhaustive.
+    """
+    if sorted(windows) != windows:
+        raise ValueError(f"windows must be strictly increasing; got {windows}")
+
+    mas = np.array([
+        SMA.compute({'close': closes}, {'window': w})['sma'].to_numpy(dtype=np.float64)[-1]
+        for w in windows
+    ])
+    if np.isnan(mas).any():
+        return None
+
+    diffs = np.diff(mas)
+    if np.all(diffs < 0):
+        return "bullish"
+    if np.all(diffs > 0):
+        return "bearish"
+    return "tangled"
 
 
 @RuleRegistry.register("ma_ribbon_bullish")
@@ -2680,10 +2717,7 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     windows_list = list(windows)
     if len(closes) < max(windows_list):
         return False
-    out = MARibbon.compute(data={'close': closes}, params={'windows': windows_list})
-    if pd.isna(out['ribbon_bullish'].iloc[-1]):
-        return False
-    return bool(out['ribbon_bullish'].iloc[-1])
+    return _ribbon_alignment(closes, windows_list) == "bullish"
 
 
 @RuleRegistry.register("ma_ribbon_bearish")
@@ -2705,10 +2739,7 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     windows_list = list(windows)
     if len(closes) < max(windows_list):
         return False
-    out = MARibbon.compute(data={'close': closes}, params={'windows': windows_list})
-    if pd.isna(out['ribbon_bearish'].iloc[-1]):
-        return False
-    return bool(out['ribbon_bearish'].iloc[-1])
+    return _ribbon_alignment(closes, windows_list) == "bearish"
 
 
 @RuleRegistry.register("ma_ribbon_tangled")
@@ -2732,10 +2763,7 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     windows_list = list(windows)
     if len(closes) < max(windows_list):
         return False
-    out = MARibbon.compute(data={'close': closes}, params={'windows': windows_list})
-    if pd.isna(out['ribbon_tangled'].iloc[-1]):
-        return False
-    return bool(out['ribbon_tangled'].iloc[-1])
+    return _ribbon_alignment(closes, windows_list) == "tangled"
 
 
 # --- TTM Squeeze signals ---

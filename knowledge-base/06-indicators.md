@@ -963,8 +963,12 @@ Bandwidth = (Upper - Lower) / Middle * 100
 - **Parameters**:
   - `window`: Parameter for BollingerBands calculation
   - `window_dev`: Parameter for BollingerBands calculation
-- **Outputs**: `mavg`, `hband`, `lband`, `wband`, `pband`, `hband_indicator`, `lband_indicator`
+- **Outputs**: `mavg`, `hband`, `lband`, `wband`, `pband`
 - **Usage Example**: `BollingerBands.compute(data={'close': df['Close']}, params={'window': value, 'window_dev': value})`
+
+`hband_indicator` and `lband_indicator` were removed: a boolean decision over a numeric series the
+indicator already emits is a signal, not a measurement. That content is the `bb_above_upper` and
+`bb_below_lower` FILTER signals.
 
 #### Related Trading Signals
 
