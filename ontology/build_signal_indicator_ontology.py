@@ -857,22 +857,6 @@ for ind, cls in sorted(assigned.items()):
 import mangrove_kb.signals  # noqa: E402,F401  -- registers every signal
 from mangrove_kb.registry import RuleRegistry  # noqa: E402
 
-# Output descriptions are AUTHORED into the indicator nodes, not lifted from source, so the only
-# place to read them is the previous build. An edge describes what it carries using the same words
-# the indicator uses for that output -- one description per output in the whole graph, rather than a
-# copy on every edge that reads it. Null before the first build, which the authoring queue picks up.
-_PREV_PATH = pathlib.Path(__file__).resolve().parent / "signal-indicator-ontology.json"
-_PREV_OUTPUTS = {}
-if _PREV_PATH.exists():
-    for _a in json.loads(_PREV_PATH.read_text()).get("atoms", []):
-        if _a["id"].startswith("procedure:indicator-"):
-            for _k, _v in (_a.get("props", {}).get("outputs") or {}).items():
-                _PREV_OUTPUTS[(_a["title"], _k)] = _v.get("description")
-
-
-def _prev_output_desc(ind, out):
-    return _PREV_OUTPUTS.get((ind, out))
-
 # Which signals get nodes. The signal layer is being brought in deliberately, one group at a time,
 # the same way the indicator layer was: settle the shape on a specimen, review it, then widen.
 #
@@ -922,14 +906,17 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
     known = [i for i in facts["consumes"] if i in assigned]
     for ind in known:
         # Same nested-dict shape as a node's `inputs`, because it is the same concept: series the
-        # signal consumes. Descriptions are lifted from the indicator's own authored output
-        # descriptions rather than restated, so `hband` is described once in the graph.
+        # signal consumes.
+        #
+        # NO `description` here. The edge's job is to say WHICH output flows across it; what that
+        # output means is authored once, on the indicator node that emits it, and following the edge
+        # is how you get there. Copying the prose onto the edge duplicated it and carried a
+        # description written for one context into another -- BollingerBands' `lband` reads
+        # "Population stdev, as above", which is true where it sits under `hband` on the indicator
+        # node and dangles on an edge that carries only `lband`.
         ind_outputs = (_lift(CLASSES[ind]).get("outputs") or {})
-        edge_inputs = {}
-        for out in facts["consumes"][ind]:
-            authored = _prev_output_desc(ind, out)
-            edge_inputs[out] = {"type": ind_outputs.get(out, {}).get("type") or "series",
-                                "description": authored}
+        edge_inputs = {out: {"type": ind_outputs.get(out, {}).get("type") or "series"}
+                       for out in facts["consumes"][ind]}
         rel(sname, "uses", ind, "reads indicator output",
             sid, f"procedure:indicator-{ind.lower()}", inputs=edge_inputs)
     if not known:

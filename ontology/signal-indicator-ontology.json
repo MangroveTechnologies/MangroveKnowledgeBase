@@ -6012,8 +6012,7 @@
    "to_id": "procedure:indicator-bollingerbands",
    "inputs": {
     "hband": {
-     "type": "series",
-     "description": "mavg + window_dev * rolling stdev -- the upper band. The stdev is the POPULATION calculation (ddof=0), matching Bollinger's own stated convention"
+     "type": "series"
     }
    }
   },
@@ -6042,8 +6041,7 @@
    "to_id": "procedure:indicator-bollingerbands",
    "inputs": {
     "lband": {
-     "type": "series",
-     "description": "mavg - window_dev * rolling stdev -- the lower band. Population stdev, as above"
+     "type": "series"
     }
    }
   },
@@ -6072,8 +6070,7 @@
    "to_id": "procedure:indicator-bollingerbands",
    "inputs": {
     "lband": {
-     "type": "series",
-     "description": "mavg - window_dev * rolling stdev -- the lower band. Population stdev, as above"
+     "type": "series"
     }
    }
   },
@@ -6102,8 +6099,7 @@
    "to_id": "procedure:indicator-bollingerbands",
    "inputs": {
     "wband": {
-     "type": "series",
-     "description": "band separation as a percent of the center band, (hband - lband) / mavg * 100. Non-negative because the rolling stdev cannot be negative. Scale-free, so comparable across assets and price levels"
+     "type": "series"
     }
    }
   },
@@ -6132,8 +6128,7 @@
    "to_id": "procedure:indicator-bollingerbands",
    "inputs": {
     "hband": {
-     "type": "series",
-     "description": "mavg + window_dev * rolling stdev -- the upper band. The stdev is the POPULATION calculation (ddof=0), matching Bollinger's own stated convention"
+     "type": "series"
     }
    }
   }

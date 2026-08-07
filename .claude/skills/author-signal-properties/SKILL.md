@@ -46,10 +46,13 @@ there, not here:
 | `inputs` | the docstring `Requires:` line |
 | `params` | the docstring `Args:` block |
 | `outputs` | the return annotation and the `Returns:` line |
-| the `uses` edge's `inputs` | AST, described using the indicator's own output descriptions |
+| the `uses` edge's `inputs` | AST -- the output name and type only |
 
 `interpretation`, `applications` and the signal's **class** are not fields at all. They are reached
 by following `uses` to the indicator. Do not add them.
+
+Nor does the `uses` edge carry a description of the output it names. The edge says WHICH output
+flows across it; what that output means is authored once on the indicator that emits it.
 
 ## `formula` - the predicate in domain terms
 
