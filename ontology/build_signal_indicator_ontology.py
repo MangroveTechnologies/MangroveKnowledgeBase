@@ -563,7 +563,232 @@ def _load_classes():
     return found
 
 
+# =============================================================================
+# SIGNAL LAYER
+#
+# Same two-stage rule as the indicator layer: lift everything machine-readable, emit `null` for
+# anything a human must author. Shape settled in `example-bollinger-signals-subgraph.md`, which is
+# the review artifact for everything below.
+#
+# A signal node reuses the indicator node's fields wherever the field means the same thing --
+# `inputs` in particular is raw input series at BOTH layers, so the two are comparable -- plus one
+# addition, `consumes`, naming which of an indicator's outputs the signal actually reads.
+#
+# Only `reference` and `formula` come out null. `interpretation`, `applications` and the class are
+# deliberately NOT fields: they are reached by following the `uses` edge to the indicator, which is
+# the same rule that makes an indicator's class its `instance-of` edge rather than a property.
+# =============================================================================
+
+def _guard_to_warmup(expr):
+    """Convert a `len(df) < EXPR` guard into `warmup_bars`, which is a DIFFERENT quantity.
+
+    The guard is the minimum frame length the signal needs. `warmup_bars` -- established by the
+    indicator layer -- is the number of leading bars DISCARDED before the first valid output, which
+    is one less. BollingerBands(window=20) is authored `window - 1` and has exactly 19 leading NaNs;
+    a signal reading it needs a frame of 20 to produce its first answer, so it discards 19 too.
+
+    Lifting the guard verbatim published every signal's warmup one too high, and hid a relationship
+    that is obvious once the numbers are right: a state signal inherits its indicator's warmup
+    unchanged, and a crossing costs exactly one bar more.
+
+    Folds the common `X + 1` case so the result reads as a bound rather than as arithmetic.
+    """
+    import ast
+
+    try:
+        node = ast.parse(expr, mode="eval").body
+    except SyntaxError:
+        return f"({expr}) - 1"
+    if isinstance(node, ast.Constant) and isinstance(node.value, int):
+        return str(node.value - 1)
+    if (isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add)
+            and isinstance(node.right, ast.Constant) and isinstance(node.right.value, int)):
+        k = node.right.value - 1
+        return ast.unparse(node.left) if k == 0 else f"{ast.unparse(node.left)} + {k}"
+    return f"{expr} - 1"
+
+
+_SIG_TYPE = re.compile(r"^\s*Type:\s*(.+)$", re.M)
+_SIG_REQUIRES = re.compile(r"^\s*Requires:\s*(.+)$", re.M)
+_SIG_RETURNS = re.compile(r"Returns:\s*\n\s*bool:\s*(.+)")
+
+
+def _signal_facts():
+    """Per-signal facts only the AST can supply: which indicator outputs are read, and the warmup.
+
+    Both are read from the registered function's own body, following local helpers, because a signal
+    that delegates to a shared helper (`_ma_cross`, `_macd_line`) reads its indicator there rather
+    than at the decorated function.
+
+    Returns {registered name: {"consumes": {Indicator: [output, ...]}, "warmup_bars": str|None}}.
+    """
+    import ast
+
+    sigs_dir = pathlib.Path(inspect.getfile(importlib.import_module("mangrove_kb.signals.trend"))).parent
+    out = {}
+    for path in sorted(sigs_dir.glob("*.py")):
+        if path.name == "__init__.py":
+            continue
+        tree = ast.parse(path.read_text())
+        local = {n.name: n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+
+        def scan(fn):
+            """(consumes, calls, guards) for one function body, no recursion."""
+            consumes, calls, guards, assigned = {}, set(), [], {}
+            for nd in ast.walk(fn):
+                if isinstance(nd, ast.Call):
+                    f = nd.func
+                    if isinstance(f, ast.Name) and f.id in local:
+                        calls.add(f.id)
+                # X.compute(...)['key']
+                if isinstance(nd, ast.Subscript) and isinstance(nd.value, ast.Call):
+                    f = nd.value.func
+                    if (isinstance(f, ast.Attribute) and f.attr == "compute"
+                            and isinstance(f.value, ast.Name) and isinstance(nd.slice, ast.Constant)):
+                        consumes.setdefault(f.value.id, set()).add(nd.slice.value)
+                # var = X.compute(...)   then   var['key']
+                if isinstance(nd, ast.Assign) and isinstance(nd.value, ast.Call):
+                    f = nd.value.func
+                    if isinstance(f, ast.Attribute) and f.attr == "compute" and isinstance(f.value, ast.Name):
+                        for t in nd.targets:
+                            if isinstance(t, ast.Name):
+                                assigned[t.id] = f.value.id
+                # the `if len(x) < N: return False` warmup guard
+                if isinstance(nd, ast.If) and isinstance(nd.test, ast.Compare):
+                    c = nd.test
+                    if (isinstance(c.left, ast.Call) and getattr(c.left.func, "id", None) == "len"
+                            and c.comparators):
+                        guards.append(ast.unparse(c.comparators[0]))
+            for nd in ast.walk(fn):
+                if (isinstance(nd, ast.Subscript) and isinstance(nd.value, ast.Name)
+                        and nd.value.id in assigned and isinstance(nd.slice, ast.Constant)):
+                    consumes.setdefault(assigned[nd.value.id], set()).add(nd.slice.value)
+            return consumes, calls, guards
+
+        def resolve(fname, seen=None):
+            seen = seen or set()
+            if fname in seen or fname not in local:
+                return {}, []
+            seen.add(fname)
+            consumes, calls, guards = scan(local[fname])
+            for c in calls:
+                sub_c, sub_g = resolve(c, seen)
+                for k, v in sub_c.items():
+                    consumes.setdefault(k, set()).update(v)
+                guards += sub_g
+            return consumes, guards
+
+        for fn in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
+            for d in fn.decorator_list:
+                if (isinstance(d, ast.Call) and isinstance(d.func, ast.Attribute)
+                        and d.func.attr == "register" and d.args):
+                    consumes, guards = resolve(fn.name)
+                    out[d.args[0].value] = {
+                        # Sorted for a stable diff; `set` above only deduplicates.
+                        "consumes": {k: sorted(v) for k, v in sorted(consumes.items())},
+                        # Only when unambiguous. Several guards with different expressions means the
+                        # minimum is a judgement rather than a reading, so it goes to the queue.
+                        "warmup_bars": (_guard_to_warmup(guards[0])
+                                        if len(set(guards)) == 1 else None),
+                        "module": path.stem,
+                    }
+    return out
+
+
+SIGNAL_FACTS = _signal_facts()
+
+
+def _signal_input_descriptions():
+    """{series name: description}, lifted from what is already authored on the indicator nodes.
+
+    `close` means the same thing wherever it appears, so a signal's input descriptions are taken
+    from the indicator layer rather than authored a second time. Derivation, not authoring -- and it
+    keeps one description per series instead of 247 copies that can drift.
+    """
+    out = {}
+    for cls in CLASSES.values():
+        for name, spec in (_lift(cls).get("inputs") or {}).items():
+            if spec.get("description") and name not in out:
+                out[name] = spec["description"]
+    return out
+
+
+def _signal_summary(doc):
+    """The docstring's leading prose, which becomes the atom's `summary`.
+
+    The signal counterpart of `_describe`, and simpler: a signal docstring has no title line to skip
+    and no reference URL in the prose, so everything above the first section IS the description.
+    """
+    head = re.split(r"\n\s*(?:Type|Requires|Args|Returns):", doc)[0]
+    return re.sub(r"\s+", " ", head).strip() or None
+
+
+def _signal_lift(name, fn, facts):
+    """Everything liftable for one signal. `reference` and `formula` are the only nulls."""
+    doc = inspect.getdoc(fn) or ""
+
+    # inputs: the raw series the signal declares it needs in the frame. Same meaning as an
+    # indicator's `inputs`. NOT the indicator outputs it reads -- those are `consumes`.
+    req = _SIG_REQUIRES.search(doc)
+    inputs = {}
+    for tok in (re.split(r"[,/]", req.group(1)) if req else []):
+        tok = tok.strip()
+        if not tok:
+            continue
+        # OHLCV is declared capitalised (`Close`) because that is the DataFrame column; the series
+        # itself is lowercase everywhere else in this graph. Non-price series keep their own casing.
+        key = tok.lower() if tok.lower() in ("open", "high", "low", "close", "volume") else tok
+        inputs[key] = {"type": "series", "description": SIGNAL_INPUT_DESC.get(key)}
+
+    params = {}
+    blk = re.search(r"Args:(.*?)(?:Returns:|\Z)", doc, re.S)
+    for line in (blk.group(1).splitlines() if blk else []):
+        m = _PARAM_LINE.match(line)
+        if not m or m.group(1) == "df":
+            continue
+        pname, ptype, rest = m.group(1), m.group(2).strip(), m.group(3).strip()
+        desc = re.split(r"\s*(?:Range|Default):", rest)[0].strip().rstrip(".")
+        rng, dflt = _RANGE.search(rest), _DEFAULT.search(rest)
+
+        # `_num` narrows an integral value to int, which is right for an int param and wrong for a
+        # float one: `threshold` is declared float with default 5.0 and Range 1-20, and came out
+        # `{"type": "float", "default": 5, "min": 1, "max": 20}` -- every bound an int. A consumer
+        # generating a sweep from that gets integer steps on a continuous parameter.
+        cast = (lambda v: None if v is None else float(v)) if ptype == "float" else (lambda v: v)
+        params[pname] = {"type": ptype,
+                         "default": cast(_num(dflt.group(1))) if dflt else None,
+                         "min": cast(_num(rng.group(1))) if rng else None,
+                         "max": cast(_num(rng.group(2))) if rng else None,
+                         "description": desc or None}
+
+    ret = _SIG_RETURNS.search(doc)
+    sig_params = ", ".join(f"'{p}': value" for p in params)
+    return {
+        "source_module": facts["module"],
+        "reference": None,
+        "warmup_bars": facts["warmup_bars"],
+        # Signals have no abbreviation. Held at null for consistency with the indicator layer, which
+        # already uses null for inapplicable rather than a real value -- see the worked example.
+        "abbreviation": None,
+        "usage_example": f"RuleRegistry.evaluate({{'name': '{name}', 'params': {{{sig_params}}}}}, df)",
+        "formula": None,
+        # NOTE there is no `consumes` here. Which indicator outputs a signal reads is a property of
+        # the `uses` EDGE, not of the signal -- see `rel()`. `inputs` below is the same word for the
+        # same concept: series the signal consumes. The two differ only by provenance, which is
+        # exactly what an edge expresses. A signal's full input set is this dict plus the `inputs` on
+        # each of its `uses` edges.
+        "inputs": inputs,
+        "params": params,
+        # One boolean. A signal returns a bare bool with no name to lift, so the key is invented --
+        # named rather than anonymous so it carries the same sub-schema as every indicator output.
+        "outputs": {"fired": {"type": "bool", "units": "boolean", "range": [0, 1],
+                              "canonical_name": "none",
+                              "description": ret.group(1).strip().rstrip(".") if ret else None}},
+    }
+
+
 CLASSES = _load_classes()
+SIGNAL_INPUT_DESC = _signal_input_descriptions()
 
 
 
@@ -571,8 +796,15 @@ atoms, rels = [], []
 def atom(i, t, k, s, **p):
     atoms.append({"id": i, "title": t, "kind": k, "summary": s,
                   "epistemic": "ratified", "status": "ratified", "props": p})
-def rel(a, r, b, why, ai, bi):
-    rels.append({"from": a, "rel": r, "to": b, "why": why, "from_id": ai, "to_id": bi})
+def rel(a, r, b, why, ai, bi, **props):
+    """`props` are properties of the RELATIONSHIP, not of either endpoint.
+
+    `uses` carries `inputs` this way: which of the indicator's outputs flow into the signal is a
+    fact about the connection, and storing it on either node would be storing it in the wrong place.
+    It also cannot be ambiguous here -- one edge per indicator -- whereas a node property had to
+    repeat the indicator name to disambiguate the signals that read two.
+    """
+    rels.append({"from": a, "rel": r, "to": b, "why": why, "from_id": ai, "to_id": bi, **props})
 
 # entity types
 atom("concept:indicator", "Indicator", "Procedure",
@@ -608,6 +840,100 @@ for ind, cls in sorted(assigned.items()):
          source_module=f"{mod_of[ind]}_indicators", **lifted)
     rel(ind, "instance-of", cls, "class membership",
         f"procedure:indicator-{ind.lower()}", f"concept:indicator-class-{cls}")
+
+# --- signals.
+#
+# Three edges each, and no new relation vocabulary: `instance-of` (structural) to the Signal entity
+# type, `uses` (associative) to the indicator it invokes, `has-role` (descriptive) to its role.
+#
+# `uses` rather than `derived-from`: the vendored ontology glosses it as "runtime
+# invocation/orchestration (skill->tool, procedure->tool)", and a signal is a Procedure that calls
+# `Indicator.compute()` when evaluated. `derived-from` is provenance of knowledge, not dataflow, and
+# `requires` is the KST surmise relation, which this would distort. Reasoning in full in
+# `example-bollinger-signals-subgraph.md`.
+#
+# The class is NOT emitted: it is reached by following `uses` to the indicator and then that
+# indicator's `instance-of`. Same rule as the indicator layer, one level out.
+import mangrove_kb.signals  # noqa: E402,F401  -- registers every signal
+from mangrove_kb.registry import RuleRegistry  # noqa: E402
+
+# Output descriptions are AUTHORED into the indicator nodes, not lifted from source, so the only
+# place to read them is the previous build. An edge describes what it carries using the same words
+# the indicator uses for that output -- one description per output in the whole graph, rather than a
+# copy on every edge that reads it. Null before the first build, which the authoring queue picks up.
+_PREV_PATH = pathlib.Path(__file__).resolve().parent / "signal-indicator-ontology.json"
+_PREV_OUTPUTS = {}
+if _PREV_PATH.exists():
+    for _a in json.loads(_PREV_PATH.read_text()).get("atoms", []):
+        if _a["id"].startswith("procedure:indicator-"):
+            for _k, _v in (_a.get("props", {}).get("outputs") or {}).items():
+                _PREV_OUTPUTS[(_a["title"], _k)] = _v.get("description")
+
+
+def _prev_output_desc(ind, out):
+    return _PREV_OUTPUTS.get((ind, out))
+
+# Which signals get nodes. The signal layer is being brought in deliberately, one group at a time,
+# the same way the indicator layer was: settle the shape on a specimen, review it, then widen.
+#
+# This is a scope list, NOT a filter over something already decided -- emitting all 247 before the
+# shape is agreed would put 247 nodes in the graph on a schema nobody has looked at, and the point
+# of the worked example (`example-bollinger-signals-subgraph.md`) is that that does not happen.
+#
+# `None` means every registered signal. Widen by adding names, or set to None when the shape is
+# settled for all of them.
+SIGNAL_SCOPE = {
+    "bb_upper_breakout", "bb_lower_breakout", "bb_squeeze",
+    "bb_above_upper", "bb_below_lower",
+}
+
+signal_no_indicator, signal_unknown_role = [], []
+for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCOPE):
+    facts = SIGNAL_FACTS.get(sname)
+    if not facts:
+        # Registered but not found by the AST pass -- a real inconsistency, not something to paper
+        # over, since it means the source shape changed underneath the resolver.
+        print(f"ABORT signal {sname!r} is registered but was not found in the source", file=sys.stderr)
+        sys.exit(1)
+    sid = f"procedure:signal-{sname.replace('_', '-')}"
+    fn = RuleRegistry._registry[sname]
+    doc = inspect.getdoc(fn) or ""
+    lifted = _signal_lift(sname, fn, facts)
+    atom(sid, sname, "Procedure",
+         _signal_summary(doc) or f"Signal `{sname}` -- no description in source.", **lifted)
+    rel(sname, "instance-of", "Signal", "entity type", sid, "concept:signal")
+
+    m = _SIG_TYPE.search(doc)
+    role = m.group(1).strip().lower() if m else None
+    if role in ("trigger", "filter", "arm"):
+        rel(sname, "has-role", role, "role", sid, f"property:role-{role}")
+    else:
+        signal_unknown_role.append(sname)
+
+    # One `uses` edge per indicator read. A signal reading two indicators gets two edges; a signal
+    # reading none gets no edge and lands on the report below rather than being silently classless.
+    #
+    # Membership is tested against `assigned` -- the indicators that HAVE a node -- not against
+    # `CLASSES`, which is every class importable from the indicator modules. The two differ by the
+    # five stateful policy rules (SuperTrend, PSAR, ChandelierExit, ATRTrailingStop, VolatilityStop)
+    # that the ontology deliberately excludes as not-indicators. They are still importable, so
+    # testing against CLASSES produced 15 edges pointing at nodes that do not exist. The 15 signals
+    # built on them genuinely have no class, and belong on the report rather than in a dangling edge.
+    known = [i for i in facts["consumes"] if i in assigned]
+    for ind in known:
+        # Same nested-dict shape as a node's `inputs`, because it is the same concept: series the
+        # signal consumes. Descriptions are lifted from the indicator's own authored output
+        # descriptions rather than restated, so `hband` is described once in the graph.
+        ind_outputs = (_lift(CLASSES[ind]).get("outputs") or {})
+        edge_inputs = {}
+        for out in facts["consumes"][ind]:
+            authored = _prev_output_desc(ind, out)
+            edge_inputs[out] = {"type": ind_outputs.get(out, {}).get("type") or "series",
+                                "description": authored}
+        rel(sname, "uses", ind, "reads indicator output",
+            sid, f"procedure:indicator-{ind.lower()}", inputs=edge_inputs)
+    if not known:
+        signal_no_indicator.append(sname)
 
 # --- carry forward authored values. Authored values live in the nodes, and this builder is the
 # thing that rewrites the nodes -- so every run must preserve what was authored into the last one,
@@ -670,6 +996,29 @@ if half_authored:
     print("ABORT half-authored outputs:\n  " + "\n  ".join(half_authored), file=sys.stderr)
     sys.exit(1)
 
+# --- invariant: every edge lands on a node that exists. A dangling edge is a graph that lies -- a
+# consumer walking `uses` to find a signal's class follows it to nothing and gets no answer, which
+# is indistinguishable from a signal that reads no indicator at all. Caught here because it was
+# introduced once already: testing indicator membership against every importable class rather than
+# against the ones with nodes attached 15 signals to the five excluded policy rules.
+_ids = {a["id"] for a in atoms}
+dangling = [f"{r['from']} --{r['rel']}--> {r['to']}"
+            for r in rels if r["from_id"] not in _ids or r["to_id"] not in _ids]
+if dangling:
+    print(f"ABORT {len(dangling)} dangling edges:\n  " + "\n  ".join(dangling), file=sys.stderr)
+    sys.exit(1)
+
+# --- invariant: every `uses` edge declares what it carries. An edge saying only "this signal reads
+# this indicator" is a question, not an answer -- the whole reason the output list lives on the edge
+# is so a consumer can tell `bb_squeeze` (wband) from `bb_upper_breakout` (hband) without reading
+# source. A `uses` with no `inputs` is a silent gap, so it fails the build like every other one.
+uses_without_inputs = [f"{r['from']} --uses--> {r['to']}"
+                       for r in rels if r["rel"] == "uses" and not r.get("inputs")]
+if uses_without_inputs:
+    print(f"ABORT {len(uses_without_inputs)} `uses` edges declare no inputs:\n  "
+          + "\n  ".join(uses_without_inputs), file=sys.stderr)
+    sys.exit(1)
+
 out = {"atoms": atoms, "relations": rels,
        "meta": {"scope": "indicator class ontology", "indicators": len(assigned),
                 "classes": len(CLASSES_DEF), "removed_not_indicators": sorted(REMOVED),
@@ -677,6 +1026,17 @@ out = {"atoms": atoms, "relations": rels,
                 "bootstrapped_from_docstring": bootstrapped,
                 "kb_doc_sections_matched": len(KB_SECTIONS),
                 "kb_doc_sections_unmatched": sorted(KB_UNMATCHED),
+                "signals": len(atoms) - len([a for a in atoms if not a["id"].startswith("procedure:signal-")]),
+                "signals_registered": len(RuleRegistry.names()),
+                "signals_out_of_scope": (0 if SIGNAL_SCOPE is None
+                                         else len(RuleRegistry.names() - SIGNAL_SCOPE)),
+                # Reported, never silently defaulted. A signal with no `uses` edge has no class,
+                # because class is reached through that edge -- so this list IS the classless set.
+                "signals_with_no_indicator": sorted(signal_no_indicator),
+                "signals_with_unknown_role": sorted(signal_unknown_role),
+                "signals_missing_warmup": sorted(
+                    a["title"] for a in atoms
+                    if a["id"].startswith("procedure:signal-") and a["props"]["warmup_bars"] is None),
                 "indicators_missing_description":
                     sorted(i for i in assigned if not _describe(CLASSES[i]))}}
 print(json.dumps(out, indent=1))
