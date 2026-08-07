@@ -43,6 +43,31 @@ class RuleRegistry:
         return wrapper
 
     @classmethod
+    def names(cls) -> frozenset:
+        """Return the set of registered signal names.
+
+        Supported API for "which signals exist?" -- previously answerable only by reading the
+        private ``_registry``, which MangroveAI does today from a request-validation hot path.
+
+        The need is concrete: an unregistered signal name used to reach evaluation, where the
+        ``ValueError`` below was swallowed into ``return False``, and the response came back
+        successful with no orders -- indistinguishable from a valid signal that simply did not fire.
+
+        Reflects whatever is registered at call time, not an import-time snapshot: a consumer
+        registering its own signals must validate against the registry it evaluates with, and
+        MangroveAI does register additional signals of its own.
+        """
+        return frozenset(cls._registry)
+
+    @classmethod
+    def has(cls, name: str) -> bool:
+        """Whether `name` is a registered signal. Membership test without evaluating.
+
+        `evaluate` needs a DataFrame, so it was not usable as a validity check.
+        """
+        return name in cls._registry
+
+    @classmethod
     def evaluate(cls, rule, df):
         rule_name = rule["name"]
         if rule_name not in cls._registry:
