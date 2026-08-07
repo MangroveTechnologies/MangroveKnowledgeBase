@@ -6,6 +6,8 @@ CMF, Force Index, ADI, VWAP, and more.
 
 Originally from ta-master library by Dario Lopez Padial (Bukosabino).
 """
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -232,6 +234,19 @@ class VPT(IndicatorInterface):
         close = data['close']
         volume = data['volume']
         smoothing_factor = params['smoothing_factor']
+
+        # `_validate` only checks for MISSING params, so dropping `dropnans` from `_params` would
+        # let an old caller keep passing it and silently get different behaviour -- NaN-padded
+        # warmup where they previously got dropped rows. Tell them instead of failing quietly.
+        if params.get('dropnans') is not None:
+            warnings.warn(
+                "VPT's 'dropnans' parameter is removed and has no effect. It returned a shorter "
+                "series starting at a later index, breaking the aligned-index guarantee that lets "
+                "compute_frame outer-join indicators into a feature matrix. Warmup is now NaN, as "
+                "it is for every other indicator.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
 
         vpt = (close.pct_change() * volume).cumsum()
         if smoothing_factor:

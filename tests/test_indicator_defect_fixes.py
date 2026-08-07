@@ -133,7 +133,8 @@ def test_donchian_pband_matches_its_own_shipped_bands(ohlcv):
 # --- 6: zero-width bands are guarded, matching BollingerBands -------------- #
 @pytest.mark.parametrize("cls,params", [
     (DonchianChannel, {"window": 20, "offset": 0}),
-    (KeltnerChannel, {"window": 20, "window_atr": 10, "original_version": True, "multiplier": 2.0}),
+    (KeltnerChannel, {"window": 20, "window_atr": None, "original_version": True,
+                      "multiplier": None}),
 ])
 def test_zero_width_bands_yield_nan_not_inf(cls, params):
     flat = pd.Series([50.0] * 60, index=_idx(60))
@@ -146,14 +147,21 @@ def test_zero_width_bands_yield_nan_not_inf(cls, params):
 # --- 5: Keltner's original_version rejects the parameters it cannot use ---- #
 def test_keltner_original_version_rejects_inert_parameters(ohlcv):
     """Both were declared in `_params` and surfaced through the metadata API while being silently
-    ignored, so a caller tuning them saw no effect and no error."""
+    ignored, so a caller tuning them saw no effect and no error.
+
+    The check is on the COMBINATION: on this branch they must be None. An earlier revision compared
+    against hardcoded defaults, which accepted a caller who explicitly passed the default even
+    though that value is equally ignored.
+    """
     data = {k: ohlcv[k] for k in ("high", "low", "close")}
-    base = {"window": 20, "window_atr": 10, "original_version": True, "multiplier": 2.0}
+    base = {"window": 20, "window_atr": None, "original_version": True, "multiplier": None}
 
-    KeltnerChannel.compute(data, base)  # defaults are accepted
+    KeltnerChannel.compute(data, base)  # None for the inert params is the contract
 
-    for param, value in (("window_atr", 99), ("multiplier", 3.5)):
-        with pytest.raises(ValueError, match="does not use"):
+    # Any value is rejected -- including what happens to be the documented default.
+    for param, value in (("window_atr", 99), ("window_atr", 10),
+                         ("multiplier", 3.5), ("multiplier", 2.0)):
+        with pytest.raises(ValueError, match="ignores"):
             KeltnerChannel.compute(data, {**base, param: value})
 
 

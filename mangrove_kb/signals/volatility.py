@@ -237,7 +237,10 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
 
     result = KeltnerChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'window': window, 'window_atr': window_atr, 'original_version': original_version, 'multiplier': multiplier}
+        params={'window': window, 'original_version': original_version,
+                # The original formulation ignores both; the indicator requires None there.
+                'window_atr': None if original_version else window_atr,
+                'multiplier': None if original_version else multiplier}
     )
     upper = result['hband']
 
@@ -277,7 +280,10 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
 
     result = KeltnerChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'window': window, 'window_atr': window_atr, 'original_version': original_version, 'multiplier': multiplier}
+        params={'window': window, 'original_version': original_version,
+                # The original formulation ignores both; the indicator requires None there.
+                'window_atr': None if original_version else window_atr,
+                'multiplier': None if original_version else multiplier}
     )
     lower = result['lband']
 

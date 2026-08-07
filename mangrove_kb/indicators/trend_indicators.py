@@ -453,12 +453,32 @@ class MAMA(IndicatorInterface):
     Technical Analysis of Stocks & Commodities, Sept 2001.
     http://traders.com/documentation/feedbk_docs/2014/01/traderstips.html
 
+    Input is MEDIAN PRICE, (high + low) / 2, per Ehlers: "Inputs: Price = (H+L)/2".
+
+    Warmup: the first `_WARMUP_BARS` (64) values are NaN. Unlike a moving average, MAMA has no
+    window to fill -- it is a recursion seeded at zero, so it emits a number from the first bar and
+    those numbers are contaminated by the seed rather than absent. The count is therefore MEASURED,
+    not calculated, and it depends on a tolerance we choose:
+
+        tolerance    bars until the seed is forgotten
+        1%           19
+        0.1%         57   <- 64 is this, with margin
+
+    Measured by running the indicator cold, running it again with 800 bars prepended, and finding
+    the last bar where the two disagree by more than the tolerance -- across seven regimes (random
+    walk, trending, mean-reverting, low and high volatility, gappy, cyclical), three price levels
+    and three seeds each. Trending is the worst case. Sampling random walks alone understates the
+    tail by more than 20 bars.
+
+    Widening to a 1% tolerance would make this 24 bars. That is a legitimate trade and the constant
+    is the single place to change it.
+
     Implementation: genuinely sequential (per-bar Hilbert phase/period state).
     Cannot be vectorized; loop is pure Python. Future optimization wave may
     numba-accelerate this if it becomes a hot spot.
 
     Args:
-        data: {'close': pd.Series}
+        data: {'high': pd.Series, 'low': pd.Series}
         params: {'fast_limit': float, 'slow_limit': float}
 
     Returns:

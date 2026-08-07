@@ -152,14 +152,21 @@ class KeltnerChannel(IndicatorInterface):
             # Chester Keltner's 1960 construction: SMA(typical price) +/- SMA(high - low). It uses
             # neither `window_atr` nor `multiplier`, but both are declared in `_params` and
             # surfaced through the metadata API as though they were live, so a caller tuning them
-            # saw no effect and no error. Fail loudly instead of ignoring them silently.
-            _defaults = {'window_atr': 10, 'multiplier': 2.0}
-            inert = [p for p, d in _defaults.items() if float(params[p]) != d]
-            if inert:
+            # saw no effect and no error.
+            #
+            # The contract is explicit: on this branch those two params must be None. Checking the
+            # COMBINATION rather than comparing against defaults -- an earlier revision compared
+            # against hardcoded literals, which was wrong twice over. `IndicatorInterface` has no
+            # defaults mechanism, so those numbers duplicated values the class does not know and
+            # would drift; and a caller explicitly passing the default got no warning even though
+            # that value is equally ignored.
+            supplied = [p for p in ('window_atr', 'multiplier') if params[p] is not None]
+            if supplied:
                 raise ValueError(
-                    f"KeltnerChannel(original_version=True) does not use {sorted(inert)}: the "
-                    "original formulation derives its bands from SMA(high - low), not from ATR. "
-                    "Pass original_version=False to use them."
+                    f"KeltnerChannel(original_version=True) ignores {sorted(supplied)}: the "
+                    "original formulation derives its bands from SMA(high - low), not from ATR, "
+                    "so any value passed for them has no effect. Pass None for them, or use "
+                    "original_version=False."
                 )
             tp = typical_price(high, low, close).rolling(window, min_periods=window).mean()
             tp_high = (((4 * high) - (2 * low) + close) / 3.0).rolling(window, min_periods=window).mean()
