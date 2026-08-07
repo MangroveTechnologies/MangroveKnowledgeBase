@@ -33,7 +33,6 @@ from .momentum_indicators import (
     PVO,
     MOM,
     BOP,
-    APO,
     CMO,
 )
 
@@ -101,6 +100,7 @@ from .volume_indicators import (
     VWMA,
     ADOSC,
     KVO,
+    KlingerVolumeOscillator,
 )
 
 # Return indicators
@@ -138,7 +138,6 @@ __all__ = [
     "PVO",
     "MOM",
     "BOP",
-    "APO",
     "CMO",
     # Volatility indicators
     "ATR",
@@ -197,6 +196,7 @@ __all__ = [
     "VWMA",
     "ADOSC",
     "KVO",
+    "KlingerVolumeOscillator",
     # Return indicators
     "DailyReturn",
     "DailyLogReturn",

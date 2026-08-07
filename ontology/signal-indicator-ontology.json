@@ -415,68 +415,6 @@
    }
   },
   {
-   "id": "procedure:indicator-apo",
-   "title": "APO",
-   "kind": "Procedure",
-   "summary": "Difference between a fast and slow EMA of close: APO = EMA(close, window_fast) - EMA(close, window_slow) Same quantity as the MACD line (MACD without its signal line).",
-   "epistemic": "ratified",
-   "status": "ratified",
-   "props": {
-    "source_module": "momentum_indicators",
-    "reference": null,
-    "warmup_bars": "window_slow - 1",
-    "abbreviation": "APO",
-    "usage_example": "APO.compute(data={'close': df['Close']}, params={'window_fast': value, 'window_slow': value})",
-    "formula": "APO = MA(close, fast) - MA(close, slow)\n\nThis implementation uses EMA for both. Sources disagree on whether SMA is\nadmissible and on defaults (12/26, 11/21, or 10/30 with SMA). There is no\nsingle canonical APO parameterisation, and StockCharts has no APO page.",
-    "interpretation": [
-     "Above zero the fast average sits above the slow one, indicating upward momentum; below zero, downward",
-     "Zero-line crossings are the primary reading",
-     "Expressed in the instrument's own price units, so not normalised",
-     "Divergence against price warns of reversal",
-     "Byte-identical to the MACD line at matching periods -- the difference is parameterisation freedom, not arithmetic"
-    ],
-    "applications": [
-     "Trend and momentum direction via zero-line crossovers",
-     "Divergence-based reversal warnings",
-     "A user-parameterisable substitute for MACD when 12/26 EMA is not wanted"
-    ],
-    "inputs": {
-     "close": {
-      "type": "series",
-      "description": "closing price"
-     }
-    },
-    "params": {
-     "window_fast": {
-      "type": "int",
-      "default": 12,
-      "min": 2,
-      "max": 100,
-      "description": "Fast EMA period"
-     },
-     "window_slow": {
-      "type": "int",
-      "default": 26,
-      "min": 5,
-      "max": 200,
-      "description": "Slow EMA period"
-     }
-    },
-    "outputs": {
-     "apo": {
-      "type": "series",
-      "units": "price",
-      "range": [
-       null,
-       null
-      ],
-      "canonical_name": "Absolute Price Oscillator",
-      "description": "fast EMA minus slow EMA of close. VERIFIED BYTE-IDENTICAL to this corpus's MACD line at the same periods (max difference 0.00e+00) -- the literature agrees it is 'the MACD line under another name', the difference being that APO leaves the periods and often the average type user-specified where MACD pins them to 12/26 EMA. Sources split on whether SMA is admissible; this implementation is EMA-only. Unbounded, in price units, so not comparable across instruments. StockCharts has no APO page at all"
-     }
-    }
-   }
-  },
-  {
    "id": "procedure:indicator-atr",
    "title": "ATR",
    "kind": "Procedure",
@@ -1635,16 +1573,16 @@
    "id": "procedure:indicator-donchianchannel",
    "title": "DonchianChannel",
    "kind": "Procedure",
-   "summary": "Price channels formed by the highest high and lowest low over a specified period, used in the famous Turtle Trading system.",
+   "summary": "CONVENTION: the channel is measured over the `window` bars **preceding** the current one, which is what every source describing Donchian channels specifies -- Donchian's own 4-week rule (\"four preceding full calendar weeks\"), the Original Turtle Trading Rules (\"exceeding the high or low of the preceding 20 days\"), StockCharts, and TC2000. StockCharts states the reason directly: \"A channel break would not be possible if the most recent period was used.\" That is not a stylistic preference. Including the current bar makes a breakout arithmetically impossible: the current high is one of the values the upper band is the maximum of, so close can never exceed it. Measured on 400 bars, `include_current_bar=True` produced 0 closes above the upper band and 0 below the lower; excluding it produced 5 and 9. `include_current_bar=True` is retained for a caller who genuinely wants the raw rolling window -- it is a generic primitive (this is what pandas-ta, bukosabino/`ta` and Pine's `ta.highest` give you), not the Donchian convention, and no source argues for it. This parameter replaces the previous `offset`, which defaulted to the non-standard inclusive form and left each caller to remember to pass `offset=1`. The rename is deliberate: every existing call site now fails loudly on a missing parameter rather than silently changing meaning. Arbitrary additional lag is no longer a parameter -- shift the output series.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
     "reference": "https://www.investopedia.com/terms/d/donchianchannels.asp",
-    "warmup_bars": "window - 1",
+    "warmup_bars": "window - 1 if include_current_bar else window",
     "abbreviation": "DC",
-    "usage_example": "DonchianChannel.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'offset': value})",
-    "formula": "Upper Channel = Highest High over n periods\nLower Channel = Lowest Low over n periods\nMiddle Line = (Upper + Lower) / 2\nStandard period: 20",
+    "usage_example": "DonchianChannel.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'include_current_bar': value})",
+    "formula": "Upper Channel = Highest High over the n periods PRECEDING the current bar\nLower Channel = Lowest Low over the n periods PRECEDING the current bar\nMiddle Line = (Upper + Lower) / 2\nWidth = (Upper - Lower) / Middle * 100\nStandard period: 20",
     "interpretation": [
      "Price at upper channel: Strong uptrend / potential overbought",
      "Price at lower channel: Strong downtrend / potential oversold",
@@ -1680,12 +1618,12 @@
       "max": 100,
       "description": "Lookback period"
      },
-     "offset": {
-      "type": "int",
-      "default": null,
+     "include_current_bar": {
+      "type": "bool",
+      "default": false,
       "min": null,
       "max": null,
-      "description": null
+      "description": "Whether the current bar's own high and low may set the bands. False is the Donchian convention and what every source specifies -- the channel spans the `window` bars PRECEDING the current one. True makes a breakout arithmetically impossible, since the current high is one of the values the upper band is the maximum of, and is retained only as a generic rolling-window primitive. Replaces the former `offset`, an arbitrary shift that defaulted to the inclusive form and left each caller to remember to pass 1"
      }
     },
     "outputs": {
@@ -1697,7 +1635,7 @@
        null
       ],
       "canonical_name": "Upper Channel Line",
-      "description": "highest high over the window. INCLUDES the current bar at the default offset=0, which is NOT the documented convention -- StockCharts, the Turtle rules and Donchian's own 4-week rule all use the preceding N bars, precisely so a close can break the channel. At offset=0 no close can ever exceed this band; the two Donchian signals pass offset=1, which shifts the band forward and restores breakouts"
+      "description": "highest high over the `window` bars preceding the current one -- the documented convention (StockCharts, the Turtle rules, Donchian's own 4-week rule), precisely so a close can break the channel. Setting include_current_bar=True folds the current bar in, and then no close can ever exceed this band"
      },
      "lband": {
       "type": "series",
@@ -1707,7 +1645,7 @@
        null
       ],
       "canonical_name": "Lower Channel Line",
-      "description": "lowest low over the window, with the same current-bar caveat as hband"
+      "description": "lowest low over the `window` bars preceding the current one, with the same current-bar note as hband"
      },
      "mband": {
       "type": "series",
@@ -1727,17 +1665,17 @@
        null
       ],
       "canonical_name": "none",
-      "description": "channel separation as a percent, (hband - lband) / rolling_mean(close) * 100. NOTE this divides by a rolling mean of close, NOT by its own mband -- unlike BollingerBands and KeltnerChannel, whose wband divides by their middle band. The three are therefore not comparable despite the shared output name"
+      "description": "channel separation as a percent, (hband - lband) / mband * 100 -- normalised by this indicator's OWN middle band, so it means the same thing here as it does on BollingerBands and KeltnerChannel and the three are comparable. It previously divided by a rolling mean of close, a different quantity that also made this Donchian's only dependency on close outside pband; the two forms diverge by at most 1.69% (measured over 300 bars), close enough that the difference never looked like an error"
      },
      "pband": {
       "type": "series",
       "units": "ratio",
       "range": [
-       0,
-       1
+       null,
+       null
       ],
       "canonical_name": "none",
-      "description": "position of close within the channel, (close - lband) / (hband - lband). Bounded 0..1 because the window includes the current bar, so close can never sit outside its own channel -- the opposite of BollingerBands' unclamped pband. CAVEAT: computed from the UNSHIFTED bands and only then shifted by offset, so when offset is non-zero it does NOT describe the hband/lband reported alongside it, and it can never indicate a breakout"
+      "description": "position of close within the channel, (close - lband) / (hband - lband), computed from the same hband/lband reported alongside it. UNBOUNDED under the default convention: the bands span the preceding bars, so a close that breaks the channel reads below 0 or above 1 -- that excursion IS the breakout, and reading it is the point. Bounded to 0..1 only when include_current_bar=True, where close cannot sit outside its own channel. NaN where the band has zero width"
      }
     }
    }
@@ -2397,16 +2335,16 @@
    "id": "procedure:indicator-kvo",
    "title": "KVO",
    "kind": "Procedure",
-   "summary": "Volume-weighted momentum oscillator. pandas-ta / modern simplified form: sign the volume by the direction of the typical price change, then take the difference of a fast and slow EMA. trend = sign(typical_price - prev_typical_price) signed_volume = volume * trend KVO = EMA(signed_volume, fast) - EMA(signed_volume, slow) KVO_signal = EMA(KVO, signal_window) Positive KVO with rising signal = bullish volume pressure; negative with falling signal = bearish. Divergences from price are the classic Klinger entry cue.",
+   "summary": "Volume-weighted momentum oscillator. pandas-ta / modern simplified form: sign the volume by the direction of the typical price change, then take the difference of a fast and slow EMA. trend = sign(typical_price - prev_typical_price) signed_volume = volume * trend KVO = EMA(signed_volume, fast) - EMA(signed_volume, slow) KVO_signal = EMA(KVO, signal_window) Positive KVO with rising signal = bullish volume pressure; negative with falling signal = bearish. Divergences from price are the classic Klinger entry cue. VARIANT: this is the **simplified** form, and it is not on the same scale as Klinger's original -- see `KlingerVolumeOscillator` for that one. Two materially different volume-force definitions circulate under the name KVO, and nothing in the name says which you have. Reconstructed on identical data with the same 34/55 periods: this (simplified) : [    -39,493,     32,593] Klinger original  : [ -4,970,310,  5,746,198]     ~145x Anyone reconciling this against SierraChart, TradingView or MotiveWave will see numbers two orders of magnitude apart and reasonably conclude it is broken. It is not -- it is the other published variant. Both are kept because both are in circulation; pick by which platform you are reconciling against, and do not compare their levels.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
-    "reference": null,
+    "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
     "warmup_bars": "slow + signal_window - 2",
     "abbreviation": "KVO",
     "usage_example": "KVO.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'fast': value, 'slow': value, 'signal_window': value})",
-    "formula": "Volume Force = Volume * |2 * (dm/cm) - 1| * trend * 100\nKVO = EMA(Volume Force, 34) - EMA(Volume Force, 55)\nSignal = EMA(KVO, 13)",
+    "formula": "trend = sign(typical_price - prev_typical_price)\nsigned_volume = volume * trend\nKVO = EMA(signed_volume, fast) - EMA(signed_volume, slow)\nSignal = EMA(KVO, signal_window)\nDefaults: fast 34, slow 55, signal_window 13\n\nThis is the SIMPLIFIED variant. Klinger's original volume force is on KlingerVolumeOscillator.",
     "interpretation": [
      "KVO above zero: Bullish volume pressure",
      "KVO below zero: Bearish volume pressure",
@@ -2627,6 +2565,98 @@
    }
   },
   {
+   "id": "procedure:indicator-klingervolumeoscillator",
+   "title": "KlingerVolumeOscillator",
+   "kind": "Procedure",
+   "summary": "The full 1997 construction, as opposed to the simplified signed-volume form in `KVO`. Where the simplified variant weights volume by nothing more than the direction of the typical price change, this weights it by how far the current bar's range departs from a running measurement of range accumulated since the last trend change -- which is the part that gives the original its scale and its character:: tp    = (high + low + close) / 3 trend = +1 if tp > tp[-1] else -1                      # binary, no flat branch dm    = high - low                                     # this bar's range cm    = cm[-1] + dm       if trend == trend[-1]        # accumulate within a trend dm[-1] + dm       otherwise                    # reset on a trend change vf    = volume * abs(2 * (dm / cm - 1)) * trend * 100   # volume force KVO   = EMA(vf, fast) - EMA(vf, slow) signal = EMA(KVO, signal_window) Note `cm` is the reason this cannot be expressed as a rolling window: it is a path-dependent accumulator whose reset points are determined by the trend series itself. SCALE: roughly 145x the simplified `KVO` on identical data and identical 34/55 periods -- measured `[-4,970,310, 5,746,198]` against `[-39,493, 32,593]`. The two are read the same way (sign, slope, crossings of the signal line, and divergence against price) but their levels are not comparable and must never be mixed in one feature set as though they were the same measurement. SOURCING CAVEAT, stated plainly because it is unusual for this package: **the primary source could not be obtained.** Klinger's 1997 *Stocks & Commodities* original sits behind a Cloudflare challenge, and StockCharts has no Klinger page at all. This construction is reconciled across secondary platform documentation -- SierraChart, TradingView, CQG, MotiveWave, QuantShare -- which agree with each other on the formula above. That agreement is the whole of the evidence, and it is also how two incompatible variants came to circulate under one name in the first place.",
+   "epistemic": "ratified",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume_indicators",
+    "reference": "https://www.sierrachart.com/index.php?page=doc/StudiesReference.php",
+    "warmup_bars": "slow + signal_window - 2",
+    "abbreviation": "KVO",
+    "usage_example": "KlingerVolumeOscillator.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'fast': value, 'slow': value, 'signal_window': value})",
+    "formula": "tp    = (high + low + close) / 3\ntrend = +1 if tp > prev_tp else -1        (binary -- no flat branch)\ndm    = high - low\ncm    = prev_cm + dm   if trend == prev_trend   (accumulate within a trend)\n        prev_dm + dm   otherwise                (reset on a trend change)\n\nVolume Force = Volume * |2 * (dm/cm - 1)| * trend * 100\nKVO    = EMA(Volume Force, 34) - EMA(Volume Force, 55)\nSignal = EMA(KVO, 13)",
+    "interpretation": [
+     "KVO above zero: Bullish volume pressure",
+     "KVO below zero: Bearish volume pressure",
+     "KVO crossing signal line: Potential trade signal",
+     "Divergences with price indicate weakening trends",
+     "The level is scale-arbitrary and roughly 145x the simplified KVO's -- read sign, slope and crossings, never magnitude"
+    ],
+    "applications": [
+     "Signal-line crossovers as the primary trade trigger",
+     "Zero-line crossings for money-flow bias",
+     "Divergence against price for reversal anticipation",
+     "Reconciling against platforms that implement the original -- SierraChart, TradingView, CQG, MotiveWave -- where the simplified KVO would appear two orders of magnitude wrong"
+    ],
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar; supplies both the typical price and the bar range dm"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar; supplies both the typical price and the bar range dm"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price; enters only through the typical price, which sets the trend direction"
+     },
+     "volume": {
+      "type": "series",
+      "description": "units traded during the bar; the quantity the volume force scales"
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 34,
+      "min": 5,
+      "max": 100,
+      "description": "Fast EMA period applied to the volume force"
+     },
+     "slow": {
+      "type": "int",
+      "default": 55,
+      "min": 10,
+      "max": 200,
+      "description": "Slow EMA period applied to the volume force"
+     },
+     "signal_window": {
+      "type": "int",
+      "default": 13,
+      "min": 2,
+      "max": 50,
+      "description": "Signal-line EMA period"
+     }
+    },
+    "outputs": {
+     "kvo": {
+      "type": "series",
+      "units": "dimensionless",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "Klinger Volume Oscillator",
+      "description": "fast EMA minus slow EMA of Klinger's volume force -- volume scaled by |2*(dm/cm - 1)|*100 and signed by trend, where cm accumulates bar range since the last trend change. This is the ORIGINAL 1997 construction; KVO carries the simplified signed-volume variant, and on identical data with identical periods this runs about 145x larger. Volume-scaled, unbounded, not comparable across instruments, and not comparable to KVO. Zero-range bars contribute zero force"
+     },
+     "kvo_signal": {
+      "type": "series",
+      "units": "dimensionless",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "Signal Line",
+      "description": "EMA of kvo over signal_window; also called the trigger line. Crossings of kvo against it are the primary documented signal"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-macd",
    "title": "MACD",
    "kind": "Procedure",
@@ -2663,16 +2693,16 @@
      "window_slow": {
       "type": "int",
       "default": 26,
-      "min": 10,
-      "max": 100,
-      "description": "Slow EMA window"
+      "min": 5,
+      "max": 200,
+      "description": "Slow EMA period"
      },
      "window_fast": {
       "type": "int",
       "default": 12,
       "min": 2,
-      "max": 50,
-      "description": "Fast EMA window"
+      "max": 100,
+      "description": "Fast EMA period"
      },
      "window_sign": {
       "type": "int",
@@ -5305,14 +5335,6 @@
    "to_id": "concept:indicator-class-averaging"
   },
   {
-   "from": "APO",
-   "rel": "instance-of",
-   "to": "momentum",
-   "why": "class membership",
-   "from_id": "procedure:indicator-apo",
-   "to_id": "concept:indicator-class-momentum"
-  },
-  {
    "from": "ATR",
    "rel": "instance-of",
    "to": "volatility",
@@ -5535,6 +5557,14 @@
    "why": "class membership",
    "from_id": "procedure:indicator-keltnerchannel",
    "to_id": "concept:indicator-class-volatility"
+  },
+  {
+   "from": "KlingerVolumeOscillator",
+   "rel": "instance-of",
+   "to": "momentum",
+   "why": "class membership",
+   "from_id": "procedure:indicator-klingervolumeoscillator",
+   "to_id": "concept:indicator-class-momentum"
   },
   {
    "from": "MACD",
@@ -5836,7 +5866,7 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 742,
+  "carried_forward_from_previous_build": 770,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
@@ -5845,7 +5875,6 @@
    "CumulativeReturn",
    "DailyLogReturn",
    "DailyReturn",
-   "DonchianChannel",
    "EMA",
    "Ichimoku",
    "NVI",

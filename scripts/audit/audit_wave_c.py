@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """Audit Wave C indicators (momentum) against pandas-ta reference.
 
-Wave C indicators: MOM, BOP, APO, CMO.
+Wave C indicators: MOM, BOP, CMO.
 
 Notes:
 - MOM, BOP: bit-exact match against pandas-ta.
-- APO: our implementation is EMA-based (MACD-line equivalent); pandas-ta
-  defaults to SMA but accepts mamode='ema'. Compared with mamode='ema',
-  talib=False. Post-warmup match due to the same presma seeding difference
-  as DEMA/TEMA.
+- APO was removed from the package: it emitted a series byte-identical to
+  MACD.macd (max diff 0.00e+00 over 400 bars). Its four signals are now the
+  macd_line_* family and are covered by the MACD audit.
 - CMO: compared against pandas-ta with talib=False (rolling-sum definition,
   matching our implementation). pandas-ta's default talib=True uses an
   RMA-smoothed variant which is a different algorithm.
@@ -31,7 +30,7 @@ from audit.compare import (
     verify_signal,
     bench_indicator,
 )
-from mangrove_kb.indicators import MOM, BOP, APO, CMO
+from mangrove_kb.indicators import MOM, BOP, CMO
 
 
 def run_audit():
@@ -65,21 +64,6 @@ def run_audit():
         tolerance=1e-10,
         tolerance_tier='EXACT',
         reference_library='pandas-ta',
-    ))
-
-    # APO: EMA-based (MACD line). Post-warmup relative match.
-    results.append(compare_indicator(
-        indicator_name='APO',
-        category='Momentum',
-        our_fn=lambda: APO.compute({'close': close}, {'window_fast': 12, 'window_slow': 26}),
-        ref_fn=lambda: {'apo': ta.apo(close, fast=12, slow=26, mamode='ema', talib=False)},
-        output_keys=['apo'],
-        tolerance=1e-5,
-        tolerance_tier='RELATIVE_1e-5',
-        skip_warmup=250,
-        relative=True,
-        reference_library='pandas-ta (ema, talib=False)',
-        notes='APO is MACD-line equivalent (EMA-based). pandas-ta defaults to SMA; we use EMA.',
     ))
 
     # CMO: rolling-sum definition (talib=False)
@@ -167,14 +151,6 @@ def run_signal_audit():
     results.append(verify_signal('bop_cross_up', {}, df, _truth_zero_cross(bop, 'up')))
     results.append(verify_signal('bop_cross_down', {}, df, _truth_zero_cross(bop, 'down')))
 
-    # --- APO signals ---
-    apo_params = {'window_fast': 12, 'window_slow': 26}
-    apo = APO.compute({'close': close}, apo_params)['apo']
-    results.append(verify_signal('apo_bullish', apo_params, df, _truth_bullish(apo)))
-    results.append(verify_signal('apo_bearish', apo_params, df, _truth_bearish(apo)))
-    results.append(verify_signal('apo_cross_up', apo_params, df, _truth_zero_cross(apo, 'up')))
-    results.append(verify_signal('apo_cross_down', apo_params, df, _truth_zero_cross(apo, 'down')))
-
     # --- CMO signals ---
     cmo = CMO.compute({'close': close}, {'window': 14})['cmo']
     results.append(verify_signal('cmo_overbought', {'window': 14, 'threshold': 50.0}, df, _truth_threshold_ge(cmo, 50.0)))
@@ -194,7 +170,6 @@ def run_benchmark():
     return [
         bench_indicator('MOM(10)', lambda: MOM.compute({'close': close}, {'window': 10}), bars),
         bench_indicator('BOP', lambda: BOP.compute({'open': open_, 'high': high, 'low': low, 'close': close}, {}), bars),
-        bench_indicator('APO(12,26)', lambda: APO.compute({'close': close}, {'window_fast': 12, 'window_slow': 26}), bars),
         bench_indicator('CMO(14)', lambda: CMO.compute({'close': close}, {'window': 14}), bars),
     ]
 

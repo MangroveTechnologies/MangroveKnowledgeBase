@@ -47,12 +47,32 @@ class RSI(IndicatorInterface):
         emadn = down_direction.ewm(alpha=1 / window, min_periods=window, adjust=False).mean()
 
         relative_strength = emaup / emadn
-        rsi = pd.Series(
-            np.where(emadn == 0, 100, 100 - (100 / (1 + relative_strength))),
-            index=close.index,
-        )
 
-        return {'rsi': pd.Series(rsi, name="rsi")}
+        # ZERO-RANGE CONVENTION. Two different degenerate cases hide behind `emadn == 0`, and they
+        # do not have the same answer:
+        #
+        #   gains, no losses -> 100. A real limit: RS -> infinity, so RSI -> 100. This is the
+        #                       documented behaviour and it is correct.
+        #   no gains, no losses (a perfectly flat series) -> undefined. RS is 0/0. The previous
+        #                       guard tested only the denominator, so it returned 100 -- the
+        #                       all-gains answer for a market with no gains.
+        #
+        # NaN for the flat case lines RSI up with StochasticOscillator, WilliamsR and StochRSI,
+        # which are all per-bar bounded readings where a NaN is contained to the bar it describes.
+        # (Contrast ADI and CMF, which are running sums: there a NaN would poison every later bar,
+        # so they substitute 0.)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            rsi = np.where(
+                (emadn == 0) & (emaup > 0),
+                100.0,
+                np.where(
+                    (emadn == 0) & (emaup == 0),
+                    np.nan,
+                    100 - (100 / (1 + relative_strength)),
+                ),
+            )
+
+        return {'rsi': pd.Series(rsi, index=close.index, name="rsi")}
 
 
 class TSI(IndicatorInterface):
@@ -203,7 +223,19 @@ class StochasticOscillator(IndicatorInterface):
 
         smin = low.rolling(window, min_periods=window).min()
         smax = high.rolling(window, min_periods=window).max()
-        stoch_k = 100 * (close - smin) / (smax - smin)
+
+        # ZERO-RANGE CONVENTION: NaN, deliberately. Where the window's high equals its low, %K is
+        # 0/0 -- close sits simultaneously at the top and the bottom of the range, and there is no
+        # limit to take. No source states a convention for this case. The result was already NaN,
+        # but by falling through pandas' division rather than by decision; the explicit guard also
+        # covers the malformed-data case where close lies outside [low, high], which would otherwise
+        # divide a non-zero numerator by zero and yield +/-inf.
+        #
+        # NaN is the right answer here because %K is a per-bar bounded reading: the NaN is contained
+        # to the bar it describes. ADI and CMF face the same 0/0 and answer 0 instead, because they
+        # are running sums where a NaN propagates forever.
+        span = smax - smin
+        stoch_k = (100 * (close - smin) / span).where(span != 0, np.nan)
         stoch_d = stoch_k.rolling(smooth_window, min_periods=smooth_window).mean()
 
         return {
@@ -393,7 +425,11 @@ class WilliamsR(IndicatorInterface):
 
         highest_high = high.rolling(window, min_periods=window).max()
         lowest_low = low.rolling(window, min_periods=window).min()
-        wr = -100 * (highest_high - close) / (highest_high - lowest_low)
+
+        # ZERO-RANGE CONVENTION: NaN, deliberately -- see StochasticOscillator, of which this is the
+        # inverse. A window whose high equals its low makes this 0/0 with no limit to take.
+        span = highest_high - lowest_low
+        wr = (-100 * (highest_high - close) / span).where(span != 0, np.nan)
 
         return {'wr': pd.Series(wr, name="wr")}
 
@@ -435,9 +471,12 @@ class StochRSI(IndicatorInterface):
 
         rsi_result = RSI.compute({'close': close}, {'window': window})['rsi']
         lowest_low_rsi = rsi_result.rolling(window).min()
-        stochrsi = (rsi_result - lowest_low_rsi) / (
-            rsi_result.rolling(window).max() - lowest_low_rsi
-        )
+
+        # ZERO-RANGE CONVENTION: NaN, deliberately -- the same 0/0 as StochasticOscillator, one
+        # level up. A window over which RSI never moves gives an identical rolling max and min, so
+        # there is no range to locate the current reading within.
+        span = rsi_result.rolling(window).max() - lowest_low_rsi
+        stochrsi = ((rsi_result - lowest_low_rsi) / span).where(span != 0, np.nan)
         stochrsi_k = stochrsi.rolling(smooth1).mean()
         stochrsi_d = stochrsi_k.rolling(smooth2).mean()
 
@@ -593,36 +632,17 @@ class BOP(IndicatorInterface):
         return {'bop': pd.Series(bop, index=close.index, name='bop')}
 
 
-class APO(IndicatorInterface):
-    """Absolute Price Oscillator (APO)
-
-    Difference between a fast and slow EMA of close:
-        APO = EMA(close, window_fast) - EMA(close, window_slow)
-    Same quantity as the MACD line (MACD without its signal line).
-
-    Reference: TA-Lib canonical definition.
-
-    Args:
-        data: {'close': pd.Series}
-        params: {'window_fast': int, 'window_slow': int}
-
-    Returns:
-        {'apo': pd.Series}
-    """
-    _data = ["close"]
-    _params = ["window_fast", "window_slow"]
-    _outputs = ["apo"]
-
-    @classmethod
-    def _compute(cls, data, params):
-        close = data['close']
-        window_fast = params['window_fast']
-        window_slow = params['window_slow']
-
-        ema_fast = EMA.compute({'close': close}, {'window': window_fast})['ema']
-        ema_slow = EMA.compute({'close': close}, {'window': window_slow})['ema']
-        apo = ema_fast - ema_slow
-        return {'apo': pd.Series(apo.values, index=close.index, name=f'apo_{window_fast}_{window_slow}')}
+# APO (Absolute Price Oscillator) was removed here. It computed
+# `EMA(close, window_fast) - EMA(close, window_slow)`, which is the MACD line: verified
+# byte-identical to `MACD.macd`, maximum difference 0.00e+00 across 400 bars -- the same series, not
+# an approximation. The literature agrees this is expected rather than a coincidence (LuxAlgo calls
+# APO "the MACD line under another name"; Fidelity frames MACD as APO with the periods and average
+# type pinned; StockCharts has no APO page at all), and APO is also the one member of the MACD
+# family where sources disagree on both the moving-average type and the default periods.
+#
+# The corpus was presenting one measurement as two independent indicators, which double-counts under
+# anything that ranks or selects over indicators. Use `MACD` and read its `macd` output. The four
+# `apo_*` signals are now `macd_line_*` in signals/momentum.py, unchanged in behaviour.
 
 
 class CMO(IndicatorInterface):

@@ -1102,9 +1102,10 @@ Price channels formed by the highest high and lowest low over a specified period
 
 #### Formula
 ```
-Upper Channel = Highest High over n periods
-Lower Channel = Lowest Low over n periods
+Upper Channel = Highest High over the n periods PRECEDING the current bar
+Lower Channel = Lowest Low over the n periods PRECEDING the current bar
 Middle Line = (Upper + Lower) / 2
+Width = (Upper - Lower) / Middle * 100
 Standard period: 20
 ```
 
@@ -1346,16 +1347,32 @@ Volume-based oscillator designed to identify long-term money flow trends.
 
 #### Formula
 ```
-Volume Force = Volume * |2 * (dm/cm) - 1| * trend * 100
-KVO = EMA(Volume Force, 34) - EMA(Volume Force, 55)
+tp    = (high + low + close) / 3
+trend = +1 if tp > prev_tp else -1        (binary -- no flat branch)
+dm    = high - low
+cm    = prev_cm + dm   if trend == prev_trend   (accumulate within a trend)
+        prev_dm + dm   otherwise                (reset on a trend change)
+
+Volume Force = Volume * |2 * (dm/cm - 1)| * trend * 100
+KVO    = EMA(Volume Force, 34) - EMA(Volume Force, 55)
 Signal = EMA(KVO, 13)
 ```
+
+`cm` is a path-dependent accumulator whose reset points are set by the trend series itself, so this
+cannot be expressed as a rolling window.
+
+Two incompatible variants circulate under this name. The above is Klinger's original, implemented by
+`KlingerVolumeOscillator`. The simplified form implemented by `KVO` signs volume by nothing more than
+the direction of the typical price change; on identical data with identical periods the original runs
+about 145x larger. Read either by sign, slope and signal-line crossings -- never by level, and never
+against each other.
 
 #### Interpretation
 - KVO above zero: Bullish volume pressure
 - KVO below zero: Bearish volume pressure
 - KVO crossing signal line: Potential trade signal
 - Divergences with price indicate weakening trends
+- The level is scale-arbitrary and roughly 145x the simplified KVO's -- read sign, slope and crossings, never magnitude
 
 ---
 

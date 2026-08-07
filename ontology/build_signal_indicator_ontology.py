@@ -64,8 +64,9 @@ CLASSES_DEF = {
 }
 ASSIGN = {
  'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator MARibbon",
- 'momentum': "ROC MOM TRIX MACD PPO APO KST AwesomeOscillator DPO PVO ForceIndex EaseOfMovement "
-             "ADOSC KVO DailyReturn DailyLogReturn MassIndex ADX Aroon Vortex MultiTFTrend",
+ 'momentum': "ROC MOM TRIX MACD PPO KST AwesomeOscillator DPO PVO ForceIndex EaseOfMovement "
+             "ADOSC KVO KlingerVolumeOscillator DailyReturn DailyLogReturn MassIndex ADX Aroon "
+             "Vortex MultiTFTrend",
  'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
@@ -260,9 +261,16 @@ def _lift(cls):
 
     DOC_SECTIONS[cls.__name__] = _doc_sections(doc)
 
-    # warmup: min_periods is the only machine-readable hint, and only when unambiguous.
-    warm = sorted({m for m in re.findall(r"min_periods\s*=\s*([A-Za-z_]\w*|\d+)",
-                                         inspect.getsource(cls))})
+    # warmup: min_periods is the only machine-readable hint, and only when unambiguous. It is a
+    # GUESS, not a reading -- it assumes the rolling result is published on the bar it was computed
+    # for. A `.shift(` breaks that assumption and makes the guess wrong by exactly the shift, so the
+    # guess is withheld and the authored value stands. DonchianChannel is the case that exposed
+    # this: excluding the current bar costs one extra warmup bar, and `min_periods=window` alone
+    # cannot see it.
+    src = inspect.getsource(cls)
+    warm = sorted({m for m in re.findall(r"min_periods\s*=\s*([A-Za-z_]\w*|\d+)", src)})
+    if ".shift(" in src:
+        warm = []
     return {
         # NOTE: the indicator description is NOT returned here. It belongs in the atom's native
         # `summary` field -- the only place it is stored. `viz.data_from_rows` reads
@@ -411,7 +419,11 @@ GLOSSARY = KB_REPO / "knowledge-base" / "09-glossary.md"
 # join here silently attaches one indicator's prose to another.
 KB_TITLE_ALIASES = {
     "Accumulation/Distribution Line (ADL)": "ADI",   # same measure, different expansion
-    "Klinger Volume Oscillator": "KVO",
+    # The KB section states the Volume Force / dm-cm construction, which is Klinger's ORIGINAL --
+    # not the simplified signed-volume form that `KVO` implements. It used to be joined to `KVO`,
+    # attaching one variant's prose to the other on the one indicator in the corpus where the two
+    # variants are ~145x apart in scale.
+    "Klinger Volume Oscillator": "KlingerVolumeOscillator",
     "Vortex Indicator": "Vortex",
 }
 # Sections that legitimately match nothing: indicators we deliberately excluded, or breadth/market

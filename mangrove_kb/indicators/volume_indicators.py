@@ -41,8 +41,18 @@ class ADI(IndicatorInterface):
         close = data['close']
         volume = data['volume']
 
+        # ZERO-RANGE CONVENTION: 0, deliberately, and narrowly. Where high equals low the Money Flow
+        # Multiplier is 0/0 and no source states a convention. Zero -- "this bar carries no
+        # directional information, so it contributes nothing" -- is the only non-destructive answer
+        # available: ADI is a running cumulative total, so a NaN here would propagate through every
+        # later bar rather than being contained to this one. (StochasticOscillator, WilliamsR and
+        # StochRSI meet the same 0/0 and answer NaN, because they are per-bar readings.)
+        #
+        # The guard is on `high == low` specifically. It used to be a blanket `.fillna(0.0)`, which
+        # also swallowed NaNs arising from missing input data -- a genuine data gap read as "no
+        # flow" rather than surfacing.
         clv = ((close - low) - (high - close)) / (high - low)
-        clv = clv.fillna(0.0)  # float division by zero
+        clv = clv.where(high != low, 0.0)
         adi = clv * volume
         adi = adi.cumsum()
 
@@ -118,8 +128,13 @@ class CMF(IndicatorInterface):
         volume = data['volume']
         window = params['window']
 
+        # ZERO-RANGE CONVENTION: 0, deliberately, and narrowly -- identical reasoning to ADI, whose
+        # per-bar term this is. CMF is a rolling sum, so a NaN would blank the whole `window`-bar
+        # window rather than the single bar it describes. The guard is on `high == low` specifically
+        # rather than the previous blanket `.fillna(0.0)`, so missing input data still surfaces as
+        # NaN instead of reading as "no flow".
         mfv = ((close - low) - (high - close)) / (high - low)
-        mfv = mfv.fillna(0.0)  # float division by zero
+        mfv = mfv.where(high != low, 0.0)
         mfv *= volume
 
         cmf = (
@@ -495,10 +510,21 @@ class KVO(IndicatorInterface):
     falling signal = bearish. Divergences from price are the classic
     Klinger entry cue.
 
+    VARIANT: this is the **simplified** form, and it is not on the same scale as Klinger's original
+    -- see `KlingerVolumeOscillator` for that one. Two materially different volume-force definitions
+    circulate under the name KVO, and nothing in the name says which you have. Reconstructed on
+    identical data with the same 34/55 periods:
+
+        this (simplified) : [    -39,493,     32,593]
+        Klinger original  : [ -4,970,310,  5,746,198]     ~145x
+
+    Anyone reconciling this against SierraChart, TradingView or MotiveWave will see numbers two
+    orders of magnitude apart and reasonably conclude it is broken. It is not -- it is the other
+    published variant. Both are kept because both are in circulation; pick by which platform you are
+    reconciling against, and do not compare their levels.
+
     Reference: Stephen J. Klinger (simplified modern form as implemented in
-    pandas-ta / TradingView; Klinger's original 1997 formulation uses a
-    more elaborate cumulative-measurement reset that this does not
-    replicate).
+    pandas-ta / TradingView).
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}
@@ -545,4 +571,108 @@ class KVO(IndicatorInterface):
         return {
             'kvo': pd.Series(kvo.values, index=close.index, name=f'kvo_{fast}_{slow}'),
             'kvo_signal': pd.Series(kvo_signal.values, index=close.index, name=f'kvo_signal_{signal_window}'),
+        }
+
+
+class KlingerVolumeOscillator(IndicatorInterface):
+    """Klinger Volume Oscillator -- Klinger's original formulation.
+
+    The full 1997 construction, as opposed to the simplified signed-volume form in `KVO`. Where the
+    simplified variant weights volume by nothing more than the direction of the typical price
+    change, this weights it by how far the current bar's range departs from a running measurement of
+    range accumulated since the last trend change -- which is the part that gives the original its
+    scale and its character::
+
+        tp    = (high + low + close) / 3
+        trend = +1 if tp > tp[-1] else -1                      # binary, no flat branch
+        dm    = high - low                                     # this bar's range
+        cm    = cm[-1] + dm       if trend == trend[-1]        # accumulate within a trend
+                dm[-1] + dm       otherwise                    # reset on a trend change
+        vf    = volume * abs(2 * (dm / cm - 1)) * trend * 100   # volume force
+        KVO   = EMA(vf, fast) - EMA(vf, slow)
+        signal = EMA(KVO, signal_window)
+
+    Note `cm` is the reason this cannot be expressed as a rolling window: it is a path-dependent
+    accumulator whose reset points are determined by the trend series itself.
+
+    SCALE: roughly 145x the simplified `KVO` on identical data and identical 34/55 periods --
+    measured `[-4,970,310, 5,746,198]` against `[-39,493, 32,593]`. The two are read the same way
+    (sign, slope, crossings of the signal line, and divergence against price) but their levels are
+    not comparable and must never be mixed in one feature set as though they were the same
+    measurement.
+
+    SOURCING CAVEAT, stated plainly because it is unusual for this package: **the primary source
+    could not be obtained.** Klinger's 1997 *Stocks & Commodities* original sits behind a Cloudflare
+    challenge, and StockCharts has no Klinger page at all. This construction is reconciled across
+    secondary platform documentation -- SierraChart, TradingView, CQG, MotiveWave, QuantShare -- which
+    agree with each other on the formula above. That agreement is the whole of the evidence, and it
+    is also how two incompatible variants came to circulate under one name in the first place.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}
+        params: {'fast': int, 'slow': int, 'signal_window': int}
+
+    Returns:
+        {'kvo': pd.Series, 'kvo_signal': pd.Series}
+    """
+    _data = ["high", "low", "close", "volume"]
+    _params = ["fast", "slow", "signal_window"]
+    _outputs = ["kvo", "kvo_signal"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        from mangrove_kb.indicators.trend_indicators import EMA
+        from mangrove_kb.indicators.utils import typical_price
+
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        volume = data['volume']
+        fast = params['fast']
+        slow = params['slow']
+        signal_window = params['signal_window']
+
+        tp = typical_price(high, low, close).to_numpy(dtype=np.float64, copy=False)
+        dm = (high - low).to_numpy(dtype=np.float64, copy=False)
+        vol = volume.to_numpy(dtype=np.float64, copy=False)
+        n = len(close)
+
+        vf = np.full(n, np.nan)
+        if n:
+            # Bar 0 has no prior typical price, so its trend is undefined. The seed is immaterial to
+            # bar 0's own value -- cm equals dm there, so dm/cm is 1 and the force term |2*(1-1)| is
+            # exactly 0 whatever sign is chosen. It matters only in deciding whether bar 1 is read
+            # as a trend change. +1 is the seed the platform implementations use.
+            trend_prev = 1.0
+            cm_prev = dm[0]
+            dm_prev = dm[0]
+            vf[0] = 0.0
+
+            for i in range(1, n):
+                trend = 1.0 if tp[i] > tp[i - 1] else -1.0
+                cm = (cm_prev + dm[i]) if trend == trend_prev else (dm_prev + dm[i])
+
+                if cm == 0.0:
+                    # Two consecutive zero-range bars. The force term is 0/0 and no source states a
+                    # convention. 0 -- "no range, so no measurable force" -- matches the choice made
+                    # for the same degenerate case in ADI and CMF, and for the same reason: vf feeds
+                    # an EMA, so a NaN would propagate through every subsequent bar rather than
+                    # being contained to the one it describes.
+                    vf[i] = 0.0
+                else:
+                    vf[i] = vol[i] * abs(2.0 * (dm[i] / cm - 1.0)) * trend * 100.0
+
+                trend_prev, cm_prev, dm_prev = trend, cm, dm[i]
+
+        vf_series = pd.Series(vf, index=close.index)
+        ema_fast = EMA.compute({'close': vf_series}, {'window': fast})['ema']
+        ema_slow = EMA.compute({'close': vf_series}, {'window': slow})['ema']
+        kvo = ema_fast - ema_slow
+        kvo_signal = EMA.compute({'close': kvo}, {'window': signal_window})['ema']
+
+        return {
+            'kvo': pd.Series(kvo.values, index=close.index, name=f'klinger_kvo_{fast}_{slow}'),
+            'kvo_signal': pd.Series(
+                kvo_signal.values, index=close.index, name=f'klinger_kvo_signal_{signal_window}'
+            ),
         }

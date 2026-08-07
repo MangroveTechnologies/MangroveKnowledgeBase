@@ -308,8 +308,9 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     Detect price breaking above upper Donchian Channel (new high).
 
     Fires on the bar where close exceeds the prior period's upper band.
-    The channel is computed from the N bars BEFORE the current bar (offset=1)
-    so the current bar's high doesn't inflate the band it's compared against.
+    The channel is computed from the N bars BEFORE the current bar so the
+    current bar's high doesn't inflate the band it's compared against --
+    that is the Donchian convention and the indicator's own behaviour.
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -326,7 +327,7 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
 
     result = DonchianChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'window': window, 'offset': 1}
+        params={'window': window, 'include_current_bar': False}
     )
     upper = result['hband']
 
@@ -347,8 +348,9 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     Detect price breaking below lower Donchian Channel (new low).
 
     Fires on the bar where close drops below the prior period's lower band.
-    The channel is computed from the N bars BEFORE the current bar (offset=1)
-    so the current bar's low doesn't deflate the band it's compared against.
+    The channel is computed from the N bars BEFORE the current bar so the
+    current bar's low doesn't deflate the band it's compared against --
+    that is the Donchian convention and the indicator's own behaviour.
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -365,7 +367,7 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
 
     result = DonchianChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'window': window, 'offset': 1}
+        params={'window': window, 'include_current_bar': False}
     )
     lower = result['lband']
 

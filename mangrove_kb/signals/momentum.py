@@ -35,7 +35,7 @@ from mangrove_kb.indicators import (
     PVO,
     MOM,
     BOP,
-    APO,
+    MACD,
     CMO,
 )
 
@@ -1190,14 +1190,36 @@ def bop_cross_down(df: pd.DataFrame) -> bool:
     return _zero_cross_signal(bop, "down")
 
 
-# --- APO signals ---
+# --- MACD-line signals (formerly the APO signals) ---
+#
+# These read the MACD LINE, which is where an oscillator built from the difference of two EMAs of
+# close sits relative to zero. They were registered as `apo_*` and computed from an `APO` indicator
+# that emitted a series byte-identical to `MACD.macd` -- verified, maximum difference 0.00e+00 over
+# 400 bars, not approximately equal but the same series. The literature agrees this is expected:
+# LuxAlgo calls APO "the MACD line under another name", and Fidelity frames MACD as APO with the
+# periods and average type pinned. The duplicate indicator has been removed; these signals are
+# unchanged in behaviour and now read the one indicator that measures this.
+#
+# Distinct from `macd_positive` in signals/trend.py, which reads the HISTOGRAM.
+#
+# `MACD` requires `window_sign` and these signals do not expose it, because the MACD line does not
+# depend on it -- verified identical for window_sign 9 and 30. It is pinned to the conventional 9
+# rather than surfaced as a knob that provably does nothing.
+_MACD_LINE_SIGN_WINDOW = 9
 
-@RuleRegistry.register("apo_bullish")
-def apo_bullish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+
+def _macd_line(closes: pd.Series, window_fast: int, window_slow: int) -> pd.Series:
+    return MACD.compute(
+        data={'close': closes},
+        params={'window_fast': window_fast, 'window_slow': window_slow,
+                'window_sign': _MACD_LINE_SIGN_WINDOW},
+    )['macd']
+
+
+@RuleRegistry.register("macd_line_positive")
+def macd_line_positive(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
     """
-    Check if the Absolute Price Oscillator (EMA fast - EMA slow) is positive.
-
-    Equivalent to the MACD line being above zero (bullish momentum regime).
+    Check if the MACD line (EMA fast - EMA slow) is above zero (bullish momentum regime).
 
     Type: FILTER
     Requires: Close
@@ -1208,21 +1230,21 @@ def apo_bullish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) 
         window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
 
     Returns:
-        bool: True if APO > 0, False otherwise.
+        bool: True if the MACD line > 0, False otherwise.
     """
     closes = df["Close"]
     if len(closes) < window_slow:
         return False
-    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
-    if pd.isna(apo.iloc[-1]):
+    macd_line = _macd_line(closes, window_fast, window_slow)
+    if pd.isna(macd_line.iloc[-1]):
         return False
-    return bool(apo.iloc[-1] > 0)
+    return bool(macd_line.iloc[-1] > 0)
 
 
-@RuleRegistry.register("apo_bearish")
-def apo_bearish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+@RuleRegistry.register("macd_line_negative")
+def macd_line_negative(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
     """
-    Check if the Absolute Price Oscillator is negative (bearish regime).
+    Check if the MACD line is below zero (bearish momentum regime).
 
     Type: FILTER
     Requires: Close
@@ -1233,21 +1255,21 @@ def apo_bearish(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) 
         window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
 
     Returns:
-        bool: True if APO < 0, False otherwise.
+        bool: True if the MACD line < 0, False otherwise.
     """
     closes = df["Close"]
     if len(closes) < window_slow:
         return False
-    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
-    if pd.isna(apo.iloc[-1]):
+    macd_line = _macd_line(closes, window_fast, window_slow)
+    if pd.isna(macd_line.iloc[-1]):
         return False
-    return bool(apo.iloc[-1] < 0)
+    return bool(macd_line.iloc[-1] < 0)
 
 
-@RuleRegistry.register("apo_cross_up")
-def apo_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+@RuleRegistry.register("macd_line_cross_up")
+def macd_line_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
     """
-    Detect APO crossing above zero (bullish momentum onset).
+    Detect the MACD line crossing above zero (bullish momentum onset).
 
     Type: TRIGGER
     Requires: Close
@@ -1258,19 +1280,18 @@ def apo_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26)
         window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
 
     Returns:
-        bool: True if APO crosses above zero on the current bar.
+        bool: True if the MACD line crosses above zero on the current bar.
     """
     closes = df["Close"]
     if len(closes) < window_slow + 1:
         return False
-    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
-    return _zero_cross_signal(apo, "up")
+    return _zero_cross_signal(_macd_line(closes, window_fast, window_slow), "up")
 
 
-@RuleRegistry.register("apo_cross_down")
-def apo_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
+@RuleRegistry.register("macd_line_cross_down")
+def macd_line_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
     """
-    Detect APO crossing below zero (bearish momentum onset).
+    Detect the MACD line crossing below zero (bearish momentum onset).
 
     Type: TRIGGER
     Requires: Close
@@ -1281,13 +1302,12 @@ def apo_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 2
         window_slow (int): Slow EMA period. Range: 5-200. Default: 26.
 
     Returns:
-        bool: True if APO crosses below zero on the current bar.
+        bool: True if the MACD line crosses below zero on the current bar.
     """
     closes = df["Close"]
     if len(closes) < window_slow + 1:
         return False
-    apo = APO.compute(data={'close': closes}, params={'window_fast': window_fast, 'window_slow': window_slow})['apo']
-    return _zero_cross_signal(apo, "down")
+    return _zero_cross_signal(_macd_line(closes, window_fast, window_slow), "down")
 
 
 # --- CMO signals ---
