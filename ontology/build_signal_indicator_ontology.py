@@ -721,8 +721,12 @@ def _signal_summary(doc):
     into its own field, and one fact in two places is one too many.
     """
     head = re.split(r"\n\s*(?:Type|Requires|Args|Returns):", doc)[0]
-    head = re.sub(r"^\s*References?:.*$", "", head, flags=re.M)
-    return re.sub(r"\s+", " ", head).strip() or None
+    # Strip the reference clause WHEREVER it sits. Anchoring this to the start of a line was wrong:
+    # most pattern docstrings append `Reference: <url>` to the end of a prose sentence rather than
+    # putting it on its own line, so 29 summaries carried the URL as well as the `reference` field --
+    # one fact in two places, which is the thing this strip exists to prevent.
+    head = re.sub(r"References?:\s*\S+", "", head)
+    return re.sub(r"\s+", " ", head).strip().rstrip() or None
 
 
 def _signal_lift(name, fn, facts):

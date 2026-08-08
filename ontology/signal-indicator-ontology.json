@@ -5365,7 +5365,7 @@
    "id": "procedure:signal-bearish-engulfing-trigger",
    "title": "bearish_engulfing_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bearish engulfing pattern completed on the current bar. Current bearish candle's body completely contains the previous bullish candle's body. Strong bearish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
+   "summary": "Check if a bearish engulfing pattern completed on the current bar. Current bearish candle's body completely contains the previous bullish candle's body. Strong bearish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -5404,7 +5404,7 @@
    "id": "procedure:signal-bearish-harami-trigger",
    "title": "bearish_harami_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bearish harami pattern completed on the current bar. Current small bearish candle's body is inside the previous large bullish candle's body. Potential bearish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
+   "summary": "Check if a bearish harami pattern completed on the current bar. Current small bearish candle's body is inside the previous large bullish candle's body. Potential bearish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -5498,7 +5498,7 @@
    "id": "procedure:signal-bearish-pin-bar-trigger",
    "title": "bearish_pin_bar_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bearish pin bar is detected on the current bar. Long upper wick with body in the lower portion of the range. Bearish reversal at resistance. Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/",
+   "summary": "Check if a bearish pin bar is detected on the current bar. Long upper wick with body in the lower portion of the range. Bearish reversal at resistance.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -5560,7 +5560,7 @@
    "id": "procedure:signal-bullish-engulfing-trigger",
    "title": "bullish_engulfing_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bullish engulfing pattern completed on the current bar. Current bullish candle's body completely contains the previous bearish candle's body. Strong bullish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
+   "summary": "Check if a bullish engulfing pattern completed on the current bar. Current bullish candle's body completely contains the previous bearish candle's body. Strong bullish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -5599,7 +5599,7 @@
    "id": "procedure:signal-bullish-harami-trigger",
    "title": "bullish_harami_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bullish harami pattern completed on the current bar. Current small bullish candle's body is inside the previous large bearish candle's body. Potential bullish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
+   "summary": "Check if a bullish harami pattern completed on the current bar. Current small bullish candle's body is inside the previous large bearish candle's body. Potential bullish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -5693,7 +5693,7 @@
    "id": "procedure:signal-bullish-pin-bar-trigger",
    "title": "bullish_pin_bar_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bullish pin bar is detected on the current bar. Long lower wick with body in the upper portion of the range. Bullish reversal at support. Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/",
+   "summary": "Check if a bullish pin bar is detected on the current bar. Long lower wick with body in the upper portion of the range. Bullish reversal at support.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -5927,7 +5927,7 @@
    "id": "procedure:signal-doji-trigger",
    "title": "doji_trigger",
    "kind": "Procedure",
-   "summary": "Check if a doji pattern is detected on the current bar. A doji forms when open and close are nearly equal relative to the candle's range, signaling indecision. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
+   "summary": "Check if a doji pattern is detected on the current bar. A doji forms when open and close are nearly equal relative to the candle's range, signaling indecision.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -5982,7 +5982,7 @@
    "id": "procedure:signal-dragonfly-doji-trigger",
    "title": "dragonfly_doji_trigger",
    "kind": "Procedure",
-   "summary": "Check if a dragonfly doji is detected on the current bar. A doji with open/close near the high and a long lower shadow. Bullish signal at support. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
+   "summary": "Check if a dragonfly doji is detected on the current bar. A doji with open/close near the high and a long lower shadow. Bullish signal at support.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6044,7 +6044,7 @@
    "id": "procedure:signal-evening-star-trigger",
    "title": "evening_star_trigger",
    "kind": "Procedure",
-   "summary": "Check if an evening star pattern completed on the current bar. Three-candle bearish reversal: bullish candle, small-bodied star, then bearish candle closing below midpoint of first. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
+   "summary": "Check if an evening star pattern completed on the current bar. Three-candle bearish reversal: bullish candle, small-bodied star, then bearish candle closing below midpoint of first.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6099,7 +6099,7 @@
    "id": "procedure:signal-gravestone-doji-trigger",
    "title": "gravestone_doji_trigger",
    "kind": "Procedure",
-   "summary": "Check if a gravestone doji is detected on the current bar. A doji with open/close near the low and a long upper shadow. Bearish signal at resistance. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
+   "summary": "Check if a gravestone doji is detected on the current bar. A doji with open/close near the low and a long upper shadow. Bearish signal at resistance.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6161,7 +6161,7 @@
    "id": "procedure:signal-hammer-trigger",
    "title": "hammer_trigger",
    "kind": "Procedure",
-   "summary": "Check if a hammer shape is detected on the current bar. Small body at upper end with long lower wick and minimal upper wick. Bullish reversal after downtrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
+   "summary": "Check if a hammer shape is detected on the current bar. Small body at upper end with long lower wick and minimal upper wick. Bullish reversal after downtrend.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6223,7 +6223,7 @@
    "id": "procedure:signal-hanging-man-trigger",
    "title": "hanging_man_trigger",
    "kind": "Procedure",
-   "summary": "Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body, long lower wick) but interpreted as a bearish reversal when appearing after an uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
+   "summary": "Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body, long lower wick) but interpreted as a bearish reversal when appearing after an uptrend.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6340,7 +6340,7 @@
    "id": "procedure:signal-inside-bar-trigger",
    "title": "inside_bar_trigger",
    "kind": "Procedure",
-   "summary": "Check if an inside bar is detected on the current bar. Current bar's range is completely contained within the previous bar's range. Signals consolidation and potential breakout. Reference: https://thepatternsite.com/InsideDays.html",
+   "summary": "Check if an inside bar is detected on the current bar. Current bar's range is completely contained within the previous bar's range. Signals consolidation and potential breakout.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6379,7 +6379,7 @@
    "id": "procedure:signal-inverted-hammer-trigger",
    "title": "inverted_hammer_trigger",
    "kind": "Procedure",
-   "summary": "Check if an inverted hammer shape is detected on the current bar. Same shape as shooting star (small body, long upper wick) but interpreted as a bullish reversal when appearing after a downtrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
+   "summary": "Check if an inverted hammer shape is detected on the current bar. Same shape as shooting star (small body, long upper wick) but interpreted as a bullish reversal when appearing after a downtrend.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6441,7 +6441,7 @@
    "id": "procedure:signal-long-legged-doji-trigger",
    "title": "long_legged_doji_trigger",
    "kind": "Procedure",
-   "summary": "Check if a long-legged doji is detected on the current bar. A doji with both upper and lower wicks at least wick_threshold of the total range, indicating extreme indecision. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
+   "summary": "Check if a long-legged doji is detected on the current bar. A doji with both upper and lower wicks at least wick_threshold of the total range, indicating extreme indecision.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6503,7 +6503,7 @@
    "id": "procedure:signal-marubozu-bearish-trigger",
    "title": "marubozu_bearish_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bearish marubozu is detected on the current bar. Full-bodied bearish candle with minimal or no wicks. Signals strong selling conviction. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
+   "summary": "Check if a bearish marubozu is detected on the current bar. Full-bodied bearish candle with minimal or no wicks. Signals strong selling conviction.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6558,7 +6558,7 @@
    "id": "procedure:signal-marubozu-bullish-trigger",
    "title": "marubozu_bullish_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bullish marubozu is detected on the current bar. Full-bodied bullish candle with minimal or no wicks. Signals strong buying conviction. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
+   "summary": "Check if a bullish marubozu is detected on the current bar. Full-bodied bullish candle with minimal or no wicks. Signals strong buying conviction.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6613,7 +6613,7 @@
    "id": "procedure:signal-morning-star-trigger",
    "title": "morning_star_trigger",
    "kind": "Procedure",
-   "summary": "Check if a morning star pattern completed on the current bar. Three-candle bullish reversal: bearish candle, small-bodied star, then bullish candle closing above midpoint of first. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
+   "summary": "Check if a morning star pattern completed on the current bar. Three-candle bullish reversal: bearish candle, small-bodied star, then bullish candle closing above midpoint of first.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6668,7 +6668,7 @@
    "id": "procedure:signal-nr7-trigger",
    "title": "nr7_trigger",
    "kind": "Procedure",
-   "summary": "Check if a narrow range day is detected on the current bar. Current bar has the smallest range within the window period. Signals volatility compression and imminent breakout. Default window=7 for NR7; use 4 for NR4. Reference: https://thepatternsite.com/nr7.html",
+   "summary": "Check if a narrow range day is detected on the current bar. Current bar has the smallest range within the window period. Signals volatility compression and imminent breakout. Default window=7 for NR7; use 4 for NR4.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6715,7 +6715,7 @@
    "id": "procedure:signal-outside-bar-trigger",
    "title": "outside_bar_trigger",
    "kind": "Procedure",
-   "summary": "Check if an outside bar is detected on the current bar. Current bar's range completely engulfs the previous bar's range. Signals increased volatility. Reference: https://thepatternsite.com/OutsideDays.html",
+   "summary": "Check if an outside bar is detected on the current bar. Current bar's range completely engulfs the previous bar's range. Signals increased volatility.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -6926,7 +6926,7 @@
    "id": "procedure:signal-shooting-star-trigger",
    "title": "shooting_star_trigger",
    "kind": "Procedure",
-   "summary": "Check if a shooting star shape is detected on the current bar. Small body at lower end with long upper wick and minimal lower wick. Bearish reversal after uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
+   "summary": "Check if a shooting star shape is detected on the current bar. Small body at lower end with long upper wick and minimal lower wick. Bearish reversal after uptrend.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7105,7 +7105,7 @@
    "id": "procedure:signal-three-black-crows-trigger",
    "title": "three_black_crows_trigger",
    "kind": "Procedure",
-   "summary": "Check if three black crows pattern completed on the current bar. Three consecutive bearish candles with lower closes, each opening within the previous body. Strong bearish signal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
+   "summary": "Check if three black crows pattern completed on the current bar. Three consecutive bearish candles with lower closes, each opening within the previous body. Strong bearish signal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7160,7 +7160,7 @@
    "id": "procedure:signal-three-inside-down-trigger",
    "title": "three_inside_down_trigger",
    "kind": "Procedure",
-   "summary": "Check if three inside down pattern completed on the current bar. Bullish candle, bearish harami, then bearish close below first candle's open. Confirmed bearish reversal. Reference: https://thepatternsite.com/ThreeInsideDown.html",
+   "summary": "Check if three inside down pattern completed on the current bar. Bullish candle, bearish harami, then bearish close below first candle's open. Confirmed bearish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7199,7 +7199,7 @@
    "id": "procedure:signal-three-inside-up-trigger",
    "title": "three_inside_up_trigger",
    "kind": "Procedure",
-   "summary": "Check if three inside up pattern completed on the current bar. Bearish candle, bullish harami, then bullish close above first candle's open. Confirmed bullish reversal. Reference: https://thepatternsite.com/ThreeInsideUp.html",
+   "summary": "Check if three inside up pattern completed on the current bar. Bearish candle, bullish harami, then bullish close above first candle's open. Confirmed bullish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7238,7 +7238,7 @@
    "id": "procedure:signal-three-white-soldiers-trigger",
    "title": "three_white_soldiers_trigger",
    "kind": "Procedure",
-   "summary": "Check if three white soldiers pattern completed on the current bar. Three consecutive bullish candles with higher closes, each opening within the previous body. Strong bullish signal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
+   "summary": "Check if three white soldiers pattern completed on the current bar. Three consecutive bullish candles with higher closes, each opening within the previous body. Strong bullish signal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7293,7 +7293,7 @@
    "id": "procedure:signal-tweezer-bottoms-trigger",
    "title": "tweezer_bottoms_trigger",
    "kind": "Procedure",
-   "summary": "Check if a tweezer bottoms pattern completed on the current bar. Two consecutive candles with approximately equal lows, first bearish and second bullish. Bullish reversal. Reference: https://thepatternsite.com/TweezersBottom.html",
+   "summary": "Check if a tweezer bottoms pattern completed on the current bar. Two consecutive candles with approximately equal lows, first bearish and second bullish. Bullish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7348,7 +7348,7 @@
    "id": "procedure:signal-tweezer-tops-trigger",
    "title": "tweezer_tops_trigger",
    "kind": "Procedure",
-   "summary": "Check if a tweezer tops pattern completed on the current bar. Two consecutive candles with approximately equal highs, first bullish and second bearish. Bearish reversal. Reference: https://thepatternsite.com/TweezersTop.html",
+   "summary": "Check if a tweezer tops pattern completed on the current bar. Two consecutive candles with approximately equal highs, first bullish and second bearish. Bearish reversal.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7403,7 +7403,7 @@
    "id": "procedure:signal-two-bar-reversal-bearish-trigger",
    "title": "two_bar_reversal_bearish_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bearish two-bar reversal completed on the current bar. Bullish bar followed by bearish bar that takes out the high then closes below the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme. Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/",
+   "summary": "Check if a bearish two-bar reversal completed on the current bar. Bullish bar followed by bearish bar that takes out the high then closes below the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
@@ -7458,7 +7458,7 @@
    "id": "procedure:signal-two-bar-reversal-bullish-trigger",
    "title": "two_bar_reversal_bullish_trigger",
    "kind": "Procedure",
-   "summary": "Check if a bullish two-bar reversal completed on the current bar. Bearish bar followed by bullish bar that takes out the low then closes above the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme. Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/",
+   "summary": "Check if a bullish two-bar reversal completed on the current bar. Bearish bar followed by bullish bar that takes out the low then closes above the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme.",
    "epistemic": "ratified",
    "status": "ratified",
    "props": {
