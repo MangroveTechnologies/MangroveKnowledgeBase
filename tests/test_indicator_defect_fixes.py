@@ -592,3 +592,59 @@ def test_no_indicator_emits_a_boolean_series_except_the_two_held():
 
     assert checked > 50, f"only {checked} indicators exercised -- the sweep is not covering the corpus"
     assert offenders == [], f"boolean outputs still in the indicator layer: {offenders}"
+
+
+# --- duplicate signals are marked, not deleted --------------------------- #
+def test_duplicate_pattern_signals_are_deprecated_not_removed():
+    """`hanging_man_trigger` runs `hammer_trigger`'s arithmetic and `shooting_star_trigger` runs
+    `inverted_hammer_trigger`'s -- each detector calls the other and renames the output. The
+    patterns differ by the prior trend, which the implementation does not encode.
+
+    They are NOT deleted: the names are referenced outside this repository, in MangroveOracle's
+    signals_metadata.json, its strategy cohort files and its experiment outputs. So the duplication
+    is declared instead -- a runtime DeprecationWarning, and in the graph a `deprecated` status plus
+    a `supersedes` edge from the canonical name.
+    """
+    import warnings
+
+    import mangrove_kb.signals  # noqa: F401
+    from mangrove_kb.registry import RuleRegistry
+
+    n = 300
+    rs = np.random.RandomState(3)
+    close = pd.Series(100 + rs.normal(0, 1.5, n).cumsum(), index=_idx(n))
+    open_ = close.shift(1).bfill() + rs.normal(0, 0.5, n)
+    df = pd.DataFrame({
+        "Open": open_,
+        "High": np.maximum(open_, close) + np.abs(rs.normal(0, 0.8, n)),
+        "Low": np.minimum(open_, close) - np.abs(rs.normal(0, 0.8, n)),
+        "Close": close, "Volume": 1000.0}, index=_idx(n))
+
+    pairs = [("hammer_trigger", "hanging_man_trigger", {"wick_ratio": 2.0, "upper_wick_max": 0.1}),
+             ("inverted_hammer_trigger", "shooting_star_trigger",
+              {"wick_ratio": 2.0, "lower_wick_max": 0.1})]
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        for canon, dup, params in pairs:
+            a = [bool(RuleRegistry.evaluate({"name": canon, "params": params}, df.iloc[:t + 1]))
+                 for t in range(1, n)]
+            b = [bool(RuleRegistry.evaluate({"name": dup, "params": params}, df.iloc[:t + 1]))
+                 for t in range(1, n)]
+            assert a == b, f"{dup} is no longer identical to {canon}"
+
+    # Both still registered -- removing them would break the downstream references.
+    for canon, dup, _ in pairs:
+        assert RuleRegistry.has(canon) and RuleRegistry.has(dup)
+
+    # The duplicate warns; the canonical one does not.
+    for canon, dup, params in pairs:
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            RuleRegistry.evaluate({"name": dup, "params": params}, df)
+            assert any(issubclass(w.category, DeprecationWarning) for w in caught), dup
+            assert any(canon in str(w.message) for w in caught), f"{dup} does not name {canon}"
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            RuleRegistry.evaluate({"name": canon, "params": params}, df)
+            assert not [w for w in caught if issubclass(w.category, DeprecationWarning)], canon

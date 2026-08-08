@@ -608,6 +608,15 @@ def _guard_to_warmup(expr):
     return f"{expr} - 1"
 
 
+# A signal that duplicates another announces it in its own docstring, and both the node `status` and
+# the `supersedes` edge are lifted from that one declaration -- so the code stays the single source
+# and the graph cannot drift from it.
+#
+# `deprecated` is not invented: the vendored ontology defines
+# STATUS = {"draft", "ratified", "deprecated"}, and `supersedes` (meta, acyclic) is its relation for
+# "this replaces that".
+_SIG_DEPRECATED = re.compile(r"^\s*DEPRECATED:\s*identical to `(\w+)`", re.M)
+
 _SIG_TYPE = re.compile(r"^\s*Type:\s*(.+)$", re.M)
 _SIG_REQUIRES = re.compile(r"^\s*Requires:\s*(.+)$", re.M)
 _SIG_RETURNS = re.compile(r"Returns:\s*\n\s*bool:\s*(.+)")
@@ -807,9 +816,9 @@ SIGNAL_INPUT_DESC = _signal_input_descriptions()
 
 
 atoms, rels = [], []
-def atom(i, t, k, s, **p):
+def atom(i, t, k, s, status="ratified", **p):
     atoms.append({"id": i, "title": t, "kind": k, "summary": s,
-                  "epistemic": "ratified", "status": "ratified", "props": p})
+                  "epistemic": "ratified", "status": status, "props": p})
 def rel(a, r, b, why, ai, bi, **props):
     """`props` are properties of the RELATIONSHIP, not of either endpoint.
 
@@ -901,7 +910,7 @@ SIGNAL_SCOPE = {
     "two_bar_reversal_bullish_trigger",
 }
 
-signal_no_indicator, signal_unknown_role = [], []
+signal_no_indicator, signal_unknown_role, deprecated_signals = [], [], []
 for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCOPE):
     facts = SIGNAL_FACTS.get(sname)
     if not facts:
@@ -913,9 +922,17 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
     fn = RuleRegistry._registry[sname]
     doc = inspect.getdoc(fn) or ""
     lifted = _signal_lift(sname, fn, facts)
+    dep = _SIG_DEPRECATED.search(doc)
     atom(sid, sname, "Procedure",
-         _signal_summary(doc) or f"Signal `{sname}` -- no description in source.", **lifted)
+         _signal_summary(doc) or f"Signal `{sname}` -- no description in source.",
+         status="deprecated" if dep else "ratified", **lifted)
     rel(sname, "instance-of", "Signal", "entity type", sid, "concept:signal")
+    if dep:
+        # The canonical signal supersedes the duplicate. Emitted from the DUPLICATE's docstring so
+        # one declaration produces both the status and the edge; recorded on the replacement's side
+        # because `supersedes` reads "newer replaces older".
+        canon = dep.group(1)
+        deprecated_signals.append((canon, sname))
 
     m = _SIG_TYPE.search(doc)
     role = m.group(1).strip().lower() if m else None
@@ -951,6 +968,19 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
             sid, f"procedure:indicator-{ind.lower()}", inputs=edge_inputs)
     if not known:
         signal_no_indicator.append(sname)
+
+# `supersedes` edges for the duplicate signals. Emitted after the loop so both endpoints exist --
+# a replacement may be declared before or after the signal that names it.
+_sig_ids = {a["title"]: a["id"] for a in atoms if a["id"].startswith("procedure:signal-")}
+for canon, dup in deprecated_signals:
+    if canon not in _sig_ids:
+        # The replacement is out of scope, so the edge would dangle. Report rather than drop.
+        print(f"NOTE {dup} is deprecated in favour of {canon}, which is not in SIGNAL_SCOPE -- "
+              f"no supersedes edge emitted", file=sys.stderr)
+        continue
+    rel(canon, "supersedes", dup, "computes the same thing under the canonical name",
+        _sig_ids[canon], _sig_ids[dup])
+
 
 # --- carry forward authored values. Authored values live in the nodes, and this builder is the
 # thing that rewrites the nodes -- so every run must preserve what was authored into the last one,

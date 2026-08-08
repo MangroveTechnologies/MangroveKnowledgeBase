@@ -21,6 +21,7 @@ Detection logic references: see findings/chart-patterns-plan.md Section 5.
 """
 
 import logging
+import warnings
 
 import pandas as pd
 
@@ -190,6 +191,12 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Small body at lower end with long upper wick and minimal lower wick.
     Bearish reversal after uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
 
+
+    DEPRECATED: identical to `inverted_hammer_trigger`. `_shooting_star` calls `_inverted_hammer`
+    and renames the output, so the two fire on exactly the same bars -- verified identical across
+    499 bars. The distinction is the prior trend, which this implementation does not encode. Kept
+    because the name is referenced outside this repository. Use `inverted_hammer_trigger`.
+
     Type: TRIGGER
     Requires: Open, High, Low, Close
 
@@ -201,6 +208,10 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Returns:
         bool: True if shooting star detected on current bar, False otherwise.
     """
+    warnings.warn(
+        "shooting_star_trigger is deprecated: it computes exactly what inverted_hammer_trigger computes. "
+        "Use inverted_hammer_trigger.",
+        DeprecationWarning, stacklevel=3)
     if len(df) < 1:
         return False
     result = _shooting_star(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, lower_wick_max=lower_wick_max)
@@ -216,6 +227,13 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Same shape as hammer (small body, long lower wick) but interpreted as a
     bearish reversal when appearing after an uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
 
+
+    DEPRECATED: identical to `hammer_trigger`. `_hanging_man` calls `_hammer` and renames the
+    output, so the two fire on exactly the same bars -- verified identical across 499 bars. A
+    hanging man IS a hammer; what distinguishes them is the prior trend, which this implementation
+    does not encode. Kept because the name is referenced outside this repository (MangroveOracle's
+    signals_metadata.json, strategy cohort files, experiment outputs). Use `hammer_trigger`.
+
     Type: TRIGGER
     Requires: Open, High, Low, Close
 
@@ -227,6 +245,10 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Returns:
         bool: True if hanging man detected on current bar, False otherwise.
     """
+    warnings.warn(
+        "hanging_man_trigger is deprecated: it computes exactly what hammer_trigger computes. "
+        "Use hammer_trigger.",
+        DeprecationWarning, stacklevel=3)
     if len(df) < 1:
         return False
     result = _hanging_man(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, upper_wick_max=upper_wick_max)

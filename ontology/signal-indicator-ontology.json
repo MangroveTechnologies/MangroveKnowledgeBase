@@ -6223,9 +6223,9 @@
    "id": "procedure:signal-hanging-man-trigger",
    "title": "hanging_man_trigger",
    "kind": "Procedure",
-   "summary": "Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body, long lower wick) but interpreted as a bearish reversal when appearing after an uptrend.",
+   "summary": "Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body, long lower wick) but interpreted as a bearish reversal when appearing after an uptrend. DEPRECATED: identical to `hammer_trigger`. `_hanging_man` calls `_hammer` and renames the output, so the two fire on exactly the same bars -- verified identical across 499 bars. A hanging man IS a hammer; what distinguishes them is the prior trend, which this implementation does not encode. Kept because the name is referenced outside this repository (MangroveOracle's signals_metadata.json, strategy cohort files, experiment outputs). Use `hammer_trigger`.",
    "epistemic": "ratified",
-   "status": "ratified",
+   "status": "deprecated",
    "props": {
     "source_module": "patterns",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
@@ -6926,9 +6926,9 @@
    "id": "procedure:signal-shooting-star-trigger",
    "title": "shooting_star_trigger",
    "kind": "Procedure",
-   "summary": "Check if a shooting star shape is detected on the current bar. Small body at lower end with long upper wick and minimal lower wick. Bearish reversal after uptrend.",
+   "summary": "Check if a shooting star shape is detected on the current bar. Small body at lower end with long upper wick and minimal lower wick. Bearish reversal after uptrend. DEPRECATED: identical to `inverted_hammer_trigger`. `_shooting_star` calls `_inverted_hammer` and renames the output, so the two fire on exactly the same bars -- verified identical across 499 bars. The distinction is the prior trend, which this implementation does not encode. Kept because the name is referenced outside this repository. Use `inverted_hammer_trigger`.",
    "epistemic": "ratified",
-   "status": "ratified",
+   "status": "deprecated",
    "props": {
     "source_module": "patterns",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
@@ -9656,6 +9656,22 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "hammer_trigger",
+   "rel": "supersedes",
+   "to": "hanging_man_trigger",
+   "why": "computes the same thing under the canonical name",
+   "from_id": "procedure:signal-hammer-trigger",
+   "to_id": "procedure:signal-hanging-man-trigger"
+  },
+  {
+   "from": "inverted_hammer_trigger",
+   "rel": "supersedes",
+   "to": "shooting_star_trigger",
+   "why": "computes the same thing under the canonical name",
+   "from_id": "procedure:signal-inverted-hammer-trigger",
+   "to_id": "procedure:signal-shooting-star-trigger"
   }
  ],
  "meta": {
