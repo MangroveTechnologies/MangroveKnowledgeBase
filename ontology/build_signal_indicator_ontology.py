@@ -905,9 +905,16 @@ from mangrove_kb.registry import RuleRegistry  # noqa: E402
 # `None` means every registered signal. Widen by adding names, or set to None when the shape is
 # settled for all of them.
 SIGNAL_SCOPE = {
-    # Bollinger -- the worked example that settled the shape.
-    "bb_upper_breakout", "bb_lower_breakout", "bb_squeeze",
-    "bb_above_upper", "bb_below_lower",
+    # Volatility -- the five Bollinger signals were the worked example that settled the
+    # node shape; the rest of the module follows.
+    "atr_high_volatility", "atr_trailing_stop_flip_down", "atr_trailing_stop_flip_up",
+    "atr_trailing_stop_long", "atr_trailing_stop_short", "bb_above_upper",
+    "bb_below_lower", "bb_lower_breakout", "bb_squeeze",
+    "bb_upper_breakout", "dc_lower_breakout", "dc_upper_breakout",
+    "kc_above_upper", "kc_below_lower", "kc_lower_breakout",
+    "kc_upper_breakout", "natr_high_volatility", "natr_low_volatility",
+    "starc_lower_breakout", "starc_upper_breakout", "ulcer_high_risk",
+    "ulcer_low_risk", "volatility_stop_lower", "volatility_stop_upper",
     # Chart patterns.
     "bearish_engulfing_trigger", "bearish_harami_trigger", "bearish_pattern_recent",
     "bearish_pin_bar_trigger", "bullish_engulfing_trigger", "bullish_harami_trigger",

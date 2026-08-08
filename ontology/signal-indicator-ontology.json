@@ -5105,6 +5105,296 @@
    }
   },
   {
+   "id": "procedure:signal-atr-high-volatility",
+   "title": "atr_high_volatility",
+   "kind": "Procedure",
+   "summary": "Check if ATR indicates high volatility relative to price. High volatility (ATR as % of close > threshold) can indicate potential trading opportunities or increased risk.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-true-range-atr",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'atr_high_volatility', 'params': {'window': value, 'threshold_pct': value}}, df)",
+    "formula": "atr[t] / close[t] * 100 > threshold_pct -- ATR normalised by price here rather than read raw, so the threshold is comparable across instruments. False when close is zero.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "ATR period"
+     },
+     "threshold_pct": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": 10.0,
+      "description": "ATR as percentage of close threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ATR% > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-atr-trailing-stop-flip-down",
+   "title": "atr_trailing_stop_flip_down",
+   "kind": "Procedure",
+   "summary": "Detect ATR Trailing Stop flipping from long (+1) to short (-1). Bearish trend-following entry signal.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/atr-trailing-stops",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'atr_trailing_stop_flip_down', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "direction[t-1] == +1 and direction[t] == -1 -- the bar the latch flips",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 100,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if direction flipped from +1 to -1 on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-atr-trailing-stop-flip-up",
+   "title": "atr_trailing_stop_flip_up",
+   "kind": "Procedure",
+   "summary": "Detect ATR Trailing Stop flipping from short (-1) to long (+1). Bullish trend-following entry signal.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/atr-trailing-stops",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'atr_trailing_stop_flip_up', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "direction[t-1] == -1 and direction[t] == +1 -- the bar the latch flips",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 100,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if direction flipped from -1 to +1 on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-atr-trailing-stop-long",
+   "title": "atr_trailing_stop_long",
+   "kind": "Procedure",
+   "summary": "Check if ATR Trailing Stop is in the long regime (+1 direction).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/atr-trailing-stops",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'atr_trailing_stop_long', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "direction[t] == +1, where direction is a LATCHED state: the stop ratchets in the trend's favour and flips only when price closes through it, so this bar's value depends on every bar before it rather than on a comparison at t",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 100,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier for stop distance"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if trailing stop is in long regime, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-atr-trailing-stop-short",
+   "title": "atr_trailing_stop_short",
+   "kind": "Procedure",
+   "summary": "Check if ATR Trailing Stop is in the short regime (-1 direction).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/atr-trailing-stops",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'atr_trailing_stop_short', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "direction[t] == -1, where direction is the same latched state as atr_trailing_stop_long",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 100,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier for stop distance"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if trailing stop is in short regime, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-bb-above-upper",
    "title": "bb_above_upper",
    "kind": "Procedure",
@@ -5924,6 +6214,108 @@
    }
   },
   {
+   "id": "procedure:signal-dc-lower-breakout",
+   "title": "dc_lower_breakout",
+   "kind": "Procedure",
+   "summary": "Detect price breaking below lower Donchian Channel (new low). Fires on the bar where close drops below the prior period's lower band. The channel is computed from the N bars BEFORE the current bar so the current bar's low doesn't deflate the band it's compared against -- that is the Donchian convention and the indicator's own behaviour.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/price-channels",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'dc_lower_breakout', 'params': {'window': value}}, df)",
+    "formula": "close[t-1] >= lband[t-1] and close[t] < lband[t] -- the channel spans the bars PRECEDING each bar (include_current_bar=False)",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Lookback period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where close breaks below the prior lower band"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-dc-upper-breakout",
+   "title": "dc_upper_breakout",
+   "kind": "Procedure",
+   "summary": "Detect price breaking above upper Donchian Channel (new high). Fires on the bar where close exceeds the prior period's upper band. The channel is computed from the N bars BEFORE the current bar so the current bar's high doesn't inflate the band it's compared against -- that is the Donchian convention and the indicator's own behaviour.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/price-channels",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'dc_upper_breakout', 'params': {'window': value}}, df)",
+    "formula": "close[t-1] <= hband[t-1] and close[t] > hband[t] -- the channel spans the bars PRECEDING each bar (include_current_bar=False), which is what makes a break possible at all",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Lookback period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where close breaks above the prior upper band"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-doji-trigger",
    "title": "doji_trigger",
    "kind": "Procedure",
@@ -6438,6 +6830,280 @@
    }
   },
   {
+   "id": "procedure:signal-kc-above-upper",
+   "title": "kc_above_upper",
+   "kind": "Procedure",
+   "summary": "Check if price is currently above the upper Keltner Channel band. A state, not an event: true for every bar close sits above the band.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels",
+    "warmup_bars": "max(window, window_atr) - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kc_above_upper', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
+    "formula": "close[t] > hband[t] -- a STATE: true for every bar close sits above the band, unlike kc_upper_breakout which fires only on the bar that crosses it",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "EMA period for the center band"
+     },
+     "window_atr": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 30,
+      "description": "ATR period"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": 5.0,
+      "description": "ATR multiplier for band width"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > upper band on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kc-below-lower",
+   "title": "kc_below_lower",
+   "kind": "Procedure",
+   "summary": "Check if price is currently below the lower Keltner Channel band. A state, not an event: true for every bar close sits below the band.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels",
+    "warmup_bars": "max(window, window_atr) - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kc_below_lower', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
+    "formula": "close[t] < lband[t] -- a STATE: true for every bar close sits below the band, unlike kc_lower_breakout which fires only on the bar that crosses it",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "EMA period for the center band"
+     },
+     "window_atr": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 30,
+      "description": "ATR period"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": 5.0,
+      "description": "ATR multiplier for band width"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close < lower band on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kc-lower-breakout",
+   "title": "kc_lower_breakout",
+   "kind": "Procedure",
+   "summary": "Detect price breaking below lower Keltner Channel band. Fires on the bar where price crosses below the lower band.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels",
+    "warmup_bars": "max(window, window_atr)",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kc_lower_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value, 'original_version': value}}, df)",
+    "formula": "close[t-1] >= lband[t-1] and close[t] < lband[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "EMA period"
+     },
+     "window_atr": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 30,
+      "description": "ATR period"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier for band width"
+     },
+     "original_version": {
+      "type": "bool",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Use original Keltner Channel formula instead of EMA+ATR"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where close crosses below lower band"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kc-upper-breakout",
+   "title": "kc_upper_breakout",
+   "kind": "Procedure",
+   "summary": "Detect price breaking above upper Keltner Channel band. Fires on the bar where price crosses above the upper band.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels",
+    "warmup_bars": "max(window, window_atr)",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kc_upper_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value, 'original_version': value}}, df)",
+    "formula": "close[t-1] <= hband[t-1] and close[t] > hband[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "EMA period"
+     },
+     "window_atr": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 30,
+      "description": "ATR period"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier for band width"
+     },
+     "original_version": {
+      "type": "bool",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Use original Keltner Channel formula instead of EMA+ATR"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where close crosses above upper band"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-long-legged-doji-trigger",
    "title": "long_legged_doji_trigger",
    "kind": "Procedure",
@@ -6660,6 +7326,122 @@
       ],
       "canonical_name": "none",
       "description": "True if morning star detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-natr-high-volatility",
+   "title": "natr_high_volatility",
+   "kind": "Procedure",
+   "summary": "Check if normalized ATR is above a high-volatility threshold. NATR = 100 * ATR / close, so the threshold is a percentage. Values above ~2-3% typically indicate elevated volatility in equities; crypto markets can run 4-6%+ routinely.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/volatility_indicators.html",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'natr_high_volatility', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "natr[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 100,
+      "description": "NATR window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "High volatility threshold as percentage"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if NATR > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-natr-low-volatility",
+   "title": "natr_low_volatility",
+   "kind": "Procedure",
+   "summary": "Check if normalized ATR is below a low-volatility threshold. Useful as a squeeze / consolidation filter.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/volatility_indicators.html",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'natr_low_volatility', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "natr[t] < threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 100,
+      "description": "NATR window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 1.0,
+      "min": 0.1,
+      "max": null,
+      "description": "Low volatility threshold as percentage"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if NATR < threshold, False otherwise"
      }
     }
    }
@@ -7042,6 +7824,136 @@
       ],
       "canonical_name": "none",
       "description": "True if spinning top detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-starc-lower-breakout",
+   "title": "starc_lower_breakout",
+   "kind": "Procedure",
+   "summary": "Check if close is below the STARC lower band (breakdown).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "max(window, window_atr)",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'starc_lower_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
+    "formula": "close[t] < starc_lband[t] -- a STATE despite the name: true for every bar close sits below the band",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "SMA window"
+     },
+     "window_atr": {
+      "type": "int",
+      "default": 15,
+      "min": 5,
+      "max": 100,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier for band width"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close < lower band, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-starc-upper-breakout",
+   "title": "starc_upper_breakout",
+   "kind": "Procedure",
+   "summary": "Check if close is above the STARC upper band (breakout).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "max(window, window_atr)",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'starc_upper_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
+    "formula": "close[t] > starc_hband[t] -- a STATE despite the name: true for every bar close sits above the band, not only the bar that crosses it",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "SMA window"
+     },
+     "window_atr": {
+      "type": "int",
+      "default": 15,
+      "min": 5,
+      "max": 100,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier for band width"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > upper band, False otherwise"
      }
     }
    }
@@ -7505,6 +8417,206 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish two-bar reversal detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ulcer-high-risk",
+   "title": "ulcer_high_risk",
+   "kind": "Procedure",
+   "summary": "Check if Ulcer Index indicates high downside risk. Higher Ulcer Index values indicate greater downside volatility.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ulcer_high_risk', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "ulcer_index[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 10.0,
+      "min": 5.0,
+      "max": 30.0,
+      "description": "High risk threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Ulcer Index > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ulcer-low-risk",
+   "title": "ulcer_low_risk",
+   "kind": "Procedure",
+   "summary": "Check if Ulcer Index indicates low downside risk. Lower Ulcer Index values indicate lower downside volatility.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ulcer_low_risk', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "ulcer_index[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 5.0,
+      "min": 1.0,
+      "max": 15.0,
+      "description": "Low risk threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Ulcer Index < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-volatility-stop-lower",
+   "title": "volatility_stop_lower",
+   "kind": "Procedure",
+   "summary": "Check if close has reached or fallen below the stdev-based volatility lower stop.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'volatility_stop_lower', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t] <= vstop_lband[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling stdev window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "Stdev multiplier for stop distance"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close <= lower volatility stop, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-volatility-stop-upper",
+   "title": "volatility_stop_upper",
+   "kind": "Procedure",
+   "summary": "Check if close has reached or exceeded the stdev-based volatility upper stop. Indicates the price has moved multiplier standard deviations above the current bar -- a potential exhaustion / mean-reversion signal.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'volatility_stop_upper', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t] >= vstop_hband[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling stdev window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "Stdev multiplier for stop distance"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close >= upper volatility stop, False otherwise"
      }
     }
    }
@@ -8136,6 +9248,99 @@
    "to_id": "concept:indicator-class-oscillator"
   },
   {
+   "from": "atr_high_volatility",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-atr-high-volatility",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "atr_high_volatility",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-atr-high-volatility",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "atr_high_volatility",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-atr-high-volatility",
+   "to_id": "procedure:indicator-atr",
+   "inputs": {
+    "atr": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "atr_trailing_stop_flip_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-atr-trailing-stop-flip-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "atr_trailing_stop_flip_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-atr-trailing-stop-flip-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "atr_trailing_stop_flip_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-atr-trailing-stop-flip-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "atr_trailing_stop_flip_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-atr-trailing-stop-flip-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "atr_trailing_stop_long",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-atr-trailing-stop-long",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "atr_trailing_stop_long",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-atr-trailing-stop-long",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "atr_trailing_stop_short",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-atr-trailing-stop-short",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "atr_trailing_stop_short",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-atr-trailing-stop-short",
+   "to_id": "property:role-filter"
+  },
+  {
    "from": "bb_above_upper",
    "rel": "instance-of",
    "to": "Signal",
@@ -8673,6 +9878,64 @@
    "to_id": "property:role-trigger"
   },
   {
+   "from": "dc_lower_breakout",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-dc-lower-breakout",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "dc_lower_breakout",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-dc-lower-breakout",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "dc_lower_breakout",
+   "rel": "uses",
+   "to": "DonchianChannel",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-dc-lower-breakout",
+   "to_id": "procedure:indicator-donchianchannel",
+   "inputs": {
+    "lband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "dc_upper_breakout",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-dc-upper-breakout",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "dc_upper_breakout",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-dc-upper-breakout",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "dc_upper_breakout",
+   "rel": "uses",
+   "to": "DonchianChannel",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-dc-upper-breakout",
+   "to_id": "procedure:indicator-donchianchannel",
+   "inputs": {
+    "hband": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "doji_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -9004,6 +10267,122 @@
    }
   },
   {
+   "from": "kc_above_upper",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kc-above-upper",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kc_above_upper",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-kc-above-upper",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "kc_above_upper",
+   "rel": "uses",
+   "to": "KeltnerChannel",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kc-above-upper",
+   "to_id": "procedure:indicator-keltnerchannel",
+   "inputs": {
+    "hband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kc_below_lower",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kc-below-lower",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kc_below_lower",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-kc-below-lower",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "kc_below_lower",
+   "rel": "uses",
+   "to": "KeltnerChannel",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kc-below-lower",
+   "to_id": "procedure:indicator-keltnerchannel",
+   "inputs": {
+    "lband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kc_lower_breakout",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kc-lower-breakout",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kc_lower_breakout",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kc-lower-breakout",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kc_lower_breakout",
+   "rel": "uses",
+   "to": "KeltnerChannel",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kc-lower-breakout",
+   "to_id": "procedure:indicator-keltnerchannel",
+   "inputs": {
+    "lband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kc_upper_breakout",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kc-upper-breakout",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kc_upper_breakout",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kc-upper-breakout",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kc_upper_breakout",
+   "rel": "uses",
+   "to": "KeltnerChannel",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kc-upper-breakout",
+   "to_id": "procedure:indicator-keltnerchannel",
+   "inputs": {
+    "hband": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "long_legged_doji_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -9145,6 +10524,64 @@
      "type": "series"
     },
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "natr_high_volatility",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-natr-high-volatility",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "natr_high_volatility",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-natr-high-volatility",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "natr_high_volatility",
+   "rel": "uses",
+   "to": "NATR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-natr-high-volatility",
+   "to_id": "procedure:indicator-natr",
+   "inputs": {
+    "natr": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "natr_low_volatility",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-natr-low-volatility",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "natr_low_volatility",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-natr-low-volatility",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "natr_low_volatility",
+   "rel": "uses",
+   "to": "NATR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-natr-low-volatility",
+   "to_id": "procedure:indicator-natr",
+   "inputs": {
+    "natr": {
      "type": "series"
     }
    }
@@ -9408,6 +10845,64 @@
    }
   },
   {
+   "from": "starc_lower_breakout",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-starc-lower-breakout",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "starc_lower_breakout",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-starc-lower-breakout",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "starc_lower_breakout",
+   "rel": "uses",
+   "to": "STARCBands",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-starc-lower-breakout",
+   "to_id": "procedure:indicator-starcbands",
+   "inputs": {
+    "starc_lband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "starc_upper_breakout",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-starc-upper-breakout",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "starc_upper_breakout",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-starc-upper-breakout",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "starc_upper_breakout",
+   "rel": "uses",
+   "to": "STARCBands",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-starc-upper-breakout",
+   "to_id": "procedure:indicator-starcbands",
+   "inputs": {
+    "starc_hband": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "strong_body_recent",
    "rel": "instance-of",
    "to": "Signal",
@@ -9656,6 +11151,96 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ulcer_high_risk",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ulcer-high-risk",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ulcer_high_risk",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ulcer-high-risk",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ulcer_high_risk",
+   "rel": "uses",
+   "to": "UlcerIndex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ulcer-high-risk",
+   "to_id": "procedure:indicator-ulcerindex",
+   "inputs": {
+    "ulcer_index": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ulcer_low_risk",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ulcer-low-risk",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ulcer_low_risk",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ulcer-low-risk",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ulcer_low_risk",
+   "rel": "uses",
+   "to": "UlcerIndex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ulcer-low-risk",
+   "to_id": "procedure:indicator-ulcerindex",
+   "inputs": {
+    "ulcer_index": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "volatility_stop_lower",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-volatility-stop-lower",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "volatility_stop_lower",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-volatility-stop-lower",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "volatility_stop_upper",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-volatility-stop-upper",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "volatility_stop_upper",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-volatility-stop-upper",
+   "to_id": "property:role-filter"
   },
   {
    "from": "hammer_trigger",
@@ -9685,18 +11270,24 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 791,
+  "carried_forward_from_previous_build": 825,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 45,
+  "signals": 64,
   "signals_registered": 247,
-  "signals_out_of_scope": 202,
+  "signals_out_of_scope": 183,
   "signals_with_no_indicator": [
+   "atr_trailing_stop_flip_down",
+   "atr_trailing_stop_flip_up",
+   "atr_trailing_stop_long",
+   "atr_trailing_stop_short",
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",
    "three_inside_down_trigger",
-   "three_inside_up_trigger"
+   "three_inside_up_trigger",
+   "volatility_stop_lower",
+   "volatility_stop_upper"
   ],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],

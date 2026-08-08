@@ -133,6 +133,44 @@ replacement. Do not delete the signal without checking who reads the name outsid
 `hanging_man_trigger` and `shooting_star_trigger` are referenced by MangroveOracle's
 `signals_metadata.json`, its strategy cohort files and its experiment outputs.
 
+## Caveats learned the hard way
+
+**A `null` in a slot is not always a hole.** `max: null` on a parameter means *unbounded above* --
+`wick_ratio` has a minimum of 1.5 and no maximum, and that is authored, not missing. Same inside a
+range: `range: [0, null]` means bounded below at zero and unbounded above, which is how the
+convention says to write it. Only a *bare* null means unauthored. Counting every null as a gap
+produces an inflated number and a false picture of how much work is left.
+
+**Author into the node. Never anywhere else.** The values go in
+`ontology/signal-indicator-ontology.json`, by hand, on the node under discussion. Not a sidecar
+file, not a data module, not a script that generates them, not a new key invented to hold them.
+Invoking this skill loads instructions; it does not run a program. Reaching for `Write` while
+authoring is the tell that something has gone wrong.
+
+**One fact in one place.** If the `uses` edge already says which indicator a signal reads, the node
+does not also carry it. If `reference` holds the URL, the summary must not repeat it. Both of those
+shipped and both had to be undone. Before adding a field, check whether an edge or an existing field
+already says it.
+
+**A signal with no `uses` edge has no class, and that is a finding, not a failure.** Signals built on
+the five excluded stateful policy rules (`SuperTrend`, `PSAR`, `ChandelierExit`, `ATRTrailingStop`,
+`VolatilityStop`) genuinely have no indicator in the ontology to inherit from. The build reports them
+under `signals_with_no_indicator`. Report the list; do not invent an edge to make it go away, and do
+not test indicator membership against every importable class -- that produced 15 edges pointing at
+nodes which do not exist.
+
+**Check the disposition of what the docstring already claims.** Docstrings carry `Type:`,
+`Requires:`, references and sometimes a citation scheme. Before authoring around them, confirm they
+are accurate: the pattern docstrings cited ten bracket keys against a legend defining three, so
+nothing resolved and `reference` could not be lifted at all. Fixing the source beat teaching the
+builder to parse a broken scheme.
+
+**Never cite a URL you have not fetched.** Not "it looks right", not "that is the usual pattern for
+this site". `TweezerTops.html` is really `TweezersTop.html`, `InsideDay.html` is really
+`InsideDays.html`, and `candles.html` does not exist -- three dead links that a plausibility check
+would have shipped. And before hunting for a new source, resolve the citation the docstring already
+has: the last four pattern references came from working out that `[TSR]` meant Trading Setups Review.
+
 ## Verify before finishing
 
 1. `python3 ontology/build_signal_indicator_ontology.py > /tmp/check.json` and diff against the
