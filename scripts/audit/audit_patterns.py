@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """OBSOLETE -- will not import: the 27 pattern indicator classes it depends on were
 removed, and pattern detection now lives as private detectors in
-`mangrove_kb.signals.patterns`; this needs rewriting against the signals.
+`mangrove_kb.signals.pattern`; this needs rewriting against the signals.
 
 Audit pattern indicators using synthetic OHLC tests and BTC daily data.
 
@@ -715,7 +715,7 @@ PATTERN_TESTS = {
     "NarrowRange": test_narrow_range,
 }
 
-# Default params for BTC run (same as used in signals/patterns.py)
+# Default params for BTC run (same as used in signals/pattern.py)
 BTC_PARAMS = {
     "Doji": {"body_threshold": 0.1},
     "LongLeggedDoji": {"body_threshold": 0.1, "wick_threshold": 0.3},

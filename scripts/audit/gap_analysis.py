@@ -67,7 +67,7 @@ def get_our_indicators() -> dict[str, list[str]]:
 
 def get_our_signals() -> dict[str, list[str]]:
     """Return dict of category -> list of signal function names."""
-    from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
+    from mangrove_kb.signals import momentum, trend, volume, volatility, pattern, oscillator, averaging
 
     categorized: dict[str, list[str]] = {
         "Momentum": [],

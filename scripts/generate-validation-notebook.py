@@ -65,7 +65,7 @@ from datetime import datetime
 
 from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.docstring_parser import parse_all_signals
-from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.signals import momentum, trend, volume, volatility, pattern, oscillator, averaging
 
 # Parse all signals
 SIGNAL_MODULES = [momentum, trend, volume, volatility, patterns]

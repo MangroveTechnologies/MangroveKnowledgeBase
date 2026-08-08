@@ -349,7 +349,7 @@ def _signal_param_docs():
     import ast
     from mangrove_kb.registry import RuleRegistry
     import mangrove_kb.signals.momentum, mangrove_kb.signals.trend, mangrove_kb.signals.volume  # noqa
-    import mangrove_kb.signals.volatility, mangrove_kb.signals.patterns                          # noqa
+    import mangrove_kb.signals.volatility, mangrove_kb.signals.pattern                           # noqa
 
     kbs = pathlib.Path(inspect.getfile(mangrove_kb.signals.trend)).parent
     out = {}
@@ -587,7 +587,7 @@ def _load_classes():
 # the same rule that makes an indicator's class its `instance-of` edge rather than a property.
 # =============================================================================
 
-def _guard_to_warmup(expr):
+def _guard_to_warmup(expr, strict=True):
     """Convert a `len(df) < EXPR` guard into `warmup_bars`, which is a DIFFERENT quantity.
 
     The guard is the minimum frame length the signal needs. `warmup_bars` -- established by the
@@ -599,9 +599,17 @@ def _guard_to_warmup(expr):
     that is obvious once the numbers are right: a state signal inherits its indicator's warmup
     unchanged, and a crossing costs exactly one bar more.
 
+    `strict` is whether the guard used `<` or `<=`, and it changes the answer by one:
+    `len(df) < N` needs N bars and so discards N-1, while `len(df) <= N` needs N+1 and discards N.
+    Assuming `<` everywhere published mom_cross_up as `window` when its guard is
+    `len(closes) <= window + 1`, i.e. `window + 1`.
+
     Folds the common `X + 1` case so the result reads as a bound rather than as arithmetic.
     """
     import ast
+
+    if not strict:
+        return expr
 
     try:
         node = ast.parse(expr, mode="eval").body
@@ -711,7 +719,9 @@ def _signal_facts():
                     c = nd.test
                     if (isinstance(c.left, ast.Call) and getattr(c.left.func, "id", None) == "len"
                             and c.comparators):
-                        guards.append(ast.unparse(c.comparators[0]))
+                        # `<` and `<=` mean different warmups -- see _guard_to_warmup
+                        guards.append((ast.unparse(c.comparators[0]),
+                                       isinstance(c.ops[0], ast.Lt)))
             for nd in ast.walk(fn):
                 if (isinstance(nd, ast.Subscript) and isinstance(nd.value, ast.Name)
                         and nd.value.id in assigned):
@@ -744,7 +754,7 @@ def _signal_facts():
                         "consumes": {k: sorted(v) for k, v in sorted(consumes.items())},
                         # Only when unambiguous. Several guards with different expressions means the
                         # minimum is a judgement rather than a reading, so it goes to the queue.
-                        "warmup_bars": (_guard_to_warmup(guards[0])
+                        "warmup_bars": (_guard_to_warmup(*guards[0])
                                         if len(set(guards)) == 1 else None),
                         "module": path.stem,
                     }

@@ -12,7 +12,7 @@ Usage:
 import pytest
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals import patterns as pattern_signals
+from mangrove_kb.signals import pattern as pattern_signals
 from mangrove_kb.docstring_parser import (
     parse_signal_docstring,
     parse_all_signals,

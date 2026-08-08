@@ -11,8 +11,15 @@ class TestSignalServiceMetadata:
         assert len(signals) == 247
 
     def test_list_signals_filter_by_category(self):
-        momentum = self.service.list_signals(category="Momentum")
-        assert len(momentum) == 42
+        """Categories follow the file layout, and the files follow the ontology class. Momentum was
+        42 when one file held three classes: the bounded oscillators (RSI, Stochastic, StochRSI,
+        Williams %R, CMO, TSI, BOP, Ultimate Oscillator) are `oscillator` and the KAMA crossings are
+        `averaging`. Only 18 of the 42 measure rate of change."""
+        assert len(self.service.list_signals(category="Momentum")) == 18
+        assert len(self.service.list_signals(category="Oscillator")) == 22
+        assert len(self.service.list_signals(category="Averaging")) == 2
+        assert len(self.service.list_signals(category="Pattern")) == 40
+        assert len(self.service.list_signals(category="Volatility")) == 24
 
     def test_list_signals_filter_by_type(self):
         triggers = self.service.list_signals(signal_type="TRIGGER")

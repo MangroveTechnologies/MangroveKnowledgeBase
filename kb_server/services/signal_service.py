@@ -8,19 +8,25 @@ import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.docstring_parser import parse_all_signals
-from mangrove_kb.signals import momentum, trend, volume, volatility, patterns, onchain, defi_pro
+from mangrove_kb.signals import (momentum, trend, volume, volatility, pattern, oscillator,
+                                 averaging, onchain, defi_pro)
 
+# Files reorganised onto the ontology class are named for that class; the rest keep their old
+# use-case names until they are reorganised too.
 _MODULE_CATEGORY = {
+    "oscillator": "Oscillator",
     "momentum": "Momentum",
+    "averaging": "Averaging",
+    "volatility": "Volatility",
+    "pattern": "Pattern",
     "trend": "Trend",
     "volume": "Volume",
-    "volatility": "Volatility",
-    "patterns": "Patterns",
     "onchain": "On-Chain",
     "defi_pro": "DeFi Pro",
 }
 
-_SIGNAL_MODULES = [momentum, trend, volume, volatility, patterns, onchain, defi_pro]
+_SIGNAL_MODULES = [momentum, trend, volume, volatility, pattern, oscillator, averaging,
+                   onchain, defi_pro]
 
 
 class SignalService:

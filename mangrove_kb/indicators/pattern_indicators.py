@@ -7,11 +7,11 @@ before it.
 This module used to hold 27 pattern-detection classes as well. They emitted a
 decision (0/1, or -1/0/+1) rather than a measurement, which put a boolean-valued
 output in the indicator layer and left the ontology unable to say what they
-were. They now live as private detectors in `mangrove_kb.signals.patterns`,
+were. They now live as private detectors in `mangrove_kb.signals.pattern`,
 where a boolean answer is the contract, and they compute from the two indicators
 here rather than from raw comparisons.
 
-Each pattern signal in `mangrove_kb.signals.patterns` carries a `Reference:` URL in its own
+Each pattern signal in `mangrove_kb.signals.pattern` carries a `Reference:` URL in its own
 docstring, which the ontology builder lifts. The bracket-key scheme this block used to define was
 replaced: it named ten distinct keys across the signal docstrings and defined three of them, so
 seven cited a source nothing in the repository identified, and nothing could be lifted.

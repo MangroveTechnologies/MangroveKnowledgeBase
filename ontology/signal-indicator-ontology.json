@@ -5610,7 +5610,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -5649,7 +5649,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -5688,7 +5688,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -5743,7 +5743,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -5805,7 +5805,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -5852,7 +5852,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -5899,7 +5899,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -5946,7 +5946,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -5993,7 +5993,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -6032,7 +6032,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -6071,7 +6071,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -6126,7 +6126,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -6188,7 +6188,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": null,
     "warmup_bars": "window + 1",
     "abbreviation": null,
@@ -6238,7 +6238,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": null,
     "warmup_bars": "window + 1",
     "abbreviation": null,
@@ -6288,7 +6288,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": null,
     "warmup_bars": "window",
     "abbreviation": null,
@@ -6338,7 +6338,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": null,
     "warmup_bars": "window",
     "abbreviation": null,
@@ -6388,7 +6388,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -6443,7 +6443,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -6498,7 +6498,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -6662,7 +6662,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -6717,7 +6717,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -6779,7 +6779,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -6834,7 +6834,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -6896,7 +6896,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -6958,7 +6958,7 @@
    "epistemic": "observed",
    "status": "deprecated",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -7020,7 +7020,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "6",
     "abbreviation": null,
@@ -7075,7 +7075,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://thepatternsite.com/InsideDays.html",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -7114,7 +7114,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -7176,7 +7176,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama",
     "warmup_bars": "window + max(pow1, pow2) - 1",
     "abbreviation": null,
@@ -7233,7 +7233,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama",
     "warmup_bars": "window + max(pow1, pow2) - 1",
     "abbreviation": null,
@@ -7564,7 +7564,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -7826,7 +7826,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -7881,7 +7881,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -7938,7 +7938,7 @@
    "props": {
     "source_module": "momentum",
     "reference": null,
-    "warmup_bars": "window - 1",
+    "warmup_bars": "window",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_bearish', 'params': {'window': value}}, df)",
     "formula": "mom[t] < 0",
@@ -7981,7 +7981,7 @@
    "props": {
     "source_module": "momentum",
     "reference": null,
-    "warmup_bars": "window - 1",
+    "warmup_bars": "window",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_bullish', 'params': {'window': value}}, df)",
     "formula": "mom[t] > 0",
@@ -8108,7 +8108,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -8279,7 +8279,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://thepatternsite.com/nr7.html",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -8326,7 +8326,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://thepatternsite.com/OutsideDays.html",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -8365,7 +8365,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -8655,7 +8655,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -8710,7 +8710,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -8915,7 +8915,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
     "warmup_bars": "window",
     "abbreviation": null,
@@ -8965,7 +8965,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
     "warmup_bars": "window",
     "abbreviation": null,
@@ -9015,7 +9015,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
     "warmup_bars": "window",
     "abbreviation": null,
@@ -9065,7 +9065,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
     "warmup_bars": "window",
     "abbreviation": null,
@@ -9115,7 +9115,7 @@
    "epistemic": "observed",
    "status": "deprecated",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -9177,7 +9177,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -9369,7 +9369,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9434,7 +9434,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9499,7 +9499,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
     "warmup_bars": "window + smooth1 + smooth2 - 1",
     "abbreviation": null,
@@ -9563,7 +9563,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
     "warmup_bars": "window + smooth1 + smooth2 - 1",
     "abbreviation": null,
@@ -9627,7 +9627,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
@@ -9682,7 +9682,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -9737,7 +9737,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://thepatternsite.com/ThreeInsideDown.html",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -9776,7 +9776,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://thepatternsite.com/ThreeInsideUp.html",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -9815,7 +9815,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
     "warmup_bars": "2",
     "abbreviation": null,
@@ -9870,7 +9870,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index",
     "warmup_bars": "window_slow + window_fast - 1",
     "abbreviation": null,
@@ -9927,7 +9927,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index",
     "warmup_bars": "window_slow + window_fast - 1",
     "abbreviation": null,
@@ -9984,7 +9984,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://thepatternsite.com/TweezersBottom.html",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -10039,7 +10039,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://thepatternsite.com/TweezersTop.html",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -10094,7 +10094,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -10149,7 +10149,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "patterns",
+    "source_module": "pattern",
     "reference": "https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/",
     "warmup_bars": "1",
     "abbreviation": null,
@@ -10304,7 +10304,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator",
     "warmup_bars": "window_long - 1",
     "abbreviation": null,
@@ -10376,7 +10376,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator",
     "warmup_bars": "window_long - 1",
     "abbreviation": null,
@@ -10448,7 +10448,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -10506,7 +10506,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "momentum",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -14339,7 +14339,7 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 897,
+  "carried_forward_from_previous_build": 893,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],

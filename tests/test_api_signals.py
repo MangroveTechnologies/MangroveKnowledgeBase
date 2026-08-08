@@ -15,9 +15,13 @@ class TestSignalEndpoints:
         assert data["total"] == 247
 
     def test_list_signals_filter_category(self):
-        resp = client.get("/api/signals?category=Momentum")
-        assert resp.status_code == 200
-        assert resp.json()["total"] == 42
+        """Momentum was 42 when one file held three ontology classes; the bounded oscillators and
+        the KAMA crossings now sit under their own."""
+        for category, total in (("Momentum", 18), ("Oscillator", 22), ("Averaging", 2),
+                                ("Pattern", 40)):
+            resp = client.get(f"/api/signals?category={category}")
+            assert resp.status_code == 200
+            assert resp.json()["total"] == total, category
 
     def test_list_signals_filter_type(self):
         resp = client.get("/api/signals?signal_type=TRIGGER")

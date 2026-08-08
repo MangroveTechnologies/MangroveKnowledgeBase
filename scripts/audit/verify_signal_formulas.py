@@ -46,7 +46,7 @@ if "site-packages" in mangrove_kb.__file__:  # pragma: no cover - guardrail
     )
 
 import mangrove_kb.signals  # noqa: E402,F401  -- registers every signal
-import mangrove_kb.signals.patterns as P  # noqa: E402
+import mangrove_kb.signals.pattern as P  # noqa: E402
 import mangrove_kb.signals.volatility as VOL  # noqa: E402
 from audit import load_btc_daily  # noqa: E402
 from mangrove_kb.registry import RuleRegistry  # noqa: E402
@@ -489,6 +489,10 @@ def spec_patterns(df):
     }
 
 
+# Keyed by the signal's source module, which is now the ontology CLASS -- `momentum` here covers
+# only the 18 rate-of-change signals; the bounded oscillators moved to `oscillator` and the KAMA
+# crossings to `averaging`. spec_momentum still returns all three because they are verified the same
+# way; the split that matters is in the files, not here.
 CLASSES = {
     "volatility": spec_volatility,
     "momentum": spec_momentum,
