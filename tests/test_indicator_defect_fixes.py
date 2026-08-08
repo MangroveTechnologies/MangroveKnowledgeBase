@@ -648,3 +648,32 @@ def test_duplicate_pattern_signals_are_deprecated_not_removed():
             warnings.simplefilter("always")
             RuleRegistry.evaluate({"name": canon, "params": params}, df)
             assert not [w for w in caught if issubclass(w.category, DeprecationWarning)], canon
+
+
+def test_graph_atoms_use_the_ontology_value_vocabularies():
+    """`epistemic` and `status` answer different questions and every atom emitted a status value for
+    both -- `epistemic: "ratified"` -- so the field conveyed nothing on all 127 atoms.
+
+    Per the vendored ontology: `epistemic` is how the belief was arrived at
+    (observed | inferred | hypothesized | assumed); `status` is admission state
+    (draft | ratified | deprecated).
+    """
+    import json
+    from pathlib import Path
+
+    EPISTEMIC = {"observed", "inferred", "hypothesized", "assumed"}
+    STATUS = {"draft", "ratified", "deprecated"}
+
+    graph = json.loads((Path(__file__).resolve().parent.parent
+                        / "ontology" / "signal-indicator-ontology.json").read_text())
+    atoms = graph["atoms"]
+    assert atoms
+
+    bad_e = {a["title"]: a["epistemic"] for a in atoms if a["epistemic"] not in EPISTEMIC}
+    bad_s = {a["title"]: a["status"] for a in atoms if a["status"] not in STATUS}
+    assert not bad_e, f"illegal epistemic values: {bad_e}"
+    assert not bad_s, f"illegal status values: {bad_s}"
+
+    # Everything here is read from the code and verified by executing it, never interpreted from
+    # prose -- the indicators and signals whose behaviour is unsettled are held out of scope.
+    assert {a["epistemic"] for a in atoms} == {"observed"}

@@ -817,8 +817,23 @@ SIGNAL_INPUT_DESC = _signal_input_descriptions()
 
 atoms, rels = [], []
 def atom(i, t, k, s, status="ratified", **p):
+    """`epistemic` and `status` are two different questions, and this emitted a status value for
+    both until 2026-08-08.
+
+    Per the vendored ontology: `epistemic` = how the belief was arrived at
+    (observed | inferred | hypothesized | assumed); `status` = admission state
+    (draft | ratified | deprecated). `ratified` was never a legal `epistemic` value, so that field
+    conveyed nothing on all 127 atoms.
+
+    Everything in this graph is `observed`: the lifted fields are read directly from the code, and
+    the authored ones are read from `_compute` and verified by executing it. Nothing here is an
+    interpretation of prose, because the indicators and signals whose behaviour is genuinely
+    unsettled are being held out of scope rather than guessed at. If that ever stops being true --
+    an atom whose content is inferred rather than read -- it takes `inferred`, and the difference
+    is the point of the field.
+    """
     atoms.append({"id": i, "title": t, "kind": k, "summary": s,
-                  "epistemic": "ratified", "status": status, "props": p})
+                  "epistemic": "observed", "status": status, "props": p})
 def rel(a, r, b, why, ai, bi, **props):
     """`props` are properties of the RELATIONSHIP, not of either endpoint.
 

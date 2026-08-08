@@ -5,7 +5,7 @@
    "title": "Indicator",
    "kind": "Procedure",
    "summary": "A computation over one or more input series producing one or more numeric output series.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -14,7 +14,7 @@
    "title": "Signal",
    "kind": "Procedure",
    "summary": "A boolean predicate over indicator output, evaluated per bar. Composed of (indicator, predicate, params).",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -23,7 +23,7 @@
    "title": "Strategy",
    "kind": "Schema",
    "summary": "A structured template composing signals into entry/exit rules plus configuration.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -32,7 +32,7 @@
    "title": "Role",
    "kind": "Property",
    "summary": "The position a signal occupies within a strategy. Contextual, not intrinsic.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -41,7 +41,7 @@
    "title": "trigger",
    "kind": "Property",
    "summary": "Signal role: trigger.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -50,7 +50,7 @@
    "title": "filter",
    "kind": "Property",
    "summary": "Signal role: filter.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -59,7 +59,7 @@
    "title": "arm",
    "kind": "Property",
    "summary": "Signal role: arm.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -68,7 +68,7 @@
    "title": "averaging",
    "kind": "Concept",
    "summary": "Emits a reference level in price units, produced by averaging over a window.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -77,7 +77,7 @@
    "title": "momentum",
    "kind": "Concept",
    "summary": "Measures rate of change -- how fast, and in which direction, the input is moving.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -86,7 +86,7 @@
    "title": "oscillator",
    "kind": "Concept",
    "summary": "Bounded output where absolute thresholds are meaningful (overbought/oversold).",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -95,7 +95,7 @@
    "title": "volatility",
    "kind": "Concept",
    "summary": "Measures observed dispersion -- distance, width, or range.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -104,7 +104,7 @@
    "title": "flow",
    "kind": "Concept",
    "summary": "Running accumulation whose level is arbitrary but whose direction carries meaning.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -113,7 +113,7 @@
    "title": "pattern",
    "kind": "Concept",
    "summary": "Shape of one or a few bars (candlestick geometry).",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -122,7 +122,7 @@
    "title": "unclassed",
    "kind": "Concept",
    "summary": "No class determined yet. Deliberately named so the gap stays visible.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
@@ -131,7 +131,7 @@
    "title": "ADI",
    "kind": "Procedure",
    "summary": "Acting as leading indicator of price movements.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -191,7 +191,7 @@
    "title": "ADOSC",
    "kind": "Procedure",
    "summary": "Momentum of the Accumulation/Distribution Line: difference of two EMAs of the AD line. Positive values indicate accumulation; negative indicate distribution. A classic Chaikin confirmation indicator.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -266,7 +266,7 @@
    "title": "ADX",
    "kind": "Procedure",
    "summary": "The Plus Directional Indicator (+DI) and Minus Directional Indicator (-DI) are derived from smoothed averages of these differences, and measure trend direction over time. These two indicators are often referred to collectively as the Directional Movement Indicator (DMI). The Average Directional Index (ADX) is in turn derived from the smoothed averages of the difference between +DI and -DI, and measures the strength of the trend (regardless of direction) over time. Using these three indicators together, chartists can determine both the direction and strength of the trend.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -349,7 +349,7 @@
    "title": "ALMA",
    "kind": "Procedure",
    "summary": "Gaussian-weighted moving average where `offset` controls which part of the window carries most weight and `sigma` controls spread. Offset near 1 reacts faster to recent bars; offset near 0 resembles an SMA.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -419,7 +419,7 @@
    "title": "ATR",
    "kind": "Procedure",
    "summary": "The indicator provide an indication of the degree of price volatility. Strong moves, in either direction, are often accompanied by large ranges, or large True Ranges.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -483,7 +483,7 @@
    "title": "Aroon",
    "kind": "Procedure",
    "summary": "Identify when trends are likely to change direction. Aroon Up = ((N - Days Since N-day High) / N) x 100 Aroon Down = ((N - Days Since N-day Low) / N) x 100 Aroon Indicator = Aroon Up - Aroon Down",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -561,7 +561,7 @@
    "title": "AwesomeOscillator",
    "kind": "Procedure",
    "summary": "The Awesome Oscillator is an indicator used to measure market momentum. AO calculates the difference of a 34 Period and 5 Period Simple Moving Averages. The Simple Moving Averages that are used are not calculated using closing price but rather each bar's midpoints. AO is generally used to affirm trends or to anticipate possible reversals. MEDIAN PRICE = (HIGH+LOW)/2 AO = SMA(MEDIAN PRICE, 5)-SMA(MEDIAN PRICE, 34)",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -627,7 +627,7 @@
    "title": "BOP",
    "kind": "Procedure",
    "summary": "Measures buying vs. selling pressure within a single bar: BOP = (close - open) / (high - low) Returns a value in [-1, 1] where positive = buyers in control, negative = sellers. NaN where high == low (no intrabar range). SMOOTHING: this is the RAW single-bar series, which the literature does not use directly. Livshin writes \"I typically plot a 14-day moving average of the balance of power indicator\", and TradingView notes the raw series is \"quite choppy\". Every source plots a 14-period moving average of it. A consumer wanting the indicator as published must smooth this themselves.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -689,7 +689,7 @@
    "title": "BollingerBands",
    "kind": "Procedure",
    "summary": "Volatility bands placed above and below a moving average, with width determined by standard deviation.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -792,7 +792,7 @@
    "title": "CCI",
    "kind": "Procedure",
    "summary": "CCI measures the difference between a security's price change and its average price change. High positive readings indicate that prices are well above their average, which is a show of strength. Low negative readings indicate that prices are well below their average, which is a show of weakness.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -862,7 +862,7 @@
    "title": "CMF",
    "kind": "Procedure",
    "summary": "It measures the amount of Money Flow Volume over a specific period.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -929,7 +929,7 @@
    "title": "CMO",
    "kind": "Procedure",
    "summary": "Similar in spirit to RSI but uses the raw sum of gains and losses rather than smoothed averages. Ranges from -100 (strongest down) to +100 (strongest up), with 0 as neutral.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -986,7 +986,7 @@
    "title": "CandleGeometry",
    "kind": "Procedure",
    "summary": "Decomposes each bar into the numeric measurements candlestick analysis is built from: how large the body is, how far the bar travelled, how long each wick is, and what fraction of the range the body occupies. Direction is carried by the sign of the body rather than by a separate flag.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "pattern_indicators",
@@ -1096,7 +1096,7 @@
    "title": "CandleRelation",
    "kind": "Procedure",
    "summary": "Measures the current bar against the previous one along three independent axes, because they answer different questions and none implies the others. LEVEL -- where this bar sits. Each `*_delta` is the signed distance between an edge of the current bar and the same edge of the previous one, so a pair of signs states containment directly: low_delta < 0 and high_delta > 0    current span CONTAINS the previous low_delta > 0 and high_delta < 0    current span is CONTAINED BY it signs agree                         the spans overlap, or are disjoint This is what Engulfing, Harami, InsideBar and OutsideBar each reduce to. Level is NOT recoverable from size: a bar can be smaller than its predecessor while sitting entirely above it, so \"smaller\" is not \"nested\". SIZE -- how much bigger. The `*_size_ratio` outputs are current span over previous span, so 2.0 means twice as large and 0.5 means half. Unbounded above, floored at 0, and 0 where the previous span was zero. GAP -- whether trading jumped between the bars. `gap` is the opening gap, open against the previous close. `range_overlap` is the shared extent of the two ranges: positive means they overlap by that much, and NEGATIVE means a true gap with no overlap at all, its magnitude being the size of the void. One output covers gap-up and gap-down, the direction coming from the sign.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "pattern_indicators",
@@ -1226,7 +1226,7 @@
    "title": "CumulativeReturn",
    "kind": "Procedure",
    "summary": "Indicator `CumulativeReturn` -- no description in source.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "return_indicators",
@@ -1274,7 +1274,7 @@
    "title": "DEMA",
    "kind": "Procedure",
    "summary": "Reduces lag of a traditional EMA by applying EMA twice and combining.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -1328,7 +1328,7 @@
    "title": "DPO",
    "kind": "Procedure",
    "summary": "Is an indicator designed to remove trend from price and make it easier to identify cycles.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -1383,7 +1383,7 @@
    "title": "DailyLogReturn",
    "kind": "Procedure",
    "summary": "Indicator `DailyLogReturn` -- no description in source.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "return_indicators",
@@ -1432,7 +1432,7 @@
    "title": "DailyReturn",
    "kind": "Procedure",
    "summary": "Indicator `DailyReturn` -- no description in source.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "return_indicators",
@@ -1480,7 +1480,7 @@
    "title": "Divergence",
    "kind": "Procedure",
    "summary": "Detects the four classic divergence types via swing-point matching: regular_bullish:  price makes lower low, indicator makes higher low (reversal up) regular_bearish:  price makes higher high, indicator makes lower high (reversal down) hidden_bullish:   price makes higher low,  indicator makes lower low  (continuation up) hidden_bearish:   price makes lower high,  indicator makes higher high (continuation down) Swing points are detected via scipy.signal.argrelextrema with a configurable comparison window. A divergence flag fires on the bar where the second swing point is confirmed (i.e., `swing_window` bars AFTER the actual extreme -- so it is not lookahead-biased in backtests).",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -1554,7 +1554,7 @@
    "title": "DonchianChannel",
    "kind": "Procedure",
    "summary": "CONVENTION: the channel is measured over the `window` bars **preceding** the current one, which is what every source describing Donchian channels specifies -- Donchian's own 4-week rule (\"four preceding full calendar weeks\"), the Original Turtle Trading Rules (\"exceeding the high or low of the preceding 20 days\"), StockCharts, and TC2000. StockCharts states the reason directly: \"A channel break would not be possible if the most recent period was used.\" That is not a stylistic preference. Including the current bar makes a breakout arithmetically impossible: the current high is one of the values the upper band is the maximum of, so close can never exceed it. Measured on 400 bars, `include_current_bar=True` produced 0 closes above the upper band and 0 below the lower; excluding it produced 5 and 9. `include_current_bar=True` is retained for a caller who genuinely wants the raw rolling window -- it is a generic primitive (this is what pandas-ta, bukosabino/`ta` and Pine's `ta.highest` give you), not the Donchian convention, and no source argues for it. This parameter replaces the previous `offset`, which defaulted to the non-standard inclusive form and left each caller to remember to pass `offset=1`. The rename is deliberate: every existing call site now fails loudly on a missing parameter rather than silently changing meaning. Arbitrary additional lag is no longer a parameter -- shift the output series.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -1665,7 +1665,7 @@
    "title": "EMA",
    "kind": "Procedure",
    "summary": "A weighted moving average that gives more weight to recent prices, making it more responsive to new information.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -1718,7 +1718,7 @@
    "title": "EPMA",
    "kind": "Procedure",
    "summary": "For each bar, fits a linear regression over the last `window` closes and returns the regression value at the endpoint (most recent bar). Projects the trend to \"now\" rather than averaging past values.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -1760,7 +1760,7 @@
    "title": "EaseOfMovement",
    "kind": "Procedure",
    "summary": "It relate an asset's price change to its volume and is particularly useful for assessing the strength of a trend.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -1833,7 +1833,7 @@
    "title": "ForceIndex",
    "kind": "Procedure",
    "summary": "It illustrates how strong the actual buying or selling pressure is. High positive values mean there is a strong rising trend, and low values signify a strong downward trend.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -1892,7 +1892,7 @@
    "title": "HMA",
    "kind": "Procedure",
    "summary": "Low-lag moving average designed to track price without sacrificing smoothness. Reduces lag compared to EMA/SMA while remaining smoother than WMA.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -1948,7 +1948,7 @@
    "title": "HeikinAshi",
    "kind": "Procedure",
    "summary": "Smoothed candlestick representation that averages across multiple bars, making trends visually easier to identify. Japanese for \"average bar\".",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -2015,7 +2015,7 @@
    "title": "Ichimoku",
    "kind": "Procedure",
    "summary": "A comprehensive indicator system providing support/resistance, trend direction, and momentum through five components. **Components:** ``` Tenkan-sen (Conversion Line) = (Highest High + Lowest Low) / 2 over 9 periods Kijun-sen (Base Line) = (Highest High + Lowest Low) / 2 over 26 periods Senkou Span A (Leading Span A) = (Tenkan + Kijun) / 2, plotted 26 periods ahead Senkou Span B (Leading Span B) = (Highest High + Lowest Low) / 2 over 52 periods, plotted 26 periods ahead Chikou Span (Lagging Span) = Current close, plotted 26 periods back ```",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -2115,7 +2115,7 @@
    "title": "KAMA",
    "kind": "Procedure",
    "summary": "Moving average designed to account for market noise or volatility. KAMA will closely follow prices when the price swings are relatively small and the noise is low. KAMA will adjust when the price swings widen and follow prices from a greater distance. This trend-following indicator can be used to identify the overall trend, time turning points and filter price movements.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -2184,7 +2184,7 @@
    "title": "KST",
    "kind": "Procedure",
    "summary": "It is useful to identify major stock market cycle junctures because its formula is weighed to be more greatly influenced by the longer and more dominant time spans, in order to better reflect the primary swings of stock market cycle.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -2316,7 +2316,7 @@
    "title": "KVO",
    "kind": "Procedure",
    "summary": "Volume-weighted momentum oscillator. pandas-ta / modern simplified form: sign the volume by the direction of the typical price change, then take the difference of a fast and slow EMA. trend = sign(typical_price - prev_typical_price) signed_volume = volume * trend KVO = EMA(signed_volume, fast) - EMA(signed_volume, slow) KVO_signal = EMA(KVO, signal_window) Positive KVO with rising signal = bullish volume pressure; negative with falling signal = bearish. Divergences from price are the classic Klinger entry cue. VARIANT: this is the **simplified** form, and it is not on the same scale as Klinger's original -- see `KlingerVolumeOscillator` for that one. Two materially different volume-force definitions circulate under the name KVO, and nothing in the name says which you have. Reconstructed on identical data with the same 34/55 periods: this (simplified) : [    -39,493,     32,593] Klinger original  : [ -4,970,310,  5,746,198]     ~145x Anyone reconciling this against SierraChart, TradingView or MotiveWave will see numbers two orders of magnitude apart and reasonably conclude it is broken. It is not -- it is the other published variant. Both are kept because both are in circulation; pick by which platform you are reconciling against, and do not compare their levels.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -2407,7 +2407,7 @@
    "title": "KeltnerChannel",
    "kind": "Procedure",
    "summary": "Keltner Channels are a trend following indicator used to identify reversals with channel breakouts and channel direction. Channels can also be used to identify overbought and oversold levels when the trend is flat.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -2529,7 +2529,7 @@
    "title": "KlingerVolumeOscillator",
    "kind": "Procedure",
    "summary": "The full 1997 construction, as opposed to the simplified signed-volume form in `KVO`. Where the simplified variant weights volume by nothing more than the direction of the typical price change, this weights it by how far the current bar's range departs from a running measurement of range accumulated since the last trend change -- which is the part that gives the original its scale and its character:: tp    = (high + low + close) / 3 trend = +1 if tp > tp[-1] else -1                      # binary, no flat branch dm    = high - low                                     # this bar's range cm    = cm[-1] + dm       if trend == trend[-1]        # accumulate within a trend dm[-1] + dm       otherwise                    # reset on a trend change vf    = volume * abs(2 * (dm / cm - 1)) * trend * 100   # volume force KVO   = EMA(vf, fast) - EMA(vf, slow) signal = EMA(KVO, signal_window) Note `cm` is the reason this cannot be expressed as a rolling window: it is a path-dependent accumulator whose reset points are determined by the trend series itself. SCALE: roughly 145x the simplified `KVO` on identical data and identical 34/55 periods -- measured `[-4,970,310, 5,746,198]` against `[-39,493, 32,593]`. The two are read the same way (sign, slope, crossings of the signal line, and divergence against price) but their levels are not comparable and must never be mixed in one feature set as though they were the same measurement. SOURCING CAVEAT, stated plainly because it is unusual for this package: **the primary source could not be obtained.** Klinger's 1997 *Stocks & Commodities* original sits behind a Cloudflare challenge, and StockCharts has no Klinger page at all. This construction is reconciled across secondary platform documentation -- SierraChart, TradingView, CQG, MotiveWave, QuantShare -- which agree with each other on the formula above. That agreement is the whole of the evidence, and it is also how two incompatible variants came to circulate under one name in the first place.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -2621,7 +2621,7 @@
    "title": "MACD",
    "kind": "Procedure",
    "summary": "Is a trend-following momentum indicator that shows the relationship between two moving averages of prices.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -2711,7 +2711,7 @@
    "title": "MAMA",
    "kind": "Procedure",
    "summary": "Adaptive moving average that speeds up in trending markets and slows down in consolidations, using a Hilbert Transform Discriminator to estimate the dominant cycle period and adjust alpha dynamically. Also emits FAMA (Following Adaptive MA), half-alpha of MAMA -- MAMA/FAMA crossovers are used as trend signals.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -2795,7 +2795,7 @@
    "title": "MFI",
    "kind": "Procedure",
    "summary": "Uses both price and volume to measure buying and selling pressure. It is positive when the typical price rises (buying pressure) and negative when the typical price declines (selling pressure). A ratio of positive and negative money flow is then plugged into an RSI formula to create an oscillator that moves between zero and one hundred.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -2862,7 +2862,7 @@
    "title": "MOM",
    "kind": "Procedure",
    "summary": "Absolute price change over a lookback window: MOM = close - close[-n]. Distinct from ROC which expresses the same change as a percentage.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -2918,7 +2918,7 @@
    "title": "MassIndex",
    "kind": "Procedure",
    "summary": "It uses the high-low range to identify trend reversals based on range expansions. It identifies range bulges that can foreshadow a reversal of the current trend.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -2984,7 +2984,7 @@
    "title": "MultiTFTrend",
    "kind": "Procedure",
    "summary": "Resamples to a higher timeframe, computes EMA slope on the resampled closes, and broadcasts the slope direction back onto the base-timeframe index via forward-fill. The resulting `higher_tf_trend` series is +1 (higher-TF EMA rising), -1 (falling), or 0 (flat / insufficient data).",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -3054,7 +3054,7 @@
    "title": "NATR",
    "kind": "Procedure",
    "summary": "ATR expressed as a percentage of close: NATR = 100 * ATR / close. Useful for comparing volatility across assets and timeframes where absolute ATR scales with price.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -3120,7 +3120,7 @@
    "title": "NVI",
    "kind": "Procedure",
    "summary": "Tracks price changes on days when volume decreases from the previous day, thought to track \"smart money\" activity.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -3190,7 +3190,7 @@
    "title": "OBV",
    "kind": "Procedure",
    "summary": "It relates price and volume in the stock market. OBV is based on a cumulative total volume.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -3241,7 +3241,7 @@
    "title": "PPO",
    "kind": "Procedure",
    "summary": "the difference between two moving averages as a percentage of the larger moving average.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -3331,7 +3331,7 @@
    "title": "PVO",
    "kind": "Procedure",
    "summary": "The PVO measures the difference between two volume-based moving averages as a percentage of the larger moving average.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -3420,7 +3420,7 @@
    "title": "ROC",
    "kind": "Procedure",
    "summary": "The Rate-of-Change (ROC) indicator, which is also referred to as simply Momentum, is a pure momentum oscillator that measures the percent change in price from one period to the next. The ROC calculation compares the current price with the price \"n\" periods ago. The plot forms an oscillator that fluctuates above and below the zero line as the Rate-of-Change moves from positive to negative. As a momentum oscillator, ROC signals include centerline crossovers, divergences and overbought-oversold readings.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -3475,7 +3475,7 @@
    "title": "RSI",
    "kind": "Procedure",
    "summary": "Compares the magnitude of recent gains and losses over a specified time period to measure speed and change of price movements of a security. It is primarily used to attempt to identify overbought or oversold conditions in the trading of an asset.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -3532,7 +3532,7 @@
    "title": "SMA",
    "kind": "Procedure",
    "summary": "The arithmetic mean of price over a specified number of periods.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -3586,7 +3586,7 @@
    "title": "SMMA",
    "kind": "Procedure",
    "summary": "Exponential smoothing with alpha = 1/window (vs EMA's 2/(window+1)), giving slower, more stable smoothing. Same family as used inside RSI and ATR.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -3642,7 +3642,7 @@
    "title": "STARCBands",
    "kind": "Procedure",
    "summary": "SMA-centered ATR-scaled envelope: upper = SMA(close, window) + multiplier * ATR(window_atr) lower = SMA(close, window) - multiplier * ATR(window_atr) Similar to Keltner Channel but with an explicitly separate window for the SMA and ATR. Useful for breakout strategies.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -3740,7 +3740,7 @@
    "title": "STC",
    "kind": "Procedure",
    "summary": "The Schaff Trend Cycle (STC) is a charting indicator that is commonly used to identify market trends and provide buy and sell signals to traders. Developed in 1999 by noted currency trader Doug Schaff, STC is a type of oscillator and is based on the assumption that, regardless of time frame, currency trends accelerate and decelerate in cyclical patterns.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -3824,7 +3824,7 @@
    "title": "StochRSI",
    "kind": "Procedure",
    "summary": "The StochRSI oscillator was developed to take advantage of both momentum indicators in order to create a more sensitive indicator that is attuned to a specific security's historical performance rather than a generalized analysis of price change. SCALE: this emits 0..1, the canonical Chande-Kroll / StockCharts form. The literature is genuinely split -- Fidelity and many platforms render the same quantity x100, and TradingView is internally inconsistent (its docs say 0-1, its plotted indicator renders 0-100). The conventional 20/80 overbought/oversold levels are therefore **0.20 / 0.80** here. Applying 20 and 80 directly to this series can never produce a signal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -3914,7 +3914,7 @@
    "title": "StochasticOscillator",
    "kind": "Procedure",
    "summary": "Developed in the late 1950s by George Lane. The stochastic oscillator presents the location of the closing price of a stock in relation to the high and low range of the price of a stock over a period of time, typically a 14-day period. VARIANT: this is the **Fast** stochastic. `stoch_k` is the raw %K and `stoch_d` is an SMA of it. The literature distinguishes Fast, Slow (%K itself smoothed, %D an SMA of that) and Full (user-specified smoothing on both); they produce materially different series, and neither the class name nor the parameters say which one this is.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -3995,7 +3995,7 @@
    "title": "T3",
    "kind": "Procedure",
    "summary": "Six chained EMAs combined via Tillson's volume-factor formula. Produces a smooth, low-lag trend line. The `volume_factor` (a) controls smoothness: a=0 collapses to a triple EMA; a=1 is the most responsive.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -4058,7 +4058,7 @@
    "title": "TEMA",
    "kind": "Procedure",
    "summary": "Further reduces lag over DEMA by combining three EMA passes.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -4112,7 +4112,7 @@
    "title": "TRIMA",
    "kind": "Procedure",
    "summary": "Double-smoothed SMA. More weight is placed on the middle of the window than on the edges, reducing noise at both ends. Formula (TA-Lib convention): - if window is odd:  inner = SMA(window), outer = SMA((window+1)//2, inner) - if window is even: inner = SMA(window//2), outer = SMA(window//2 + 1, inner)",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -4168,7 +4168,7 @@
    "title": "TRIX",
    "kind": "Procedure",
    "summary": "Shows the percent rate of change of a triple exponentially smoothed moving average.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -4240,7 +4240,7 @@
    "title": "TSI",
    "kind": "Procedure",
    "summary": "Shows both trend direction and overbought/oversold conditions.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -4302,7 +4302,7 @@
    "title": "TTMSqueeze",
    "kind": "Procedure",
    "summary": "Detects volatility contraction (\"squeeze\") when Bollinger Bands are entirely inside Keltner Channels, and signals a volatility expansion when the squeeze releases (BB exits KC). The momentum sub-output indicates which direction the coiled volatility is likely to break. State definition: - squeeze_on: bb_hband < kc_hband  AND  bb_lband > kc_lband - squeeze_fired: squeeze was on the previous bar, off on the current - momentum: linear-regression slope of (close - midpoint) over the momentum window, where midpoint = (highest_high + lowest_low + SMA(close)) / 3. Positive = bullish coil; negative = bearish.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -4394,7 +4394,7 @@
    "title": "TrueRange",
    "kind": "Procedure",
    "summary": "Welles Wilder's True Range: max of (high - low), |high - prev_close|, |low - prev_close| captures gap volatility that a simple high-low range misses. This is the raw building block used inside ATR (and Vortex, UO, etc.). Exposed as a standalone indicator for strategies that want the raw per-bar range rather than a smoothed average.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -4451,7 +4451,7 @@
    "title": "UlcerIndex",
    "kind": "Procedure",
    "summary": "Measures downside risk and volatility by focusing only on drawdowns from recent highs.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
@@ -4507,7 +4507,7 @@
    "title": "UltimateOscillator",
    "kind": "Procedure",
    "summary": "Larry Williams' (1976) signal, a momentum oscillator designed to capture momentum across three different timeframes. BP = Close - Minimum(Low or Prior Close). TR = Maximum(High or Prior Close)  -  Minimum(Low or Prior Close) Average7 = (7-period BP Sum) / (7-period TR Sum) Average14 = (14-period BP Sum) / (14-period TR Sum) Average28 = (28-period BP Sum) / (28-period TR Sum) UO = 100 x [(4 x Average7)+(2 x Average14)+Average28]/(4+2+1)",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -4605,7 +4605,7 @@
    "title": "VPT",
    "kind": "Procedure",
    "summary": "Is based on a running cumulative volume that adds or substracts a multiple of the percentage change in share price trend and current volume, depending upon the investment's upward or downward movements.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -4664,7 +4664,7 @@
    "title": "VWAP",
    "kind": "Procedure",
    "summary": "Rolling volume-weighted average of typical price: traded value over the window divided by volume over the window. Each bar is weighted by how much actually traded, so heavy bars pull the level toward them and quiet bars barely move it. Uses a rolling `window` rather than a session anchor. The textbook definition resets at each session open, but anchoring presupposes a session boundary, and a continuously traded 24/7 market does not have one -- there is no open to accumulate from and no close to reset at. The rolling form is therefore the coherent definition here, not an approximation of the anchored one. Consequence worth knowing: on a session-traded instrument such as an equity, this is not the institutional execution benchmark, because that benchmark is defined by the session it anchors to. This series is exactly VWMA computed on typical price.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -4731,7 +4731,7 @@
    "title": "VWMA",
    "kind": "Procedure",
    "summary": "Weights each price by its bar's volume, emphasizing bars with heavy participation. Unlike VWAP (which resets daily/session), VWMA is a true rolling moving average over the last N bars.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
@@ -4791,7 +4791,7 @@
    "title": "Vortex",
    "kind": "Procedure",
    "summary": "It consists of two oscillators that capture positive and negative trend movement. A bullish signal triggers when the positive trend indicator crosses above the negative trend indicator or a key level.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -4875,7 +4875,7 @@
    "title": "WMA",
    "kind": "Procedure",
    "summary": "A moving average that assigns more weight to recent prices using a linear weighting scheme.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -4929,7 +4929,7 @@
    "title": "WilliamsAlligator",
    "kind": "Procedure",
    "summary": "Three SMMA lines plotted on median price ((high + low) / 2) with forward offsets: Jaw   = SMMA(13) shifted forward 8 bars (slowest, \"sleeping alligator\") Teeth = SMMA( 8) shifted forward 5 bars Lips  = SMMA( 5) shifted forward 3 bars (fastest, \"gator's lips\") The forward shift is applied via pandas .shift(+n), which is lookahead-free in backtesting: the value at bar `t` in the output is the SMMA computed at bar `t - n`. Trend interpretation: - Lips > Teeth > Jaw (all spreading upward): alligator is eating, strong uptrend. - Lips < Teeth < Jaw (all spreading downward): strong downtrend. - Tangled (lines crossing/converging): alligator is sleeping, no trend.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
@@ -5046,7 +5046,7 @@
    "title": "WilliamsR",
    "kind": "Procedure",
    "summary": "Developed by Larry Williams, Williams %R is a momentum indicator that is the inverse of the Fast Stochastic Oscillator. Also referred to as %R, Williams %R reflects the level of the close relative to the highest high for the look-back period. In contrast, the Stochastic Oscillator reflects the level of the close relative to the lowest low. %R corrects for the inversion by multiplying the raw value by -100. As a result, the Fast Stochastic Oscillator and Williams %R produce the exact same lines, only the scaling is different. Williams %R oscillates from 0 to -100. Readings from 0 to -20 are considered overbought. Readings from -80 to -100 are considered oversold. %R = (Highest High - Close)/(Highest High - Lowest Low) * -100",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
@@ -5109,7 +5109,7 @@
    "title": "bb_above_upper",
    "kind": "Procedure",
    "summary": "Check if price is currently above the upper Bollinger Band. A state, not an event: true for every bar close sits above the band, unlike bb_upper_breakout which fires only on the bar that crosses it.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility",
@@ -5159,7 +5159,7 @@
    "title": "bb_below_lower",
    "kind": "Procedure",
    "summary": "Check if price is currently below the lower Bollinger Band. A state, not an event: true for every bar close sits below the band, unlike bb_lower_breakout which fires only on the bar that crosses it.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility",
@@ -5209,7 +5209,7 @@
    "title": "bb_lower_breakout",
    "kind": "Procedure",
    "summary": "Detect price breaking below the lower Bollinger Band. Fires on the bar where price crosses below the lower band, not while price remains below it. Crypto assets frequently test bands during high volatility; use with volume confirmation.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility",
@@ -5259,7 +5259,7 @@
    "title": "bb_squeeze",
    "kind": "Procedure",
    "summary": "Detect Bollinger Band squeeze onset (low volatility, potential breakout). Fires on the bar where band width drops below the threshold, not while it remains below.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility",
@@ -5316,7 +5316,7 @@
    "title": "bb_upper_breakout",
    "kind": "Procedure",
    "summary": "Detect price breaking above the upper Bollinger Band. Fires on the bar where price crosses above the upper band, not while price remains above it. Crypto assets frequently test bands during high volatility; use with volume confirmation.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility",
@@ -5366,7 +5366,7 @@
    "title": "bearish_engulfing_trigger",
    "kind": "Procedure",
    "summary": "Check if a bearish engulfing pattern completed on the current bar. Current bearish candle's body completely contains the previous bullish candle's body. Strong bearish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5405,7 +5405,7 @@
    "title": "bearish_harami_trigger",
    "kind": "Procedure",
    "summary": "Check if a bearish harami pattern completed on the current bar. Current small bearish candle's body is inside the previous large bullish candle's body. Potential bearish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5444,7 +5444,7 @@
    "title": "bearish_pattern_recent",
    "kind": "Procedure",
    "summary": "Check if any bearish candlestick pattern was detected within recent window. Scans for hanging man, shooting star, bearish engulfing, bearish harami, dark cloud cover, evening star, gravestone doji, three black crows, three inside down, tweezer tops, and bearish pin bar within the recent window.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5499,7 +5499,7 @@
    "title": "bearish_pin_bar_trigger",
    "kind": "Procedure",
    "summary": "Check if a bearish pin bar is detected on the current bar. Long upper wick with body in the lower portion of the range. Bearish reversal at resistance.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5561,7 +5561,7 @@
    "title": "bullish_engulfing_trigger",
    "kind": "Procedure",
    "summary": "Check if a bullish engulfing pattern completed on the current bar. Current bullish candle's body completely contains the previous bearish candle's body. Strong bullish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5600,7 +5600,7 @@
    "title": "bullish_harami_trigger",
    "kind": "Procedure",
    "summary": "Check if a bullish harami pattern completed on the current bar. Current small bullish candle's body is inside the previous large bearish candle's body. Potential bullish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5639,7 +5639,7 @@
    "title": "bullish_pattern_recent",
    "kind": "Procedure",
    "summary": "Check if any bullish candlestick pattern was detected within recent window. Scans for hammer, inverted hammer, bullish engulfing, bullish harami, piercing line, morning star, dragonfly doji, three white soldiers, three inside up, tweezer bottoms, and bullish pin bar within the recent window.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5694,7 +5694,7 @@
    "title": "bullish_pin_bar_trigger",
    "kind": "Procedure",
    "summary": "Check if a bullish pin bar is detected on the current bar. Long lower wick with body in the upper portion of the range. Bullish reversal at support.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5756,7 +5756,7 @@
    "title": "continuation_pattern_bearish",
    "kind": "Procedure",
    "summary": "Check if a bearish continuation pattern was detected within recent window. Scans for three black crows and three inside down.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5811,7 +5811,7 @@
    "title": "continuation_pattern_bullish",
    "kind": "Procedure",
    "summary": "Check if a bullish continuation pattern was detected within recent window. Scans for three white soldiers and three inside up.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5866,7 +5866,7 @@
    "title": "dark_cloud_cover_trigger",
    "kind": "Procedure",
    "summary": "Check if a dark cloud cover pattern completed on the current bar. Bearish reversal: bullish candle followed by bearish candle opening above prior high (classic) or prior close (relaxed) and closing below midpoint of prior body. The classic definition requires a price gap, which is rare in 24/7 crypto/forex markets. Set require_gap=False for those markets.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5928,7 +5928,7 @@
    "title": "doji_trigger",
    "kind": "Procedure",
    "summary": "Check if a doji pattern is detected on the current bar. A doji forms when open and close are nearly equal relative to the candle's range, signaling indecision.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -5983,7 +5983,7 @@
    "title": "dragonfly_doji_trigger",
    "kind": "Procedure",
    "summary": "Check if a dragonfly doji is detected on the current bar. A doji with open/close near the high and a long lower shadow. Bullish signal at support.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6045,7 +6045,7 @@
    "title": "evening_star_trigger",
    "kind": "Procedure",
    "summary": "Check if an evening star pattern completed on the current bar. Three-candle bearish reversal: bullish candle, small-bodied star, then bearish candle closing below midpoint of first.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6100,7 +6100,7 @@
    "title": "gravestone_doji_trigger",
    "kind": "Procedure",
    "summary": "Check if a gravestone doji is detected on the current bar. A doji with open/close near the low and a long upper shadow. Bearish signal at resistance.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6162,7 +6162,7 @@
    "title": "hammer_trigger",
    "kind": "Procedure",
    "summary": "Check if a hammer shape is detected on the current bar. Small body at upper end with long lower wick and minimal upper wick. Bullish reversal after downtrend.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6224,7 +6224,7 @@
    "title": "hanging_man_trigger",
    "kind": "Procedure",
    "summary": "Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body, long lower wick) but interpreted as a bearish reversal when appearing after an uptrend. DEPRECATED: identical to `hammer_trigger`. `_hanging_man` calls `_hammer` and renames the output, so the two fire on exactly the same bars -- verified identical across 499 bars. A hanging man IS a hammer; what distinguishes them is the prior trend, which this implementation does not encode. Kept because the name is referenced outside this repository (MangroveOracle's signals_metadata.json, strategy cohort files, experiment outputs). Use `hammer_trigger`.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "deprecated",
    "props": {
     "source_module": "patterns",
@@ -6286,7 +6286,7 @@
    "title": "indecision_pattern_recent",
    "kind": "Procedure",
    "summary": "Check if an indecision pattern was detected within recent window. Scans for doji, spinning top, inside bar, and NR7.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6341,7 +6341,7 @@
    "title": "inside_bar_trigger",
    "kind": "Procedure",
    "summary": "Check if an inside bar is detected on the current bar. Current bar's range is completely contained within the previous bar's range. Signals consolidation and potential breakout.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6380,7 +6380,7 @@
    "title": "inverted_hammer_trigger",
    "kind": "Procedure",
    "summary": "Check if an inverted hammer shape is detected on the current bar. Same shape as shooting star (small body, long upper wick) but interpreted as a bullish reversal when appearing after a downtrend.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6442,7 +6442,7 @@
    "title": "long_legged_doji_trigger",
    "kind": "Procedure",
    "summary": "Check if a long-legged doji is detected on the current bar. A doji with both upper and lower wicks at least wick_threshold of the total range, indicating extreme indecision.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6504,7 +6504,7 @@
    "title": "marubozu_bearish_trigger",
    "kind": "Procedure",
    "summary": "Check if a bearish marubozu is detected on the current bar. Full-bodied bearish candle with minimal or no wicks. Signals strong selling conviction.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6559,7 +6559,7 @@
    "title": "marubozu_bullish_trigger",
    "kind": "Procedure",
    "summary": "Check if a bullish marubozu is detected on the current bar. Full-bodied bullish candle with minimal or no wicks. Signals strong buying conviction.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6614,7 +6614,7 @@
    "title": "morning_star_trigger",
    "kind": "Procedure",
    "summary": "Check if a morning star pattern completed on the current bar. Three-candle bullish reversal: bearish candle, small-bodied star, then bullish candle closing above midpoint of first.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6669,7 +6669,7 @@
    "title": "nr7_trigger",
    "kind": "Procedure",
    "summary": "Check if a narrow range day is detected on the current bar. Current bar has the smallest range within the window period. Signals volatility compression and imminent breakout. Default window=7 for NR7; use 4 for NR4.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6716,7 +6716,7 @@
    "title": "outside_bar_trigger",
    "kind": "Procedure",
    "summary": "Check if an outside bar is detected on the current bar. Current bar's range completely engulfs the previous bar's range. Signals increased volatility.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6755,7 +6755,7 @@
    "title": "piercing_line_trigger",
    "kind": "Procedure",
    "summary": "Check if a piercing line pattern completed on the current bar. Bullish reversal: bearish candle followed by bullish candle opening below prior low (classic) or prior close (relaxed) and closing above midpoint of prior body. The classic definition requires a price gap, which is rare in 24/7 crypto/forex markets. Set require_gap=False for those markets.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6817,7 +6817,7 @@
    "title": "reversal_pattern_bearish",
    "kind": "Procedure",
    "summary": "Check if a bearish reversal pattern was detected within recent window. Scans for hanging man, shooting star, bearish engulfing, evening star, dark cloud cover, and gravestone doji -- the classic bearish reversal patterns.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6872,7 +6872,7 @@
    "title": "reversal_pattern_bullish",
    "kind": "Procedure",
    "summary": "Check if a bullish reversal pattern was detected within recent window. Scans for hammer, inverted hammer, bullish engulfing, morning star, piercing line, and dragonfly doji -- the classic bullish reversal patterns.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -6927,7 +6927,7 @@
    "title": "shooting_star_trigger",
    "kind": "Procedure",
    "summary": "Check if a shooting star shape is detected on the current bar. Small body at lower end with long upper wick and minimal lower wick. Bearish reversal after uptrend. DEPRECATED: identical to `inverted_hammer_trigger`. `_shooting_star` calls `_inverted_hammer` and renames the output, so the two fire on exactly the same bars -- verified identical across 499 bars. The distinction is the prior trend, which this implementation does not encode. Kept because the name is referenced outside this repository. Use `inverted_hammer_trigger`.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "deprecated",
    "props": {
     "source_module": "patterns",
@@ -6989,7 +6989,7 @@
    "title": "spinning_top_trigger",
    "kind": "Procedure",
    "summary": "Check if a spinning top is detected on the current bar. Small body with significant wicks on both sides, signaling indecision.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7051,7 +7051,7 @@
    "title": "strong_body_recent",
    "kind": "Procedure",
    "summary": "Check if a marubozu (strong body) was detected within recent window. Scans for both bullish and bearish marubozu patterns.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7106,7 +7106,7 @@
    "title": "three_black_crows_trigger",
    "kind": "Procedure",
    "summary": "Check if three black crows pattern completed on the current bar. Three consecutive bearish candles with lower closes, each opening within the previous body. Strong bearish signal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7161,7 +7161,7 @@
    "title": "three_inside_down_trigger",
    "kind": "Procedure",
    "summary": "Check if three inside down pattern completed on the current bar. Bullish candle, bearish harami, then bearish close below first candle's open. Confirmed bearish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7200,7 +7200,7 @@
    "title": "three_inside_up_trigger",
    "kind": "Procedure",
    "summary": "Check if three inside up pattern completed on the current bar. Bearish candle, bullish harami, then bullish close above first candle's open. Confirmed bullish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7239,7 +7239,7 @@
    "title": "three_white_soldiers_trigger",
    "kind": "Procedure",
    "summary": "Check if three white soldiers pattern completed on the current bar. Three consecutive bullish candles with higher closes, each opening within the previous body. Strong bullish signal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7294,7 +7294,7 @@
    "title": "tweezer_bottoms_trigger",
    "kind": "Procedure",
    "summary": "Check if a tweezer bottoms pattern completed on the current bar. Two consecutive candles with approximately equal lows, first bearish and second bullish. Bullish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7349,7 +7349,7 @@
    "title": "tweezer_tops_trigger",
    "kind": "Procedure",
    "summary": "Check if a tweezer tops pattern completed on the current bar. Two consecutive candles with approximately equal highs, first bullish and second bearish. Bearish reversal.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7404,7 +7404,7 @@
    "title": "two_bar_reversal_bearish_trigger",
    "kind": "Procedure",
    "summary": "Check if a bearish two-bar reversal completed on the current bar. Bullish bar followed by bearish bar that takes out the high then closes below the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
@@ -7459,7 +7459,7 @@
    "title": "two_bar_reversal_bullish_trigger",
    "kind": "Procedure",
    "summary": "Check if a bullish two-bar reversal completed on the current bar. Bearish bar followed by bullish bar that takes out the low then closes above the prior open. The close_proximity parameter controls how close the close must be to the high/low extreme.",
-   "epistemic": "ratified",
+   "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "patterns",
