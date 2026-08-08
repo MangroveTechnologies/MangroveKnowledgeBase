@@ -64,8 +64,18 @@ _NODES = {a["title"]: a for a in _json.loads(
 
 
 def real_fixture() -> pd.DataFrame:
-    """The 1,294-bar BTC daily trace. The primary evidence for every formula."""
-    return load_btc_daily()[["Open", "High", "Low", "Close", "Volume"]].copy()
+    """The 1,294-bar BTC daily trace. The primary evidence for every formula.
+
+    Indexed by its own timestamps. The loader parses them and then resets to a RangeIndex, which
+    silently disqualifies every time-aware signal: `multi_tf_trend_bullish` resamples to a higher
+    timeframe and returns False outright unless the index is a DatetimeIndex, so it could never fire
+    on the real trace and would have been verified against synthetic bars instead. Signals address
+    bars positionally, so carrying the real dates changes nothing else.
+    """
+    df = load_btc_daily()
+    out = df[["Open", "High", "Low", "Close", "Volume"]].copy()
+    out.index = pd.DatetimeIndex(df["timestamp"])
+    return out
 
 
 def synthetic_fixture(n: int = 600, seed: int = 71) -> pd.DataFrame:
@@ -599,6 +609,192 @@ def spec_flow_and_volume_derived(df):
 # only the 18 rate-of-change signals; the bounded oscillators moved to `oscillator` and the KAMA
 # crossings to `averaging`. spec_momentum still returns all three because they are verified the same
 # way; the split that matters is in the files, not here.
+
+def spec_trend(df):
+    """The 64 signals still living in trend.py, whose classes are averaging, momentum, oscillator.
+
+    `trend` is not one of the seven ontology classes -- the file is a use-case grouping that predates
+    the class axis, and these 64 split three ways by the class of the indicator each one reads. They
+    are verified together here because verification does not care which file they live in; the split
+    that matters is on disk.
+
+    The 24 not here are held out of the graph, so they have no formula to check: nine are built on
+    the excluded stateful policy rules (SuperTrend, PSAR, ChandelierExit) and fifteen read an
+    indicator still in the `unclassed` class.
+    """
+    from mangrove_kb.indicators import (
+        ADX, ALMA, Aroon, CCI, DEMA, DPO, EMA, HMA, KST, MACD, MAMA, MassIndex,
+        MultiTFTrend, SMA, SMMA, STC, T3, TEMA, TRIMA, TRIX, Vortex, WMA, WilliamsAlligator,
+    )
+    C = df["Close"]
+    HLC = {"high": df["High"], "low": df["Low"], "close": df["Close"]}
+    spec = {}
+
+    # --- averaging: two averages of one kind at different windows, and price against one average
+    def ma(cls, key, w, **kw):
+        return cls.compute(data={"close": C}, params={"window": w, **kw})[key]
+
+    MAS = [
+        # (signal stem, class, output key, fast, slow, extra params, is_above window)
+        ("sma",   SMA,   "sma",   None, None, {}, None),
+        ("ema",   EMA,   "ema",   9, 21, {}, None),
+        ("wma",   WMA,   "wma",   9, 21, {}, None),
+        ("dema",  DEMA,  "dema",  9, 21, {}, 21),
+        ("tema",  TEMA,  "tema",  9, 21, {}, 21),
+        ("trima", TRIMA, "trima", 10, 30, {}, 20),
+        ("smma",  SMMA,  "smma",  14, 50, {}, 14),
+        ("hma",   HMA,   "hma",   9, 25, {}, 16),
+        ("alma",  ALMA,  "alma",  9, 21, {"offset": 0.85, "sigma": 6.0}, None),
+        ("t3",    T3,    "t3",    5, 10, {"volume_factor": 0.7}, None),
+    ]
+    for stem, cls, key, f, s, extra, above_w in MAS:
+        if f is not None:
+            fast, slow = ma(cls, key, f, **extra), ma(cls, key, s, **extra)
+            p = {"window_fast": f, "window_slow": s, **extra}
+            spec[f"{stem}_cross_up"] = (p, crosses_above(fast, slow))
+            spec[f"{stem}_cross_down"] = (p, crosses_below(fast, slow))
+        if above_w is not None:
+            spec[f"is_above_{stem}"] = ({"window": above_w}, outside_above(C, ma(cls, key, above_w)))
+
+    # SMA's windows have no defaults -- the signal requires them, so the spec supplies them.
+    sf, ss = ma(SMA, "sma", 9), ma(SMA, "sma", 21)
+    spec["sma_cross_up"] = ({"window_fast": 9, "window_slow": 21}, crosses_above(sf, ss))
+    spec["sma_cross_down"] = ({"window_fast": 9, "window_slow": 21}, crosses_below(sf, ss))
+    spec["sma_crossover"] = ({"window_fast": 9, "window_slow": 21, "direction": "bullish"},
+                             crosses_above(sf, ss))
+    spec["is_above_sma"] = ({"window": 20}, outside_above(C, ma(SMA, "sma", 20)))
+    # ALMA and T3 take extra shape parameters, so their `is_above` cannot come from the loop above.
+    spec["is_above_alma"] = ({"window": 21, "offset": 0.85, "sigma": 6.0},
+                             outside_above(C, ma(ALMA, "alma", 21, offset=0.85, sigma=6.0)))
+    spec["is_above_t3"] = ({"window": 10, "volume_factor": 0.7},
+                           outside_above(C, ma(T3, "t3", 10, volume_factor=0.7)))
+    ef, es = ma(EMA, "ema", 9), ma(EMA, "ema", 21)
+    spec["ema_crossover"] = ({"window_fast": 9, "window_slow": 21, "direction": "bearish"},
+                             crosses_below(ef, es))
+    spec["price_above_ema"] = ({"window": 20}, outside_above(C, ma(EMA, "ema", 20)))
+
+    # MAMA against FAMA: two outputs of one computation, not two windows.
+    mm = MAMA.compute(data={"high": df["High"], "low": df["Low"]},
+                      params={"fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": 64})
+    mama, fama = mm["mama"], mm["fama"]
+    spec["mama_cross_up"] = ({"fast_limit": 0.5, "slow_limit": 0.05}, crosses_above(mama, fama))
+    spec["mama_cross_down"] = ({"fast_limit": 0.5, "slow_limit": 0.05}, crosses_below(mama, fama))
+    spec["is_above_mama"] = ({"fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": 64},
+                             outside_above(C, mama))
+
+    # Alligator: three displaced smoothed averages, checked as an ordering.
+    ap = {"jaw": 13, "teeth": 8, "lips": 5, "jaw_offset": 8, "teeth_offset": 5, "lips_offset": 3}
+    al = WilliamsAlligator.compute(data={"high": df["High"], "low": df["Low"]}, params=ap)
+    jaw, teeth, lips = al["jaw"], al["teeth"], al["lips"]
+
+    def gator(kind):
+        def f(t):
+            j, e, l = jaw.iloc[t], teeth.iloc[t], lips.iloc[t]
+            if not defined(j, e, l):
+                return False
+            bull, bear = l > e > j, l < e < j
+            return {"bullish": bull, "bearish": bear, "sleeping": not (bull or bear)}[kind]
+        return f
+    for kind in ("bullish", "bearish", "sleeping"):
+        spec[f"alligator_{kind}"] = (dict(ap), gator(kind))
+
+    # Ribbon: SMAs at strictly increasing windows, all gaps the same sign.
+    RW = [10, 20, 30, 40, 50]
+    ribbon = [ma(SMA, "sma", w) for w in RW]
+
+    def ribbon_is(kind):
+        def f(t):
+            vals = [s.iloc[t] for s in ribbon]
+            if not defined(*vals):
+                return False
+            d = [b - a for a, b in zip(vals, vals[1:])]
+            bull, bear = all(x < 0 for x in d), all(x > 0 for x in d)
+            return {"bullish": bull, "bearish": bear, "tangled": not (bull or bear)}[kind]
+        return f
+    for kind in ("bullish", "bearish", "tangled"):
+        spec[f"ma_ribbon_{kind}"] = ({"windows": RW}, ribbon_is(kind))
+
+    # --- momentum
+    adx = ADX.compute(data=HLC, params={"window": 14})
+    spec["adx_strong_trend"] = ({"window": 14, "threshold": 25.0}, above(adx["adx"], 25.0))
+    spec["adx_bullish_di"] = ({"window": 14}, outside_above(adx["adx_pos"], adx["adx_neg"]))
+
+    ar = Aroon.compute(data={"high": df["High"], "low": df["Low"]}, params={"window": 25})
+    up, dn = ar["aroon_up"], ar["aroon_down"]
+    spec["aroon_up_trend"] = ({"window": 25, "threshold": 70.0}, above(up, 70.0))
+    spec["aroon_down_trend"] = ({"window": 25, "threshold": 70.0}, above(dn, 70.0))
+    spec["aroon_crossover"] = ({"window": 25, "direction": "bullish"}, crosses_above(up, dn))
+
+    dpo = DPO.compute(data={"close": C}, params={"window": 20})["dpo"]
+    spec["dpo_positive"] = ({"window": 20}, above(dpo, 0))
+    spec["dpo_negative"] = ({"window": 20}, below(dpo, 0))
+
+    kp = {"roc1": 10, "roc2": 15, "roc3": 20, "roc4": 30, "window_sma1": 10, "window_sma2": 10,
+          "window_sma3": 10, "window_sma4": 15, "nsig": 9}
+    k = KST.compute(data={"close": C}, params={"roc1": 10, "roc2": 15, "roc3": 20, "roc4": 30,
+                                               "window1": 10, "window2": 10, "window3": 10,
+                                               "window4": 15, "nsig": 9})
+    spec["kst_bullish_cross"] = (dict(kp), crosses_above(k["kst"], k["kst_signal"]))
+    spec["kst_bearish_cross"] = (dict(kp), crosses_below(k["kst"], k["kst_signal"]))
+
+    mp = {"window_fast": 12, "window_slow": 26, "window_sign": 9}
+    m = MACD.compute(data={"close": C}, params=dict(mp))
+    spec["macd_bullish_cross"] = (dict(mp), crosses_above(m["macd"], m["signal"]))
+    spec["macd_bearish_cross"] = (dict(mp), crosses_below(m["macd"], m["signal"]))
+    spec["macd_positive"] = (dict(mp), above(m["histogram"], 0))
+
+    msp = {"window_fast": 9, "window_slow": 25}
+    mi = MassIndex.compute(data={"high": df["High"], "low": df["Low"]}, params=dict(msp))["mass_index"]
+
+    def bulge(t):
+        window = mi.iloc[max(0, t - 9):t + 1]
+        return bool((window > 27.0).any()) and defined(mi.iloc[t]) and mi.iloc[t] < 26.5
+    spec["mass_reversal_signal"] = ({**msp, "threshold_high": 27.0, "threshold_low": 26.5}, bulge)
+
+    tx = TRIX.compute(data={"close": C}, params={"window": 15, "window_sign": 9})["trix"]
+    spec["trix_bullish"] = ({"window": 15, "threshold": 0.0}, above(tx, 0.0))
+    spec["trix_bearish"] = ({"window": 15, "threshold": 0.0}, below(tx, 0.0))
+
+    vx = Vortex.compute(data=HLC, params={"window": 14})
+    vp, vn = vx["vortex_pos"], vx["vortex_neg"]
+    spec["vortex_bullish"] = ({"window": 14}, outside_above(vp, vn))
+    spec["vortex_bearish"] = ({"window": 14}, outside_above(vn, vp))
+    spec["vortex_crossover"] = ({"window": 14, "direction": "bearish"}, crosses_below(vp, vn))
+
+    # MultiTFTrend resamples, so it needs a DatetimeIndex -- which every fixture here now has.
+    #
+    # And it is the one indicator whose reference series CANNOT be precomputed on the full frame.
+    # Resampling groups day t into a higher-timeframe bar; on the full frame that bar is complete
+    # because it also contains days AFTER t, so the precomputed value at t is contaminated by the
+    # future. The signal sees a partial current period and gets a different slope. Precomputing
+    # disagreed on exactly one bar out of 1,224 -- rare enough to look like a formula error and
+    # be "fixed" in the wrong place, which is why this note is longer than the code.
+    #
+    # Every other indicator here is path-independent, so precomputing is safe for them.
+    mt = {"higher_tf": "W", "window": 10, "slope_threshold": 0.0}
+
+    def tf_trend(value):
+        def f(t):
+            upto = MultiTFTrend.compute(data={"close": C.iloc[:t + 1]}, params=dict(mt))
+            v = upto["higher_tf_trend"].iloc[-1]
+            return bool(v == value)
+        return f
+    spec["multi_tf_trend_bullish"] = (dict(mt), tf_trend(1))
+    spec["multi_tf_trend_bearish"] = (dict(mt), tf_trend(-1))
+
+    # --- oscillator
+    cci = CCI.compute(data=HLC, params={"window": 20, "constant": 0.015})["cci"]
+    spec["cci_overbought"] = ({"window": 20, "constant": 0.015, "threshold": 100.0}, above(cci, 100.0))
+    spec["cci_oversold"] = ({"window": 20, "constant": 0.015, "threshold": -100.0}, below(cci, -100.0))
+
+    sp = {"window_slow": 50, "window_fast": 23, "cycle": 10, "smooth1": 3, "smooth2": 3}
+    stc = STC.compute(data={"close": C}, params=dict(sp))["stc"]
+    spec["stc_overbought"] = ({**sp, "threshold": 75.0}, above(stc, 75.0))
+    spec["stc_oversold"] = ({**sp, "threshold": 25.0}, below(stc, 25.0))
+
+    return spec
+
+
 CLASSES = {
     "volatility": spec_volatility,
     "momentum": spec_momentum,
@@ -607,6 +803,7 @@ CLASSES = {
     # four ways by the class of the indicator each reads. They are still verified
     # together, since the verification does not care which file they live in.
     "flow": spec_flow_and_volume_derived,
+    "trend": spec_trend,
 }
 
 

@@ -144,7 +144,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:accumulation_distribution_line",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line",
     "warmup_bars": "0",
     "abbreviation": "ADI",
     "usage_example": "ADI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={})",
@@ -279,7 +279,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx",
     "warmup_bars": "2 * window - 1",
     "abbreviation": "ADX",
     "usage_example": "ADX.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
@@ -432,7 +432,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-true-range-atr",
     "warmup_bars": "window - 1",
     "abbreviation": "ATR",
     "usage_example": "ATR.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
@@ -702,7 +702,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:bollinger_bands",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands",
     "warmup_bars": "window - 1",
     "abbreviation": "BB",
     "usage_example": "BollingerBands.compute(data={'close': df['Close']}, params={'window': value, 'window_dev': value})",
@@ -805,7 +805,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:commodity_channel_index_cci",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci",
     "warmup_bars": "window - 1",
     "abbreviation": "CCI",
     "usage_example": "CCI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'constant': value})",
@@ -875,7 +875,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chaikin_money_flow_cmf",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf",
     "warmup_bars": "window - 1",
     "abbreviation": "CMF",
     "usage_example": "CMF.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
@@ -999,7 +999,7 @@
    "status": "ratified",
    "props": {
     "source_module": "pattern_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
     "usage_example": "CandleGeometry.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
@@ -1341,7 +1341,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:detrended_price_osci",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo",
     "warmup_bars": "window - 1",
     "abbreviation": "DPO",
     "usage_example": "DPO.compute(data={'close': df['Close']}, params={'window': value})",
@@ -1846,7 +1846,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:force_index",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index",
     "warmup_bars": "window",
     "abbreviation": "FI",
     "usage_example": "ForceIndex.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
@@ -2028,7 +2028,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ichimoku_cloud",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud",
     "warmup_bars": "max(window1, window2, window3) - 1",
     "abbreviation": null,
     "usage_example": "Ichimoku.compute(data={'high': df['High'], 'low': df['Low']}, params={'window1': value, 'window2': value, 'window3': value, 'visual': value})",
@@ -2197,7 +2197,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:know_sure_thing_kst",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst",
     "warmup_bars": "max(roc1 + window1, roc2 + window2, roc3 + window3, roc4 + window4) + nsig - 2",
     "abbreviation": "KST",
     "usage_example": "KST.compute(data={'close': df['Close']}, params={'roc1': value, 'roc2': value, 'roc3': value, 'roc4': value, 'window1': value, 'window2': value, 'window3': value, 'window4': value, 'nsig': value})",
@@ -2420,7 +2420,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:keltner_channels",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels",
     "warmup_bars": "window - 1",
     "abbreviation": "KC",
     "usage_example": "KeltnerChannel.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'window_atr': value, 'original_version': value, 'multiplier': value})",
@@ -2634,7 +2634,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:moving_average_convergence_divergence_macd",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
     "warmup_bars": "window_slow + window_sign - 2",
     "abbreviation": "MACD",
     "usage_example": "MACD.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
@@ -2808,7 +2808,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi",
     "warmup_bars": "window - 1",
     "abbreviation": "MFI",
     "usage_example": "MFI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
@@ -2931,7 +2931,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:mass_index",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index",
     "warmup_bars": "window_slow - 1",
     "abbreviation": "MI",
     "usage_example": "MassIndex.compute(data={'high': df['High'], 'low': df['Low']}, params={'window_fast': value, 'window_slow': value})",
@@ -3133,7 +3133,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:negative_volume_inde",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi",
     "warmup_bars": "0",
     "abbreviation": "NVI",
     "usage_example": "NVI.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
@@ -3254,7 +3254,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:price_oscillators_ppo",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo",
     "warmup_bars": "window_slow + window_sign - 2",
     "abbreviation": "PPO",
     "usage_example": "PPO.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
@@ -3344,7 +3344,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:percentage_volume_oscillator_pvo",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo",
     "warmup_bars": "window_slow + window_sign - 2",
     "abbreviation": "PVO",
     "usage_example": "PVO.compute(data={'volume': df['Volume']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
@@ -3433,7 +3433,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:rate_of_change_roc_and_momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
     "warmup_bars": "window",
     "abbreviation": "ROC",
     "usage_example": "ROC.compute(data={'close': df['Close']}, params={'window': value})",
@@ -3837,7 +3837,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:stochrsi",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
     "warmup_bars": "2 * window + smooth1 + smooth2 - 4",
     "abbreviation": "StochRSI",
     "usage_example": "StochRSI.compute(data={'close': df['Close']}, params={'window': value, 'smooth1': value, 'smooth2': value})",
@@ -3927,7 +3927,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:stochastic_oscillator_fast_slow_and_full",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full",
     "warmup_bars": "window + smooth_window - 2",
     "abbreviation": "Stoch",
     "usage_example": "StochasticOscillator.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'smooth_window': value})",
@@ -4181,7 +4181,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:trix",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix",
     "warmup_bars": "3 * (window - 1) + 1",
     "abbreviation": "TRIX",
     "usage_example": "TRIX.compute(data={'close': df['Close']}, params={'window': value, 'window_sign': value})",
@@ -4253,7 +4253,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:true_strength_index",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index",
     "warmup_bars": "window_slow + window_fast - 1",
     "abbreviation": "TSI",
     "usage_example": "TSI.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value})",
@@ -4464,7 +4464,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volatility_indicators",
-    "reference": "https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ulcer_index",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index",
     "warmup_bars": "window - 1",
     "abbreviation": "UI",
     "usage_example": "UlcerIndex.compute(data={'close': df['Close']}, params={'window': value})",
@@ -4520,7 +4520,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ultimate_oscillator",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator",
     "warmup_bars": "window3",
     "abbreviation": "UO",
     "usage_example": "UltimateOscillator.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window1': value, 'window2': value, 'window3': value, 'weight1': value, 'weight2': value, 'weight3': value})",
@@ -4677,7 +4677,7 @@
    "status": "ratified",
    "props": {
     "source_module": "volume_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:vwap_intraday",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap",
     "warmup_bars": "window - 1",
     "abbreviation": "VWAP",
     "usage_example": "VWAP.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
@@ -4804,7 +4804,7 @@
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
-    "reference": "http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:vortex_indicator",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
     "warmup_bars": "window - 1",
     "abbreviation": "VI",
     "usage_example": "Vortex.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
@@ -5059,7 +5059,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum_indicators",
-    "reference": "https://school.stockcharts.com/doku.php?id=technical_indicators:williams_r",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r",
     "warmup_bars": "window - 1",
     "abbreviation": "%R",
     "usage_example": "WilliamsR.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
@@ -5472,6 +5472,489 @@
    }
   },
   {
+   "id": "procedure:signal-adx-bullish-di",
+   "title": "adx_bullish_di",
+   "kind": "Procedure",
+   "summary": "Check if +DI is greater than -DI (bullish directional movement). When +DI > -DI, bulls have the upper hand.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx",
+    "warmup_bars": "window * 2 - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adx_bullish_di', 'params': {'window': value}}, df)",
+    "formula": "adx_pos[t] > adx_neg[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "ADX period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if +DI > -DI, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-adx-strong-trend",
+   "title": "adx_strong_trend",
+   "kind": "Procedure",
+   "summary": "Check if ADX indicates a strong trend. ADX values above 25 typically indicate a strong trend (either up or down).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx",
+    "warmup_bars": "window * 2 - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adx_strong_trend', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "adx[t] > threshold -- trend STRENGTH, undirected",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "ADX period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 25.0,
+      "min": 15.0,
+      "max": 50.0,
+      "description": "Trend strength threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ADX > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-alligator-bearish",
+   "title": "alligator_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Williams Alligator lines are in bearish alignment (lips < teeth < jaw). Strong downtrend, all lines spreading downward.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator",
+    "warmup_bars": "jaw + jaw_offset",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'alligator_bearish', 'params': {'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value}}, df)",
+    "formula": "lips[t] < teeth[t] < jaw[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "jaw": {
+      "type": "int",
+      "default": 13,
+      "min": 5,
+      "max": 50,
+      "description": "Jaw SMMA period"
+     },
+     "teeth": {
+      "type": "int",
+      "default": 8,
+      "min": 3,
+      "max": 30,
+      "description": "Teeth SMMA period"
+     },
+     "lips": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Lips SMMA period"
+     },
+     "jaw_offset": {
+      "type": "int",
+      "default": 8,
+      "min": 0,
+      "max": 20,
+      "description": "Jaw forward shift"
+     },
+     "teeth_offset": {
+      "type": "int",
+      "default": 5,
+      "min": 0,
+      "max": 15,
+      "description": "Teeth forward shift"
+     },
+     "lips_offset": {
+      "type": "int",
+      "default": 3,
+      "min": 0,
+      "max": 10,
+      "description": "Lips forward shift"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if lips < teeth < jaw on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-alligator-bullish",
+   "title": "alligator_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Williams Alligator lines are in bullish alignment (lips > teeth > jaw). Bill Williams's \"hungry alligator\" state: strong uptrend, all lines spreading upward.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator",
+    "warmup_bars": "jaw + jaw_offset",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'alligator_bullish', 'params': {'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value}}, df)",
+    "formula": "lips[t] > teeth[t] > jaw[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "jaw": {
+      "type": "int",
+      "default": 13,
+      "min": 5,
+      "max": 50,
+      "description": "Jaw SMMA period"
+     },
+     "teeth": {
+      "type": "int",
+      "default": 8,
+      "min": 3,
+      "max": 30,
+      "description": "Teeth SMMA period"
+     },
+     "lips": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Lips SMMA period"
+     },
+     "jaw_offset": {
+      "type": "int",
+      "default": 8,
+      "min": 0,
+      "max": 20,
+      "description": "Jaw forward shift"
+     },
+     "teeth_offset": {
+      "type": "int",
+      "default": 5,
+      "min": 0,
+      "max": 15,
+      "description": "Teeth forward shift"
+     },
+     "lips_offset": {
+      "type": "int",
+      "default": 3,
+      "min": 0,
+      "max": 10,
+      "description": "Lips forward shift"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if lips > teeth > jaw on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-alligator-sleeping",
+   "title": "alligator_sleeping",
+   "kind": "Procedure",
+   "summary": "Check if the Williams Alligator is sleeping (lines tangled, no trend). True when lines are neither strictly bullish-aligned nor bearish-aligned. Used as a no-trade filter during consolidation.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator",
+    "warmup_bars": "jaw + jaw_offset",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'alligator_sleeping', 'params': {'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value}}, df)",
+    "formula": "not (lips[t] > teeth[t] > jaw[t]) and not (lips[t] < teeth[t] < jaw[t]) -- neither alignment holds; the lines are tangled",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "jaw": {
+      "type": "int",
+      "default": 13,
+      "min": 5,
+      "max": 50,
+      "description": "Jaw SMMA period"
+     },
+     "teeth": {
+      "type": "int",
+      "default": 8,
+      "min": 3,
+      "max": 30,
+      "description": "Teeth SMMA period"
+     },
+     "lips": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Lips SMMA period"
+     },
+     "jaw_offset": {
+      "type": "int",
+      "default": 8,
+      "min": 0,
+      "max": 20,
+      "description": "Jaw forward shift"
+     },
+     "teeth_offset": {
+      "type": "int",
+      "default": 5,
+      "min": 0,
+      "max": 15,
+      "description": "Teeth forward shift"
+     },
+     "lips_offset": {
+      "type": "int",
+      "default": 3,
+      "min": 0,
+      "max": 10,
+      "description": "Lips forward shift"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if lines are tangled (no strict bullish or bearish alignment)"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-alma-cross-down",
+   "title": "alma_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'alma_cross_down', 'params': {'window_fast': value, 'window_slow': value, 'offset': value, 'sigma': value}}, df)",
+    "formula": "alma(window_fast)[t-1] >= alma(window_slow)[t-1] and alma(window_fast)[t] < alma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast ALMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow ALMA window"
+     },
+     "offset": {
+      "type": "float",
+      "default": 0.85,
+      "min": 0.0,
+      "max": null,
+      "description": "Weight center"
+     },
+     "sigma": {
+      "type": "float",
+      "default": 6.0,
+      "min": 0.1,
+      "max": null,
+      "description": "Gaussian spread"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish ALMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-alma-cross-up",
+   "title": "alma_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA). Both ALMAs use the same offset and sigma; only the window differs.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'alma_cross_up', 'params': {'window_fast': value, 'window_slow': value, 'offset': value, 'sigma': value}}, df)",
+    "formula": "alma(window_fast)[t-1] <= alma(window_slow)[t-1] and alma(window_fast)[t] > alma(window_slow)[t] -- both ALMAs share offset and sigma; only the window differs",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast ALMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow ALMA window"
+     },
+     "offset": {
+      "type": "float",
+      "default": 0.85,
+      "min": 0.0,
+      "max": null,
+      "description": "Weight center"
+     },
+     "sigma": {
+      "type": "float",
+      "default": 6.0,
+      "min": 0.1,
+      "max": null,
+      "description": "Gaussian spread"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish ALMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-ao-bearish",
    "title": "ao_bearish",
    "kind": "Procedure",
@@ -5650,6 +6133,168 @@
       ],
       "canonical_name": "none",
       "description": "True if zero cross detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-aroon-crossover",
+   "title": "aroon_crossover",
+   "kind": "Procedure",
+   "summary": "Check if Aroon lines cross (trend change signal).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'aroon_crossover', 'params': {'window': value, 'direction': value}}, df)",
+    "formula": "direction == 'bullish': aroon_up[t-1] <= aroon_down[t-1] and aroon_up[t] > aroon_down[t]; direction == 'bearish': aroon_up[t-1] >= aroon_down[t-1] and aroon_up[t] < aroon_down[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 25,
+      "min": 10,
+      "max": 50,
+      "description": "Lookback period"
+     },
+     "direction": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Crossover direction, 'bullish' or 'bearish'"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if crossover detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-aroon-down-trend",
+   "title": "aroon_down_trend",
+   "kind": "Procedure",
+   "summary": "Check if Aroon Down indicates strong downtrend.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'aroon_down_trend', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "aroon_down[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 25,
+      "min": 10,
+      "max": 50,
+      "description": "Lookback period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 70.0,
+      "min": 50.0,
+      "max": 100.0,
+      "description": "Strong trend threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Aroon Down > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-aroon-up-trend",
+   "title": "aroon_up_trend",
+   "kind": "Procedure",
+   "summary": "Check if Aroon Up indicates strong uptrend.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'aroon_up_trend', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "aroon_up[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 25,
+      "min": 10,
+      "max": 50,
+      "description": "Lookback period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 70.0,
+      "min": 50.0,
+      "max": 100.0,
+      "description": "Strong trend threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Aroon Up > threshold, False otherwise"
      }
     }
    }
@@ -6548,6 +7193,136 @@
    }
   },
   {
+   "id": "procedure:signal-cci-overbought",
+   "title": "cci_overbought",
+   "kind": "Procedure",
+   "summary": "Check if CCI indicates overbought condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cci_overbought', 'params': {'window': value, 'constant': value, 'threshold': value}}, df)",
+    "formula": "cci[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "CCI period"
+     },
+     "constant": {
+      "type": "float",
+      "default": 0.015,
+      "min": 0.001,
+      "max": null,
+      "description": "CCI constant"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 100.0,
+      "min": 50.0,
+      "max": 200.0,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CCI > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cci-oversold",
+   "title": "cci_oversold",
+   "kind": "Procedure",
+   "summary": "Check if CCI indicates oversold condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cci_oversold', 'params': {'window': value, 'constant': value, 'threshold': value}}, df)",
+    "formula": "cci[t] < threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "CCI period"
+     },
+     "constant": {
+      "type": "float",
+      "default": 0.015,
+      "min": 0.001,
+      "max": null,
+      "description": "CCI constant"
+     },
+     "threshold": {
+      "type": "float",
+      "default": -100.0,
+      "min": -200.0,
+      "max": -50.0,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CCI < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-cmf-bearish",
    "title": "cmf_bearish",
    "kind": "Procedure",
@@ -7318,6 +8093,106 @@
    }
   },
   {
+   "id": "procedure:signal-dema-cross-down",
+   "title": "dema_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA). Lower-lag equivalent of an SMA/EMA death cross.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'dema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "dema(window_fast)[t-1] >= dema(window_slow)[t-1] and dema(window_fast)[t] < dema(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast DEMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow DEMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish DEMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-dema-cross-up",
+   "title": "dema_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA). Lower-lag equivalent of an SMA/EMA golden cross.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'dema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "dema(window_fast)[t-1] <= dema(window_slow)[t-1] and dema(window_fast)[t] > dema(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast DEMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow DEMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish DEMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-doji-trigger",
    "title": "doji_trigger",
    "kind": "Procedure",
@@ -7368,6 +8243,92 @@
       ],
       "canonical_name": "none",
       "description": "True if doji detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-dpo-negative",
+   "title": "dpo_negative",
+   "kind": "Procedure",
+   "summary": "Check if DPO is negative (price below detrended average).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'dpo_negative', 'params': {'window': value}}, df)",
+    "formula": "dpo[t] < 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "DPO period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if DPO < 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-dpo-positive",
+   "title": "dpo_positive",
+   "kind": "Procedure",
+   "summary": "Check if DPO is positive (price above detrended average).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'dpo_positive', 'params': {'window': value}}, df)",
+    "formula": "dpo[t] > 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "DPO period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if DPO > 0, False otherwise"
      }
     }
    }
@@ -7430,6 +8391,163 @@
       ],
       "canonical_name": "none",
       "description": "True if dragonfly doji detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ema-cross-down",
+   "title": "ema_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "ema(window_fast)[t-1] >= ema(window_slow)[t-1] and ema(window_fast)[t] < ema(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 5,
+      "max": 200,
+      "description": "Slow EMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish crossover detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ema-cross-up",
+   "title": "ema_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "ema(window_fast)[t-1] <= ema(window_slow)[t-1] and ema(window_fast)[t] > ema(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 5,
+      "max": 200,
+      "description": "Slow EMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish crossover detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ema-crossover",
+   "title": "ema_crossover",
+   "kind": "Procedure",
+   "summary": "Detect an EMA crossover signal with configurable direction (bullish or bearish). Uses EMA indicator to calculate window_fast and window_slow EMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover: window_fast EMA crosses above window_slow EMA Bearish crossover: window_fast EMA crosses below window_slow EMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast <= prev window_slow AND current window_fast > current window_slow - Bearish: prev window_fast >= prev window_slow AND current window_fast < current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ema_crossover', 'params': {'window_fast': value, 'window_slow': value, 'direction': value}}, df)",
+    "formula": "direction == 'bullish': ema(window_fast)[t-1] <= ema(window_slow)[t-1] and ema(window_fast)[t] > ema(window_slow)[t]; direction == 'bearish': ema(window_fast)[t-1] >= ema(window_slow)[t-1] and ema(window_fast)[t] < ema(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Fast EMA window in bars"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Slow EMA window in bars"
+     },
+     "direction": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Crossover direction, 'bullish' or 'bearish'"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if crossover detected in the specified direction, False otherwise"
      }
     }
    }
@@ -7900,6 +9018,106 @@
    }
   },
   {
+   "id": "procedure:signal-hma-cross-down",
+   "title": "hma_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish HMA crossover (fast HMA crosses below slow HMA). Low-lag crossover; fires earlier than SMA/EMA equivalents.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'hma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "hma(window_fast)[t-1] >= hma(window_slow)[t-1] and hma(window_fast)[t] < hma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 4,
+      "max": 100,
+      "description": "Fast HMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 25,
+      "min": 4,
+      "max": 200,
+      "description": "Slow HMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish HMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-hma-cross-up",
+   "title": "hma_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish HMA crossover (fast HMA crosses above slow HMA). Low-lag crossover; fires earlier than SMA/EMA equivalents.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'hma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "hma(window_fast)[t-1] <= hma(window_slow)[t-1] and hma(window_fast)[t] > hma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 4,
+      "max": 100,
+      "description": "Fast HMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 25,
+      "min": 4,
+      "max": 200,
+      "description": "Slow HMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish HMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-indecision-pattern-recent",
    "title": "indecision_pattern_recent",
    "kind": "Procedure",
@@ -8051,6 +9269,428 @@
       ],
       "canonical_name": "none",
       "description": "True if inverted hammer detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-alma",
+   "title": "is_above_alma",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Arnaud Legoux Moving Average (ALMA). ALMA is a Gaussian-weighted MA that can be tuned to react faster (offset near 1, lower sigma) or smoother (offset near 0, higher sigma).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_alma', 'params': {'window': value, 'offset': value, 'sigma': value}}, df)",
+    "formula": "close[t] > alma[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "ALMA window in bars"
+     },
+     "offset": {
+      "type": "float",
+      "default": 0.85,
+      "min": 0.0,
+      "max": null,
+      "description": "Weight center, 0=oldest, 1=newest"
+     },
+     "sigma": {
+      "type": "float",
+      "default": 6.0,
+      "min": 0.1,
+      "max": null,
+      "description": "Gaussian spread. Higher = smoother"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > ALMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-dema",
+   "title": "is_above_dema",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Double Exponential Moving Average (DEMA). DEMA reduces lag compared to a standard EMA by combining two EMA passes. Useful for trend-following filters where responsiveness matters.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_dema', 'params': {'window': value}}, df)",
+    "formula": "close[t] > dema[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "DEMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > DEMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-hma",
+   "title": "is_above_hma",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Hull Moving Average (HMA). HMA tracks price with very low lag while remaining smoother than WMA. A common crypto trend filter.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_hma', 'params': {'window': value}}, df)",
+    "formula": "close[t] > hma[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 16,
+      "min": 4,
+      "max": 200,
+      "description": "HMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > HMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-mama",
+   "title": "is_above_mama",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the MESA Adaptive Moving Average (MAMA). MAMA adapts its smoothing to volatility via a Hilbert transform.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "warmup_bars",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_mama', 'params': {'fast_limit': value, 'slow_limit': value, 'warmup_bars': value}}, df)",
+    "formula": "close[t] > mama[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "fast_limit": {
+      "type": "float",
+      "default": 0.5,
+      "min": 0.1,
+      "max": null,
+      "description": "Upper alpha bound (fast response)"
+     },
+     "slow_limit": {
+      "type": "float",
+      "default": 0.05,
+      "min": 0.01,
+      "max": null,
+      "description": "Lower alpha bound (slow response)"
+     },
+     "warmup_bars": {
+      "type": "int",
+      "default": 64,
+      "min": 6,
+      "max": 200,
+      "description": "Leading bars discarded as contaminated by the zero seed"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > MAMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-sma",
+   "title": "is_above_sma",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Simple Moving Average. Uses SMA indicator to calculate the SMA for the given window and returns True if the most recent close price is strictly greater than the SMA value. Returns False if insufficient data is available. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_sma', 'params': {'window': value}}, df)",
+    "formula": "close[t] > sma[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "SMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > SMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-smma",
+   "title": "is_above_smma",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Smoothed Moving Average (SMMA / Wilder's). SMMA uses Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing a slower, more stable trend line. Same family used inside RSI and ATR.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_smma', 'params': {'window': value}}, df)",
+    "formula": "close[t] > smma[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 200,
+      "description": "SMMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > SMMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-t3",
+   "title": "is_above_t3",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Tillson T3 moving average. T3 is a smooth low-lag MA that combines 6 EMAs via the volume factor.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window * 6 - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_t3', 'params': {'window': value, 'volume_factor': value}}, df)",
+    "formula": "close[t] > t3[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "T3 window in bars"
+     },
+     "volume_factor": {
+      "type": "float",
+      "default": 0.7,
+      "min": 0.0,
+      "max": null,
+      "description": "Tillson volume factor, controls smoothness"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > T3, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-tema",
+   "title": "is_above_tema",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Triple Exponential Moving Average (TEMA). TEMA has even less lag than DEMA by combining three EMA passes.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_tema', 'params': {'window': value}}, df)",
+    "formula": "close[t] > tema[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "TEMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > TEMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-trima",
+   "title": "is_above_trima",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Triangular Moving Average (TRIMA). TRIMA is a double-smoothed SMA that weights the middle of the window more heavily, producing a smoother trend line than SMA.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_trima', 'params': {'window': value}}, df)",
+    "formula": "close[t] > trima[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 2,
+      "max": 200,
+      "description": "TRIMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > TRIMA, False otherwise"
      }
     }
    }
@@ -8491,6 +10131,204 @@
    }
   },
   {
+   "id": "procedure:signal-kst-bearish-cross",
+   "title": "kst_bearish_cross",
+   "kind": "Procedure",
+   "summary": "Check if KST crosses below signal line (bearish).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst",
+    "warmup_bars": "roc4 + window_sma4 + nsig - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kst_bearish_cross', 'params': {'roc1': value, 'roc2': value, 'roc3': value, 'roc4': value, 'window_sma1': value, 'window_sma2': value, 'window_sma3': value, 'window_sma4': value, 'nsig': value}}, df)",
+    "formula": "kst[t-1] >= kst_signal[t-1] and kst[t] < kst_signal[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "roc1": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "ROC1 period"
+     },
+     "roc2": {
+      "type": "int",
+      "default": 15,
+      "min": 1,
+      "max": 200,
+      "description": "ROC2 period"
+     },
+     "roc3": {
+      "type": "int",
+      "default": 20,
+      "min": 1,
+      "max": 200,
+      "description": "ROC3 period"
+     },
+     "roc4": {
+      "type": "int",
+      "default": 30,
+      "min": 1,
+      "max": 200,
+      "description": "ROC4 period"
+     },
+     "window_sma1": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "SMA1 smoothing window for ROC1"
+     },
+     "window_sma2": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "SMA2 smoothing window for ROC2"
+     },
+     "window_sma3": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "SMA3 smoothing window for ROC3"
+     },
+     "window_sma4": {
+      "type": "int",
+      "default": 15,
+      "min": 2,
+      "max": 200,
+      "description": "SMA4 smoothing window for ROC4"
+     },
+     "nsig": {
+      "type": "int",
+      "default": 9,
+      "min": 1,
+      "max": 200,
+      "description": "Signal line period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if KST crosses below signal, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kst-bullish-cross",
+   "title": "kst_bullish_cross",
+   "kind": "Procedure",
+   "summary": "Check if KST crosses above signal line (bullish).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst",
+    "warmup_bars": "roc4 + window_sma4 + nsig - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kst_bullish_cross', 'params': {'roc1': value, 'roc2': value, 'roc3': value, 'roc4': value, 'window_sma1': value, 'window_sma2': value, 'window_sma3': value, 'window_sma4': value, 'nsig': value}}, df)",
+    "formula": "kst[t-1] <= kst_signal[t-1] and kst[t] > kst_signal[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "roc1": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "ROC1 period"
+     },
+     "roc2": {
+      "type": "int",
+      "default": 15,
+      "min": 1,
+      "max": 200,
+      "description": "ROC2 period"
+     },
+     "roc3": {
+      "type": "int",
+      "default": 20,
+      "min": 1,
+      "max": 200,
+      "description": "ROC3 period"
+     },
+     "roc4": {
+      "type": "int",
+      "default": 30,
+      "min": 1,
+      "max": 200,
+      "description": "ROC4 period"
+     },
+     "window_sma1": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "SMA1 smoothing window for ROC1"
+     },
+     "window_sma2": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "SMA2 smoothing window for ROC2"
+     },
+     "window_sma3": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "SMA3 smoothing window for ROC3"
+     },
+     "window_sma4": {
+      "type": "int",
+      "default": 15,
+      "min": 2,
+      "max": 200,
+      "description": "SMA4 smoothing window for ROC4"
+     },
+     "nsig": {
+      "type": "int",
+      "default": 9,
+      "min": 1,
+      "max": 200,
+      "description": "Signal line period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if KST crosses above signal, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-kvo-bearish",
    "title": "kvo_bearish",
    "kind": "Procedure",
@@ -8829,6 +10667,249 @@
    }
   },
   {
+   "id": "procedure:signal-ma-ribbon-bearish",
+   "title": "ma_ribbon_bearish",
+   "kind": "Procedure",
+   "summary": "Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
+    "warmup_bars": "max(windows_list) - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_bearish', 'params': {'windows': value}}, df)",
+    "formula": "sma(windows[0])[t] < sma(windows[1])[t] < ... < sma(windows[-1])[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "windows": {
+      "type": "tuple",
+      "default": null,
+      "min": 2,
+      "max": 1000,
+      "description": "Strictly increasing tuple of SMA periods"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ribbon is bearish-aligned on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ma-ribbon-bullish",
+   "title": "ma_ribbon_bullish",
+   "kind": "Procedure",
+   "summary": "Check if all MAs in the ribbon are in strict bullish alignment (faster above slower). Uses 8 Fibonacci-spaced SMAs by default. Strict alignment means SMA(5) > SMA(8) > SMA(13) > ... > SMA(144). This is a strong trend filter -- when true, the market is in a clear uptrend across all horizons.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
+    "warmup_bars": "max(windows_list) - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_bullish', 'params': {'windows': value}}, df)",
+    "formula": "sma(windows[0])[t] > sma(windows[1])[t] > ... > sma(windows[-1])[t] -- shortest window on top, every gap the same sign",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "windows": {
+      "type": "tuple",
+      "default": null,
+      "min": 2,
+      "max": 1000,
+      "description": "Strictly increasing tuple of SMA periods"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ribbon is bullish-aligned on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ma-ribbon-tangled",
+   "title": "ma_ribbon_tangled",
+   "kind": "Procedure",
+   "summary": "Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter). Useful as a no-trade filter during choppy markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
+    "warmup_bars": "max(windows_list) - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_tangled', 'params': {'windows': value}}, df)",
+    "formula": "neither the bullish nor the bearish ordering holds across all of windows",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "windows": {
+      "type": "tuple",
+      "default": null,
+      "min": 2,
+      "max": 1000,
+      "description": "Strictly increasing tuple of SMA periods"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ribbon is neither bullish nor bearish aligned"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-macd-bearish-cross",
+   "title": "macd_bearish_cross",
+   "kind": "Procedure",
+   "summary": "Detect MACD bearish crossover (MACD line crosses below signal line). A bearish MACD crossover occurs when the MACD line crosses below the signal line, indicating potential downward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
+    "warmup_bars": "window_slow + window_sign - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'macd_bearish_cross', 'params': {'window_fast': value, 'window_slow': value, 'window_sign': value}}, df)",
+    "formula": "macd[t-1] >= signal[t-1] and macd[t] < signal[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 2,
+      "max": 50,
+      "description": "Fast EMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 10,
+      "max": 100,
+      "description": "Slow EMA window"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 50,
+      "description": "Signal line EMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish crossover detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-macd-bullish-cross",
+   "title": "macd_bullish_cross",
+   "kind": "Procedure",
+   "summary": "Detect MACD bullish crossover (MACD line crosses above signal line). A bullish MACD crossover occurs when the MACD line crosses above the signal line, indicating potential upward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
+    "warmup_bars": "window_slow + window_sign - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'macd_bullish_cross', 'params': {'window_fast': value, 'window_slow': value, 'window_sign': value}}, df)",
+    "formula": "macd[t-1] <= signal[t-1] and macd[t] > signal[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 2,
+      "max": 50,
+      "description": "Fast EMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 10,
+      "max": 100,
+      "description": "Slow EMA window"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 50,
+      "description": "Signal line EMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish crossover detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-macd-line-cross-down",
    "title": "macd_line_cross_down",
    "kind": "Procedure",
@@ -9029,6 +11110,163 @@
    }
   },
   {
+   "id": "procedure:signal-macd-positive",
+   "title": "macd_positive",
+   "kind": "Procedure",
+   "summary": "Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce frequent signals; use with trend confirmation.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
+    "warmup_bars": "min_periods - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'macd_positive', 'params': {'window_fast': value, 'window_slow': value, 'window_sign': value}}, df)",
+    "formula": "histogram[t] > 0 -- the HISTOGRAM, macd minus signal; macd_line_positive is the one that reads the MACD line itself",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 2,
+      "max": 50,
+      "description": "Fast EMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 10,
+      "max": 100,
+      "description": "Slow EMA window"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 50,
+      "description": "Signal line EMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if MACD histogram > 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mama-cross-down",
+   "title": "mama_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA). Classic Ehlers exit signal: MAMA falling below FAMA signals a downtrend.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "warmup_bars",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_down', 'params': {'fast_limit': value, 'slow_limit': value}}, df)",
+    "formula": "mama[t-1] >= fama[t-1] and mama[t] < fama[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "fast_limit": {
+      "type": "float",
+      "default": 0.5,
+      "min": 0.1,
+      "max": null,
+      "description": "Upper alpha bound"
+     },
+     "slow_limit": {
+      "type": "float",
+      "default": 0.05,
+      "min": 0.01,
+      "max": null,
+      "description": "Lower alpha bound"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish MAMA/FAMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mama-cross-up",
+   "title": "mama_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA). Classic Ehlers entry signal: MAMA rising above FAMA signals an uptrend.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "warmup_bars",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_up', 'params': {'fast_limit': value, 'slow_limit': value}}, df)",
+    "formula": "mama[t-1] <= fama[t-1] and mama[t] > fama[t] -- MAMA against its own following adaptive line FAMA, not a second window",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "fast_limit": {
+      "type": "float",
+      "default": 0.5,
+      "min": 0.1,
+      "max": null,
+      "description": "Upper alpha bound"
+     },
+     "slow_limit": {
+      "type": "float",
+      "default": 0.05,
+      "min": 0.01,
+      "max": null,
+      "description": "Lower alpha bound"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish MAMA/FAMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-marubozu-bearish-trigger",
    "title": "marubozu_bearish_trigger",
    "kind": "Procedure",
@@ -9134,6 +11372,74 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish marubozu detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mass-reversal-signal",
+   "title": "mass_reversal_signal",
+   "kind": "Procedure",
+   "summary": "Check if Mass Index signals potential reversal (reversal bulge). A reversal bulge occurs when Mass Index rises above 27 then falls below 26.5.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index",
+    "warmup_bars": "window_slow + window_fast - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mass_reversal_signal', 'params': {'window_fast': value, 'window_slow': value, 'threshold_high': value, 'threshold_low': value}}, df)",
+    "formula": "any(mass_index[t-9 .. t] > threshold_high) and mass_index[t] < threshold_low -- the reversal bulge: a spike above, then a fall back through the lower level",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 5,
+      "max": 15,
+      "description": "Fast EMA period"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 25,
+      "min": 15,
+      "max": 40,
+      "description": "Sum period"
+     },
+     "threshold_high": {
+      "type": "float",
+      "default": 27.0,
+      "min": 25.0,
+      "max": 30.0,
+      "description": "Upper threshold"
+     },
+     "threshold_low": {
+      "type": "float",
+      "default": 26.5,
+      "min": 24.0,
+      "max": 27.0,
+      "description": "Lower threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if reversal bulge detected, False otherwise"
      }
     }
    }
@@ -9271,7 +11577,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum",
-    "reference": null,
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
     "warmup_bars": "window",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_bearish', 'params': {'window': value}}, df)",
@@ -9314,7 +11620,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum",
-    "reference": null,
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
     "warmup_bars": "window",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_bullish', 'params': {'window': value}}, df)",
@@ -9357,7 +11663,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum",
-    "reference": null,
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
     "warmup_bars": "window + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_cross_down', 'params': {'window': value}}, df)",
@@ -9400,7 +11706,7 @@
    "status": "ratified",
    "props": {
     "source_module": "momentum",
-    "reference": null,
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
     "warmup_bars": "window + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_cross_up', 'params': {'window': value}}, df)",
@@ -9485,6 +11791,120 @@
       ],
       "canonical_name": "none",
       "description": "True if morning star detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-multi-tf-trend-bearish",
+   "title": "multi_tf_trend_bearish",
+   "kind": "Procedure",
+   "summary": "Check if the higher-timeframe EMA is falling.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window * (base bars per higher_tf period)",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bearish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
+    "formula": "higher_tf_trend[t] == -1",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "higher_tf": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Pandas offset alias"
+     },
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 100,
+      "description": "EMA period"
+     },
+     "slope_threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Slope threshold for non-flat"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if higher-TF trend == -1 on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-multi-tf-trend-bullish",
+   "title": "multi_tf_trend_bullish",
+   "kind": "Procedure",
+   "summary": "Check if the higher-timeframe EMA is rising (trend confirmation filter). Requires a DatetimeIndex. Resamples to the specified higher timeframe, computes an EMA on the resampled closes, and returns True if the EMA slope is positive. Broadcasts back to the current bar's timestamp so lower-TF signals can be filtered by higher-TF trend.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window * (base bars per higher_tf period)",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bullish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
+    "formula": "higher_tf_trend[t] == 1",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "higher_tf": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Pandas offset alias for the higher timeframe"
+     },
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 100,
+      "description": "EMA period on the resampled close"
+     },
+     "slope_threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Relative slope threshold for non-flat classification"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if higher-TF trend == +1 on the current bar"
      }
     }
    }
@@ -10051,6 +12471,49 @@
       ],
       "canonical_name": "none",
       "description": "True if PPO crosses above signal, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-price-above-ema",
+   "title": "price_above_ema",
+   "kind": "Procedure",
+   "summary": "Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'price_above_ema', 'params': {'window': value}}, df)",
+    "formula": "close[t] > ema[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 2,
+      "max": 200,
+      "description": "EMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > EMA, False otherwise"
      }
     }
    }
@@ -10692,6 +13155,263 @@
    }
   },
   {
+   "id": "procedure:signal-sma-cross-down",
+   "title": "sma_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish SMA crossover as an exit signal. Returns True when the window_fast SMA crosses below the window_slow SMA (death cross). This is a momentum-driven exit signal, indicating a transition from bullish to bearish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'sma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "sma(window_fast)[t-1] >= sma(window_slow)[t-1] and sma(window_fast)[t] < sma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Fast SMA window in bars"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Slow SMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish crossover detected in the current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-sma-cross-up",
+   "title": "sma_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish SMA crossover as an entry signal. Returns True when the window_fast SMA crosses above the window_slow SMA (golden cross). This is a momentum-driven entry signal, indicating a transition from bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper around sma_crossover.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'sma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "sma(window_fast)[t-1] <= sma(window_slow)[t-1] and sma(window_fast)[t] > sma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Fast SMA window in bars"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Slow SMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish crossover detected in the current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-sma-crossover",
+   "title": "sma_crossover",
+   "kind": "Procedure",
+   "summary": "Detect an SMA crossover signal with configurable direction (bullish or bearish). Uses SMA indicator to calculate window_fast and window_slow SMAs. Returns True when a crossover is detected in the specified direction. Bullish crossover (golden cross): window_fast SMA crosses above window_slow SMA Bearish crossover (death cross): window_fast SMA crosses below window_slow SMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast <= prev window_slow AND current window_fast > current window_slow - Bearish: prev window_fast >= prev window_slow AND current window_fast < current window_slow Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'sma_crossover', 'params': {'window_fast': value, 'window_slow': value, 'direction': value}}, df)",
+    "formula": "direction == 'bullish': sma(window_fast)[t-1] <= sma(window_slow)[t-1] and sma(window_fast)[t] > sma(window_slow)[t]; direction == 'bearish': sma(window_fast)[t-1] >= sma(window_slow)[t-1] and sma(window_fast)[t] < sma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Fast SMA window in bars"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": null,
+      "min": 1,
+      "max": 200,
+      "description": "Slow SMA window in bars"
+     },
+     "direction": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Crossover direction, 'bullish' or 'bearish'"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if crossover detected in the specified direction, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-smma-cross-down",
+   "title": "smma_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA). Slower, more stable crossover than EMA cross; fewer false triggers.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'smma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "smma(window_fast)[t-1] >= smma(window_slow)[t-1] and smma(window_fast)[t] < smma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "Fast SMMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 50,
+      "min": 2,
+      "max": 200,
+      "description": "Slow SMMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish SMMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-smma-cross-up",
+   "title": "smma_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA). Slower, more stable crossover than EMA cross; fewer false triggers.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'smma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "smma(window_fast)[t-1] <= smma(window_slow)[t-1] and smma(window_fast)[t] > smma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "Fast SMMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 50,
+      "min": 2,
+      "max": 200,
+      "description": "Slow SMMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish SMMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-spinning-top-trigger",
    "title": "spinning_top_trigger",
    "kind": "Procedure",
@@ -10879,6 +13599,162 @@
       ],
       "canonical_name": "none",
       "description": "True if close > upper band, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-stc-overbought",
+   "title": "stc_overbought",
+   "kind": "Procedure",
+   "summary": "Check if STC indicates overbought condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window_slow + cycle - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'stc_overbought', 'params': {'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
+    "formula": "stc[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 50,
+      "min": 2,
+      "max": 200,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 23,
+      "min": 2,
+      "max": 200,
+      "description": "Fast EMA period"
+     },
+     "cycle": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "Cycle period"
+     },
+     "smooth1": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 200,
+      "description": "First smoothing period"
+     },
+     "smooth2": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 200,
+      "description": "Second smoothing period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 75.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if STC > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-stc-oversold",
+   "title": "stc_oversold",
+   "kind": "Procedure",
+   "summary": "Check if STC indicates oversold condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": null,
+    "warmup_bars": "window_slow + cycle - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'stc_oversold', 'params': {'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
+    "formula": "stc[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 50,
+      "min": 2,
+      "max": 200,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 23,
+      "min": 2,
+      "max": 200,
+      "description": "Fast EMA period"
+     },
+     "cycle": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "Cycle period"
+     },
+     "smooth1": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 200,
+      "description": "First smoothing period"
+     },
+     "smooth2": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 200,
+      "description": "Second smoothing period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 25.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if STC < threshold, False otherwise"
      }
     }
    }
@@ -11197,6 +14073,220 @@
    }
   },
   {
+   "id": "procedure:signal-t3-cross-down",
+   "title": "t3_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish T3 crossover (fast T3 crosses below slow T3).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window_slow * 6",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 't3_cross_down', 'params': {'window_fast': value, 'window_slow': value, 'volume_factor': value}}, df)",
+    "formula": "t3(window_fast)[t-1] >= t3(window_slow)[t-1] and t3(window_fast)[t] < t3(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 100,
+      "description": "Fast T3 window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "Slow T3 window"
+     },
+     "volume_factor": {
+      "type": "float",
+      "default": 0.7,
+      "min": 0.0,
+      "max": null,
+      "description": "Tillson volume factor"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish T3 crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-t3-cross-up",
+   "title": "t3_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish T3 crossover (fast T3 crosses above slow T3). Very smooth, low-lag crossover. Both T3s share the same volume_factor.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window_slow * 6",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 't3_cross_up', 'params': {'window_fast': value, 'window_slow': value, 'volume_factor': value}}, df)",
+    "formula": "t3(window_fast)[t-1] <= t3(window_slow)[t-1] and t3(window_fast)[t] > t3(window_slow)[t] -- both T3s share volume_factor",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 100,
+      "description": "Fast T3 window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 200,
+      "description": "Slow T3 window"
+     },
+     "volume_factor": {
+      "type": "float",
+      "default": 0.7,
+      "min": 0.0,
+      "max": null,
+      "description": "Tillson volume factor"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish T3 crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-tema-cross-down",
+   "title": "tema_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA). Very low-lag cross signal; expect more whipsaw in noisy markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'tema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "tema(window_fast)[t-1] >= tema(window_slow)[t-1] and tema(window_fast)[t] < tema(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast TEMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow TEMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish TEMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-tema-cross-up",
+   "title": "tema_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA). Very low-lag cross signal; expect more whipsaw in noisy markets.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'tema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "tema(window_fast)[t-1] <= tema(window_slow)[t-1] and tema(window_fast)[t] > tema(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast TEMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow TEMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish TEMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-three-black-crows-trigger",
    "title": "three_black_crows_trigger",
    "kind": "Procedure",
@@ -11380,6 +14470,206 @@
       ],
       "canonical_name": "none",
       "description": "True if three white soldiers detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-trima-cross-down",
+   "title": "trima_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'trima_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "trima(window_fast)[t-1] >= trima(window_slow)[t-1] and trima(window_fast)[t] < trima(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 100,
+      "description": "Fast TRIMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 30,
+      "min": 2,
+      "max": 200,
+      "description": "Slow TRIMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish TRIMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-trima-cross-up",
+   "title": "trima_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'trima_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "trima(window_fast)[t-1] <= trima(window_slow)[t-1] and trima(window_fast)[t] > trima(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 100,
+      "description": "Fast TRIMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 30,
+      "min": 2,
+      "max": 200,
+      "description": "Slow TRIMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish TRIMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-trix-bearish",
+   "title": "trix_bearish",
+   "kind": "Procedure",
+   "summary": "Check if TRIX indicates bearish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix",
+    "warmup_bars": "window * 3 - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'trix_bearish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "trix[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 15,
+      "min": 5,
+      "max": 30,
+      "description": "TRIX period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bearish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if TRIX < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-trix-bullish",
+   "title": "trix_bullish",
+   "kind": "Procedure",
+   "summary": "Check if TRIX indicates bullish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix",
+    "warmup_bars": "window * 3 - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'trix_bullish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "trix[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 15,
+      "min": 5,
+      "max": 30,
+      "description": "TRIX period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bullish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if TRIX > threshold, False otherwise"
      }
     }
    }
@@ -11963,6 +15253,166 @@
    }
   },
   {
+   "id": "procedure:signal-vortex-bearish",
+   "title": "vortex_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Vortex Indicator shows bearish trend (-VI > +VI).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vortex_bearish', 'params': {'window': value}}, df)",
+    "formula": "vortex_neg[t] > vortex_pos[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "Vortex period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if -VI > +VI, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-vortex-bullish",
+   "title": "vortex_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Vortex Indicator shows bullish trend (+VI > -VI).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vortex_bullish', 'params': {'window': value}}, df)",
+    "formula": "vortex_pos[t] > vortex_neg[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "Vortex period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if +VI > -VI, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-vortex-crossover",
+   "title": "vortex_crossover",
+   "kind": "Procedure",
+   "summary": "Check if Vortex lines cross (trend change).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vortex_crossover', 'params': {'window': value, 'direction': value}}, df)",
+    "formula": "direction == 'bullish': vortex_pos[t-1] <= vortex_neg[t-1] and vortex_pos[t] > vortex_neg[t]; direction == 'bearish': vortex_pos[t-1] >= vortex_neg[t-1] and vortex_pos[t] < vortex_neg[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "Vortex period"
+     },
+     "direction": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish'"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if crossover detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-vpt-bearish",
    "title": "vpt_bearish",
    "kind": "Procedure",
@@ -12065,7 +15515,7 @@
    "status": "ratified",
    "props": {
     "source_module": "averaging",
-    "reference": null,
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap",
     "warmup_bars": "window - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vwap_above', 'params': {'window': value}}, df)",
@@ -12120,7 +15570,7 @@
    "status": "ratified",
    "props": {
     "source_module": "averaging",
-    "reference": null,
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap",
     "warmup_bars": "window - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vwap_below', 'params': {'window': value}}, df)",
@@ -12386,6 +15836,106 @@
       ],
       "canonical_name": "none",
       "description": "True if Williams %R < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-wma-cross-down",
+   "title": "wma_cross_down",
+   "kind": "Procedure",
+   "summary": "Check if fast WMA crosses below slow WMA (bearish).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'wma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "wma(window_fast)[t-1] >= wma(window_slow)[t-1] and wma(window_fast)[t] < wma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 50,
+      "description": "Fast WMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 10,
+      "max": 100,
+      "description": "Slow WMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if fast WMA crosses below slow WMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-wma-cross-up",
+   "title": "wma_cross_up",
+   "kind": "Procedure",
+   "summary": "Check if fast WMA crosses above slow WMA (bullish).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend",
+    "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'wma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "wma(window_fast)[t-1] <= wma(window_slow)[t-1] and wma(window_fast)[t] > wma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 50,
+      "description": "Fast WMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 10,
+      "max": 100,
+      "description": "Slow WMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if fast WMA crosses above slow WMA, False otherwise"
      }
     }
    }
@@ -13223,6 +16773,230 @@
    }
   },
   {
+   "from": "adx_bullish_di",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adx-bullish-di",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adx_bullish_di",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-adx-bullish-di",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "adx_bullish_di",
+   "rel": "uses",
+   "to": "ADX",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adx-bullish-di",
+   "to_id": "procedure:indicator-adx",
+   "inputs": {
+    "adx_neg": {
+     "type": "series"
+    },
+    "adx_pos": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "adx_strong_trend",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adx-strong-trend",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adx_strong_trend",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-adx-strong-trend",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "adx_strong_trend",
+   "rel": "uses",
+   "to": "ADX",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adx-strong-trend",
+   "to_id": "procedure:indicator-adx",
+   "inputs": {
+    "adx": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "alligator_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-alligator-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "alligator_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-alligator-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "alligator_bearish",
+   "rel": "uses",
+   "to": "WilliamsAlligator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-alligator-bearish",
+   "to_id": "procedure:indicator-williamsalligator",
+   "inputs": {
+    "jaw": {
+     "type": "series"
+    },
+    "lips": {
+     "type": "series"
+    },
+    "teeth": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "alligator_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-alligator-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "alligator_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-alligator-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "alligator_bullish",
+   "rel": "uses",
+   "to": "WilliamsAlligator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-alligator-bullish",
+   "to_id": "procedure:indicator-williamsalligator",
+   "inputs": {
+    "jaw": {
+     "type": "series"
+    },
+    "lips": {
+     "type": "series"
+    },
+    "teeth": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "alligator_sleeping",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-alligator-sleeping",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "alligator_sleeping",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-alligator-sleeping",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "alligator_sleeping",
+   "rel": "uses",
+   "to": "WilliamsAlligator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-alligator-sleeping",
+   "to_id": "procedure:indicator-williamsalligator",
+   "inputs": {
+    "jaw": {
+     "type": "series"
+    },
+    "lips": {
+     "type": "series"
+    },
+    "teeth": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "alma_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-alma-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "alma_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-alma-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "alma_cross_down",
+   "rel": "uses",
+   "to": "ALMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-alma-cross-down",
+   "to_id": "procedure:indicator-alma",
+   "inputs": {
+    "alma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "alma_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-alma-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "alma_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-alma-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "alma_cross_up",
+   "rel": "uses",
+   "to": "ALMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-alma-cross-up",
+   "to_id": "procedure:indicator-alma",
+   "inputs": {
+    "alma": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "ao_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -13305,6 +17079,96 @@
    "to_id": "procedure:indicator-awesomeoscillator",
    "inputs": {
     "ao": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "aroon_crossover",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-aroon-crossover",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "aroon_crossover",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-aroon-crossover",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "aroon_crossover",
+   "rel": "uses",
+   "to": "Aroon",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-aroon-crossover",
+   "to_id": "procedure:indicator-aroon",
+   "inputs": {
+    "aroon_down": {
+     "type": "series"
+    },
+    "aroon_up": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "aroon_down_trend",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-aroon-down-trend",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "aroon_down_trend",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-aroon-down-trend",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "aroon_down_trend",
+   "rel": "uses",
+   "to": "Aroon",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-aroon-down-trend",
+   "to_id": "procedure:indicator-aroon",
+   "inputs": {
+    "aroon_down": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "aroon_up_trend",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-aroon-up-trend",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "aroon_up_trend",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-aroon-up-trend",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "aroon_up_trend",
+   "rel": "uses",
+   "to": "Aroon",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-aroon-up-trend",
+   "to_id": "procedure:indicator-aroon",
+   "inputs": {
+    "aroon_up": {
      "type": "series"
     }
    }
@@ -13912,6 +17776,64 @@
    }
   },
   {
+   "from": "cci_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cci-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cci_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cci-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cci_overbought",
+   "rel": "uses",
+   "to": "CCI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cci-overbought",
+   "to_id": "procedure:indicator-cci",
+   "inputs": {
+    "cci": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cci_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cci-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cci_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cci-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cci_oversold",
+   "rel": "uses",
+   "to": "CCI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cci-oversold",
+   "to_id": "procedure:indicator-cci",
+   "inputs": {
+    "cci": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "cmf_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -14340,6 +18262,64 @@
    }
   },
   {
+   "from": "dema_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-dema-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "dema_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-dema-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "dema_cross_down",
+   "rel": "uses",
+   "to": "DEMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-dema-cross-down",
+   "to_id": "procedure:indicator-dema",
+   "inputs": {
+    "dema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "dema_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-dema-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "dema_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-dema-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "dema_cross_up",
+   "rel": "uses",
+   "to": "DEMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-dema-cross-up",
+   "to_id": "procedure:indicator-dema",
+   "inputs": {
+    "dema": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "doji_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -14367,6 +18347,64 @@
      "type": "series"
     },
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "dpo_negative",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-dpo-negative",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "dpo_negative",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-dpo-negative",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "dpo_negative",
+   "rel": "uses",
+   "to": "DPO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-dpo-negative",
+   "to_id": "procedure:indicator-dpo",
+   "inputs": {
+    "dpo": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "dpo_positive",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-dpo-positive",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "dpo_positive",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-dpo-positive",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "dpo_positive",
+   "rel": "uses",
+   "to": "DPO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-dpo-positive",
+   "to_id": "procedure:indicator-dpo",
+   "inputs": {
+    "dpo": {
      "type": "series"
     }
    }
@@ -14405,6 +18443,93 @@
      "type": "series"
     },
     "upper_wick": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ema_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ema-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ema_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ema-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ema_cross_down",
+   "rel": "uses",
+   "to": "EMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ema-cross-down",
+   "to_id": "procedure:indicator-ema",
+   "inputs": {
+    "ema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ema_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ema-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ema_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ema-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ema_cross_up",
+   "rel": "uses",
+   "to": "EMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ema-cross-up",
+   "to_id": "procedure:indicator-ema",
+   "inputs": {
+    "ema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ema_crossover",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ema-crossover",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ema_crossover",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ema-crossover",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ema_crossover",
+   "rel": "uses",
+   "to": "EMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ema-crossover",
+   "to_id": "procedure:indicator-ema",
+   "inputs": {
+    "ema": {
      "type": "series"
     }
    }
@@ -14666,6 +18791,64 @@
    }
   },
   {
+   "from": "hma_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-hma-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "hma_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-hma-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "hma_cross_down",
+   "rel": "uses",
+   "to": "HMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-hma-cross-down",
+   "to_id": "procedure:indicator-hma",
+   "inputs": {
+    "hma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "hma_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-hma-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "hma_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-hma-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "hma_cross_up",
+   "rel": "uses",
+   "to": "HMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-hma-cross-up",
+   "to_id": "procedure:indicator-hma",
+   "inputs": {
+    "hma": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "indecision_pattern_recent",
    "rel": "instance-of",
    "to": "Signal",
@@ -14782,6 +18965,270 @@
      "type": "series"
     },
     "upper_wick": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_alma",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-alma",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_alma",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-alma",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_alma",
+   "rel": "uses",
+   "to": "ALMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-alma",
+   "to_id": "procedure:indicator-alma",
+   "inputs": {
+    "alma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_dema",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-dema",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_dema",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-dema",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_dema",
+   "rel": "uses",
+   "to": "DEMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-dema",
+   "to_id": "procedure:indicator-dema",
+   "inputs": {
+    "dema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_hma",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-hma",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_hma",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-hma",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_hma",
+   "rel": "uses",
+   "to": "HMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-hma",
+   "to_id": "procedure:indicator-hma",
+   "inputs": {
+    "hma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_mama",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-mama",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_mama",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-mama",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_mama",
+   "rel": "uses",
+   "to": "MAMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-mama",
+   "to_id": "procedure:indicator-mama",
+   "inputs": {
+    "fama": {
+     "type": "series"
+    },
+    "mama": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_sma",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-sma",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_sma",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-sma",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_sma",
+   "rel": "uses",
+   "to": "SMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-sma",
+   "to_id": "procedure:indicator-sma",
+   "inputs": {
+    "sma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_smma",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-smma",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_smma",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-smma",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_smma",
+   "rel": "uses",
+   "to": "SMMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-smma",
+   "to_id": "procedure:indicator-smma",
+   "inputs": {
+    "smma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_t3",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-t3",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_t3",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-t3",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_t3",
+   "rel": "uses",
+   "to": "T3",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-t3",
+   "to_id": "procedure:indicator-t3",
+   "inputs": {
+    "t3": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_tema",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-tema",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_tema",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-tema",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_tema",
+   "rel": "uses",
+   "to": "TEMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-tema",
+   "to_id": "procedure:indicator-tema",
+   "inputs": {
+    "tema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_trima",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-trima",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_trima",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-trima",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_trima",
+   "rel": "uses",
+   "to": "TRIMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-trima",
+   "to_id": "procedure:indicator-trima",
+   "inputs": {
+    "trima": {
      "type": "series"
     }
    }
@@ -14990,6 +19437,70 @@
    }
   },
   {
+   "from": "kst_bearish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kst-bearish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kst_bearish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kst-bearish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kst_bearish_cross",
+   "rel": "uses",
+   "to": "KST",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kst-bearish-cross",
+   "to_id": "procedure:indicator-kst",
+   "inputs": {
+    "kst": {
+     "type": "series"
+    },
+    "kst_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kst_bullish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kst-bullish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kst_bullish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kst-bullish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kst_bullish_cross",
+   "rel": "uses",
+   "to": "KST",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kst-bullish-cross",
+   "to_id": "procedure:indicator-kst",
+   "inputs": {
+    "kst": {
+     "type": "series"
+    },
+    "kst_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "kvo_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -15156,6 +19667,157 @@
    }
   },
   {
+   "from": "ma_ribbon_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ma-ribbon-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ma_ribbon_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ma-ribbon-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ma_ribbon_bearish",
+   "rel": "uses",
+   "to": "SMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ma-ribbon-bearish",
+   "to_id": "procedure:indicator-sma",
+   "inputs": {
+    "sma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ma_ribbon_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ma-ribbon-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ma_ribbon_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ma-ribbon-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ma_ribbon_bullish",
+   "rel": "uses",
+   "to": "SMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ma-ribbon-bullish",
+   "to_id": "procedure:indicator-sma",
+   "inputs": {
+    "sma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ma_ribbon_tangled",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ma-ribbon-tangled",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ma_ribbon_tangled",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ma-ribbon-tangled",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ma_ribbon_tangled",
+   "rel": "uses",
+   "to": "SMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ma-ribbon-tangled",
+   "to_id": "procedure:indicator-sma",
+   "inputs": {
+    "sma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "macd_bearish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-macd-bearish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "macd_bearish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-macd-bearish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "macd_bearish_cross",
+   "rel": "uses",
+   "to": "MACD",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-macd-bearish-cross",
+   "to_id": "procedure:indicator-macd",
+   "inputs": {
+    "macd": {
+     "type": "series"
+    },
+    "signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "macd_bullish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-macd-bullish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "macd_bullish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-macd-bullish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "macd_bullish_cross",
+   "rel": "uses",
+   "to": "MACD",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-macd-bullish-cross",
+   "to_id": "procedure:indicator-macd",
+   "inputs": {
+    "macd": {
+     "type": "series"
+    },
+    "signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "macd_line_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -15272,6 +19934,99 @@
    }
   },
   {
+   "from": "macd_positive",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-macd-positive",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "macd_positive",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-macd-positive",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "macd_positive",
+   "rel": "uses",
+   "to": "MACD",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-macd-positive",
+   "to_id": "procedure:indicator-macd",
+   "inputs": {
+    "histogram": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mama_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mama-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mama_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-mama-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "mama_cross_down",
+   "rel": "uses",
+   "to": "MAMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mama-cross-down",
+   "to_id": "procedure:indicator-mama",
+   "inputs": {
+    "fama": {
+     "type": "series"
+    },
+    "mama": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mama_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mama-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mama_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-mama-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "mama_cross_up",
+   "rel": "uses",
+   "to": "MAMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mama-cross-up",
+   "to_id": "procedure:indicator-mama",
+   "inputs": {
+    "fama": {
+     "type": "series"
+    },
+    "mama": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "marubozu_bearish_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -15343,6 +20098,35 @@
      "type": "series"
     },
     "upper_wick": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mass_reversal_signal",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mass-reversal-signal",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mass_reversal_signal",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-mass-reversal-signal",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "mass_reversal_signal",
+   "rel": "uses",
+   "to": "MassIndex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mass-reversal-signal",
+   "to_id": "procedure:indicator-massindex",
+   "inputs": {
+    "mass_index": {
      "type": "series"
     }
    }
@@ -15549,6 +20333,64 @@
      "type": "series"
     },
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "multi_tf_trend_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-multi-tf-trend-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "multi_tf_trend_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-multi-tf-trend-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "multi_tf_trend_bearish",
+   "rel": "uses",
+   "to": "MultiTFTrend",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-multi-tf-trend-bearish",
+   "to_id": "procedure:indicator-multitftrend",
+   "inputs": {
+    "higher_tf_trend": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "multi_tf_trend_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-multi-tf-trend-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "multi_tf_trend_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-multi-tf-trend-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "multi_tf_trend_bullish",
+   "rel": "uses",
+   "to": "MultiTFTrend",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-multi-tf-trend-bullish",
+   "to_id": "procedure:indicator-multitftrend",
+   "inputs": {
+    "higher_tf_trend": {
      "type": "series"
     }
    }
@@ -15875,6 +20717,35 @@
    }
   },
   {
+   "from": "price_above_ema",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-price-above-ema",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "price_above_ema",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-price-above-ema",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "price_above_ema",
+   "rel": "uses",
+   "to": "EMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-price-above-ema",
+   "to_id": "procedure:indicator-ema",
+   "inputs": {
+    "ema": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "pvo_bearish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -16280,6 +21151,151 @@
      "type": "series"
     },
     "upper_wick": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "sma_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-sma-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "sma_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-sma-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "sma_cross_down",
+   "rel": "uses",
+   "to": "SMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-sma-cross-down",
+   "to_id": "procedure:indicator-sma",
+   "inputs": {
+    "sma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "sma_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-sma-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "sma_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-sma-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "sma_cross_up",
+   "rel": "uses",
+   "to": "SMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-sma-cross-up",
+   "to_id": "procedure:indicator-sma",
+   "inputs": {
+    "sma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "sma_crossover",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-sma-crossover",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "sma_crossover",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-sma-crossover",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "sma_crossover",
+   "rel": "uses",
+   "to": "SMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-sma-crossover",
+   "to_id": "procedure:indicator-sma",
+   "inputs": {
+    "sma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "smma_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-smma-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "smma_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-smma-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "smma_cross_down",
+   "rel": "uses",
+   "to": "SMMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-smma-cross-down",
+   "to_id": "procedure:indicator-smma",
+   "inputs": {
+    "smma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "smma_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-smma-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "smma_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-smma-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "smma_cross_up",
+   "rel": "uses",
+   "to": "SMMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-smma-cross-up",
+   "to_id": "procedure:indicator-smma",
+   "inputs": {
+    "smma": {
      "type": "series"
     }
    }
@@ -16381,6 +21397,64 @@
    }
   },
   {
+   "from": "stc_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-stc-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "stc_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-stc-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "stc_overbought",
+   "rel": "uses",
+   "to": "STC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-stc-overbought",
+   "to_id": "procedure:indicator-stc",
+   "inputs": {
+    "stc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "stc_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-stc-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "stc_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-stc-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "stc_oversold",
+   "rel": "uses",
+   "to": "STC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-stc-oversold",
+   "to_id": "procedure:indicator-stc",
+   "inputs": {
+    "stc": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "stoch_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -16535,6 +21609,122 @@
    }
   },
   {
+   "from": "t3_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-t3-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "t3_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-t3-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "t3_cross_down",
+   "rel": "uses",
+   "to": "T3",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-t3-cross-down",
+   "to_id": "procedure:indicator-t3",
+   "inputs": {
+    "t3": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "t3_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-t3-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "t3_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-t3-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "t3_cross_up",
+   "rel": "uses",
+   "to": "T3",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-t3-cross-up",
+   "to_id": "procedure:indicator-t3",
+   "inputs": {
+    "t3": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "tema_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-tema-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "tema_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-tema-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "tema_cross_down",
+   "rel": "uses",
+   "to": "TEMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-tema-cross-down",
+   "to_id": "procedure:indicator-tema",
+   "inputs": {
+    "tema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "tema_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-tema-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "tema_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-tema-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "tema_cross_up",
+   "rel": "uses",
+   "to": "TEMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-tema-cross-up",
+   "to_id": "procedure:indicator-tema",
+   "inputs": {
+    "tema": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "three_black_crows_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -16626,6 +21816,122 @@
      "type": "series"
     },
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "trima_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-trima-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "trima_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-trima-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "trima_cross_down",
+   "rel": "uses",
+   "to": "TRIMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-trima-cross-down",
+   "to_id": "procedure:indicator-trima",
+   "inputs": {
+    "trima": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "trima_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-trima-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "trima_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-trima-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "trima_cross_up",
+   "rel": "uses",
+   "to": "TRIMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-trima-cross-up",
+   "to_id": "procedure:indicator-trima",
+   "inputs": {
+    "trima": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "trix_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-trix-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "trix_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-trix-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "trix_bearish",
+   "rel": "uses",
+   "to": "TRIX",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-trix-bearish",
+   "to_id": "procedure:indicator-trix",
+   "inputs": {
+    "trix": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "trix_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-trix-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "trix_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-trix-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "trix_bullish",
+   "rel": "uses",
+   "to": "TRIX",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-trix-bullish",
+   "to_id": "procedure:indicator-trix",
+   "inputs": {
+    "trix": {
      "type": "series"
     }
    }
@@ -16921,6 +22227,102 @@
    }
   },
   {
+   "from": "vortex_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vortex-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vortex_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-vortex-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "vortex_bearish",
+   "rel": "uses",
+   "to": "Vortex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vortex-bearish",
+   "to_id": "procedure:indicator-vortex",
+   "inputs": {
+    "vortex_neg": {
+     "type": "series"
+    },
+    "vortex_pos": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "vortex_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vortex-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vortex_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-vortex-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "vortex_bullish",
+   "rel": "uses",
+   "to": "Vortex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vortex-bullish",
+   "to_id": "procedure:indicator-vortex",
+   "inputs": {
+    "vortex_neg": {
+     "type": "series"
+    },
+    "vortex_pos": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "vortex_crossover",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vortex-crossover",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vortex_crossover",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-vortex-crossover",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "vortex_crossover",
+   "rel": "uses",
+   "to": "Vortex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vortex-crossover",
+   "to_id": "procedure:indicator-vortex",
+   "inputs": {
+    "vortex_neg": {
+     "type": "series"
+    },
+    "vortex_pos": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "vpt_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -17148,6 +22550,64 @@
    "to_id": "procedure:indicator-williamsr",
    "inputs": {
     "wr": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "wma_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-wma-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "wma_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-wma-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "wma_cross_down",
+   "rel": "uses",
+   "to": "WMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-wma-cross-down",
+   "to_id": "procedure:indicator-wma",
+   "inputs": {
+    "wma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "wma_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-wma-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "wma_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-wma-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "wma_cross_up",
+   "rel": "uses",
+   "to": "WMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-wma-cross-up",
+   "to_id": "procedure:indicator-wma",
+   "inputs": {
+    "wma": {
      "type": "series"
     }
    }
@@ -17180,13 +22640,13 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 951,
+  "carried_forward_from_previous_build": 1084,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 133,
+  "signals": 197,
   "signals_registered": 247,
-  "signals_out_of_scope": 114,
+  "signals_out_of_scope": 50,
   "signals_with_no_indicator": [
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",

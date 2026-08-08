@@ -125,7 +125,12 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
         bool: True if crossover detected in the specified direction, False otherwise.
     """
     closes = df["Close"]
-    if len(closes) < window_slow:
+    # window_slow + 1, not window_slow: a crossing compares two bars, and with exactly window_slow
+    # bars the slow SMA has a single value, so there is no previous bar to compare against. The
+    # NaN check below already returned False there, so this changes no result -- it makes the bound
+    # state what the signal actually needs, which is what the ontology lifts as warmup_bars. Every
+    # other two-average crossing in this file already guards on `window_slow + 1`.
+    if len(closes) < window_slow + 1:
         return False
 
     # Calculate SMAs

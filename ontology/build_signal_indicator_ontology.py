@@ -1057,6 +1057,40 @@ SIGNAL_SCOPE = {
     "three_inside_down_trigger", "three_inside_up_trigger", "three_white_soldiers_trigger",
     "tweezer_bottoms_trigger", "tweezer_tops_trigger", "two_bar_reversal_bearish_trigger",
     "two_bar_reversal_bullish_trigger",
+
+    # Trend -- 64 of the file's 88. The other 24 are held out for two different reasons.
+    #
+    # Nine are built on the excluded stateful policy rules and must never enter the graph:
+    # chandelier_long_stop_hit, chandelier_short_stop_hit (ChandelierExit); psar_bearish,
+    # psar_bullish, psar_reversal (PSAR); supertrend_flip_down, supertrend_flip_up,
+    # supertrend_long, supertrend_short (SuperTrend). Same rule that kept the six ATR/volatility
+    # stop signals out; the guard below fails the build if one slips in.
+    #
+    # Fifteen read an indicator still in the `unclassed` class, whose classification is an open
+    # decision: heikin_ashi_{bullish,bearish} (HeikinAshi); ichimoku_{bullish,bearish},
+    # ichimoku_tk_cross (Ichimoku); rsi_{,hidden_}{bullish,bearish}_divergence (Divergence);
+    # ttm_squeeze_active, ttm_squeeze_fired_{bullish,bearish} (TTMSqueeze); epma_cross_up,
+    # epma_cross_down, is_above_epma (EPMA -- reached through the shared MA helper, so only the
+    # builder's parameter binding resolves it; a direct read of the call graph misses them). Their
+    # class is
+    # transitive, so it changes when those five are classed -- and the file a signal lives in is
+    # transitive, so it changes when those five are classed -- and the file a signal lives in is
+    # its class, so authoring them now would place them on a guess.
+    "adx_bullish_di", "adx_strong_trend", "alligator_bearish", "alligator_bullish",
+    "alligator_sleeping", "alma_cross_down", "alma_cross_up", "aroon_crossover",
+    "aroon_down_trend", "aroon_up_trend", "cci_overbought", "cci_oversold", "dema_cross_down",
+    "dema_cross_up", "dpo_negative", "dpo_positive", "ema_cross_down", "ema_cross_up",
+    "ema_crossover", "hma_cross_down", "hma_cross_up",
+    "is_above_alma", "is_above_dema", "is_above_hma", "is_above_mama",
+    "is_above_sma", "is_above_smma", "is_above_t3", "is_above_tema", "is_above_trima",
+    "kst_bearish_cross", "kst_bullish_cross", "ma_ribbon_bearish", "ma_ribbon_bullish",
+    "ma_ribbon_tangled", "macd_bearish_cross", "macd_bullish_cross", "macd_positive",
+    "mama_cross_down", "mama_cross_up", "mass_reversal_signal", "multi_tf_trend_bearish",
+    "multi_tf_trend_bullish", "price_above_ema", "sma_cross_down", "sma_cross_up",
+    "sma_crossover", "smma_cross_down", "smma_cross_up", "stc_overbought", "stc_oversold",
+    "t3_cross_down", "t3_cross_up", "tema_cross_down", "tema_cross_up", "trima_cross_down",
+    "trima_cross_up", "trix_bearish", "trix_bullish", "vortex_bearish", "vortex_bullish",
+    "vortex_crossover", "wma_cross_down", "wma_cross_up",
 }
 
 # A signal built on one of the five excluded policy rules must not enter the graph. The design is
