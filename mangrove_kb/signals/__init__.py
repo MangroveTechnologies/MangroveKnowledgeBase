@@ -20,6 +20,11 @@ Signal Categories:
     - onchain: smart-money flows, exchange flows, whale activity, holder concentration
     - defi_pro: token-unlock pressure, perp funding regime, ETF-flow momentum,
       treasury accumulation, lending-rate spread (DeFiLlama Pro)
+
+Deprecated paths: `volume` (split four ways) and `patterns` (now `pattern`) survive as shim modules
+that re-export from the new homes and warn on import. They are deliberately NOT imported below --
+importing the package must not emit a DeprecationWarning -- so they load only when something asks
+for the old path by name. Registered signal names never changed, so no strategy is affected.
 """
 
 # Import all signal modules to trigger registration with RuleRegistry
