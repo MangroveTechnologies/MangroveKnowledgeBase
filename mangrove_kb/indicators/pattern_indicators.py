@@ -11,10 +11,10 @@ were. They now live as private detectors in `mangrove_kb.signals.patterns`,
 where a boolean answer is the contract, and they compute from the two indicators
 here rather than from raw comparisons.
 
-References key:
-    [NISON]       Steve Nison, Japanese Candlestick Charting Techniques
-    [KB-07]       MangroveKnowledgeBase knowledge-base/07-chart-patterns.md
-    [STOCKCHARTS] StockCharts Candlestick Pattern Dictionary
+Each pattern signal in `mangrove_kb.signals.patterns` carries a `Reference:` URL in its own
+docstring, which the ontology builder lifts. The bracket-key scheme this block used to define was
+replaced: it named ten distinct keys across the signal docstrings and defined three of them, so
+seven cited a source nothing in the repository identified, and nothing could be lifted.
 """
 
 import numpy as np

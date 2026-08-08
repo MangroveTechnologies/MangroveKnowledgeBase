@@ -716,10 +716,12 @@ def _signal_input_descriptions():
 def _signal_summary(doc):
     """The docstring's leading prose, which becomes the atom's `summary`.
 
-    The signal counterpart of `_describe`, and simpler: a signal docstring has no title line to skip
-    and no reference URL in the prose, so everything above the first section IS the description.
+    The signal counterpart of `_describe`. The `Reference:` line sits above the first section, so it
+    is stripped here rather than ending up inside the description -- the URL is lifted separately
+    into its own field, and one fact in two places is one too many.
     """
     head = re.split(r"\n\s*(?:Type|Requires|Args|Returns):", doc)[0]
+    head = re.sub(r"^\s*References?:.*$", "", head, flags=re.M)
     return re.sub(r"\s+", " ", head).strip() or None
 
 
@@ -763,9 +765,17 @@ def _signal_lift(name, fn, facts):
 
     ret = _SIG_RETURNS.search(doc)
     sig_params = ", ".join(f"'{p}': value" for p in params)
+
+    # The first URL in the docstring, exactly as the indicator layer does it. Absent on most
+    # signals, and absent is fine: it stays null and lands on the authoring queue like any other
+    # null. The pattern signals cited sources as bracket keys (`References: [NISON], [KB-07]`)
+    # against a legend that defined three of the ten keys in use, so nothing resolved and the field
+    # could not be lifted at all; they now carry a URL directly.
+    url = re.search(r"https?://\S+", doc)
+
     return {
         "source_module": facts["module"],
-        "reference": None,
+        "reference": url.group(0).rstrip(".,") if url else None,
         "warmup_bars": facts["warmup_bars"],
         # Signals have no abbreviation. Held at null for consistency with the indicator layer, which
         # already uses null for inapplicable rather than a real value -- see the worked example.
@@ -867,8 +877,24 @@ from mangrove_kb.registry import RuleRegistry  # noqa: E402
 # `None` means every registered signal. Widen by adding names, or set to None when the shape is
 # settled for all of them.
 SIGNAL_SCOPE = {
+    # Bollinger -- the worked example that settled the shape.
     "bb_upper_breakout", "bb_lower_breakout", "bb_squeeze",
     "bb_above_upper", "bb_below_lower",
+    # Chart patterns.
+    "bearish_engulfing_trigger", "bearish_harami_trigger", "bearish_pattern_recent",
+    "bearish_pin_bar_trigger", "bullish_engulfing_trigger", "bullish_harami_trigger",
+    "bullish_pattern_recent", "bullish_pin_bar_trigger", "continuation_pattern_bearish",
+    "continuation_pattern_bullish", "dark_cloud_cover_trigger", "doji_trigger",
+    "dragonfly_doji_trigger", "evening_star_trigger", "gravestone_doji_trigger",
+    "hammer_trigger", "hanging_man_trigger", "indecision_pattern_recent",
+    "inside_bar_trigger", "inverted_hammer_trigger", "long_legged_doji_trigger",
+    "marubozu_bearish_trigger", "marubozu_bullish_trigger", "morning_star_trigger",
+    "nr7_trigger", "outside_bar_trigger", "piercing_line_trigger",
+    "reversal_pattern_bearish", "reversal_pattern_bullish", "shooting_star_trigger",
+    "spinning_top_trigger", "strong_body_recent", "three_black_crows_trigger",
+    "three_inside_down_trigger", "three_inside_up_trigger", "three_white_soldiers_trigger",
+    "tweezer_bottoms_trigger", "tweezer_tops_trigger", "two_bar_reversal_bearish_trigger",
+    "two_bar_reversal_bullish_trigger",
 }
 
 signal_no_indicator, signal_unknown_role = [], []

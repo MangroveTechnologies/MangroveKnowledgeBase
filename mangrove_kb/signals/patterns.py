@@ -59,7 +59,7 @@ def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
     Check if a doji pattern is detected on the current bar.
 
     A doji forms when open and close are nearly equal relative to the
-    candle's range, signaling indecision. References: [NISON], [KB-07], [CM45T3R].
+    candle's range, signaling indecision. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -84,7 +84,7 @@ def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     Check if a long-legged doji is detected on the current bar.
 
     A doji with both upper and lower wicks at least wick_threshold of
-    the total range, indicating extreme indecision. References: [NISON], [STOCKCHARTS].
+    the total range, indicating extreme indecision. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -110,7 +110,7 @@ def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     Check if a dragonfly doji is detected on the current bar.
 
     A doji with open/close near the high and a long lower shadow.
-    Bullish signal at support. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
+    Bullish signal at support. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -136,7 +136,7 @@ def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     Check if a gravestone doji is detected on the current bar.
 
     A doji with open/close near the low and a long upper shadow.
-    Bearish signal at resistance. References: [NISON], [STOCKCHARTS], [TRENDSPIDER].
+    Bearish signal at resistance. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -162,7 +162,7 @@ def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Check if a hammer shape is detected on the current bar.
 
     Small body at upper end with long lower wick and minimal upper wick.
-    Bullish reversal after downtrend. References: [NISON], [KB-07], [CM45T3R].
+    Bullish reversal after downtrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -188,7 +188,7 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Check if a shooting star shape is detected on the current bar.
 
     Small body at lower end with long upper wick and minimal lower wick.
-    Bearish reversal after uptrend. References: [NISON], [STOCKCHARTS].
+    Bearish reversal after uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -214,7 +214,7 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Check if a hanging man shape is detected on the current bar.
 
     Same shape as hammer (small body, long lower wick) but interpreted as a
-    bearish reversal when appearing after an uptrend. References: [NISON], [STOCKCHARTS].
+    bearish reversal when appearing after an uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -240,7 +240,7 @@ def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Check if an inverted hammer shape is detected on the current bar.
 
     Same shape as shooting star (small body, long upper wick) but interpreted as a
-    bullish reversal when appearing after a downtrend. References: [NISON], [STOCKCHARTS].
+    bullish reversal when appearing after a downtrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -265,7 +265,7 @@ def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     Check if a bullish marubozu is detected on the current bar.
 
     Full-bodied bullish candle with minimal or no wicks.
-    Signals strong buying conviction. References: [NISON], [KB-07], [CM45T3R].
+    Signals strong buying conviction. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -289,7 +289,7 @@ def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     Check if a bearish marubozu is detected on the current bar.
 
     Full-bodied bearish candle with minimal or no wicks.
-    Signals strong selling conviction. References: [NISON], [KB-07], [CM45T3R].
+    Signals strong selling conviction. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -314,7 +314,7 @@ def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
     Check if a spinning top is detected on the current bar.
 
     Small body with significant wicks on both sides, signaling indecision.
-    References: [NISON], [CM45T3R], [STOCKCHARTS].
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -344,7 +344,7 @@ def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
     Check if a bullish engulfing pattern completed on the current bar.
 
     Current bullish candle's body completely contains the previous bearish
-    candle's body. Strong bullish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
+    candle's body. Strong bullish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, Close
@@ -367,7 +367,7 @@ def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
     Check if a bearish engulfing pattern completed on the current bar.
 
     Current bearish candle's body completely contains the previous bullish
-    candle's body. Strong bearish reversal. References: [NISON], [KB-07], [STOCKCHARTS].
+    candle's body. Strong bearish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, Close
@@ -390,7 +390,7 @@ def bullish_harami_trigger(df: pd.DataFrame) -> bool:
     Check if a bullish harami pattern completed on the current bar.
 
     Current small bullish candle's body is inside the previous large bearish
-    candle's body. Potential bullish reversal. References: [NISON], [STOCKCHARTS].
+    candle's body. Potential bullish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, Close
@@ -413,7 +413,7 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
     Check if a bearish harami pattern completed on the current bar.
 
     Current small bearish candle's body is inside the previous large bullish
-    candle's body. Potential bearish reversal. References: [NISON], [STOCKCHARTS].
+    candle's body. Potential bearish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, Close
@@ -439,7 +439,7 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
     prior low (classic) or prior close (relaxed) and closing above midpoint of
     prior body. The classic definition requires a price gap, which is rare in
     24/7 crypto/forex markets. Set require_gap=False for those markets.
-    References: [NISON], [KB-07].
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -467,7 +467,7 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
     prior high (classic) or prior close (relaxed) and closing below midpoint of
     prior body. The classic definition requires a price gap, which is rare in
     24/7 crypto/forex markets. Set require_gap=False for those markets.
-    References: [NISON], [KB-07].
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -492,7 +492,7 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     Check if a tweezer tops pattern completed on the current bar.
 
     Two consecutive candles with approximately equal highs, first bullish
-    and second bearish. Bearish reversal. References: [NISON], [CM45T3R].
+    and second bearish. Bearish reversal. Reference: https://thepatternsite.com/TweezersTop.html
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -516,7 +516,7 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     Check if a tweezer bottoms pattern completed on the current bar.
 
     Two consecutive candles with approximately equal lows, first bearish
-    and second bullish. Bullish reversal. References: [NISON], [CM45T3R].
+    and second bullish. Bullish reversal. Reference: https://thepatternsite.com/TweezersBottom.html
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -545,7 +545,7 @@ def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     Check if a morning star pattern completed on the current bar.
 
     Three-candle bullish reversal: bearish candle, small-bodied star, then
-    bullish candle closing above midpoint of first. References: [NISON], [KB-07].
+    bullish candle closing above midpoint of first. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -569,7 +569,7 @@ def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     Check if an evening star pattern completed on the current bar.
 
     Three-candle bearish reversal: bullish candle, small-bodied star, then
-    bearish candle closing below midpoint of first. References: [NISON], [KB-07].
+    bearish candle closing below midpoint of first. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -593,7 +593,7 @@ def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) 
     Check if three white soldiers pattern completed on the current bar.
 
     Three consecutive bullish candles with higher closes, each opening within
-    the previous body. Strong bullish signal. References: [NISON], [KB-07], [STOCKCHARTS].
+    the previous body. Strong bullish signal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -617,7 +617,7 @@ def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> 
     Check if three black crows pattern completed on the current bar.
 
     Three consecutive bearish candles with lower closes, each opening within
-    the previous body. Strong bearish signal. References: [NISON], [KB-07], [STOCKCHARTS].
+    the previous body. Strong bearish signal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -641,7 +641,7 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
     Check if three inside up pattern completed on the current bar.
 
     Bearish candle, bullish harami, then bullish close above first candle's open.
-    Confirmed bullish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
+    Confirmed bullish reversal. Reference: https://thepatternsite.com/ThreeInsideUp.html
 
     Type: TRIGGER
     Requires: Open, Close
@@ -664,7 +664,7 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
     Check if three inside down pattern completed on the current bar.
 
     Bullish candle, bearish harami, then bearish close below first candle's open.
-    Confirmed bearish reversal. References: [NISON], [KB-07], [TRENDSPIDER].
+    Confirmed bearish reversal. Reference: https://thepatternsite.com/ThreeInsideDown.html
 
     Type: TRIGGER
     Requires: Open, Close
@@ -692,7 +692,7 @@ def inside_bar_trigger(df: pd.DataFrame) -> bool:
     Check if an inside bar is detected on the current bar.
 
     Current bar's range is completely contained within the previous bar's range.
-    Signals consolidation and potential breakout. References: [KB-07], [TSR].
+    Signals consolidation and potential breakout. Reference: https://thepatternsite.com/InsideDays.html
 
     Type: TRIGGER
     Requires: High, Low
@@ -715,7 +715,7 @@ def outside_bar_trigger(df: pd.DataFrame) -> bool:
     Check if an outside bar is detected on the current bar.
 
     Current bar's range completely engulfs the previous bar's range.
-    Signals increased volatility. References: [KB-07], [TSR].
+    Signals increased volatility. Reference: https://thepatternsite.com/OutsideDays.html
 
     Type: TRIGGER
     Requires: High, Low
@@ -739,7 +739,7 @@ def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Check if a bullish pin bar is detected on the current bar.
 
     Long lower wick with body in the upper portion of the range.
-    Bullish reversal at support. References: [KB-07], [TSR], [PRICEACTION].
+    Bullish reversal at support. Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -765,7 +765,7 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Check if a bearish pin bar is detected on the current bar.
 
     Long upper wick with body in the lower portion of the range.
-    Bearish reversal at resistance. References: [KB-07], [TSR], [PRICEACTION].
+    Bearish reversal at resistance. Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -791,7 +791,7 @@ def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 
 
     Bearish bar followed by bullish bar that takes out the low then
     closes above the prior open. The close_proximity parameter controls how
-    close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
+    close the close must be to the high/low extreme. Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -816,7 +816,7 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 
 
     Bullish bar followed by bearish bar that takes out the high then
     closes below the prior open. The close_proximity parameter controls how
-    close the close must be to the high/low extreme. References: [KB-07], [TSR], [DAILYFOREX].
+    close the close must be to the high/low extreme. Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -841,7 +841,7 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
 
     Current bar has the smallest range within the window period.
     Signals volatility compression and imminent breakout.
-    Default window=7 for NR7; use 4 for NR4. References: [CRABEL], [KB-07], [BULKOWSKI].
+    Default window=7 for NR7; use 4 for NR4. Reference: https://thepatternsite.com/nr7.html
 
     Type: TRIGGER
     Requires: High, Low
@@ -872,6 +872,8 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Scans for hammer, inverted hammer, bullish engulfing, bullish harami,
     piercing line, morning star, dragonfly doji, three white soldiers,
     three inside up, tweezer bottoms, and bullish pin bar within the recent window.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -924,6 +926,8 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     dark cloud cover, evening star, gravestone doji, three black crows,
     three inside down, tweezer tops, and bearish pin bar within the recent window.
 
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+
     Type: FILTER
     Requires: Open, High, Low, Close
 
@@ -974,6 +978,8 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     Scans for hammer, inverted hammer, bullish engulfing, morning star,
     piercing line, and dragonfly doji -- the classic bullish reversal patterns.
 
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+
     Type: FILTER
     Requires: Open, High, Low, Close
 
@@ -1014,6 +1020,8 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     Scans for hanging man, shooting star, bearish engulfing, evening star,
     dark cloud cover, and gravestone doji -- the classic bearish reversal patterns.
 
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+
     Type: FILTER
     Requires: Open, High, Low, Close
 
@@ -1053,6 +1061,8 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
 
     Scans for three white soldiers and three inside up.
 
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+
     Type: FILTER
     Requires: Open, High, Low, Close
 
@@ -1081,6 +1091,8 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
 
     Scans for three black crows and three inside down.
 
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+
     Type: FILTER
     Requires: Open, High, Low, Close
 
@@ -1108,6 +1120,8 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Check if an indecision pattern was detected within recent window.
 
     Scans for doji, spinning top, inside bar, and NR7.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1141,6 +1155,8 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Check if a marubozu (strong body) was detected within recent window.
 
     Scans for both bullish and bearish marubozu patterns.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Type: FILTER
     Requires: Open, High, Low, Close
