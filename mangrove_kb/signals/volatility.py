@@ -63,17 +63,17 @@ def bb_upper_breakout(
         data={'close': closes},
         params={'window': window, 'window_dev': window_dev}
     )
-    upper = result['hband']
+    hband = result['hband']
 
-    if pd.isna(upper.iloc[-1]) or pd.isna(upper.iloc[-2]):
+    if pd.isna(hband.iloc[-1]) or pd.isna(hband.iloc[-2]):
         return False
 
     prev_close = float(closes.iloc[-2])
     curr_close = float(closes.iloc[-1])
-    prev_upper = float(upper.iloc[-2])
-    curr_upper = float(upper.iloc[-1])
+    prev_hband = float(hband.iloc[-2])
+    curr_hband = float(hband.iloc[-1])
 
-    return prev_close <= prev_upper and curr_close > curr_upper
+    return prev_close <= prev_hband and curr_close > curr_hband
 
 
 @RuleRegistry.register("bb_lower_breakout")
@@ -105,17 +105,17 @@ def bb_lower_breakout(
         data={'close': closes},
         params={'window': window, 'window_dev': window_dev}
     )
-    lower = result['lband']
+    lband = result['lband']
 
-    if pd.isna(lower.iloc[-1]) or pd.isna(lower.iloc[-2]):
+    if pd.isna(lband.iloc[-1]) or pd.isna(lband.iloc[-2]):
         return False
 
     prev_close = float(closes.iloc[-2])
     curr_close = float(closes.iloc[-1])
-    prev_lower = float(lower.iloc[-2])
-    curr_lower = float(lower.iloc[-1])
+    prev_lband = float(lband.iloc[-2])
+    curr_lband = float(lband.iloc[-1])
 
-    return prev_close >= prev_lower and curr_close < curr_lower
+    return prev_close >= prev_lband and curr_close < curr_lband
 
 
 @RuleRegistry.register("bb_squeeze")
@@ -199,13 +199,13 @@ def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
     if len(closes) < window:
         return False
 
-    upper = BollingerBands.compute(
+    hband = BollingerBands.compute(
         data={'close': closes}, params={'window': window, 'window_dev': window_dev}
     )['hband']
 
-    if pd.isna(upper.iloc[-1]):
+    if pd.isna(hband.iloc[-1]):
         return False
-    return bool(float(closes.iloc[-1]) > float(upper.iloc[-1]))
+    return bool(float(closes.iloc[-1]) > float(hband.iloc[-1]))
 
 
 @RuleRegistry.register("bb_below_lower")
@@ -231,13 +231,13 @@ def bb_below_lower(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
     if len(closes) < window:
         return False
 
-    lower = BollingerBands.compute(
+    lband = BollingerBands.compute(
         data={'close': closes}, params={'window': window, 'window_dev': window_dev}
     )['lband']
 
-    if pd.isna(lower.iloc[-1]):
+    if pd.isna(lband.iloc[-1]):
         return False
-    return bool(float(closes.iloc[-1]) < float(lower.iloc[-1]))
+    return bool(float(closes.iloc[-1]) < float(lband.iloc[-1]))
 
 
 @RuleRegistry.register("kc_above_upper")
@@ -265,15 +265,15 @@ def kc_above_upper(
     if len(closes) < max(window, window_atr):
         return False
 
-    upper = KeltnerChannel.compute(
+    hband = KeltnerChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': closes},
         params={'window': window, 'window_atr': window_atr,
                 'original_version': False, 'multiplier': multiplier},
     )['hband']
 
-    if pd.isna(upper.iloc[-1]):
+    if pd.isna(hband.iloc[-1]):
         return False
-    return bool(float(closes.iloc[-1]) > float(upper.iloc[-1]))
+    return bool(float(closes.iloc[-1]) > float(hband.iloc[-1]))
 
 
 @RuleRegistry.register("kc_below_lower")
@@ -301,15 +301,15 @@ def kc_below_lower(
     if len(closes) < max(window, window_atr):
         return False
 
-    lower = KeltnerChannel.compute(
+    lband = KeltnerChannel.compute(
         data={'high': df["High"], 'low': df["Low"], 'close': closes},
         params={'window': window, 'window_atr': window_atr,
                 'original_version': False, 'multiplier': multiplier},
     )['lband']
 
-    if pd.isna(lower.iloc[-1]):
+    if pd.isna(lband.iloc[-1]):
         return False
-    return bool(float(closes.iloc[-1]) < float(lower.iloc[-1]))
+    return bool(float(closes.iloc[-1]) < float(lband.iloc[-1]))
 
 
 
@@ -395,17 +395,17 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
                 'window_atr': None if original_version else window_atr,
                 'multiplier': None if original_version else multiplier}
     )
-    upper = result['hband']
+    hband = result['hband']
 
-    if pd.isna(upper.iloc[-1]) or pd.isna(upper.iloc[-2]):
+    if pd.isna(hband.iloc[-1]) or pd.isna(hband.iloc[-2]):
         return False
 
     prev_close = float(df["Close"].iloc[-2])
     curr_close = float(df["Close"].iloc[-1])
-    prev_upper = float(upper.iloc[-2])
-    curr_upper = float(upper.iloc[-1])
+    prev_hband = float(hband.iloc[-2])
+    curr_hband = float(hband.iloc[-1])
 
-    return prev_close <= prev_upper and curr_close > curr_upper
+    return prev_close <= prev_hband and curr_close > curr_hband
 
 
 @RuleRegistry.register("kc_lower_breakout")
@@ -438,17 +438,17 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
                 'window_atr': None if original_version else window_atr,
                 'multiplier': None if original_version else multiplier}
     )
-    lower = result['lband']
+    lband = result['lband']
 
-    if pd.isna(lower.iloc[-1]) or pd.isna(lower.iloc[-2]):
+    if pd.isna(lband.iloc[-1]) or pd.isna(lband.iloc[-2]):
         return False
 
     prev_close = float(df["Close"].iloc[-2])
     curr_close = float(df["Close"].iloc[-1])
-    prev_lower = float(lower.iloc[-2])
-    curr_lower = float(lower.iloc[-1])
+    prev_lband = float(lband.iloc[-2])
+    curr_lband = float(lband.iloc[-1])
 
-    return prev_close >= prev_lower and curr_close < curr_lower
+    return prev_close >= prev_lband and curr_close < curr_lband
 
 
 # =============================================================================
@@ -482,17 +482,17 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
         params={'window': window, 'include_current_bar': False}
     )
-    upper = result['hband']
+    hband = result['hband']
 
-    if pd.isna(upper.iloc[-1]) or pd.isna(upper.iloc[-2]):
+    if pd.isna(hband.iloc[-1]) or pd.isna(hband.iloc[-2]):
         return False
 
     prev_close = float(df["Close"].iloc[-2])
     curr_close = float(df["Close"].iloc[-1])
-    prev_upper = float(upper.iloc[-2])
-    curr_upper = float(upper.iloc[-1])
+    prev_hband = float(hband.iloc[-2])
+    curr_hband = float(hband.iloc[-1])
 
-    return prev_close <= prev_upper and curr_close > curr_upper
+    return prev_close <= prev_hband and curr_close > curr_hband
 
 
 @RuleRegistry.register("dc_lower_breakout")
@@ -522,17 +522,17 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
         data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
         params={'window': window, 'include_current_bar': False}
     )
-    lower = result['lband']
+    lband = result['lband']
 
-    if pd.isna(lower.iloc[-1]) or pd.isna(lower.iloc[-2]):
+    if pd.isna(lband.iloc[-1]) or pd.isna(lband.iloc[-2]):
         return False
 
     prev_close = float(df["Close"].iloc[-2])
     curr_close = float(df["Close"].iloc[-1])
-    prev_lower = float(lower.iloc[-2])
-    curr_lower = float(lower.iloc[-1])
+    prev_lband = float(lband.iloc[-2])
+    curr_lband = float(lband.iloc[-1])
 
-    return prev_close >= prev_lower and curr_close < curr_lower
+    return prev_close >= prev_lband and curr_close < curr_lband
 
 
 # =============================================================================
