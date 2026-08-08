@@ -348,8 +348,9 @@ def _signal_param_docs():
     """{indicator name: {param: {description, min, max, default}}}"""
     import ast
     from mangrove_kb.registry import RuleRegistry
-    import mangrove_kb.signals.momentum, mangrove_kb.signals.trend, mangrove_kb.signals.volume  # noqa
-    import mangrove_kb.signals.volatility, mangrove_kb.signals.pattern                           # noqa
+    # Importing the package registers every signal module, so this does not need updating each
+    # time a file is split or renamed -- which it did, twice.
+    import mangrove_kb.signals  # noqa: F401
 
     kbs = pathlib.Path(inspect.getfile(mangrove_kb.signals.trend)).parent
     out = {}

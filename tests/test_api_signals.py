@@ -15,10 +15,10 @@ class TestSignalEndpoints:
         assert data["total"] == 247
 
     def test_list_signals_filter_category(self):
-        """Momentum was 42 when one file held three ontology classes; the bounded oscillators and
-        the KAMA crossings now sit under their own."""
-        for category, total in (("Momentum", 18), ("Oscillator", 22), ("Averaging", 2),
-                                ("Pattern", 40)):
+        """Files are named for the ontology class they hold. momentum.py and volume.py each held
+        several, and volume.py is gone -- there is no `volume` indicator class."""
+        for category, total in (("Momentum", 32), ("Oscillator", 26), ("Averaging", 7),
+                                ("Flow", 10), ("Pattern", 40), ("Volatility", 24)):
             resp = client.get(f"/api/signals?category={category}")
             assert resp.status_code == 200
             assert resp.json()["total"] == total, category

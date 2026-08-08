@@ -7,17 +7,18 @@ unchanged; only the file moved.
 
 import logging
 
-import numpy as np
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.signals._common import zero_cross
 from mangrove_kb.indicators import (
     BOP,
+    CMF,
     CMO,
+    MFI,
     RSI,
-    StochasticOscillator,
     StochRSI,
+    StochasticOscillator,
     TSI,
     UltimateOscillator,
     WilliamsR,
@@ -707,3 +708,119 @@ def uo_oversold(df: pd.DataFrame, window_short: int = 7, window_medium: int = 14
         return False
 
     return float(uo.iloc[-1]) < threshold
+
+
+@RuleRegistry.register("cmf_bearish")
+def cmf_bearish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> bool:
+    """
+    Check if CMF (Chaikin Money Flow) indicates selling pressure.
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CMF period. Range: 10-50. Default: 20.
+        threshold (float): Bearish threshold. Range: -1.0-1.0. Default: 0.0.
+
+    Returns:
+        bool: True if CMF < threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = CMF.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    })
+    cmf = result['cmf']
+
+    if pd.isna(cmf.iloc[-1]):
+        return False
+
+    return float(cmf.iloc[-1]) < threshold
+
+
+@RuleRegistry.register("cmf_bullish")
+def cmf_bullish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> bool:
+    """
+    Check if CMF (Chaikin Money Flow) indicates buying pressure.
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CMF period. Range: 10-50. Default: 20.
+        threshold (float): Bullish threshold. Range: -1.0-1.0. Default: 0.0.
+
+    Returns:
+        bool: True if CMF > threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = CMF.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    })
+    cmf = result['cmf']
+
+    if pd.isna(cmf.iloc[-1]):
+        return False
+
+    return float(cmf.iloc[-1]) > threshold
+
+
+@RuleRegistry.register("mfi_overbought")
+def mfi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 80.0) -> bool:
+    """
+    Check if MFI (Money Flow Index) indicates overbought condition.
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): MFI period. Range: 5-30. Default: 14.
+        threshold (float): Overbought threshold. Range: 70-95. Default: 80.0.
+
+    Returns:
+        bool: True if MFI > threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = MFI.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    })
+    mfi = result['mfi']
+
+    if pd.isna(mfi.iloc[-1]):
+        return False
+
+    return float(mfi.iloc[-1]) > threshold
+
+
+@RuleRegistry.register("mfi_oversold")
+def mfi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 20.0) -> bool:
+    """
+    Check if MFI (Money Flow Index) indicates oversold condition.
+
+    Type: FILTER
+    Requires: High, Low, Close, Volume
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): MFI period. Range: 5-30. Default: 14.
+        threshold (float): Oversold threshold. Range: 5-30. Default: 20.0.
+
+    Returns:
+        bool: True if MFI < threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = MFI.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    })
+    mfi = result['mfi']
+
+    if pd.isna(mfi.iloc[-1]):
+        return False
+
+    return float(mfi.iloc[-1]) < threshold

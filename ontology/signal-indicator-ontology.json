@@ -5112,7 +5112,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -5167,7 +5167,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -5222,7 +5222,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
     "warmup_bars": "slow",
     "abbreviation": null,
@@ -5284,7 +5284,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
     "warmup_bars": "slow",
     "abbreviation": null,
@@ -5346,7 +5346,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
     "warmup_bars": "slow + 1",
     "abbreviation": null,
@@ -5408,7 +5408,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
     "warmup_bars": "slow + 1",
     "abbreviation": null,
@@ -6546,7 +6546,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -6608,7 +6608,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -6980,7 +6980,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": null,
     "warmup_bars": "1",
     "abbreviation": null,
@@ -7023,7 +7023,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": null,
     "warmup_bars": "1",
     "abbreviation": null,
@@ -7066,7 +7066,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": null,
     "warmup_bars": "1",
     "abbreviation": null,
@@ -7109,7 +7109,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": null,
     "warmup_bars": "1",
     "abbreviation": null,
@@ -7433,7 +7433,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -7491,7 +7491,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -7604,7 +7604,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -7658,7 +7658,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -8054,7 +8054,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -8489,7 +8489,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
     "warmup_bars": "slow + signal_window",
     "abbreviation": null,
@@ -8519,14 +8519,14 @@
       "default": 34,
       "min": 5,
       "max": 100,
-      "description": "Fast EMA period"
+      "description": "Fast EMA period for signed volume"
      },
      "slow": {
       "type": "int",
       "default": 55,
       "min": 10,
       "max": 200,
-      "description": "Slow EMA period"
+      "description": "Slow EMA period for signed volume"
      },
      "signal_window": {
       "type": "int",
@@ -8558,7 +8558,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
     "warmup_bars": "slow + signal_window",
     "abbreviation": null,
@@ -8588,14 +8588,14 @@
       "default": 34,
       "min": 5,
       "max": 100,
-      "description": "Fast EMA period"
+      "description": "Fast EMA period for signed volume"
      },
      "slow": {
       "type": "int",
       "default": 55,
       "min": 10,
       "max": 200,
-      "description": "Slow EMA period"
+      "description": "Slow EMA period for signed volume"
      },
      "signal_window": {
       "type": "int",
@@ -8627,7 +8627,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
     "warmup_bars": "slow + signal_window",
     "abbreviation": null,
@@ -8657,14 +8657,14 @@
       "default": 34,
       "min": 5,
       "max": 100,
-      "description": "Fast EMA period"
+      "description": "Fast EMA period for signed volume"
      },
      "slow": {
       "type": "int",
       "default": 55,
       "min": 10,
       "max": 200,
-      "description": "Slow EMA period"
+      "description": "Slow EMA period for signed volume"
      },
      "signal_window": {
       "type": "int",
@@ -8696,7 +8696,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "momentum",
     "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
     "warmup_bars": "slow + signal_window",
     "abbreviation": null,
@@ -9137,7 +9137,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9199,7 +9199,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9651,7 +9651,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9698,7 +9698,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9745,7 +9745,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/on-balance-volume-obv",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9792,7 +9792,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/on-balance-volume-obv",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -11961,7 +11961,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -12008,7 +12008,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "flow",
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -12055,7 +12055,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -12110,7 +12110,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -12165,7 +12165,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -12219,7 +12219,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "volume",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,

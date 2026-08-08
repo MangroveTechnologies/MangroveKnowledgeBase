@@ -423,7 +423,7 @@ def spec_momentum(df):
     }
 
 
-def spec_patterns(df):
+def spec_pattern(df):
     O, H, L, C = df["Open"], df["High"], df["Low"], df["Close"]
 
     def d(fn, **kw):
@@ -530,7 +530,7 @@ def fell_over(series, window):
                       and series.iloc[t] < series.iloc[t - window + 1])
 
 
-def spec_volume(df):
+def spec_flow_and_volume_derived(df):
     from mangrove_kb.indicators import (ADI, ADOSC, CMF, KVO, MFI, NVI, OBV, VPT, VWAP, VWMA,
                                         CumulativeReturn, DailyReturn, EaseOfMovement, ForceIndex)
     H, L, C, V = df["High"], df["Low"], df["Close"], df["Volume"]
@@ -602,8 +602,11 @@ def spec_volume(df):
 CLASSES = {
     "volatility": spec_volatility,
     "momentum": spec_momentum,
-    "patterns": spec_patterns,
-    "volume": spec_volume,
+    "pattern": spec_pattern,
+    # volume.py is gone: there is no `volume` indicator class, so its 33 signals split
+    # four ways by the class of the indicator each reads. They are still verified
+    # together, since the verification does not care which file they live in.
+    "flow": spec_flow_and_volume_derived,
 }
 
 

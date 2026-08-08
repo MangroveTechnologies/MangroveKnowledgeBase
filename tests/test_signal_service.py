@@ -11,13 +11,17 @@ class TestSignalServiceMetadata:
         assert len(signals) == 247
 
     def test_list_signals_filter_by_category(self):
-        """Categories follow the file layout, and the files follow the ontology class. Momentum was
-        42 when one file held three classes: the bounded oscillators (RSI, Stochastic, StochRSI,
-        Williams %R, CMO, TSI, BOP, Ultimate Oscillator) are `oscillator` and the KAMA crossings are
-        `averaging`. Only 18 of the 42 measure rate of change."""
-        assert len(self.service.list_signals(category="Momentum")) == 18
-        assert len(self.service.list_signals(category="Oscillator")) == 22
-        assert len(self.service.list_signals(category="Averaging")) == 2
+        """Categories follow the file layout, and the files follow the ontology class.
+
+        Two files held several classes at once and were split. momentum.py was 42: the bounded
+        oscillators are `oscillator` and the KAMA crossings are `averaging`. volume.py was 33 and is
+        gone entirely -- there is no `volume` indicator class, so its signals went four ways by the
+        class of the indicator each reads, and `flow` (the cumulative lines: OBV, ADI, VPT, NVI)
+        appeared as a file for the first time."""
+        assert len(self.service.list_signals(category="Momentum")) == 32
+        assert len(self.service.list_signals(category="Oscillator")) == 26
+        assert len(self.service.list_signals(category="Averaging")) == 7
+        assert len(self.service.list_signals(category="Flow")) == 10
         assert len(self.service.list_signals(category="Pattern")) == 40
         assert len(self.service.list_signals(category="Volatility")) == 24
 

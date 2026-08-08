@@ -1,9 +1,14 @@
 """
 Validation tests for the docstring parser.
 
-Loads the original signals_metadata.json, imports all 5 signal modules
-(momentum, trend, volume, volatility, social), parses their docstrings
-using the parser, and compares the parsed output to the JSON for every signal.
+Loads the original signals_metadata.json, imports the signal modules whose signals that JSON
+covers, parses their docstrings using the parser, and compares the parsed output to the JSON for
+every signal.
+
+The module list is not hand-maintained: the reorganisation onto ontology classes moved signals
+between files twice, and a hard-coded list silently drops whichever ones moved out. Every module in
+the package is imported and `parse_all_signals` is given all of them; signals absent from the JSON
+are skipped downstream as they always were.
 
 Reports mismatches in type, requires, param names, param types, param ranges,
 and param defaults.
@@ -22,10 +27,7 @@ import pytest
 # ---------------------------------------------------------------------------
 
 from mangrove_kb.registry import RuleRegistry  # noqa: E402
-from mangrove_kb.signals import momentum as momentum_signals  # noqa: E402
-from mangrove_kb.signals import trend as trend_signals  # noqa: E402
-from mangrove_kb.signals import volume as volume_signals  # noqa: E402
-from mangrove_kb.signals import volatility as volatility_signals  # noqa: E402
+import mangrove_kb.signals  # noqa: E402
 from mangrove_kb.docstring_parser import (  # noqa: E402
     parse_signal_docstring,
     parse_all_signals,
@@ -52,10 +54,9 @@ METADATA_JSON_PATH = (
 )
 
 ALL_SIGNAL_MODULES = [
-    momentum_signals,
-    trend_signals,
-    volume_signals,
-    volatility_signals,
+    m for m in vars(mangrove_kb.signals).values()
+    if getattr(m, "__name__", "").startswith("mangrove_kb.signals.")
+    and not m.__name__.rsplit(".", 1)[-1].startswith("_")
 ]
 
 

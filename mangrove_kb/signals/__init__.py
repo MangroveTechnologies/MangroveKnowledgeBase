@@ -9,12 +9,13 @@ signal reads -- so a signal's location agrees with its position in the graph. Fi
 reorganised keep their old use-case names.
 
 Signal Categories:
-    - oscillator: RSI, Stochastic, StochRSI, Williams %R, CMO, TSI, BOP, Ultimate Oscillator
-    - momentum: MACD line, ROC, MOM, PPO, PVO, Awesome Oscillator
-    - averaging: KAMA crossings
+    - oscillator: RSI, Stochastic, StochRSI, Williams %R, CMO, TSI, BOP, Ultimate Oscillator, CMF, MFI
+    - momentum: MACD line, ROC, MOM, PPO, PVO, Awesome Oscillator, ADOSC, Force Index,
+      Ease of Movement, KVO, daily returns
+    - averaging: KAMA crossings, VWAP, VWMA
+    - flow: OBV, ADI, VPT, NVI, CumulativeReturn -- running accumulations read by direction
     - pattern: Doji, Hammer, Engulfing, MorningStar, InsideBar, NR7, etc.
     - trend: SMA, EMA, MACD, ADX, Aroon, Ichimoku, PSAR, etc.
-    - volume: OBV, CMF, MFI, VWAP, ADI, Force Index, etc.
     - volatility: Bollinger Bands, ATR, Keltner Channel, Donchian, etc.
     - onchain: smart-money flows, exchange flows, whale activity, holder concentration
     - defi_pro: token-unlock pressure, perp funding regime, ETF-flow momentum,
@@ -24,7 +25,7 @@ Signal Categories:
 # Import all signal modules to trigger registration with RuleRegistry
 from mangrove_kb.signals import momentum
 from mangrove_kb.signals import trend
-from mangrove_kb.signals import volume
+from mangrove_kb.signals import flow
 from mangrove_kb.signals import volatility
 from mangrove_kb.signals import pattern
 from mangrove_kb.signals import oscillator
