@@ -75,15 +75,24 @@ of what it is -- which bars the predicate reads.
 nothing to a reader of the graph. Read the body, then write the predicate in the names the node
 already uses. This is the one field where reading source is required rather than optional.
 
-**Verify against the REAL fixture first.** `scripts/audit`'s `load_btc_daily()` is 1,294 bars of
-actual BTC daily data. Replay the formula against the signal on that, bar for bar, before anything
-else. Synthetic series are a supplement for setups the real trace does not contain -- not a
-substitute, and never the only thing reported. Saying "verified over N bars" without saying which
-data is how a whole pass gets re-run.
+**Use the harness. Do not write a script.** `scripts/audit/verify_signal_formulas.py` replays every
+authored formula against the signal it describes, on the real 1,294-bar BTC fixture first, falling
+back to a constructed series only for setups the real trace does not contain. Add a `spec_<class>`
+entry and a line in `CLASSES`:
 
-**Compute the indicator, evaluate the predicate you wrote against the signal's actual output, and
-confirm they agree bar for bar.** A formula that disagrees with the code is worse than a null,
-because a null is honest.
+    PYTHONPATH=. python3 scripts/audit/verify_signal_formulas.py            # everything
+    PYTHONPATH=. python3 scripts/audit/verify_signal_formulas.py volatility # one class
+
+It refuses to pass if a signal has an authored formula and no spec entry, so authoring without
+verifying is not possible. It also carries the predicate builders -- `crosses_above`,
+`outside_above`, `fired_within`, `equals` -- so the distinctions that matter (a crossing versus a
+state, a signed detector versus a boolean one) are expressed once rather than re-derived per class.
+
+The first three passes each got their own throwaway script and each repeated a fresh mistake: wrong
+detector call shapes, parameters the signal does not expose, warmup offsets, a fixture whose `open`
+equalled the prior close so no strict inequality could fire. That is why this is one file.
+
+A formula that disagrees with the code is worse than a null, because a null is honest.
 
 **A signal that never fires on the REAL fixture is a finding, not just a gap in the test.** Ask why
 before reaching for synthetic data. Two answers, and they need opposite responses:
