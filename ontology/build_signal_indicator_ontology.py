@@ -329,6 +329,14 @@ _DEFAULT = re.compile(r"Default:\s*(\S+?)[.,]?(?=\s|$)")
 
 
 def _num(x):
+    """Parse a docstring literal into a value, or None if it is not one.
+
+    Booleans are handled explicitly: a bool param writes `Default: false`, which `float()` rejects,
+    so every boolean default lifted as None and looked unauthored. `require_gap` and
+    `original_version` are the ones this hid.
+    """
+    if isinstance(x, str) and x.strip().lower().rstrip(".") in ("true", "false"):
+        return x.strip().lower().rstrip(".") == "true"
     try:
         f = float(x)
         return int(f) if f == int(f) else f

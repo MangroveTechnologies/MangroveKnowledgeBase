@@ -8,6 +8,8 @@ Usage:
     pytest tests/test_indicator_defect_fixes.py -v
 """
 
+import inspect
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -677,3 +679,66 @@ def test_graph_atoms_use_the_ontology_value_vocabularies():
     # Everything here is read from the code and verified by executing it, never interpreted from
     # prose -- the indicators and signals whose behaviour is unsettled are held out of scope.
     assert {a["epistemic"] for a in atoms} == {"observed"}
+
+
+def test_gap_requiring_patterns_can_fire_in_a_247_market():
+    """`piercing_line_trigger` and `dark_cloud_cover_trigger` defaulted to `require_gap=True`, which
+    needs the bar to open beyond the PRIOR EXTREME -- below the prior low, or above the prior high.
+
+    A 24/7 market does not gap. On the 1,294-bar BTC daily fixture the open is below the prior low
+    zero times and above the prior high zero times, so both signals were inert on every crypto
+    series: 0 fires against 63 and 67 for the relaxed form. The default is now False.
+
+    Caught only by replaying against the real fixture; the synthetic series used during authoring
+    were built from a random walk with an independent open, so they gapped freely.
+    """
+    import mangrove_kb.signals  # noqa: F401
+    from mangrove_kb.registry import RuleRegistry
+
+    n = 400
+    rs = np.random.RandomState(17)
+    close = pd.Series(100 + rs.normal(0, 1.5, n).cumsum(), index=_idx(n))
+    # A 24/7 series: each bar opens NEAR where the last one closed, never beyond the prior bar's
+    # range. Exactly equal would be degenerate -- the relaxed form tests `open < prior close`
+    # strictly, so an identical open cannot fire either, and real continuous markets do move a
+    # little between bars.
+    open_ = close.shift(1).bfill() + rs.normal(0, 0.25, n)
+    df = pd.DataFrame({
+        "Open": open_,
+        "High": np.maximum(open_, close) + np.abs(rs.normal(0, 0.6, n)),
+        "Low": np.minimum(open_, close) - np.abs(rs.normal(0, 0.6, n)),
+        "Close": close, "Volume": 1000.0}, index=_idx(n))
+
+    # the defining property of a continuous market: the open never escapes the prior bar's range
+    df["Open"] = df["Open"].clip(lower=df["Low"].shift(1), upper=df["High"].shift(1)).fillna(df["Open"])
+    assert int((df["Open"] > df["High"].shift(1)).sum()) == 0
+    assert int((df["Open"] < df["Low"].shift(1)).sum()) == 0
+
+    for name in ("piercing_line_trigger", "dark_cloud_cover_trigger"):
+        fn = RuleRegistry._registry[name]
+        assert inspect.signature(fn).parameters["require_gap"].default is False, \
+            f"{name} defaults to the classic form, which cannot fire without gaps"
+        relaxed = sum(bool(fn(df.iloc[:t + 1])) for t in range(3, n))
+        strict = sum(bool(fn(df.iloc[:t + 1], require_gap=True)) for t in range(3, n))
+        assert relaxed > 0, f"{name} cannot fire on a gapless series even relaxed"
+        assert strict == 0, f"{name} fired with require_gap=True on a series that never gaps"
+
+
+def test_boolean_parameter_defaults_are_lifted_into_the_graph():
+    """`Default: false` in a docstring lifted as None, because the parser went through `float()`.
+    Every boolean default in the corpus therefore looked unauthored -- including
+    KeltnerChannel.original_version, unrelated to the signals that exposed it."""
+    import json
+    from pathlib import Path
+
+    graph = json.loads((Path(__file__).resolve().parent.parent
+                        / "ontology" / "signal-indicator-ontology.json").read_text())
+    bools = {(a["title"], k): v for a in graph["atoms"]
+             for k, v in (a["props"].get("params") or {}).items() if v.get("type") == "bool"}
+    assert bools, "no boolean parameters in the graph -- the test is not covering anything"
+
+    for name in (("piercing_line_trigger", "require_gap"),
+                 ("dark_cloud_cover_trigger", "require_gap"),
+                 ("KeltnerChannel", "original_version")):
+        assert name in bools, name
+        assert bools[name]["default"] is False, f"{name} default did not lift: {bools[name]}"

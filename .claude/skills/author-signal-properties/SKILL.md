@@ -75,9 +75,26 @@ of what it is -- which bars the predicate reads.
 nothing to a reader of the graph. Read the body, then write the predicate in the names the node
 already uses. This is the one field where reading source is required rather than optional.
 
-**Verify by execution, not by eye.** Compute the indicator, evaluate the predicate you wrote against
-the signal's actual output over a few hundred bars, and confirm they agree bar for bar. A formula
-that disagrees with the code is worse than a null, because a null is honest.
+**Verify against the REAL fixture first.** `scripts/audit`'s `load_btc_daily()` is 1,294 bars of
+actual BTC daily data. Replay the formula against the signal on that, bar for bar, before anything
+else. Synthetic series are a supplement for setups the real trace does not contain -- not a
+substitute, and never the only thing reported. Saying "verified over N bars" without saying which
+data is how a whole pass gets re-run.
+
+**Compute the indicator, evaluate the predicate you wrote against the signal's actual output, and
+confirm they agree bar for bar.** A formula that disagrees with the code is worse than a null,
+because a null is honest.
+
+**A signal that never fires on the REAL fixture is a finding, not just a gap in the test.** Ask why
+before reaching for synthetic data. Two answers, and they need opposite responses:
+
+- *the setup does not occur in this market* -- `natr_low_volatility` needs NATR below 1.0 and BTC's
+  daily range is 1.72-6.67; `gravestone_doji` occurs once in 1,294 bars. Nothing to fix; construct
+  bars to verify the formula and record that it is rare here.
+- *the signal cannot fire in this market* -- a real defect. `piercing_line_trigger` and
+  `dark_cloud_cover_trigger` defaulted to `require_gap=True`, which needs the bar to open beyond the
+  prior extreme. A 24/7 market does not gap: measured, BTC opens above the prior high ZERO times in
+  1,294 bars, so both signals were inert. Flipping the default to False gives 59 and 61 fires.
 
 **A signal that never fires verifies nothing.** If the signal returned False on every bar, so did the
 formula, and they agree for a reason that has nothing to do with correctness. Check the fire count;
@@ -180,3 +197,6 @@ has: the last four pattern references came from working out that `[TSR]` meant T
    a fixed point.
 3. No new nulls anywhere else in the node. `abbreviation` stays null on every signal by convention;
    nothing else should be.
+4. Check the default the node ended up with, not the one you expected. A boolean default used to
+   lift as `null` because `float("false")` fails -- fixed, but the class of bug recurs: a parser
+   that silently returns None makes a real value look unauthored.

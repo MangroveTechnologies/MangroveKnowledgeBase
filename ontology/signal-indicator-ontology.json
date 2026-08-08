@@ -2457,7 +2457,7 @@
      },
      "original_version": {
       "type": "bool",
-      "default": null,
+      "default": false,
       "min": null,
       "max": null,
       "description": "Use original Keltner Channel formula instead of EMA+ATR"
@@ -6494,7 +6494,7 @@
    "id": "procedure:signal-dark-cloud-cover-trigger",
    "title": "dark_cloud_cover_trigger",
    "kind": "Procedure",
-   "summary": "Check if a dark cloud cover pattern completed on the current bar. Bearish reversal: bullish candle followed by bearish candle opening above prior high (classic) or prior close (relaxed) and closing below midpoint of prior body. The classic definition requires a price gap, which is rare in 24/7 crypto/forex markets. Set require_gap=False for those markets.",
+   "summary": "Check if a dark cloud cover pattern completed on the current bar. Bearish reversal: bullish candle followed by bearish candle opening above prior high (classic) or prior close (relaxed) and closing below midpoint of prior body. DEFAULT IS THE RELAXED FORM, because the classic one cannot fire here. It requires the bar to open above the prior HIGH, and a 24/7 market does not gap: measured on 1,294 BTC daily bars, the open is above the prior high ZERO times, so require_gap=True yields 0 fires against 67 for the relaxed form. Set require_gap=True only for a market that actually closes.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -6503,7 +6503,7 @@
     "warmup_bars": "1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dark_cloud_cover_trigger', 'params': {'min_penetration': value, 'require_gap': value}}, df)",
-    "formula": "close[t-1] > open[t-1] and close[t] < open[t] and open[t] > close[t-1] and close[t] < close[t-1] - (close[t-1] - open[t-1]) * min_penetration -- open[t] > high[t-1] instead when require_gap is true",
+    "formula": "close[t-1] > open[t-1] and close[t] < open[t] and open[t] > close[t-1] and close[t] < close[t-1] - (close[t-1] - open[t-1]) * min_penetration -- open[t] > high[t-1] instead when require_gap is true, which cannot occur in a 24/7 market",
     "inputs": {
      "open": {
       "type": "series",
@@ -6532,10 +6532,10 @@
      },
      "require_gap": {
       "type": "bool",
-      "default": null,
+      "default": false,
       "min": null,
       "max": null,
-      "description": "If True, requires open above previous high (classic Nison). If False, requires open above previous close (relaxed for 24/7 markets)"
+      "description": "If True, requires open above previous high (classic Nison), which cannot occur in a 24/7 market. If False, requires open above previous close"
      }
     },
     "outputs": {
@@ -7464,7 +7464,7 @@
      },
      "original_version": {
       "type": "bool",
-      "default": null,
+      "default": false,
       "min": null,
       "max": null,
       "description": "Use original Keltner Channel formula instead of EMA+ATR"
@@ -7536,7 +7536,7 @@
      },
      "original_version": {
       "type": "bool",
-      "default": null,
+      "default": false,
       "min": null,
       "max": null,
       "description": "Use original Keltner Channel formula instead of EMA+ATR"
@@ -8361,7 +8361,7 @@
    "id": "procedure:signal-piercing-line-trigger",
    "title": "piercing_line_trigger",
    "kind": "Procedure",
-   "summary": "Check if a piercing line pattern completed on the current bar. Bullish reversal: bearish candle followed by bullish candle opening below prior low (classic) or prior close (relaxed) and closing above midpoint of prior body. The classic definition requires a price gap, which is rare in 24/7 crypto/forex markets. Set require_gap=False for those markets.",
+   "summary": "Check if a piercing line pattern completed on the current bar. Bullish reversal: bearish candle followed by bullish candle opening below prior low (classic) or prior close (relaxed) and closing above midpoint of prior body. DEFAULT IS THE RELAXED FORM, because the classic one cannot fire here. It requires the bar to open below the prior LOW, and a 24/7 market does not gap: measured on 1,294 BTC daily bars, the open is below the prior low ZERO times, so require_gap=True yields 0 fires against 63 for the relaxed form. Set require_gap=True only for a market that actually closes.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -8370,7 +8370,7 @@
     "warmup_bars": "1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'piercing_line_trigger', 'params': {'min_penetration': value, 'require_gap': value}}, df)",
-    "formula": "close[t-1] < open[t-1] and close[t] > open[t] and open[t] < close[t-1] and close[t] > close[t-1] + (open[t-1] - close[t-1]) * min_penetration -- open[t] < low[t-1] instead when require_gap is true",
+    "formula": "close[t-1] < open[t-1] and close[t] > open[t] and open[t] < close[t-1] and close[t] > close[t-1] + (open[t-1] - close[t-1]) * min_penetration -- open[t] < low[t-1] instead when require_gap is true, which cannot occur in a 24/7 market",
     "inputs": {
      "open": {
       "type": "series",
@@ -8399,10 +8399,10 @@
      },
      "require_gap": {
       "type": "bool",
-      "default": null,
+      "default": false,
       "min": null,
       "max": null,
-      "description": "If True, requires open below previous low (classic Nison). If False, requires open below previous close (relaxed for 24/7 markets)"
+      "description": "If True, requires open below previous low (classic Nison), which cannot occur in a 24/7 market. If False, requires open below previous close"
      }
     },
     "outputs": {
