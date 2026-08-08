@@ -92,10 +92,33 @@ than the class, because consumers reason about derived signals and can read it.
 
 ### Removed from the indicator layer
 
-`ATRTrailingStop`, `VolatilityStop`, `ChandelierExit`, `SuperTrend`, `PSAR` are **not indicators**.
-They are stateful rules emitting a decision boundary plus a regime flag -- policy, not measurement.
-Excluded from this ontology and from the graph. The measurement underneath the ATR-based ones is
-ATR, which is already classed.
+**Indicators are measurements, never verdicts. Signals are verdicts.**
+
+That is the whole criterion. An indicator states what it measured; deciding what the measurement
+means is the signal layer's job.
+
+`ATRTrailingStop`, `VolatilityStop`, `SuperTrend` and `PSAR` fail it and are excluded from this
+ontology and from the graph. SuperTrend emits `direction` (+1 long / -1 short) and NaNs its bands
+according to that verdict; PSAR emits `psar_up_indicator` / `psar_down_indicator`, which are flip
+flags; the two trailing stops carry a position state forward. The measurement underneath the
+ATR-based ones is ATR, which is already classed.
+
+This generalises the boolean-output rule below: a boolean is a verdict with two values, and the
+same argument applies to a ternary or any other flag.
+
+**`ChandelierExit` was on that list and should not have been.** It emits two price levels, both
+defined on every bar, both plain functions of the window -- and its own docstring said it was not a
+state machine. It was excluded for a property it does not have. It is now `ChandelierLevels`, class
+`volatility`, living in `volatility_indicators.py` beside the ATR it is built on, with outputs
+renamed `high_offset` / `low_offset` and its two signals renamed `cl_below_high_offset` /
+`cl_above_low_offset` (old names aliased). Note the two offsets are anchored to OPPOSITE extremes,
+so they are not an upper and a lower band and do cross -- 27% of bars on the BTC fixture.
+
+**Known violation, pending a decision:** `MultiTFTrend` emits `higher_tf_trend`, a ternary
+-1 / 0 / +1 state, and is currently classed `momentum` with two signals that read the verdict
+directly. By the rule above it does not belong in the indicator layer as it stands; the measurement
+is the normalised higher-timeframe slope, and the sign should be the signal's decision. Left in
+place deliberately rather than silently, so the rule and the data are not quietly inconsistent.
 
 ---
 

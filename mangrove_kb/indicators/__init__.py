@@ -36,8 +36,10 @@ from .momentum_indicators import (
     CMO,
 )
 
-# Volatility indicators
-from .volatility_indicators import (
+# Volatility indicators. ChandelierExit is the deprecated spelling of ChandelierLevels:
+# importable so old code keeps working, absent from __all__ so it is not a second entry in
+# the indicator catalogue.
+from .volatility_indicators import (  # noqa: F401
     ATR,
     BollingerBands,
     KeltnerChannel,
@@ -49,6 +51,8 @@ from .volatility_indicators import (
     STARCBands,
     VolatilityStop,
     TTMSqueeze,
+    ChandelierLevels,
+    ChandelierExit,
 )
 
 # Trend indicators
@@ -66,7 +70,6 @@ from .trend_indicators import (
     T3,
     MAMA,
     HeikinAshi,
-    ChandelierExit,
     WilliamsAlligator,
     SuperTrend,
     MultiTFTrend,
@@ -164,7 +167,7 @@ __all__ = [
     "T3",
     "MAMA",
     "HeikinAshi",
-    "ChandelierExit",
+    "ChandelierLevels",
     "WilliamsAlligator",
     "SuperTrend",
     "MultiTFTrend",

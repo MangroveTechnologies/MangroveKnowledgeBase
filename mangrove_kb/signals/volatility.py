@@ -16,6 +16,7 @@ from mangrove_kb.registry import RuleRegistry
 
 # Import volatility indicator classes
 from mangrove_kb.indicators import (
+    ChandelierLevels,
     ATR,
     BollingerBands,
     KeltnerChannel,
@@ -886,3 +887,88 @@ def volatility_stop_lower(df: pd.DataFrame, window: int = 20, multiplier: float 
     if pd.isna(lband.iloc[-1]):
         return False
     return bool(df["Close"].iloc[-1] <= lband.iloc[-1])
+
+
+# ---------------------------------------------------------------------------
+# Chandelier Levels -- two volatility-scaled offsets from the window's extremes
+# ---------------------------------------------------------------------------
+
+def _chandelier_offsets(df: pd.DataFrame, window: int, multiplier: float):
+    """Both offsets, or None before the window is filled.
+
+    `len(df) < window`, not `window + 1`: the first defined value is at index `window - 1`, so a
+    per-bar state predicate can answer from the window-th bar. The old bound discarded one bar more
+    than the measurement needs.
+    """
+    if len(df) < window:
+        return None
+    out = ChandelierLevels.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'multiplier': multiplier},
+    )
+    return out['high_offset'], out['low_offset']
+
+
+@RuleRegistry.register("cl_below_high_offset")
+def cl_below_high_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
+    """
+    Check if close is below the Chandelier high offset (close < high_offset).
+
+    A STATE, not an event: true for every bar close sits below the level, not only the bar that
+    crosses it. Registered twice -- `chandelier_long_stop_hit` is the released name and names a use
+    (an exit for a long) rather than what is measured.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling extreme and ATR window. Range: 5-100. Default: 22.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if close < high_offset, False otherwise.
+    """
+    offsets = _chandelier_offsets(df, window, multiplier)
+    if offsets is None:
+        return False
+    high_offset, _ = offsets
+    if pd.isna(high_offset.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] < high_offset.iloc[-1])
+
+
+@RuleRegistry.register("cl_above_low_offset")
+def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
+    """
+    Check if close is above the Chandelier low offset (close > low_offset).
+
+    A STATE, not an event. The two offsets are anchored to opposite extremes and can cross, so this
+    and `cl_below_high_offset` are both true on some bars -- 15 of 1,294 BTC daily bars at the
+    defaults. That is not a contradiction: they are two independent levels, not a band pair.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling extreme and ATR window. Range: 5-100. Default: 22.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if close > low_offset, False otherwise.
+    """
+    offsets = _chandelier_offsets(df, window, multiplier)
+    if offsets is None:
+        return False
+    _, low_offset = offsets
+    if pd.isna(low_offset.iloc[-1]):
+        return False
+    return bool(df["Close"].iloc[-1] > low_offset.iloc[-1])
+
+
+# The released names. They evaluate and warn; they are not separate signals, so the catalogue still
+# reports one signal per behaviour. MangroveOracle's signals_metadata.json and its strategy cohort
+# files hold these strings.
+RuleRegistry.alias("chandelier_long_stop_hit", "cl_below_high_offset")
+RuleRegistry.alias("chandelier_short_stop_hit", "cl_above_low_offset")

@@ -1,4 +1,5 @@
 import functools
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -30,6 +31,13 @@ def _to_native(value):
 class RuleRegistry:
     _registry = {}
 
+    #: Retired signal names -> the name that replaced them. A deprecated name must keep evaluating,
+    #: because a stored strategy holds the name as a string and cannot be migrated by us. It must
+    #: NOT appear in `names()` or the catalogue, or every rename would inflate the signal count and
+    #: show the same signal twice. Registering the old name as a second signal did exactly that:
+    #: 247 became 249.
+    _aliases = {}
+
     @classmethod
     def register(cls, name):
         def wrapper(fn):
@@ -41,6 +49,25 @@ class RuleRegistry:
             return coerced
 
         return wrapper
+
+    @classmethod
+    def alias(cls, old_name: str, new_name: str):
+        """Record `old_name` as a retired spelling of `new_name`."""
+        cls._aliases[old_name] = new_name
+
+    @classmethod
+    def resolve(cls, name: str) -> str:
+        """The current name for `name`, warning if a retired one was used."""
+        target = cls._aliases.get(name)
+        if target is None:
+            return name
+        warnings.warn(
+            f"signal {name!r} has been renamed to {target!r}; the old name still evaluates but "
+            f"will be removed. Registered names are the strategy-facing contract, so this is a "
+            f"rename with a grace period, not a break.",
+            DeprecationWarning, stacklevel=3,
+        )
+        return target
 
     @classmethod
     def names(cls) -> frozenset:
@@ -65,11 +92,11 @@ class RuleRegistry:
 
         `evaluate` needs a DataFrame, so it was not usable as a validity check.
         """
-        return name in cls._registry
+        return name in cls._registry or name in cls._aliases
 
     @classmethod
     def evaluate(cls, rule, df):
-        rule_name = rule["name"]
+        rule_name = cls.resolve(rule["name"])
         if rule_name not in cls._registry:
             raise ValueError(f"Unknown rule name: {rule_name}")
 

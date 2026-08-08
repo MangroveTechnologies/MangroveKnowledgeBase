@@ -317,8 +317,8 @@ def report(results):
 # =============================================================================
 
 def spec_volatility(df):
-    from mangrove_kb.indicators import (ATR, NATR, BollingerBands, DonchianChannel, KeltnerChannel,
-                                        STARCBands, UlcerIndex)
+    from mangrove_kb.indicators import (ATR, NATR, BollingerBands, ChandelierLevels,
+                                        DonchianChannel, KeltnerChannel, STARCBands, UlcerIndex)
     H, L, C = df["High"], df["Low"], df["Close"]
     atr = ATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["atr"]
     natr = NATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["natr"]
@@ -334,7 +334,13 @@ def spec_volatility(df):
     bbp = {"window": 20, "window_dev": 2}
     kcp = {"window": 20, "window_atr": 10, "multiplier": 2.0}
     stp = {"window": 20, "window_atr": 14, "multiplier": 2.0}
+    # Chandelier Levels: offsets from OPPOSITE extremes, so NOT a band pair -- both predicates are
+    # true together on 15 of these 1,294 bars, which a band invariant would forbid.
+    clp = {"window": 22, "multiplier": 3.0}
+    cl = ChandelierLevels.compute({"high": H, "low": L, "close": C}, dict(clp))
     return {
+        "cl_below_high_offset": (clp, outside_below(C, cl["high_offset"])),
+        "cl_above_low_offset": (clp, outside_above(C, cl["low_offset"])),
         "bb_upper_breakout": (bbp, crosses_above(C, bb["hband"])),
         "bb_lower_breakout": (bbp, crosses_below(C, bb["lband"])),
         "bb_above_upper": (bbp, outside_above(C, bb["hband"])),
@@ -618,8 +624,8 @@ def spec_trend(df):
     are verified together here because verification does not care which file they live in; the split
     that matters is on disk.
 
-    The 24 not here are held out of the graph, so they have no formula to check: nine are built on
-    the excluded stateful policy rules (SuperTrend, PSAR, ChandelierExit) and fifteen read an
+    The 22 not here are held out of the graph, so they have no formula to check: nine are built on
+    indicators that emit a verdict rather than a measurement (SuperTrend, PSAR) and fifteen read an
     indicator still in the `unclassed` class.
     """
     from mangrove_kb.indicators import (

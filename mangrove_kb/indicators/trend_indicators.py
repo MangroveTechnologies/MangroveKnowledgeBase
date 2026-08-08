@@ -1393,61 +1393,6 @@ class HeikinAshi(IndicatorInterface):
         }
 
 
-class ChandelierExit(IndicatorInterface):
-    """Chandelier Exit (Chuck LeBeau).
-
-    Volatility-scaled trailing stop using rolling extreme and ATR:
-        long_stop  = highest_high(window) - multiplier * ATR(window)
-        short_stop = lowest_low(window)   + multiplier * ATR(window)
-
-    Unlike ATRTrailingStop this is NOT a state machine -- long and short stops
-    are always computed, and the user picks which one applies based on their
-    current position. Use `long_stop` as a floor for long positions;
-    `short_stop` as a ceiling for shorts.
-
-    Reference: Chuck LeBeau, SmartTrader. Popularized in Chande's "Beyond
-    Technical Analysis" (1997).
-
-    Args:
-        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
-        params: {'window': int, 'multiplier': float}
-
-    Returns:
-        {'long_stop': pd.Series, 'short_stop': pd.Series}
-    """
-    _data = ["high", "low", "close"]
-    _params = ["window", "multiplier"]
-    _outputs = ["long_stop", "short_stop"]
-
-    @classmethod
-    def _compute(cls, data, params):
-        # Local import -- ATR lives in volatility_indicators; avoids circular import at load time.
-        from mangrove_kb.indicators.volatility_indicators import ATR
-
-        high = data['high']
-        low = data['low']
-        close = data['close']
-        window = params['window']
-        mult = float(params['multiplier'])
-
-        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
-        # Mask warmup to NaN: our ATR fills first window-1 bars with 0.
-        atr_vals = atr.to_numpy(dtype=np.float64, copy=False).copy()
-        atr_vals[: window - 1] = np.nan
-        atr_masked = pd.Series(atr_vals, index=close.index)
-
-        hh = high.rolling(window, min_periods=window).max()
-        ll = low.rolling(window, min_periods=window).min()
-
-        long_stop = hh - mult * atr_masked
-        short_stop = ll + mult * atr_masked
-
-        return {
-            'long_stop': pd.Series(long_stop.values, index=close.index, name='long_stop'),
-            'short_stop': pd.Series(short_stop.values, index=close.index, name='short_stop'),
-        }
-
-
 class WilliamsAlligator(IndicatorInterface):
     """Williams Alligator (Bill Williams).
 

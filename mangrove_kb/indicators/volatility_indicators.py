@@ -670,3 +670,65 @@ class TTMSqueeze(IndicatorInterface):
             'squeeze_fired': pd.Series(squeeze_fired.values, index=close.index, name='squeeze_fired'),
             'momentum': pd.Series(momentum, index=close.index, name='ttm_momentum'),
         }
+
+
+class ChandelierLevels(IndicatorInterface):
+    """Chandelier Levels (Chuck LeBeau), measured as two volatility-scaled offsets from the
+    window's extremes.
+
+        high_offset = highest_high(window) - multiplier * ATR(window)
+        low_offset  = lowest_low(window)   + multiplier * ATR(window)
+
+    Both are emitted every bar and both are plain functions of the window -- there is no state
+    carried forward and no regime decided here. LeBeau published this as the "Chandelier Exit", a
+    trailing stop, but the exit is a USE of the measurement, not part of it: what is computed is a
+    distance, scaled by volatility, in from each extreme.
+
+    The two are NOT an upper and a lower band. They are anchored to opposite extremes, so in a wide
+    range they cross: measured on 1,294 BTC daily bars at window=22, multiplier=3.0, `high_offset`
+    sits below `low_offset` on only 73% of bars, and both offsets are breached on the same bar 15
+    times. Anything that assumes a band invariant (`hband >= lband`, as Bollinger, Keltner and
+    Donchian all hold) is wrong about this indicator.
+
+    Reference: Chuck LeBeau, SmartTrader. Popularized in Chande's "Beyond Technical Analysis"
+    (1997).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int, 'multiplier': float}
+
+    Returns:
+        {'high_offset': pd.Series, 'low_offset': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window", "multiplier"]
+    _outputs = ["high_offset", "low_offset"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        window = params['window']
+        mult = float(params['multiplier'])
+
+        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
+        # Mask warmup to NaN: our ATR fills the first window-1 bars with 0.
+        atr_vals = atr.to_numpy(dtype=np.float64, copy=False).copy()
+        atr_vals[: window - 1] = np.nan
+        atr_masked = pd.Series(atr_vals, index=close.index)
+
+        hh = high.rolling(window, min_periods=window).max()
+        ll = low.rolling(window, min_periods=window).min()
+
+        return {
+            'high_offset': pd.Series((hh - mult * atr_masked).values, index=close.index,
+                                     name='high_offset'),
+            'low_offset': pd.Series((ll + mult * atr_masked).values, index=close.index,
+                                    name='low_offset'),
+        }
+
+
+#: Deprecated name. "Exit" states a use, not a measurement, and this ontology's indicator layer
+#: holds measurements only -- what to do about a level is the signal layer's business.
+ChandelierExit = ChandelierLevels

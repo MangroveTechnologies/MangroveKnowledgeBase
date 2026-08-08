@@ -1231,6 +1231,70 @@
    }
   },
   {
+   "id": "procedure:indicator-chandelierlevels",
+   "title": "ChandelierLevels",
+   "kind": "Procedure",
+   "summary": "window's extremes. high_offset = highest_high(window) - multiplier * ATR(window) low_offset  = lowest_low(window)   + multiplier * ATR(window) Both are emitted every bar and both are plain functions of the window -- there is no state carried forward and no regime decided here. LeBeau published this as the \"Chandelier Exit\", a trailing stop, but the exit is a USE of the measurement, not part of it: what is computed is a distance, scaled by volatility, in from each extreme. The two are NOT an upper and a lower band. They are anchored to opposite extremes, so in a wide range they cross: measured on 1,294 BTC daily bars at window=22, multiplier=3.0, `high_offset` sits below `low_offset` on only 73% of bars, and both offsets are breached on the same bar 15 times. Anything that assumes a band invariant (`hband >= lband`, as Bollinger, Keltner and Donchian all hold) is wrong about this indicator.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility_indicators",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "ChandelierLevels.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'multiplier': value})",
+    "formula": "high_offset[t] = max(high[t-window+1..t]) - multiplier * atr[t]; low_offset[t] = min(low[t-window+1..t]) + multiplier * atr[t]",
+    "interpretation": "How far price has retraced from the window's extreme, measured in units of that window's own volatility. The two are anchored to OPPOSITE extremes, so they are not an upper and a lower band and can cross: at window=22, multiplier=3.0 on 1,294 BTC daily bars, high_offset sits below low_offset on only 73% of them.",
+    "applications": "Published as the Chandelier Exit, a trailing stop -- but that is a use of the level, not what it measures. As a measurement it marks a volatility-scaled retracement from the recent high or low.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": null
+     },
+     "low": {
+      "type": "series",
+      "description": null
+     },
+     "close": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 22,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling extreme and ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "high_offset": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     },
+     "low_offset": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-cumulativereturn",
    "title": "CumulativeReturn",
    "kind": "Procedure",
@@ -7318,6 +7382,122 @@
       ],
       "canonical_name": "none",
       "description": "True if CCI < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cl-above-low-offset",
+   "title": "cl_above_low_offset",
+   "kind": "Procedure",
+   "summary": "Check if close is above the Chandelier low offset (close > low_offset). A STATE, not an event. The two offsets are anchored to opposite extremes and can cross, so this and `cl_below_high_offset` are both true on some bars -- 15 of 1,294 BTC daily bars at the defaults. That is not a contradiction: they are two independent levels, not a band pair.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cl_above_low_offset', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t] > low_offset[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 22,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling extreme and ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > low_offset, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cl-below-high-offset",
+   "title": "cl_below_high_offset",
+   "kind": "Procedure",
+   "summary": "Check if close is below the Chandelier high offset (close < high_offset). A STATE, not an event: true for every bar close sits below the level, not only the bar that crosses it. Registered twice -- `chandelier_long_stop_hit` is the released name and names a use (an exit for a long) rather than what is measured.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cl_below_high_offset', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t] < high_offset[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 22,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling extreme and ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close < high_offset, False otherwise"
      }
     }
    }
@@ -16167,6 +16347,14 @@
    "to_id": "concept:indicator-class-pattern"
   },
   {
+   "from": "ChandelierLevels",
+   "rel": "instance-of",
+   "to": "volatility",
+   "why": "class membership",
+   "from_id": "procedure:indicator-chandelierlevels",
+   "to_id": "concept:indicator-class-volatility"
+  },
+  {
    "from": "CumulativeReturn",
    "rel": "instance-of",
    "to": "flow",
@@ -17829,6 +18017,70 @@
    "to_id": "procedure:indicator-cci",
    "inputs": {
     "cci": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cl_above_low_offset",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cl-above-low-offset",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cl_above_low_offset",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cl-above-low-offset",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cl_above_low_offset",
+   "rel": "uses",
+   "to": "ChandelierLevels",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cl-above-low-offset",
+   "to_id": "procedure:indicator-chandelierlevels",
+   "inputs": {
+    "high_offset": {
+     "type": "series"
+    },
+    "low_offset": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cl_below_high_offset",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cl-below-high-offset",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cl_below_high_offset",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cl-below-high-offset",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cl_below_high_offset",
+   "rel": "uses",
+   "to": "ChandelierLevels",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cl-below-high-offset",
+   "to_id": "procedure:indicator-chandelierlevels",
+   "inputs": {
+    "high_offset": {
+     "type": "series"
+    },
+    "low_offset": {
      "type": "series"
     }
    }
@@ -22631,22 +22883,21 @@
  ],
  "meta": {
   "scope": "indicator class ontology",
-  "indicators": 68,
+  "indicators": 69,
   "classes": 7,
   "removed_not_indicators": [
    "ATRTrailingStop",
-   "ChandelierExit",
    "PSAR",
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 1088,
+  "carried_forward_from_previous_build": 1096,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 197,
+  "signals": 199,
   "signals_registered": 247,
-  "signals_out_of_scope": 50,
+  "signals_out_of_scope": 48,
   "signals_with_no_indicator": [
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",

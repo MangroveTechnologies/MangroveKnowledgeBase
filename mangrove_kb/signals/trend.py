@@ -5,11 +5,12 @@ predates the class axis, and the 64 signals whose class could be determined have
 `averaging.py`, `momentum.py` and `oscillator.py`, named for the class of the indicator each one
 reads.
 
-The 24 left here cannot be placed yet, for two different reasons:
+The 22 left here cannot be placed yet, for two different reasons:
 
-  9  are built on the stateful policy rules the ontology excludes -- SuperTrend, PSAR and
-     ChandelierExit are policy, not measurement, so they are not indicators and have no class to
-     inherit. These signals have nothing to be classified by.
+  7  read an indicator that emits a VERDICT rather than a measurement -- SuperTrend's `direction`
+     is +1 long / -1 short, and PSAR's up/down indicators are flip flags. An indicator states what
+     it measured; deciding what that means is the signal layer's job, so these have no measurement
+     to inherit a class from.
 
   15 read an indicator still in the `unclassed` class: HeikinAshi, Ichimoku, Divergence, TTMSqueeze
      and EPMA. A signal's class is transitive through the indicator it reads, so classifying those
@@ -30,7 +31,6 @@ from mangrove_kb.signals._common import _ma_crossover, _ma_is_above, moved_signa
 
 # Import trend indicator classes
 from mangrove_kb.indicators import (
-    ChandelierExit,
     Divergence,
     EPMA,
     HeikinAshi,
@@ -432,73 +432,6 @@ def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
     if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
         return False
     return bool(out['ha_close'].iloc[-1] < out['ha_open'].iloc[-1])
-
-
-# --- ChandelierExit signals ---
-
-def _chandelier_stops(df: pd.DataFrame, window: int, multiplier: float):
-    """Helper: compute long and short stops, return None if insufficient data."""
-    if len(df) < window + 1:
-        return None
-    out = ChandelierExit.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'window': window, 'multiplier': multiplier},
-    )
-    return out['long_stop'], out['short_stop']
-
-
-@RuleRegistry.register("chandelier_long_stop_hit")
-def chandelier_long_stop_hit(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
-    """
-    Check if close has breached the Chandelier long stop (close < long_stop).
-
-    If holding a long position, this is your exit trigger.
-
-    Type: FILTER
-    Requires: High, Low, Close
-
-    Args:
-        df (pd.DataFrame): DataFrame with OHLCV data.
-        window (int): Rolling high/ATR window. Range: 5-100. Default: 22.
-        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
-
-    Returns:
-        bool: True if close < long_stop, False otherwise.
-    """
-    stops = _chandelier_stops(df, window, multiplier)
-    if stops is None:
-        return False
-    long_stop, _ = stops
-    if pd.isna(long_stop.iloc[-1]):
-        return False
-    return bool(df["Close"].iloc[-1] < long_stop.iloc[-1])
-
-
-@RuleRegistry.register("chandelier_short_stop_hit")
-def chandelier_short_stop_hit(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
-    """
-    Check if close has breached the Chandelier short stop (close > short_stop).
-
-    If holding a short position, this is your exit trigger.
-
-    Type: FILTER
-    Requires: High, Low, Close
-
-    Args:
-        df (pd.DataFrame): DataFrame with OHLCV data.
-        window (int): Rolling low/ATR window. Range: 5-100. Default: 22.
-        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
-
-    Returns:
-        bool: True if close > short_stop, False otherwise.
-    """
-    stops = _chandelier_stops(df, window, multiplier)
-    if stops is None:
-        return False
-    _, short_stop = stops
-    if pd.isna(short_stop.iloc[-1]):
-        return False
-    return bool(df["Close"].iloc[-1] > short_stop.iloc[-1])
 
 
 # --- WilliamsAlligator signals ---

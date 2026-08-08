@@ -68,11 +68,21 @@ ASSIGN = {
              "ADOSC KVO KlingerVolumeOscillator DailyReturn DailyLogReturn MassIndex ADX Aroon "
              "Vortex MultiTFTrend",
  'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
- 'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands",
+ 'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
+               "ChandelierLevels",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
  'unclassed': "EPMA Ichimoku HeikinAshi TTMSqueeze Divergence",
 }
-REMOVED = "ATRTrailingStop VolatilityStop ChandelierExit SuperTrend PSAR".split()
+# Not indicators: their outputs are VERDICTS, not measurements. SuperTrend emits `direction`
+# (+1 long / -1 short) and NaNs its bands according to it; PSAR emits flip flags; ATRTrailingStop
+# and VolatilityStop carry a position state forward. An indicator states what it measured, and
+# deciding what that means is the signal layer's job.
+#
+# ChandelierExit was on this list and should not have been: it emits two price levels, both defined
+# every bar, both plain functions of the window. It was excluded for being a "stateful policy rule"
+# when its own docstring says it is not a state machine. It is now `ChandelierLevels`, class
+# volatility. See `signal-indicator-ontology.md`.
+REMOVED = "ATRTrailingStop VolatilityStop SuperTrend PSAR".split()
 
 # --- ground truth from the installed package
 present, mod_of = set(), {}
@@ -1038,6 +1048,7 @@ SIGNAL_SCOPE = {
     # with no class as a symptom.
     # Volatility -- the five Bollinger signals were the worked example that settled the
     # node shape; the rest of the module follows.
+    "cl_above_low_offset", "cl_below_high_offset",
     "atr_high_volatility", 
     "bb_above_upper",
     "bb_below_lower", "bb_lower_breakout", "bb_squeeze",
@@ -1089,13 +1100,14 @@ SIGNAL_SCOPE = {
     "tweezer_bottoms_trigger", "tweezer_tops_trigger", "two_bar_reversal_bearish_trigger",
     "two_bar_reversal_bullish_trigger",
 
-    # Trend -- 64 of the file's 88. The other 24 are held out for two different reasons.
+    # Trend -- 64 of the file's 88 (86 after the two chandelier signals moved to volatility). The other 24 are held out for two different reasons.
     #
-    # Nine are built on the excluded stateful policy rules and must never enter the graph:
-    # chandelier_long_stop_hit, chandelier_short_stop_hit (ChandelierExit); psar_bearish,
-    # psar_bullish, psar_reversal (PSAR); supertrend_flip_down, supertrend_flip_up,
-    # supertrend_long, supertrend_short (SuperTrend). Same rule that kept the six ATR/volatility
-    # stop signals out; the guard below fails the build if one slips in.
+    # Seven read an indicator whose output is a VERDICT rather than a measurement, and must never
+    # enter the graph: psar_bearish, psar_bullish, psar_reversal (PSAR's flip flags);
+    # supertrend_flip_down, supertrend_flip_up, supertrend_long, supertrend_short (SuperTrend's
+    # +1/-1 `direction`). The guard below fails the build if one slips in. The two chandelier
+    # signals were on this list until ChandelierExit was found to emit plain levels; they are now
+    # cl_below_high_offset / cl_above_low_offset, in scope above.
     #
     # Fifteen read an indicator still in the `unclassed` class, whose classification is an open
     # decision: heikin_ashi_{bullish,bearish} (HeikinAshi); ichimoku_{bullish,bearish},
