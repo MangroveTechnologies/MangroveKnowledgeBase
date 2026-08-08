@@ -649,27 +649,63 @@ def _signal_facts():
         tree = ast.parse(path.read_text())
         local = {n.name: n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
 
-        def scan(fn):
-            """(consumes, calls, guards) for one function body, no recursion."""
+        def scan(fn, binding=None):
+            """(consumes, calls, guards) for one function body, no recursion.
+
+            `binding` maps this function's parameter names to what the caller passed, so a generic
+            helper resolves to the concrete indicator and output. Without it the MA signals recorded
+            `indicator_cls` -- a parameter name -- as their indicator.
+            """
+            binding = binding or {}
+
+            def val(node):
+                """The literal behind a node, following the call-site binding through a parameter."""
+                if isinstance(node, ast.Constant):
+                    return node.value
+                if isinstance(node, ast.Name):
+                    return binding.get(node.id, node.id)
+                return None
+
             consumes, calls, guards, assigned = {}, set(), [], {}
             for nd in ast.walk(fn):
                 if isinstance(nd, ast.Call):
                     f = nd.func
                     if isinstance(f, ast.Name) and f.id in local:
-                        calls.add(f.id)
+                        # Record the call WITH the indicator classes passed into it. The MA signals
+                        # never write `DEMA.compute(...)`; they write
+                        # `_ma_is_above(df, DEMA, 'dema', window)` and the helper calls
+                        # `indicator_cls.compute(...)`. Scanning the helper alone yields the
+                        # PARAMETER name, so 18 signals resolved to a variable and got no `uses`
+                        # edge, and DEMA/TEMA/TRIMA/SMMA/HMA looked like indicators nothing used.
+                        # Bind the helper's PARAMETERS to what this call site passes, so a helper
+                        # written generically resolves to the indicator it was handed. Names and
+                        # string literals both matter: `_ma_is_above(df, DEMA, 'dema', window)`
+                        # supplies the indicator AND the output key, and the helper body names
+                        # neither -- it says `indicator_cls.compute(...)[output_key]`.
+                        params = [a.arg for a in local[f.id].args.args]
+                        binding = {}
+                        for pname, arg in zip(params, nd.args):
+                            if isinstance(arg, ast.Name) and arg.id in present:
+                                binding[pname] = arg.id
+                            elif isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                                binding[pname] = arg.value
+                        calls.add((f.id, tuple(sorted(binding.items()))))
                 # X.compute(...)['key']
                 if isinstance(nd, ast.Subscript) and isinstance(nd.value, ast.Call):
                     f = nd.value.func
-                    if (isinstance(f, ast.Attribute) and f.attr == "compute"
-                            and isinstance(f.value, ast.Name) and isinstance(nd.slice, ast.Constant)):
-                        consumes.setdefault(f.value.id, set()).add(nd.slice.value)
+                    if isinstance(f, ast.Attribute) and f.attr == "compute" and isinstance(f.value, ast.Name):
+                        ind, key = val(f.value), val(nd.slice)
+                        if ind in present and isinstance(key, str):
+                            consumes.setdefault(ind, set()).add(key)
                 # var = X.compute(...)   then   var['key']
                 if isinstance(nd, ast.Assign) and isinstance(nd.value, ast.Call):
                     f = nd.value.func
                     if isinstance(f, ast.Attribute) and f.attr == "compute" and isinstance(f.value, ast.Name):
-                        for t in nd.targets:
-                            if isinstance(t, ast.Name):
-                                assigned[t.id] = f.value.id
+                        ind = val(f.value)
+                        if ind in present:
+                            for t in nd.targets:
+                                if isinstance(t, ast.Name):
+                                    assigned[t.id] = ind
                 # the `if len(x) < N: return False` warmup guard
                 if isinstance(nd, ast.If) and isinstance(nd.test, ast.Compare):
                     c = nd.test
@@ -678,18 +714,21 @@ def _signal_facts():
                         guards.append(ast.unparse(c.comparators[0]))
             for nd in ast.walk(fn):
                 if (isinstance(nd, ast.Subscript) and isinstance(nd.value, ast.Name)
-                        and nd.value.id in assigned and isinstance(nd.slice, ast.Constant)):
-                    consumes.setdefault(assigned[nd.value.id], set()).add(nd.slice.value)
+                        and nd.value.id in assigned):
+                    key = val(nd.slice)
+                    if isinstance(key, str):
+                        consumes.setdefault(assigned[nd.value.id], set()).add(key)
             return consumes, calls, guards
 
-        def resolve(fname, seen=None):
+        def resolve(fname, seen=None, binding=()):
+            """Resolve one function, with its parameters bound to what the caller passed."""
             seen = seen or set()
             if fname in seen or fname not in local:
                 return {}, []
             seen.add(fname)
-            consumes, calls, guards = scan(local[fname])
-            for c in calls:
-                sub_c, sub_g = resolve(c, seen)
+            consumes, calls, guards = scan(local[fname], dict(binding))
+            for cname, passed in calls:
+                sub_c, sub_g = resolve(cname, seen, passed)
                 for k, v in sub_c.items():
                     consumes.setdefault(k, set()).update(v)
                 guards += sub_g
