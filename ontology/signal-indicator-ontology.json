@@ -5105,6 +5105,189 @@
    }
   },
   {
+   "id": "procedure:signal-ao-bearish",
+   "title": "ao_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Awesome Oscillator indicates bearish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/",
+    "warmup_bars": "window_slow - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ao_bearish', 'params': {'window_fast': value, 'window_slow': value, 'threshold': value}}, df)",
+    "formula": "ao[t] < threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 15,
+      "description": "Fast SMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 34,
+      "min": 20,
+      "max": 60,
+      "description": "Slow SMA window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bearish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if AO < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ao-bullish",
+   "title": "ao_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Awesome Oscillator indicates bullish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/",
+    "warmup_bars": "window_slow - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ao_bullish', 'params': {'window_fast': value, 'window_slow': value, 'threshold': value}}, df)",
+    "formula": "ao[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 15,
+      "description": "Fast SMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 34,
+      "min": 20,
+      "max": 60,
+      "description": "Slow SMA window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bullish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if AO > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ao-zero-cross",
+   "title": "ao_zero_cross",
+   "kind": "Procedure",
+   "summary": "Check if Awesome Oscillator crosses zero line.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ao_zero_cross', 'params': {'window_fast': value, 'window_slow': value, 'direction': value}}, df)",
+    "formula": "ao[t-1] <= 0 and ao[t] > 0 when direction is bullish; ao[t-1] >= 0 and ao[t] < 0 when bearish",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 15,
+      "description": "Fast SMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 34,
+      "min": 20,
+      "max": 60,
+      "description": "Slow SMA window"
+     },
+     "direction": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Direction: 'bullish' for cross above, 'bearish' for cross below"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if zero cross detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-atr-high-volatility",
    "title": "atr_high_volatility",
    "kind": "Procedure",
@@ -5615,6 +5798,194 @@
    }
   },
   {
+   "id": "procedure:signal-bop-bearish",
+   "title": "bop_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Balance of Power indicates sellers in control on the current bar.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'bop_bearish', 'params': {}}, df)",
+    "formula": "bop[t] < 0",
+    "inputs": {
+     "open": {
+      "type": "series",
+      "description": "opening price of the bar"
+     },
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {},
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if BOP < 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-bop-bullish",
+   "title": "bop_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Balance of Power indicates buyers in control on the current bar. BOP = (close - open) / (high - low). Positive = buyers dominated the bar.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'bop_bullish', 'params': {}}, df)",
+    "formula": "bop[t] > 0",
+    "inputs": {
+     "open": {
+      "type": "series",
+      "description": "opening price of the bar"
+     },
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {},
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if BOP > 0, False otherwise (including NaN when high==low)"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-bop-cross-down",
+   "title": "bop_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect Balance of Power crossing below zero (buyers -> sellers).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
+    "warmup_bars": "1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'bop_cross_down', 'params': {}}, df)",
+    "formula": "bop[t-1] >= 0 and bop[t] < 0",
+    "inputs": {
+     "open": {
+      "type": "series",
+      "description": "opening price of the bar"
+     },
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {},
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if BOP crosses below zero on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-bop-cross-up",
+   "title": "bop_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect Balance of Power crossing above zero (sellers -> buyers).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/",
+    "warmup_bars": "1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'bop_cross_up', 'params': {}}, df)",
+    "formula": "bop[t-1] <= 0 and bop[t] > 0",
+    "inputs": {
+     "open": {
+      "type": "series",
+      "description": "opening price of the bar"
+     },
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {},
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if BOP crosses above zero on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-bullish-engulfing-trigger",
    "title": "bullish_engulfing_trigger",
    "kind": "Procedure",
@@ -5805,6 +6176,206 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish pin bar detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cmo-cross-down",
+   "title": "cmo_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect CMO crossing below the overbought threshold (bearish momentum onset). Analogous to RSI crossing below 70.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cmo_cross_down', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "cmo[t-1] >= threshold and cmo[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "CMO lookback"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 50.0,
+      "min": 20.0,
+      "max": null,
+      "description": "Overbought threshold to cross below"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CMO crosses below threshold on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cmo-cross-up",
+   "title": "cmo_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect CMO crossing above the oversold threshold (bullish momentum return). Analogous to RSI crossing above 30.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cmo_cross_up', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "cmo[t-1] <= threshold and cmo[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "CMO lookback"
+     },
+     "threshold": {
+      "type": "float",
+      "default": -50.0,
+      "min": -90.0,
+      "max": null,
+      "description": "Oversold threshold to cross above"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CMO crosses above threshold on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cmo-overbought",
+   "title": "cmo_overbought",
+   "kind": "Procedure",
+   "summary": "Check if Chande Momentum Oscillator is above the overbought threshold. CMO ranges from -100 to +100; default threshold of +50 is standard (analogous to RSI 70).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cmo_overbought', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "cmo[t] >= threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "CMO lookback"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 50.0,
+      "min": 20.0,
+      "max": null,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CMO >= threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cmo-oversold",
+   "title": "cmo_oversold",
+   "kind": "Procedure",
+   "summary": "Check if Chande Momentum Oscillator is below the oversold threshold. Default threshold of -50 is standard (analogous to RSI 30).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cmo_oversold', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "cmo[t] <= threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "CMO lookback"
+     },
+     "threshold": {
+      "type": "float",
+      "default": -50.0,
+      "min": -90.0,
+      "max": null,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CMO <= threshold, False otherwise"
      }
     }
    }
@@ -6598,6 +7169,120 @@
    }
   },
   {
+   "id": "procedure:signal-kama-cross-down",
+   "title": "kama_cross_down",
+   "kind": "Procedure",
+   "summary": "Check if price crosses below KAMA (bearish signal).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama",
+    "warmup_bars": "window + max(pow1, pow2) - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kama_cross_down', 'params': {'window': value, 'pow1': value, 'pow2': value}}, df)",
+    "formula": "close[t-1] >= kama[t-1] and close[t] < kama[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 30,
+      "description": "Efficiency ratio period"
+     },
+     "pow1": {
+      "type": "int",
+      "default": 2,
+      "min": 1,
+      "max": 10,
+      "description": "Fast smoothing constant"
+     },
+     "pow2": {
+      "type": "int",
+      "default": 30,
+      "min": 10,
+      "max": 50,
+      "description": "Slow smoothing constant"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if price crosses below KAMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kama-cross-up",
+   "title": "kama_cross_up",
+   "kind": "Procedure",
+   "summary": "Check if price crosses above KAMA (bullish signal).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama",
+    "warmup_bars": "window + max(pow1, pow2) - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kama_cross_up', 'params': {'window': value, 'pow1': value, 'pow2': value}}, df)",
+    "formula": "close[t-1] <= kama[t-1] and close[t] > kama[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 30,
+      "description": "Efficiency ratio period"
+     },
+     "pow1": {
+      "type": "int",
+      "default": 2,
+      "min": 1,
+      "max": 10,
+      "description": "Fast smoothing constant"
+     },
+     "pow2": {
+      "type": "int",
+      "default": 30,
+      "min": 10,
+      "max": 50,
+      "description": "Slow smoothing constant"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if price crosses above KAMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-kc-above-upper",
    "title": "kc_above_upper",
    "kind": "Procedure",
@@ -6934,6 +7619,206 @@
    }
   },
   {
+   "id": "procedure:signal-macd-line-cross-down",
+   "title": "macd_line_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect the MACD line crossing below zero (bearish momentum onset).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "macd[t-1] >= 0 and macd[t] < 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EMA period"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 5,
+      "max": 200,
+      "description": "Slow EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the MACD line crosses below zero on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-macd-line-cross-up",
+   "title": "macd_line_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect the MACD line crossing above zero (bullish momentum onset).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "macd[t-1] <= 0 and macd[t] > 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EMA period"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 5,
+      "max": 200,
+      "description": "Slow EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the MACD line crosses above zero on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-macd-line-negative",
+   "title": "macd_line_negative",
+   "kind": "Procedure",
+   "summary": "Check if the MACD line is below zero (bearish momentum regime).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
+    "warmup_bars": "window_slow - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_negative', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "macd[t] < 0 -- the MACD LINE, not the histogram",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EMA period"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 5,
+      "max": 200,
+      "description": "Slow EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the MACD line < 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-macd-line-positive",
+   "title": "macd_line_positive",
+   "kind": "Procedure",
+   "summary": "Check if the MACD line (EMA fast - EMA slow) is above zero (bullish momentum regime).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
+    "warmup_bars": "window_slow - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_positive', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "macd[t] > 0 -- the MACD LINE, not the histogram",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EMA period"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 5,
+      "max": 200,
+      "description": "Slow EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the MACD line > 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-marubozu-bearish-trigger",
    "title": "marubozu_bearish_trigger",
    "kind": "Procedure",
@@ -7039,6 +7924,178 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish marubozu detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mom-bearish",
+   "title": "mom_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Momentum (close - close[-n]) is negative. Indicates downward price momentum over the lookback window.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mom_bearish', 'params': {'window': value}}, df)",
+    "formula": "mom[t] < 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "Lookback period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if MOM < 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mom-bullish",
+   "title": "mom_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Momentum (close - close[-n]) is positive. Indicates upward price momentum over the lookback window.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mom_bullish', 'params': {'window': value}}, df)",
+    "formula": "mom[t] > 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "Lookback period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if MOM > 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mom-cross-down",
+   "title": "mom_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect Momentum crossing below zero (bearish zero-line cross).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mom_cross_down', 'params': {'window': value}}, df)",
+    "formula": "mom[t-1] >= 0 and mom[t] < 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "Lookback period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if MOM crosses below zero on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mom-cross-up",
+   "title": "mom_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect Momentum crossing above zero (bullish zero-line cross).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": null,
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mom_cross_up', 'params': {'window': value}}, df)",
+    "formula": "mom[t-1] <= 0 and mom[t] > 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 1,
+      "max": 200,
+      "description": "Lookback period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if MOM crosses above zero on the current bar"
      }
     }
    }
@@ -7363,6 +8420,234 @@
    }
   },
   {
+   "id": "procedure:signal-ppo-bearish-cross",
+   "title": "ppo_bearish_cross",
+   "kind": "Procedure",
+   "summary": "Check if PPO crosses below signal line (bearish).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo",
+    "warmup_bars": "window_slow + window_sign - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ppo_bearish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
+    "formula": "ppo[t-1] >= ppo_signal[t-1] and ppo[t] < ppo_signal[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 15,
+      "max": 50,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 20,
+      "description": "Fast EMA period"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 3,
+      "max": 15,
+      "description": "Signal line period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if PPO crosses below signal, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ppo-bullish-cross",
+   "title": "ppo_bullish_cross",
+   "kind": "Procedure",
+   "summary": "Check if PPO crosses above signal line (bullish).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo",
+    "warmup_bars": "window_slow + window_sign - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ppo_bullish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
+    "formula": "ppo[t-1] <= ppo_signal[t-1] and ppo[t] > ppo_signal[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 15,
+      "max": 50,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 20,
+      "description": "Fast EMA period"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 3,
+      "max": 15,
+      "description": "Signal line period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if PPO crosses above signal, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-pvo-bearish-cross",
+   "title": "pvo_bearish_cross",
+   "kind": "Procedure",
+   "summary": "Check if PVO crosses below signal line (bearish volume).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo",
+    "warmup_bars": "window_slow + window_sign - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'pvo_bearish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
+    "formula": "pvo[t-1] >= pvo_signal[t-1] and pvo[t] < pvo_signal[t] -- computed from VOLUME, not price",
+    "inputs": {
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 15,
+      "max": 50,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 20,
+      "description": "Fast EMA period"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 3,
+      "max": 15,
+      "description": "Signal line period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if PVO crosses below signal, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-pvo-bullish-cross",
+   "title": "pvo_bullish_cross",
+   "kind": "Procedure",
+   "summary": "Check if PVO crosses above signal line (bullish volume).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo",
+    "warmup_bars": "window_slow + window_sign - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'pvo_bullish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
+    "formula": "pvo[t-1] <= pvo_signal[t-1] and pvo[t] > pvo_signal[t] -- computed from VOLUME, not price",
+    "inputs": {
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 26,
+      "min": 15,
+      "max": 50,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 20,
+      "description": "Fast EMA period"
+     },
+     "window_sign": {
+      "type": "int",
+      "default": 9,
+      "min": 3,
+      "max": 15,
+      "description": "Signal line period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if PVO crosses above signal, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-reversal-pattern-bearish",
    "title": "reversal_pattern_bearish",
    "kind": "Procedure",
@@ -7468,6 +8753,356 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish reversal pattern found in recent window, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-roc-momentum-shift",
+   "title": "roc_momentum_shift",
+   "kind": "Procedure",
+   "summary": "Check if ROC crosses zero (momentum shift).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'roc_momentum_shift', 'params': {'window': value, 'direction': value}}, df)",
+    "formula": "roc[t-1] <= 0 and roc[t] > 0 when direction is bullish; roc[t-1] >= 0 and roc[t] < 0 when bearish",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 12,
+      "min": 1,
+      "max": 50,
+      "description": "ROC period"
+     },
+     "direction": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Direction: 'bullish' for cross above zero, 'bearish' for cross below"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if momentum shift detected, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-roc-negative",
+   "title": "roc_negative",
+   "kind": "Procedure",
+   "summary": "Check if Rate of Change indicates negative momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'roc_negative', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "roc[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 12,
+      "min": 1,
+      "max": 50,
+      "description": "ROC period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": -10.0,
+      "max": 10.0,
+      "description": "Negative momentum threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ROC < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-roc-positive",
+   "title": "roc_positive",
+   "kind": "Procedure",
+   "summary": "Check if Rate of Change indicates positive momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'roc_positive', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "roc[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 12,
+      "min": 1,
+      "max": 50,
+      "description": "ROC period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": -10.0,
+      "max": 10.0,
+      "description": "Positive momentum threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ROC > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-cross-down",
+   "title": "rsi_cross_down",
+   "kind": "Procedure",
+   "summary": "Check if RSI crosses below a threshold level. Returns True when RSI was at or above the threshold in the previous bar and is now below the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_cross_down', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "rsi[t-1] >= threshold and rsi[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI calculation window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 50.0,
+      "min": 0.0,
+      "max": 100.0,
+      "description": "Threshold level to cross below"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if RSI crosses below threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-cross-up",
+   "title": "rsi_cross_up",
+   "kind": "Procedure",
+   "summary": "Check if RSI crosses above a threshold level. Returns True when RSI was at or below the threshold in the previous bar and is now above the threshold in the current bar. In crypto markets, consider higher thresholds (80/20) during strong trends.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_cross_up', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "rsi[t-1] <= threshold and rsi[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI calculation window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 50.0,
+      "min": 0.0,
+      "max": 100.0,
+      "description": "Threshold level to cross above"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if RSI crosses above threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-overbought",
+   "title": "rsi_overbought",
+   "kind": "Procedure",
+   "summary": "Check if RSI is above the overbought threshold. RSI values above 70 typically indicate overbought conditions, suggesting the asset may be due for a pullback. In crypto markets, consider higher thresholds (80/20) during strong trends.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_overbought', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "rsi[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI calculation window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 70.0,
+      "min": 50.0,
+      "max": 100.0,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if RSI > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-oversold",
+   "title": "rsi_oversold",
+   "kind": "Procedure",
+   "summary": "Check if RSI is below the oversold threshold. RSI values below 30 typically indicate oversold conditions, suggesting the asset may be due for a bounce. In crypto markets, consider higher thresholds (80/20) during strong trends.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_oversold', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "rsi[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI calculation window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 30.0,
+      "min": 0.0,
+      "max": 50.0,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if RSI < threshold, False otherwise"
      }
     }
    }
@@ -7727,6 +9362,264 @@
    }
   },
   {
+   "id": "procedure:signal-stoch-overbought",
+   "title": "stoch_overbought",
+   "kind": "Procedure",
+   "summary": "Check if Stochastic %K is above the overbought threshold.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'stoch_overbought', 'params': {'window': value, 'smooth_window': value, 'threshold': value}}, df)",
+    "formula": "stoch_k[t] > threshold -- the FAST %K, unsmoothed",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "%K period"
+     },
+     "smooth_window": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "description": "%K smoothing period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 80.0,
+      "min": 70.0,
+      "max": 100.0,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if %K > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-stoch-oversold",
+   "title": "stoch_oversold",
+   "kind": "Procedure",
+   "summary": "Check if Stochastic %K is below the oversold threshold.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'stoch_oversold', 'params': {'window': value, 'smooth_window': value, 'threshold': value}}, df)",
+    "formula": "stoch_k[t] < threshold -- the FAST %K, unsmoothed",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "%K period"
+     },
+     "smooth_window": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "description": "%K smoothing period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 20.0,
+      "min": 0.0,
+      "max": 30.0,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if %K < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-stochrsi-overbought",
+   "title": "stochrsi_overbought",
+   "kind": "Procedure",
+   "summary": "Check if Stochastic RSI indicates overbought condition. In crypto markets, consider adjusting thresholds during strong trends.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
+    "warmup_bars": "window + smooth1 + smooth2 - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'stochrsi_overbought', 'params': {'window': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
+    "formula": "stochrsi[t] > threshold -- StochRSI is on the 0..1 scale, so the conventional 80 level is 0.80 here",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "RSI period"
+     },
+     "smooth1": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "description": "Stochastic %K smoothing"
+     },
+     "smooth2": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "description": "Stochastic %D smoothing"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.8,
+      "min": 0.6,
+      "max": null,
+      "description": "Overbought threshold (0-1 scale)"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if StochRSI > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-stochrsi-oversold",
+   "title": "stochrsi_oversold",
+   "kind": "Procedure",
+   "summary": "Check if Stochastic RSI indicates oversold condition. In crypto markets, consider adjusting thresholds during strong trends.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
+    "warmup_bars": "window + smooth1 + smooth2 - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'stochrsi_oversold', 'params': {'window': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
+    "formula": "stochrsi[t] < threshold -- 0..1 scale, so the conventional 20 level is 0.20",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "RSI period"
+     },
+     "smooth1": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "description": "Stochastic %K smoothing"
+     },
+     "smooth2": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 10,
+      "description": "Stochastic %D smoothing"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.2,
+      "min": 0.0,
+      "max": null,
+      "description": "Oversold threshold (0-1 scale)"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if StochRSI < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-strong-body-recent",
    "title": "strong_body_recent",
    "kind": "Procedure",
@@ -7965,6 +9858,120 @@
       ],
       "canonical_name": "none",
       "description": "True if three white soldiers detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-tsi-bearish",
+   "title": "tsi_bearish",
+   "kind": "Procedure",
+   "summary": "Check if True Strength Index indicates bearish momentum. TSI below zero indicates bearish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index",
+    "warmup_bars": "window_slow + window_fast - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'tsi_bearish', 'params': {'window_slow': value, 'window_fast': value, 'threshold': value}}, df)",
+    "formula": "tsi[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 25,
+      "min": 10,
+      "max": 50,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 13,
+      "min": 5,
+      "max": 25,
+      "description": "Fast EMA period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": -50.0,
+      "max": 50.0,
+      "description": "Bearish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if TSI < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-tsi-bullish",
+   "title": "tsi_bullish",
+   "kind": "Procedure",
+   "summary": "Check if True Strength Index indicates bullish momentum. TSI above zero indicates bullish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index",
+    "warmup_bars": "window_slow + window_fast - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'tsi_bullish', 'params': {'window_slow': value, 'window_fast': value, 'threshold': value}}, df)",
+    "formula": "tsi[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_slow": {
+      "type": "int",
+      "default": 25,
+      "min": 10,
+      "max": 50,
+      "description": "Slow EMA period"
+     },
+     "window_fast": {
+      "type": "int",
+      "default": 13,
+      "min": 5,
+      "max": 25,
+      "description": "Fast EMA period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": -50.0,
+      "max": 50.0,
+      "description": "Bullish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if TSI > threshold, False otherwise"
      }
     }
    }
@@ -8285,6 +10292,266 @@
       ],
       "canonical_name": "none",
       "description": "True if Ulcer Index < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-uo-overbought",
+   "title": "uo_overbought",
+   "kind": "Procedure",
+   "summary": "Check if Ultimate Oscillator indicates overbought condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator",
+    "warmup_bars": "window_long - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'uo_overbought', 'params': {'window_short': value, 'window_medium': value, 'window_long': value, 'threshold': value}}, df)",
+    "formula": "ultimate_oscillator[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_short": {
+      "type": "int",
+      "default": 7,
+      "min": 3,
+      "max": 20,
+      "description": "Short window"
+     },
+     "window_medium": {
+      "type": "int",
+      "default": 14,
+      "min": 7,
+      "max": 30,
+      "description": "Medium window"
+     },
+     "window_long": {
+      "type": "int",
+      "default": 28,
+      "min": 14,
+      "max": 50,
+      "description": "Long window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 70.0,
+      "min": 60.0,
+      "max": 90.0,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if UO > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-uo-oversold",
+   "title": "uo_oversold",
+   "kind": "Procedure",
+   "summary": "Check if Ultimate Oscillator indicates oversold condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator",
+    "warmup_bars": "window_long - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'uo_oversold', 'params': {'window_short': value, 'window_medium': value, 'window_long': value, 'threshold': value}}, df)",
+    "formula": "ultimate_oscillator[t] < threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_short": {
+      "type": "int",
+      "default": 7,
+      "min": 3,
+      "max": 20,
+      "description": "Short window"
+     },
+     "window_medium": {
+      "type": "int",
+      "default": 14,
+      "min": 7,
+      "max": 30,
+      "description": "Medium window"
+     },
+     "window_long": {
+      "type": "int",
+      "default": 28,
+      "min": 14,
+      "max": 50,
+      "description": "Long window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 30.0,
+      "min": 10.0,
+      "max": 40.0,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if UO < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-williams-r-overbought",
+   "title": "williams_r_overbought",
+   "kind": "Procedure",
+   "summary": "Check if Williams %R is above the overbought threshold. Williams %R ranges from -100 to 0. Values above -20 indicate overbought.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'williams_r_overbought', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "wr[t] > threshold -- Williams %R is NEGATIVE, so overbought is the band nearest zero and the default threshold is -20",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": -20.0,
+      "min": -30.0,
+      "max": 0.0,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Williams %R > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-williams-r-oversold",
+   "title": "williams_r_oversold",
+   "kind": "Procedure",
+   "summary": "Check if Williams %R is below the oversold threshold. Williams %R ranges from -100 to 0. Values below -80 indicate oversold.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'williams_r_oversold', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "wr[t] < threshold -- negative scale, so oversold is the default -80",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": -80.0,
+      "min": -100.0,
+      "max": -70.0,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Williams %R < threshold, False otherwise"
      }
     }
    }
@@ -8916,6 +11183,93 @@
    "to_id": "concept:indicator-class-oscillator"
   },
   {
+   "from": "ao_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ao-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ao_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ao-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ao_bearish",
+   "rel": "uses",
+   "to": "AwesomeOscillator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ao-bearish",
+   "to_id": "procedure:indicator-awesomeoscillator",
+   "inputs": {
+    "ao": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ao_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ao-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ao_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ao-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ao_bullish",
+   "rel": "uses",
+   "to": "AwesomeOscillator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ao-bullish",
+   "to_id": "procedure:indicator-awesomeoscillator",
+   "inputs": {
+    "ao": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ao_zero_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ao-zero-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ao_zero_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ao-zero-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ao_zero_cross",
+   "rel": "uses",
+   "to": "AwesomeOscillator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ao-zero-cross",
+   "to_id": "procedure:indicator-awesomeoscillator",
+   "inputs": {
+    "ao": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "atr_high_volatility",
    "rel": "instance-of",
    "to": "Signal",
@@ -9246,6 +11600,122 @@
    }
   },
   {
+   "from": "bop_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-bop-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "bop_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-bop-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "bop_bearish",
+   "rel": "uses",
+   "to": "BOP",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-bop-bearish",
+   "to_id": "procedure:indicator-bop",
+   "inputs": {
+    "bop": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "bop_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-bop-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "bop_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-bop-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "bop_bullish",
+   "rel": "uses",
+   "to": "BOP",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-bop-bullish",
+   "to_id": "procedure:indicator-bop",
+   "inputs": {
+    "bop": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "bop_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-bop-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "bop_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-bop-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "bop_cross_down",
+   "rel": "uses",
+   "to": "BOP",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-bop-cross-down",
+   "to_id": "procedure:indicator-bop",
+   "inputs": {
+    "bop": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "bop_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-bop-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "bop_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-bop-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "bop_cross_up",
+   "rel": "uses",
+   "to": "BOP",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-bop-cross-up",
+   "to_id": "procedure:indicator-bop",
+   "inputs": {
+    "bop": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "bullish_engulfing_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -9397,6 +11867,122 @@
      "type": "series"
     },
     "upper_wick": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cmo_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cmo-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cmo_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-cmo-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "cmo_cross_down",
+   "rel": "uses",
+   "to": "CMO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cmo-cross-down",
+   "to_id": "procedure:indicator-cmo",
+   "inputs": {
+    "cmo": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cmo_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cmo-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cmo_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-cmo-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "cmo_cross_up",
+   "rel": "uses",
+   "to": "CMO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cmo-cross-up",
+   "to_id": "procedure:indicator-cmo",
+   "inputs": {
+    "cmo": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cmo_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cmo-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cmo_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cmo-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cmo_overbought",
+   "rel": "uses",
+   "to": "CMO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cmo-overbought",
+   "to_id": "procedure:indicator-cmo",
+   "inputs": {
+    "cmo": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cmo_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cmo-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cmo_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cmo-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cmo_oversold",
+   "rel": "uses",
+   "to": "CMO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cmo-oversold",
+   "to_id": "procedure:indicator-cmo",
+   "inputs": {
+    "cmo": {
      "type": "series"
     }
    }
@@ -9871,6 +12457,64 @@
    }
   },
   {
+   "from": "kama_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kama-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kama_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kama-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kama_cross_down",
+   "rel": "uses",
+   "to": "KAMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kama-cross-down",
+   "to_id": "procedure:indicator-kama",
+   "inputs": {
+    "kama": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kama_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kama-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kama_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kama-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kama_cross_up",
+   "rel": "uses",
+   "to": "KAMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kama-cross-up",
+   "to_id": "procedure:indicator-kama",
+   "inputs": {
+    "kama": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "kc_above_upper",
    "rel": "instance-of",
    "to": "Signal",
@@ -10025,6 +12669,122 @@
    }
   },
   {
+   "from": "macd_line_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-macd-line-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "macd_line_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-macd-line-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "macd_line_cross_down",
+   "rel": "uses",
+   "to": "MACD",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-macd-line-cross-down",
+   "to_id": "procedure:indicator-macd",
+   "inputs": {
+    "macd": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "macd_line_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-macd-line-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "macd_line_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-macd-line-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "macd_line_cross_up",
+   "rel": "uses",
+   "to": "MACD",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-macd-line-cross-up",
+   "to_id": "procedure:indicator-macd",
+   "inputs": {
+    "macd": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "macd_line_negative",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-macd-line-negative",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "macd_line_negative",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-macd-line-negative",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "macd_line_negative",
+   "rel": "uses",
+   "to": "MACD",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-macd-line-negative",
+   "to_id": "procedure:indicator-macd",
+   "inputs": {
+    "macd": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "macd_line_positive",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-macd-line-positive",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "macd_line_positive",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-macd-line-positive",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "macd_line_positive",
+   "rel": "uses",
+   "to": "MACD",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-macd-line-positive",
+   "to_id": "procedure:indicator-macd",
+   "inputs": {
+    "macd": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "marubozu_bearish_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -10096,6 +12856,122 @@
      "type": "series"
     },
     "upper_wick": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mom_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mom-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mom_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-mom-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "mom_bearish",
+   "rel": "uses",
+   "to": "MOM",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mom-bearish",
+   "to_id": "procedure:indicator-mom",
+   "inputs": {
+    "mom": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mom_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mom-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mom_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-mom-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "mom_bullish",
+   "rel": "uses",
+   "to": "MOM",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mom-bullish",
+   "to_id": "procedure:indicator-mom",
+   "inputs": {
+    "mom": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mom_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mom-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mom_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-mom-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "mom_cross_down",
+   "rel": "uses",
+   "to": "MOM",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mom-cross-down",
+   "to_id": "procedure:indicator-mom",
+   "inputs": {
+    "mom": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mom_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mom-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mom_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-mom-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "mom_cross_up",
+   "rel": "uses",
+   "to": "MOM",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mom-cross-up",
+   "to_id": "procedure:indicator-mom",
+   "inputs": {
+    "mom": {
      "type": "series"
     }
    }
@@ -10268,6 +13144,134 @@
    "to_id": "property:role-trigger"
   },
   {
+   "from": "ppo_bearish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ppo-bearish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ppo_bearish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ppo-bearish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ppo_bearish_cross",
+   "rel": "uses",
+   "to": "PPO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ppo-bearish-cross",
+   "to_id": "procedure:indicator-ppo",
+   "inputs": {
+    "ppo": {
+     "type": "series"
+    },
+    "ppo_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ppo_bullish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ppo-bullish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ppo_bullish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ppo-bullish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ppo_bullish_cross",
+   "rel": "uses",
+   "to": "PPO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ppo-bullish-cross",
+   "to_id": "procedure:indicator-ppo",
+   "inputs": {
+    "ppo": {
+     "type": "series"
+    },
+    "ppo_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "pvo_bearish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-pvo-bearish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "pvo_bearish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-pvo-bearish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "pvo_bearish_cross",
+   "rel": "uses",
+   "to": "PVO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-pvo-bearish-cross",
+   "to_id": "procedure:indicator-pvo",
+   "inputs": {
+    "pvo": {
+     "type": "series"
+    },
+    "pvo_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "pvo_bullish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-pvo-bullish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "pvo_bullish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-pvo-bullish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "pvo_bullish_cross",
+   "rel": "uses",
+   "to": "PVO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-pvo-bullish-cross",
+   "to_id": "procedure:indicator-pvo",
+   "inputs": {
+    "pvo": {
+     "type": "series"
+    },
+    "pvo_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "reversal_pattern_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -10371,6 +13375,209 @@
      "type": "series"
     },
     "body_low_delta": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "roc_momentum_shift",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-roc-momentum-shift",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "roc_momentum_shift",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-roc-momentum-shift",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "roc_momentum_shift",
+   "rel": "uses",
+   "to": "ROC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-roc-momentum-shift",
+   "to_id": "procedure:indicator-roc",
+   "inputs": {
+    "roc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "roc_negative",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-roc-negative",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "roc_negative",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-roc-negative",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "roc_negative",
+   "rel": "uses",
+   "to": "ROC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-roc-negative",
+   "to_id": "procedure:indicator-roc",
+   "inputs": {
+    "roc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "roc_positive",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-roc-positive",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "roc_positive",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-roc-positive",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "roc_positive",
+   "rel": "uses",
+   "to": "ROC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-roc-positive",
+   "to_id": "procedure:indicator-roc",
+   "inputs": {
+    "roc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "rsi_cross_down",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-cross-down",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "rsi_cross_up",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-cross-up",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "rsi_overbought",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-overbought",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "rsi_oversold",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-oversold",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
      "type": "series"
     }
    }
@@ -10507,6 +13714,122 @@
    }
   },
   {
+   "from": "stoch_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-stoch-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "stoch_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-stoch-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "stoch_overbought",
+   "rel": "uses",
+   "to": "StochasticOscillator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-stoch-overbought",
+   "to_id": "procedure:indicator-stochasticoscillator",
+   "inputs": {
+    "stoch_k": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "stoch_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-stoch-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "stoch_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-stoch-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "stoch_oversold",
+   "rel": "uses",
+   "to": "StochasticOscillator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-stoch-oversold",
+   "to_id": "procedure:indicator-stochasticoscillator",
+   "inputs": {
+    "stoch_k": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "stochrsi_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-stochrsi-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "stochrsi_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-stochrsi-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "stochrsi_overbought",
+   "rel": "uses",
+   "to": "StochRSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-stochrsi-overbought",
+   "to_id": "procedure:indicator-stochrsi",
+   "inputs": {
+    "stochrsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "stochrsi_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-stochrsi-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "stochrsi_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-stochrsi-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "stochrsi_oversold",
+   "rel": "uses",
+   "to": "StochRSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-stochrsi-oversold",
+   "to_id": "procedure:indicator-stochrsi",
+   "inputs": {
+    "stochrsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "strong_body_recent",
    "rel": "instance-of",
    "to": "Signal",
@@ -10641,6 +13964,64 @@
    }
   },
   {
+   "from": "tsi_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-tsi-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "tsi_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-tsi-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "tsi_bearish",
+   "rel": "uses",
+   "to": "TSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-tsi-bearish",
+   "to_id": "procedure:indicator-tsi",
+   "inputs": {
+    "tsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "tsi_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-tsi-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "tsi_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-tsi-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "tsi_bullish",
+   "rel": "uses",
+   "to": "TSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-tsi-bullish",
+   "to_id": "procedure:indicator-tsi",
+   "inputs": {
+    "tsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "tweezer_bottoms_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -10810,6 +14191,122 @@
    "to_id": "procedure:indicator-ulcerindex",
    "inputs": {
     "ulcer_index": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "uo_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-uo-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "uo_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-uo-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "uo_overbought",
+   "rel": "uses",
+   "to": "UltimateOscillator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-uo-overbought",
+   "to_id": "procedure:indicator-ultimateoscillator",
+   "inputs": {
+    "ultimate_oscillator": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "uo_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-uo-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "uo_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-uo-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "uo_oversold",
+   "rel": "uses",
+   "to": "UltimateOscillator",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-uo-oversold",
+   "to_id": "procedure:indicator-ultimateoscillator",
+   "inputs": {
+    "ultimate_oscillator": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "williams_r_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-williams-r-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "williams_r_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-williams-r-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "williams_r_overbought",
+   "rel": "uses",
+   "to": "WilliamsR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-williams-r-overbought",
+   "to_id": "procedure:indicator-williamsr",
+   "inputs": {
+    "wr": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "williams_r_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-williams-r-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "williams_r_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-williams-r-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "williams_r_oversold",
+   "rel": "uses",
+   "to": "WilliamsR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-williams-r-oversold",
+   "to_id": "procedure:indicator-williamsr",
+   "inputs": {
+    "wr": {
      "type": "series"
     }
    }
@@ -10842,13 +14339,13 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 815,
+  "carried_forward_from_previous_build": 897,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 58,
+  "signals": 100,
   "signals_registered": 247,
-  "signals_out_of_scope": 189,
+  "signals_out_of_scope": 147,
   "signals_with_no_indicator": [
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",
