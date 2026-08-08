@@ -905,16 +905,22 @@ from mangrove_kb.registry import RuleRegistry  # noqa: E402
 # `None` means every registered signal. Widen by adding names, or set to None when the shape is
 # settled for all of them.
 SIGNAL_SCOPE = {
+    # NOT here, deliberately: atr_trailing_stop_{long,short,flip_up,flip_down} and
+    # volatility_stop_{upper,lower}. They are built on ATRTrailingStop and VolatilityStop, two of
+    # the five stateful policy rules that `signal-indicator-ontology.md` excludes -- "not
+    # indicators ... policy, not measurement. Excluded from this ontology AND FROM THE GRAPH."
+    # Adding them put six signals in the graph that the design excludes, and produced six signals
+    # with no class as a symptom.
     # Volatility -- the five Bollinger signals were the worked example that settled the
     # node shape; the rest of the module follows.
-    "atr_high_volatility", "atr_trailing_stop_flip_down", "atr_trailing_stop_flip_up",
-    "atr_trailing_stop_long", "atr_trailing_stop_short", "bb_above_upper",
+    "atr_high_volatility", 
+    "bb_above_upper",
     "bb_below_lower", "bb_lower_breakout", "bb_squeeze",
     "bb_upper_breakout", "dc_lower_breakout", "dc_upper_breakout",
     "kc_above_upper", "kc_below_lower", "kc_lower_breakout",
     "kc_upper_breakout", "natr_high_volatility", "natr_low_volatility",
     "starc_lower_breakout", "starc_upper_breakout", "ulcer_high_risk",
-    "ulcer_low_risk", "volatility_stop_lower", "volatility_stop_upper",
+    "ulcer_low_risk", 
     # Chart patterns.
     "bearish_engulfing_trigger", "bearish_harami_trigger", "bearish_pattern_recent",
     "bearish_pin_bar_trigger", "bullish_engulfing_trigger", "bullish_harami_trigger",
@@ -931,6 +937,20 @@ SIGNAL_SCOPE = {
     "tweezer_bottoms_trigger", "tweezer_tops_trigger", "two_bar_reversal_bearish_trigger",
     "two_bar_reversal_bullish_trigger",
 }
+
+# A signal built on one of the five excluded policy rules must not enter the graph. The design is
+# explicit -- "Excluded from this ontology AND FROM THE GRAPH" -- but excluding the indicator alone
+# does not exclude the signals standing on it, and six of them were added before this check existed.
+# They arrive looking like an ordinary signal with no class, which is indistinguishable from the
+# pattern signals that legitimately read raw OHLC, so it fails the build rather than being reported.
+_on_removed = sorted(
+    n for n in (RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCOPE)
+    if set(SIGNAL_FACTS.get(n, {}).get("consumes", {})) & set(REMOVED))
+if _on_removed:
+    print(f"ABORT {len(_on_removed)} in-scope signals are built on indicators excluded from the "
+          f"graph ({', '.join(sorted(set(REMOVED)))}):\n  " + "\n  ".join(_on_removed),
+          file=sys.stderr)
+    sys.exit(1)
 
 signal_no_indicator, signal_unknown_role, deprecated_signals = [], [], []
 for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCOPE):
