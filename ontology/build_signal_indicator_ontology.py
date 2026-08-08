@@ -902,19 +902,33 @@ def rel(a, r, b, why, ai, bi, **props):
     """
     rels.append({"from": a, "rel": r, "to": b, "why": why, "from_id": ai, "to_id": bi, **props})
 
-# The ontology's own root.
+# The knowledge space's root.
 #
-# Without it the graph has four disconnected tops -- Indicator, Signal, Strategy and Role -- and
-# nothing states that they are the same ontology. A viewer that walks containment from one root can
-# then only ever see part of the graph, and the missing part was Role.
+# NOT "the ontology": the ontology is jarvis's nine primitives and its relation hierarchy, and it was
+# decided before any of this. What we are building is the KNOWLEDGE SPACE -- the populated instance
+# graph that the ontology types. Signals and indicators are only its first region; strategies,
+# markets and the rest of the knowledge base land under this same root.
+#
+# `Object`, not `Concept`. Per the primitive definitions, a Concept is a CATEGORY with graded
+# membership -- things are `instance-of` it. Nothing is an instance of this; Indicator, Signal and
+# Strategy are `part-of` it. It is a single individuated artifact that persists and has identity,
+# which is a DOLCE endurant, i.e. an Object -- the same kind of thing as "MangroveTrader" in the
+# ontology doc's own examples.
+#
+# Without a root the graph has four disconnected tops -- Indicator, Signal, Strategy and Role -- and
+# nothing states that they belong to the same space. A viewer that walks containment from one root
+# can then only ever see part of the graph, and the missing part was Role.
 #
 # It exists here, in the source, for the same reason every other node does: it is part of the model.
 # A renderer that invents it in memory is asserting a fact about the ontology in display code, where
 # nothing can query it and the next rebuild does not know about it.
-ROOT = "concept:signal-indicator-ontology"
-atom(ROOT, "Signal/Indicator Ontology", "Concept",
-     "Root of the signal/indicator ontology: the entity types it defines (Indicator, Signal, "
-     "Strategy), the role axis, and everything classified under them.")
+ROOT = "object:mangrove-knowledge-space"
+ROOT_TITLE = "Mangrove Knowledge Space"
+atom(ROOT, ROOT_TITLE, "Object",
+     "Root of the Mangrove knowledge space -- the populated graph the jarvis ontology types. Its "
+     "first region is signals and indicators: the entity types (Indicator, Signal, Strategy), the "
+     "role axis, and everything classified under them. Strategies, markets and the rest of the "
+     "knowledge base attach here too.")
 
 # entity types
 atom("concept:indicator", "Indicator", "Procedure",
@@ -925,7 +939,7 @@ atom("concept:strategy", "Strategy", "Schema",
      "A structured template composing signals into entry/exit rules plus configuration.")
 for _t, _tid in (("Indicator", "concept:indicator"), ("Signal", "concept:signal"),
                  ("Strategy", "concept:strategy")):
-    rel(_t, "part-of", "Signal/Indicator Ontology", "entity type defined by the ontology", _tid, ROOT)
+    rel(_t, "part-of", ROOT_TITLE, "entity type defined by the knowledge space", _tid, ROOT)
 
 # role axis
 #
