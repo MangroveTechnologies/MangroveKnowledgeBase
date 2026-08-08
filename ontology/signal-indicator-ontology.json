@@ -1,6 +1,15 @@
 {
  "atoms": [
   {
+   "id": "concept:signal-indicator-ontology",
+   "title": "Signal/Indicator Ontology",
+   "kind": "Concept",
+   "summary": "Root of the signal/indicator ontology: the entity types it defines (Indicator, Signal, Strategy), the role axis, and everything classified under them.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {}
+  },
+  {
    "id": "concept:indicator",
    "title": "Indicator",
    "kind": "Procedure",
@@ -12383,6 +12392,38 @@
   }
  ],
  "relations": [
+  {
+   "from": "Indicator",
+   "rel": "part-of",
+   "to": "Signal/Indicator Ontology",
+   "why": "entity type defined by the ontology",
+   "from_id": "concept:indicator",
+   "to_id": "concept:signal-indicator-ontology"
+  },
+  {
+   "from": "Signal",
+   "rel": "part-of",
+   "to": "Signal/Indicator Ontology",
+   "why": "entity type defined by the ontology",
+   "from_id": "concept:signal",
+   "to_id": "concept:signal-indicator-ontology"
+  },
+  {
+   "from": "Strategy",
+   "rel": "part-of",
+   "to": "Signal/Indicator Ontology",
+   "why": "entity type defined by the ontology",
+   "from_id": "concept:strategy",
+   "to_id": "concept:signal-indicator-ontology"
+  },
+  {
+   "from": "Role",
+   "rel": "part-of",
+   "to": "Signal",
+   "why": "axis along which signals are placed",
+   "from_id": "property:role",
+   "to_id": "concept:signal"
+  },
   {
    "from": "trigger",
    "rel": "kind-of",

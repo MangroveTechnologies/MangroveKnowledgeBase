@@ -23,6 +23,15 @@ Throughout, claims are marked **verified** (read or executed against the install
 | Signal | `Procedure` | also a pure computation; the boolean output is a property of it, not a different kind of thing |
 | Strategy | `Schema` | a structured template/policy composing signals -- the primitive's own example is a runbook |
 
+The three are `part-of` a root node, `concept:signal-indicator-ontology`, and the role axis is
+`part-of` Signal. Without those four edges the graph has four disconnected tops and nothing states
+that they belong to one ontology -- a consumer walking containment from any one of them sees only
+part of the model, and the part it misses is Role.
+
+The root is in the graph source rather than added by a viewer. A renderer that invents it asserts a
+fact about the ontology in display code, where nothing can query it and the next rebuild does not
+know it exists.
+
 ## Class axis (indicators)
 
 `Class` is the name of the axis, not a node. The classes are subcategories of Indicator. The whole
@@ -300,10 +309,14 @@ series, which may be indicator outputs or raw OHLC."** `Requires:` already decla
 ```
 Property             (existing primitive)
     ^ is-a
-Role
+Role                 -- part-of Signal
     ^ kind-of
 trigger | filter | arm
 ```
+
+Role is `part-of` **Signal**, not a peer of it under the root: every `has-role` edge in the graph
+starts at a signal and none at an indicator, so it is an axis of Signal specifically. `part-of`
+rather than `kind-of` because a role is not a kind of signal.
 
 Role is **contextual**, class is **intrinsic** -- which is why they attach to different branches of
 the relation hierarchy: class via `structural` (`kind-of`, `instance-of`), role via `descriptive`

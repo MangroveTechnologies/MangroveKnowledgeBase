@@ -902,6 +902,20 @@ def rel(a, r, b, why, ai, bi, **props):
     """
     rels.append({"from": a, "rel": r, "to": b, "why": why, "from_id": ai, "to_id": bi, **props})
 
+# The ontology's own root.
+#
+# Without it the graph has four disconnected tops -- Indicator, Signal, Strategy and Role -- and
+# nothing states that they are the same ontology. A viewer that walks containment from one root can
+# then only ever see part of the graph, and the missing part was Role.
+#
+# It exists here, in the source, for the same reason every other node does: it is part of the model.
+# A renderer that invents it in memory is asserting a fact about the ontology in display code, where
+# nothing can query it and the next rebuild does not know about it.
+ROOT = "concept:signal-indicator-ontology"
+atom(ROOT, "Signal/Indicator Ontology", "Concept",
+     "Root of the signal/indicator ontology: the entity types it defines (Indicator, Signal, "
+     "Strategy), the role axis, and everything classified under them.")
+
 # entity types
 atom("concept:indicator", "Indicator", "Procedure",
      "A computation over one or more input series producing one or more numeric output series.")
@@ -909,10 +923,18 @@ atom("concept:signal", "Signal", "Procedure",
      "A boolean predicate over indicator output, evaluated per bar. Composed of (indicator, predicate, params).")
 atom("concept:strategy", "Strategy", "Schema",
      "A structured template composing signals into entry/exit rules plus configuration.")
+for _t, _tid in (("Indicator", "concept:indicator"), ("Signal", "concept:signal"),
+                 ("Strategy", "concept:strategy")):
+    rel(_t, "part-of", "Signal/Indicator Ontology", "entity type defined by the ontology", _tid, ROOT)
 
 # role axis
+#
+# `part-of` Signal, not the root: every one of the has-role edges this builder emits starts at a
+# signal and none at an indicator, so role is a facet of Signal rather than a peer of it. `kind-of`
+# would be wrong -- a role is not a kind of signal, it is an axis along which signals are placed.
 atom("property:role", "Role", "Property",
      "The position a signal occupies within a strategy. Contextual, not intrinsic.")
+rel("Role", "part-of", "Signal", "axis along which signals are placed", "property:role", "concept:signal")
 for r in ("trigger", "filter", "arm"):
     atom(f"property:role-{r}", r, "Property", f"Signal role: {r}.")
     rel(r, "kind-of", "Role", "role value", f"property:role-{r}", "property:role")
