@@ -105,3 +105,60 @@ def test_strategies_never_depended_on_the_file_layout():
     assert RuleRegistry.evaluate({"name": "obv_bullish", "parameters": {"window": 20}}, df) in (True, False)
     assert RuleRegistry.has("cmf_bearish")   # volume.py -> oscillator.py
     assert RuleRegistry.has("doji_trigger")  # patterns.py -> pattern.py
+
+
+# ---------------------------------------------------------------------------
+# Signals that moved BETWEEN modules that both still exist
+# ---------------------------------------------------------------------------
+# The whole-module shims above do not cover this: `trend.py` is still there, but 64 of its signals
+# are not, so `from mangrove_kb.signals.trend import vortex_bullish` raised ImportError. This is
+# the exact statement in MangroveAI's examples/test_indicator_param_fixes.py.
+
+MOVED_AWAY = [
+    ("mangrove_kb.signals.trend", ["adx_bullish_di", "vortex_bullish", "vortex_bearish",
+                                   "vortex_crossover", "sma_cross_up", "macd_bullish_cross"]),
+    ("mangrove_kb.signals.momentum", ["rsi_overbought", "rsi_oversold", "kama_cross_up"]),
+]
+
+
+@pytest.mark.parametrize("path,names", MOVED_AWAY)
+def test_names_that_moved_out_still_resolve_from_the_old_module(path, names):
+    mod = importlib.import_module(path)
+    for n in names:
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            fn = getattr(mod, n)
+        assert callable(fn)
+        assert any(issubclass(w.category, DeprecationWarning) for w in caught), n
+
+
+@pytest.mark.parametrize("path,names", MOVED_AWAY)
+def test_a_name_that_never_lived_there_still_raises(path, names):
+    mod = importlib.import_module(path)
+    with pytest.raises(AttributeError):
+        getattr(mod, "doji_trigger" if "trend" in path else "bullish_engulfing_trigger")
+
+
+@pytest.mark.parametrize("path,names", MOVED_AWAY)
+def test_a_moved_name_does_not_join_the_old_module_namespace(path, names):
+    """PEP 562, not a re-export: binding them would make each signal appear to live in two files,
+    and the module a function is defined in is what the API reports as its category."""
+    mod = importlib.import_module(path)
+    for n in names:
+        getattr(mod, n)                       # resolve it
+    assert not (set(names) & set(vars(mod)))  # still not in the namespace
+
+
+def test_the_mangroveai_import_statement_verbatim():
+    """Copied from MangroveAI/src/MangroveAI/examples/test_indicator_param_fixes.py.
+
+    Deliberately a MIX: the three ichimoku signals are still defined in trend.py (they read an
+    indicator whose class is undecided, so they have not moved), while the other four are now in
+    momentum.py. One statement, both paths -- which is the shape that broke.
+    """
+    from mangrove_kb.signals.trend import (      # noqa: F401
+        ichimoku_bullish, ichimoku_bearish, ichimoku_tk_cross,
+        adx_bullish_di, vortex_bullish, vortex_bearish, vortex_crossover,
+    )
+    assert ichimoku_bullish.__module__ == "mangrove_kb.signals.trend"
+    assert vortex_bullish.__module__ == "mangrove_kb.signals.momentum"

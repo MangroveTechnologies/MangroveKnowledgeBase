@@ -15,7 +15,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals._common import zero_cross
+from mangrove_kb.signals._common import zero_cross, moved_signals
 
 from mangrove_kb.indicators import (
     ADOSC,
@@ -1754,3 +1754,21 @@ def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bulli
         return prev_above and curr_below
 
     return False
+
+# Signals that were in this file when 1.3.4 shipped and are now in the file named for
+# their ontology class. Reached by name, with a DeprecationWarning; see
+# `moved_signals` for why this is PEP 562 rather than a plain re-export.
+_MOVED = {
+    "averaging": (
+        "kama_cross_down", "kama_cross_up"
+    ),
+    "oscillator": (
+        "bop_bearish", "bop_bullish", "bop_cross_down", "bop_cross_up", "cmo_cross_down",
+        "cmo_cross_up", "cmo_overbought", "cmo_oversold", "rsi_cross_down", "rsi_cross_up",
+        "rsi_overbought", "rsi_oversold", "stoch_overbought", "stoch_oversold",
+        "stochrsi_overbought", "stochrsi_oversold", "tsi_bearish", "tsi_bullish",
+        "uo_overbought", "uo_oversold", "williams_r_overbought", "williams_r_oversold"
+    ),
+}
+
+__getattr__ = moved_signals("mangrove_kb.signals.momentum", _MOVED)

@@ -5,6 +5,9 @@ Splitting the signal files onto the ontology class put `bop_cross_up` (an `oscil
 A helper used by two classes belongs to neither, so it lives here rather than being imported across
 class files or copied into both.
 """
+import importlib
+import warnings
+
 import pandas as pd
 
 
@@ -59,3 +62,36 @@ def _ma_crossover(
     if direction == "bullish":
         return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
     return bool(prev_fast >= prev_slow and curr_fast < curr_slow)
+
+
+def moved_signals(here: str, moved: dict):
+    """Build a module-level ``__getattr__`` for signals that moved to another file.
+
+    Reorganising the files onto the ontology class moved signals BETWEEN modules that both still
+    exist, which the whole-module shims (`volume`, `patterns`) do not cover:
+    ``from mangrove_kb.signals.trend import vortex_bullish`` raised ImportError even though
+    `trend.py` was still there. MangroveAI imports exactly that shape.
+
+    PEP 562 rather than assigning the names into the module, deliberately. The attribute is only
+    looked up when something asks for it, so the module's own namespace stays exactly the signals it
+    defines -- which is what the API reports as a category, and what discovery walks. Binding them
+    would make every moved signal appear to live in two places at once.
+
+    `moved` maps destination module -> the names that went there, so the mapping reads as a record
+    of the move. A name that never lived here still raises AttributeError.
+    """
+    lookup = {name: dest for dest, names in moved.items() for name in names}
+
+    def __getattr__(name):
+        dest = lookup.get(name)
+        if dest is None:
+            raise AttributeError(f"module {here!r} has no attribute {name!r}")
+        warnings.warn(
+            f"{here}.{name} moved to mangrove_kb.signals.{dest}: signal files are named for the "
+            f"ontology class they hold, and this signal's class is {dest}. The registered name is "
+            f"unchanged, so strategies and RuleRegistry are unaffected.",
+            DeprecationWarning, stacklevel=2,
+        )
+        return getattr(importlib.import_module(f"mangrove_kb.signals.{dest}"), name)
+
+    return __getattr__

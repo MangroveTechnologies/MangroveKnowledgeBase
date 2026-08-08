@@ -26,7 +26,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals._common import _ma_crossover, _ma_is_above
+from mangrove_kb.signals._common import _ma_crossover, _ma_is_above, moved_signals
 
 # Import trend indicator classes
 from mangrove_kb.indicators import (
@@ -882,3 +882,32 @@ def rsi_hidden_bearish_divergence(
 
 
 # --- Multi-Timeframe Trend signals ---
+
+# Signals that were in this file when 1.3.4 shipped and are now in the file named for
+# their ontology class. Reached by name, with a DeprecationWarning; see
+# `moved_signals` for why this is PEP 562 rather than a plain re-export.
+_MOVED = {
+    "averaging": (
+        "alligator_bearish", "alligator_bullish", "alligator_sleeping", "alma_cross_down",
+        "alma_cross_up", "dema_cross_down", "dema_cross_up", "ema_cross_down", "ema_cross_up",
+        "ema_crossover", "hma_cross_down", "hma_cross_up", "is_above_alma", "is_above_dema",
+        "is_above_hma", "is_above_mama", "is_above_sma", "is_above_smma", "is_above_t3",
+        "is_above_tema", "is_above_trima", "ma_ribbon_bearish", "ma_ribbon_bullish",
+        "ma_ribbon_tangled", "mama_cross_down", "mama_cross_up", "price_above_ema",
+        "sma_cross_down", "sma_cross_up", "sma_crossover", "smma_cross_down", "smma_cross_up",
+        "t3_cross_down", "t3_cross_up", "tema_cross_down", "tema_cross_up",
+        "trima_cross_down", "trima_cross_up", "wma_cross_down", "wma_cross_up"
+    ),
+    "momentum": (
+        "adx_bullish_di", "adx_strong_trend", "aroon_crossover", "aroon_down_trend",
+        "aroon_up_trend", "dpo_negative", "dpo_positive", "kst_bearish_cross",
+        "kst_bullish_cross", "macd_bearish_cross", "macd_bullish_cross", "macd_positive",
+        "mass_reversal_signal", "multi_tf_trend_bearish", "multi_tf_trend_bullish",
+        "trix_bearish", "trix_bullish", "vortex_bearish", "vortex_bullish", "vortex_crossover"
+    ),
+    "oscillator": (
+        "cci_overbought", "cci_oversold", "stc_overbought", "stc_oversold"
+    ),
+}
+
+__getattr__ = moved_signals("mangrove_kb.signals.trend", _MOVED)
