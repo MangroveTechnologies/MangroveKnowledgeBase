@@ -18,6 +18,12 @@ Migrate to `mangrove_kb.signals.pattern`; this file is intended to be removed.
 
 import warnings
 
+#: Marks this module as a back-compat shim rather than a home for signals. Importing a shim binds
+#: it as an attribute of `mangrove_kb.signals`, so anything discovering signal modules by walking
+#: the package namespace would otherwise pick it up and see every re-exported function a second
+#: time, under a module that does not define it.
+__deprecated__ = True
+
 from mangrove_kb.signals.pattern import (
     bearish_engulfing_trigger,
     bearish_harami_trigger,

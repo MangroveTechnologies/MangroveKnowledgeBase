@@ -57,6 +57,11 @@ ALL_SIGNAL_MODULES = [
     m for m in vars(mangrove_kb.signals).values()
     if getattr(m, "__name__", "").startswith("mangrove_kb.signals.")
     and not m.__name__.rsplit(".", 1)[-1].startswith("_")
+    # A deprecated path is a shim that re-exports; it defines no signal of its own. Importing one
+    # binds it as an attribute of the package, so without this every signal it re-exports would be
+    # parsed a second time under a module that does not define it -- and whether that happened
+    # would depend on whether some other test imported the old path first.
+    and not getattr(m, "__deprecated__", False)
 ]
 
 
