@@ -5449,7 +5449,7 @@
    "props": {
     "source_module": "patterns",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
-    "warmup_bars": null,
+    "warmup_bars": "2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bearish_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, bearish harami, dark_cloud_cover, gravestone_doji, tweezer_tops, bearish pin_bar, evening_star, three_black_crows, three_inside_down",
@@ -5644,7 +5644,7 @@
    "props": {
     "source_module": "patterns",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
-    "warmup_bars": null,
+    "warmup_bars": "2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bullish_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, bullish harami, piercing_line, dragonfly_doji, tweezer_bottoms, bullish pin_bar, morning_star, three_white_soldiers, three_inside_up",
@@ -6291,7 +6291,7 @@
    "props": {
     "source_module": "patterns",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
-    "warmup_bars": null,
+    "warmup_bars": "6",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'indecision_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: doji, spinning_top, inside_bar, narrow_range(7)",
@@ -6822,7 +6822,7 @@
    "props": {
     "source_module": "patterns",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
-    "warmup_bars": null,
+    "warmup_bars": "2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'reversal_pattern_bearish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, dark_cloud_cover, gravestone_doji, evening_star",
@@ -6877,7 +6877,7 @@
    "props": {
     "source_module": "patterns",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
-    "warmup_bars": null,
+    "warmup_bars": "2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'reversal_pattern_bullish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, piercing_line, dragonfly_doji, morning_star",
@@ -9685,7 +9685,7 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 786,
+  "carried_forward_from_previous_build": 791,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
@@ -9699,13 +9699,7 @@
    "three_inside_up_trigger"
   ],
   "signals_with_unknown_role": [],
-  "signals_missing_warmup": [
-   "bearish_pattern_recent",
-   "bullish_pattern_recent",
-   "indecision_pattern_recent",
-   "reversal_pattern_bearish",
-   "reversal_pattern_bullish"
-  ],
+  "signals_missing_warmup": [],
   "indicators_missing_description": [
    "BollingerBands",
    "CumulativeReturn",
