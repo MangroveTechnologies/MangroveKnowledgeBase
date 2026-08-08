@@ -17,13 +17,17 @@ class TestSignalServiceMetadata:
         oscillators are `oscillator` and the KAMA crossings are `averaging`. volume.py was 33 and is
         gone entirely -- there is no `volume` indicator class, so its signals went four ways by the
         class of the indicator each reads, and `flow` (the cumulative lines: OBV, ADI, VPT, NVI)
-        appeared as a file for the first time."""
-        assert len(self.service.list_signals(category="Momentum")) == 32
-        assert len(self.service.list_signals(category="Oscillator")) == 26
-        assert len(self.service.list_signals(category="Averaging")) == 7
+        appeared as a file for the first time. trend.py was 88 and is down to the 24 whose class
+        cannot be settled: nine stand on excluded policy rules, fifteen read an unclassed
+        indicator."""
+        assert len(self.service.list_signals(category="Momentum")) == 52
+        assert len(self.service.list_signals(category="Oscillator")) == 30
+        assert len(self.service.list_signals(category="Averaging")) == 47
         assert len(self.service.list_signals(category="Flow")) == 10
         assert len(self.service.list_signals(category="Pattern")) == 40
         assert len(self.service.list_signals(category="Volatility")) == 24
+        # trend.py is not a class -- what is left there is what cannot be classified yet
+        assert len(self.service.list_signals(category="Trend")) == 24
 
     def test_list_signals_filter_by_type(self):
         triggers = self.service.list_signals(signal_type="TRIGGER")

@@ -19,16 +19,24 @@ from mangrove_kb.signals._common import zero_cross
 
 from mangrove_kb.indicators import (
     ADOSC,
+    ADX,
+    Aroon,
     AwesomeOscillator,
+    DPO,
     DailyReturn,
     EaseOfMovement,
     ForceIndex,
+    KST,
     KVO,
     MACD,
     MOM,
+    MassIndex,
+    MultiTFTrend,
     PPO,
     PVO,
     ROC,
+    TRIX,
+    Vortex,
 )
 
 logger = logging.getLogger(__name__)
@@ -1031,3 +1039,718 @@ def kvo_bullish_cross(
     if len(kvo) < 2 or pd.isna(kvo.iloc[-1]) or pd.isna(kvo.iloc[-2]) or pd.isna(sig.iloc[-1]) or pd.isna(sig.iloc[-2]):
         return False
     return bool(kvo.iloc[-2] <= sig.iloc[-2] and kvo.iloc[-1] > sig.iloc[-1])
+
+
+# ---------------------------------------------------------------------------
+# Moved from trend.py, which held four classes at once.
+# Signals whose class is `momentum` -- the class of the indicator each one reads.
+# ---------------------------------------------------------------------------
+
+@RuleRegistry.register("adx_bullish_di")
+def adx_bullish_di(df: pd.DataFrame, window: int = 14) -> bool:
+    """
+    Check if +DI is greater than -DI (bullish directional movement).
+
+    When +DI > -DI, bulls have the upper hand.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ADX period. Range: 5-50. Default: 14.
+
+    Returns:
+        bool: True if +DI > -DI, False otherwise.
+    """
+    if len(df) < window * 2:
+        return False
+
+    result = ADX.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window}
+    )
+    di_pos = result['adx_pos']
+    di_neg = result['adx_neg']
+
+    if pd.isna(di_pos.iloc[-1]) or pd.isna(di_neg.iloc[-1]):
+        return False
+
+    return float(di_pos.iloc[-1]) > float(di_neg.iloc[-1])
+
+@RuleRegistry.register("adx_strong_trend")
+def adx_strong_trend(df: pd.DataFrame, window: int = 14, threshold: float = 25.0) -> bool:
+    """
+    Check if ADX indicates a strong trend.
+
+    ADX values above 25 typically indicate a strong trend (either up or down).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ADX period. Range: 5-50. Default: 14.
+        threshold (float): Trend strength threshold. Range: 15-50. Default: 25.0.
+
+    Returns:
+        bool: True if ADX > threshold, False otherwise.
+    """
+    if len(df) < window * 2:
+        return False
+
+    result = ADX.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window}
+    )
+    adx = result['adx']
+
+    if pd.isna(adx.iloc[-1]):
+        return False
+
+    return float(adx.iloc[-1]) > threshold
+
+@RuleRegistry.register("aroon_crossover")
+def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullish") -> bool:
+    """
+    Check if Aroon lines cross (trend change signal).
+
+    Type: TRIGGER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Lookback period. Range: 10-50. Default: 25.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+
+    Returns:
+        bool: True if crossover detected, False otherwise.
+    """
+    if len(df) < window + 1:
+        return False
+
+    result = Aroon.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={'window': window}
+    )
+    aroon_up = result['aroon_up']
+    aroon_down = result['aroon_down']
+
+    if len(aroon_up) < 2:
+        return False
+    if (pd.isna(aroon_up.iloc[-1]) or pd.isna(aroon_down.iloc[-1])
+            or pd.isna(aroon_up.iloc[-2]) or pd.isna(aroon_down.iloc[-2])):
+        return False
+
+    if direction.lower() == "bullish":
+        prev_below = float(aroon_up.iloc[-2]) <= float(aroon_down.iloc[-2])
+        curr_above = float(aroon_up.iloc[-1]) > float(aroon_down.iloc[-1])
+        return prev_below and curr_above
+    elif direction.lower() == "bearish":
+        prev_above = float(aroon_up.iloc[-2]) >= float(aroon_down.iloc[-2])
+        curr_below = float(aroon_up.iloc[-1]) < float(aroon_down.iloc[-1])
+        return prev_above and curr_below
+
+    return False
+
+@RuleRegistry.register("aroon_down_trend")
+def aroon_down_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) -> bool:
+    """
+    Check if Aroon Down indicates strong downtrend.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Lookback period. Range: 10-50. Default: 25.
+        threshold (float): Strong trend threshold. Range: 50-100. Default: 70.0.
+
+    Returns:
+        bool: True if Aroon Down > threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = Aroon.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={'window': window}
+    )
+    aroon_down = result['aroon_down']
+
+    if pd.isna(aroon_down.iloc[-1]):
+        return False
+
+    return float(aroon_down.iloc[-1]) > threshold
+
+@RuleRegistry.register("aroon_up_trend")
+def aroon_up_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) -> bool:
+    """
+    Check if Aroon Up indicates strong uptrend.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Lookback period. Range: 10-50. Default: 25.
+        threshold (float): Strong trend threshold. Range: 50-100. Default: 70.0.
+
+    Returns:
+        bool: True if Aroon Up > threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = Aroon.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={'window': window}
+    )
+    aroon_up = result['aroon_up']
+
+    if pd.isna(aroon_up.iloc[-1]):
+        return False
+
+    return float(aroon_up.iloc[-1]) > threshold
+
+@RuleRegistry.register("dpo_negative")
+def dpo_negative(df: pd.DataFrame, window: int = 20) -> bool:
+    """
+    Check if DPO is negative (price below detrended average).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): DPO period. Range: 10-50. Default: 20.
+
+    Returns:
+        bool: True if DPO < 0, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = DPO.compute(data={'close': df["Close"]}, params={'window': window})
+    dpo = result['dpo']
+
+    if pd.isna(dpo.iloc[-1]):
+        return False
+
+    return float(dpo.iloc[-1]) < 0
+
+@RuleRegistry.register("dpo_positive")
+def dpo_positive(df: pd.DataFrame, window: int = 20) -> bool:
+    """
+    Check if DPO is positive (price above detrended average).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): DPO period. Range: 10-50. Default: 20.
+
+    Returns:
+        bool: True if DPO > 0, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = DPO.compute(data={'close': df["Close"]}, params={'window': window})
+    dpo = result['dpo']
+
+    if pd.isna(dpo.iloc[-1]):
+        return False
+
+    return float(dpo.iloc[-1]) > 0
+
+@RuleRegistry.register("kst_bearish_cross")
+def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: int = 20, roc4: int = 30, window_sma1: int = 10, window_sma2: int = 10, window_sma3: int = 10, window_sma4: int = 15, nsig: int = 9) -> bool:
+    """
+    Check if KST crosses below signal line (bearish).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        roc1 (int): ROC1 period. Range: 1-200. Default: 10.
+        roc2 (int): ROC2 period. Range: 1-200. Default: 15.
+        roc3 (int): ROC3 period. Range: 1-200. Default: 20.
+        roc4 (int): ROC4 period. Range: 1-200. Default: 30.
+        window_sma1 (int): SMA1 smoothing window for ROC1. Range: 2-200. Default: 10.
+        window_sma2 (int): SMA2 smoothing window for ROC2. Range: 2-200. Default: 10.
+        window_sma3 (int): SMA3 smoothing window for ROC3. Range: 2-200. Default: 10.
+        window_sma4 (int): SMA4 smoothing window for ROC4. Range: 2-200. Default: 15.
+        nsig (int): Signal line period. Range: 1-200. Default: 9.
+
+    Returns:
+        bool: True if KST crosses below signal, False otherwise.
+    """
+    if len(df) < roc4 + window_sma4 + nsig:
+        return False
+
+    result = KST.compute(
+        data={'close': df["Close"]},
+        params={
+            'roc1': roc1, 'roc2': roc2, 'roc3': roc3, 'roc4': roc4,
+            'window1': window_sma1, 'window2': window_sma2, 'window3': window_sma3, 'window4': window_sma4,
+            'nsig': nsig
+        }
+    )
+    kst = result['kst']
+    signal = result['kst_signal']
+
+    if len(kst) < 2 or pd.isna(kst.iloc[-1]) or pd.isna(signal.iloc[-1]):
+        return False
+
+    prev_above = float(kst.iloc[-2]) >= float(signal.iloc[-2])
+    curr_below = float(kst.iloc[-1]) < float(signal.iloc[-1])
+
+    return prev_above and curr_below
+
+@RuleRegistry.register("kst_bullish_cross")
+def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: int = 20, roc4: int = 30, window_sma1: int = 10, window_sma2: int = 10, window_sma3: int = 10, window_sma4: int = 15, nsig: int = 9) -> bool:
+    """
+    Check if KST crosses above signal line (bullish).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        roc1 (int): ROC1 period. Range: 1-200. Default: 10.
+        roc2 (int): ROC2 period. Range: 1-200. Default: 15.
+        roc3 (int): ROC3 period. Range: 1-200. Default: 20.
+        roc4 (int): ROC4 period. Range: 1-200. Default: 30.
+        window_sma1 (int): SMA1 smoothing window for ROC1. Range: 2-200. Default: 10.
+        window_sma2 (int): SMA2 smoothing window for ROC2. Range: 2-200. Default: 10.
+        window_sma3 (int): SMA3 smoothing window for ROC3. Range: 2-200. Default: 10.
+        window_sma4 (int): SMA4 smoothing window for ROC4. Range: 2-200. Default: 15.
+        nsig (int): Signal line period. Range: 1-200. Default: 9.
+
+    Returns:
+        bool: True if KST crosses above signal, False otherwise.
+    """
+    if len(df) < roc4 + window_sma4 + nsig:
+        return False
+
+    result = KST.compute(
+        data={"close": df["Close"]},
+        params={
+            "roc1": roc1,
+            "roc2": roc2,
+            "roc3": roc3,
+            "roc4": roc4,
+            "window1": window_sma1,
+            "window2": window_sma2,
+            "window3": window_sma3,
+            "window4": window_sma4,
+            "nsig": nsig,
+        },
+    )
+    kst = result["kst"]
+    signal = result["kst_signal"]
+
+    if len(kst) < 2 or pd.isna(kst.iloc[-1]) or pd.isna(signal.iloc[-1]):
+        return False
+
+    prev_below = float(kst.iloc[-2]) <= float(signal.iloc[-2])
+    curr_above = float(kst.iloc[-1]) > float(signal.iloc[-1])
+
+    return prev_below and curr_above
+
+@RuleRegistry.register("macd_bearish_cross")
+def macd_bearish_cross(
+    df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26, window_sign: int = 9
+) -> bool:
+    """
+    Detect MACD bearish crossover (MACD line crosses below signal line).
+
+    A bearish MACD crossover occurs when the MACD line crosses below
+    the signal line, indicating potential downward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA window. Range: 2-50. Default: 12.
+        window_slow (int): Slow EMA window. Range: 10-100. Default: 26.
+        window_sign (int): Signal line EMA window. Range: 2-50. Default: 9.
+
+    Returns:
+        bool: True if bearish crossover detected, False otherwise.
+    """
+    closes = df["Close"]
+    min_periods = window_slow + window_sign
+    if len(closes) < min_periods:
+        return False
+
+    result = MACD.compute(
+        data={'close': closes},
+        params={'window_fast': window_fast, 'window_slow': window_slow, 'window_sign': window_sign}
+    )
+    macd_line = result['macd']
+    signal_line = result['signal']
+
+    if len(macd_line) < 2:
+        return False
+
+    # Check for crossover: MACD was above/equal to signal, now below
+    prev_macd = macd_line.iloc[-2]
+    prev_signal = signal_line.iloc[-2]
+    curr_macd = macd_line.iloc[-1]
+    curr_signal = signal_line.iloc[-1]
+
+    if pd.isna(prev_macd) or pd.isna(curr_macd) or pd.isna(prev_signal) or pd.isna(curr_signal):
+        return False
+
+    return bool(prev_macd >= prev_signal and curr_macd < curr_signal)
+
+@RuleRegistry.register("macd_bullish_cross")
+def macd_bullish_cross(
+    df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26, window_sign: int = 9
+) -> bool:
+    """
+    Detect MACD bullish crossover (MACD line crosses above signal line).
+
+    A bullish MACD crossover occurs when the MACD line crosses above
+    the signal line, indicating potential upward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA window. Range: 2-50. Default: 12.
+        window_slow (int): Slow EMA window. Range: 10-100. Default: 26.
+        window_sign (int): Signal line EMA window. Range: 2-50. Default: 9.
+
+    Returns:
+        bool: True if bullish crossover detected, False otherwise.
+    """
+    closes = df["Close"]
+    min_periods = window_slow + window_sign
+    if len(closes) < min_periods:
+        return False
+
+    result = MACD.compute(
+        data={'close': closes},
+        params={'window_fast': window_fast, 'window_slow': window_slow, 'window_sign': window_sign}
+    )
+    macd_line = result['macd']
+    signal_line = result['signal']
+
+    if len(macd_line) < 2:
+        return False
+
+    # Check for crossover: MACD was below/equal to signal, now above
+    prev_macd = macd_line.iloc[-2]
+    prev_signal = signal_line.iloc[-2]
+    curr_macd = macd_line.iloc[-1]
+    curr_signal = signal_line.iloc[-1]
+
+    if pd.isna(prev_macd) or pd.isna(curr_macd) or pd.isna(prev_signal) or pd.isna(curr_signal):
+        return False
+
+    return bool(prev_macd <= prev_signal and curr_macd > curr_signal)
+
+@RuleRegistry.register("macd_positive")
+def macd_positive(
+    df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26, window_sign: int = 9
+) -> bool:
+    """
+    Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA window. Range: 2-50. Default: 12.
+        window_slow (int): Slow EMA window. Range: 10-100. Default: 26.
+        window_sign (int): Signal line EMA window. Range: 2-50. Default: 9.
+
+    Returns:
+        bool: True if MACD histogram > 0, False otherwise.
+    """
+    closes = df["Close"]
+    min_periods = window_slow + window_sign
+    if len(closes) < min_periods:
+        return False
+
+    result = MACD.compute(
+        data={'close': closes},
+        params={'window_fast': window_fast, 'window_slow': window_slow, 'window_sign': window_sign}
+    )
+    macd_diff = result['histogram']
+
+    if pd.isna(macd_diff.iloc[-1]):
+        return False
+
+    return float(macd_diff.iloc[-1]) > 0
+
+@RuleRegistry.register("mass_reversal_signal")
+def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25, threshold_high: float = 27.0, threshold_low: float = 26.5) -> bool:
+    """
+    Check if Mass Index signals potential reversal (reversal bulge).
+
+    A reversal bulge occurs when Mass Index rises above 27 then falls below 26.5.
+
+    Type: TRIGGER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA period. Range: 5-15. Default: 9.
+        window_slow (int): Sum period. Range: 15-40. Default: 25.
+        threshold_high (float): Upper threshold. Range: 25-30. Default: 27.0.
+        threshold_low (float): Lower threshold. Range: 24-27. Default: 26.5.
+
+    Returns:
+        bool: True if reversal bulge detected, False otherwise.
+    """
+    if len(df) < window_slow + window_fast:
+        return False
+
+    result = MassIndex.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={'window_fast': window_fast, 'window_slow': window_slow}
+    )
+    mi = result['mass_index']
+
+    if len(mi) < 5 or pd.isna(mi.iloc[-1]):
+        return False
+
+    # Check for bulge: was above threshold_high recently, now below threshold_low
+    recent = mi.iloc[-10:]
+    was_above = any(float(v) > threshold_high for v in recent if not pd.isna(v))
+    now_below = float(mi.iloc[-1]) < threshold_low
+
+    return was_above and now_below
+
+@RuleRegistry.register("multi_tf_trend_bearish")
+def multi_tf_trend_bearish(
+    df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
+) -> bool:
+    """
+    Check if the higher-timeframe EMA is falling.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
+        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1W.
+        window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
+        slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
+
+    Returns:
+        bool: True if higher-TF trend == -1 on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
+        return False
+    out = MultiTFTrend.compute(
+        data={'close': closes},
+        params={'higher_tf': higher_tf, 'window': window, 'slope_threshold': slope_threshold},
+    )
+    val = out['higher_tf_trend'].iloc[-1]
+    if pd.isna(val):
+        return False
+    return val == -1
+
+@RuleRegistry.register("multi_tf_trend_bullish")
+def multi_tf_trend_bullish(
+    df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
+) -> bool:
+    """
+    Check if the higher-timeframe EMA is rising (trend confirmation filter).
+
+    Requires a DatetimeIndex. Resamples to the specified higher timeframe,
+    computes an EMA on the resampled closes, and returns True if the EMA
+    slope is positive. Broadcasts back to the current bar's timestamp so
+    lower-TF signals can be filtered by higher-TF trend.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
+        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1W.
+        window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
+        slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
+
+    Returns:
+        bool: True if higher-TF trend == +1 on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
+        return False
+    out = MultiTFTrend.compute(
+        data={'close': closes},
+        params={'higher_tf': higher_tf, 'window': window, 'slope_threshold': slope_threshold},
+    )
+    val = out['higher_tf_trend'].iloc[-1]
+    if pd.isna(val):
+        return False
+    return val == 1
+
+@RuleRegistry.register("trix_bearish")
+def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> bool:
+    """
+    Check if TRIX indicates bearish momentum.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): TRIX period. Range: 5-30. Default: 15.
+        threshold (float): Bearish threshold. Range: 0.0-100.0. Default: 0.0.
+
+    Returns:
+        bool: True if TRIX < threshold, False otherwise.
+    """
+    if len(df) < window * 3:
+        return False
+
+    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window, 'window_sign': 9})
+    trix = result['trix']
+
+    if pd.isna(trix.iloc[-1]):
+        return False
+
+    return float(trix.iloc[-1]) < threshold
+
+@RuleRegistry.register("trix_bullish")
+def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> bool:
+    """
+    Check if TRIX indicates bullish momentum.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): TRIX period. Range: 5-30. Default: 15.
+        threshold (float): Bullish threshold. Range: 0.0-100.0. Default: 0.0.
+
+    Returns:
+        bool: True if TRIX > threshold, False otherwise.
+    """
+    if len(df) < window * 3:
+        return False
+
+    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window, 'window_sign': 9})
+    trix = result['trix']
+
+    if pd.isna(trix.iloc[-1]):
+        return False
+
+    return float(trix.iloc[-1]) > threshold
+
+@RuleRegistry.register("vortex_bearish")
+def vortex_bearish(df: pd.DataFrame, window: int = 14) -> bool:
+    """
+    Check if Vortex Indicator shows bearish trend (-VI > +VI).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Vortex period. Range: 5-30. Default: 14.
+
+    Returns:
+        bool: True if -VI > +VI, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = Vortex.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window}
+    )
+    vi_pos = result['vortex_pos']
+    vi_neg = result['vortex_neg']
+
+    if pd.isna(vi_pos.iloc[-1]) or pd.isna(vi_neg.iloc[-1]):
+        return False
+
+    return float(vi_neg.iloc[-1]) > float(vi_pos.iloc[-1])
+
+@RuleRegistry.register("vortex_bullish")
+def vortex_bullish(df: pd.DataFrame, window: int = 14) -> bool:
+    """
+    Check if Vortex Indicator shows bullish trend (+VI > -VI).
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Vortex period. Range: 5-30. Default: 14.
+
+    Returns:
+        bool: True if +VI > -VI, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = Vortex.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window}
+    )
+    vi_pos = result['vortex_pos']
+    vi_neg = result['vortex_neg']
+
+    if pd.isna(vi_pos.iloc[-1]) or pd.isna(vi_neg.iloc[-1]):
+        return False
+
+    return float(vi_pos.iloc[-1]) > float(vi_neg.iloc[-1])
+
+@RuleRegistry.register("vortex_crossover")
+def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bullish") -> bool:
+    """
+    Check if Vortex lines cross (trend change).
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Vortex period. Range: 5-30. Default: 14.
+        direction (str): Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish'. Default: bullish.
+
+    Returns:
+        bool: True if crossover detected, False otherwise.
+    """
+    if len(df) < window + 1:
+        return False
+
+    result = Vortex.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window}
+    )
+    vi_pos = result['vortex_pos']
+    vi_neg = result['vortex_neg']
+
+    if len(vi_pos) < 2:
+        return False
+    if (pd.isna(vi_pos.iloc[-1]) or pd.isna(vi_neg.iloc[-1])
+            or pd.isna(vi_pos.iloc[-2]) or pd.isna(vi_neg.iloc[-2])):
+        return False
+
+    if direction.lower() == "bullish":
+        prev_below = float(vi_pos.iloc[-2]) <= float(vi_neg.iloc[-2])
+        curr_above = float(vi_pos.iloc[-1]) > float(vi_neg.iloc[-1])
+        return prev_below and curr_above
+    elif direction.lower() == "bearish":
+        prev_above = float(vi_pos.iloc[-2]) >= float(vi_neg.iloc[-2])
+        curr_below = float(vi_pos.iloc[-1]) < float(vi_neg.iloc[-1])
+        return prev_above and curr_below
+
+    return False

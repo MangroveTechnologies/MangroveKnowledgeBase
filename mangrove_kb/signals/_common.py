@@ -23,3 +23,39 @@ def zero_cross(series: pd.Series, direction: str) -> bool:
     if direction == "up":
         return bool(prev <= 0 < curr)
     return bool(prev >= 0 > curr)
+
+
+def _ma_is_above(df: pd.DataFrame, indicator_cls, output_key: str, window: int) -> bool:
+    """Helper: check if current close is above the given MA."""
+    closes = df["Close"]
+    if len(closes) < window:
+        return False
+    result = indicator_cls.compute(data={'close': closes}, params={'window': window})
+    ma = result[output_key]
+    if ma.empty or pd.isna(ma.iloc[-1]):
+        return False
+    return bool(closes.iloc[-1] > ma.iloc[-1])
+
+def _ma_crossover(
+    df: pd.DataFrame,
+    indicator_cls,
+    output_key: str,
+    window_fast: int,
+    window_slow: int,
+    direction: str,
+) -> bool:
+    """Helper: detect fast/slow MA crossover in the given direction."""
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+    fast = indicator_cls.compute(data={'close': closes}, params={'window': window_fast})[output_key]
+    slow = indicator_cls.compute(data={'close': closes}, params={'window': window_slow})[output_key]
+    if len(fast) < 2 or len(slow) < 2:
+        return False
+    prev_fast, curr_fast = fast.iloc[-2], fast.iloc[-1]
+    prev_slow, curr_slow = slow.iloc[-2], slow.iloc[-1]
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+    if direction == "bullish":
+        return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
+    return bool(prev_fast >= prev_slow and curr_fast < curr_slow)

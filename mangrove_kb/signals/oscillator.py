@@ -13,10 +13,12 @@ from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.signals._common import zero_cross
 from mangrove_kb.indicators import (
     BOP,
+    CCI,
     CMF,
     CMO,
     MFI,
     RSI,
+    STC,
     StochRSI,
     StochasticOscillator,
     TSI,
@@ -824,3 +826,151 @@ def mfi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 20.0) ->
         return False
 
     return float(mfi.iloc[-1]) < threshold
+
+
+# ---------------------------------------------------------------------------
+# Moved from trend.py, which held four classes at once.
+# Signals whose class is `oscillator` -- the class of the indicator each one reads.
+# ---------------------------------------------------------------------------
+
+@RuleRegistry.register("cci_overbought")
+def cci_overbought(df: pd.DataFrame, window: int = 20, constant: float = 0.015, threshold: float = 100.0) -> bool:
+    """
+    Check if CCI indicates overbought condition.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CCI period. Range: 10-50. Default: 20.
+        constant (float): CCI constant. Range: 0.001-0.1. Default: 0.015.
+        threshold (float): Overbought threshold. Range: 50-200. Default: 100.0.
+
+    Returns:
+        bool: True if CCI > threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = CCI.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'constant': constant}
+    )
+    cci = result['cci']
+
+    if pd.isna(cci.iloc[-1]):
+        return False
+
+    return float(cci.iloc[-1]) > threshold
+
+@RuleRegistry.register("cci_oversold")
+def cci_oversold(df: pd.DataFrame, window: int = 20, constant: float = 0.015, threshold: float = -100.0) -> bool:
+    """
+    Check if CCI indicates oversold condition.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): CCI period. Range: 10-50. Default: 20.
+        constant (float): CCI constant. Range: 0.001-0.1. Default: 0.015.
+        threshold (float): Oversold threshold. Range: -200--50. Default: -100.0.
+
+    Returns:
+        bool: True if CCI < threshold, False otherwise.
+    """
+    if len(df) < window:
+        return False
+
+    result = CCI.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'window': window, 'constant': constant}
+    )
+    cci = result['cci']
+
+    if pd.isna(cci.iloc[-1]):
+        return False
+
+    return float(cci.iloc[-1]) < threshold
+
+@RuleRegistry.register("stc_overbought")
+def stc_overbought(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23, cycle: int = 10, smooth1: int = 3, smooth2: int = 3, threshold: float = 75.0) -> bool:
+    """
+    Check if STC indicates overbought condition.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_slow (int): Slow EMA period. Range: 2-200. Default: 50.
+        window_fast (int): Fast EMA period. Range: 2-200. Default: 23.
+        cycle (int): Cycle period. Range: 1-200. Default: 10.
+        smooth1 (int): First smoothing period. Range: 1-200. Default: 3.
+        smooth2 (int): Second smoothing period. Range: 1-200. Default: 3.
+        threshold (float): Overbought threshold. Range: 0.0-100.0. Default: 75.0.
+
+    Returns:
+        bool: True if STC > threshold, False otherwise.
+    """
+    if len(df) < window_slow + cycle:
+        return False
+
+    result = STC.compute(
+        data={'close': df["Close"]},
+        params={
+            'window_slow': window_slow,
+            'window_fast': window_fast,
+            'cycle': cycle,
+            'smooth1': smooth1,
+            'smooth2': smooth2
+        }
+    )
+    stc = result['stc']
+
+    if pd.isna(stc.iloc[-1]):
+        return False
+
+    return float(stc.iloc[-1]) > threshold
+
+@RuleRegistry.register("stc_oversold")
+def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23, cycle: int = 10, smooth1: int = 3, smooth2: int = 3, threshold: float = 25.0) -> bool:
+    """
+    Check if STC indicates oversold condition.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_slow (int): Slow EMA period. Range: 2-200. Default: 50.
+        window_fast (int): Fast EMA period. Range: 2-200. Default: 23.
+        cycle (int): Cycle period. Range: 1-200. Default: 10.
+        smooth1 (int): First smoothing period. Range: 1-200. Default: 3.
+        smooth2 (int): Second smoothing period. Range: 1-200. Default: 3.
+        threshold (float): Oversold threshold. Range: 0.0-100.0. Default: 25.0.
+
+    Returns:
+        bool: True if STC < threshold, False otherwise.
+    """
+    if len(df) < window_slow + cycle:
+        return False
+
+    result = STC.compute(
+        data={'close': df["Close"]},
+        params={
+            'window_slow': window_slow,
+            'window_fast': window_fast,
+            'cycle': cycle,
+            'smooth1': smooth1,
+            'smooth2': smooth2
+        }
+    )
+    stc = result['stc']
+
+    if pd.isna(stc.iloc[-1]):
+        return False
+
+    return float(stc.iloc[-1]) < threshold

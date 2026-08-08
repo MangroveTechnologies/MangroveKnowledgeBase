@@ -344,6 +344,35 @@ def _num(x):
         return None
 
 
+def _sibling_functions(path, sigs_dir):
+    """Top-level functions this file imports from another signal module, as {name: ast node}.
+
+    Helper resolution used to be per-file, which was correct only while every helper lived beside
+    the signals that call it. Splitting the files onto the ontology class moved `_ma_crossover` and
+    `_ma_is_above` into `_common.py` -- both are called from `averaging.py` AND from the EPMA
+    signals still in `trend.py`, so a helper used by two classes belongs to neither. Fifteen signals
+    silently lost their `uses` edge, and with it their class, because the call went to a name this
+    scan could no longer see.
+
+    Resolved through the file's own imports rather than by pooling every function name in the
+    package, so two modules may define the same private helper without shadowing each other.
+    """
+    import ast
+    out = {}
+    for node in ast.parse(path.read_text()).body:
+        if not (isinstance(node, ast.ImportFrom) and (node.module or "").startswith("mangrove_kb.signals.")):
+            continue
+        sib = sigs_dir / (node.module.rsplit(".", 1)[-1] + ".py")
+        if not sib.exists():
+            continue
+        sib_fns = {n.name: n for n in ast.walk(ast.parse(sib.read_text()))
+                   if isinstance(n, ast.FunctionDef)}
+        for alias in node.names:
+            if alias.name in sib_fns:
+                out[alias.asname or alias.name] = sib_fns[alias.name]
+    return out
+
+
 def _signal_param_docs():
     """{indicator name: {param: {description, min, max, default}}}"""
     import ast
@@ -358,9 +387,10 @@ def _signal_param_docs():
         if path.name in ("__init__.py", "onchain.py", "defi_pro.py"):
             continue
         tree = ast.parse(path.read_text())
-        local = {n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+        sibling = _sibling_functions(path, kbs)
+        local = {n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)} | set(sibling)
         info, reg = {}, {}
-        for fn in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]:
+        for fn in [n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)] + list(sibling.values()):
             inds, calls = set(), set()
             for nd in ast.walk(fn):
                 if isinstance(nd, ast.Call):
@@ -657,6 +687,7 @@ def _signal_facts():
             continue
         tree = ast.parse(path.read_text())
         local = {n.name: n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+        local.update({k: v for k, v in _sibling_functions(path, sigs_dir).items() if k not in local})
 
         def scan(fn, binding=None):
             """(consumes, calls, guards) for one function body, no recursion.

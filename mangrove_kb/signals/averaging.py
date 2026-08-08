@@ -7,16 +7,33 @@ unchanged; only the file moved.
 
 import logging
 
+import numpy as np
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.signals._common import _ma_crossover, _ma_is_above
 from mangrove_kb.indicators import (
+    ALMA,
+    DEMA,
+    EMA,
+    HMA,
     KAMA,
+    MAMA,
+    SMA,
+    SMMA,
+    T3,
+    TEMA,
+    TRIMA,
     VWAP,
     VWMA,
+    WMA,
+    WilliamsAlligator,
 )
 
 logger = logging.getLogger(__name__)
+
+#: Fibonacci windows -- the ribbon's conventional set. A tuple so the default cannot be mutated.
+_DEFAULT_RIBBON_WINDOWS = (5, 8, 13, 21, 34, 55, 89, 144)
 
 
 @RuleRegistry.register("kama_cross_up")
@@ -237,3 +254,1195 @@ def vwma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
         return False
     return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
+
+
+# ---------------------------------------------------------------------------
+# Moved from trend.py, which held four classes at once.
+# Signals whose class is `averaging` -- the class of the indicator each one reads.
+# ---------------------------------------------------------------------------
+
+def _alligator_lines(df: pd.DataFrame, jaw: int, teeth: int, lips: int,
+                     jaw_offset: int, teeth_offset: int, lips_offset: int):
+    """Helper: compute alligator lines, return None if insufficient data."""
+    if len(df) < jaw + jaw_offset + 1:
+        return None
+    out = WilliamsAlligator.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={
+            'jaw': jaw, 'teeth': teeth, 'lips': lips,
+            'jaw_offset': jaw_offset, 'teeth_offset': teeth_offset, 'lips_offset': lips_offset,
+        },
+    )
+    return out['jaw'], out['teeth'], out['lips']
+
+def _mama_compute(df: pd.DataFrame, fast_limit: float, slow_limit: float, warmup_bars: int = 64):
+    """Helper: compute MAMA+FAMA once for signal evaluation.
+
+    MAMA consumes median price per Ehlers. `warmup_bars` is how many leading values are discarded
+    as contaminated by the zero seed -- see the indicator docstring for the measurement behind the
+    default.
+    """
+    if len(df) <= warmup_bars:
+        return None
+    result = MAMA.compute(data={'high': df["High"], 'low': df["Low"]},
+                          params={'fast_limit': fast_limit, 'slow_limit': slow_limit,
+                                  'warmup_bars': warmup_bars})
+    mama, fama = result['mama'], result['fama']
+    if len(mama) < 2 or pd.isna(mama.iloc[-1]) or pd.isna(fama.iloc[-1]):
+        return None
+    return mama, fama
+
+def _ribbon_alignment(closes: pd.Series, windows: list) -> str | None:
+    """Classify the ribbon on the latest bar as 'bullish', 'bearish' or 'tangled'.
+
+    Returns None where the alignment is undefined -- any SMA still in warmup on that bar.
+
+    Bullish is strict alignment fastest-above-slowest, i.e. the row of SMAs read shortest window to
+    longest is strictly DECREASING. Bearish is the strict opposite. Tangled is defined as neither,
+    so the three are mutually exclusive and, wherever alignment is defined, exhaustive.
+    """
+    if sorted(windows) != windows:
+        raise ValueError(f"windows must be strictly increasing; got {windows}")
+
+    mas = np.array([
+        SMA.compute({'close': closes}, {'window': w})['sma'].to_numpy(dtype=np.float64)[-1]
+        for w in windows
+    ])
+    if np.isnan(mas).any():
+        return None
+
+    diffs = np.diff(mas)
+    if np.all(diffs < 0):
+        return "bullish"
+    if np.all(diffs > 0):
+        return "bearish"
+    return "tangled"
+
+@RuleRegistry.register("alligator_bearish")
+def alligator_bearish(
+    df: pd.DataFrame,
+    jaw: int = 13, teeth: int = 8, lips: int = 5,
+    jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
+) -> bool:
+    """
+    Check if Williams Alligator lines are in bearish alignment (lips < teeth < jaw).
+
+    Strong downtrend, all lines spreading downward.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        jaw (int): Jaw SMMA period. Range: 5-50. Default: 13.
+        teeth (int): Teeth SMMA period. Range: 3-30. Default: 8.
+        lips (int): Lips SMMA period. Range: 2-20. Default: 5.
+        jaw_offset (int): Jaw forward shift. Range: 0-20. Default: 8.
+        teeth_offset (int): Teeth forward shift. Range: 0-15. Default: 5.
+        lips_offset (int): Lips forward shift. Range: 0-10. Default: 3.
+
+    Returns:
+        bool: True if lips < teeth < jaw on the current bar.
+    """
+    lines = _alligator_lines(df, jaw, teeth, lips, jaw_offset, teeth_offset, lips_offset)
+    if lines is None:
+        return False
+    jaw_s, teeth_s, lips_s = lines
+    if pd.isna(jaw_s.iloc[-1]) or pd.isna(teeth_s.iloc[-1]) or pd.isna(lips_s.iloc[-1]):
+        return False
+    return bool(lips_s.iloc[-1] < teeth_s.iloc[-1] < jaw_s.iloc[-1])
+
+@RuleRegistry.register("alligator_bullish")
+def alligator_bullish(
+    df: pd.DataFrame,
+    jaw: int = 13, teeth: int = 8, lips: int = 5,
+    jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
+) -> bool:
+    """
+    Check if Williams Alligator lines are in bullish alignment (lips > teeth > jaw).
+
+    Bill Williams's "hungry alligator" state: strong uptrend, all lines
+    spreading upward.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        jaw (int): Jaw SMMA period. Range: 5-50. Default: 13.
+        teeth (int): Teeth SMMA period. Range: 3-30. Default: 8.
+        lips (int): Lips SMMA period. Range: 2-20. Default: 5.
+        jaw_offset (int): Jaw forward shift. Range: 0-20. Default: 8.
+        teeth_offset (int): Teeth forward shift. Range: 0-15. Default: 5.
+        lips_offset (int): Lips forward shift. Range: 0-10. Default: 3.
+
+    Returns:
+        bool: True if lips > teeth > jaw on the current bar.
+    """
+    lines = _alligator_lines(df, jaw, teeth, lips, jaw_offset, teeth_offset, lips_offset)
+    if lines is None:
+        return False
+    jaw_s, teeth_s, lips_s = lines
+    if pd.isna(jaw_s.iloc[-1]) or pd.isna(teeth_s.iloc[-1]) or pd.isna(lips_s.iloc[-1]):
+        return False
+    return bool(lips_s.iloc[-1] > teeth_s.iloc[-1] > jaw_s.iloc[-1])
+
+@RuleRegistry.register("alligator_sleeping")
+def alligator_sleeping(
+    df: pd.DataFrame,
+    jaw: int = 13, teeth: int = 8, lips: int = 5,
+    jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
+) -> bool:
+    """
+    Check if the Williams Alligator is sleeping (lines tangled, no trend).
+
+    True when lines are neither strictly bullish-aligned nor bearish-aligned.
+    Used as a no-trade filter during consolidation.
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        jaw (int): Jaw SMMA period. Range: 5-50. Default: 13.
+        teeth (int): Teeth SMMA period. Range: 3-30. Default: 8.
+        lips (int): Lips SMMA period. Range: 2-20. Default: 5.
+        jaw_offset (int): Jaw forward shift. Range: 0-20. Default: 8.
+        teeth_offset (int): Teeth forward shift. Range: 0-15. Default: 5.
+        lips_offset (int): Lips forward shift. Range: 0-10. Default: 3.
+
+    Returns:
+        bool: True if lines are tangled (no strict bullish or bearish alignment).
+    """
+    lines = _alligator_lines(df, jaw, teeth, lips, jaw_offset, teeth_offset, lips_offset)
+    if lines is None:
+        return False
+    jaw_s, teeth_s, lips_s = lines
+    if pd.isna(jaw_s.iloc[-1]) or pd.isna(teeth_s.iloc[-1]) or pd.isna(lips_s.iloc[-1]):
+        return False
+    j, t, l = jaw_s.iloc[-1], teeth_s.iloc[-1], lips_s.iloc[-1]
+    bullish = l > t > j
+    bearish = l < t < j
+    return not (bullish or bearish)
+
+@RuleRegistry.register("alma_cross_down")
+def alma_cross_down(
+    df: pd.DataFrame,
+    window_fast: int = 9,
+    window_slow: int = 21,
+    offset: float = 0.85,
+    sigma: float = 6.0,
+) -> bool:
+    """
+    Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast ALMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow ALMA window. Range: 2-200. Default: 21.
+        offset (float): Weight center, 0=oldest, 1=newest. Range: 0.0-1.0. Default: 0.85.
+        sigma (float): Gaussian spread. Higher = smoother. Range: 0.1-20.0. Default: 6.0.
+
+    Returns:
+        bool: True if bearish ALMA crossover detected on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+    common = {'offset': offset, 'sigma': sigma}
+    fast = ALMA.compute(data={'close': closes}, params={'window': window_fast, **common})['alma']
+    slow = ALMA.compute(data={'close': closes}, params={'window': window_slow, **common})['alma']
+    if len(fast) < 2 or len(slow) < 2:
+        return False
+    prev_fast, curr_fast = fast.iloc[-2], fast.iloc[-1]
+    prev_slow, curr_slow = slow.iloc[-2], slow.iloc[-1]
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+    return bool(prev_fast >= prev_slow and curr_fast < curr_slow)
+
+@RuleRegistry.register("alma_cross_up")
+def alma_cross_up(
+    df: pd.DataFrame,
+    window_fast: int = 9,
+    window_slow: int = 21,
+    offset: float = 0.85,
+    sigma: float = 6.0,
+) -> bool:
+    """
+    Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA).
+
+    Both ALMAs use the same offset and sigma; only the window differs.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast ALMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow ALMA window. Range: 2-200. Default: 21.
+        offset (float): Weight center, 0=oldest, 1=newest. Range: 0.0-1.0. Default: 0.85.
+        sigma (float): Gaussian spread. Higher = smoother. Range: 0.1-20.0. Default: 6.0.
+
+    Returns:
+        bool: True if bullish ALMA crossover detected on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+    common = {'offset': offset, 'sigma': sigma}
+    fast = ALMA.compute(data={'close': closes}, params={'window': window_fast, **common})['alma']
+    slow = ALMA.compute(data={'close': closes}, params={'window': window_slow, **common})['alma']
+    if len(fast) < 2 or len(slow) < 2:
+        return False
+    prev_fast, curr_fast = fast.iloc[-2], fast.iloc[-1]
+    prev_slow, curr_slow = slow.iloc[-2], slow.iloc[-1]
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+    return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
+
+@RuleRegistry.register("dema_cross_down")
+def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA).
+
+    Lower-lag equivalent of an SMA/EMA death cross.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast DEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow DEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bearish DEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, DEMA, 'dema', window_fast, window_slow, "bearish")
+
+@RuleRegistry.register("dema_cross_up")
+def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA).
+
+    Lower-lag equivalent of an SMA/EMA golden cross.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast DEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow DEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bullish DEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, DEMA, 'dema', window_fast, window_slow, "bullish")
+
+@RuleRegistry.register("ema_cross_down")
+def ema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow EMA window. Range: 5-200. Default: 21.
+
+    Returns:
+        bool: True if bearish crossover detected, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+
+    fast_result = EMA.compute(data={'close': closes}, params={'window': window_fast})
+    fast_ema = fast_result['ema']
+    slow_result = EMA.compute(data={'close': closes}, params={'window': window_slow})
+    slow_ema = slow_result['ema']
+
+    if len(fast_ema) < 2:
+        return False
+
+    prev_fast = fast_ema.iloc[-2]
+    prev_slow = slow_ema.iloc[-2]
+    curr_fast = fast_ema.iloc[-1]
+    curr_slow = slow_ema.iloc[-1]
+
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+
+    return bool(prev_fast >= prev_slow and curr_fast < curr_slow)
+
+@RuleRegistry.register("ema_cross_up")
+def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow EMA window. Range: 5-200. Default: 21.
+
+    Returns:
+        bool: True if bullish crossover detected, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+
+    fast_result = EMA.compute(data={'close': closes}, params={'window': window_fast})
+    fast_ema = fast_result['ema']
+    slow_result = EMA.compute(data={'close': closes}, params={'window': window_slow})
+    slow_ema = slow_result['ema']
+
+    if len(fast_ema) < 2:
+        return False
+
+    prev_fast = fast_ema.iloc[-2]
+    prev_slow = slow_ema.iloc[-2]
+    curr_fast = fast_ema.iloc[-1]
+    curr_slow = slow_ema.iloc[-1]
+
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+
+    return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
+
+@RuleRegistry.register("ema_crossover")
+def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, direction: str = "bullish") -> bool:
+    """
+    Detect an EMA crossover signal with configurable direction (bullish or bearish).
+
+    Uses EMA indicator to calculate window_fast and window_slow EMAs. Returns True when a crossover
+    is detected in the specified direction.
+
+    Bullish crossover: window_fast EMA crosses above window_slow EMA
+    Bearish crossover: window_fast EMA crosses below window_slow EMA
+
+    The crossover detection compares the previous and current bars:
+    - Bullish: prev window_fast <= prev window_slow AND current window_fast > current window_slow
+    - Bearish: prev window_fast >= prev window_slow AND current window_fast < current window_slow
+
+    Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EMA window in bars. Range: 1-200.
+        window_slow (int): Slow EMA window in bars. Range: 1-200.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+
+    Returns:
+        bool: True if crossover detected in the specified direction, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow + 1:
+        return False
+
+    fast_result = EMA.compute(data={'close': closes}, params={'window': window_fast})
+    fast_ema = fast_result['ema']
+    slow_result = EMA.compute(data={'close': closes}, params={'window': window_slow})
+    slow_ema = slow_result['ema']
+
+    if len(fast_ema) < 2:
+        return False
+
+    prev_fast = fast_ema.iloc[-2]
+    prev_slow = slow_ema.iloc[-2]
+    curr_fast = fast_ema.iloc[-1]
+    curr_slow = slow_ema.iloc[-1]
+
+    # Check for NaN values
+    if pd.isna(prev_fast) or pd.isna(prev_slow) or pd.isna(curr_fast) or pd.isna(curr_slow):
+        return False
+
+    if direction.lower() == "bullish":
+        # Bullish crossover: window_fast was below or equal to window_slow, now window_fast is above window_slow
+        return prev_fast <= prev_slow and curr_fast > curr_slow
+    elif direction.lower() == "bearish":
+        # Bearish crossover: window_fast was above or equal to window_slow, now window_fast is below window_slow
+        return prev_fast >= prev_slow and curr_fast < curr_slow
+    else:
+        logger.warning(f"Unknown direction '{direction}', expected 'bullish' or 'bearish'")
+        return False
+
+@RuleRegistry.register("hma_cross_down")
+def hma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) -> bool:
+    """
+    Detect a bearish HMA crossover (fast HMA crosses below slow HMA).
+
+    Low-lag crossover; fires earlier than SMA/EMA equivalents.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast HMA window. Range: 4-100. Default: 9.
+        window_slow (int): Slow HMA window. Range: 4-200. Default: 25.
+
+    Returns:
+        bool: True if bearish HMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, HMA, 'hma', window_fast, window_slow, "bearish")
+
+@RuleRegistry.register("hma_cross_up")
+def hma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) -> bool:
+    """
+    Detect a bullish HMA crossover (fast HMA crosses above slow HMA).
+
+    Low-lag crossover; fires earlier than SMA/EMA equivalents.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast HMA window. Range: 4-100. Default: 9.
+        window_slow (int): Slow HMA window. Range: 4-200. Default: 25.
+
+    Returns:
+        bool: True if bullish HMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, HMA, 'hma', window_fast, window_slow, "bullish")
+
+@RuleRegistry.register("is_above_alma")
+def is_above_alma(df: pd.DataFrame, window: int = 21, offset: float = 0.85, sigma: float = 6.0) -> bool:
+    """
+    Check if the current price is above the Arnaud Legoux Moving Average (ALMA).
+
+    ALMA is a Gaussian-weighted MA that can be tuned to react faster (offset
+    near 1, lower sigma) or smoother (offset near 0, higher sigma).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ALMA window in bars. Range: 2-200. Default: 21.
+        offset (float): Weight center, 0=oldest, 1=newest. Range: 0.0-1.0. Default: 0.85.
+        sigma (float): Gaussian spread. Higher = smoother. Range: 0.1-20.0. Default: 6.0.
+
+    Returns:
+        bool: True if close > ALMA, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window:
+        return False
+    result = ALMA.compute(data={'close': closes}, params={'window': window, 'offset': offset, 'sigma': sigma})
+    alma = result['alma']
+    if alma.empty or pd.isna(alma.iloc[-1]):
+        return False
+    return bool(closes.iloc[-1] > alma.iloc[-1])
+
+@RuleRegistry.register("is_above_dema")
+def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
+    """
+    Check if the current price is above the Double Exponential Moving Average (DEMA).
+
+    DEMA reduces lag compared to a standard EMA by combining two EMA passes.
+    Useful for trend-following filters where responsiveness matters.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): DEMA window in bars. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if close > DEMA, False otherwise.
+    """
+    return _ma_is_above(df, DEMA, 'dema', window)
+
+@RuleRegistry.register("is_above_hma")
+def is_above_hma(df: pd.DataFrame, window: int = 16) -> bool:
+    """
+    Check if the current price is above the Hull Moving Average (HMA).
+
+    HMA tracks price with very low lag while remaining smoother than WMA.
+    A common crypto trend filter.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): HMA window in bars. Range: 4-200. Default: 16.
+
+    Returns:
+        bool: True if close > HMA, False otherwise.
+    """
+    return _ma_is_above(df, HMA, 'hma', window)
+
+@RuleRegistry.register("is_above_mama")
+def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
+    """
+    Check if the current price is above the MESA Adaptive Moving Average (MAMA).
+
+    MAMA adapts its smoothing to volatility via a Hilbert transform.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast_limit (float): Upper alpha bound (fast response). Range: 0.1-1.0. Default: 0.5.
+        slow_limit (float): Lower alpha bound (slow response). Range: 0.01-0.5. Default: 0.05.
+        warmup_bars (int): Leading bars discarded as contaminated by the zero seed. Range: 6-200. Default: 64.
+
+    Returns:
+        bool: True if close > MAMA, False otherwise.
+    """
+    out = _mama_compute(df, fast_limit, slow_limit, warmup_bars)
+    if out is None:
+        return False
+    mama, _ = out
+    return bool(df["Close"].iloc[-1] > mama.iloc[-1])
+
+@RuleRegistry.register("is_above_sma")
+def is_above_sma(df: pd.DataFrame, window: int) -> bool:
+    """
+    Check if the current price is above the Simple Moving Average.
+
+    Uses SMA indicator to calculate the SMA for the given window and returns True
+    if the most recent close price is strictly greater than the SMA value.
+    Returns False if insufficient data is available. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): SMA window in bars. Range: 1-200.
+
+    Returns:
+        bool: True if close > SMA, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window:
+        return False
+
+    result = SMA.compute(data={'close': closes}, params={'window': window})
+    sma = result['sma']
+
+    if sma.empty or pd.isna(sma.iloc[-1]):
+        return False
+
+    return closes.iloc[-1] > sma.iloc[-1]
+
+@RuleRegistry.register("is_above_smma")
+def is_above_smma(df: pd.DataFrame, window: int = 14) -> bool:
+    """
+    Check if the current price is above the Smoothed Moving Average (SMMA / Wilder's).
+
+    SMMA uses Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing
+    a slower, more stable trend line. Same family used inside RSI and ATR.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): SMMA window in bars. Range: 2-200. Default: 14.
+
+    Returns:
+        bool: True if close > SMMA, False otherwise.
+    """
+    return _ma_is_above(df, SMMA, 'smma', window)
+
+@RuleRegistry.register("is_above_t3")
+def is_above_t3(df: pd.DataFrame, window: int = 10, volume_factor: float = 0.7) -> bool:
+    """
+    Check if the current price is above the Tillson T3 moving average.
+
+    T3 is a smooth low-lag MA that combines 6 EMAs via the volume factor.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): T3 window in bars. Range: 2-200. Default: 10.
+        volume_factor (float): Tillson volume factor, controls smoothness. Range: 0.0-1.0. Default: 0.7.
+
+    Returns:
+        bool: True if close > T3, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window * 6:
+        return False
+    result = T3.compute(data={'close': closes}, params={'window': window, 'volume_factor': volume_factor})
+    t3 = result['t3']
+    if t3.empty or pd.isna(t3.iloc[-1]):
+        return False
+    return bool(closes.iloc[-1] > t3.iloc[-1])
+
+@RuleRegistry.register("is_above_tema")
+def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
+    """
+    Check if the current price is above the Triple Exponential Moving Average (TEMA).
+
+    TEMA has even less lag than DEMA by combining three EMA passes.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): TEMA window in bars. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if close > TEMA, False otherwise.
+    """
+    return _ma_is_above(df, TEMA, 'tema', window)
+
+@RuleRegistry.register("is_above_trima")
+def is_above_trima(df: pd.DataFrame, window: int = 20) -> bool:
+    """
+    Check if the current price is above the Triangular Moving Average (TRIMA).
+
+    TRIMA is a double-smoothed SMA that weights the middle of the window more
+    heavily, producing a smoother trend line than SMA.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): TRIMA window in bars. Range: 2-200. Default: 20.
+
+    Returns:
+        bool: True if close > TRIMA, False otherwise.
+    """
+    return _ma_is_above(df, TRIMA, 'trima', window)
+
+@RuleRegistry.register("ma_ribbon_bearish")
+def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
+    """
+    Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+
+    Returns:
+        bool: True if ribbon is bearish-aligned on the current bar.
+    """
+    closes = df["Close"]
+    windows_list = list(windows)
+    if len(closes) < max(windows_list):
+        return False
+    return _ribbon_alignment(closes, windows_list) == "bearish"
+
+@RuleRegistry.register("ma_ribbon_bullish")
+def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
+    """
+    Check if all MAs in the ribbon are in strict bullish alignment (faster above slower).
+
+    Uses 8 Fibonacci-spaced SMAs by default. Strict alignment means
+    SMA(5) > SMA(8) > SMA(13) > ... > SMA(144). This is a strong trend filter
+    -- when true, the market is in a clear uptrend across all horizons.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+
+    Returns:
+        bool: True if ribbon is bullish-aligned on the current bar.
+    """
+    closes = df["Close"]
+    windows_list = list(windows)
+    if len(closes) < max(windows_list):
+        return False
+    return _ribbon_alignment(closes, windows_list) == "bullish"
+
+@RuleRegistry.register("ma_ribbon_tangled")
+def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
+    """
+    Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter).
+
+    Useful as a no-trade filter during choppy markets.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+
+    Returns:
+        bool: True if ribbon is neither bullish nor bearish aligned.
+    """
+    closes = df["Close"]
+    windows_list = list(windows)
+    if len(closes) < max(windows_list):
+        return False
+    return _ribbon_alignment(closes, windows_list) == "tangled"
+
+@RuleRegistry.register("mama_cross_down")
+def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
+    """
+    Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA).
+
+    Classic Ehlers exit signal: MAMA falling below FAMA signals a downtrend.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast_limit (float): Upper alpha bound. Range: 0.1-1.0. Default: 0.5.
+        slow_limit (float): Lower alpha bound. Range: 0.01-0.5. Default: 0.05.
+
+    Returns:
+        bool: True if bearish MAMA/FAMA crossover detected on the current bar.
+    """
+    out = _mama_compute(df, fast_limit, slow_limit, warmup_bars)
+    if out is None:
+        return False
+    mama, fama = out
+    if pd.isna(mama.iloc[-2]) or pd.isna(fama.iloc[-2]):
+        return False
+    return bool(mama.iloc[-2] >= fama.iloc[-2] and mama.iloc[-1] < fama.iloc[-1])
+
+@RuleRegistry.register("mama_cross_up")
+def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
+    """
+    Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA).
+
+    Classic Ehlers entry signal: MAMA rising above FAMA signals an uptrend.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        fast_limit (float): Upper alpha bound. Range: 0.1-1.0. Default: 0.5.
+        slow_limit (float): Lower alpha bound. Range: 0.01-0.5. Default: 0.05.
+
+    Returns:
+        bool: True if bullish MAMA/FAMA crossover detected on the current bar.
+    """
+    out = _mama_compute(df, fast_limit, slow_limit, warmup_bars)
+    if out is None:
+        return False
+    mama, fama = out
+    if pd.isna(mama.iloc[-2]) or pd.isna(fama.iloc[-2]):
+        return False
+    return bool(mama.iloc[-2] <= fama.iloc[-2] and mama.iloc[-1] > fama.iloc[-1])
+
+@RuleRegistry.register("price_above_ema")
+def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
+    """
+    Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): EMA window. Range: 2-200. Default: 20.
+
+    Returns:
+        bool: True if close > EMA, False otherwise.
+    """
+    closes = df["Close"]
+    if len(closes) < window:
+        return False
+
+    result = EMA.compute(data={'close': closes}, params={'window': window})
+    ema = result['ema']
+
+    if pd.isna(ema.iloc[-1]):
+        return False
+
+    return float(closes.iloc[-1]) > float(ema.iloc[-1])
+
+@RuleRegistry.register("sma_cross_down")
+def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
+    """
+    Detect a bearish SMA crossover as an exit signal.
+
+    Returns True when the window_fast SMA crosses below the window_slow SMA (death cross).
+    This is a momentum-driven exit signal, indicating a transition from
+    bullish to bearish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Note: This is a backwards-compatible wrapper around sma_crossover.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast SMA window in bars. Range: 1-200.
+        window_slow (int): Slow SMA window in bars. Range: 1-200.
+
+    Returns:
+        bool: True if bearish crossover detected in the current bar, False otherwise.
+    """
+    return sma_crossover(df, window_fast=window_fast, window_slow=window_slow, direction="bearish")
+
+@RuleRegistry.register("sma_cross_up")
+def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
+    """
+    Detect a bullish SMA crossover as an entry signal.
+
+    Returns True when the window_fast SMA crosses above the window_slow SMA (golden cross).
+    This is a momentum-driven entry signal, indicating a transition from
+    bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Note: This is a backwards-compatible wrapper around sma_crossover.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast SMA window in bars. Range: 1-200.
+        window_slow (int): Slow SMA window in bars. Range: 1-200.
+
+    Returns:
+        bool: True if bullish crossover detected in the current bar, False otherwise.
+    """
+    return sma_crossover(df, window_fast=window_fast, window_slow=window_slow, direction="bullish")
+
+@RuleRegistry.register("sma_crossover")
+def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, direction: str = "bullish") -> bool:
+    """
+    Detect an SMA crossover signal with configurable direction (bullish or bearish).
+
+    Uses SMA indicator to calculate window_fast and window_slow SMAs. Returns True when a crossover
+    is detected in the specified direction.
+
+    Bullish crossover (golden cross): window_fast SMA crosses above window_slow SMA
+    Bearish crossover (death cross): window_fast SMA crosses below window_slow SMA
+
+    The crossover detection compares the previous and current bars:
+    - Bullish: prev window_fast <= prev window_slow AND current window_fast > current window_slow
+    - Bearish: prev window_fast >= prev window_slow AND current window_fast < current window_slow
+
+    Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast SMA window in bars. Range: 1-200.
+        window_slow (int): Slow SMA window in bars. Range: 1-200.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+
+    Returns:
+        bool: True if crossover detected in the specified direction, False otherwise.
+    """
+    closes = df["Close"]
+    # window_slow + 1, not window_slow: a crossing compares two bars, and with exactly window_slow
+    # bars the slow SMA has a single value, so there is no previous bar to compare against. The
+    # NaN check below already returned False there, so this changes no result -- it makes the bound
+    # state what the signal actually needs, which is what the ontology lifts as warmup_bars. Every
+    # other two-average crossing in this file already guards on `window_slow + 1`.
+    if len(closes) < window_slow + 1:
+        return False
+
+    # Calculate SMAs
+    fast_result = SMA.compute(data={'close': closes}, params={'window': window_fast})
+    fast_sma = fast_result['sma']
+    slow_result = SMA.compute(data={'close': closes}, params={'window': window_slow})
+    slow_sma = slow_result['sma']
+
+    # Check if we have enough data for the crossover (need 2 bars to detect crossing)
+    if len(fast_sma) < 2 or len(slow_sma) < 2:
+        return False
+
+    # Get current and previous values
+    current_fast = fast_sma.iloc[-1]
+    current_slow = slow_sma.iloc[-1]
+    prev_fast = fast_sma.iloc[-2]
+    prev_slow = slow_sma.iloc[-2]
+
+    # Check for NaN values
+    if pd.isna(current_fast) or pd.isna(current_slow) or pd.isna(prev_fast) or pd.isna(prev_slow):
+        return False
+
+    if direction.lower() == "bullish":
+        return prev_fast <= prev_slow and current_fast > current_slow
+    elif direction.lower() == "bearish":
+        # Bearish crossover: window_fast was above or equal to window_slow, now window_fast is below window_slow
+        return prev_fast >= prev_slow and current_fast < current_slow
+    else:
+        logger.warning(f"Unknown direction '{direction}', expected 'bullish' or 'bearish'")
+        return False
+
+@RuleRegistry.register("smma_cross_down")
+def smma_cross_down(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50) -> bool:
+    """
+    Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA).
+
+    Slower, more stable crossover than EMA cross; fewer false triggers.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast SMMA window. Range: 2-100. Default: 14.
+        window_slow (int): Slow SMMA window. Range: 2-200. Default: 50.
+
+    Returns:
+        bool: True if bearish SMMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, SMMA, 'smma', window_fast, window_slow, "bearish")
+
+@RuleRegistry.register("smma_cross_up")
+def smma_cross_up(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50) -> bool:
+    """
+    Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA).
+
+    Slower, more stable crossover than EMA cross; fewer false triggers.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast SMMA window. Range: 2-100. Default: 14.
+        window_slow (int): Slow SMMA window. Range: 2-200. Default: 50.
+
+    Returns:
+        bool: True if bullish SMMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, SMMA, 'smma', window_fast, window_slow, "bullish")
+
+@RuleRegistry.register("t3_cross_down")
+def t3_cross_down(
+    df: pd.DataFrame,
+    window_fast: int = 5,
+    window_slow: int = 10,
+    volume_factor: float = 0.7,
+) -> bool:
+    """
+    Detect a bearish T3 crossover (fast T3 crosses below slow T3).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast T3 window. Range: 2-100. Default: 5.
+        window_slow (int): Slow T3 window. Range: 2-200. Default: 10.
+        volume_factor (float): Tillson volume factor. Range: 0.0-1.0. Default: 0.7.
+
+    Returns:
+        bool: True if bearish T3 crossover detected on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow * 6 + 1:
+        return False
+    common = {'volume_factor': volume_factor}
+    fast = T3.compute(data={'close': closes}, params={'window': window_fast, **common})['t3']
+    slow = T3.compute(data={'close': closes}, params={'window': window_slow, **common})['t3']
+    if len(fast) < 2 or len(slow) < 2:
+        return False
+    prev_fast, curr_fast = fast.iloc[-2], fast.iloc[-1]
+    prev_slow, curr_slow = slow.iloc[-2], slow.iloc[-1]
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+    return bool(prev_fast >= prev_slow and curr_fast < curr_slow)
+
+@RuleRegistry.register("t3_cross_up")
+def t3_cross_up(
+    df: pd.DataFrame,
+    window_fast: int = 5,
+    window_slow: int = 10,
+    volume_factor: float = 0.7,
+) -> bool:
+    """
+    Detect a bullish T3 crossover (fast T3 crosses above slow T3).
+
+    Very smooth, low-lag crossover. Both T3s share the same volume_factor.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast T3 window. Range: 2-100. Default: 5.
+        window_slow (int): Slow T3 window. Range: 2-200. Default: 10.
+        volume_factor (float): Tillson volume factor. Range: 0.0-1.0. Default: 0.7.
+
+    Returns:
+        bool: True if bullish T3 crossover detected on the current bar.
+    """
+    closes = df["Close"]
+    if len(closes) < window_slow * 6 + 1:
+        return False
+    common = {'volume_factor': volume_factor}
+    fast = T3.compute(data={'close': closes}, params={'window': window_fast, **common})['t3']
+    slow = T3.compute(data={'close': closes}, params={'window': window_slow, **common})['t3']
+    if len(fast) < 2 or len(slow) < 2:
+        return False
+    prev_fast, curr_fast = fast.iloc[-2], fast.iloc[-1]
+    prev_slow, curr_slow = slow.iloc[-2], slow.iloc[-1]
+    if pd.isna(prev_fast) or pd.isna(curr_fast) or pd.isna(prev_slow) or pd.isna(curr_slow):
+        return False
+    return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
+
+@RuleRegistry.register("tema_cross_down")
+def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA).
+
+    Very low-lag cross signal; expect more whipsaw in noisy markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow TEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bearish TEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TEMA, 'tema', window_fast, window_slow, "bearish")
+
+@RuleRegistry.register("tema_cross_up")
+def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA).
+
+    Very low-lag cross signal; expect more whipsaw in noisy markets.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TEMA window. Range: 2-100. Default: 9.
+        window_slow (int): Slow TEMA window. Range: 2-200. Default: 21.
+
+    Returns:
+        bool: True if bullish TEMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TEMA, 'tema', window_fast, window_slow, "bullish")
+
+@RuleRegistry.register("trima_cross_down")
+def trima_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TRIMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow TRIMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bearish TRIMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TRIMA, 'trima', window_fast, window_slow, "bearish")
+
+@RuleRegistry.register("trima_cross_up")
+def trima_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast TRIMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow TRIMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bullish TRIMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, TRIMA, 'trima', window_fast, window_slow, "bullish")
+
+@RuleRegistry.register("wma_cross_down")
+def wma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Check if fast WMA crosses below slow WMA (bearish).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast WMA window. Range: 2-50. Default: 9.
+        window_slow (int): Slow WMA window. Range: 10-100. Default: 21.
+
+    Returns:
+        bool: True if fast WMA crosses below slow WMA, False otherwise.
+    """
+    if len(df) < window_slow + 1:
+        return False
+
+    fast_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_fast})
+    fast_wma = fast_result['wma']
+    slow_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_slow})
+    slow_wma = slow_result['wma']
+
+    if len(fast_wma) < 2 or pd.isna(fast_wma.iloc[-1]) or pd.isna(slow_wma.iloc[-1]):
+        return False
+
+    prev_above = float(fast_wma.iloc[-2]) >= float(slow_wma.iloc[-2])
+    curr_below = float(fast_wma.iloc[-1]) < float(slow_wma.iloc[-1])
+
+    return prev_above and curr_below
+
+@RuleRegistry.register("wma_cross_up")
+def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
+    """
+    Check if fast WMA crosses above slow WMA (bullish).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast WMA window. Range: 2-50. Default: 9.
+        window_slow (int): Slow WMA window. Range: 10-100. Default: 21.
+
+    Returns:
+        bool: True if fast WMA crosses above slow WMA, False otherwise.
+    """
+    if len(df) < window_slow + 1:
+        return False
+
+    fast_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_fast})
+    fast_wma = fast_result['wma']
+    slow_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_slow})
+    slow_wma = slow_result['wma']
+
+    if len(fast_wma) < 2 or pd.isna(fast_wma.iloc[-1]) or pd.isna(slow_wma.iloc[-1]):
+        return False
+
+    prev_below = float(fast_wma.iloc[-2]) <= float(slow_wma.iloc[-2])
+    curr_above = float(fast_wma.iloc[-1]) > float(slow_wma.iloc[-1])
+
+    return prev_below and curr_above

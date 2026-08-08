@@ -5479,7 +5479,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx",
     "warmup_bars": "window * 2 - 1",
     "abbreviation": null,
@@ -5530,7 +5530,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx",
     "warmup_bars": "window * 2 - 1",
     "abbreviation": null,
@@ -5588,7 +5588,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator",
     "warmup_bars": "jaw + jaw_offset",
     "abbreviation": null,
@@ -5670,7 +5670,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator",
     "warmup_bars": "jaw + jaw_offset",
     "abbreviation": null,
@@ -5752,7 +5752,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator",
     "warmup_bars": "jaw + jaw_offset",
     "abbreviation": null,
@@ -5834,7 +5834,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -5866,14 +5866,14 @@
       "default": 0.85,
       "min": 0.0,
       "max": null,
-      "description": "Weight center"
+      "description": "Weight center, 0=oldest, 1=newest"
      },
      "sigma": {
       "type": "float",
       "default": 6.0,
       "min": 0.1,
       "max": null,
-      "description": "Gaussian spread"
+      "description": "Gaussian spread. Higher = smoother"
      }
     },
     "outputs": {
@@ -5898,7 +5898,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -5930,14 +5930,14 @@
       "default": 0.85,
       "min": 0.0,
       "max": null,
-      "description": "Weight center"
+      "description": "Weight center, 0=oldest, 1=newest"
      },
      "sigma": {
       "type": "float",
       "default": 6.0,
       "min": 0.1,
       "max": null,
-      "description": "Gaussian spread"
+      "description": "Gaussian spread. Higher = smoother"
      }
     },
     "outputs": {
@@ -6145,7 +6145,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon",
     "warmup_bars": "window",
     "abbreviation": null,
@@ -6199,7 +6199,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -6253,7 +6253,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -7200,7 +7200,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -7265,7 +7265,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -8100,7 +8100,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -8150,7 +8150,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -8255,7 +8255,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -8298,7 +8298,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -8403,7 +8403,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -8453,7 +8453,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -8503,7 +8503,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -9025,7 +9025,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -9075,7 +9075,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -9281,7 +9281,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9338,7 +9338,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9381,7 +9381,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9424,7 +9424,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "warmup_bars",
     "abbreviation": null,
@@ -9481,7 +9481,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9524,7 +9524,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9567,7 +9567,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window * 6 - 1",
     "abbreviation": null,
@@ -9617,7 +9617,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -9660,7 +9660,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -10138,7 +10138,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst",
     "warmup_bars": "roc4 + window_sma4 + nsig - 1",
     "abbreviation": null,
@@ -10237,7 +10237,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst",
     "warmup_bars": "roc4 + window_sma4 + nsig - 1",
     "abbreviation": null,
@@ -10674,7 +10674,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
     "warmup_bars": "max(windows_list) - 1",
     "abbreviation": null,
@@ -10717,7 +10717,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
     "warmup_bars": "max(windows_list) - 1",
     "abbreviation": null,
@@ -10760,7 +10760,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
     "warmup_bars": "max(windows_list) - 1",
     "abbreviation": null,
@@ -10803,7 +10803,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
     "warmup_bars": "window_slow + window_sign - 1",
     "abbreviation": null,
@@ -10860,7 +10860,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
     "warmup_bars": "window_slow + window_sign - 1",
     "abbreviation": null,
@@ -11117,7 +11117,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
     "warmup_bars": "min_periods - 1",
     "abbreviation": null,
@@ -11174,7 +11174,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "warmup_bars",
     "abbreviation": null,
@@ -11224,7 +11224,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "warmup_bars",
     "abbreviation": null,
@@ -11384,7 +11384,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index",
     "warmup_bars": "window_slow + window_fast - 1",
     "abbreviation": null,
@@ -11803,7 +11803,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": null,
     "warmup_bars": "window * (base bars per higher_tf period)",
     "abbreviation": null,
@@ -11821,21 +11821,21 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": "Pandas offset alias"
+      "description": "Pandas offset alias for the higher timeframe"
      },
      "window": {
       "type": "int",
       "default": 10,
       "min": 2,
       "max": 100,
-      "description": "EMA period"
+      "description": "EMA period on the resampled close"
      },
      "slope_threshold": {
       "type": "float",
       "default": 0.0,
       "min": 0.0,
       "max": null,
-      "description": "Slope threshold for non-flat"
+      "description": "Relative slope threshold for non-flat classification"
      }
     },
     "outputs": {
@@ -11860,7 +11860,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": null,
     "warmup_bars": "window * (base bars per higher_tf period)",
     "abbreviation": null,
@@ -12483,7 +12483,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -13162,7 +13162,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -13212,7 +13212,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -13262,7 +13262,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -13319,7 +13319,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -13369,7 +13369,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": null,
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -13611,7 +13611,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "oscillator",
     "reference": null,
     "warmup_bars": "window_slow + cycle - 1",
     "abbreviation": null,
@@ -13689,7 +13689,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "oscillator",
     "reference": null,
     "warmup_bars": "window_slow + cycle - 1",
     "abbreviation": null,
@@ -14080,7 +14080,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window_slow * 6",
     "abbreviation": null,
@@ -14137,7 +14137,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window_slow * 6",
     "abbreviation": null,
@@ -14194,7 +14194,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -14244,7 +14244,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -14482,7 +14482,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -14532,7 +14532,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -14582,7 +14582,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix",
     "warmup_bars": "window * 3 - 1",
     "abbreviation": null,
@@ -14632,7 +14632,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix",
     "warmup_bars": "window * 3 - 1",
     "abbreviation": null,
@@ -15260,7 +15260,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -15311,7 +15311,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
     "warmup_bars": "window - 1",
     "abbreviation": null,
@@ -15362,7 +15362,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
     "warmup_bars": "window",
     "abbreviation": null,
@@ -15848,7 +15848,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -15898,7 +15898,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "source_module": "trend",
+    "source_module": "averaging",
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "window_slow",
     "abbreviation": null,
@@ -22640,7 +22640,7 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 1084,
+  "carried_forward_from_previous_build": 1088,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
