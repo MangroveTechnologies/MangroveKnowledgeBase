@@ -21,7 +21,7 @@ class ADI(IndicatorInterface):
 
     Acting as leading indicator of price movements.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:accumulation_distribution_line
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}
@@ -107,7 +107,7 @@ class CMF(IndicatorInterface):
 
     It measures the amount of Money Flow Volume over a specific period.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chaikin_money_flow_cmf
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}
@@ -152,7 +152,7 @@ class ForceIndex(IndicatorInterface):
     positive values mean there is a strong rising trend, and low values signify
     a strong downward trend.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:force_index
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index
 
     Args:
         data: {'close': pd.Series, 'volume': pd.Series}
@@ -272,7 +272,7 @@ class VPT(IndicatorInterface):
 class NVI(IndicatorInterface):
     """Negative Volume Index (NVI)
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:negative_volume_inde
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi
 
     Args:
         data: {'close': pd.Series, 'volume': pd.Series}
@@ -320,7 +320,7 @@ class MFI(IndicatorInterface):
     negative money flow is then plugged into an RSI formula to create an
     oscillator that moves between zero and one hundred.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}
@@ -381,7 +381,7 @@ class VWAP(IndicatorInterface):
     the institutional execution benchmark, because that benchmark is defined by the session
     it anchors to. This series is exactly VWMA computed on typical price.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:vwap_intraday
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series, 'volume': pd.Series}

@@ -20,7 +20,7 @@ class ATR(IndicatorInterface):
     Strong moves, in either direction, are often accompanied by large ranges,
     or large True Ranges.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_true_range_atr
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-true-range-atr
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -69,7 +69,7 @@ class ATR(IndicatorInterface):
 class BollingerBands(IndicatorInterface):
     """Bollinger Bands
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:bollinger_bands
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
 
     Args:
         data: {'close': pd.Series}
@@ -119,7 +119,7 @@ class KeltnerChannel(IndicatorInterface):
     channel direction. Channels can also be used to identify overbought and oversold levels when the trend
     is flat.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:keltner_channels
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -220,7 +220,7 @@ class DonchianChannel(IndicatorInterface):
     meaning. Arbitrary additional lag is no longer a parameter -- shift the output series.
 
     https://www.investopedia.com/terms/d/donchianchannels.asp
-    https://school.stockcharts.com/doku.php?id=technical_indicators:price_channels
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/price-channels
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -280,7 +280,7 @@ class DonchianChannel(IndicatorInterface):
 class UlcerIndex(IndicatorInterface):
     """Ulcer Index
 
-    https://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ulcer_index
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index
 
     Args:
         data: {'close': pd.Series}

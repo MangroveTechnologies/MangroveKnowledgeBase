@@ -89,7 +89,7 @@ class CandleGeometry(IndicatorInterface):
     wick is, and what fraction of the range the body occupies. Direction is
     carried by the sign of the body rather than by a separate flag.
 
-    https://school.stockcharts.com/doku.php?id=chart_school:chart_analysis:introduction_to_candlesticks
+    https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
 
     Formula:
         body        = |close - open|

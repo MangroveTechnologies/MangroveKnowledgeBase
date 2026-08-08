@@ -625,7 +625,7 @@ class MACD(IndicatorInterface):
     Is a trend-following momentum indicator that shows the relationship between
     two moving averages of prices.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:moving_average_convergence_divergence_macd
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
 
     Args:
         data: {'close': pd.Series}
@@ -717,7 +717,7 @@ class TRIX(IndicatorInterface):
 
     Note: Early bars (warmup period) produce NaN rather than approximated values.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:trix
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix
 
     Args:
         data: {'close': pd.Series}
@@ -762,7 +762,7 @@ class MassIndex(IndicatorInterface):
     expansions. It identifies range bulges that can foreshadow a reversal of
     the current trend.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:mass_index
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series}
@@ -794,7 +794,7 @@ class MassIndex(IndicatorInterface):
 class Ichimoku(IndicatorInterface):
     """Ichimoku Kinko Hyo (Ichimoku)
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ichimoku_cloud
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series}
@@ -852,7 +852,7 @@ class KST(IndicatorInterface):
 
     Note: Early bars (warmup period) produce NaN rather than approximated values.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:know_sure_thing_kst
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst
 
     Args:
         data: {'close': pd.Series}
@@ -909,7 +909,7 @@ class DPO(IndicatorInterface):
 
     Note: Early bars (warmup period) produce NaN rather than approximated values.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:detrended_price_osci
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo
 
     Args:
         data: {'close': pd.Series}
@@ -944,7 +944,7 @@ class CCI(IndicatorInterface):
     indicate that prices are well below their average, which is a show of
     weakness.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:commodity_channel_index_cci
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -1002,7 +1002,7 @@ class ADX(IndicatorInterface):
     Using these three indicators together, chartists can determine both the
     direction and strength of the trend.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:average_directional_index_adx
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -1128,7 +1128,7 @@ class Vortex(IndicatorInterface):
 
     Note: Early bars (warmup period) produce NaN rather than approximated values.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:vortex_indicator
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -1173,7 +1173,7 @@ class PSAR(IndicatorInterface):
     parabolic line (or dots) underneath the price bars in an uptrend,
     and above the price bars in a downtrend.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:parabolic_sar
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}

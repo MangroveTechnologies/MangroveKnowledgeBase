@@ -80,7 +80,7 @@ class TSI(IndicatorInterface):
 
     Shows both trend direction and overbought/oversold conditions.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:true_strength_index
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index
 
     Args:
         data: {'close': pd.Series}
@@ -126,7 +126,7 @@ class UltimateOscillator(IndicatorInterface):
     Larry Williams' (1976) signal, a momentum oscillator designed to capture
     momentum across three different timeframes.
 
-    http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:ultimate_oscillator
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator
 
     BP = Close - Minimum(Low or Prior Close).
     TR = Maximum(High or Prior Close)  -  Minimum(Low or Prior Close)
@@ -200,7 +200,7 @@ class StochasticOscillator(IndicatorInterface):
     (user-specified smoothing on both); they produce materially different series, and neither the
     class name nor the parameters say which one this is.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:stochastic_oscillator_fast_slow_and_full
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -325,7 +325,7 @@ class ROC(IndicatorInterface):
     positive to negative. As a momentum oscillator, ROC signals include
     centerline crossovers, divergences and overbought-oversold readings.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:rate_of_change_roc_and_momentum
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
 
     Args:
         data: {'close': pd.Series}
@@ -403,7 +403,7 @@ class WilliamsR(IndicatorInterface):
 
     %R = (Highest High - Close)/(Highest High - Lowest Low) * -100
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:williams_r
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r
 
     Args:
         data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -448,7 +448,7 @@ class StochRSI(IndicatorInterface):
     conventional 20/80 overbought/oversold levels are therefore **0.20 / 0.80** here. Applying 20
     and 80 directly to this series can never produce a signal.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:stochrsi
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi
     https://www.investopedia.com/terms/s/stochrsi.asp
 
     Args:
@@ -492,7 +492,7 @@ class PPO(IndicatorInterface):
     The Percentage Price Oscillator (PPO) is a momentum oscillator that measures
     the difference between two moving averages as a percentage of the larger moving average.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:price_oscillators_ppo
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo
 
     Args:
         data: {'close': pd.Series}
@@ -531,7 +531,7 @@ class PVO(IndicatorInterface):
     The PVO measures the difference between two volume-based moving averages as a
     percentage of the larger moving average.
 
-    https://school.stockcharts.com/doku.php?id=technical_indicators:percentage_volume_oscillator_pvo
+    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo
 
     Args:
         data: {'volume': pd.Series}
