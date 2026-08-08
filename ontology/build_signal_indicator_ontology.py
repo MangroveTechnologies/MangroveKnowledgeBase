@@ -993,6 +993,18 @@ SIGNAL_SCOPE = {
     "stoch_oversold", "stochrsi_overbought", "stochrsi_oversold",
     "tsi_bearish", "tsi_bullish", "uo_overbought",
     "uo_oversold", "williams_r_overbought", "williams_r_oversold",
+    # Volume.
+    "adi_bearish", "adi_bullish", "adosc_bearish",
+    "adosc_bullish", "adosc_cross_down", "adosc_cross_up",
+    "cmf_bearish", "cmf_bullish", "cumulative_return_positive",
+    "cumulative_return_target", "daily_return_negative", "daily_return_positive",
+    "eom_bearish", "eom_bullish", "force_bearish",
+    "force_bullish", "is_above_vwma", "kvo_bearish",
+    "kvo_bearish_cross", "kvo_bullish", "kvo_bullish_cross",
+    "mfi_overbought", "mfi_oversold", "nvi_bearish",
+    "nvi_bullish", "obv_bearish", "obv_bullish",
+    "vpt_bearish", "vpt_bullish", "vwap_above",
+    "vwap_below", "vwma_cross_down", "vwma_cross_up",
     # Chart patterns.
     "bearish_engulfing_trigger", "bearish_harami_trigger", "bearish_pattern_recent",
     "bearish_pin_bar_trigger", "bullish_engulfing_trigger", "bullish_harami_trigger",

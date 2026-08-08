@@ -1,6 +1,6 @@
 # Signal Audit Report
 
-**Date**: 2026-08-08 10:24
+**Date**: 2026-08-08 11:52
 **Data**: BTC/USD Daily, 1294 bars (2022-08-01 to 2026-02-14)
 
 ## 1. Smoke Test Summary

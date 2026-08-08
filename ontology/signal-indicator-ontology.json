@@ -5105,6 +5105,364 @@
    }
   },
   {
+   "id": "procedure:signal-adi-bearish",
+   "title": "adi_bearish",
+   "kind": "Procedure",
+   "summary": "Check if ADI (Accumulation/Distribution) is falling (bearish volume).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adi_bearish', 'params': {'window': value}}, df)",
+    "formula": "adi[t] < adi[t-window+1] -- a fall over the window; the level itself is meaningless",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback for trend"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ADI trending down, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-adi-bullish",
+   "title": "adi_bullish",
+   "kind": "Procedure",
+   "summary": "Check if ADI (Accumulation/Distribution) is rising (bullish volume).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adi_bullish', 'params': {'window': value}}, df)",
+    "formula": "adi[t] > adi[t-window+1] -- ADI is a running total whose absolute level is an artefact of where the series begins, so it is read as a rise over the window",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback for trend"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ADI trending up, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-adosc-bearish",
+   "title": "adosc_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Chaikin A/D Oscillator is negative (distribution regime).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
+    "warmup_bars": "slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adosc_bearish', 'params': {'fast': value, 'slow': value}}, df)",
+    "formula": "adosc[t] < 0",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 3,
+      "min": 2,
+      "max": 20,
+      "description": "Fast EMA period for AD"
+     },
+     "slow": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "Slow EMA period for AD"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ADOSC < 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-adosc-bullish",
+   "title": "adosc_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Chaikin A/D Oscillator is positive (accumulation regime). Positive ADOSC = AD line's fast EMA above its slow EMA, indicating short-term buying pressure relative to longer-term trend.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
+    "warmup_bars": "slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adosc_bullish', 'params': {'fast': value, 'slow': value}}, df)",
+    "formula": "adosc[t] > 0",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 3,
+      "min": 2,
+      "max": 20,
+      "description": "Fast EMA period for AD"
+     },
+     "slow": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "Slow EMA period for AD"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ADOSC > 0, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-adosc-cross-down",
+   "title": "adosc_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect ADOSC crossing below zero (distribution onset).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
+    "warmup_bars": "slow + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adosc_cross_down', 'params': {'fast': value, 'slow': value}}, df)",
+    "formula": "adosc[t-1] >= 0 and adosc[t] < 0",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 3,
+      "min": 2,
+      "max": 20,
+      "description": "Fast EMA period for AD"
+     },
+     "slow": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "Slow EMA period for AD"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ADOSC crosses below zero on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-adosc-cross-up",
+   "title": "adosc_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect ADOSC crossing above zero (accumulation onset).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator",
+    "warmup_bars": "slow + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'adosc_cross_up', 'params': {'fast': value, 'slow': value}}, df)",
+    "formula": "adosc[t-1] <= 0 and adosc[t] > 0",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 3,
+      "min": 2,
+      "max": 20,
+      "description": "Fast EMA period for AD"
+     },
+     "slow": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "Slow EMA period for AD"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if ADOSC crosses above zero on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-ao-bearish",
    "title": "ao_bearish",
    "kind": "Procedure",
@@ -6181,6 +6539,130 @@
    }
   },
   {
+   "id": "procedure:signal-cmf-bearish",
+   "title": "cmf_bearish",
+   "kind": "Procedure",
+   "summary": "Check if CMF (Chaikin Money Flow) indicates selling pressure.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cmf_bearish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "cmf[t] < threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "CMF period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": -1.0,
+      "max": null,
+      "description": "Bearish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CMF < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cmf-bullish",
+   "title": "cmf_bullish",
+   "kind": "Procedure",
+   "summary": "Check if CMF (Chaikin Money Flow) indicates buying pressure.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cmf_bullish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "cmf[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 10,
+      "max": 50,
+      "description": "CMF period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": -1.0,
+      "max": null,
+      "description": "Bullish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if CMF > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-cmo-cross-down",
    "title": "cmo_cross_down",
    "kind": "Procedure",
@@ -6491,6 +6973,178 @@
    }
   },
   {
+   "id": "procedure:signal-cumulative-return-positive",
+   "title": "cumulative_return_positive",
+   "kind": "Procedure",
+   "summary": "Check if cumulative return from start is positive.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cumulative_return_positive', 'params': {'threshold': value}}, df)",
+    "formula": "cumulative_return[t] > threshold -- rebased by the caller's slice, since CumulativeReturn divides by close[0] of whatever series it is given",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Minimum cumulative return in percent"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if cumulative return > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cumulative-return-target",
+   "title": "cumulative_return_target",
+   "kind": "Procedure",
+   "summary": "Check if cumulative return has reached target.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cumulative_return_target', 'params': {'target': value}}, df)",
+    "formula": "cumulative_return[t] >= target -- note >=, unlike the strict > of cumulative_return_positive",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "target": {
+      "type": "float",
+      "default": 10.0,
+      "min": 1.0,
+      "max": 100.0,
+      "description": "Target cumulative return in percent"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if cumulative return >= target, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-daily-return-negative",
+   "title": "daily_return_negative",
+   "kind": "Procedure",
+   "summary": "Check if daily return is negative.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'daily_return_negative', 'params': {'threshold': value}}, df)",
+    "formula": "daily_return[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Maximum return threshold in percent"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if daily return < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-daily-return-positive",
+   "title": "daily_return_positive",
+   "kind": "Procedure",
+   "summary": "Check if daily return is positive.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'daily_return_positive', 'params': {'threshold': value}}, df)",
+    "formula": "daily_return[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Minimum return threshold in percent"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if daily return > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-dark-cloud-cover-trigger",
    "title": "dark_cloud_cover_trigger",
    "kind": "Procedure",
@@ -6772,6 +7426,122 @@
    }
   },
   {
+   "id": "procedure:signal-eom-bearish",
+   "title": "eom_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Ease of Movement indicates bearish (easy downward movement).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'eom_bearish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "eom[t] < threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "EOM period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bearish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if EOM < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-eom-bullish",
+   "title": "eom_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Ease of Movement indicates bullish (easy upward movement).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'eom_bullish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "eom[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "EOM period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bullish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if EOM > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-evening-star-trigger",
    "title": "evening_star_trigger",
    "kind": "Procedure",
@@ -6822,6 +7592,114 @@
       ],
       "canonical_name": "none",
       "description": "True if evening star detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-force-bearish",
+   "title": "force_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Force Index indicates bearish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'force_bearish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "fi[t] < threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 13,
+      "min": 5,
+      "max": 30,
+      "description": "EMA period for smoothing"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bearish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Force Index < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-force-bullish",
+   "title": "force_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Force Index indicates bullish momentum.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'force_bullish', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "fi[t] > threshold",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 13,
+      "min": 5,
+      "max": 30,
+      "description": "EMA period for smoothing"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": null,
+      "description": "Bullish threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Force Index > threshold, False otherwise"
      }
     }
    }
@@ -7164,6 +8042,53 @@
       ],
       "canonical_name": "none",
       "description": "True if inverted hammer detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-vwma",
+   "title": "is_above_vwma",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the Volume-Weighted Moving Average (VWMA). VWMA weights each bar's close by its volume, emphasizing high-participation bars. Useful as a filter that incorporates conviction from volume.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_vwma', 'params': {'window': value}}, df)",
+    "formula": "close[t] > vwma[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 2,
+      "max": 200,
+      "description": "VWMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > VWMA, False otherwise"
      }
     }
    }
@@ -7557,6 +8482,282 @@
    }
   },
   {
+   "id": "procedure:signal-kvo-bearish",
+   "title": "kvo_bearish",
+   "kind": "Procedure",
+   "summary": "Check if KVO is below its signal line (bearish volume regime).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
+    "warmup_bars": "slow + signal_window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bearish', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
+    "formula": "kvo[t] < kvo_signal[t] -- same simplified-variant caveat",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 34,
+      "min": 5,
+      "max": 100,
+      "description": "Fast EMA period"
+     },
+     "slow": {
+      "type": "int",
+      "default": 55,
+      "min": 10,
+      "max": 200,
+      "description": "Slow EMA period"
+     },
+     "signal_window": {
+      "type": "int",
+      "default": 13,
+      "min": 2,
+      "max": 50,
+      "description": "Signal-line EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if KVO < signal line on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kvo-bearish-cross",
+   "title": "kvo_bearish_cross",
+   "kind": "Procedure",
+   "summary": "Detect KVO crossing below its signal line (bearish volume onset).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
+    "warmup_bars": "slow + signal_window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bearish_cross', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
+    "formula": "kvo[t-1] >= kvo_signal[t-1] and kvo[t] < kvo_signal[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 34,
+      "min": 5,
+      "max": 100,
+      "description": "Fast EMA period"
+     },
+     "slow": {
+      "type": "int",
+      "default": 55,
+      "min": 10,
+      "max": 200,
+      "description": "Slow EMA period"
+     },
+     "signal_window": {
+      "type": "int",
+      "default": 13,
+      "min": 2,
+      "max": 50,
+      "description": "Signal-line EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if KVO crosses below signal line on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kvo-bullish",
+   "title": "kvo_bullish",
+   "kind": "Procedure",
+   "summary": "Check if KVO is above its signal line (bullish volume regime).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
+    "warmup_bars": "slow + signal_window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bullish', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
+    "formula": "kvo[t] > kvo_signal[t] -- the SIMPLIFIED KVO variant; its level is roughly 150x smaller than Klinger's original and the two are not comparable",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 34,
+      "min": 5,
+      "max": 100,
+      "description": "Fast EMA period"
+     },
+     "slow": {
+      "type": "int",
+      "default": 55,
+      "min": 10,
+      "max": 200,
+      "description": "Slow EMA period"
+     },
+     "signal_window": {
+      "type": "int",
+      "default": 13,
+      "min": 2,
+      "max": 50,
+      "description": "Signal-line EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if KVO > signal line on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-kvo-bullish-cross",
+   "title": "kvo_bullish_cross",
+   "kind": "Procedure",
+   "summary": "Detect KVO crossing above its signal line (bullish volume onset). Classic Klinger entry trigger; often confirms a price divergence.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
+    "warmup_bars": "slow + signal_window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bullish_cross', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
+    "formula": "kvo[t-1] <= kvo_signal[t-1] and kvo[t] > kvo_signal[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "fast": {
+      "type": "int",
+      "default": 34,
+      "min": 5,
+      "max": 100,
+      "description": "Fast EMA period for signed volume"
+     },
+     "slow": {
+      "type": "int",
+      "default": 55,
+      "min": 10,
+      "max": 200,
+      "description": "Slow EMA period for signed volume"
+     },
+     "signal_window": {
+      "type": "int",
+      "default": 13,
+      "min": 2,
+      "max": 50,
+      "description": "Signal-line EMA period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if KVO crosses above signal line on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-long-legged-doji-trigger",
    "title": "long_legged_doji_trigger",
    "kind": "Procedure",
@@ -7924,6 +9125,130 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish marubozu detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mfi-overbought",
+   "title": "mfi_overbought",
+   "kind": "Procedure",
+   "summary": "Check if MFI (Money Flow Index) indicates overbought condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mfi_overbought', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "mfi[t] > threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "MFI period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 80.0,
+      "min": 70.0,
+      "max": 95.0,
+      "description": "Overbought threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if MFI > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-mfi-oversold",
+   "title": "mfi_oversold",
+   "kind": "Procedure",
+   "summary": "Check if MFI (Money Flow Index) indicates oversold condition.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'mfi_oversold', 'params': {'window': value, 'threshold': value}}, df)",
+    "formula": "mfi[t] < threshold",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 30,
+      "description": "MFI period"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 20.0,
+      "min": 5.0,
+      "max": 30.0,
+      "description": "Oversold threshold"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if MFI < threshold, False otherwise"
      }
     }
    }
@@ -8314,6 +9639,194 @@
       ],
       "canonical_name": "none",
       "description": "True if narrow range detected on current bar, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-nvi-bearish",
+   "title": "nvi_bearish",
+   "kind": "Procedure",
+   "summary": "Check if NVI (Negative Volume Index) indicates smart money selling. NVI below its moving average suggests smart money distribution.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'nvi_bearish', 'params': {'window': value}}, df)",
+    "formula": "nvi[t] < nvi_ema[t] -- same seed-constant caveat as nvi_bullish",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 255,
+      "min": 100,
+      "max": 200,
+      "description": "EMA period for signal"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if NVI < NVI EMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-nvi-bullish",
+   "title": "nvi_bullish",
+   "kind": "Procedure",
+   "summary": "Check if NVI (Negative Volume Index) indicates smart money buying. NVI above its moving average suggests smart money accumulation.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'nvi_bullish', 'params': {'window': value}}, df)",
+    "formula": "nvi[t] > nvi_ema[t] -- NVI's level is set by an arbitrary seed constant, so every documented reading is positional against its own EMA rather than absolute",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 255,
+      "min": 100,
+      "max": 200,
+      "description": "EMA period for signal"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if NVI > NVI EMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-obv-bearish",
+   "title": "obv_bearish",
+   "kind": "Procedure",
+   "summary": "Check if OBV is falling (bearish volume confirmation).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/on-balance-volume-obv",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'obv_bearish', 'params': {'window': value}}, df)",
+    "formula": "obv[t] < obv[t-window+1]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback for trend"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if OBV trending down, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-obv-bullish",
+   "title": "obv_bullish",
+   "kind": "Procedure",
+   "summary": "Check if OBV is rising (bullish volume confirmation).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/on-balance-volume-obv",
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'obv_bullish', 'params': {'window': value}}, df)",
+    "formula": "obv[t] > obv[t-window+1] -- a rise over the window; OBV's level is an artefact of where the series begins",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 50,
+      "description": "Lookback for trend"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if OBV trending up, False otherwise"
      }
     }
    }
@@ -10441,6 +11954,318 @@
    }
   },
   {
+   "id": "procedure:signal-vpt-bearish",
+   "title": "vpt_bearish",
+   "kind": "Procedure",
+   "summary": "Check if VPT (Volume Price Trend) is falling.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vpt_bearish', 'params': {'window': value}}, df)",
+    "formula": "vpt[t] < vpt[t-window+1]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 50,
+      "description": "Window for trend comparison"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if VPT trending down, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-vpt-bullish",
+   "title": "vpt_bullish",
+   "kind": "Procedure",
+   "summary": "Check if VPT (Volume Price Trend) is rising.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vpt_bullish', 'params': {'window': value}}, df)",
+    "formula": "vpt[t] > vpt[t-window+1] -- a rise over the window; same cumulative-level caveat",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 50,
+      "description": "Window for trend comparison"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if VPT trending up, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-vwap-above",
+   "title": "vwap_above",
+   "kind": "Procedure",
+   "summary": "Check if price is above VWAP (bullish bias).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vwap_above', 'params': {'window': value}}, df)",
+    "formula": "close[t] > vwap[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "VWAP period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Close > VWAP, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-vwap-below",
+   "title": "vwap_below",
+   "kind": "Procedure",
+   "summary": "Check if price is below VWAP (bearish bias).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vwap_below', 'params': {'window': value}}, df)",
+    "formula": "close[t] < vwap[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 14,
+      "min": 5,
+      "max": 50,
+      "description": "VWAP period"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if Close < VWAP, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-vwma-cross-down",
+   "title": "vwma_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish VWMA crossover (fast VWMA crosses below slow VWMA). Volume-weighted version of the classic SMA death cross.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vwma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "vwma(window_fast)[t-1] >= vwma(window_slow)[t-1] and vwma(window_fast)[t] < vwma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast VWMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow VWMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish VWMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-vwma-cross-up",
+   "title": "vwma_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish VWMA crossover (fast VWMA crosses above slow VWMA). Volume-weighted version of the classic SMA golden cross. High-volume bars carry more weight, so the signal is less susceptible to low-volume noise.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volume",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential",
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'vwma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "vwma(window_fast)[t-1] <= vwma(window_slow)[t-1] and vwma(window_fast)[t] > vwma(window_slow)[t] -- two VWMAs of different windows, not price against one",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "volume": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 9,
+      "min": 2,
+      "max": 100,
+      "description": "Fast VWMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 21,
+      "min": 2,
+      "max": 200,
+      "description": "Slow VWMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish VWMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-williams-r-overbought",
    "title": "williams_r_overbought",
    "kind": "Procedure",
@@ -11183,6 +13008,180 @@
    "to_id": "concept:indicator-class-oscillator"
   },
   {
+   "from": "adi_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adi-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adi_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-adi-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "adi_bearish",
+   "rel": "uses",
+   "to": "ADI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adi-bearish",
+   "to_id": "procedure:indicator-adi",
+   "inputs": {
+    "adi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "adi_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adi-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adi_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-adi-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "adi_bullish",
+   "rel": "uses",
+   "to": "ADI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adi-bullish",
+   "to_id": "procedure:indicator-adi",
+   "inputs": {
+    "adi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "adosc_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adosc-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adosc_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-adosc-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "adosc_bearish",
+   "rel": "uses",
+   "to": "ADOSC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adosc-bearish",
+   "to_id": "procedure:indicator-adosc",
+   "inputs": {
+    "adosc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "adosc_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adosc-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adosc_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-adosc-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "adosc_bullish",
+   "rel": "uses",
+   "to": "ADOSC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adosc-bullish",
+   "to_id": "procedure:indicator-adosc",
+   "inputs": {
+    "adosc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "adosc_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adosc-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adosc_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-adosc-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "adosc_cross_down",
+   "rel": "uses",
+   "to": "ADOSC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adosc-cross-down",
+   "to_id": "procedure:indicator-adosc",
+   "inputs": {
+    "adosc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "adosc_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-adosc-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "adosc_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-adosc-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "adosc_cross_up",
+   "rel": "uses",
+   "to": "ADOSC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-adosc-cross-up",
+   "to_id": "procedure:indicator-adosc",
+   "inputs": {
+    "adosc": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "ao_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -11872,6 +13871,64 @@
    }
   },
   {
+   "from": "cmf_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cmf-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cmf_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cmf-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cmf_bearish",
+   "rel": "uses",
+   "to": "CMF",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cmf-bearish",
+   "to_id": "procedure:indicator-cmf",
+   "inputs": {
+    "cmf": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cmf_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cmf-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cmf_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cmf-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cmf_bullish",
+   "rel": "uses",
+   "to": "CMF",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cmf-bullish",
+   "to_id": "procedure:indicator-cmf",
+   "inputs": {
+    "cmf": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "cmo_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -12047,6 +14104,122 @@
      "type": "series"
     },
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cumulative_return_positive",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cumulative-return-positive",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cumulative_return_positive",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cumulative-return-positive",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cumulative_return_positive",
+   "rel": "uses",
+   "to": "CumulativeReturn",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cumulative-return-positive",
+   "to_id": "procedure:indicator-cumulativereturn",
+   "inputs": {
+    "cumulative_return": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cumulative_return_target",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cumulative-return-target",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cumulative_return_target",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-cumulative-return-target",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "cumulative_return_target",
+   "rel": "uses",
+   "to": "CumulativeReturn",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cumulative-return-target",
+   "to_id": "procedure:indicator-cumulativereturn",
+   "inputs": {
+    "cumulative_return": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "daily_return_negative",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-daily-return-negative",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "daily_return_negative",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-daily-return-negative",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "daily_return_negative",
+   "rel": "uses",
+   "to": "DailyReturn",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-daily-return-negative",
+   "to_id": "procedure:indicator-dailyreturn",
+   "inputs": {
+    "daily_return": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "daily_return_positive",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-daily-return-positive",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "daily_return_positive",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-daily-return-positive",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "daily_return_positive",
+   "rel": "uses",
+   "to": "DailyReturn",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-daily-return-positive",
+   "to_id": "procedure:indicator-dailyreturn",
+   "inputs": {
+    "daily_return": {
      "type": "series"
     }
    }
@@ -12196,6 +14369,64 @@
    }
   },
   {
+   "from": "eom_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-eom-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "eom_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-eom-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "eom_bearish",
+   "rel": "uses",
+   "to": "EaseOfMovement",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-eom-bearish",
+   "to_id": "procedure:indicator-easeofmovement",
+   "inputs": {
+    "eom": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "eom_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-eom-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "eom_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-eom-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "eom_bullish",
+   "rel": "uses",
+   "to": "EaseOfMovement",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-eom-bullish",
+   "to_id": "procedure:indicator-easeofmovement",
+   "inputs": {
+    "eom": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "evening_star_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -12223,6 +14454,64 @@
      "type": "series"
     },
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "force_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-force-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "force_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-force-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "force_bearish",
+   "rel": "uses",
+   "to": "ForceIndex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-force-bearish",
+   "to_id": "procedure:indicator-forceindex",
+   "inputs": {
+    "fi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "force_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-force-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "force_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-force-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "force_bullish",
+   "rel": "uses",
+   "to": "ForceIndex",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-force-bullish",
+   "to_id": "procedure:indicator-forceindex",
+   "inputs": {
+    "fi": {
      "type": "series"
     }
    }
@@ -12457,6 +14746,35 @@
    }
   },
   {
+   "from": "is_above_vwma",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-vwma",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_vwma",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-vwma",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_vwma",
+   "rel": "uses",
+   "to": "VWMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-vwma",
+   "to_id": "procedure:indicator-vwma",
+   "inputs": {
+    "vwma": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "kama_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -12626,6 +14944,134 @@
    "to_id": "procedure:indicator-keltnerchannel",
    "inputs": {
     "hband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kvo_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kvo-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kvo_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-kvo-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "kvo_bearish",
+   "rel": "uses",
+   "to": "KVO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kvo-bearish",
+   "to_id": "procedure:indicator-kvo",
+   "inputs": {
+    "kvo": {
+     "type": "series"
+    },
+    "kvo_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kvo_bearish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kvo-bearish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kvo_bearish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kvo-bearish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kvo_bearish_cross",
+   "rel": "uses",
+   "to": "KVO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kvo-bearish-cross",
+   "to_id": "procedure:indicator-kvo",
+   "inputs": {
+    "kvo": {
+     "type": "series"
+    },
+    "kvo_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kvo_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kvo-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kvo_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-kvo-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "kvo_bullish",
+   "rel": "uses",
+   "to": "KVO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kvo-bullish",
+   "to_id": "procedure:indicator-kvo",
+   "inputs": {
+    "kvo": {
+     "type": "series"
+    },
+    "kvo_signal": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "kvo_bullish_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-kvo-bullish-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "kvo_bullish_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-kvo-bullish-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "kvo_bullish_cross",
+   "rel": "uses",
+   "to": "KVO",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-kvo-bullish-cross",
+   "to_id": "procedure:indicator-kvo",
+   "inputs": {
+    "kvo": {
+     "type": "series"
+    },
+    "kvo_signal": {
      "type": "series"
     }
    }
@@ -12861,6 +15307,64 @@
    }
   },
   {
+   "from": "mfi_overbought",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mfi-overbought",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mfi_overbought",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-mfi-overbought",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "mfi_overbought",
+   "rel": "uses",
+   "to": "MFI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mfi-overbought",
+   "to_id": "procedure:indicator-mfi",
+   "inputs": {
+    "mfi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "mfi_oversold",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-mfi-oversold",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "mfi_oversold",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-mfi-oversold",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "mfi_oversold",
+   "rel": "uses",
+   "to": "MFI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-mfi-oversold",
+   "to_id": "procedure:indicator-mfi",
+   "inputs": {
+    "mfi": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "mom_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -13091,6 +15595,128 @@
    "to_id": "procedure:indicator-candlegeometry",
    "inputs": {
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "nvi_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-nvi-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "nvi_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-nvi-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "nvi_bearish",
+   "rel": "uses",
+   "to": "NVI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-nvi-bearish",
+   "to_id": "procedure:indicator-nvi",
+   "inputs": {
+    "nvi": {
+     "type": "series"
+    },
+    "nvi_ema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "nvi_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-nvi-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "nvi_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-nvi-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "nvi_bullish",
+   "rel": "uses",
+   "to": "NVI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-nvi-bullish",
+   "to_id": "procedure:indicator-nvi",
+   "inputs": {
+    "nvi": {
+     "type": "series"
+    },
+    "nvi_ema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "obv_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-obv-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "obv_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-obv-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "obv_bearish",
+   "rel": "uses",
+   "to": "OBV",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-obv-bearish",
+   "to_id": "procedure:indicator-obv",
+   "inputs": {
+    "obv": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "obv_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-obv-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "obv_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-obv-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "obv_bullish",
+   "rel": "uses",
+   "to": "OBV",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-obv-bullish",
+   "to_id": "procedure:indicator-obv",
+   "inputs": {
+    "obv": {
      "type": "series"
     }
    }
@@ -14254,6 +16880,180 @@
    }
   },
   {
+   "from": "vpt_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vpt-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vpt_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-vpt-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "vpt_bearish",
+   "rel": "uses",
+   "to": "VPT",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vpt-bearish",
+   "to_id": "procedure:indicator-vpt",
+   "inputs": {
+    "vpt": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "vpt_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vpt-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vpt_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-vpt-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "vpt_bullish",
+   "rel": "uses",
+   "to": "VPT",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vpt-bullish",
+   "to_id": "procedure:indicator-vpt",
+   "inputs": {
+    "vpt": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "vwap_above",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vwap-above",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vwap_above",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-vwap-above",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "vwap_above",
+   "rel": "uses",
+   "to": "VWAP",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vwap-above",
+   "to_id": "procedure:indicator-vwap",
+   "inputs": {
+    "vwap": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "vwap_below",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vwap-below",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vwap_below",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-vwap-below",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "vwap_below",
+   "rel": "uses",
+   "to": "VWAP",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vwap-below",
+   "to_id": "procedure:indicator-vwap",
+   "inputs": {
+    "vwap": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "vwma_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vwma-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vwma_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-vwma-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "vwma_cross_down",
+   "rel": "uses",
+   "to": "VWMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vwma-cross-down",
+   "to_id": "procedure:indicator-vwma",
+   "inputs": {
+    "vwma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "vwma_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-vwma-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "vwma_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-vwma-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "vwma_cross_up",
+   "rel": "uses",
+   "to": "VWMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-vwma-cross-up",
+   "to_id": "procedure:indicator-vwma",
+   "inputs": {
+    "vwma": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "williams_r_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -14339,13 +17139,13 @@
    "SuperTrend",
    "VolatilityStop"
   ],
-  "carried_forward_from_previous_build": 893,
+  "carried_forward_from_previous_build": 951,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 100,
+  "signals": 133,
   "signals_registered": 247,
-  "signals_out_of_scope": 147,
+  "signals_out_of_scope": 114,
   "signals_with_no_indicator": [
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",

@@ -56,6 +56,13 @@ from mangrove_kb.registry import RuleRegistry  # noqa: E402
 # Fixtures
 # =============================================================================
 
+import json as _json  # noqa: E402
+
+_NODES = {a["title"]: a for a in _json.loads(
+    (Path(__file__).resolve().parents[2] / "ontology" / "signal-indicator-ontology.json").read_text()
+)["atoms"]}
+
+
 def real_fixture() -> pd.DataFrame:
     """The 1,294-bar BTC daily trace. The primary evidence for every formula."""
     return load_btc_daily()[["Open", "High", "Low", "Close", "Volume"]].copy()
@@ -231,6 +238,23 @@ def replay(name, params, predicate, df, start):
     return fires, mismatches
 
 
+def graph_warmup(name, params, floor=70):
+    """The signal's own warmup, from its node, evaluated against the params under test.
+
+    A signal will not answer before its guard is satisfied, and comparing against it earlier reports
+    the guard as a formula mismatch. `nvi_bullish` needs 255 bars; a fixed start of 70 called it
+    wrong on 185 of them. `warmup_bars` already records this, so read it rather than guess.
+    """
+    node = _NODES.get(name) or {}
+    expr = (node.get("props") or {}).get("warmup_bars")
+    if not expr:
+        return floor
+    try:
+        return max(floor, int(eval(expr, {"__builtins__": {}, "max": max, "min": min}, dict(params))) + 1)
+    except Exception:
+        return floor
+
+
 def run(spec_builder, label, start=70):
     """Run one class's spec against the real fixture, falling back for anything that never fires."""
     real = real_fixture()
@@ -239,7 +263,8 @@ def run(spec_builder, label, start=70):
     for name, (params, predicate) in spec.items():
         r = Result(name, label)
         try:
-            r.real_fires, r.real_mismatch = replay(name, params, predicate, real, start)
+            r.real_fires, r.real_mismatch = replay(
+                name, params, predicate, real, graph_warmup(name, params, start))
         except Exception as exc:  # a signal that raises is a defect, not a skip
             r.error = f"{type(exc).__name__}: {exc}"
             results.append(r)
@@ -489,6 +514,87 @@ def spec_patterns(df):
     }
 
 
+def rose_over(series, window):
+    """A running total higher than it was `window` bars ago -- the only way to read a cumulative
+    line whose absolute level is an artefact of where the data begins.
+
+    The comparison bar is `t - window + 1`, not `t - window`. The signal reads `iloc[-window]` on a
+    frame of length t+1, which is index t+1-window; using t-window looks right and is one bar early.
+    """
+    return lambda t: (t >= window and defined(series.iloc[t], series.iloc[t - window + 1])
+                      and series.iloc[t] > series.iloc[t - window + 1])
+
+
+def fell_over(series, window):
+    return lambda t: (t >= window and defined(series.iloc[t], series.iloc[t - window + 1])
+                      and series.iloc[t] < series.iloc[t - window + 1])
+
+
+def spec_volume(df):
+    from mangrove_kb.indicators import (ADI, ADOSC, CMF, KVO, MFI, NVI, OBV, VPT, VWAP, VWMA,
+                                        CumulativeReturn, DailyReturn, EaseOfMovement, ForceIndex)
+    H, L, C, V = df["High"], df["Low"], df["Close"], df["Volume"]
+    hlcv = {"high": H, "low": L, "close": C, "volume": V}
+    adi = ADI.compute(hlcv, {})["adi"]
+    adosc = ADOSC.compute(hlcv, {"fast": 3, "slow": 10})["adosc"]
+    cmf = CMF.compute(hlcv, {"window": 20})["cmf"]
+    cr = CumulativeReturn.compute({"close": C}, {})["cumulative_return"]
+    dr = DailyReturn.compute({"close": C}, {})["daily_return"]
+    eom = EaseOfMovement.compute({"high": H, "low": L, "volume": V}, {"window": 14})["eom"]
+    fi = ForceIndex.compute({"close": C, "volume": V}, {"window": 13})["fi"]
+    mfi = MFI.compute(hlcv, {"window": 14})["mfi"]
+    nvi = NVI.compute({"close": C, "volume": V}, {"window": 255})
+    obv = OBV.compute({"close": C, "volume": V}, {})["obv"]
+    vpt = VPT.compute({"close": C, "volume": V}, {"smoothing_factor": None})["vpt"]
+    vwap = VWAP.compute(hlcv, {"window": 14})["vwap"]
+    vwma20 = VWMA.compute({"close": C, "volume": V}, {"window": 20})["vwma"]
+    vwma_f = VWMA.compute({"close": C, "volume": V}, {"window": 10})["vwma"]
+    vwma_s = VWMA.compute({"close": C, "volume": V}, {"window": 30})["vwma"]
+    kvo = KVO.compute(hlcv, {"fast": 34, "slow": 55, "signal_window": 13})
+    ap = {"fast": 3, "slow": 10}
+    kp = {"fast": 34, "slow": 55, "signal_window": 13}
+    return {
+        # cumulative flow lines: read by DIRECTION over a window, never by level -- the level is an
+        # artefact of where the series begins
+        "adi_bullish": ({"window": 20}, rose_over(adi, 20)),
+        "adi_bearish": ({"window": 20}, fell_over(adi, 20)),
+        "obv_bullish": ({"window": 20}, rose_over(obv, 20)),
+        "obv_bearish": ({"window": 20}, fell_over(obv, 20)),
+        "vpt_bullish": ({"window": 20}, rose_over(vpt, 20)),
+        "vpt_bearish": ({"window": 20}, fell_over(vpt, 20)),
+        "adosc_bullish": (ap, above(adosc, 0.0)),
+        "adosc_bearish": (ap, below(adosc, 0.0)),
+        "adosc_cross_up": (ap, crosses_up(adosc)),
+        "adosc_cross_down": (ap, crosses_down(adosc)),
+        "cmf_bullish": ({"window": 20, "threshold": 0.0}, above(cmf, 0.0)),
+        "cmf_bearish": ({"window": 20, "threshold": 0.0}, below(cmf, 0.0)),
+        "eom_bullish": ({"window": 14, "threshold": 0.0}, above(eom, 0.0)),
+        "eom_bearish": ({"window": 14, "threshold": 0.0}, below(eom, 0.0)),
+        "force_bullish": ({"window": 13, "threshold": 0.0}, above(fi, 0.0)),
+        "force_bearish": ({"window": 13, "threshold": 0.0}, below(fi, 0.0)),
+        "daily_return_positive": ({"threshold": 0.0}, above(dr, 0.0)),
+        "daily_return_negative": ({"threshold": 0.0}, below(dr, 0.0)),
+        "cumulative_return_positive": ({"threshold": 0.0}, above(cr, 0.0)),
+        "cumulative_return_target": ({"target": 10.0}, at_least(cr, 10.0)),
+        "mfi_overbought": ({"window": 14, "threshold": 80.0}, above(mfi, 80.0)),
+        "mfi_oversold": ({"window": 14, "threshold": 20.0}, below(mfi, 20.0)),
+        # NVI's level is an arbitrary seed constant, so every documented reading is positional
+        # against its own EMA
+        "nvi_bullish": ({"window": 255}, outside_above(nvi["nvi"], nvi["nvi_ema"])),
+        "nvi_bearish": ({"window": 255}, outside_below(nvi["nvi"], nvi["nvi_ema"])),
+        "vwap_above": ({"window": 14}, outside_above(C, vwap)),
+        "vwap_below": ({"window": 14}, outside_below(C, vwap)),
+        "is_above_vwma": ({"window": 20}, outside_above(C, vwma20)),
+        "vwma_cross_up": ({"window_fast": 10, "window_slow": 30}, crosses_above(vwma_f, vwma_s)),
+        "vwma_cross_down": ({"window_fast": 10, "window_slow": 30}, crosses_below(vwma_f, vwma_s)),
+        # the SIMPLIFIED KVO; KlingerVolumeOscillator is the original and no signal reads it
+        "kvo_bullish": (kp, outside_above(kvo["kvo"], kvo["kvo_signal"])),
+        "kvo_bearish": (kp, outside_below(kvo["kvo"], kvo["kvo_signal"])),
+        "kvo_bullish_cross": (kp, crosses_above(kvo["kvo"], kvo["kvo_signal"])),
+        "kvo_bearish_cross": (kp, crosses_below(kvo["kvo"], kvo["kvo_signal"])),
+    }
+
+
 # Keyed by the signal's source module, which is now the ontology CLASS -- `momentum` here covers
 # only the 18 rate-of-change signals; the bounded oscillators moved to `oscillator` and the KAMA
 # crossings to `averaging`. spec_momentum still returns all three because they are verified the same
@@ -497,6 +603,7 @@ CLASSES = {
     "volatility": spec_volatility,
     "momentum": spec_momentum,
     "patterns": spec_patterns,
+    "volume": spec_volume,
 }
 
 
