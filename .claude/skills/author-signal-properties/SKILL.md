@@ -161,6 +161,18 @@ replacement. Do not delete the signal without checking who reads the name outsid
 
 ## Caveats learned the hard way
 
+**Three kinds of null, and only one is work.** The final audit counted 440 and the real number was
+56. Separate them before reporting any total:
+
+| | example | meaning |
+|---|---|---|
+| bare null on a prop | `reference: null` | genuinely unauthored -- the only real gap |
+| null inside a slot | `max: null`, `range: [0, null]` | a BOUND: unbounded above. Authored, not missing |
+| null by convention | `abbreviation` on every signal | decided, not pending |
+
+`params.max` was null on 140 slots and every one of them meant "unbounded". Counting those as gaps
+produces a number four times too big and a false picture of the work left.
+
 **A `null` in a slot is not always a hole.** `max: null` on a parameter means *unbounded above* --
 `wick_ratio` has a minimum of 1.5 and no maximum, and that is authored, not missing. Same inside a
 range: `range: [0, null]` means bounded below at zero and unbounded above, which is how the
@@ -196,6 +208,19 @@ this site". `TweezerTops.html` is really `TweezersTop.html`, `InsideDay.html` is
 `InsideDays.html`, and `candles.html` does not exist -- three dead links that a plausibility check
 would have shipped. And before hunting for a new source, resolve the citation the docstring already
 has: the last four pattern references came from working out that `[TSR]` meant Trading Setups Review.
+
+## An input or param description is authored ONCE, on the indicator
+
+Signals derive their `inputs.<name>.description` from the indicator layer -- `close` means the same
+thing everywhere, so it is written once rather than 247 times that can drift. Two consequences:
+
+- **Do not author an input description on a signal.** Author it on an indicator that takes that
+  series and it reaches every signal reading it.
+- The derivation reads the AUTHORED nodes first, then falls back to re-lifting from source. It used
+  to only re-lift, which meant a hand-authored description was invisible to it: `volume` was
+  authored on 14 indicators and reached NONE of the 31 signals that read it, while `close` came
+  through because source happens to supply that one. If a description you authored does not appear
+  on the signals, that asymmetry is the first thing to check.
 
 ## Verify before finishing
 

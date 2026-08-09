@@ -607,14 +607,14 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "fast SMA period on median price"
      },
      "window2": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "slow SMA period on median price"
      }
     },
     "outputs": {
@@ -1241,7 +1241,7 @@
     "source_module": "volatility_indicators",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit",
     "warmup_bars": "window - 1",
-    "abbreviation": null,
+    "abbreviation": "CE",
     "usage_example": "ChandelierLevels.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'multiplier': value})",
     "formula": "high_offset[t] = max(high[t-window+1..t]) - multiplier * atr[t]; low_offset[t] = min(low[t-window+1..t]) + multiplier * atr[t]",
     "interpretation": "How far price has retraced from the window's extreme, measured in units of that window's own volatility. The two are anchored to OPPOSITE extremes, so they are not an upper and a lower band and can cross: at window=22, multiplier=3.0 on 1,294 BTC daily bars, high_offset sits below low_offset on only 73% of them.",
@@ -1249,15 +1249,15 @@
     "inputs": {
      "high": {
       "type": "series",
-      "description": null
+      "description": "highest price traded during the bar"
      },
      "low": {
       "type": "series",
-      "description": null
+      "description": "lowest price traded during the bar"
      },
      "close": {
       "type": "series",
-      "description": null
+      "description": "closing price"
      }
     },
     "params": {
@@ -1279,17 +1279,23 @@
     "outputs": {
      "high_offset": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "high_offset",
+      "description": "A volatility-scaled distance BELOW the window's highest high: highest_high - multiplier * ATR. Not a lower band -- it is anchored to the high."
      },
      "low_offset": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "low_offset",
+      "description": "The mirror, above the window's lowest low. Anchored to the opposite extreme from high_offset, so the two cross in a wide range."
      }
     }
    }
@@ -1379,7 +1385,7 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "EMA period; the double smoothing uses it twice"
      }
     },
     "outputs": {
@@ -1723,15 +1729,15 @@
     "source_module": "trend_indicators",
     "reference": null,
     "warmup_bars": "window - 1",
-    "abbreviation": null,
+    "abbreviation": "EPMA",
     "usage_example": "EPMA.compute(data={'close': df['Close']}, params={'window': value})",
-    "formula": null,
-    "interpretation": null,
-    "applications": null,
+    "formula": "epma[t] = sum(w_i * close[t-window+1+i]) for i in 0..window-1, w_i = (6i + 4 - 2*window) / (window*(window+1))",
+    "interpretation": "Where the window's linear trend says price IS now, rather than where it has been on average. The FIR weights are the closed form of a least-squares fit evaluated at its endpoint, so it turns faster than an SMA of the same length and overshoots more.",
+    "applications": "Used like any other moving average -- price against the line, or two windows crossing -- but it leads them, which is the point and also the cost.",
     "inputs": {
      "close": {
       "type": "series",
-      "description": null
+      "description": "closing price"
      }
     },
     "params": {
@@ -1740,16 +1746,19 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "period of the linear regression fitted each bar"
      }
     },
     "outputs": {
      "epma": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "epma",
+      "description": "The value at the endpoint of a linear regression fitted over the window -- the trend projected to now, rather than an average of the past."
      }
     }
    }
@@ -1925,7 +1934,7 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "period; the construction also uses window/2 and sqrt(window)"
      }
     },
     "outputs": {
@@ -1953,58 +1962,70 @@
     "source_module": "trend_indicators",
     "reference": null,
     "warmup_bars": "0",
-    "abbreviation": null,
+    "abbreviation": "HA",
     "usage_example": "HeikinAshi.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
-    "formula": null,
-    "interpretation": null,
-    "applications": null,
+    "formula": "ha_close[t] = (open[t]+high[t]+low[t]+close[t])/4; ha_open[t] = (ha_open[t-1]+ha_close[t-1])/2; ha_high[t] = max(high[t], ha_open[t], ha_close[t]); ha_low[t] = min(low[t], ha_open[t], ha_close[t])",
+    "interpretation": "A smoothed re-drawing of the bars themselves rather than a line laid over them. ha_open is recursive, so each candle carries the previous one, which is what suppresses the single-bar noise and also what makes a run of same-colour candles persist longer than the raw bars would.",
+    "applications": "Trend legibility: consecutive same-colour candles read as a continuing move. Because ha_open depends on its own history, these are NOT the bars the market traded and should not be used for fills.",
     "inputs": {
      "open": {
       "type": "series",
-      "description": null
+      "description": "opening price"
      },
      "high": {
       "type": "series",
-      "description": null
+      "description": "highest price traded during the bar"
      },
      "low": {
       "type": "series",
-      "description": null
+      "description": "lowest price traded during the bar"
      },
      "close": {
       "type": "series",
-      "description": null
+      "description": "closing price"
      }
     },
     "params": {},
     "outputs": {
      "ha_open": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "ha_open",
+      "description": "Mean of the PREVIOUS ha_open and ha_close, so it is recursive and each candle inherits the last."
      },
      "ha_high": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "ha_high",
+      "description": "The highest of the bar's high, ha_open and ha_close."
      },
      "ha_low": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "ha_low",
+      "description": "The lowest of the bar's low, ha_open and ha_close."
      },
      "ha_close": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "ha_close",
+      "description": "Mean of the bar's own open, high, low and close."
      }
     }
    }
@@ -2022,7 +2043,7 @@
     "warmup_bars": "max(window1, window2, window3) - 1",
     "abbreviation": null,
     "usage_example": "Ichimoku.compute(data={'high': df['High'], 'low': df['Low']}, params={'window1': value, 'window2': value, 'window3': value, 'visual': value})",
-    "formula": null,
+    "formula": "conversion_line[t] = (max(high[t-w1+1..t]) + min(low[t-w1+1..t]))/2; base_line[t] the same over w2; span_a[t] = (conversion_line[t] + base_line[t])/2; span_b[t] = (max(high[t-w3+1..t]) + min(low[t-w3+1..t]))/2",
     "interpretation": [
      "Price above cloud: Bullish",
      "Price below cloud: Bearish",
@@ -2040,11 +2061,11 @@
     "inputs": {
      "high": {
       "type": "series",
-      "description": null
+      "description": "highest price traded during the bar"
      },
      "low": {
       "type": "series",
-      "description": null
+      "description": "lowest price traded during the bar"
      }
     },
     "params": {
@@ -2053,58 +2074,70 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "Tenkan-sen period"
      },
      "window2": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "Kijun-sen period"
      },
      "window3": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "Senkou Span B period"
      },
      "visual": {
       "type": "bool",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "shift the spans forward for plotting; False keeps them lookahead-free"
      }
     },
     "outputs": {
      "conversion_line": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "conversion_line",
+      "description": "Tenkan-sen: midpoint of the high/low range over window1."
      },
      "base_line": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "base_line",
+      "description": "Kijun-sen: the same midpoint over the longer window2."
      },
      "span_a": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "span_a",
+      "description": "Senkou Span A: midpoint of the conversion and base lines. With span_b it bounds the cloud."
      },
      "span_b": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "span_b",
+      "description": "Senkou Span B: midpoint of the high/low range over window3. Which span is on top is what makes the cloud bullish or bearish."
      }
     }
    }
@@ -2245,28 +2278,28 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "SMA period smoothing the first ROC"
      },
      "window2": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "SMA period for the second ROC"
      },
      "window3": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "SMA period for the third ROC"
      },
      "window4": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "SMA period for the fourth ROC"
      },
      "nsig": {
       "type": "int",
@@ -2997,7 +3030,7 @@
     "inputs": {
      "close": {
       "type": "series",
-      "description": null
+      "description": "closing price"
      }
     },
     "params": {
@@ -3019,10 +3052,13 @@
     "outputs": {
      "higher_tf_slope": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "unitless",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "higher_tf_slope",
+      "description": "Slope of a higher-timeframe EMA divided by that EMA's own rolling magnitude, so the number is comparable across assets and price levels. Forward-filled from the most recently CLOSED higher-timeframe bar."
      }
     }
    }
@@ -3598,7 +3634,7 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "period, applied as Wilder's alpha = 1/window"
      }
     },
     "outputs": {
@@ -3807,8 +3843,8 @@
    "props": {
     "source_module": "volatility_indicators",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
-    "warmup_bars": null,
-    "abbreviation": null,
+    "warmup_bars": "max(bb_window, kc_window, mom_window) - 1",
+    "abbreviation": "TTM",
     "usage_example": "SqueezeDepth.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value})",
     "formula": "squeeze_depth[t] = min(kc_hband[t] - bb_hband[t], bb_lband[t] - kc_lband[t]); momentum[t] = EPMA(close - ((highest_high + lowest_low)/2 + sma(close))/2, mom_window)[t]",
     "interpretation": "How far inside the Keltner Channel the Bollinger Bands sit. Positive is Carter's squeeze, and the magnitude says by how much -- which the boolean it replaces discarded. Crossing down through zero is the release.",
@@ -3816,15 +3852,15 @@
     "inputs": {
      "high": {
       "type": "series",
-      "description": null
+      "description": "highest price traded during the bar"
      },
      "low": {
       "type": "series",
-      "description": null
+      "description": "lowest price traded during the bar"
      },
      "close": {
       "type": "series",
-      "description": null
+      "description": "closing price"
      }
     },
     "params": {
@@ -3867,17 +3903,23 @@
     "outputs": {
      "squeeze_depth": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "squeeze_depth",
+      "description": "How far inside the Keltner Channel the Bollinger Bands sit, as the smaller of the two side gaps. Positive IS Carter's squeeze; the magnitude says by how much, which the boolean it replaced discarded."
      },
      "momentum": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "momentum",
+      "description": "Carter's momentum: the linear-regression endpoint of close minus the midpoint of the window's range and its SMA. Sign gives the direction the coiled volatility is leaning."
      }
     }
    }
@@ -4072,11 +4114,11 @@
     "inputs": {
      "price": {
       "type": "series",
-      "description": null
+      "description": "the price series swings are found in, normally close"
      },
      "indicator": {
       "type": "series",
-      "description": null
+      "description": "any series to compare against price -- RSI, MACD, OBV; its swings are paired with price's"
      }
     },
     "params": {
@@ -4098,31 +4140,43 @@
     "outputs": {
      "low_price_delta": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "low_price_delta",
+      "description": "Change in price between its last two confirmed swing LOWS. NaN except on a confirmation bar."
      },
      "low_indicator_delta": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "indicator units",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "low_indicator_delta",
+      "description": "Change in the companion indicator between the two lows paired with those price lows."
      },
      "high_price_delta": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "high_price_delta",
+      "description": "The same across swing HIGHS."
      },
      "high_indicator_delta": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "indicator units",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "high_indicator_delta",
+      "description": "The companion indicator's change across the paired highs. Opposite signs between a price delta and its indicator delta are what divergence analysis reads as a divergence."
      }
     }
    }
@@ -4227,7 +4281,7 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "EMA period; the triple smoothing uses it three times"
      }
     },
     "outputs": {
@@ -4283,7 +4337,7 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "period of both passes of the double SMA"
      }
     },
     "outputs": {
@@ -4593,42 +4647,42 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "shortest lookback"
      },
      "window2": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "middle lookback"
      },
      "window3": {
       "type": "int",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "longest lookback"
      },
      "weight1": {
       "type": "float",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "weight on the shortest average"
      },
      "weight2": {
       "type": "float",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "weight on the middle average"
      },
      "weight3": {
       "type": "float",
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "weight on the longest average"
      }
     },
     "outputs": {
@@ -4687,7 +4741,7 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "EMA period applied to the accumulation; 0 leaves it unsmoothed"
      }
     },
     "outputs": {
@@ -4842,7 +4896,7 @@
     "source_module": "volatility_indicators",
     "reference": null,
     "warmup_bars": "window",
-    "abbreviation": null,
+    "abbreviation": "VE",
     "usage_example": "VolatilityEnvelope.compute(data={'close': df['Close']}, params={'window': value, 'multiplier': value})",
     "formula": "vstop_hband[t] = close[t-1] * (1 + multiplier * stdev(pct_change(close)[t-window+1..t])); vstop_lband[t] = close[t-1] * (1 - multiplier * stdev(pct_change(close)[t-window+1..t]))",
     "interpretation": "The range today would stay inside if returns behaved like the recent window. Centred on the PREVIOUS close, so being outside it is a statement about today's move rather than an artefact of centring on today's own close. Symmetric, so vstop_hband >= vstop_lband always holds.",
@@ -4850,7 +4904,7 @@
     "inputs": {
      "close": {
       "type": "series",
-      "description": null
+      "description": "closing price"
      }
     },
     "params": {
@@ -4872,17 +4926,23 @@
     "outputs": {
      "vstop_hband": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "vstop_hband",
+      "description": "Previous close plus `multiplier` standard deviations of recent RETURNS, scaled by that close. Symmetric with vstop_lband, so hband >= lband always holds."
      },
      "vstop_lband": {
       "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "vstop_lband",
+      "description": "The lower half of the same envelope."
      }
     }
    }
@@ -5008,7 +5068,7 @@
       "default": null,
       "min": null,
       "max": null,
-      "description": null
+      "description": "period over which the linear weights are laid"
      }
     },
     "outputs": {
@@ -5234,7 +5294,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -5289,7 +5349,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -5344,7 +5404,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -5406,7 +5466,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -5468,7 +5528,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -5530,7 +5590,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -7559,7 +7619,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -7621,7 +7681,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -8785,7 +8845,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -8843,7 +8903,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -9052,7 +9112,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -9106,7 +9166,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -10351,7 +10411,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -10992,7 +11052,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -11061,7 +11121,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -11130,7 +11190,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -11199,7 +11259,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -12108,7 +12168,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -12170,7 +12230,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -12728,7 +12788,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -12775,7 +12835,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -12822,7 +12882,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -12869,7 +12929,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -13170,7 +13230,7 @@
     "inputs": {
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -13227,7 +13287,7 @@
     "inputs": {
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -16633,7 +16693,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -16680,7 +16740,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -16735,7 +16795,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -16790,7 +16850,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -16837,7 +16897,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -16891,7 +16951,7 @@
      },
      "volume": {
       "type": "series",
-      "description": null
+      "description": "units traded during the bar"
      }
     },
     "params": {
@@ -24390,7 +24450,7 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "carried_forward_from_previous_build": 1128,
+  "carried_forward_from_previous_build": 1262,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],

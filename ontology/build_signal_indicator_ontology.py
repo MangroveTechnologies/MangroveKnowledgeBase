@@ -53,6 +53,10 @@ KB_REPO = pathlib.Path(os.environ.get(
 sys.path.insert(0, str(KB_REPO))
 KB = str(KB_REPO / "mangrove_kb" / "indicators")
 
+#: The graph itself. Read back in for carry-forward AND to derive signal input descriptions from
+#: what has been authored on the indicator nodes.
+NODE_FILE = pathlib.Path(__file__).resolve().parent / "signal-indicator-ontology.json"
+
 CLASSES_DEF = {
  'averaging': "Emits a reference level in price units, produced by averaging over a window.",
  'momentum': "Measures rate of change -- how fast, and in which direction, the input is moving.",
@@ -830,6 +834,21 @@ def _signal_input_descriptions():
     keeps one description per series instead of 247 copies that can drift.
     """
     out = {}
+    # The AUTHORED graph first. `_lift` re-derives from source, so it only ever sees descriptions
+    # that source supplies -- and an input description that was written by hand lives in the node,
+    # nowhere else. `volume` is authored on 14 indicators ("units traded during the bar") and was
+    # reaching NONE of the 31 signals that read it, while `close` came through because source
+    # happens to supply that one. Reading the nodes first fixes every such case, not just volume.
+    try:
+        prev = json.loads(NODE_FILE.read_text()).get("atoms", [])
+    except (OSError, ValueError):
+        prev = []
+    for atom in prev:
+        if not atom.get("id", "").startswith("procedure:indicator"):
+            continue
+        for name, spec in ((atom.get("props") or {}).get("inputs") or {}).items():
+            if isinstance(spec, dict) and spec.get("description") and name not in out:
+                out[name] = spec["description"]
     for cls in CLASSES.values():
         for name, spec in (_lift(cls).get("inputs") or {}).items():
             if spec.get("description") and name not in out:
@@ -1251,7 +1270,6 @@ for canon, dup in deprecated_signals:
 # are supposed to propagate), but wherever THIS run produced `null` and the previous build had a
 # value, the previous value is kept. Keys absent from this run are NOT resurrected, so a field
 # deliberately removed from the schema stays removed.
-NODE_FILE = pathlib.Path(__file__).resolve().parent / "signal-indicator-ontology.json"
 
 
 def _carry(new, old):
