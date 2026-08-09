@@ -268,6 +268,15 @@ Notes on the example:
 
 ### Schema conventions
 
+**An unbounded range is `Infinity`, not `null`.** `[0, Infinity]` for a price, `[-Infinity,
+Infinity]` for a signed quantity, and a bare `null` reserved for "not authored yet" -- one meaning
+per form. `[null, null]` used to appear on 62 outputs, looking authored while stating nothing.
+Parameters are the exception: no parameter docstring declares `inf`, so a null `min`/`max` there
+means the source states no bound, and writing infinity would invent a fact the source never made.
+`json.dumps` emits the bare token `Infinity`, which Python and a JavaScript literal both accept and
+the JSON spec does not; every consumer today is one of those two.
+
+
 **`null` means "not yet authored" -- everywhere, with no exceptions.** The nulls are the worklist, so
 a field that is *deliberately* not applicable must never be null; it would be indistinguishable from
 one nobody has filled in yet. A boolean flag output therefore carries `units: "boolean"` and

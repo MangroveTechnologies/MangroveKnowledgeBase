@@ -14,6 +14,31 @@ time**.
 > turned up as a defect. This file is the innermost step of that loop. Design decisions are in
 > `ontology/signal-indicator-ontology.md`; the research already done is in `ontology/research/`.
 
+## `range` uses infinity, never null
+
+An unbounded side is `Infinity` / `-Infinity`, not `null`:
+
+    "range": [0, Infinity]          a price: non-negative, no ceiling
+    "range": [-Infinity, Infinity]  a signed difference or position
+    "range": [0, 100]               genuinely bounded
+    "range": null                   NOT AUTHORED YET -- the only meaning a bare null carries
+
+`null` inside a range said two different things at once -- "unbounded" and "nobody wrote this" --
+and 62 outputs were carrying `[null, null]`, which looks authored and states nothing. The rule for
+picking a side: `units: price` is non-negative, so `[0, Infinity]`; anything dimensionless, percent
+or ratio here is a difference or a position and carries a sign, so `[-Infinity, Infinity]`.
+
+The builder emits it from `inf` / `-inf` in a docstring `Range:` line. Note that parameters are
+different: no parameter docstring declares `inf`, so a null `min`/`max` on a param means the source
+states no bound, and asserting infinity there would invent a fact.
+
+**Serialisation caveat.** `json.dumps` writes bare `Infinity`, which Python accepts and a
+JavaScript literal accepts (`Infinity` is a JS global) but the JSON spec does not. Every consumer
+today is one of those two -- the builder, the harness, the tests and the renderer, which embeds the
+graph as `const DATA = {...}` rather than parsing it. A strict third-party parser would need
+`parse_constant`.
+
+
 ## The fields, in one place
 
 Per output: `units`, `range`, `canonical_name`, `description`.

@@ -147,8 +147,25 @@ _RET_CANON = re.compile(r"Canonical:\s*([^.\n]+)")
 
 
 def _bound(tok):
-    """`inf` / `-inf` mean unbounded on that side, which the schema spells as None."""
-    return None if tok.lower().lstrip("-") == "inf" else _num(tok)
+    """`inf` / `-inf` mean unbounded on that side, and the schema says so with a float infinity.
+
+    This used to collapse them to None, which lost the distinction the null taxonomy depends on: a
+    BARE null means "nobody has authored this", while an infinite bound is an authored fact -- the
+    quantity genuinely has no limit on that side. Writing None for both made 140 unbounded slots
+    indistinguishable from unauthored ones.
+
+    Only OUTPUT ranges declare inf; no parameter does, so a null min/max on a param still means
+    "the docstring states no bound" and is left alone. Asserting `inf` there would claim a fact the
+    source never stated.
+
+    Serialisation note: `json.dumps` writes this as the bare token `Infinity`, which Python and a
+    JavaScript literal both accept but the JSON spec does not. Every consumer today is one of those
+    two (see README); a strict third-party parser would need `parse_constant`.
+    """
+    t = tok.lower().strip()
+    if t.lstrip("-") == "inf":
+        return float("-inf") if t.startswith("-") else float("inf")
+    return _num(tok)
 
 
 def _parse_returns(doc):
@@ -369,9 +386,11 @@ def _num(x):
         return x.strip().lower().rstrip(".") == "true"
     try:
         f = float(x)
-        return int(f) if f == int(f) else f
     except ValueError:
         return None
+    if f != f or f in (float("inf"), float("-inf")):   # NaN or infinite: no integer form
+        return f
+    return int(f) if f == int(f) else f
 
 
 def _sibling_functions(path, sigs_dir):

@@ -186,8 +186,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Accumulation Distribution Line",
       "description": "running total of volume weighted by where the close sits within the bar's own high-low range. The weight (the Money Flow Multiplier, or Close Location Value) is hard-bounded -1..+1 -- +1 with the close on the high, -1 on the low, 0 at the midpoint -- so a bar can never contribute more than its own volume, unlike VPT. Critically it NEVER LOOKS AT THE PRIOR CLOSE, which is why a security can gap down and close lower while this line RISES, provided the close sits above the bar's midpoint; neither OBV nor VPT can do that. Unbounded, and the level depends on the arbitrary start of the series, so only the shape is meaningful. Zero-range bars (high equals low) are treated as zero flow here -- no source prescribes a convention for that case. Chaikin's original name for it was the Cumulative Money Flow Line"
@@ -261,8 +261,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Chaikin Oscillator",
       "description": "the MACD construction applied to the Accumulation/Distribution Line: fast EMA minus slow EMA of the ADL. An indicator of an indicator, and the literature warns it sits three steps removed from price and is prone to disconnecting from it. Volume-scaled and therefore not comparable across instruments, though it IS invariant to the ADL's arbitrary starting value, since a constant offset cancels between the two EMAs. Undefined where high equals low. 'ADOSC' is the TA-Lib function name; the literature name is Chaikin Oscillator"
@@ -414,8 +414,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Arnaud Legoux Moving Average",
       "description": "Gaussian-weighted average: weight exp(-0.5*((sigma/window)*(i-k))^2) with the peak at k = floor(offset*(window-1)), normalised to sum to 1. `offset` slides the peak toward the newest bars (higher = more responsive); `sigma` sets the bell's width (higher = smoother). NOT adaptive in the data-driven sense -- the weights are fixed at configuration time and never respond to market state, unlike KAMA or MAMA. All weights positive and normalised, so it CANNOT overshoot the window's price range -- measured 0 excursions"
@@ -479,7 +479,7 @@
       "units": "price",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "Average True Range",
       "description": "Wilder-smoothed mean of the true range. Seeded with the arithmetic mean of the first `window` true-range values, then smoothed by ewm(alpha=1/window) -- Wilder's original recurrence, not an ordinary EMA. In the instrument's own price units, so NOT comparable across instruments or price levels; use NATR for that. WARMUP CAVEAT: bars 0..window-2 are filled with literal 0.0 rather than NaN, so a zero here means 'not yet computed' and is indistinguishable from genuine zero volatility -- mask the first window-1 bars before consuming this series"
@@ -622,8 +622,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Awesome Oscillator",
       "description": "5-period SMA minus 34-period SMA of MEDIAN price (high+low)/2, not close. Unbounded and in price units, so not comparable across instruments; zero is a structural level (the two SMAs are equal), not a bound. Plotted as a histogram whose bar colour encodes the change from the prior bar, not the sign -- the saucer and twin-peaks patterns are read from that"
@@ -747,8 +747,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "rolling mean of close over window -- the center band"
@@ -757,8 +757,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "mavg + window_dev * rolling stdev -- the upper band. The stdev is the POPULATION calculation (ddof=0), matching Bollinger's own stated convention"
@@ -767,8 +767,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "mavg - window_dev * rolling stdev -- the lower band. Population stdev, as above"
@@ -778,7 +778,7 @@
       "units": "percent",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "BandWidth",
       "description": "band separation as a percent of the center band, (hband - lband) / mavg * 100. Non-negative because the rolling stdev cannot be negative. Scale-free, so comparable across assets and price levels"
@@ -787,8 +787,8 @@
       "type": "series",
       "units": "ratio",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "%B",
       "description": "position of close between the bands, (close - lband) / (hband - lband). 0 at the lower band, 1 at the upper, but NOT clamped -- exceeds 1 above hband and drops below 0 under lband, which the literature treats as significant rather than as an edge case. NaN when the bands coincide, explicitly guarded here unlike Keltner and Donchian"
@@ -857,8 +857,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "CCI",
       "description": "(typical price - its moving average) / (constant * mean absolute deviation) over window. NOT BOUNDED -- the familiar +/-100 band is a distributional convention created by Lambert's 0.015 constant, which he chose so that roughly 70-80% of readings fall inside it; the remainder lie outside BY DESIGN. Observed here from -320 to +327. This implementation computes the TRUE mean absolute deviation, measuring each window's deviations against that window's own mean, which matches the published formula; the common library shortcut of rolling-averaging |tp - rolling_mean| is a different quantity and diverges from this by over 150 CCI points on the same data"
@@ -1042,7 +1042,7 @@
       "units": "price",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "absolute body size, |close - open|. Non-negative by construction, and never larger than range, since open and close both lie within the bar's high-low span"
@@ -1051,8 +1051,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "close - open, so the SIGN carries direction -- positive is an up bar, negative a down bar, zero a flat one. Replaces the boolean is_bullish/is_bearish pair this indicator supersedes, keeping every output numeric"
@@ -1062,7 +1062,7 @@
       "units": "price",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "full travel of the bar, high - low. Non-negative, and zero on a bar that did not move at all"
@@ -1072,7 +1072,7 @@
       "units": "price",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "high - max(open, close) -- the rejection above the body. Non-negative"
@@ -1082,7 +1082,7 @@
       "units": "price",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "min(open, close) - low -- the rejection below the body. Non-negative"
@@ -1151,8 +1151,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "distance from the previous bar's lower body edge to this one's, as a percent of the previous close. Negative means this body starts below the last one"
@@ -1161,8 +1161,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "the same for the upper body edge. Paired with body_low_delta the signs state containment: negative low with positive high is engulfing, the inverse is harami"
@@ -1171,8 +1171,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "distance between the two bars' lows. Positive means this bar's low sits above the last one's"
@@ -1181,8 +1181,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "distance between the two bars' highs. With range_low_delta this is InsideBar and OutsideBar: both edges drawn inward is inside, both outward is outside"
@@ -1192,7 +1192,7 @@
       "units": "ratio",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "this bar's body over the previous bar's, so 2.0 is twice as large and 0.5 is half. Non-negative, no ceiling, and 0 where the previous body was zero-width. NaN on the first bar, which has no predecessor"
@@ -1202,7 +1202,7 @@
       "units": "ratio",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "the same for the full high-low range. Answers \"how much bigger is this bar\" independently of where it sits"
@@ -1212,7 +1212,7 @@
       "units": "percent",
       "range": [
        -100,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "open minus the previous close, as a percent of that close. Positive is a gap up, negative a gap down. Floored at -100, since the open cannot fall below zero"
@@ -1221,8 +1221,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "shared extent of the two bars' ranges, as a percent of the previous close. Positive means they overlap by that much; NEGATIVE means no overlap at all -- a true gap -- and the magnitude is how far apart they are. This is the output to read for \"did we gap\", with direction taken from the sign of `gap`"
@@ -1281,8 +1281,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "high_offset",
       "description": "A volatility-scaled distance BELOW the window's highest high: highest_high - multiplier * ATR. Not a lower band -- it is anchored to the high."
@@ -1291,8 +1291,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "low_offset",
       "description": "The mirror, above the window's lowest low. Anchored to the opposite extreme from high_offset, so the two cross in a wide range."
@@ -1340,7 +1340,7 @@
       "units": "percent",
       "range": [
        -100,
-       null
+       Infinity
       ],
       "canonical_name": "Cumulative Return",
       "description": "total percent change from the FIRST BAR OF THE SUPPLIED SERIES to each bar: (close / close[0] - 1) * 100. Its value therefore depends entirely on where the caller's data slice begins -- reslicing the input rebases the whole series. HARD floor at -100 because prices cannot go below zero and, once a factor reaches zero, the product is absorbed there permanently; no ceiling. Not annualised, so two windows of different length are not comparable. Path-independent given the endpoints, so it says nothing about drawdown along the way. Not a named technical indicator -- it is the elementary finance quantity, also called total return, holding-period return or compounded return"
@@ -1393,8 +1393,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Double Exponential Moving Average",
       "description": "2*EMA - EMA(EMA), both passes at the same window. Mulloy's construction subtracts the double-smoothed lag from the single-smoothed line, so it tracks closer to price and crosses earlier than an EMA. OVERSHOOT: the negative -EMA(EMA) term means this is NOT a convex combination of the window's prices and can print outside that window's high-low range -- measured on a step change, 53 of 181 bars printed outside, up to 3.46 price units beyond"
@@ -1448,8 +1448,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Detrended Price Oscillator",
       "description": "close from (window/2 + 1) bars ago minus the current window-period SMA. This is the CAUSAL alignment -- it uses only past data and is lookahead-free, unlike the centred alignment that charting platforms plot, which reaches (window/2 + 1) bars into the future and therefore cannot produce a value on the most recent bar. The trade-off is that this series describes a state (window/2 + 1) bars STALE. Every primary source rules DPO out for momentum signals, overbought/oversold levels and scans -- it exists to identify cycle length by counting bars between its peaks and troughs. Unbounded, in price units, so not comparable across instruments"
@@ -1497,8 +1497,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "log return",
       "description": "one-bar continuously compounded return, ln(close / prior close) * 100. UNBOUNDED IN BOTH DIRECTIONS -- ln maps (0, inf) onto the whole real line, which removes the -100 floor the simple return has. That is precisely why it is preferred for modelling: it is time-additive, so multi-period returns are plain sums, and symmetric, so equal up and down moves cancel. Undefined at a zero or negative price. Not additive across assets, unlike the simple return. Not a named technical indicator"
@@ -1546,7 +1546,7 @@
       "units": "percent",
       "range": [
        -100,
-       null
+       Infinity
       ],
       "canonical_name": "simple return",
       "description": "one-bar percent change, (close / prior close - 1) * 100. HARD floor at -100 because prices cannot go below zero; no ceiling. Aggregates MULTIPLICATIVELY -- daily simple returns cannot be summed -- and is asymmetric, since a -50% move needs +100% to recover. It is the correct quantity for aggregating across assets at a point in time. Not a named technical indicator; it is the elementary finance quantity, identical to a 1-period Rate of Change"
@@ -1616,8 +1616,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Upper Channel Line",
       "description": "highest high over the `window` bars preceding the current one -- the documented convention (StockCharts, the Turtle rules, Donchian's own 4-week rule), precisely so a close can break the channel. Setting include_current_bar=True folds the current bar in, and then no close can ever exceed this band"
@@ -1626,8 +1626,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Lower Channel Line",
       "description": "lowest low over the `window` bars preceding the current one, with the same current-bar note as hband"
@@ -1636,8 +1636,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Middle Channel",
       "description": "midpoint of the channel, (hband - lband) / 2 + lband. StockCharts calls this the Centerline"
@@ -1647,7 +1647,7 @@
       "units": "percent",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "channel separation as a percent, (hband - lband) / mband * 100 -- normalised by this indicator's OWN middle band, so it means the same thing here as it does on BollingerBands and KeltnerChannel and the three are comparable. It previously divided by a rolling mean of close, a different quantity that also made this Donchian's only dependency on close outside pband; the two forms diverge by at most 1.69% (measured over 300 bars), close enough that the difference never looked like an error"
@@ -1656,8 +1656,8 @@
       "type": "series",
       "units": "ratio",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "position of close within the channel, (close - lband) / (hband - lband), computed from the same hband/lband reported alongside it. UNBOUNDED under the default convention: the bands span the preceding bars, so a close that breaks the channel reads below 0 or above 1 -- that excursion IS the breakout, and reading it is the point. Bounded to 0..1 only when include_current_bar=True, where close cannot sit outside its own channel. NaN where the band has zero width"
@@ -1709,8 +1709,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Exponential Moving Average",
       "description": "recursive average with alpha = 2/(window+1), weighting recent bars more heavily. Infinite memory (IIR): old data never fully leaves, so the whole history is embedded and the weighting halves each time the window doubles. Turns before an SMA of the same length. SEEDING CAVEAT: seeded from the FIRST observation (the statistics convention), not from an SMA of the first `window` bars as StockCharts, TradingView and Fidelity specify -- a warmup-only difference that decays to zero within roughly 100 bars"
@@ -1754,8 +1754,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "epma",
       "description": "The value at the endpoint of a linear regression fitted over the window -- the trend projected to now, rather than an average of the past."
@@ -1817,8 +1817,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "1-Period EMV",
       "description": "Arms' ratio of midpoint movement to a volume-per-range 'box ratio' -- large when a wide range is achieved on light volume, small when a narrow range takes heavy volume. Its SIGN is exactly the sign of the midpoint change, since the box ratio is strictly positive. The 100,000,000 volume divisor is a CONVENTION chosen so readings land in single or double digits, and sources use 1e6, 1e8 and 1e9 for it -- so a bare EMV number is uninterpretable without knowing the producer's divisor. Undefined on a flat bar (high equals low) or a zero-volume bar"
@@ -1827,8 +1827,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Ease of Movement",
       "description": "simple moving average (not exponential) of eom over window. This is the plotted series; zero-line crossings are its usual signal. The literature is explicit that it confirms other analysis rather than standing alone, since it largely tracks price"
@@ -1886,8 +1886,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Force Index",
       "description": "Elder's combination of direction, extent and volume: (close - prior close) * volume, smoothed by an EMA. Units are price-change times volume -- not a price, percentage or ratio -- so the scale is arbitrary and readings are NOT comparable across instruments. Unbounded both ways with no normalising term anywhere in the formula. The sign of the unsmoothed 1-period form exactly tracks the close-to-close direction because volume is non-negative; after smoothing that guarantee is lost. Elder pairs a 2-period version for corrections with a 13- or 100-period version for trend"
@@ -1942,8 +1942,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Hull Moving Average",
       "description": "WMA(2*WMA(window/2) - WMA(window), sqrt(window)) -- Alan Hull's construction, near-zero lag while staying smooth. Both window/2 and sqrt(window) are FLOORED here, matching Tulip and the Chart manual; StockCharts rounds window/2 up instead, so odd windows differ between implementations and Hull's own listing settles neither. OVERSHOOT: weights go negative beyond about window/2 bars back, so it can print outside the window's range -- 14 of 181 bars measured, the largest excursion of the family at 7.64 price units. Hull explicitly advises AGAINST crossover signals, since those rely on the lag he removed; read the turning points instead"
@@ -1991,8 +1991,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "ha_open",
       "description": "Mean of the PREVIOUS ha_open and ha_close, so it is recursive and each candle inherits the last."
@@ -2001,8 +2001,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "ha_high",
       "description": "The highest of the bar's high, ha_open and ha_close."
@@ -2011,8 +2011,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "ha_low",
       "description": "The lowest of the bar's low, ha_open and ha_close."
@@ -2021,8 +2021,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "ha_close",
       "description": "Mean of the bar's own open, high, low and close."
@@ -2103,8 +2103,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "conversion_line",
       "description": "Tenkan-sen: midpoint of the high/low range over window1."
@@ -2113,8 +2113,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "base_line",
       "description": "Kijun-sen: the same midpoint over the longer window2."
@@ -2123,8 +2123,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "span_a",
       "description": "Senkou Span A: midpoint of the conversion and base lines. With span_b it bounds the cloud."
@@ -2133,8 +2133,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "span_b",
       "description": "Senkou Span B: midpoint of the high/low range over window3. Which span is on top is what makes the cloud bullish or bearish."
@@ -2202,8 +2202,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Kaufman's Adaptive Moving Average",
       "description": "genuinely data-driven adaptive average: the smoothing constant is recomputed each bar from the efficiency ratio, net directional movement divided by total path length. Efficient trends drive the constant toward the fast bound so the line hugs price; choppy action drives it toward the slow bound so the line nearly stops. A FLAT KAMA is itself information -- it means inefficient, ranging price, not merely unchanged price. The constant is squared, capping effective smoothing near 0.44 rather than 0.67, and stays within (0,1) so the line cannot overshoot. SEEDING CAVEAT: seeded with the price at the first valid bar; StockCharts specifies an initial SMA"
@@ -2314,8 +2314,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "KST",
       "description": "Pring's summed rate of change: four smoothed ROCs over increasing lookbacks, weighted 1/2/3/4 so the longest cycle dominates. Unbounded in both directions and explicitly ill-suited to overbought/oversold work -- Pring's own preference is signal-line crossovers and trend-line breaks. A -1000 floor follows arithmetically from the four ROC floors but is not a literature claim and is unreachable"
@@ -2324,8 +2324,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Signal Line",
       "description": "SMA (not EMA) of kst over nsig. Pring favours crossings of kst against this line as the primary signal"
@@ -2334,8 +2334,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "kst minus kst_signal. Convenience histogram; the literature defines only the KST line and its signal, and names no third series"
@@ -2415,8 +2415,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Klinger Volume Oscillator",
       "description": "fast EMA minus slow EMA of a signed volume series. IMPLEMENTATION CAVEAT: this is the SIMPLIFIED variant -- volume signed by the direction of typical price -- not Klinger's original volume force, which multiplies volume by a |2*(dm/cm - 1)|*100 factor built from cumulative range measurements. Both circulate under the same name and they are not interchangeable: measured on identical data, the full form runs about 145x larger. Volume-scaled, unbounded, not comparable across instruments"
@@ -2425,8 +2425,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Signal Line",
       "description": "EMA of kvo over signal_window; also called the trigger line. Crossings of kvo against it are the primary documented signal"
@@ -2507,8 +2507,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Middle Line",
       "description": "the centre line: SMA of typical price ((high+low+close)/3) over window when original_version is True, otherwise an EMA of close over window"
@@ -2517,8 +2517,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Upper Channel Line",
       "description": "original_version True: SMA(typical price) + SMA(high - low), verified algebraically identical to Chester Keltner's 1960 rule. Otherwise mband + multiplier * ATR(window_atr). NOTE on the original path window_atr and multiplier are ignored entirely, so tuning them has no effect and raises no error"
@@ -2527,8 +2527,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Lower Channel Line",
       "description": "the mirror of hband below the centre line: SMA(typical price) - SMA(high - low) on the original path, otherwise mband - multiplier * ATR(window_atr)"
@@ -2538,7 +2538,7 @@
       "units": "percent",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "channel separation as a percent of the centre line, (hband - lband) / mband * 100. The literature has no established name for this series -- it is a borrowing of Bollinger's BandWidth construction"
@@ -2547,8 +2547,8 @@
       "type": "series",
       "units": "ratio",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "position of close between the channel lines, (close - lband) / (hband - lband). Unclamped, so it exceeds 1 above the upper line and drops below 0 under the lower. NOT guarded against coinciding bands, unlike BollingerBands, so a zero-width channel can produce inf rather than NaN. No established literature name"
@@ -2629,8 +2629,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Klinger Volume Oscillator",
       "description": "fast EMA minus slow EMA of Klinger's volume force -- volume scaled by |2*(dm/cm - 1)|*100 and signed by trend, where cm accumulates bar range since the last trend change. This is the ORIGINAL 1997 construction; KVO carries the simplified signed-volume variant, and on identical data with identical periods this runs about 145x larger. Volume-scaled, unbounded, not comparable across instruments, and not comparable to KVO. Zero-range bars contribute zero force"
@@ -2639,8 +2639,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Signal Line",
       "description": "EMA of kvo over signal_window; also called the trigger line. Crossings of kvo against it are the primary documented signal"
@@ -2709,8 +2709,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "MACD Line",
       "description": "fast EMA minus slow EMA of close. Positive means the fast EMA sits above the slow one, i.e. rising momentum; the zero line is where they cross. UNBOUNDED and in the instrument's own PRICE UNITS, so its magnitude scales with the price level and readings are NOT comparable across instruments -- use PPO for that. Explicitly not an overbought/oversold tool: it can over-extend past its own historical extremes"
@@ -2719,8 +2719,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Signal Line",
       "description": "EMA of the MACD line over window_sign. Crossings of macd against this line are the most commonly used MACD signal"
@@ -2729,8 +2729,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "MACD Histogram",
       "description": "macd minus signal. Crosses zero exactly when macd crosses its signal line, and expands as the two diverge -- Aspray added it to anticipate those crossovers"
@@ -2803,8 +2803,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "MAMA",
       "description": "Ehlers' MESA Adaptive Moving Average. Adapts to the CYCLE PHASE RATE OF CHANGE measured by a Hilbert-transform discriminator -- explicitly not to volatility, which is what distinguishes it from KAMA and VIDYA. Phase snaps back every half cycle, forcing alpha to its fast limit so the line rapidly approaches price, then decays slowly and holds: Ehlers' 'fast attack, slow decay' ratcheting. Alpha is clamped between the slow and fast limits, so it cannot overshoot. INPUT CAVEAT: Ehlers specifies median price (high+low)/2; this implementation consumes close. WARMUP CAVEAT: the recursion starts from zero and only the first 6 bars are masked, so roughly ten further bars are published while still converging -- at bar 6 the value sat 50% below price in testing"
@@ -2813,8 +2813,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "FAMA",
       "description": "Following Adaptive Moving Average -- the same recursion driven at half MAMA's alpha, so it steps in time with MAMA but moves less dramatically. The pair is the point: MAMA and FAMA do not cross unless market direction has genuinely changed, which is what makes the crossover system resistant to whipsaw. Same input and warmup caveats as MAMA"
@@ -2936,8 +2936,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Momentum",
       "description": "absolute price difference over window: close - close_n. Same zero crossings as ROC -- they differ only in scale, not in signal timing. Unbounded both ways and in PRICE UNITS, so no conventional threshold band exists, unlike ROC's. Beware a three-way name collision: 'Momentum' also denotes the percent form (this corpus's ROC) and a ratio form centred on 100 rather than 0; this is the difference form"
@@ -3003,7 +3003,7 @@
       "units": "dimensionless",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "Mass Index",
       "description": "sum over window_slow of the ratio of a single- to a double-smoothed EMA of the high-low range. A pure RANGE-EXPANSION measure with no directional content -- a bulge signals that a reversal is near without saying which way, so it must be paired with a directional indicator. Strictly positive, with no ceiling; it rests near 25 because each of the 25 ratios sits near 1, but readings below 25 are entirely normal when volatility contracts. The reversal bulge at 27 with confirmation back below 26.5 is a conventional signal level, not a bound"
@@ -3054,8 +3054,8 @@
       "type": "series",
       "units": "unitless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "higher_tf_slope",
       "description": "Slope of a higher-timeframe EMA divided by that EMA's own rolling magnitude, so the number is comparable across assets and price levels. Forward-filled from the most recently CLOSED higher-timeframe bar."
@@ -3121,7 +3121,7 @@
       "units": "percent",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "Normalized Average True Range",
       "description": "100 * ATR(window) / close -- average true range as a percentage of current price. Scale-free, so unlike raw ATR it is comparable across instruments, price levels and splits. This is the TA-Lib convention (smooth the true range first, then divide by close); an alternative definition normalises each bar's true range before averaging and gives different values. Warmup is masked to NaN here, which differs from ATR's zero-fill for the same region"
@@ -3181,7 +3181,7 @@
       "units": "dimensionless",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "Negative Volume Index",
       "description": "compounding index that moves ONLY on bars where volume FELL against the prior bar, and is carried forward unchanged when volume rose. The premise is Dysart's 'smart money' theory -- that informed investors trade on quiet days while the crowd trades on heavy ones. Seeded at 1000, a pure scale choice with no effect on behaviour (1 and 100 are also in use), so the ABSOLUTE LEVEL IS MEANINGLESS and every documented reading is positional, relative to its own moving average. Strictly non-negative because it is a product of (1 + return) factors over positive prices. Built for broad market indices, and unusable where there is no real volume data"
@@ -3191,7 +3191,7 @@
       "units": "dimensionless",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "none",
       "description": "EMA of nvi, conventionally over 255 bars (one year). Fosback's statistics are defined against this line, not against the index: roughly a 96% chance of a bull market when NVI sits above it, but only about 53% for a bear market when below -- the bullish reading is strong and the bearish one barely better than a coin flip. The literature gives this series no proper name, referring to it only descriptively. Note this EMA carries no minimum-periods guard, so its earliest values are dominated by the seed rather than by data"
@@ -3241,8 +3241,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "On Balance Volume",
       "description": "running total of volume signed by the direction of the close. UNBOUNDED, and the ABSOLUTE LEVEL CARRIES NO INFORMATION -- StockCharts states plainly that 'the absolute value of OBV is not important' and does not even show its scale, because a cumulative total's level is set by where the data happens to begin. Only the shape and direction are read, and the zero crossing is an artefact of the start date, not a signal. Full volume is committed to one side by close direction alone, so a +0.01% bar and a +8% bar add the same amount. IMPLEMENTATION CAVEAT: Granville's rule is three-way and carries the total forward UNCHANGED when the close is flat; this implementation branches only two ways and adds volume on flat bars, so it drifts upward in instruments where unchanged closes are common"
@@ -3311,8 +3311,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "PPO Line",
       "description": "MACD expressed as a percentage: (fast EMA - slow EMA) / slow EMA * 100, the denominator being the SLOW EMA. Normalising by price level is the whole point -- unlike MACD, readings ARE comparable across instruments and across periods where the price level changed. Still UNBOUNDED: percentage normalisation removes price-level dependence, not magnitude. A theoretical -100 floor follows from positive prices but is not a literature claim and is unreachable in practice"
@@ -3321,8 +3321,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Signal Line",
       "description": "EMA of ppo over window_sign, read exactly like the MACD signal line"
@@ -3331,8 +3331,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "PPO Histogram",
       "description": "ppo minus ppo_signal; anticipates signal-line crossovers the same way the MACD histogram does"
@@ -3401,7 +3401,7 @@
       "units": "percent",
       "range": [
        -100,
-       null
+       Infinity
       ],
       "canonical_name": "PVO Line",
       "description": "the PPO construction applied to VOLUME: (fast EMA - slow EMA) / slow EMA * 100 of volume. Measures volume momentum and carries no directional price information. Positive means volume is running above its longer average. Hard floor at -100 since volumes are non-negative; no ceiling. The literature warns it is choppy because volume does not trend, which makes divergence analysis unreliable here"
@@ -3411,7 +3411,7 @@
       "units": "percent",
       "range": [
        -100,
-       null
+       Infinity
       ],
       "canonical_name": "Signal Line",
       "description": "EMA of pvo over window_sign"
@@ -3420,8 +3420,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "PVO Histogram",
       "description": "pvo minus pvo_signal. Unbounded either way, being a difference of two bounded-below series"
@@ -3476,7 +3476,7 @@
       "units": "percent",
       "range": [
        -100,
-       null
+       Infinity
       ],
       "canonical_name": "Rate of Change",
       "description": "percent change of close over window: (close - close_n) / close_n * 100. HARD floor at -100 because a security can only fall to zero; no ceiling at all. The conventional +/-10 overbought/oversold band is volatility-dependent (+/-5 for quiet names, +/-15 for volatile ones) and is NOT a bound. The literature warns that ROC divergences fail more often than they work"
@@ -3586,8 +3586,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Simple Moving Average",
       "description": "unweighted arithmetic mean of close over window -- every bar in the window carries equal weight. A finite-window (FIR) average: a value leaving the window changes the line even with no new price action. Lags by construction, and the longer the window the greater the lag"
@@ -3642,8 +3642,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Smoothed Moving Average",
       "description": "recursive average with alpha = 1/window -- Wilder's smoothing, the engine inside RSI and ATR. Also published as RMA (Running), MMA (Modified) and Wilder's Moving Average; all four names denote this series. Because 2/(N+1) = 1/n at N = 2n-1, SMMA(n) is EXACTLY our EMA(2n-1) -- verified to zero difference; the literature hedges to 'approximately' only because implementations seed differently. Roughly half the responsiveness of an EMA of the same nominal length"
@@ -3720,8 +3720,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Middle Band",
       "description": "SMA of close over window -- the centre of the envelope"
@@ -3730,8 +3730,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "STARC Band+",
       "description": "starc_mid + multiplier * ATR(window_atr). ATR's warmup region is masked to NaN before the band is formed, so zero-ATR values do not leak in and widen the envelope artificially"
@@ -3740,8 +3740,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "STARC Band-",
       "description": "starc_mid - multiplier * ATR(window_atr), with the same ATR warmup masking as starc_hband"
@@ -3905,8 +3905,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "squeeze_depth",
       "description": "How far inside the Keltner Channel the Bollinger Bands sit, as the smaller of the two side gaps. Positive IS Carter's squeeze; the magnitude says by how much, which the boolean it replaced discarded."
@@ -3915,8 +3915,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "momentum",
       "description": "Carter's momentum: the linear-regression endpoint of close minus the midpoint of the window's range and its SMA. Sign gives the direction the coiled volatility is leaning."
@@ -4142,8 +4142,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "low_price_delta",
       "description": "Change in price between its last two confirmed swing LOWS. NaN except on a confirmation bar."
@@ -4152,8 +4152,8 @@
       "type": "series",
       "units": "indicator units",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "low_indicator_delta",
       "description": "Change in the companion indicator between the two lows paired with those price lows."
@@ -4162,8 +4162,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "high_price_delta",
       "description": "The same across swing HIGHS."
@@ -4172,8 +4172,8 @@
       "type": "series",
       "units": "indicator units",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "high_indicator_delta",
       "description": "The companion indicator's change across the paired highs. Opposite signs between a price delta and its indicator delta are what divergence analysis reads as a divergence."
@@ -4235,8 +4235,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "T3",
       "description": "Tillson's generalised DEMA run through itself three times, expanded as c1*e6 + c2*e5 + c3*e4 + c4*e3 over six chained EMAs, with the coefficients functions of the volume factor alone. The volume factor dials how much lag-reduction is applied: 0 gives a plain EMA, 1 gives DEMA, and Tillson chose 0.7. Adaptive only in his filter-theory sense -- the coefficients are constant and measure nothing about the market. OVERSHOOT: c1 and c3 are negative, so this is not a convex combination and can print outside the price range. Tillson's claim that T3 'does not overshoot the data' holds only comparatively: on a clean step, DEMA-cubed (the construction he set out to cure) rings 10.82 past the new level while T3 at his default 0.7 rings 4.28 -- a 60% reduction, but not elimination, and marginally worse than a plain DEMA's 3.67"
@@ -4289,8 +4289,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Triple Exponential Moving Average",
       "description": "3*EMA - 3*EMA(EMA) + EMA(EMA(EMA)), all passes at the same window. The name is a misnomer -- it is not a thrice-smoothed EMA but a composite of single, double and triple EMAs. Least lag of the EMA family and the earliest crossovers, at the cost of more whipsaw in sideways markets. OVERSHOOT: more pronounced than DEMA -- 57 of 181 bars outside the window's range, up to 5.05 price units, from the negative -3*EMA(EMA) term"
@@ -4345,8 +4345,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Triangular Moving Average",
       "description": "an SMA of an SMA, producing symmetric triangular weights that emphasise the MIDDLE of the window and de-emphasise both ends. Odd windows use (window+1)/2 twice; even windows use window/2 then window/2+1, giving a flat-topped kernel -- verified to produce the canonical weights (n=7 -> 1,2,3,4,3,2,1; n=4 -> 1,2,2,1). The laggiest average here, the opposite bargain from DEMA/TEMA/HMA, bought for far stronger noise rejection. All weights positive, so unlike them it CANNOT overshoot the window's price range -- measured 0 excursions"
@@ -4407,8 +4407,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "TRIX",
       "description": "1-period percent change OF a triple-smoothed EMA -- the three EMAs are applied in sequence first, and the rate of change is taken last, on the final series only. Triple smoothing is a noise filter: it takes more than a one-day move to turn it. Percent-normalised, so unlike MACD its magnitude does not scale with price level, but it is unbounded above. NOTE the canonical TRIX also carries a signal line (a 9-period EMA of this series), and signal-line crossovers are its primary documented use -- that second series is NOT emitted here"
@@ -4417,8 +4417,8 @@
       "type": "series",
       "units": "percent",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "signal line",
       "description": "9-period EMA of TRIX. Signal-line crossovers are the primary documented TRIX signal: TRIX crossing above it is bullish, below it bearish. Same units and unbounded domain as TRIX itself, since it is a moving average of that series"
@@ -4537,7 +4537,7 @@
       "units": "price",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "True Range",
       "description": "per-bar volatility as max(high - low, |high - prev_close|, |low - prev_close|), which counts gap moves a plain high-low range would miss. Unsmoothed, so noisier bar to bar than ATR. Non-directional: it states how far price travelled, not which way. The first bar has no prior close and falls back to high - low rather than NaN -- the common convention, though the literature does not agree on one"
@@ -4593,7 +4593,7 @@
       "units": "percent",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "Ulcer Index",
       "description": "downside-only volatility -- the quadratic mean of percentage drawdowns from the highest close in the window, sqrt(mean(r^2)) where r = 100 * (close - rolling_max) / rolling_max. Squaring penalises deep drawdowns disproportionately, so it measures depth and persistence of declines together. Upside contributes nothing, the deliberate difference from standard deviation and from ATR; approaches 0 when price keeps making new highs within the window. This is the rolling-window charting form, NOT Peter Martin's original, which measures retracement against the running peak over the whole sample and yields different values"
@@ -4749,8 +4749,8 @@
       "type": "series",
       "units": "dimensionless",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "Volume-Price Trend",
       "description": "running total of volume weighted by the FRACTIONAL price change, so unlike OBV it commits only a portion of each bar's volume in proportion to how far price moved. That also means the per-bar contribution is UNCAPPED -- a bar that doubles in price contributes twice its volume, where ADI can never exceed one times volume. Unbounded, and the level is explicitly arbitrary: only the shape is used, not the actual total. The core indicator is a raw cumulative sum with NO canonical smoothing; the optional smoothing_factor here is an overlay, and no source standardises a signal-line period. CAVEAT: the dropnans parameter DROPS ROWS, returning a shorter series than the input -- every other indicator in this corpus returns a full-length series aligned to the input index"
@@ -4816,8 +4816,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "volume weighted average price",
       "description": "Rolling volume-weighted average of typical price over `window` bars. The literature's VWAP is session-anchored -- it accumulates from the session open and resets each session -- but anchoring presupposes a session boundary, which a 24/7 market does not have, so the rolling form is the coherent definition here rather than an approximation of the anchored one. Exactly equal to VWMA computed on typical price. Against a synthetic session-anchored VWAP over five sessions it differs by up to 4.00 price units (3.9% of price), which matters only when reconciling against a session-based instrument or platform, where the institutional execution benchmark is defined by the session it anchors to"
@@ -4876,8 +4876,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Volume Weighted Moving Average",
       "description": "sum(close*volume) / sum(volume) over window -- bars traded on heavy volume dominate the average and quiet bars contribute little. Sitting above an SMA of the same window indicates volume is concentrated on up bars; below it, on down bars. Converges to the SMA when volume is flat across the window. A convex combination of the window's prices (weights are non-negative volumes, normalised), so it cannot overshoot that window's range"
@@ -4928,8 +4928,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "vstop_hband",
       "description": "Previous close plus `multiplier` standard deviations of recent RETURNS, scaled by that close. Symmetric with vstop_lband, so hband >= lband always holds."
@@ -4938,8 +4938,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "vstop_lband",
       "description": "The lower half of the same envelope."
@@ -5003,7 +5003,7 @@
       "units": "ratio",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "+VI",
       "description": "upward vortex movement, sum|high - prior low|, divided by the summed true range. Bounded below at 0 by the absolute value, but UNBOUNDED ABOVE -- the numerator spans across bars while true range is a within-bar measure, so a gap drives the ratio past 1 without limit. The familiar 'oscillates around 1' and the 0.90/1.10 signal levels are behavioural conventions, not bounds"
@@ -5013,7 +5013,7 @@
       "units": "ratio",
       "range": [
        0,
-       null
+       Infinity
       ],
       "canonical_name": "-VI",
       "description": "downward vortex movement, sum|low - prior high|, over the same summed true range. Same 0 floor and same absence of a ceiling. Crossings against +VI are the primary signal"
@@ -5022,8 +5022,8 @@
       "type": "series",
       "units": "ratio",
       "range": [
-       null,
-       null
+       -Infinity,
+       Infinity
       ],
       "canonical_name": "none",
       "description": "vortex_pos minus vortex_neg -- greater separation means a stronger trend. The literature names no third Vortex series; five sources were checked"
@@ -5076,8 +5076,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Weighted Moving Average",
       "description": "linearly weighted average -- the newest bar carries weight `window`, the next `window-1`, down to 1, normalised by the triangle number window*(window+1)/2. Finite window, so weights reach exactly zero at the edge, unlike the EMA's exponential tail. Not to be confused with VWMA, which weights by volume rather than recency"
@@ -5173,8 +5173,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Jaw",
       "description": "the slowest of Bill Williams' three Balance Lines -- a smoothed moving average of median price (high+low)/2 over the jaw window, displaced forward. Conventionally 13-period smoothed and shifted 8 bars, plotted blue. Displacement is applied by carrying older values forward, which is lookahead-free and preserves the canonical spacing between the three lines"
@@ -5183,8 +5183,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Teeth",
       "description": "the middle Balance Line -- conventionally an 8-period smoothed moving average of median price shifted 5 bars, plotted red"
@@ -5193,8 +5193,8 @@
       "type": "series",
       "units": "price",
       "range": [
-       null,
-       null
+       0,
+       Infinity
       ],
       "canonical_name": "Lips",
       "description": "the fastest Balance Line -- conventionally a 5-period smoothed moving average of median price shifted 3 bars, plotted green. Lips crossing the other two is the 'awakening' that marks a trend emerging from the sleeping, interwoven state"
