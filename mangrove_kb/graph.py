@@ -29,13 +29,13 @@ Usage::
 
     kg = KnowledgeGraph.load()
     kg.stats()["relations"]                          # what vocabulary exists at all
-    kg.find(role="trigger", uses_kind="momentum")    # both axes, joined across `uses`
+    kg.find(kind="momentum", role="trigger")         # both axes at once
     kg.get("procedure:indicator-rsi")["outputs"]     # typed outputs with units and range
     kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # who reads it
 
-Note that the two axes sit on **different populations** -- indicator classes are borne by
-indicators, roles by signals -- so they are joined through ``uses`` rather than intersected on one
-node. :meth:`KnowledgeGraph.find` takes ``uses_kind`` for exactly that hop.
+A signal's class is not a property it declares -- it is derived from the graph: ``signal --uses-->
+indicator --instance-of--> class``. :meth:`KnowledgeGraph.in_class` walks that, so ``kind`` reaches
+signals and indicators alike.
 """
 from __future__ import annotations
 
@@ -358,39 +358,50 @@ class KnowledgeGraph:
 
     # --- search ----------------------------------------------------------------------------------
 
+    def in_class(self, cls: str) -> set[str]:
+        """Everything in a class -- **including what derives its class through what it uses**.
+
+        A class reaches its members two ways, and both are edges in the graph:
+
+        * directly, over the rigid backbone -- an indicator ``instance-of`` its class;
+        * through the computation it is built on -- a signal ``uses`` an indicator that is
+          ``instance-of`` the class. ``adosc_bearish --uses--> ADOSC --instance-of--> momentum``.
+
+        The second is not a workaround for a missing edge; it is how a signal's class is *stated* in
+        this model. A signal does not declare a class of its own -- it inherits the character of
+        the computation it reads, and the graph already says so. 209 of 216 signals resolve this
+        way. (The node property ``source_module`` happens to carry the same string, but it is
+        provenance, not the assertion -- the graph is the source of truth.)
+
+        Roles are still excluded here: derivation runs over ``uses`` and the backbone, never over
+        ``has-role``, so nothing is ever classified by the part it plays.
+        """
+        cid = self.resolve(cls)
+        direct = set(self.descendants(cid)) | {cid}
+        via_uses = {e.src for e in self.edges if e.relation == "uses" and e.dst in direct}
+        return (direct | via_uses) - {cid}
+
     def find(self, query: str = "", *, kind: str | None = None, role: str | None = None,
-             uses_kind: str | None = None, primitive: str | None = None,
-             limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
-        """Search by text, and/or filter by class, by role, and by the class of what it uses.
+             primitive: str | None = None, limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
+        """Search by text, and/or filter by class and by role.
 
-        The three filters are separate parameters on purpose and they intersect. ``kind`` is matched
-        transitively over the rigid backbone; ``role`` is matched on the direct ``has-role`` edge and
-        **never** inherited.
+        ``kind`` and ``role`` are separate parameters on purpose, and they intersect. ``kind`` is
+        resolved by :meth:`in_class`, so it reaches indicators by their own ``instance-of`` edge and
+        signals through the indicator they ``use``. ``role`` is matched on the direct ``has-role``
+        edge and is **never** inherited or derived -- a role is what something is being used as, and
+        must never be reachable as though it were a type::
 
-        ``uses_kind`` exists because **the two axes sit on different populations**: indicator classes
-        (momentum, oscillator, …) are borne by *indicators*, roles (trigger, filter) by *signals*,
-        and a signal's only type is ``concept:signal``. So ``kind`` and ``role`` on the same node is
-        almost always empty -- the axes are joined by the ``uses`` edge, one hop away. ``uses_kind``
-        walks that join, which is the question people actually have::
-
-            kg.find(role="trigger", uses_kind="momentum")   # trigger signals off momentum indicators
-            kg.find(kind="oscillator")                      # indicators in the oscillator class
-            kg.find(role="filter")                          # signals used as filters
-
-        Doing this join caller-side would cost one ``neighbors`` call per candidate; here it is one.
+            kg.find(kind="momentum", role="trigger")   # momentum-class signals used as triggers
+            kg.find(kind="oscillator")                 # everything in the oscillator class
+            kg.find(role="filter")                     # signals playing the filter part
         """
         pool: set[str] | None = None
         if kind is not None:
-            kid = self.resolve(kind)
-            pool = set(self.descendants(kid))
+            pool = self.in_class(kind)
         if role is not None:
             rid = self.resolve(role)
             borne = set(self.bearers(rid))
             pool = borne if pool is None else (pool & borne)
-        if uses_kind is not None:
-            target = set(self.descendants(self.resolve(uses_kind)))
-            via = {e.src for e in self.edges if e.relation == "uses" and e.dst in target}
-            pool = via if pool is None else (pool & via)
 
         q = query.lower().strip()
         rows: list[dict[str, Any]] = []

@@ -71,25 +71,41 @@ def test_backbone_closure_is_transitive_but_roles_are_one_hop(kg):
     assert set(kg.bearers("property:role-trigger")) == direct
 
 
-def test_the_two_axes_sit_on_disjoint_populations(kg):
-    """Classes are borne by indicators, roles by signals. Pins the fact that motivates `uses_kind`."""
-    assert all(b.startswith("procedure:signal-") for b in kg.bearers("property:role-trigger"))
-    assert all(d.startswith("procedure:indicator-")
-               for d in kg.descendants("concept:indicator-class-momentum"))
-    assert kg.find(kind="concept:indicator-class-momentum",
-                   role="property:role-trigger", limit=None).total == 0
+def test_class_is_derived_through_uses_not_declared(kg):
+    """A signal's class comes from the indicator it uses -- the graph states it, nothing is buried.
+
+    Regression for a real mistake: this was first read as "signals have no class", because they
+    carry no DIRECT class edge. They carry it one hop out, via `uses`, and 209 of 216 resolve.
+    """
+    momentum = kg.in_class("concept:indicator-class-momentum")
+    assert any(m.startswith("procedure:signal-") for m in momentum), \
+        "signals must reach their class through the indicator they use"
+    assert any(m.startswith("procedure:indicator-") for m in momentum), \
+        "indicators must reach their class directly"
+    for sig in (m for m in momentum if m.startswith("procedure:signal-")):
+        used = {n["id"] for n in kg.neighbors(sig, relation="uses", direction="out", limit=None)}
+        assert used & set(kg.descendants("concept:indicator-class-momentum"))
 
 
-def test_uses_kind_joins_the_axes(kg):
-    joined = kg.find(role="trigger", uses_kind="momentum", limit=None)
-    assert joined.total > 0
-    momentum = set(kg.descendants("concept:indicator-class-momentum"))
+def test_both_axes_in_one_call(kg):
+    """The obvious question must work: momentum-class signals playing a trigger role."""
+    r = kg.find(kind="momentum", role="trigger", limit=None)
+    assert r.total > 0, "kind x role must not be empty -- class is derivable for signals"
     triggers = set(kg.bearers("property:role-trigger"))
-    for row in joined:
-        assert row["id"] in triggers
-        used = {n["id"] for n in kg.neighbors(row["id"], relation="uses", direction="out",
-                                              limit=None)}
-        assert used & momentum, f"{row['id']} does not use a momentum indicator"
+    momentum = kg.in_class("concept:indicator-class-momentum")
+    for row in r:
+        assert row["id"] in triggers and row["id"] in momentum
+
+
+def test_derivation_never_runs_over_roles(kg):
+    """Class derivation follows uses + the backbone. A role must never confer class membership."""
+    for role in kg.roles():
+        bearers = set(kg.bearers(role))
+        for cls in kg.stats()["kinds"]:
+            if cls.startswith("concept:indicator-class-"):
+                members = kg.in_class(cls)
+                assert not (members >= bearers), \
+                    f"{cls} swallowed every bearer of {role} -- roles are leaking into class"
 
 
 # --- bounded results -----------------------------------------------------------------------------
