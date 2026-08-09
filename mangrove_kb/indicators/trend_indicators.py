@@ -1165,7 +1165,14 @@ class Vortex(IndicatorInterface):
 
 
 class PSAR(IndicatorInterface):
-    """Parabolic Stop and Reverse (Parabolic SAR)
+    """DEPRECATED for the ontology: its level is downstream of a verdict.
+
+    `psar[i]` cannot be computed without the indicator having decided which regime it is in --
+    the anchor, the acceleration factor and the update rule all switch on `up_trend` -- and
+    `psar_up_indicator` / `psar_down_indicator` expose that decision as 0/1 flags. So unlike
+    ChandelierLevels, which is a pure function of its window, there is no regime-free
+    measurement to recover. Kept working and unchanged.
+Parabolic Stop and Reverse (Parabolic SAR)
 
     The Parabolic Stop and Reverse, more commonly known as the
     Parabolic SAR,is a trend-following indicator developed by
@@ -1542,7 +1549,13 @@ class WilliamsAlligator(IndicatorInterface):
 
 
 class SuperTrend(IndicatorInterface):
-    """SuperTrend (Olivier Seban).
+    """DEPRECATED for the ontology: emits a verdict, not only a measurement.
+
+    `direction` is +1 long / -1 short, and `long_band` / `short_band` are NaN according to it.
+    Indicators here state what they measured; deciding what it means is the signal layer's
+    job. Unlike TTMSqueeze and MultiTFTrend there is no regime-free core to split out --
+    the bands themselves switch on the regime. Kept working and unchanged.
+SuperTrend (Olivier Seban).
 
     ATR-scaled bands around hl2 with a trend-following flip rule. When close
     crosses the opposite band, the trend flips; between flips, the active

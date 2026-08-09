@@ -162,3 +162,40 @@ def test_the_mangroveai_import_statement_verbatim():
     )
     assert ichimoku_bullish.__module__ == "mangrove_kb.signals.averaging"
     assert vortex_bullish.__module__ == "mangrove_kb.signals.momentum"
+
+
+# ---------------------------------------------------------------------------
+# Signals the ontology will never model, marked deprecated but still working
+# ---------------------------------------------------------------------------
+# Eleven signals read an indicator that emits a verdict (SuperTrend's `direction`, PSAR's flip
+# flags, ATRTrailingStop's `direction`), or a level that is only defined relative to a regime the
+# indicator decided. They have no measurement to inherit a class from, so they will not enter the
+# graph -- but they are registered signals and a stored strategy may name any of them.
+
+NOT_MODELLED = [
+    "supertrend_long", "supertrend_short", "supertrend_flip_up", "supertrend_flip_down",
+    "psar_bullish", "psar_bearish", "psar_reversal",
+    "atr_trailing_stop_long", "atr_trailing_stop_short",
+    "atr_trailing_stop_flip_up", "atr_trailing_stop_flip_down",
+]
+
+
+@pytest.mark.parametrize("name", NOT_MODELLED)
+def test_not_modelled_signals_still_evaluate_and_warn(name):
+    from mangrove_kb.sample_data import sample_ohlcv
+    df = sample_ohlcv(200)
+    assert RuleRegistry.has(name)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = RuleRegistry.evaluate({"name": name, "params": {}}, df)
+    assert result in (True, False), name
+    assert any(issubclass(w.category, DeprecationWarning) for w in caught), name
+
+
+def test_the_three_excluded_indicators_are_importable_but_uncatalogued():
+    """Deprecated, not deleted. Out of __all__ so they are not offered as indicators; still
+    importable so anything already calling them keeps working."""
+    import mangrove_kb.indicators as I
+    for n in ("SuperTrend", "PSAR", "ATRTrailingStop"):
+        assert getattr(I, n, None) is not None, n
+        assert n not in I.__all__, n

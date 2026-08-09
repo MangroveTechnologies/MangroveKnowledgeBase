@@ -26,7 +26,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals._common import _ma_crossover, _ma_is_above, moved_signals
+from mangrove_kb.signals._common import deprecated_signal, _ma_crossover, _ma_is_above, moved_signals
 
 # Import trend indicator classes
 from mangrove_kb.indicators import (
@@ -47,6 +47,11 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 @RuleRegistry.register("psar_bullish")
+@deprecated_signal(
+    "PSAR's level is only defined relative to a regime the indicator itself decides -- the"
+    "anchor, the acceleration factor and the update rule all switch on it -- so there is no"
+    "regime-free measurement underneath and this signal is not in the ontology graph"
+)
 def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) -> bool:
     """
     Check if PSAR indicates bullish trend (PSAR below price).
@@ -78,6 +83,11 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
 
 
 @RuleRegistry.register("psar_bearish")
+@deprecated_signal(
+    "PSAR's level is only defined relative to a regime the indicator itself decides -- the"
+    "anchor, the acceleration factor and the update rule all switch on it -- so there is no"
+    "regime-free measurement underneath and this signal is not in the ontology graph"
+)
 def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) -> bool:
     """
     Check if PSAR indicates bearish trend (PSAR above price).
@@ -109,6 +119,11 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
 
 
 @RuleRegistry.register("psar_reversal")
+@deprecated_signal(
+    "PSAR's level is only defined relative to a regime the indicator itself decides -- the"
+    "anchor, the acceleration factor and the update rule all switch on it -- so there is no"
+    "regime-free measurement underneath and this signal is not in the ontology graph"
+)
 def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, direction: str = "bullish") -> bool:
     """
     Check if PSAR flips sides (potential reversal).
@@ -222,6 +237,11 @@ def _supertrend_direction(df: pd.DataFrame, window: int, multiplier: float):
 
 
 @RuleRegistry.register("supertrend_long")
+@deprecated_signal(
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
+    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "graph"
+)
 def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
     """
     Check if SuperTrend is in the long regime (+1 direction).
@@ -244,6 +264,11 @@ def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0)
 
 
 @RuleRegistry.register("supertrend_short")
+@deprecated_signal(
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
+    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "graph"
+)
 def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
     """
     Check if SuperTrend is in the short regime (-1 direction).
@@ -266,6 +291,11 @@ def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0
 
 
 @RuleRegistry.register("supertrend_flip_up")
+@deprecated_signal(
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
+    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "graph"
+)
 def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
     """
     Detect SuperTrend flipping from short (-1) to long (+1).
@@ -293,6 +323,11 @@ def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3
 
 
 @RuleRegistry.register("supertrend_flip_down")
+@deprecated_signal(
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
+    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "graph"
+)
 def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
     """
     Detect SuperTrend flipping from long (+1) to short (-1).

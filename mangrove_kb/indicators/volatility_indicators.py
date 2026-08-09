@@ -378,7 +378,11 @@ class NATR(IndicatorInterface):
 
 
 class ATRTrailingStop(IndicatorInterface):
-    """ATR Trailing Stop (Chuck LeBeau variant).
+    """DEPRECATED for the ontology: stateful, and emits a verdict.
+
+    The stop level accumulates forward and `direction` is +1 long / -1 short. Both halves
+    of the rule fail. Kept working and unchanged.
+ATR Trailing Stop (Chuck LeBeau variant).
 
     Stateful trailing stop that flips between long and short regimes:
       - In long regime: stop = max(previous_stop, close - multiplier*ATR).

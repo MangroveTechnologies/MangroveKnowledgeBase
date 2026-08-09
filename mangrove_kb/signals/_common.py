@@ -5,6 +5,7 @@ Splitting the signal files onto the ontology class put `bop_cross_up` (an `oscil
 A helper used by two classes belongs to neither, so it lives here rather than being imported across
 class files or copied into both.
 """
+import functools
 import importlib
 import warnings
 
@@ -130,3 +131,23 @@ def renamed_signals(here: str):
         raise AttributeError(f"module {here!r} has no attribute {name!r}")
 
     return __getattr__
+
+
+def deprecated_signal(reason: str):
+    """Mark a signal deprecated without changing what it does.
+
+    These signals read an indicator the ontology excludes -- a verdict output, or a level that is
+    only defined relative to a regime the indicator itself decided. They still evaluate, and a
+    stored strategy naming one keeps working; they are simply not modelled, and will not gain a
+    class. The warning says so at the point of use, which is the only place anyone will look.
+
+    Warns on call rather than on import: these live beside signals that are not deprecated, so an
+    import-time warning would fire for reasons the caller cannot act on.
+    """
+    def decorate(fn):
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+            warnings.warn(f"{fn.__name__} is deprecated: {reason}", DeprecationWarning, stacklevel=2)
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorate

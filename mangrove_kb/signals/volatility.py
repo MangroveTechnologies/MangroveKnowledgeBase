@@ -13,7 +13,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals._common import renamed_signals
+from mangrove_kb.signals._common import deprecated_signal, renamed_signals
 
 # Import volatility indicator classes
 from mangrove_kb.indicators import (
@@ -675,6 +675,10 @@ def _atr_trailing_stop_direction(df: pd.DataFrame, window: int, multiplier: floa
 
 
 @RuleRegistry.register("atr_trailing_stop_long")
+@deprecated_signal(
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "short); this signal reads that verdict, so it is not in the ontology graph"
+)
 def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
     """
     Check if ATR Trailing Stop is in the long regime (+1 direction).
@@ -697,6 +701,10 @@ def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float
 
 
 @RuleRegistry.register("atr_trailing_stop_short")
+@deprecated_signal(
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "short); this signal reads that verdict, so it is not in the ontology graph"
+)
 def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
     """
     Check if ATR Trailing Stop is in the short regime (-1 direction).
@@ -719,6 +727,10 @@ def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: floa
 
 
 @RuleRegistry.register("atr_trailing_stop_flip_up")
+@deprecated_signal(
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "short); this signal reads that verdict, so it is not in the ontology graph"
+)
 def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
     """
     Detect ATR Trailing Stop flipping from short (-1) to long (+1).
@@ -746,6 +758,10 @@ def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: fl
 
 
 @RuleRegistry.register("atr_trailing_stop_flip_down")
+@deprecated_signal(
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "short); this signal reads that verdict, so it is not in the ontology graph"
+)
 def atr_trailing_stop_flip_down(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
     """
     Detect ATR Trailing Stop flipping from long (+1) to short (-1).

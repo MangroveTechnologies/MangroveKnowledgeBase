@@ -46,7 +46,7 @@ class TestIndicatorEndpoints:
         resp = client.get("/api/indicators")
         assert resp.status_code == 200
         # 99 - 27 retired pattern indicators + CandleGeometry + CandleRelation.
-        assert resp.json()["total"] == 73
+        assert resp.json()["total"] == 70
 
     def test_get_indicator(self):
         resp = client.get("/api/indicators/RSI")
