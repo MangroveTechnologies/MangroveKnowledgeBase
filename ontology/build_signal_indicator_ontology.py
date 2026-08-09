@@ -1422,6 +1422,48 @@ if uses_without_inputs:
           + "\n  ".join(uses_without_inputs), file=sys.stderr)
     sys.exit(1)
 
+# --- invariant: every signal in the graph reads an indicator. A signal is a verdict on a
+# measurement, so a signal with nothing behind it is either reading raw prices (which means the
+# measurement it uses has no name -- CandleRaw exists because four candlestick patterns were in
+# exactly that state) or reading an indicator this scan cannot see, which is the same defect the
+# `return X.compute(...)` blind spot caused. Both were reported here for builds and neither was
+# noticed, because a report you have to read is not an invariant. A signal that genuinely reads no
+# indicator does not belong in the graph: exclude it from SIGNAL_SCOPE deliberately, as the
+# on-chain and policy-rule signals are.
+if signal_no_indicator:
+    print(f"ABORT {len(signal_no_indicator)} signals read no indicator:\n  "
+          + "\n  ".join(sorted(signal_no_indicator)), file=sys.stderr)
+    sys.exit(1)
+
+# --- invariant: a signal's derived class agrees with the module it lives in. Class is reached by
+# walking `uses` to an indicator and then `instance-of` to its class; `source_module` is the same
+# fact written as a node property, and the two are authored by different means -- the edge by this
+# scan, the module by where a human put the file. Agreement between them is therefore a real check
+# rather than a tautology, and it is the check that would have caught the four RSI divergence
+# signals: they kept an RSI edge when the SwingDelta one went missing, so they still had a class,
+# just `oscillator` where the file says `momentum`. Only the absence of a class was being reported,
+# so a WRONG class passed silently. A signal reading two indicators of different classes satisfies
+# this as long as its own module is among them.
+_class_of = {r["from_id"]: r["to_id"].replace("concept:indicator-class-", "")
+             for r in rels if r["rel"] == "instance-of"}
+_uses = {}
+for r in rels:
+    if r["rel"] == "uses":
+        _uses.setdefault(r["from_id"], []).append(r["to_id"])
+class_disagrees = []
+for a in atoms:
+    if not a["id"].startswith("procedure:signal-"):
+        continue
+    derived = {_class_of[i] for i in _uses.get(a["id"], []) if i in _class_of}
+    mod = a["props"].get("source_module")
+    if derived and mod and mod not in derived:
+        class_disagrees.append(f"{a['title']}: module says {mod}, "
+                               f"{' + '.join(sorted(derived))} via {_uses[a['id']]}")
+if class_disagrees:
+    print(f"ABORT {len(class_disagrees)} signals whose derived class contradicts their module:\n  "
+          + "\n  ".join(class_disagrees), file=sys.stderr)
+    sys.exit(1)
+
 out = {"atoms": atoms, "relations": rels,
        "meta": {"scope": "indicator class ontology", "indicators": len(assigned),
                 "classes": len(CLASSES_DEF), "removed_not_indicators": sorted(REMOVED),
