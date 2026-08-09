@@ -23,14 +23,53 @@ Whether you're a quant who can improve an RSI calculation, a trader who spots a 
 
 MangroveKnowledgeBase is a standalone repository providing:
 
-- **223 trading signal functions** across momentum, trend, volume, volatility, and pattern categories (108 TRIGGER, 115 FILTER)
-- **99 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
+- **247 trading signal functions** (117 TRIGGER, 130 FILTER), in files named for the ontology class of the indicator each one reads: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern` -- plus `onchain` and `defi_pro`, which read provider feeds rather than price
+- **70 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
+- **A signal/indicator knowledge graph** -- 301 nodes and 732 edges giving every indicator a class and every signal a machine-readable formula, verified by execution against real market data
 - **A unified server** with dual protocol access (REST API + MCP) serving 11 trading education documents with full-text search, signal/indicator metadata (free), and signal evaluation/indicator computation (x402 gated)
 - **Self-describing metadata** -- every signal carries its type, required data columns, and parameter ranges directly in its docstring
 - **A docstring parser** that extracts structured metadata from signal functions at runtime
 - **A signal explorer notebook** with 7 sample OHLCV datasets for interactive signal visualization
 
 Signals and indicators are designed to be used by trading strategy engines, backtesting frameworks, and AI agents.
+
+## The signal/indicator ontology
+
+Every indicator carries a **class** describing what its output tells you about its input, and every
+signal in the graph carries a **formula** stating the predicate it computes. The graph lives in
+`ontology/signal-indicator-ontology.json` (301 nodes, 732 edges); the design is in
+`ontology/signal-indicator-ontology.md`.
+
+The seven classes: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern`,
+`unclassed`. There is deliberately no `trend` class and no `volume` class -- nothing measures trend,
+and volume is an input rather than a measurement. Signal files are named for the class they hold, so
+a signal's location on disk agrees with its position in the graph.
+
+**One rule governs what may be an indicator: indicators are measurements, never verdicts; signals
+are verdicts.** An indicator states what it measured; deciding what that means belongs to the signal.
+Applying it moved several things: `Divergence` emitted four booleans and became `SwingDelta`
+(the two changes a divergence is drawn from); `TTMSqueeze` became `SqueezeDepth`; `MultiTFTrend`
+became `MultiTFSlope`. In each case the measurement stayed in the indicator and the threshold moved
+to the signal. The originals are kept, deprecated, and still work.
+
+### What is NOT in the graph, and why
+
+Of 247 registered signals, **216 are modelled**. The other 31 are accounted for:
+
+| | n | reason |
+|---|---|---|
+| `onchain` + `defi_pro` | 20 | read provider feed columns, not indicator outputs, so they have no class. See [issue #109](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109) |
+| SuperTrend, PSAR, ATRTrailingStop signals | 11 | read a verdict (`direction`, flip flags), or a level defined only relative to a regime the indicator itself decided |
+
+All 31 still register and still evaluate -- they are unmodelled, not unavailable.
+
+### Renames are never breaking
+
+Registered signal names are the contract, because a stored strategy holds one as a string. Where a
+signal was renamed or moved, the old name still resolves and evaluates, emitting a
+`DeprecationWarning`, and is kept out of the catalogue so it is not counted twice. The same applies
+to the modules: `mangrove_kb.signals.volume` and `.patterns` are gone as files but still importable.
+
 
 ## Installation
 
@@ -82,9 +121,9 @@ macd_line, signal_line = result['macd'], result['signal']
 Signals are boolean functions that evaluate market conditions:
 
 ```python
-from mangrove_kb.signals.momentum import rsi_oversold
-from mangrove_kb.signals.trend import macd_bullish_cross
-from mangrove_kb.signals.patterns import hammer_trigger
+from mangrove_kb.signals.oscillator import rsi_oversold
+from mangrove_kb.signals.momentum import macd_bullish_cross
+from mangrove_kb.signals.pattern import hammer_trigger
 
 if rsi_oversold(df, window=14, threshold=30.0):
     print("RSI indicates oversold")

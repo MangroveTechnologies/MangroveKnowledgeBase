@@ -144,6 +144,28 @@ template for fixing both. By the rule above it does not belong in the indicator 
 is the normalised higher-timeframe slope, and the sign should be the signal's decision. Left in
 place deliberately rather than silently, so the rule and the data are not quietly inconsistent.
 
+### Out of scope for now: the on-chain and DeFi Pro signals
+
+`signals/onchain.py` (10) and `signals/defi_pro.py` (10) are deliberately outside this graph, and
+the gap is 20 of the 247 registered signals rather than an oversight.
+
+They read PROVIDER FEED COLUMNS -- `SmartMoneyNetflow`, `EtfNetFlow`, `PerpFundingRate` -- not
+indicator outputs. `Requires: SmartMoneyNetflow` names a column exactly as `Requires: High, Low,
+Close` does elsewhere. So there is no indicator beneath them, no `uses` edge, and therefore no
+class, for any of the twenty.
+
+Modelling them means deciding whether a provider feed is an Indicator. It measures something real,
+which fits "indicators are measurements" -- but this ontology defines an Indicator as *a computation
+over one or more input series*, and a raw feed is not a computation. Widening that definition is a
+decision about the entity, not a classification exercise.
+
+Exercising all twenty against real provider data (DeFiLlama Pro, Nansen) also found that five of
+them can never fire, that their windows count observations rather than bars, and one dead branch.
+All three are recorded in
+<https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109>, and the ontology work
+waits on those answers -- authoring a `formula` for a signal that cannot fire would put a false
+claim in the graph.
+
 ---
 
 ## Node properties (indicators)
