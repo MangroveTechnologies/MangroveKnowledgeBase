@@ -622,7 +622,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "Awesome Oscillator",
@@ -1448,7 +1448,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "Detrended Price Oscillator",
@@ -2709,7 +2709,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "MACD Line",
@@ -2719,7 +2719,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "Signal Line",
@@ -2729,7 +2729,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "MACD Histogram",
@@ -2936,7 +2936,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "Momentum",
@@ -3905,7 +3905,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "squeeze_depth",
@@ -3915,7 +3915,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "momentum",
@@ -4142,7 +4142,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "low_price_delta",
@@ -4162,7 +4162,7 @@
       "type": "series",
       "units": "price",
       "range": [
-       0,
+       -Infinity,
        Infinity
       ],
       "canonical_name": "high_price_delta",

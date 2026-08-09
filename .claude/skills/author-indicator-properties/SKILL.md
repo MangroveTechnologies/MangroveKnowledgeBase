@@ -24,9 +24,18 @@ An unbounded side is `Infinity` / `-Infinity`, not `null`:
     "range": null                   NOT AUTHORED YET -- the only meaning a bare null carries
 
 `null` inside a range said two different things at once -- "unbounded" and "nobody wrote this" --
-and 62 outputs were carrying `[null, null]`, which looks authored and states nothing. The rule for
-picking a side: `units: price` is non-negative, so `[0, Infinity]`; anything dimensionless, percent
-or ratio here is a difference or a position and carries a sign, so `[-Infinity, Infinity]`.
+and 62 outputs were carrying `[null, null]`, which looks authored and states nothing. Picking a side is per output, and `units` is NOT sufficient to decide it. `units: price` covers
+both a LEVEL (an average, a band, VWAP -- non-negative, `[0, Infinity]`) and a DIFFERENCE of two
+prices (`macd`, `mom`, `ao`, `dpo`, `squeeze_depth` -- signed, `[-Infinity, Infinity]`). A
+difference of two prices is not a price: it crosses zero, and that crossing is usually the whole
+point of the output.
+
+Deciding it by `units` alone put a false `[0, Infinity]` on ten signed outputs, including two that
+had already been authored correctly by hand. Measured afterwards on the fixture: `macd` is negative
+on 582 bars, `squeeze_depth` on 1,047 of 1,294. **`[-Infinity, Infinity]` is the safe default** --
+it never asserts a bound that is not there. Narrow it only where the quantity is provably
+non-negative: a price level, an absolute magnitude (`|body|`, `range`, wick, ATR, true range), or a
+ratio of two non-negative sizes.
 
 The builder emits it from `inf` / `-inf` in a docstring `Range:` line. Note that parameters are
 different: no parameter docstring declares `inf`, so a null `min`/`max` on a param means the source
