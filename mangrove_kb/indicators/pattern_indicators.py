@@ -81,6 +81,82 @@ def _body_ratio(open_s: pd.Series, high_s: pd.Series,
 # built out of. They are indicators in the sense the ontology means it; the
 # detectors above are not, and are tracked for reclassification.
 
+class CandleRaw(IndicatorInterface):
+    """Candle Raw
+
+    The bar itself, unmodified: open, high, low and close returned exactly as
+    received. It computes nothing, and that is the point.
+
+    Four candlestick patterns -- piercing line, dark cloud cover, and the two
+    three-inside reversals -- are defined purely by where the raw prices of two or
+    three consecutive bars sit relative to each other, with no derived quantity in
+    between. The penetration depth of a piercing line is a comparison between this
+    close and the previous body, not a property of either bar. Rather than invent a
+    measurement those patterns do not use, this names what they actually read, so
+    they state their input like every other signal.
+
+    Its class is `pattern` for the same reason CandleGeometry's and CandleRelation's
+    is: they describe the shape of one bar and of a bar against its predecessor, and
+    the open-high-low-close IS the bar's shape before any decomposition. The three
+    form one layer -- raw, decomposed, related.
+
+    https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+
+    Formula:
+        open  = open
+        high  = high
+        low   = low
+        close = close
+
+    Interpretation:
+        - Identity: a reading is the price it was given, in the instrument's own units.
+        - Warmup is zero: every output is defined on the first bar.
+        - Comparisons ACROSS bars belong to the pattern that needs them, not here.
+        - A passthrough that shifted or smoothed would no longer be a passthrough.
+
+    Applications:
+        - The input layer for patterns defined by raw price position, not by a measurement.
+        - Giving a signal that reads raw price a stated dependency and therefore a class.
+
+    UNITS: all four outputs are in the instrument's own PRICE units, so their
+    magnitudes are not comparable across instruments or price regimes. Nothing is
+    normalised here, because normalising would make it something other than the
+    bar. Reach for CandleGeometry's `body_ratio` or CandleRelation's percent
+    deltas when a scale-free reading is wanted.
+
+    Args:
+        data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {}
+        open (series): opening price of the bar
+        high (series): highest price traded during the bar
+        low (series): lowest price traded during the bar
+        close (series): closing price
+
+    Returns:
+        open (series, price): the bar's opening price, unchanged. Non-negative for
+            any instrument that cannot trade below zero, which is every instrument
+            this library is used on. Range: 0-inf. Canonical: none.
+        high (series, price): the bar's highest traded price, unchanged. Never
+            below `open`, `low` or `close`, since it is their maximum by
+            definition. Range: 0-inf. Canonical: none.
+        low (series, price): the bar's lowest traded price, unchanged. Never above
+            `open`, `high` or `close`. Range: 0-inf. Canonical: none.
+        close (series, price): the bar's closing price, unchanged. This is the
+            output most patterns compare against the previous bar's body.
+            Range: 0-inf. Canonical: none.
+    """
+
+    _data = ["open", "high", "low", "close"]
+    _params = []
+    _outputs = ["open", "high", "low", "close"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        # Copied rather than returned by reference: an indicator's caller must not
+        # be able to mutate the frame it was handed by writing to a result.
+        return {k: pd.Series(data[k].values, index=data[k].index, name=k) for k in cls._outputs}
+
+
 class CandleGeometry(IndicatorInterface):
     """Candle Geometry
 

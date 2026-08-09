@@ -1101,6 +1101,93 @@
    }
   },
   {
+   "id": "procedure:indicator-candleraw",
+   "title": "CandleRaw",
+   "kind": "Procedure",
+   "summary": "The bar itself, unmodified: open, high, low and close returned exactly as received. It computes nothing, and that is the point. Four candlestick patterns -- piercing line, dark cloud cover, and the two three-inside reversals -- are defined purely by where the raw prices of two or three consecutive bars sit relative to each other, with no derived quantity in between. The penetration depth of a piercing line is a comparison between this close and the previous body, not a property of either bar. Rather than invent a measurement those patterns do not use, this names what they actually read, so they state their input like every other signal. Its class is `pattern` for the same reason CandleGeometry's and CandleRelation's is: they describe the shape of one bar and of a bar against its predecessor, and the open-high-low-close IS the bar's shape before any decomposition. The three form one layer -- raw, decomposed, related.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "pattern_indicators",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
+    "warmup_bars": 0,
+    "abbreviation": null,
+    "usage_example": "CandleRaw.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
+    "formula": "open  = open\nhigh  = high\nlow   = low\nclose = close",
+    "interpretation": [
+     "Identity: a reading is the price it was given, in the instrument's own units.",
+     "Warmup is zero: every output is defined on the first bar.",
+     "Comparisons ACROSS bars belong to the pattern that needs them, not here.",
+     "A passthrough that shifted or smoothed would no longer be a passthrough."
+    ],
+    "applications": [
+     "The input layer for patterns defined by raw price position, not by a measurement.",
+     "Giving a signal that reads raw price a stated dependency and therefore a class."
+    ],
+    "inputs": {
+     "open": {
+      "type": "series",
+      "description": "opening price of the bar"
+     },
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {},
+    "outputs": {
+     "open": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "none",
+      "description": "the bar's opening price, unchanged. Non-negative for any instrument that cannot trade below zero, which is every instrument this library is used on"
+     },
+     "high": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "none",
+      "description": "the bar's highest traded price, unchanged. Never below `open`, `low` or `close`, since it is their maximum by definition"
+     },
+     "low": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "none",
+      "description": "the bar's lowest traded price, unchanged. Never above `open`, `high` or `close`"
+     },
+     "close": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "none",
+      "description": "the bar's closing price, unchanged. This is the output most patterns compare against the previous bar's body"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-candlerelation",
    "title": "CandleRelation",
    "kind": "Procedure",
@@ -17419,6 +17506,14 @@
    "to_id": "concept:indicator-class-pattern"
   },
   {
+   "from": "CandleRaw",
+   "rel": "instance-of",
+   "to": "pattern",
+   "why": "class membership",
+   "from_id": "procedure:indicator-candleraw",
+   "to_id": "concept:indicator-class-pattern"
+  },
+  {
    "from": "CandleRelation",
    "rel": "instance-of",
    "to": "pattern",
@@ -18728,6 +18823,28 @@
   {
    "from": "bearish_pattern_recent",
    "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-bearish-pattern-recent",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "high": {
+     "type": "series"
+    },
+    "low": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "bearish_pattern_recent",
+   "rel": "uses",
    "to": "CandleRelation",
    "why": "reads indicator output",
    "from_id": "procedure:signal-bearish-pattern-recent",
@@ -19000,6 +19117,28 @@
   {
    "from": "bullish_pattern_recent",
    "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-bullish-pattern-recent",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "high": {
+     "type": "series"
+    },
+    "low": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "bullish_pattern_recent",
+   "rel": "uses",
    "to": "CandleRelation",
    "why": "reads indicator output",
    "from_id": "procedure:signal-bullish-pattern-recent",
@@ -19380,6 +19519,22 @@
    }
   },
   {
+   "from": "continuation_pattern_bearish",
+   "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-continuation-pattern-bearish",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "continuation_pattern_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -19407,6 +19562,22 @@
      "type": "series"
     },
     "range": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "continuation_pattern_bullish",
+   "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-continuation-pattern-bullish",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "open": {
      "type": "series"
     }
    }
@@ -19542,6 +19713,28 @@
    "why": "role",
    "from_id": "procedure:signal-dark-cloud-cover-trigger",
    "to_id": "property:role-trigger"
+  },
+  {
+   "from": "dark_cloud_cover_trigger",
+   "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-dark-cloud-cover-trigger",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "high": {
+     "type": "series"
+    },
+    "low": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
   },
   {
    "from": "dc_lower_breakout",
@@ -22240,6 +22433,28 @@
    "to_id": "property:role-trigger"
   },
   {
+   "from": "piercing_line_trigger",
+   "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-piercing-line-trigger",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "high": {
+     "type": "series"
+    },
+    "low": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "ppo_bearish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -22437,6 +22652,28 @@
   {
    "from": "reversal_pattern_bearish",
    "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-reversal-pattern-bearish",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "high": {
+     "type": "series"
+    },
+    "low": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "reversal_pattern_bearish",
+   "rel": "uses",
    "to": "CandleRelation",
    "why": "reads indicator output",
    "from_id": "procedure:signal-reversal-pattern-bearish",
@@ -22484,6 +22721,28 @@
      "type": "series"
     },
     "upper_wick": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "reversal_pattern_bullish",
+   "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-reversal-pattern-bullish",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "high": {
+     "type": "series"
+    },
+    "low": {
+     "type": "series"
+    },
+    "open": {
      "type": "series"
     }
    }
@@ -23540,6 +23799,22 @@
    "to_id": "property:role-trigger"
   },
   {
+   "from": "three_inside_down_trigger",
+   "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-three-inside-down-trigger",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "three_inside_up_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -23554,6 +23829,22 @@
    "why": "role",
    "from_id": "procedure:signal-three-inside-up-trigger",
    "to_id": "property:role-trigger"
+  },
+  {
+   "from": "three_inside_up_trigger",
+   "rel": "uses",
+   "to": "CandleRaw",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-three-inside-up-trigger",
+   "to_id": "procedure:indicator-candleraw",
+   "inputs": {
+    "close": {
+     "type": "series"
+    },
+    "open": {
+     "type": "series"
+    }
+   }
   },
   {
    "from": "three_white_soldiers_trigger",
@@ -24549,7 +24840,7 @@
  ],
  "meta": {
   "scope": "indicator class ontology",
-  "indicators": 70,
+  "indicators": 71,
   "classes": 7,
   "removed_not_indicators": [
    "ATRTrailingStop",
@@ -24559,19 +24850,14 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "carried_forward_from_previous_build": 1262,
+  "carried_forward_from_previous_build": 1266,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
   "signals": 216,
   "signals_registered": 247,
   "signals_out_of_scope": 31,
-  "signals_with_no_indicator": [
-   "dark_cloud_cover_trigger",
-   "piercing_line_trigger",
-   "three_inside_down_trigger",
-   "three_inside_up_trigger"
-  ],
+  "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],
   "indicators_missing_description": [

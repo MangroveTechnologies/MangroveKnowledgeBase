@@ -28,7 +28,7 @@ import pandas as pd
 import numpy as np
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.indicators.pattern_indicators import CandleGeometry, CandleRelation
+from mangrove_kb.indicators.pattern_indicators import CandleGeometry, CandleRaw, CandleRelation
 
 logger = logging.getLogger(__name__)
 
@@ -686,7 +686,7 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 3:
         return False
-    result = _three_inside_up(df["Open"], df["Close"])
+    result = _three_inside_up(df["Open"], df["High"], df["Low"], df["Close"])
     return int(result.iloc[-1]) == 1
 
 
@@ -709,7 +709,7 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 3:
         return False
-    result = _three_inside_down(df["Open"], df["Close"])
+    result = _three_inside_down(df["Open"], df["High"], df["Low"], df["Close"])
     return int(result.iloc[-1]) == -1
 
 
@@ -943,7 +943,7 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
             return True
         if _hit(_three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5), w):
             return True
-        if _hit(_three_inside_up(df["Open"], df["Close"]), w):
+        if _hit(_three_inside_up(df["Open"], df["High"], df["Low"], df["Close"]), w):
             return True
 
     return False
@@ -996,7 +996,7 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
             return True
         if _hit(_three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5).abs(), w):
             return True
-        if _hit(_three_inside_down(df["Open"], df["Close"]).abs(), w):
+        if _hit(_three_inside_down(df["Open"], df["High"], df["Low"], df["Close"]).abs(), w):
             return True
 
     return False
@@ -1111,7 +1111,7 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
 
     if _hit(_three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5), w):
         return True
-    if _hit(_three_inside_up(df["Open"], df["Close"]), w):
+    if _hit(_three_inside_up(df["Open"], df["High"], df["Low"], df["Close"]), w):
         return True
     return False
 
@@ -1141,7 +1141,7 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
 
     if _hit(_three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5).abs(), w):
         return True
-    if _hit(_three_inside_down(df["Open"], df["Close"]).abs(), w):
+    if _hit(_three_inside_down(df["Open"], df["High"], df["Low"], df["Close"]).abs(), w):
         return True
     return False
 
@@ -1223,7 +1223,9 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
 
 def _dark_cloud_cover(open_, high, low, close, min_penetration, require_gap) -> pd.Series:
     """DarkCloudCover detection. Per-bar series, not a decision."""
-    o, h, l, c = open_, high, low, close
+    _r = CandleRaw.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = _r["open"], _r["high"], _r["low"], _r["close"]
     prev_o, prev_c, prev_h = o.shift(1), c.shift(1), h.shift(1)
     pen = min_penetration
 
@@ -1494,7 +1496,9 @@ def _outside_bar(open_, high, low, close) -> pd.Series:
 
 def _piercing_line(open_, high, low, close, min_penetration, require_gap) -> pd.Series:
     """PiercingLine detection. Per-bar series, not a decision."""
-    o, h, l, c = open_, high, low, close
+    _r = CandleRaw.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, h, l, c = _r["open"], _r["high"], _r["low"], _r["close"]
     prev_o, prev_c, prev_l = o.shift(1), c.shift(1), l.shift(1)
     pen = min_penetration
 
@@ -1589,9 +1593,16 @@ def _three_black_crows(open_, high, low, close, min_body_ratio) -> pd.Series:
     return result
 
 
-def _three_inside_down(open_, close) -> pd.Series:
-    """ThreeInsideDown detection. Per-bar series, not a decision."""
-    o, c = open_, close
+def _three_inside_down(open_, high, low, close) -> pd.Series:
+    """ThreeInsideDown detection. Per-bar series, not a decision.
+
+    Takes the full bar rather than just open and close, so that its evidence comes
+    from CandleRaw like every other detector here. The pattern reads only the two
+    body edges; high and low are the rest of the bar it is a pattern in.
+    """
+    _r = CandleRaw.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, c = _r["open"], _r["close"]
     o2, c2 = o.shift(2), c.shift(2)
     o1, c1 = o.shift(1), c.shift(1)
 
@@ -1605,9 +1616,15 @@ def _three_inside_down(open_, close) -> pd.Series:
     return result
 
 
-def _three_inside_up(open_, close) -> pd.Series:
-    """ThreeInsideUp detection. Per-bar series, not a decision."""
-    o, c = open_, close
+def _three_inside_up(open_, high, low, close) -> pd.Series:
+    """ThreeInsideUp detection. Per-bar series, not a decision.
+
+    Takes the full bar for the same reason as `_three_inside_down`: the evidence
+    comes from CandleRaw, and the pattern reads the two body edges out of it.
+    """
+    _r = CandleRaw.compute(
+        {"open": open_, "high": high, "low": low, "close": close}, {})
+    o, c = _r["open"], _r["close"]
     o2, c2 = o.shift(2), c.shift(2)
     o1, c1 = o.shift(1), c.shift(1)
 

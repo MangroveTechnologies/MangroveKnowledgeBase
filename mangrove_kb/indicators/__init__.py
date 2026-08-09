@@ -119,11 +119,13 @@ from .return_indicators import (
 # Pattern indicators
 from .pattern_indicators import (
     CandleGeometry,
+    CandleRaw,
     CandleRelation,
 )
 
 __all__ = [
     "CandleGeometry",
+    "CandleRaw",
     "CandleRelation",
     # Interface
     "IndicatorInterface",

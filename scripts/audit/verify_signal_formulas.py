@@ -205,11 +205,11 @@ def fired_within(series_list, window):
 def detector(fn, O, H, L, C, **kw):
     """Call a private pattern detector.
 
-    The call shape is NOT uniform: the three-inside detectors take (open, close) only, because they
-    are pure body comparisons and never touch high/low.
+    The call shape IS uniform now. The three-inside detectors used to take (open, close) only,
+    being pure body comparisons -- but that made them the only detectors reading raw series rather
+    than an indicator, and so the only pattern signals with no indicator behind them in the graph.
+    They take the whole bar and read it back out of CandleRaw, like the rest.
     """
-    if fn in (P._three_inside_up, P._three_inside_down):
-        return fn(O, C, **kw)
     return fn(O, H, L, C, **kw)
 
 
