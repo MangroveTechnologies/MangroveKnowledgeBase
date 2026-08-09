@@ -1,6 +1,6 @@
 # Scope: backfill authored values into docstrings, make the build deterministic
 
-**Status:** scoped, not started. **Owner:** unassigned. **Blocks:** nothing. **Unblocks:** shipping
+**Status:** phase 1 complete; phases 2-6 open. **Owner:** unassigned. **Blocks:** nothing. **Unblocks:** shipping
 the graph in the wheel.
 
 ## The problem
@@ -67,42 +67,87 @@ Concretely, so that:
 The rule: **authored facts go in the docstring; facts the code already states stay derived from the
 code.** A docstring may not restate something the compiler or the AST can tell us.
 
-## Format
+## Format — settled in phase 1, proven lossless on Bollinger Bands
 
 Not a raw JSON blob. Dumping the node verbatim into `__doc__` would make `help()` unreadable, which
-forfeits reason (3) above — the point is that a user reading the docstring gets the metadata.
-
-Extend the existing sectioned format the parser already handles (`Args:`, `Returns:`, `Type:`,
-`Requires:`). Sketch, to be settled in phase 1:
+forfeits the reason for moving the values there at all. The sections below extend the format the
+parser already handles (`Args:`, `Returns:`, `Type:`, `Requires:`).
 
 ```
-Average Directional Movement Index (ADX)
+Bollinger Bands
 
-    <description prose, unchanged>
+    Volatility bands placed above and below a moving average, with width determined by standard
+    deviation.
+
+    <any further prose, unchanged -- design rationale, caveats>
+
+    Abbreviation: BB
+    Reference: https://chartschool.stockcharts.com/...
 
     Formula:
-        +DI = 100 * EMA(+DM) / ATR
-        -DI = 100 * EMA(-DM) / ATR
-        DX  = 100 * |+DI - -DI| / (+DI + -DI)
-        ADX = EMA(DX, n periods, typically 14)
+        Middle Band = SMA(Close, 20)
+        Upper Band = SMA + (2 * Standard Deviation)
+
+        Bandwidth = (Upper - Lower) / Middle * 100
+
+    Inputs:
+        close: closing price
 
     Outputs:
-        adx (series, dimensionless, 0..100) "ADX":
-            Wilder's trend-STRENGTH index -- non-directional by design...
-            WARMUP CAVEAT: the first 27 bars are filled with literal 0.0 rather than NaN...
-        adx_pos (series, dimensionless, 0..100) "+DI":
-            ...
+        mavg [price, 0..inf]:
+            rolling mean of close over window -- the center band
+        wband [percent, 0..inf] "BandWidth":
+            band separation as a percent of the center band, (hband - lband) / mavg * 100.
+            Non-negative because the rolling stdev cannot be negative
+        pband [ratio, -inf..inf] "%B":
+            position of close between the bands. NOT clamped -- exceeds 1 above hband
 
     Interpretation:
-        - ADX > 25: strong trend
-        - ADX < 20: weak trend / ranging
+        - Price at upper band: Potentially overbought / strong trend
 
-    Reference: https://chartschool.stockcharts.com/...
+    Applications:
+        - Mean reversion trades at bands in ranges
+
+    Args:      <unchanged -- types come from the signature>
+    Returns:   <unchanged>
 ```
 
-Requirements on the format: round-trips losslessly, readable in `help()`, and unambiguous enough
-that the parser needs no heuristics. Unbounded ranges are written `-inf..inf` — they are `[-inf,
-inf]` in the graph today, never null.
+Rules:
+
+* **Output line** is `name [units, lo..hi]` plus an optional `"canonical name"`, then an indented
+  description that may wrap freely. Unbounded is `-inf`/`inf`, never null.
+* **Summary** is the first prose paragraph. Everything after it, up to the first section header, is
+  free prose and is preserved untouched.
+* **A section that has no content is omitted**, not written empty.
+
+### Three things phase 1 turned up
+
+1. **Indicator and signal docstrings have different shapes, and it cannot be guessed.** An indicator
+   CLASS docstring opens with a name line (`Bollinger Bands`); a signal FUNCTION docstring opens with
+   the summary itself. Parsing on a heuristic silently mis-read the signal's summary as
+   `"Type: FILTER Requires: Close"`. The builder knows which kind of object it is holding, so it
+   passes `has_title` explicitly. **No heuristic.**
+2. **Signals carry no `interpretation` or `applications` keys at all** -- absent, not null. The format
+   must not require them, and the round-trip check must compare absent-to-absent rather than treating
+   a missing section as an empty one.
+3. **`canonical_name` is the literal string `"none"`** when an output has no canonical name, not
+   `null`. The `"..."` on the output line is simply omitted in that case and parses back to `"none"`.
+
+### Proof
+
+Both shapes round-trip exactly against the committed graph -- every authored field, no exceptions:
+
+```
+LOSSLESS   indicator BollingerBands     (summary, formula, abbreviation, reference,
+                                         interpretation, applications, input descriptions,
+                                         5 outputs x units/range/canonical_name/description)
+LOSSLESS   signal bb_above_upper        (summary, formula, reference, absent abbreviation,
+                                         absent interpretation/applications, input descriptions,
+                                         1 output x 4 fields)
+```
+
+`help()` stays readable: 64 lines, only two over 100 characters, one of which is the reference URL
+and cannot wrap.
 
 ## Migration
 
@@ -149,7 +194,7 @@ graph.**
 
 | # | phase | done when |
 |---|---|---|
-| 1 | settle the docstring format on 2–3 real indicators, both directions | round-trips losslessly by hand |
+| 1 | ~~settle the docstring format on 2–3 real indicators, both directions~~ | **DONE** — lossless on BollingerBands + bb_above_upper |
 | 2 | extend the parser to read it | parses the phase-1 examples |
 | 3 | run the generator across all 22 files | every authored value is in a docstring |
 | 4 | rebuild with carry-forward off, diff | byte-identical to the committed graph |
