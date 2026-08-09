@@ -49,6 +49,7 @@ from .volatility_indicators import (  # noqa: F401
     NATR,
     ATRTrailingStop,
     STARCBands,
+    VolatilityEnvelope,
     VolatilityStop,
     TTMSqueeze,
     ChandelierLevels,
@@ -151,7 +152,7 @@ __all__ = [
     "NATR",
     "ATRTrailingStop",
     "STARCBands",
-    "VolatilityStop",
+    "VolatilityEnvelope",
     "TTMSqueeze",
     # Trend indicators
     "SMA",

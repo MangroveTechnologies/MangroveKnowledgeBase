@@ -69,7 +69,7 @@ ASSIGN = {
              "Vortex MultiTFTrend",
  'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
-               "ChandelierLevels",
+               "ChandelierLevels VolatilityEnvelope",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
  'unclassed': "EPMA Ichimoku HeikinAshi TTMSqueeze Divergence",
 }
@@ -78,11 +78,17 @@ ASSIGN = {
 # and VolatilityStop carry a position state forward. An indicator states what it measured, and
 # deciding what that means is the signal layer's job.
 #
+# TWO of the original five were on this list wrongly, both found by reading rather than by the
+# names: ChandelierExit and VolatilityStop. The list was built from what things were CALLED.
+#
 # ChandelierExit was on this list and should not have been: it emits two price levels, both defined
 # every bar, both plain functions of the window. It was excluded for being a "stateful policy rule"
 # when its own docstring says it is not a state machine. It is now `ChandelierLevels`, class
-# volatility. See `signal-indicator-ontology.md`.
-REMOVED = "ATRTrailingStop VolatilityStop SuperTrend PSAR".split()
+# volatility. VolatilityStop likewise: its own docstring called it an envelope and said "not a
+# state machine", its outputs were already named vstop_hband / vstop_lband, and hband >= lband holds
+# on 100% of bars. It is now `VolatilityEnvelope`, class volatility.
+# See `signal-indicator-ontology.md`.
+REMOVED = "ATRTrailingStop SuperTrend PSAR".split()
 
 # --- ground truth from the installed package
 present, mod_of = set(), {}
@@ -1040,15 +1046,17 @@ from mangrove_kb.registry import RuleRegistry  # noqa: E402
 # `None` means every registered signal. Widen by adding names, or set to None when the shape is
 # settled for all of them.
 SIGNAL_SCOPE = {
-    # NOT here, deliberately: atr_trailing_stop_{long,short,flip_up,flip_down} and
-    # volatility_stop_{upper,lower}. They are built on ATRTrailingStop and VolatilityStop, two of
-    # the five stateful policy rules that `signal-indicator-ontology.md` excludes -- "not
-    # indicators ... policy, not measurement. Excluded from this ontology AND FROM THE GRAPH."
-    # Adding them put six signals in the graph that the design excludes, and produced six signals
-    # with no class as a symptom.
+    # NOT here, deliberately: atr_trailing_stop_{long,short,flip_up,flip_down}. ATRTrailingStop
+    # carries its stop level forward and emits `direction` (+1 long / -1 short); all four signals
+    # read that verdict. An indicator states what it measured -- deciding what it means is this
+    # layer's job, so there is no measurement for them to inherit a class from.
+    #
+    # The two volatility_stop_* signals WERE here for the same reason and should not have been:
+    # VolatilityStop was a stdev envelope misnamed as a stop. They are now ve_above_upper /
+    # ve_below_lower, in scope below.
     # Volatility -- the five Bollinger signals were the worked example that settled the
     # node shape; the rest of the module follows.
-    "cl_above_low_offset", "cl_below_high_offset",
+    "cl_above_low_offset", "cl_below_high_offset", "ve_above_upper", "ve_below_lower",
     "atr_high_volatility", 
     "bb_above_upper",
     "bb_below_lower", "bb_lower_breakout", "bb_squeeze",

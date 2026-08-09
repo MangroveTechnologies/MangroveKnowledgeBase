@@ -4860,6 +4860,62 @@
    }
   },
   {
+   "id": "procedure:indicator-volatilityenvelope",
+   "title": "VolatilityEnvelope",
+   "kind": "Procedure",
+   "summary": "vstop_hband = prev_close + multiplier * stdev(returns, window) * prev_close vstop_lband = prev_close - multiplier * stdev(returns, window) * prev_close An expected range for the current bar, given yesterday's close and how variable returns have been. Close outside it means today moved more than `multiplier` standard deviations -- that is the measurement; whether it reads as exhaustion or as a breakout is an interpretation, and whether to act on it is a signal's business. The centre is the PREVIOUS close deliberately. Centring on the current close would put it trivially between the bands and nothing could ever be outside them. Symmetric about that centre, so `vstop_hband >= vstop_lband` always holds -- unlike ChandelierLevels, whose two offsets are anchored to opposite extremes and cross. Named \"VolatilityStop\" until 2026-08-09 and excluded from the ontology as a stateful policy rule. It is neither: no state is carried forward (this docstring already said \"not a state machine\"), and it emits two levels rather than a verdict. Only the word \"Stop\" was positional.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility_indicators",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "VolatilityEnvelope.compute(data={'close': df['Close']}, params={'window': value, 'multiplier': value})",
+    "formula": "vstop_hband[t] = close[t-1] * (1 + multiplier * stdev(pct_change(close)[t-window+1..t])); vstop_lband[t] = close[t-1] * (1 - multiplier * stdev(pct_change(close)[t-window+1..t]))",
+    "interpretation": "The range today would stay inside if returns behaved like the recent window. Centred on the PREVIOUS close, so being outside it is a statement about today's move rather than an artefact of centring on today's own close. Symmetric, so vstop_hband >= vstop_lband always holds.",
+    "applications": "A move beyond the envelope is one that is large relative to the asset's own recent return variability, which is why the bands are scaled by stdev of RETURNS rather than of price -- the measure is scale-invariant and comparable across assets.",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling stdev window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2,
+      "min": 0.5,
+      "max": null,
+      "description": "Stdev multiplier for the band distance"
+     }
+    },
+    "outputs": {
+     "vstop_hband": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     },
+     "vstop_lband": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-vortex",
    "title": "Vortex",
    "kind": "Procedure",
@@ -15433,6 +15489,106 @@
    }
   },
   {
+   "id": "procedure:signal-ve-above-upper",
+   "title": "ve_above_upper",
+   "kind": "Procedure",
+   "summary": "Check if close is at or above the volatility envelope's upper band. Today's close is at least `multiplier` standard deviations above YESTERDAY's close, where the deviation is measured on recent returns. The envelope is centred on the previous close, not the current bar -- the old wording said \"above the current bar\", which would make the comparison vacuous. A STATE, not an event: true for every bar close stays at or beyond the band.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 've_above_upper', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t] >= vstop_hband[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling stdev window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "Stdev multiplier for the band distance"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close >= vstop_hband, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ve-below-lower",
+   "title": "ve_below_lower",
+   "kind": "Procedure",
+   "summary": "Check if close is at or below the volatility envelope's lower band. Mirror of `ve_above_upper`: today's close is at least `multiplier` standard deviations below yesterday's. A STATE, not an event.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 've_below_lower', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t] <= vstop_lband[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling stdev window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "Stdev multiplier for the band distance"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close <= vstop_lband, False otherwise"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-vortex-bearish",
    "title": "vortex_bearish",
    "kind": "Procedure",
@@ -16753,6 +16909,14 @@
    "why": "class membership",
    "from_id": "procedure:indicator-vwma",
    "to_id": "concept:indicator-class-averaging"
+  },
+  {
+   "from": "VolatilityEnvelope",
+   "rel": "instance-of",
+   "to": "volatility",
+   "why": "class membership",
+   "from_id": "procedure:indicator-volatilityenvelope",
+   "to_id": "concept:indicator-class-volatility"
   },
   {
    "from": "Vortex",
@@ -22479,6 +22643,64 @@
    }
   },
   {
+   "from": "ve_above_upper",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ve-above-upper",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ve_above_upper",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ve-above-upper",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ve_above_upper",
+   "rel": "uses",
+   "to": "VolatilityEnvelope",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ve-above-upper",
+   "to_id": "procedure:indicator-volatilityenvelope",
+   "inputs": {
+    "vstop_hband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ve_below_lower",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ve-below-lower",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ve_below_lower",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ve-below-lower",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ve_below_lower",
+   "rel": "uses",
+   "to": "VolatilityEnvelope",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ve-below-lower",
+   "to_id": "procedure:indicator-volatilityenvelope",
+   "inputs": {
+    "vstop_lband": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "vortex_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22883,21 +23105,20 @@
  ],
  "meta": {
   "scope": "indicator class ontology",
-  "indicators": 69,
+  "indicators": 70,
   "classes": 7,
   "removed_not_indicators": [
    "ATRTrailingStop",
    "PSAR",
-   "SuperTrend",
-   "VolatilityStop"
+   "SuperTrend"
   ],
-  "carried_forward_from_previous_build": 1096,
+  "carried_forward_from_previous_build": 1102,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 199,
+  "signals": 201,
   "signals_registered": 247,
-  "signals_out_of_scope": 48,
+  "signals_out_of_scope": 46,
   "signals_with_no_indicator": [
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",

@@ -25,7 +25,7 @@ from mangrove_kb.indicators import (
     NATR,
     ATRTrailingStop,
     STARCBands,
-    VolatilityStop,
+    VolatilityEnvelope,
 )
 
 logger = logging.getLogger(__name__)
@@ -836,13 +836,17 @@ def starc_lower_breakout(
     return bool(df["Close"].iloc[-1] < lband.iloc[-1])
 
 
-@RuleRegistry.register("volatility_stop_upper")
-def volatility_stop_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
+@RuleRegistry.register("ve_above_upper")
+def ve_above_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
     """
-    Check if close has reached or exceeded the stdev-based volatility upper stop.
+    Check if close is at or above the volatility envelope's upper band.
 
-    Indicates the price has moved multiplier standard deviations above the
-    current bar -- a potential exhaustion / mean-reversion signal.
+    Today's close is at least `multiplier` standard deviations above YESTERDAY's close, where the
+    deviation is measured on recent returns. The envelope is centred on the previous close, not the
+    current bar -- the old wording said "above the current bar", which would make the comparison
+    vacuous.
+
+    A STATE, not an event: true for every bar close stays at or beyond the band.
 
     Type: FILTER
     Requires: Close
@@ -850,24 +854,28 @@ def volatility_stop_upper(df: pd.DataFrame, window: int = 20, multiplier: float 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         window (int): Rolling stdev window. Range: 5-100. Default: 20.
-        multiplier (float): Stdev multiplier for stop distance. Range: 0.5-5.0. Default: 2.0.
+        multiplier (float): Stdev multiplier for the band distance. Range: 0.5-5.0. Default: 2.0.
 
     Returns:
-        bool: True if close >= upper volatility stop, False otherwise.
+        bool: True if close >= vstop_hband, False otherwise.
     """
     if len(df) < window + 1:
         return False
-    out = VolatilityStop.compute(data={'close': df["Close"]}, params={'window': window, 'multiplier': multiplier})
+    out = VolatilityEnvelope.compute(data={'close': df["Close"]},
+                                     params={'window': window, 'multiplier': multiplier})
     hband = out['vstop_hband']
     if pd.isna(hband.iloc[-1]):
         return False
     return bool(df["Close"].iloc[-1] >= hband.iloc[-1])
 
 
-@RuleRegistry.register("volatility_stop_lower")
-def volatility_stop_lower(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
+@RuleRegistry.register("ve_below_lower")
+def ve_below_lower(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
     """
-    Check if close has reached or fallen below the stdev-based volatility lower stop.
+    Check if close is at or below the volatility envelope's lower band.
+
+    Mirror of `ve_above_upper`: today's close is at least `multiplier` standard deviations below
+    yesterday's. A STATE, not an event.
 
     Type: FILTER
     Requires: Close
@@ -875,14 +883,15 @@ def volatility_stop_lower(df: pd.DataFrame, window: int = 20, multiplier: float 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         window (int): Rolling stdev window. Range: 5-100. Default: 20.
-        multiplier (float): Stdev multiplier for stop distance. Range: 0.5-5.0. Default: 2.0.
+        multiplier (float): Stdev multiplier for the band distance. Range: 0.5-5.0. Default: 2.0.
 
     Returns:
-        bool: True if close <= lower volatility stop, False otherwise.
+        bool: True if close <= vstop_lband, False otherwise.
     """
     if len(df) < window + 1:
         return False
-    out = VolatilityStop.compute(data={'close': df["Close"]}, params={'window': window, 'multiplier': multiplier})
+    out = VolatilityEnvelope.compute(data={'close': df["Close"]},
+                                     params={'window': window, 'multiplier': multiplier})
     lband = out['vstop_lband']
     if pd.isna(lband.iloc[-1]):
         return False
@@ -972,3 +981,5 @@ def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 
 # files hold these strings.
 RuleRegistry.alias("chandelier_long_stop_hit", "cl_below_high_offset")
 RuleRegistry.alias("chandelier_short_stop_hit", "cl_above_low_offset")
+RuleRegistry.alias("volatility_stop_upper", "ve_above_upper")
+RuleRegistry.alias("volatility_stop_lower", "ve_below_lower")

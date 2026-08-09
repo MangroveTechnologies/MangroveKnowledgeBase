@@ -164,6 +164,20 @@ def crosses_below(series, band):
                       and series.iloc[t - 1] >= band.iloc[t - 1] and series.iloc[t] < band.iloc[t])
 
 
+def not_below(series, band):
+    """`series >= band`, both moving. Distinct from `outside_above`, which is strict.
+
+    The volatility-envelope signals test `>=` and `<=`, and a strict builder disagrees on any bar
+    where close lands exactly on the band. Rare, but it is the difference between transcribing the
+    predicate and approximating it.
+    """
+    return lambda t: defined(series.iloc[t], band.iloc[t]) and series.iloc[t] >= band.iloc[t]
+
+
+def not_above(series, band):
+    return lambda t: defined(series.iloc[t], band.iloc[t]) and series.iloc[t] <= band.iloc[t]
+
+
 def outside_above(series, band):
     """A STATE: true for every bar `series` sits above `band`, not only the crossing bar."""
     return lambda t: defined(series.iloc[t], band.iloc[t]) and series.iloc[t] > band.iloc[t]
@@ -318,7 +332,8 @@ def report(results):
 
 def spec_volatility(df):
     from mangrove_kb.indicators import (ATR, NATR, BollingerBands, ChandelierLevels,
-                                        DonchianChannel, KeltnerChannel, STARCBands, UlcerIndex)
+                                        DonchianChannel, KeltnerChannel, STARCBands, UlcerIndex,
+                                        VolatilityEnvelope)
     H, L, C = df["High"], df["Low"], df["Close"]
     atr = ATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["atr"]
     natr = NATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["natr"]
@@ -338,7 +353,13 @@ def spec_volatility(df):
     # true together on 15 of these 1,294 bars, which a band invariant would forbid.
     clp = {"window": 22, "multiplier": 3.0}
     cl = ChandelierLevels.compute({"high": H, "low": L, "close": C}, dict(clp))
+    # VolatilityEnvelope IS a true band pair (symmetric about the previous close), unlike the
+    # Chandelier offsets above -- hband >= lband on every bar.
+    vep = {"window": 20, "multiplier": 2.0}
+    ve = VolatilityEnvelope.compute({"close": C}, dict(vep))
     return {
+        "ve_above_upper": (vep, not_below(C, ve["vstop_hband"])),
+        "ve_below_lower": (vep, not_above(C, ve["vstop_lband"])),
         "cl_below_high_offset": (clp, outside_below(C, cl["high_offset"])),
         "cl_above_low_offset": (clp, outside_above(C, cl["low_offset"])),
         "bb_upper_breakout": (bbp, crosses_above(C, bb["hband"])),

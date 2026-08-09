@@ -97,14 +97,18 @@ than the class, because consumers reason about derived signals and can read it.
 That is the whole criterion. An indicator states what it measured; deciding what the measurement
 means is the signal layer's job.
 
-`ATRTrailingStop`, `VolatilityStop`, `SuperTrend` and `PSAR` fail it and are excluded from this
-ontology and from the graph. SuperTrend emits `direction` (+1 long / -1 short) and NaNs its bands
-according to that verdict; PSAR emits `psar_up_indicator` / `psar_down_indicator`, which are flip
-flags; the two trailing stops carry a position state forward. The measurement underneath the
-ATR-based ones is ATR, which is already classed.
+`ATRTrailingStop`, `SuperTrend` and `PSAR` fail it and are excluded from this ontology and from the
+graph. SuperTrend emits `direction` (+1 long / -1 short) and NaNs its bands according to that
+verdict; PSAR emits `psar_up_indicator` / `psar_down_indicator`, which are flip flags;
+ATRTrailingStop does both -- its stop level accumulates forward and it emits `direction` too. The
+measurement underneath the ATR-based ones is ATR, which is already classed.
 
 This generalises the boolean-output rule below: a boolean is a verdict with two values, and the
 same argument applies to a ternary or any other flag.
+
+**Two of the original five were on that list wrongly**, and the list turns out to have been built
+from what things were CALLED rather than from what they do. Both were found by reading the
+implementation; both were fixed by renaming and rewriting the prose, not by changing behaviour.
 
 **`ChandelierExit` was on that list and should not have been.** It emits two price levels, both
 defined on every bar, both plain functions of the window -- and its own docstring said it was not a
@@ -113,6 +117,12 @@ state machine. It was excluded for a property it does not have. It is now `Chand
 renamed `high_offset` / `low_offset` and its two signals renamed `cl_below_high_offset` /
 `cl_above_low_offset` (old names aliased). Note the two offsets are anchored to OPPOSITE extremes,
 so they are not an upper and a lower band and do cross -- 27% of bars on the BTC fixture.
+
+**`VolatilityStop` was on it too.** Its own docstring called it a "standard-deviation-based
+volatility envelope" and said it "is not a state machine (no ratcheting)"; its outputs were already
+named `vstop_hband` / `vstop_lband`; and `hband >= lband` holds on 100% of bars, so unlike the
+Chandelier offsets it is a genuine band pair. Only the word "Stop" was positional. It is now
+`VolatilityEnvelope`, class `volatility`, with signals `ve_above_upper` / `ve_below_lower`.
 
 **Known violation, pending a decision:** `MultiTFTrend` emits `higher_tf_trend`, a ternary
 -1 / 0 / +1 state, and is currently classed `momentum` with two signals that read the verdict

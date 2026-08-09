@@ -524,23 +524,29 @@ class STARCBands(IndicatorInterface):
         }
 
 
-class VolatilityStop(IndicatorInterface):
-    """Standard-deviation-based volatility envelope.
+class VolatilityEnvelope(IndicatorInterface):
+    """Standard-deviation envelope around the previous close.
 
-    Uses rolling standard deviation of returns to build an "expected range"
-    for the current bar around the previous close:
-        upper = prev_close + multiplier * stdev(returns, window) * prev_close
-        lower = prev_close - multiplier * stdev(returns, window) * prev_close
+        vstop_hband = prev_close + multiplier * stdev(returns, window) * prev_close
+        vstop_lband = prev_close - multiplier * stdev(returns, window) * prev_close
 
-    When the current close exceeds the upper band, price has moved more than
-    `multiplier` standard deviations up from yesterday -- a potential
-    exhaustion or breakout signal. Conversely for the lower band.
+    An expected range for the current bar, given yesterday's close and how variable returns have
+    been. Close outside it means today moved more than `multiplier` standard deviations -- that is
+    the measurement; whether it reads as exhaustion or as a breakout is an interpretation, and
+    whether to act on it is a signal's business.
 
-    Distinct from ATR Trailing Stop: uses stdev of returns rather than
-    smoothed true range, and is not a state machine (no ratcheting).
+    The centre is the PREVIOUS close deliberately. Centring on the current close would put it
+    trivially between the bands and nothing could ever be outside them.
+
+    Symmetric about that centre, so `vstop_hband >= vstop_lband` always holds -- unlike
+    ChandelierLevels, whose two offsets are anchored to opposite extremes and cross.
+
+    Named "VolatilityStop" until 2026-08-09 and excluded from the ontology as a stateful policy
+    rule. It is neither: no state is carried forward (this docstring already said "not a state
+    machine"), and it emits two levels rather than a verdict. Only the word "Stop" was positional.
 
     Reference: Common stdev-envelope construction; variants appear in
-    Bollinger Bands and Cynthia Kase's stop loss methodology.
+    Bollinger Bands and Cynthia Kase's methodology.
 
     Args:
         data: {'close': pd.Series}
@@ -575,6 +581,10 @@ class VolatilityStop(IndicatorInterface):
             'vstop_hband': pd.Series(hband.values, index=close.index, name='vstop_hband'),
             'vstop_lband': pd.Series(lband.values, index=close.index, name='vstop_lband'),
         }
+
+
+#: Deprecated name. "Stop" states a use, not a measurement.
+VolatilityStop = VolatilityEnvelope
 
 
 class TTMSqueeze(IndicatorInterface):
