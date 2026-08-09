@@ -32,7 +32,6 @@ from mangrove_kb.signals._common import _ma_crossover, _ma_is_above, moved_signa
 from mangrove_kb.indicators import (
     PSAR,
     SuperTrend,
-    TTMSqueeze,
 )
 
 logger = logging.getLogger(__name__)
@@ -345,132 +344,13 @@ _DEFAULT_RIBBON_WINDOWS = (5, 8, 13, 21, 34, 55, 89, 144)
 _TTM_DEFAULTS = dict(bb_window=20, bb_std=2.0, kc_window=20, kc_atr_mult=1.5, mom_window=12)
 
 
-@RuleRegistry.register("ttm_squeeze_active")
-def ttm_squeeze_active(
-    df: pd.DataFrame,
-    bb_window: int = 20, bb_std: float = 2.0,
-    kc_window: int = 20, kc_atr_mult: float = 1.5,
-    mom_window: int = 12,
-) -> bool:
-    """
-    Check if the TTM Squeeze is active (BB inside KC -- volatility contraction).
-
-    Use as a no-breakout filter: when true, market is coiled and waiting
-    for a directional move.
-
-    Type: FILTER
-    Requires: High, Low, Close
-
-    Args:
-        df (pd.DataFrame): DataFrame with OHLCV data.
-        bb_window (int): Bollinger Band window. Range: 5-100. Default: 20.
-        bb_std (float): Bollinger std multiplier. Range: 1.0-4.0. Default: 2.0.
-        kc_window (int): Keltner Channel window (used for both EMA and ATR). Range: 5-100. Default: 20.
-        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-3.0. Default: 1.5.
-        mom_window (int): Momentum regression window. Range: 5-50. Default: 12.
-
-    Returns:
-        bool: True if squeeze is on.
-    """
-    if len(df) < max(bb_window, kc_window) + 1:
-        return False
-    out = TTMSqueeze.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
-                'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
-    )
-    if pd.isna(out['squeeze_on'].iloc[-1]):
-        return False
-    return bool(out['squeeze_on'].iloc[-1])
-
-
-@RuleRegistry.register("ttm_squeeze_fired_bullish")
-def ttm_squeeze_fired_bullish(
-    df: pd.DataFrame,
-    bb_window: int = 20, bb_std: float = 2.0,
-    kc_window: int = 20, kc_atr_mult: float = 1.5,
-    mom_window: int = 12,
-) -> bool:
-    """
-    Detect TTM Squeeze release with bullish momentum.
-
-    Fires when the squeeze just ended (was on previous bar, off now) AND
-    momentum is positive. Classic Carter entry signal.
-
-    Type: TRIGGER
-    Requires: High, Low, Close
-
-    Args:
-        df (pd.DataFrame): DataFrame with OHLCV data.
-        bb_window (int): Bollinger Band window. Range: 5-100. Default: 20.
-        bb_std (float): Bollinger std multiplier. Range: 1.0-4.0. Default: 2.0.
-        kc_window (int): Keltner Channel window. Range: 5-100. Default: 20.
-        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-3.0. Default: 1.5.
-        mom_window (int): Momentum regression window. Range: 5-50. Default: 12.
-
-    Returns:
-        bool: True on bar where squeeze fires with positive momentum.
-    """
-    if len(df) < max(bb_window, kc_window) + 2:
-        return False
-    out = TTMSqueeze.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
-                'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
-    )
-    fired = out['squeeze_fired'].iloc[-1]
-    mom = out['momentum'].iloc[-1]
-    if pd.isna(fired) or pd.isna(mom):
-        return False
-    return bool(fired and mom > 0)
-
-
-@RuleRegistry.register("ttm_squeeze_fired_bearish")
-def ttm_squeeze_fired_bearish(
-    df: pd.DataFrame,
-    bb_window: int = 20, bb_std: float = 2.0,
-    kc_window: int = 20, kc_atr_mult: float = 1.5,
-    mom_window: int = 12,
-) -> bool:
-    """
-    Detect TTM Squeeze release with bearish momentum.
-
-    Type: TRIGGER
-    Requires: High, Low, Close
-
-    Args:
-        df (pd.DataFrame): DataFrame with OHLCV data.
-        bb_window (int): Bollinger Band window. Range: 5-100. Default: 20.
-        bb_std (float): Bollinger std multiplier. Range: 1.0-4.0. Default: 2.0.
-        kc_window (int): Keltner Channel window. Range: 5-100. Default: 20.
-        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-3.0. Default: 1.5.
-        mom_window (int): Momentum regression window. Range: 5-50. Default: 12.
-
-    Returns:
-        bool: True on bar where squeeze fires with negative momentum.
-    """
-    if len(df) < max(bb_window, kc_window) + 2:
-        return False
-    out = TTMSqueeze.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
-        params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
-                'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
-    )
-    fired = out['squeeze_fired'].iloc[-1]
-    mom = out['momentum'].iloc[-1]
-    if pd.isna(fired) or pd.isna(mom):
-        return False
-    return bool(fired and mom < 0)
-
-
 # --- Divergence signals (RSI-based by default; user supplies indicator via helper) ---
 
 
 # --- Multi-Timeframe Trend signals ---
 
 # Signals that were in this file when 1.3.4 shipped and are now in the file named for
-# their ontology class. Reached by name, with a DeprecationWarning; see
-# `moved_signals` for why this is PEP 562 rather than a plain re-export.
+# their ontology class. Reached by name, with a DeprecationWarning.
 _MOVED = {
     "averaging": (
         "alligator_bearish", "alligator_bullish", "alligator_sleeping", "alma_cross_down",
@@ -499,8 +379,11 @@ _MOVED = {
         "cci_overbought", "cci_oversold", "stc_overbought", "stc_oversold"
     ),
     "volatility": (
-        "chandelier_long_stop_hit", "chandelier_short_stop_hit"
+        "chandelier_long_stop_hit", "chandelier_short_stop_hit", "ttm_squeeze_active",
+        "ttm_squeeze_fired_bearish", "ttm_squeeze_fired_bullish"
     ),
 }
 
-__getattr__ = moved_signals("mangrove_kb.signals.trend", _MOVED)
+_moved_getattr = moved_signals("mangrove_kb.signals.trend", _MOVED)
+
+__getattr__ = _moved_getattr

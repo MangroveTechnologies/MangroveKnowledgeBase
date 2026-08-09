@@ -332,8 +332,8 @@ def report(results):
 
 def spec_volatility(df):
     from mangrove_kb.indicators import (ATR, NATR, BollingerBands, ChandelierLevels,
-                                        DonchianChannel, KeltnerChannel, STARCBands, UlcerIndex,
-                                        VolatilityEnvelope)
+                                        DonchianChannel, KeltnerChannel, SqueezeDepth, STARCBands,
+                                        UlcerIndex, VolatilityEnvelope)
     H, L, C = df["High"], df["Low"], df["Close"]
     atr = ATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["atr"]
     natr = NATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["natr"]
@@ -357,7 +357,24 @@ def spec_volatility(df):
     # Chandelier offsets above -- hband >= lband on every bar.
     vep = {"window": 20, "multiplier": 2.0}
     ve = VolatilityEnvelope.compute({"close": C}, dict(vep))
+    # TTM Squeeze: the release is squeeze_depth crossing down through zero, and direction comes
+    # from Carter's momentum on the same bar. Both were booleans inside the old indicator.
+    sqp = {"bb_window": 20, "bb_std": 2.0, "kc_window": 20, "kc_atr_mult": 1.5, "mom_window": 12}
+    sq = SqueezeDepth.compute({"high": H, "low": L, "close": C}, dict(sqp))
+    depth, ttm_mom = sq["squeeze_depth"], sq["momentum"]
+
+    def fired(momentum_positive):
+        def f(t):
+            if t < 1 or not defined(depth.iloc[t - 1], depth.iloc[t], ttm_mom.iloc[t]):
+                return False
+            return (depth.iloc[t - 1] > 0 and depth.iloc[t] <= 0
+                    and (ttm_mom.iloc[t] > 0) == momentum_positive)
+        return f
+
     return {
+        "ttm_squeeze_active": (dict(sqp), above(depth, 0)),
+        "ttm_squeeze_fired_bullish": (dict(sqp), fired(True)),
+        "ttm_squeeze_fired_bearish": (dict(sqp), fired(False)),
         "ve_above_upper": (vep, not_below(C, ve["vstop_hband"])),
         "ve_below_lower": (vep, not_above(C, ve["vstop_lband"])),
         "cl_below_high_offset": (clp, outside_below(C, cl["high_offset"])),

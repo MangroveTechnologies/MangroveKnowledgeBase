@@ -17,15 +17,16 @@ from mangrove_kb.signals._common import renamed_signals
 
 # Import volatility indicator classes
 from mangrove_kb.indicators import (
-    ChandelierLevels,
     ATR,
-    BollingerBands,
-    KeltnerChannel,
-    DonchianChannel,
-    UlcerIndex,
-    NATR,
     ATRTrailingStop,
+    BollingerBands,
+    ChandelierLevels,
+    DonchianChannel,
+    KeltnerChannel,
+    NATR,
     STARCBands,
+    SqueezeDepth,
+    UlcerIndex,
     VolatilityEnvelope,
 )
 
@@ -314,8 +315,6 @@ def kc_below_lower(
     return bool(float(closes.iloc[-1]) < float(lband.iloc[-1]))
 
 
-
-
 # =============================================================================
 # ATR/Volatility Signals
 # =============================================================================
@@ -359,8 +358,6 @@ def atr_high_volatility(
 
     atr_pct = (float(atr.iloc[-1]) / close) * 100
     return atr_pct > threshold_pct
-
-
 
 
 # =============================================================================
@@ -984,6 +981,115 @@ RuleRegistry.alias("chandelier_long_stop_hit", "cl_below_high_offset")
 RuleRegistry.alias("chandelier_short_stop_hit", "cl_above_low_offset")
 RuleRegistry.alias("volatility_stop_upper", "ve_above_upper")
 RuleRegistry.alias("volatility_stop_lower", "ve_below_lower")
+
+
+# ---------------------------------------------------------------------------
+# TTM Squeeze, read from SqueezeDepth's measurement
+# ---------------------------------------------------------------------------
+
+def _squeeze(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, need=1):
+    if len(df) < max(bb_window, kc_window) + need:
+        return None
+    return SqueezeDepth.compute(
+        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
+                'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
+    )
+
+
+@RuleRegistry.register("ttm_squeeze_active")
+def ttm_squeeze_active(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.0,
+                       kc_window: int = 20, kc_atr_mult: float = 1.5,
+                       mom_window: int = 12) -> bool:
+    """
+    Check if the Bollinger Bands are inside the Keltner Channel (the squeeze is on).
+
+    `squeeze_depth` is how far inside the Keltner Channel the narrower Bollinger band sits, so a
+    positive depth IS the squeeze. The indicator measures the distance; this decides that a
+    positive distance counts.
+
+    Type: FILTER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        bb_window (int): Bollinger window. Range: 5-100. Default: 20.
+        bb_std (float): Bollinger standard deviations. Range: 0.5-5.0. Default: 2.0.
+        kc_window (int): Keltner window. Range: 5-100. Default: 20.
+        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-5.0. Default: 1.5.
+        mom_window (int): Momentum window. Range: 5-50. Default: 12.
+
+    Returns:
+        bool: True if squeeze_depth > 0.
+    """
+    out = _squeeze(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, need=1)
+    if out is None or pd.isna(out['squeeze_depth'].iloc[-1]):
+        return False
+    return bool(out['squeeze_depth'].iloc[-1] > 0)
+
+
+def _squeeze_fired(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, momentum_positive):
+    out = _squeeze(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, need=2)
+    if out is None:
+        return False
+    d, mom = out['squeeze_depth'], out['momentum'].iloc[-1]
+    if len(d) < 2 or pd.isna(d.iloc[-1]) or pd.isna(d.iloc[-2]) or pd.isna(mom):
+        return False
+    released = bool(d.iloc[-2] > 0 and d.iloc[-1] <= 0)
+    return released and bool((mom > 0) == momentum_positive)
+
+
+@RuleRegistry.register("ttm_squeeze_fired_bullish")
+def ttm_squeeze_fired_bullish(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.0,
+                              kc_window: int = 20, kc_atr_mult: float = 1.5,
+                              mom_window: int = 12) -> bool:
+    """
+    Detect a squeeze releasing with positive momentum.
+
+    The release is `squeeze_depth` crossing down through zero -- the Bollinger bands leaving the
+    Keltner channel. Direction comes from Carter's momentum on the same bar.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        bb_window (int): Bollinger window. Range: 5-100. Default: 20.
+        bb_std (float): Bollinger standard deviations. Range: 0.5-5.0. Default: 2.0.
+        kc_window (int): Keltner window. Range: 5-100. Default: 20.
+        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-5.0. Default: 1.5.
+        mom_window (int): Momentum window. Range: 5-50. Default: 12.
+
+    Returns:
+        bool: True on the bar the squeeze releases with momentum > 0.
+    """
+    return _squeeze_fired(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, True)
+
+
+@RuleRegistry.register("ttm_squeeze_fired_bearish")
+def ttm_squeeze_fired_bearish(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.0,
+                              kc_window: int = 20, kc_atr_mult: float = 1.5,
+                              mom_window: int = 12) -> bool:
+    """
+    Detect a squeeze releasing with negative momentum.
+
+    Mirror of `ttm_squeeze_fired_bullish`.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        bb_window (int): Bollinger window. Range: 5-100. Default: 20.
+        bb_std (float): Bollinger standard deviations. Range: 0.5-5.0. Default: 2.0.
+        kc_window (int): Keltner window. Range: 5-100. Default: 20.
+        kc_atr_mult (float): Keltner ATR multiplier. Range: 0.5-5.0. Default: 1.5.
+        mom_window (int): Momentum window. Range: 5-50. Default: 12.
+
+    Returns:
+        bool: True on the bar the squeeze releases with momentum < 0.
+    """
+    return _squeeze_fired(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, False)
 
 
 __getattr__ = renamed_signals("mangrove_kb.signals.volatility")

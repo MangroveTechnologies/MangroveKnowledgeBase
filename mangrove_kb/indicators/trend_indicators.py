@@ -1731,6 +1731,50 @@ class MultiTFTrend(IndicatorInterface):
         return {'higher_tf_trend': pd.Series(broadcast.values, index=close.index, name='higher_tf_trend')}
 
 
+class MultiTFSlope(IndicatorInterface):
+    """Slope of a higher-timeframe EMA, normalised by its own magnitude.
+
+        higher = close resampled to `higher_tf`, last value in each bucket
+        slope  = EMA(higher, window).diff()
+        output = slope / rolling_mean(|EMA(higher, window)|, window)
+
+    Unitless by construction, so the same number is comparable across assets and price levels.
+    Broadcast back to base bars by forward-fill from the most recently CLOSED higher-timeframe bar,
+    so no base bar sees a period that has not finished.
+
+    Replaces `MultiTFTrend`, which emitted this slope already thresholded into -1 / 0 / +1. The
+    threshold is the judgement, so it moved to the signals -- and with it `slope_threshold`, which
+    was an indicator parameter describing a decision the indicator should not have been making.
+    That class still exists and still works; it is deprecated.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'higher_tf': str, 'window': int}
+
+    Returns:
+        {'higher_tf_slope': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["higher_tf", "window"]
+    _outputs = ["higher_tf_slope"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data['close']
+        blank = pd.Series(np.full(len(close), np.nan), index=close.index, name='higher_tf_slope')
+        if not isinstance(close.index, pd.DatetimeIndex):
+            return {'higher_tf_slope': blank}
+        window = params['window']
+        higher = close.resample(params['higher_tf'], label='right', closed='right').last().dropna()
+        if len(higher) < window + 2:
+            return {'higher_tf_slope': blank}
+        ema_higher = EMA.compute({'close': higher}, {'window': window})['ema']
+        denom = ema_higher.abs().rolling(window, min_periods=1).mean().replace(0, np.nan)
+        rel = (ema_higher.diff() / denom).reindex(close.index, method='ffill')
+        return {'higher_tf_slope': pd.Series(rel.values, index=close.index, name='higher_tf_slope')}
+
+
+
 class Divergence(IndicatorInterface):
     """DEPRECATED: use `SwingDelta`, which measures instead of concluding.
 

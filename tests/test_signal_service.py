@@ -18,17 +18,16 @@ class TestSignalServiceMetadata:
         gone entirely -- there is no `volume` indicator class, so its signals went four ways by the
         class of the indicator each reads, and `flow` (the cumulative lines: OBV, ADI, VPT, NVI)
         appeared as a file for the first time. trend.py was 88 and is down to the 24 whose class
-        cannot be settled: seven read an indicator that emits a verdict rather than a
-        measurement, fifteen read an indicator still in the unclassed class. ChandelierExit left
-        that list -- it emits plain levels -- so its two signals are now Volatility."""
+        cannot be settled: all seven read SuperTrend's `direction` or PSAR's flip flags, which are
+        verdicts rather than measurements, so there is nothing for them to inherit a class from."""
         assert len(self.service.list_signals(category="Momentum")) == 56
         assert len(self.service.list_signals(category="Oscillator")) == 30
         assert len(self.service.list_signals(category="Averaging")) == 55
         assert len(self.service.list_signals(category="Flow")) == 10
         assert len(self.service.list_signals(category="Pattern")) == 40
-        assert len(self.service.list_signals(category="Volatility")) == 26
+        assert len(self.service.list_signals(category="Volatility")) == 29
         # trend.py is not a class -- what is left there is what cannot be classified yet
-        assert len(self.service.list_signals(category="Trend")) == 10
+        assert len(self.service.list_signals(category="Trend")) == 7
 
     def test_list_signals_filter_by_type(self):
         triggers = self.service.list_signals(signal_type="TRIGGER")

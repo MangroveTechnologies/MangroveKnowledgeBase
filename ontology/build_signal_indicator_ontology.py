@@ -67,15 +67,13 @@ ASSIGN = {
                "EPMA Ichimoku HeikinAshi",
  'momentum': "ROC MOM TRIX MACD PPO KST AwesomeOscillator DPO PVO ForceIndex EaseOfMovement "
              "ADOSC KVO KlingerVolumeOscillator DailyReturn DailyLogReturn MassIndex ADX Aroon "
-             "Vortex MultiTFTrend SwingDelta",
+             "Vortex MultiTFSlope SwingDelta",
  'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
-               "ChandelierLevels VolatilityEnvelope",
+               "ChandelierLevels VolatilityEnvelope SqueezeDepth",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
- # TTMSqueeze emits `squeeze_on` and `squeeze_fired` (both bool) beside `momentum` (a number) --
- # a verdict and a measurement in one object, the same defect as MultiTFTrend. Pinned pending one
- # decision covering both.
- 'unclassed': "TTMSqueeze",
+ # Empty, and kept so the class exists the moment something needs it again.
+ 'unclassed': "",
 }
 # Not indicators: their outputs are VERDICTS, not measurements. SuperTrend emits `direction`
 # (+1 long / -1 short) and NaNs its bands according to it; PSAR emits flip flags; ATRTrailingStop
@@ -96,7 +94,11 @@ ASSIGN = {
 # 1,294 bars) -- it concludes rather than measures. Its measurement was split out as `SwingDelta`,
 # which emits the two changes the conclusion is drawn from, and the four sign comparisons moved to
 # the signals. The class itself is kept, deprecated and working, for anything already calling it.
-REMOVED = "ATRTrailingStop SuperTrend PSAR Divergence".split()
+# TTMSqueeze and MultiTFTrend joined for the same reason as Divergence: each emitted a verdict
+# (two booleans / a ternary) beside a real measurement. Both were split -- SqueezeDepth and
+# MultiTFSlope emit the measurement, and the thresholds moved into the signals. The originals are
+# kept, deprecated and unchanged, for anything already calling them.
+REMOVED = "ATRTrailingStop SuperTrend PSAR Divergence TTMSqueeze MultiTFTrend".split()
 
 # --- ground truth from the installed package
 present, mod_of = set(), {}
@@ -1068,7 +1070,8 @@ SIGNAL_SCOPE = {
     "epma_cross_down", "epma_cross_up", "is_above_epma", "ichimoku_bearish", "ichimoku_bullish",
     "ichimoku_tk_cross", "heikin_ashi_bearish", "heikin_ashi_bullish",
     "rsi_bearish_divergence", "rsi_bullish_divergence", "rsi_hidden_bearish_divergence",
-    "rsi_hidden_bullish_divergence",
+    "rsi_hidden_bullish_divergence", "ttm_squeeze_active", "ttm_squeeze_fired_bearish",
+    "ttm_squeeze_fired_bullish",
     "atr_high_volatility", 
     "bb_above_upper",
     "bb_below_lower", "bb_lower_breakout", "bb_squeeze",

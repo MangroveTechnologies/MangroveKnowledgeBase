@@ -18,8 +18,8 @@ class TestSignalEndpoints:
         """Files are named for the ontology class they hold. momentum.py and volume.py each held
         several, and volume.py is gone -- there is no `volume` indicator class."""
         for category, total in (("Momentum", 56), ("Oscillator", 30), ("Averaging", 55),
-                                ("Flow", 10), ("Pattern", 40), ("Volatility", 26),
-                                ("Trend", 10)):
+                                ("Flow", 10), ("Pattern", 40), ("Volatility", 29),
+                                ("Trend", 7)):
             resp = client.get(f"/api/signals?category={category}")
             assert resp.status_code == 200
             assert resp.json()["total"] == total, category

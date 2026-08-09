@@ -18,8 +18,6 @@ from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.signals._common import zero_cross, moved_signals
 
 from mangrove_kb.indicators import (
-    RSI,
-    SwingDelta,
     ADOSC,
     ADX,
     Aroon,
@@ -33,10 +31,12 @@ from mangrove_kb.indicators import (
     MACD,
     MOM,
     MassIndex,
-    MultiTFTrend,
+    MultiTFSlope,
     PPO,
     PVO,
     ROC,
+    RSI,
+    SwingDelta,
     TRIX,
     Vortex,
 )
@@ -1555,14 +1555,12 @@ def multi_tf_trend_bearish(
     closes = df["Close"]
     if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
         return False
-    out = MultiTFTrend.compute(
-        data={'close': closes},
-        params={'higher_tf': higher_tf, 'window': window, 'slope_threshold': slope_threshold},
-    )
-    val = out['higher_tf_trend'].iloc[-1]
+    out = MultiTFSlope.compute(data={'close': closes},
+                               params={'higher_tf': higher_tf, 'window': window})
+    val = out['higher_tf_slope'].iloc[-1]
     if pd.isna(val):
         return False
-    return val == -1
+    return bool(val < -slope_threshold)
 
 @RuleRegistry.register("multi_tf_trend_bullish")
 def multi_tf_trend_bullish(
@@ -1591,14 +1589,12 @@ def multi_tf_trend_bullish(
     closes = df["Close"]
     if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
         return False
-    out = MultiTFTrend.compute(
-        data={'close': closes},
-        params={'higher_tf': higher_tf, 'window': window, 'slope_threshold': slope_threshold},
-    )
-    val = out['higher_tf_trend'].iloc[-1]
+    out = MultiTFSlope.compute(data={'close': closes},
+                               params={'higher_tf': higher_tf, 'window': window})
+    val = out['higher_tf_slope'].iloc[-1]
     if pd.isna(val):
         return False
-    return val == 1
+    return bool(val > slope_threshold)
 
 @RuleRegistry.register("trix_bearish")
 def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> bool:
@@ -1885,8 +1881,7 @@ def rsi_hidden_bearish_divergence(
     return _divergence(df, rsi_window, swing_window, min_swing_distance, "high", False, True)
 
 # Signals that were in this file when 1.3.4 shipped and are now in the file named for
-# their ontology class. Reached by name, with a DeprecationWarning; see
-# `moved_signals` for why this is PEP 562 rather than a plain re-export.
+# their ontology class. Reached by name, with a DeprecationWarning.
 _MOVED = {
     "averaging": (
         "kama_cross_down", "kama_cross_up"
@@ -1900,4 +1895,6 @@ _MOVED = {
     ),
 }
 
-__getattr__ = moved_signals("mangrove_kb.signals.momentum", _MOVED)
+_moved_getattr = moved_signals("mangrove_kb.signals.momentum", _MOVED)
+
+__getattr__ = _moved_getattr

@@ -588,7 +588,9 @@ VolatilityStop = VolatilityEnvelope
 
 
 class TTMSqueeze(IndicatorInterface):
-    """TTM Squeeze (John Carter).
+    """DEPRECATED: use `SqueezeDepth`, which measures instead of concluding.
+
+    TTM Squeeze (John Carter).
 
     Detects volatility contraction ("squeeze") when Bollinger Bands are
     entirely inside Keltner Channels, and signals a volatility expansion
@@ -680,6 +682,54 @@ class TTMSqueeze(IndicatorInterface):
             'squeeze_fired': pd.Series(squeeze_fired.values, index=close.index, name='squeeze_fired'),
             'momentum': pd.Series(momentum, index=close.index, name='ttm_momentum'),
         }
+
+
+class SqueezeDepth(IndicatorInterface):
+    """How far inside the Keltner Channel the Bollinger Bands sit, and Carter's momentum.
+
+        squeeze_depth = min(kc_hband - bb_hband, bb_lband - kc_lband)
+        momentum      = linear-regression endpoint of (close - midpoint) over mom_window,
+                        midpoint = ((highest_high + lowest_low) / 2 + SMA(close)) / 2
+
+    `squeeze_depth` is positive exactly when the Bollinger Bands are entirely inside the Keltner
+    Channel -- John Carter's "squeeze" -- and its magnitude says by how much, which the boolean it
+    replaces threw away. A squeeze releasing is `squeeze_depth` crossing down through zero, and
+    that comparison belongs to the signal making it.
+
+    Replaces `TTMSqueeze`, which emitted `squeeze_on` and `squeeze_fired` as booleans beside this
+    same `momentum`: a verdict and a measurement in one object. That class still exists and still
+    works; it is deprecated.
+
+    Reference: John Carter, "Mastering the Trade" (2005).
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'bb_window': int, 'bb_std': float, 'kc_window': int, 'kc_atr_mult': float,
+                 'mom_window': int}
+
+    Returns:
+        {'squeeze_depth': pd.Series, 'momentum': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["bb_window", "bb_std", "kc_window", "kc_atr_mult", "mom_window"]
+    _outputs = ["squeeze_depth", "momentum"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        out = TTMSqueeze._compute(data, params)
+        bb = BollingerBands.compute({'close': data['close']},
+                                    {'window': params['bb_window'], 'window_dev': float(params['bb_std'])})
+        kc = KeltnerChannel.compute(
+            data={'high': data['high'], 'low': data['low'], 'close': data['close']},
+            params={'window': params['kc_window'], 'window_atr': params['kc_window'],
+                    'original_version': False, 'multiplier': float(params['kc_atr_mult'])},
+        )
+        depth = pd.concat([kc['hband'] - bb['hband'], bb['lband'] - kc['lband']], axis=1).min(axis=1)
+        return {
+            'squeeze_depth': pd.Series(depth.values, index=data['close'].index, name='squeeze_depth'),
+            'momentum': out['momentum'],
+        }
+
 
 
 class ChandelierLevels(IndicatorInterface):

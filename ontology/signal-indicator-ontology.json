@@ -2979,36 +2979,25 @@
    }
   },
   {
-   "id": "procedure:indicator-multitftrend",
-   "title": "MultiTFTrend",
+   "id": "procedure:indicator-multitfslope",
+   "title": "MultiTFSlope",
    "kind": "Procedure",
-   "summary": "Resamples to a higher timeframe, computes EMA slope on the resampled closes, and broadcasts the slope direction back onto the base-timeframe index via forward-fill. The resulting `higher_tf_trend` series is +1 (higher-TF EMA rising), -1 (falling), or 0 (flat / insufficient data).",
+   "summary": "higher = close resampled to `higher_tf`, last value in each bucket slope  = EMA(higher, window).diff() output = slope / rolling_mean(|EMA(higher, window)|, window) Unitless by construction, so the same number is comparable across assets and price levels. Broadcast back to base bars by forward-fill from the most recently CLOSED higher-timeframe bar, so no base bar sees a period that has not finished. Replaces `MultiTFTrend`, which emitted this slope already thresholded into -1 / 0 / +1. The threshold is the judgement, so it moved to the signals -- and with it `slope_threshold`, which was an indicator parameter describing a decision the indicator should not have been making. That class still exists and still works; it is deprecated.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "trend_indicators",
     "reference": null,
     "warmup_bars": "1 - 1",
-    "abbreviation": "none",
-    "usage_example": "MultiTFTrend.compute(data={'close': df['Close']}, params={'higher_tf': value, 'window': value, 'slope_threshold': value})",
-    "formula": "higher = resample(close, higher_tf).last()\nslope  = EMA(higher, window).diff()\nrel    = slope / rolling_mean(|EMA|)          # unitless\ntrend  = +1 if rel > threshold, -1 if rel < -threshold, else 0\n\nBroadcast back to the base timeframe by forward-fill, so each bar carries the\nmost recently CLOSED higher-timeframe reading.\n\nAUTHORED -- no such indicator exists in the technical-analysis literature.",
-    "interpretation": [
-     "A ternary regime flag from a higher timeframe, not a continuous measurement",
-     "+1 when the higher-timeframe EMA is rising faster than the threshold, -1 when falling, 0 when flat",
-     "The slope is normalised by the EMA's own magnitude, so the threshold is unitless and transferable across instruments",
-     "Forward-fill broadcasting keeps it lookahead-free: no bar sees a higher-timeframe bar that has not closed",
-     "Returns all-NaN unless the input carries a DatetimeIndex, and needs at least window+2 higher-timeframe bars"
-    ],
-    "applications": [
-     "Higher-timeframe trend filter for lower-timeframe entries",
-     "Regime gating -- suppressing counter-trend signals",
-     "Multi-timeframe confluence without maintaining two datasets",
-     "Note: authored for this corpus, so no external literature or precedent applies"
-    ],
+    "abbreviation": null,
+    "usage_example": "MultiTFSlope.compute(data={'close': df['Close']}, params={'higher_tf': value, 'window': value})",
+    "formula": "higher_tf_slope[t] = diff(ema(resample(close, higher_tf), window)) / rolling_mean(|ema|, window), forward-filled from the last CLOSED higher-tf bar",
+    "interpretation": "Direction and steepness of a higher timeframe's trend, normalised by its own magnitude so the number is unitless and comparable across assets.",
+    "applications": "Higher-timeframe confirmation. Where to put the threshold is the judgement, and it moved to the signals with `slope_threshold`.",
     "inputs": {
      "close": {
       "type": "series",
-      "description": "closing price"
+      "description": null
      }
     },
     "params": {
@@ -3025,25 +3014,15 @@
       "min": 2,
       "max": 100,
       "description": "EMA period on the resampled close"
-     },
-     "slope_threshold": {
-      "type": "float",
-      "default": 0,
-      "min": 0,
-      "max": null,
-      "description": "Relative slope threshold for non-flat classification"
      }
     },
     "outputs": {
-     "higher_tf_trend": {
+     "higher_tf_slope": {
       "type": "series",
-      "units": "dimensionless",
-      "range": [
-       -1,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "TERNARY state, -1 / 0 / +1, from the sign of a higher-timeframe EMA slope normalised by its own magnitude and compared against slope_threshold. A decision over a series rather than a measurement, and AUTHORED here -- no such indicator exists in the technical-analysis literature. Requires a DatetimeIndex and returns all-NaN without one, and needs at least window+2 higher-timeframe bars. The higher-timeframe value is broadcast back by forward-fill, so each bar carries the most recently CLOSED higher-timeframe reading, which keeps it lookahead-free"
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
      }
     }
    }
@@ -3819,6 +3798,91 @@
    }
   },
   {
+   "id": "procedure:indicator-squeezedepth",
+   "title": "SqueezeDepth",
+   "kind": "Procedure",
+   "summary": "squeeze_depth = min(kc_hband - bb_hband, bb_lband - kc_lband) momentum      = linear-regression endpoint of (close - midpoint) over mom_window, midpoint = ((highest_high + lowest_low) / 2 + SMA(close)) / 2 `squeeze_depth` is positive exactly when the Bollinger Bands are entirely inside the Keltner Channel -- John Carter's \"squeeze\" -- and its magnitude says by how much, which the boolean it replaces threw away. A squeeze releasing is `squeeze_depth` crossing down through zero, and that comparison belongs to the signal making it. Replaces `TTMSqueeze`, which emitted `squeeze_on` and `squeeze_fired` as booleans beside this same `momentum`: a verdict and a measurement in one object. That class still exists and still works; it is deprecated.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility_indicators",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
+    "warmup_bars": null,
+    "abbreviation": null,
+    "usage_example": "SqueezeDepth.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value})",
+    "formula": "squeeze_depth[t] = min(kc_hband[t] - bb_hband[t], bb_lband[t] - kc_lband[t]); momentum[t] = EPMA(close - ((highest_high + lowest_low)/2 + sma(close))/2, mom_window)[t]",
+    "interpretation": "How far inside the Keltner Channel the Bollinger Bands sit. Positive is Carter's squeeze, and the magnitude says by how much -- which the boolean it replaces discarded. Crossing down through zero is the release.",
+    "applications": "Volatility-contraction setups. The threshold at zero and the direction read from momentum are both judgements, so they live in the signals.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": null
+     },
+     "low": {
+      "type": "series",
+      "description": null
+     },
+     "close": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "bb_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Bollinger window"
+     },
+     "bb_std": {
+      "type": "float",
+      "default": 2,
+      "min": 0.5,
+      "max": null,
+      "description": "Bollinger standard deviations"
+     },
+     "kc_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Keltner window"
+     },
+     "kc_atr_mult": {
+      "type": "float",
+      "default": 1.5,
+      "min": 0.5,
+      "max": null,
+      "description": "Keltner ATR multiplier"
+     },
+     "mom_window": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 50,
+      "description": "Momentum window"
+     }
+    },
+    "outputs": {
+     "squeeze_depth": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     },
+     "momentum": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-stochrsi",
    "title": "StochRSI",
    "kind": "Procedure",
@@ -4366,98 +4430,6 @@
       ],
       "canonical_name": "TSI",
       "description": "100 * double-smoothed momentum / double-smoothed absolute momentum, each an EMA over window_slow then an EMA over window_fast of close-to-close change. Hard-bounded -100..100: an EMA is a weighted average with non-negative weights, so the smoothed signed series can never exceed the smoothed absolute series in magnitude at either stage. In practice values cluster far inside, typically within +/-25, and the literature sets no fixed overbought level -- the zero-line crossover is the primary reading"
-     }
-    }
-   }
-  },
-  {
-   "id": "procedure:indicator-ttmsqueeze",
-   "title": "TTMSqueeze",
-   "kind": "Procedure",
-   "summary": "Detects volatility contraction (\"squeeze\") when Bollinger Bands are entirely inside Keltner Channels, and signals a volatility expansion when the squeeze releases (BB exits KC). The momentum sub-output indicates which direction the coiled volatility is likely to break. State definition: - squeeze_on: bb_hband < kc_hband  AND  bb_lband > kc_lband - squeeze_fired: squeeze was on the previous bar, off on the current - momentum: linear-regression slope of (close - midpoint) over the momentum window, where midpoint = (highest_high + lowest_low + SMA(close)) / 3. Positive = bullish coil; negative = bearish.",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "volatility_indicators",
-    "reference": null,
-    "warmup_bars": "mom_window - 1",
-    "abbreviation": null,
-    "usage_example": "TTMSqueeze.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value})",
-    "formula": null,
-    "interpretation": null,
-    "applications": null,
-    "inputs": {
-     "high": {
-      "type": "series",
-      "description": null
-     },
-     "low": {
-      "type": "series",
-      "description": null
-     },
-     "close": {
-      "type": "series",
-      "description": null
-     }
-    },
-    "params": {
-     "bb_window": {
-      "type": "int",
-      "default": 20,
-      "min": 5,
-      "max": 100,
-      "description": "Bollinger Band window"
-     },
-     "bb_std": {
-      "type": "float",
-      "default": 2,
-      "min": 1,
-      "max": null,
-      "description": "Bollinger std multiplier"
-     },
-     "kc_window": {
-      "type": "int",
-      "default": 20,
-      "min": 5,
-      "max": 100,
-      "description": "Keltner Channel window (used for both EMA and ATR)"
-     },
-     "kc_atr_mult": {
-      "type": "float",
-      "default": 1.5,
-      "min": 0.5,
-      "max": null,
-      "description": "Keltner ATR multiplier"
-     },
-     "mom_window": {
-      "type": "int",
-      "default": 12,
-      "min": 5,
-      "max": 50,
-      "description": "Momentum regression window"
-     }
-    },
-    "outputs": {
-     "squeeze_on": {
-      "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
-     },
-     "squeeze_fired": {
-      "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
-     },
-     "momentum": {
-      "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
      }
     }
    }
@@ -15680,6 +15652,243 @@
    }
   },
   {
+   "id": "procedure:signal-ttm-squeeze-active",
+   "title": "ttm_squeeze_active",
+   "kind": "Procedure",
+   "summary": "Check if the Bollinger Bands are inside the Keltner Channel (the squeeze is on). `squeeze_depth` is how far inside the Keltner Channel the narrower Bollinger band sits, so a positive depth IS the squeeze. The indicator measures the distance; this decides that a positive distance counts.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
+    "warmup_bars": "max(bb_window, kc_window) + need - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_active', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
+    "formula": "squeeze_depth[t] > 0 -- Bollinger Bands entirely inside the Keltner Channel",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "bb_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Bollinger window"
+     },
+     "bb_std": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "Bollinger standard deviations"
+     },
+     "kc_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Keltner window"
+     },
+     "kc_atr_mult": {
+      "type": "float",
+      "default": 1.5,
+      "min": 0.5,
+      "max": null,
+      "description": "Keltner ATR multiplier"
+     },
+     "mom_window": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 50,
+      "description": "Momentum window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if squeeze_depth > 0"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ttm-squeeze-fired-bearish",
+   "title": "ttm_squeeze_fired_bearish",
+   "kind": "Procedure",
+   "summary": "Detect a squeeze releasing with negative momentum. Mirror of `ttm_squeeze_fired_bullish`.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
+    "warmup_bars": "max(bb_window, kc_window) + need - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_fired_bearish', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
+    "formula": "squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] < 0",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "bb_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Bollinger window"
+     },
+     "bb_std": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "Bollinger standard deviations"
+     },
+     "kc_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Keltner window"
+     },
+     "kc_atr_mult": {
+      "type": "float",
+      "default": 1.5,
+      "min": 0.5,
+      "max": null,
+      "description": "Keltner ATR multiplier"
+     },
+     "mom_window": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 50,
+      "description": "Momentum window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar the squeeze releases with momentum < 0"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ttm-squeeze-fired-bullish",
+   "title": "ttm_squeeze_fired_bullish",
+   "kind": "Procedure",
+   "summary": "Detect a squeeze releasing with positive momentum. The release is `squeeze_depth` crossing down through zero -- the Bollinger bands leaving the Keltner channel. Direction comes from Carter's momentum on the same bar.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
+    "warmup_bars": "max(bb_window, kc_window) + need - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_fired_bullish', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
+    "formula": "squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] > 0",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "bb_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Bollinger window"
+     },
+     "bb_std": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": null,
+      "description": "Bollinger standard deviations"
+     },
+     "kc_window": {
+      "type": "int",
+      "default": 20,
+      "min": 5,
+      "max": 100,
+      "description": "Keltner window"
+     },
+     "kc_atr_mult": {
+      "type": "float",
+      "default": 1.5,
+      "min": 0.5,
+      "max": null,
+      "description": "Keltner ATR multiplier"
+     },
+     "mom_window": {
+      "type": "int",
+      "default": 12,
+      "min": 5,
+      "max": 50,
+      "description": "Momentum window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar the squeeze releases with momentum > 0"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-tweezer-bottoms-trigger",
    "title": "tweezer_bottoms_trigger",
    "kind": "Procedure",
@@ -17350,11 +17559,11 @@
    "to_id": "concept:indicator-class-momentum"
   },
   {
-   "from": "MultiTFTrend",
+   "from": "MultiTFSlope",
    "rel": "instance-of",
    "to": "momentum",
    "why": "class membership",
-   "from_id": "procedure:indicator-multitftrend",
+   "from_id": "procedure:indicator-multitfslope",
    "to_id": "concept:indicator-class-momentum"
   },
   {
@@ -17446,6 +17655,14 @@
    "to_id": "concept:indicator-class-oscillator"
   },
   {
+   "from": "SqueezeDepth",
+   "rel": "instance-of",
+   "to": "volatility",
+   "why": "class membership",
+   "from_id": "procedure:indicator-squeezedepth",
+   "to_id": "concept:indicator-class-volatility"
+  },
+  {
    "from": "StochRSI",
    "rel": "instance-of",
    "to": "oscillator",
@@ -17508,14 +17725,6 @@
    "why": "class membership",
    "from_id": "procedure:indicator-tsi",
    "to_id": "concept:indicator-class-oscillator"
-  },
-  {
-   "from": "TTMSqueeze",
-   "rel": "instance-of",
-   "to": "unclassed",
-   "why": "class membership",
-   "from_id": "procedure:indicator-ttmsqueeze",
-   "to_id": "concept:indicator-class-unclassed"
   },
   {
    "from": "TrueRange",
@@ -21674,12 +21883,12 @@
   {
    "from": "multi_tf_trend_bearish",
    "rel": "uses",
-   "to": "MultiTFTrend",
+   "to": "MultiTFSlope",
    "why": "reads indicator output",
    "from_id": "procedure:signal-multi-tf-trend-bearish",
-   "to_id": "procedure:indicator-multitftrend",
+   "to_id": "procedure:indicator-multitfslope",
    "inputs": {
-    "higher_tf_trend": {
+    "higher_tf_slope": {
      "type": "series"
     }
    }
@@ -21703,12 +21912,12 @@
   {
    "from": "multi_tf_trend_bullish",
    "rel": "uses",
-   "to": "MultiTFTrend",
+   "to": "MultiTFSlope",
    "why": "reads indicator output",
    "from_id": "procedure:signal-multi-tf-trend-bullish",
-   "to_id": "procedure:indicator-multitftrend",
+   "to_id": "procedure:indicator-multitfslope",
    "inputs": {
-    "higher_tf_trend": {
+    "higher_tf_slope": {
      "type": "series"
     }
    }
@@ -23429,6 +23638,54 @@
    }
   },
   {
+   "from": "ttm_squeeze_active",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ttm-squeeze-active",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ttm_squeeze_active",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ttm-squeeze-active",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ttm_squeeze_fired_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ttm_squeeze_fired_bearish",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bearish",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ttm_squeeze_fired_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ttm_squeeze_fired_bullish",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bullish",
+   "to_id": "property:role-trigger"
+  },
+  {
    "from": "tweezer_bottoms_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -24128,21 +24385,26 @@
   "removed_not_indicators": [
    "ATRTrailingStop",
    "Divergence",
+   "MultiTFTrend",
    "PSAR",
-   "SuperTrend"
+   "SuperTrend",
+   "TTMSqueeze"
   ],
-  "carried_forward_from_previous_build": 1125,
+  "carried_forward_from_previous_build": 1128,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 213,
+  "signals": 216,
   "signals_registered": 247,
-  "signals_out_of_scope": 34,
+  "signals_out_of_scope": 31,
   "signals_with_no_indicator": [
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",
    "three_inside_down_trigger",
-   "three_inside_up_trigger"
+   "three_inside_up_trigger",
+   "ttm_squeeze_active",
+   "ttm_squeeze_fired_bearish",
+   "ttm_squeeze_fired_bullish"
   ],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],

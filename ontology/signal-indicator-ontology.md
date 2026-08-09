@@ -69,13 +69,12 @@ two representations of one fact.
 | `oscillator` | 12 | bounded output where absolute thresholds are meaningful |
 | `volatility` | 8 | observed dispersion -- distance, width, or range |
 | `flow` | 5 | running accumulation; level is arbitrary, direction carries the meaning |
-| `unclassed` | 1 | not yet determined -- named so the gap stays visible |
+| `unclassed` | 0 | empty; kept so the class exists the moment something needs it |
 
-`unclassed` holds `TTMSqueeze` alone. Of the original five: `EPMA`, `Ichimoku` and `HeikinAshi` are
+`unclassed` is now empty. Of the original five: `EPMA`, `Ichimoku` and `HeikinAshi` are
 `averaging` -- each emits reference levels in price units, which is what the class asks about the
-output, whatever the indicator is used for. `Divergence` turned out not to be an indicator at all
-(four boolean outputs, no measurement) and was replaced by `SwingDelta`; see below. `TTMSqueeze`
-emits two booleans beside one number and is pinned with `MultiTFTrend`.
+output, whatever the indicator is used for. `Divergence` and `TTMSqueeze` turned out not to be
+indicators at all and were replaced by `SwingDelta` and `SqueezeDepth`; see below.
 
 ### Basis of division, and what it rejects
 
