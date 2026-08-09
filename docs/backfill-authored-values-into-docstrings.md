@@ -30,7 +30,13 @@ Three near-misses on one fragility is the argument. It is not hypothetical and i
 
 ## Goal
 
-Move every **authored** value into the docstring of the thing it describes, so that:
+**The docstrings and the code become the single source of truth. The graph becomes a derived
+artifact.**
+
+Every authored fact lives in the docstring of the thing it describes; every derived fact is read from
+the code. Nothing falls outside those two, and the JSON is regenerable from a clean tree at any time.
+
+Concretely, so that:
 
 1. the build is a pure function of the source tree — delete the JSON, rebuild, get it back;
 2. the carry-forward disappears, and with it the failure mode above;
@@ -129,9 +135,12 @@ graph.**
 
 ## Explicitly out of scope
 
-- **`knowledge-base/*.md` is not deleted.** It stops being a *builder input*, but it is an
-  independent published corpus with its own table of contents, served by the document tools. Retiring
-  it is a separate decision.
+- **`knowledge-base/*.md` stops being a source of truth entirely.** Its values -- `formula`,
+  `interpretation`, `applications`, `abbreviation` -- move into docstrings with everything else, and
+  the builder stops reading it. The *files* are not deleted, because they are also an independent
+  published corpus with their own table of contents, served by the document tools. But after this
+  they feed nothing: no value in the graph comes from them. Retiring the files is a separate
+  decision.
 - The `.claude/skills/author-*-properties` skills stay. New indicators still need authoring; only the
   target changes, from the JSON to the docstring. They need updating, not deleting.
 - Edges, and everything else in the derived column above.
