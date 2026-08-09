@@ -25,7 +25,7 @@ MangroveKnowledgeBase is a standalone repository providing:
 
 - **247 trading signal functions** (117 TRIGGER, 130 FILTER), in files named for the ontology class of the indicator each one reads: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern` -- plus `onchain` and `defi_pro`, which read provider feeds rather than price
 - **70 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
-- **A signal/indicator knowledge graph** -- 302 nodes and 750 edges giving every indicator a class and every signal a machine-readable formula, verified by execution against real market data
+- **A signal/indicator knowledge graph** -- 301 nodes and 749 edges giving every indicator a class and every signal a machine-readable formula, verified by execution against real market data
 - **A unified server** with dual protocol access (REST API + MCP) serving 11 trading education documents with full-text search, signal/indicator metadata (free), and signal evaluation/indicator computation (x402 gated)
 - **Self-describing metadata** -- every signal carries its type, required data columns, and parameter ranges directly in its docstring
 - **A docstring parser** that extracts structured metadata from signal functions at runtime
@@ -37,7 +37,7 @@ Signals and indicators are designed to be used by trading strategy engines, back
 
 Every indicator carries a **class** describing what its output tells you about its input, and every
 signal in the graph carries a **formula** stating the predicate it computes. The graph lives in
-`ontology/signal-indicator-ontology.json` (302 nodes, 750 edges); the design is in
+`ontology/signal-indicator-ontology.json` (301 nodes, 749 edges); the design is in
 `ontology/signal-indicator-ontology.md`.
 
 The seven classes: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern`,

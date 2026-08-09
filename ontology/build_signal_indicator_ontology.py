@@ -82,7 +82,6 @@ CLASSES_DEF = {
  'volatility': "Measures observed dispersion -- distance, width, or range.",
  'flow': "Running accumulation whose level is arbitrary but whose direction carries meaning.",
  'pattern': "Shape of one or a few bars (candlestick geometry).",
- 'unclassed': "No class determined yet. Deliberately named so the gap stays visible.",
 }
 ASSIGN = {
  'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator "
@@ -94,8 +93,6 @@ ASSIGN = {
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
                "ChandelierLevels VolatilityEnvelope SqueezeDepth",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
- # Empty, and kept so the class exists the moment something needs it again.
- 'unclassed': "",
 }
 # Not indicators: their outputs are VERDICTS, not measurements. SuperTrend emits `direction`
 # (+1 long / -1 short) and NaNs its bands according to it; PSAR emits flip flags; ATRTrailingStop
@@ -1244,16 +1241,10 @@ SIGNAL_SCOPE = {
     # signals were on this list until ChandelierExit was found to emit plain levels; they are now
     # cl_below_high_offset / cl_above_low_offset, in scope above.
     #
-    # Fifteen read an indicator still in the `unclassed` class, whose classification is an open
-    # decision: heikin_ashi_{bullish,bearish} (HeikinAshi); ichimoku_{bullish,bearish},
-    # ichimoku_tk_cross (Ichimoku); rsi_{,hidden_}{bullish,bearish}_divergence (Divergence);
-    # ttm_squeeze_active, ttm_squeeze_fired_{bullish,bearish} (TTMSqueeze); epma_cross_up,
-    # epma_cross_down, is_above_epma (EPMA -- reached through the shared MA helper, so only the
-    # builder's parameter binding resolves it; a direct read of the call graph misses them). Their
-    # class is
-    # transitive, so it changes when those five are classed -- and the file a signal lives in is
-    # transitive, so it changes when those five are classed -- and the file a signal lives in is
-    # its class, so authoring them now would place them on a guess.
+    # Fifteen more were held out while their indicator sat in an `unclassed` bucket -- HeikinAshi,
+    # Ichimoku, EPMA, and the two that became SwingDelta and SqueezeDepth. All five are classed
+    # now and all fifteen signals are in scope above, so the bucket is gone: every indicator has a
+    # class, and an empty class is a claim the graph no longer makes.
     "adx_bullish_di", "adx_strong_trend", "alligator_bearish", "alligator_bullish",
     "alligator_sleeping", "alma_cross_down", "alma_cross_up", "aroon_crossover",
     "aroon_down_trend", "aroon_up_trend", "cci_overbought", "cci_oversold", "dema_cross_down",

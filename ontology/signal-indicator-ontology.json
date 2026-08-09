@@ -127,15 +127,6 @@
    "props": {}
   },
   {
-   "id": "concept:indicator-class-unclassed",
-   "title": "unclassed",
-   "kind": "Concept",
-   "summary": "No class determined yet. Deliberately named so the gap stays visible.",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {}
-  },
-  {
    "id": "procedure:indicator-adi",
    "title": "ADI",
    "kind": "Procedure",
@@ -17394,14 +17385,6 @@
    "to_id": "concept:indicator"
   },
   {
-   "from": "unclassed",
-   "rel": "kind-of",
-   "to": "Indicator",
-   "why": "indicator class",
-   "from_id": "concept:indicator-class-unclassed",
-   "to_id": "concept:indicator"
-  },
-  {
    "from": "ADI",
    "rel": "instance-of",
    "to": "flow",
@@ -24841,7 +24824,7 @@
  "meta": {
   "scope": "indicator class ontology",
   "indicators": 71,
-  "classes": 7,
+  "classes": 6,
   "removed_not_indicators": [
    "ATRTrailingStop",
    "Divergence",

@@ -11,7 +11,7 @@ description: >-
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of itself: **302 nodes, 750 edges** covering 71 indicators and
+`mangrove_kb` ships a knowledge graph of itself: **301 nodes, 749 edges** covering 71 indicators and
 216 signals. It is generated from the source, so it is exact — not extracted from prose, not
 approximate, no ranking model in the way. Every answer is a fact about the code as it is.
 
