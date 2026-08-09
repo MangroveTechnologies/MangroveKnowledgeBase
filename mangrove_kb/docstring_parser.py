@@ -22,6 +22,7 @@ public metadata schema.
 
 import inspect
 import re
+import textwrap
 from typing import Any, Optional
 
 
@@ -43,6 +44,37 @@ _DISABLED_REASON_RE = re.compile(r"^\s*Disabled-Reason:\s*(.+)$", re.MULTILINE)
 
 # Matches the Args: section header
 _ARGS_HEADER_RE = re.compile(r"^\s*Args:\s*$", re.MULTILINE)
+
+# --- authored-metadata sections (the docstring-as-SSOT format) --------------------------------
+# Every authored value lives in the docstring of the thing it describes; the code supplies
+# everything derivable. See docs/backfill-authored-values-into-docstrings.md.
+
+#: Opens every indicator and signal docstring: the KIND and the CODE name, so the builder can
+#: assert the docstring is attached to the object it claims to document. A docstring copy-pasted
+#: onto the wrong class then fails the build instead of silently mislabelling a node.
+_DECL_RE = re.compile(r"^\s*(Indicator|Signal):\s*(\S+)\s*$")
+
+#: Sections carrying a single inline value.
+_INLINE_SECTIONS = ("Abbreviation", "Reference")
+#: Sections carrying an indented block.
+_BLOCK_SECTIONS = ("Formula", "Inputs", "Outputs", "Interpretation", "Applications")
+#: Sections the pre-existing parser already owns; listed so the description stops at them too.
+_LEGACY_SECTIONS = ("Type", "Requires", "Disabled", "Disabled-Reason", "Args", "Returns")
+
+_ALL_SECTIONS = _INLINE_SECTIONS + _BLOCK_SECTIONS + _LEGACY_SECTIONS
+_SECTION_START_RE = re.compile(r"^(" + "|".join(_ALL_SECTIONS) + r"):")
+
+#: Which sections each kind may carry. Enforced, not documented -- an `Interpretation:` on a signal
+#: is an authoring mistake, and the graph has no field to receive it.
+PERMITTED = {
+    "Indicator": set(_INLINE_SECTIONS) | set(_BLOCK_SECTIONS) | {"Args", "Returns"},
+    "Signal": {"Reference", "Formula", "Inputs", "Outputs", "Type", "Requires",
+               "Disabled", "Disabled-Reason", "Args", "Returns"},
+}
+
+#: `name [units, lo..hi]` with an optional `"canonical name"`. Omitting the quoted name parses back
+#: to the literal string "none", which is what the graph holds for an output that has none.
+_OUTPUT_RE = re.compile(r"^(\w+)\s*\[([^,\]]+),\s*([^\]]+)\]\s*(?:\"([^\"]+)\")?\s*:\s*$")
 
 # Matches a parameter line:  "name (type): Description text. Range: X-Y. Default: V."
 # Captures: name, type, description_and_rest
@@ -142,7 +174,7 @@ def _extract_description(docstring: str) -> str:
     for line in lines:
         stripped = line.strip()
         # Stop at the first structured tag
-        if re.match(r"^(Type|Requires|Disabled|Disabled-Reason|Args|Returns):", stripped):
+        if _SECTION_START_RE.match(stripped):
             break
         desc_lines.append(stripped)
 
@@ -507,3 +539,118 @@ def parse_all_signals(signal_modules: list) -> dict:
             print(f"Warning: Could not parse docstring for '{name}': {e}")
 
     return all_signals
+
+
+# --- the docstring-as-SSOT reader ----------------------------------------------------------------
+
+class DocstringFormatError(ValueError):
+    """The docstring does not conform to the authored-metadata format."""
+
+
+def _num(raw: str) -> Any:
+    """A range bound. `inf`/`-inf` are real values here, never a stand-in for null."""
+    raw = raw.strip()
+    if raw in ("inf", "+inf"):
+        return float("inf")
+    if raw == "-inf":
+        return float("-inf")
+    return float(raw) if "." in raw else int(raw)
+
+
+def _split_sections(body: list[str]) -> "OrderedDictType[str, list[str]]":
+    """Split docstring lines into `{section: lines}` plus a `_prose` bucket for the preamble."""
+    from collections import OrderedDict
+    out: "OrderedDictType[str, list[str]]" = OrderedDict()
+    out["_prose"] = []
+    current = "_prose"
+    for line in body:
+        stripped = line.strip()
+        if _SECTION_START_RE.match(stripped):
+            name, _, inline = stripped.partition(":")
+            current = name
+            out[current] = [inline.strip()] if inline.strip() else []
+        else:
+            out[current].append(line)
+    return out
+
+
+def parse_authored(docstring: str) -> dict:
+    """Read every AUTHORED value out of an indicator or signal docstring.
+
+    Returns the kind, the declared code name, and only the fields a human wrote. Nothing derivable
+    from the code is read here -- param types, defaults, `usage_example`, `source_module`, warmup and
+    the graph's edges all come from the code itself, and a docstring that restated them could
+    contradict it.
+
+    Raises:
+        DocstringFormatError: if the declaration line is missing or malformed, or if a section is
+            used on a kind that may not carry it.
+    """
+    if not docstring or not docstring.strip():
+        raise DocstringFormatError("empty docstring")
+    raw = textwrap.dedent("    " + docstring.strip("\n")).split("\n")
+    decl = _DECL_RE.match(raw[0].strip())
+    if not decl:
+        raise DocstringFormatError(
+            f"first line must be 'Indicator: <Name>' or 'Signal: <name>', got {raw[0].strip()!r}")
+    kind, name = decl.group(1), decl.group(2)
+
+    secs = _split_sections(textwrap.dedent("\n".join(raw[1:])).split("\n"))
+    used = {k for k in secs if k != "_prose"}
+    if forbidden := used - PERMITTED[kind]:
+        raise DocstringFormatError(
+            f"{kind} {name!r} carries section(s) it may not have: {', '.join(sorted(forbidden))}")
+
+    res: dict = {"kind": kind, "name": name}
+
+    prose = textwrap.dedent("\n".join(secs["_prose"])).strip("\n")
+    paragraphs = [re.sub(r"\s+", " ", p.strip()) for p in prose.split("\n\n") if p.strip()]
+    # The SUMMARY is the first paragraph only. Everything after it is preserved prose -- design
+    # rationale, caveats -- which belongs in the docstring but is not a graph field. Collapsing all
+    # of it into the summary was the bug this split exists to prevent.
+    if paragraphs:
+        res["summary"] = paragraphs[0]
+
+    for sec in _INLINE_SECTIONS:
+        if sec in secs and secs[sec]:
+            res[sec.lower()] = secs[sec][0].strip()
+
+    if "Formula" in secs:
+        res["formula"] = textwrap.dedent("\n".join(secs["Formula"])).strip("\n").strip()
+
+    for sec in ("Interpretation", "Applications"):
+        if sec in secs:
+            res[sec.lower()] = [l.strip()[2:].strip() for l in secs[sec] if l.strip().startswith("- ")]
+
+    if "Inputs" in secs:
+        res["inputs"] = {}
+        for line in secs["Inputs"]:
+            if line.strip() and ":" in line:
+                key, _, desc = line.strip().partition(":")
+                res["inputs"][key.strip()] = desc.strip()
+
+    if "Outputs" in secs:
+        res["outputs"] = {}
+        current = None
+        for line in secs["Outputs"]:
+            if not line.strip():
+                continue
+            m = _OUTPUT_RE.match(line.strip())
+            if m:
+                current = m.group(1)
+                lo, _, hi = m.group(3).partition("..")
+                res["outputs"][current] = {
+                    "units": m.group(2).strip(),
+                    "range": [_num(lo), _num(hi)],
+                    "canonical_name": m.group(4) or "none",
+                    "description": [],
+                }
+            elif current is None:
+                raise DocstringFormatError(
+                    f"{kind} {name!r}: text under Outputs before any output line: {line.strip()!r}")
+            else:
+                res["outputs"][current]["description"].append(line.strip())
+        for spec in res["outputs"].values():
+            spec["description"] = " ".join(spec["description"]).strip()
+
+    return res
