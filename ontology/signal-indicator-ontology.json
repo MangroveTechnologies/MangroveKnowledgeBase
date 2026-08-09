@@ -22621,6 +22621,22 @@
    }
   },
   {
+   "from": "rsi_bearish_divergence",
+   "rel": "uses",
+   "to": "SwingDelta",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-bearish-divergence",
+   "to_id": "procedure:indicator-swingdelta",
+   "inputs": {
+    "high_indicator_delta": {
+     "type": "series"
+    },
+    "high_price_delta": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "rsi_bullish_divergence",
    "rel": "instance-of",
    "to": "Signal",
@@ -22645,6 +22661,22 @@
    "to_id": "procedure:indicator-rsi",
    "inputs": {
     "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_bullish_divergence",
+   "rel": "uses",
+   "to": "SwingDelta",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-bullish-divergence",
+   "to_id": "procedure:indicator-swingdelta",
+   "inputs": {
+    "low_indicator_delta": {
+     "type": "series"
+    },
+    "low_price_delta": {
      "type": "series"
     }
    }
@@ -22737,6 +22769,22 @@
    }
   },
   {
+   "from": "rsi_hidden_bearish_divergence",
+   "rel": "uses",
+   "to": "SwingDelta",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-hidden-bearish-divergence",
+   "to_id": "procedure:indicator-swingdelta",
+   "inputs": {
+    "high_indicator_delta": {
+     "type": "series"
+    },
+    "high_price_delta": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "rsi_hidden_bullish_divergence",
    "rel": "instance-of",
    "to": "Signal",
@@ -22761,6 +22809,22 @@
    "to_id": "procedure:indicator-rsi",
    "inputs": {
     "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_hidden_bullish_divergence",
+   "rel": "uses",
+   "to": "SwingDelta",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-hidden-bullish-divergence",
+   "to_id": "procedure:indicator-swingdelta",
+   "inputs": {
+    "low_indicator_delta": {
+     "type": "series"
+    },
+    "low_price_delta": {
      "type": "series"
     }
    }
@@ -23714,6 +23778,19 @@
    "to_id": "property:role-filter"
   },
   {
+   "from": "ttm_squeeze_active",
+   "rel": "uses",
+   "to": "SqueezeDepth",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ttm-squeeze-active",
+   "to_id": "procedure:indicator-squeezedepth",
+   "inputs": {
+    "squeeze_depth": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "ttm_squeeze_fired_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -23730,6 +23807,22 @@
    "to_id": "property:role-trigger"
   },
   {
+   "from": "ttm_squeeze_fired_bearish",
+   "rel": "uses",
+   "to": "SqueezeDepth",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bearish",
+   "to_id": "procedure:indicator-squeezedepth",
+   "inputs": {
+    "momentum": {
+     "type": "series"
+    },
+    "squeeze_depth": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "ttm_squeeze_fired_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -23744,6 +23837,22 @@
    "why": "role",
    "from_id": "procedure:signal-ttm-squeeze-fired-bullish",
    "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ttm_squeeze_fired_bullish",
+   "rel": "uses",
+   "to": "SqueezeDepth",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bullish",
+   "to_id": "procedure:indicator-squeezedepth",
+   "inputs": {
+    "momentum": {
+     "type": "series"
+    },
+    "squeeze_depth": {
+     "type": "series"
+    }
+   }
   },
   {
    "from": "tweezer_bottoms_trigger",
@@ -24461,10 +24570,7 @@
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",
    "three_inside_down_trigger",
-   "three_inside_up_trigger",
-   "ttm_squeeze_active",
-   "ttm_squeeze_fired_bearish",
-   "ttm_squeeze_fired_bullish"
+   "three_inside_up_trigger"
   ],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],

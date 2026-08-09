@@ -738,6 +738,38 @@ def _signal_facts():
         local = {n.name: n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
         local.update({k: v for k, v in _sibling_functions(path, sigs_dir).items() if k not in local})
 
+        # What each local helper RETURNS, when that is an indicator's output dict.
+        #
+        # The scan below recognises the two shapes where the call and the read sit in one function:
+        # `X.compute(...)['key']`, and `var = X.compute(...)` followed by `var['key']`. Splitting the
+        # signal files pulled that call up into a shared helper that ends `return X.compute(...)` --
+        # `_squeeze` in volatility.py, `_rsi_swing_deltas` in momentum.py -- and there was no branch
+        # for it, so seven signals read outputs the graph never attributed: the three `ttm_squeeze_*`
+        # got no indicator at all, and the four RSI divergence signals kept only their RSI edge and
+        # so derived `oscillator` when SwingDelta makes them `momentum`. Resolving the return first
+        # lets `out = _squeeze(...)` bind `out` to SqueezeDepth at the call site.
+        returns_indicator = {}
+        while True:
+            found = False
+            for name, fn in local.items():
+                if name in returns_indicator:
+                    continue
+                for nd in ast.walk(fn):
+                    if not (isinstance(nd, ast.Return) and isinstance(nd.value, ast.Call)):
+                        continue
+                    f = nd.value.func
+                    if (isinstance(f, ast.Attribute) and f.attr == "compute"
+                            and isinstance(f.value, ast.Name) and f.value.id in present):
+                        returns_indicator[name] = f.value.id
+                    # a helper that returns another helper's result carries the same dict through
+                    elif isinstance(f, ast.Name) and f.id in returns_indicator:
+                        returns_indicator[name] = returns_indicator[f.id]
+                    if name in returns_indicator:
+                        found = True
+                        break
+            if not found:
+                break
+
         def scan(fn, binding=None):
             """(consumes, calls, guards) for one function body, no recursion.
 
@@ -753,6 +785,22 @@ def _signal_facts():
                     return node.value
                 if isinstance(node, ast.Name):
                     return binding.get(node.id, node.id)
+                # `out[f"{side}_price_delta"]` -- the four divergence signals name their output half
+                # at the call site (`side` is "low" or "high") and half in the helper. Neither half
+                # is a literal on its own, so without this the key is unreadable and the indicator
+                # behind it goes unrecorded.
+                if isinstance(node, ast.JoinedStr):
+                    parts = []
+                    for piece in node.values:
+                        if isinstance(piece, ast.Constant):
+                            parts.append(str(piece.value))
+                        elif (isinstance(piece, ast.FormattedValue)
+                                and isinstance(piece.value, ast.Name)
+                                and isinstance(binding.get(piece.value.id), str)):
+                            parts.append(binding[piece.value.id])
+                        else:
+                            return None  # an interpolation this scan cannot resolve
+                    return "".join(parts)
                 return None
 
             consumes, calls, guards, assigned = {}, set(), [], {}
@@ -771,14 +819,18 @@ def _signal_facts():
                         # string literals both matter: `_ma_is_above(df, DEMA, 'dema', window)`
                         # supplies the indicator AND the output key, and the helper body names
                         # neither -- it says `indicator_cls.compute(...)[output_key]`.
+                        # A LOCAL name: assigning to `binding` here would overwrite this function's
+                        # own call-site binding for every node walked after it, and `ast.walk` puts
+                        # a helper call before the later reads in the same body -- which is exactly
+                        # how `_divergence` is written.
                         params = [a.arg for a in local[f.id].args.args]
-                        binding = {}
+                        call_binding = {}
                         for pname, arg in zip(params, nd.args):
                             if isinstance(arg, ast.Name) and arg.id in present:
-                                binding[pname] = arg.id
+                                call_binding[pname] = arg.id
                             elif isinstance(arg, ast.Constant) and isinstance(arg.value, str):
-                                binding[pname] = arg.value
-                        calls.add((f.id, tuple(sorted(binding.items()))))
+                                call_binding[pname] = arg.value
+                        calls.add((f.id, tuple(sorted(call_binding.items()))))
                 # X.compute(...)['key']
                 if isinstance(nd, ast.Subscript) and isinstance(nd.value, ast.Call):
                     f = nd.value.func
@@ -787,14 +839,18 @@ def _signal_facts():
                         if ind in present and isinstance(key, str):
                             consumes.setdefault(ind, set()).add(key)
                 # var = X.compute(...)   then   var['key']
+                # var = helper(...)      then   var['key'], where the helper returns X.compute(...)
                 if isinstance(nd, ast.Assign) and isinstance(nd.value, ast.Call):
                     f = nd.value.func
+                    ind = None
                     if isinstance(f, ast.Attribute) and f.attr == "compute" and isinstance(f.value, ast.Name):
                         ind = val(f.value)
-                        if ind in present:
-                            for t in nd.targets:
-                                if isinstance(t, ast.Name):
-                                    assigned[t.id] = ind
+                    elif isinstance(f, ast.Name):
+                        ind = returns_indicator.get(f.id)
+                    if ind in present:
+                        for t in nd.targets:
+                            if isinstance(t, ast.Name):
+                                assigned[t.id] = ind
                 # the `if len(x) < N: return False` warmup guard
                 if isinstance(nd, ast.If) and isinstance(nd.test, ast.Compare):
                     c = nd.test
