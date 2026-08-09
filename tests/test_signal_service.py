@@ -8,7 +8,7 @@ class TestSignalServiceMetadata:
 
     def test_list_signals_returns_all(self):
         signals = self.service.list_signals()
-        assert len(signals) == 247
+        assert len(signals) == 249
 
     def test_list_signals_filter_by_category(self):
         """Categories follow the file layout, and the files follow the ontology class.
@@ -25,13 +25,13 @@ class TestSignalServiceMetadata:
         assert len(self.service.list_signals(category="Averaging")) == 55
         assert len(self.service.list_signals(category="Flow")) == 10
         assert len(self.service.list_signals(category="Pattern")) == 40
-        assert len(self.service.list_signals(category="Volatility")) == 29
+        assert len(self.service.list_signals(category="Volatility")) == 31
         # trend.py is not a class -- what is left there is what cannot be classified yet
         assert len(self.service.list_signals(category="Trend")) == 7
 
     def test_list_signals_filter_by_type(self):
         triggers = self.service.list_signals(signal_type="TRIGGER")
-        assert len(triggers) == 117
+        assert len(triggers) == 119
 
     def test_get_signal_exists(self):
         signal = self.service.get_signal("rsi_oversold")

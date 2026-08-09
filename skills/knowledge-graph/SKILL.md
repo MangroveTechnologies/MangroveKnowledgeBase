@@ -11,8 +11,8 @@ description: >-
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of itself: **301 nodes, 749 edges** covering 71 indicators and
-216 signals. It is generated from the source, so it is exact — not extracted from prose, not
+`mangrove_kb` ships a knowledge graph of itself: **303 nodes, 755 edges** covering 71 indicators and
+218 signals. It is generated from the source, so it is exact — not extracted from prose, not
 approximate, no ranking model in the way. Every answer is a fact about the code as it is.
 
 It answers things grep cannot: *what reads this indicator's third output*, *which signals produce a
@@ -62,7 +62,7 @@ the character of what it computes over:
 adosc_bearish --uses--> ADOSC --instance-of--> momentum --kind-of--> Indicator
 ```
 
-`find(kind=...)` walks that for you. All 216 signals resolve. Four of them derive **two** classes —
+`find(kind=...)` walks that for you. All 218 signals resolve. Four of them derive **two** classes —
 the RSI divergence signals read both an oscillator and a momentum indicator, and genuinely belong to
 both. Do not assume class is single-valued.
 

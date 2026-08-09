@@ -379,6 +379,10 @@ def spec_volatility(df):
         "ve_below_lower": (vep, not_above(C, ve["vstop_lband"])),
         "cl_below_high_offset": (clp, outside_below(C, cl["high_offset"])),
         "cl_above_low_offset": (clp, outside_above(C, cl["low_offset"])),
+        # The event form of the two above. Same pair of builders the Bollinger and Keltner
+        # crossings use, so a state/crossing mix-up here would show as a disagreement there too.
+        "cl_high_offset_break": (clp, crosses_below(C, cl["high_offset"])),
+        "cl_low_offset_break": (clp, crosses_above(C, cl["low_offset"])),
         "bb_upper_breakout": (bbp, crosses_above(C, bb["hband"])),
         "bb_lower_breakout": (bbp, crosses_below(C, bb["lband"])),
         "bb_above_upper": (bbp, outside_above(C, bb["hband"])),

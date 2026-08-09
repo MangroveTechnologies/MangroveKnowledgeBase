@@ -6,7 +6,7 @@ The repo has three clean components, no developer portal code:
 
 ```
 MangroveKnowledgeBase/
-  mangrove_kb/     # Pip package: 216 signals, 71 indicators, registry, parser
+  mangrove_kb/     # Pip package: 218 signals, 71 indicators, registry, parser
   kb_server/                   # FastAPI KB server (standalone, port 8080)
   knowledge-base/              # 11 trading education markdown documents (source of truth)
   docs/                        # Mintlify public docs site (docs.mangrovedeveloper.ai)

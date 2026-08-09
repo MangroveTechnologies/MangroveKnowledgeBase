@@ -7669,6 +7669,122 @@
    }
   },
   {
+   "id": "procedure:signal-cl-high-offset-break",
+   "title": "cl_high_offset_break",
+   "kind": "Procedure",
+   "summary": "Detect close crossing below the Chandelier high offset. The EVENT paired with `cl_below_high_offset`'s state. The state is true for every bar close stays under the level -- 356 of 1,294 BTC daily bars at the defaults -- while this fires only on the bar that breaches it. A strategy wanting the event cannot recover it from the state without keeping its own history, which is why both exist.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cl_high_offset_break', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t-1] >= high_offset[t-1] and close[t] < high_offset[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 22,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling extreme and ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where close crosses below high_offset"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-cl-low-offset-break",
+   "title": "cl_low_offset_break",
+   "kind": "Procedure",
+   "summary": "Detect close crossing above the Chandelier low offset. The EVENT paired with `cl_above_low_offset`'s state, which holds for 477 of 1,294 BTC daily bars at the defaults. The two offsets are anchored to OPPOSITE extremes -- high_offset below the rolling high, low_offset above the rolling low -- so they cross constantly: high_offset sits BELOW low_offset on 73% of BTC daily bars at the defaults. They are two independent levels, not a band pair, and nothing here may assume high_offset >= low_offset. Simultaneous firing with `cl_high_offset_break` is therefore not excluded by construction, though it does not occur on any of the seven fixtures.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'cl_low_offset_break', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "close[t-1] <= low_offset[t-1] and close[t] > low_offset[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 22,
+      "min": 5,
+      "max": 100,
+      "description": "Rolling extreme and ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": null,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where close crosses above low_offset"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-cmf-bearish",
    "title": "cmf_bearish",
    "kind": "Procedure",
@@ -19296,6 +19412,70 @@
    }
   },
   {
+   "from": "cl_high_offset_break",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cl-high-offset-break",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cl_high_offset_break",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-cl-high-offset-break",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "cl_high_offset_break",
+   "rel": "uses",
+   "to": "ChandelierLevels",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cl-high-offset-break",
+   "to_id": "procedure:indicator-chandelierlevels",
+   "inputs": {
+    "high_offset": {
+     "type": "series"
+    },
+    "low_offset": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "cl_low_offset_break",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-cl-low-offset-break",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "cl_low_offset_break",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-cl-low-offset-break",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "cl_low_offset_break",
+   "rel": "uses",
+   "to": "ChandelierLevels",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-cl-low-offset-break",
+   "to_id": "procedure:indicator-chandelierlevels",
+   "inputs": {
+    "high_offset": {
+     "type": "series"
+    },
+    "low_offset": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "cmf_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24833,12 +25013,12 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "carried_forward_from_previous_build": 1266,
+  "carried_forward_from_previous_build": 1272,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 216,
-  "signals_registered": 247,
+  "signals": 218,
+  "signals_registered": 249,
   "signals_out_of_scope": 31,
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],

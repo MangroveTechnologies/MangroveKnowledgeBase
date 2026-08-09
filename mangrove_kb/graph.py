@@ -6,7 +6,7 @@ part each signal plays in a strategy. It is generated from the source, so it is 
 extracted -- there is no text-mining noise to rank around.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (216 of 301 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (218 of 303 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -369,7 +369,7 @@ class KnowledgeGraph:
 
         The second is not a workaround for a missing edge; it is how a signal's class is *stated* in
         this model. A signal does not declare a class of its own -- it inherits the character of
-        the computation it reads, and the graph already says so. All 216 signals resolve this way. (The node property ``source_module`` happens to carry the same string, but it is
+        the computation it reads, and the graph already says so. All 218 signals resolve this way. (The node property ``source_module`` happens to carry the same string, but it is
         provenance, not the assertion -- the graph is the source of truth.)
 
         Roles are still excluded here: derivation runs over ``uses`` and the backbone, never over

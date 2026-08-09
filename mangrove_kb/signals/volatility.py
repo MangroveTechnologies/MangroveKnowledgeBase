@@ -990,6 +990,77 @@ def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 
     return bool(df["Close"].iloc[-1] > low_offset.iloc[-1])
 
 
+@RuleRegistry.register("cl_high_offset_break")
+def cl_high_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
+    """
+    Detect close crossing below the Chandelier high offset.
+
+    The EVENT paired with `cl_below_high_offset`'s state. The state is true for every bar close
+    stays under the level -- 356 of 1,294 BTC daily bars at the defaults -- while this fires only on
+    the bar that breaches it. A strategy wanting the event cannot recover it from the state without
+    keeping its own history, which is why both exist.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling extreme and ATR window. Range: 5-100. Default: 22.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True on the bar where close crosses below high_offset.
+    """
+    if len(df) < window + 1:
+        return False
+    offsets = _chandelier_offsets(df, window, multiplier)
+    if offsets is None:
+        return False
+    high_offset, _ = offsets
+    if pd.isna(high_offset.iloc[-1]) or pd.isna(high_offset.iloc[-2]):
+        return False
+    close = df["Close"]
+    return bool(close.iloc[-2] >= high_offset.iloc[-2] and close.iloc[-1] < high_offset.iloc[-1])
+
+
+@RuleRegistry.register("cl_low_offset_break")
+def cl_low_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
+    """
+    Detect close crossing above the Chandelier low offset.
+
+    The EVENT paired with `cl_above_low_offset`'s state, which holds for 477 of 1,294 BTC daily bars
+    at the defaults.
+
+    The two offsets are anchored to OPPOSITE extremes -- high_offset below the rolling high,
+    low_offset above the rolling low -- so they cross constantly: high_offset sits BELOW low_offset
+    on 73% of BTC daily bars at the defaults. They are two independent levels, not a band pair, and
+    nothing here may assume high_offset >= low_offset. Simultaneous firing with
+    `cl_high_offset_break` is therefore not excluded by construction, though it does not occur on
+    any of the seven fixtures.
+
+    Type: TRIGGER
+    Requires: High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Rolling extreme and ATR window. Range: 5-100. Default: 22.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True on the bar where close crosses above low_offset.
+    """
+    if len(df) < window + 1:
+        return False
+    offsets = _chandelier_offsets(df, window, multiplier)
+    if offsets is None:
+        return False
+    _, low_offset = offsets
+    if pd.isna(low_offset.iloc[-1]) or pd.isna(low_offset.iloc[-2]):
+        return False
+    close = df["Close"]
+    return bool(close.iloc[-2] <= low_offset.iloc[-2] and close.iloc[-1] > low_offset.iloc[-1])
+
+
 # The released names. They evaluate and warn; they are not separate signals, so the catalogue still
 # reports one signal per behaviour. MangroveOracle's signals_metadata.json and its strategy cohort
 # files hold these strings.

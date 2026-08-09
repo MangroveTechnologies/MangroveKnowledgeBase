@@ -1175,7 +1175,9 @@ SIGNAL_SCOPE = {
     # ve_below_lower, in scope below.
     # Volatility -- the five Bollinger signals were the worked example that settled the
     # node shape; the rest of the module follows.
-    "cl_above_low_offset", "cl_below_high_offset", "ve_above_upper", "ve_below_lower",
+    "cl_above_low_offset", "cl_below_high_offset",
+    "cl_high_offset_break", "cl_low_offset_break",
+    "ve_above_upper", "ve_below_lower",
     "epma_cross_down", "epma_cross_up", "is_above_epma", "ichimoku_bearish", "ichimoku_bullish",
     "ichimoku_tk_cross", "heikin_ashi_bearish", "heikin_ashi_bullish",
     "rsi_bearish_divergence", "rsi_bullish_divergence", "rsi_hidden_bearish_divergence",
