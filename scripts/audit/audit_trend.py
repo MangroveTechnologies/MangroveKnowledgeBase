@@ -120,7 +120,10 @@ def run_audit():
     results.append(compare_indicator(
         indicator_name="TRIX",
         category="Trend",
-        our_fn=lambda: TRIX.compute({"close": close}, {"window": 15}),
+        # `window_sign` became a required param when TRIX gained its signal line; this audit was
+        # never updated and has reported "OUR IMPLEMENTATION RAISED" ever since. Only `trix` is
+        # compared -- the reference library exposes no signal line.
+        our_fn=lambda: TRIX.compute({"close": close}, {"window": 15, "window_sign": 9}),
         ref_fn=lambda: {
             "trix": ta_trend.TRIXIndicator(close=close, window=15, fillna=False).trix()
         },

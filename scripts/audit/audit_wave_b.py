@@ -38,6 +38,7 @@ from mangrove_kb.indicators import HMA, ALMA, T3, MAMA
 def run_audit():
     df = load_btc_daily()
     close = df['close']
+    high, low = df['high'], df['low']
 
     results = []
 
@@ -91,7 +92,13 @@ def run_audit():
         tolerance_value=0.05,  # 5% mean relative tracking error allowed
         notes='Behavioral audit: MAMA/FAMA track price; FAMA trails MAMA; no NaN after warmup.',
     )
-    out = MAMA.compute({'close': close}, {'fast_limit': 0.5, 'slow_limit': 0.05})
+    # MAMA takes high/low, not close: Ehlers' source is (H+L)/2, corrected in 11cdb16
+    # ('sixteen defects from the literature research'). This audit was never updated and
+    # has raised ValueError('MAMA missing data') ever since. `warmup_bars` likewise became
+    # a parameter in 9aa240a rather than a hardcoded constant.
+    mama_warmup = 64
+    out = MAMA.compute({'high': high, 'low': low},
+                       {'fast_limit': 0.5, 'slow_limit': 0.05, 'warmup_bars': mama_warmup})
     mama = out['mama']
     fama = out['fama']
 
@@ -99,7 +106,10 @@ def run_audit():
     price_range = close.max() - close.min()
     mama_track_err = float((mama - close).abs().mean() / price_range)
     fama_track_err = float((fama - close).abs().mean() / price_range)
-    post_warmup_nan = int(mama.iloc[50:].isna().sum() + fama.iloc[50:].isna().sum())
+    # After the warmup the indicator was ASKED for, not after a hardcoded 50. Warmup became a
+    # parameter in 9aa240a; with the default 64 this check counted 28 legitimately-NaN values
+    # (bars 50-63, two series) and failed an indicator that is behaving correctly.
+    post_warmup_nan = int(mama.iloc[mama_warmup:].isna().sum() + fama.iloc[mama_warmup:].isna().sum())
     fama_trails = fama_track_err > mama_track_err  # FAMA lags more than MAMA
 
     mama_out = OutputResult(
@@ -129,6 +139,7 @@ def run_signal_audit():
     """Verify every Wave B signal bar-by-bar against ground truth from indicators."""
     df = load_btc_daily()
     close = df['close']
+    high, low = df['high'], df['low']
 
     results = []
 
@@ -158,8 +169,8 @@ def run_signal_audit():
         results.append(verify_signal(f"{ma_name}_cross_down", params, df, truth_crossover(fast, slow, 'down')))
 
     # --- MAMA: special -- MAMA vs FAMA crossover, not fast/slow window ---
-    mama_params = {'fast_limit': 0.5, 'slow_limit': 0.05}
-    mama_out = MAMA.compute({'close': close}, mama_params)
+    mama_params = {'fast_limit': 0.5, 'slow_limit': 0.05, 'warmup_bars': 64}
+    mama_out = MAMA.compute({'high': high, 'low': low}, mama_params)
     mama_series, fama_series = mama_out['mama'], mama_out['fama']
 
     # is_above_mama: close > MAMA
@@ -178,6 +189,7 @@ def run_benchmark():
     """Time each Wave B indicator on the full BTC daily fixture."""
     df = load_btc_daily()
     close = df['close']
+    high, low = df['high'], df['low']
     bars = len(df)
 
     return [
@@ -185,7 +197,7 @@ def run_benchmark():
         bench_indicator('ALMA(21)', lambda: ALMA.compute({'close': close}, {'window': 21, 'offset': 0.85, 'sigma': 6.0}), bars),
         bench_indicator('T3(10)', lambda: T3.compute({'close': close}, {'window': 10, 'volume_factor': 0.7}), bars),
         # MAMA: state-dependent sequential loop; fewer runs to keep audit fast.
-        bench_indicator('MAMA', lambda: MAMA.compute({'close': close}, {'fast_limit': 0.5, 'slow_limit': 0.05}), bars, runs=10),
+        bench_indicator('MAMA', lambda: MAMA.compute({'high': high, 'low': low}, {'fast_limit': 0.5, 'slow_limit': 0.05, 'warmup_bars': 64}), bars, runs=10),
     ]
 
 
