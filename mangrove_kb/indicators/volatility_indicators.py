@@ -67,19 +67,65 @@ class ATR(IndicatorInterface):
 
 
 class BollingerBands(IndicatorInterface):
-    """Bollinger Bands
+    """Indicator: BollingerBands
 
-    https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
-
-    Args:
-        data: {'close': pd.Series}
-        params: {'window': int, 'window_dev': int}
+    Volatility bands placed above and below a moving average, with width determined by standard
+    deviation.
 
     Emits measurements only. `hband_indicator` and `lband_indicator` were removed: they were
     `np.where(close > hband, 1.0, 0.0)` -- a boolean decision over a numeric series this indicator
     already emits, which is a signal, not a measurement. An indicator emits a numeric series; a
     signal emits a boolean predicate. That content now lives where it belongs, as the `bb_above_upper`
     and `bb_below_lower` FILTER signals in `signals/volatility.py`.
+
+    Abbreviation: BB
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
+
+    Formula:
+        Middle Band = SMA(Close, 20)
+        Upper Band = SMA + (2 * Standard Deviation)
+        Lower Band = SMA - (2 * Standard Deviation)
+
+        Bandwidth = (Upper - Lower) / Middle * 100
+        %B = (Close - Lower) / (Upper - Lower)
+
+    Inputs:
+        close: closing price
+
+    Outputs:
+        mavg [price, 0..inf]:
+            rolling mean of close over window -- the center band
+        hband [price, 0..inf]:
+            mavg + window_dev * rolling stdev -- the upper band. The stdev is the POPULATION
+            calculation (ddof=0), matching Bollinger's own stated convention
+        lband [price, 0..inf]:
+            mavg - window_dev * rolling stdev -- the lower band. Population stdev, as above
+        wband [percent, 0..inf] "BandWidth":
+            band separation as a percent of the center band, (hband - lband) / mavg * 100.
+            Non-negative because the rolling stdev cannot be negative. Scale-free, so comparable
+            across assets and price levels
+        pband [ratio, -inf..inf] "%B":
+            position of close between the bands, (close - lband) / (hband - lband). 0 at the lower
+            band, 1 at the upper, but NOT clamped -- exceeds 1 above hband and drops below 0 under
+            lband, which the literature treats as significant rather than as an edge case. NaN when
+            the bands coincide, explicitly guarded here unlike Keltner and Donchian
+
+    Interpretation:
+        - Price at upper band: Potentially overbought / strong trend
+        - Price at lower band: Potentially oversold / strong trend
+        - Band squeeze (narrow bands): Low volatility, breakout potential
+        - Band expansion: High volatility, trend in progress
+        - %B > 1: Above upper band; %B < 0: Below lower band
+
+    Applications:
+        - Mean reversion trades at bands in ranges
+        - Trend trades with band walking in trends
+        - Squeeze detection for breakout anticipation
+        - Volatility assessment for position sizing
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int, 'window_dev': int}
 
     Returns:
         {'mavg': pd.Series, 'hband': pd.Series, 'lband': pd.Series,

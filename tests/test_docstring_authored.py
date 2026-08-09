@@ -123,3 +123,31 @@ def test_permitted_sets_are_disjoint_where_they_should_be():
     """Guards the table in the proposal: three sections are indicator-only."""
     assert PERMITTED["Indicator"] - PERMITTED["Signal"] == {"Interpretation", "Applications",
                                                             "Abbreviation"}
+
+
+def test_declaration_does_not_leak_into_the_legacy_description():
+    """`parse_signal_docstring` feeds signal metadata consumed well outside the graph.
+
+    Regression: adding the `Signal: <name>` line prefixed every description with the rule name
+    ("Signal: bb_above_upper Check if price is..."), which no test caught because none asserted the
+    description's opening.
+    """
+    from mangrove_kb.docstring_parser import parse_signal_docstring
+    from mangrove_kb.signals.volatility import bb_above_upper
+    desc = parse_signal_docstring(bb_above_upper)["description"]
+    assert not desc.startswith("Signal:")
+    assert desc.startswith("Check if price is currently above the upper Bollinger Band.")
+
+
+def test_real_source_objects_round_trip(kg):
+    """The two converted objects, read from the live classes rather than the proposal file."""
+    from mangrove_kb.indicators import BollingerBands
+    from mangrove_kb.signals.volatility import bb_above_upper
+    for obj, node_id in ((BollingerBands, "procedure:indicator-bollingerbands"),
+                         (bb_above_upper, "procedure:signal-bb-above-upper")):
+        got, node = parse_authored(obj.__doc__), kg.get(node_id)
+        assert got["name"] == node["name"]
+        assert got.get("summary") == node["summary"]
+        for name, spec in node["outputs"].items():
+            for field in ("units", "range", "canonical_name", "description"):
+                assert got["outputs"][name][field] == spec[field], f"{node_id} {name}.{field}"

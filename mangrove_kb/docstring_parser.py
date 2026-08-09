@@ -170,6 +170,11 @@ def _extract_description(docstring: str) -> str:
         A cleaned single-line description string.
     """
     lines = docstring.split("\n")
+    # Skip the `Signal: <name>` / `Indicator: <name>` declaration. It states which object the
+    # docstring belongs to; it is not prose, and leaving it in prefixes every consumer's
+    # description with the rule name.
+    if lines and _DECL_RE.match(lines[0].strip()):
+        lines = lines[1:]
     desc_lines = []
     for line in lines:
         stripped = line.strip()

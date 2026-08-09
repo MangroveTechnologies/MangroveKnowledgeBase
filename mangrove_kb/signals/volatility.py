@@ -181,14 +181,25 @@ def bb_squeeze(
 
 @RuleRegistry.register("bb_above_upper")
 def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> bool:
-    """
-    Check if price is currently above the upper Bollinger Band.
+    """Signal: bb_above_upper
 
-    A state, not an event: true for every bar close sits above the band, unlike
-    bb_upper_breakout which fires only on the bar that crosses it.
+    Check if price is currently above the upper Bollinger Band. A state, not an event: true for every
+    bar close sits above the band, unlike bb_upper_breakout which fires only on the bar that crosses it.
 
     Type: FILTER
     Requires: Close
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
+
+    Formula:
+        close[t] > hband[t]
+
+    Inputs:
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > upper band on the current bar
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
