@@ -3,7 +3,7 @@
 Eight tasks an agent actually gets asked to do with this library, and how to do each one with
 `mangrove_kb.graph`. Every call here was executed against the committed graph; the outputs are real.
 
-The skill (`skills/knowledge-graph/SKILL.md`) is the reference for *which call*. This is the
+The skill (`SKILL.md`, beside this file) is the reference for *which call*. This is the
 reference for *what a whole job looks like*, including the traps.
 
 ```python
@@ -29,6 +29,22 @@ s["roles"]                      # ['property:role-filter', 'property:role-trigge
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
+```
+nodes, edges  301 749
+primitives    {'Procedure': 289, 'Concept': 6, 'Property': 4, 'Object': 1, 'Schema': 1}
+relations     {'instance-of': 287, 'uses': 231, 'has-role': 216, 'kind-of': 9,
+               'part-of': 4, 'supersedes': 2}
+kinds         ['concept:indicator', 'concept:indicator-class-averaging',
+               'concept:indicator-class-flow', 'concept:indicator-class-momentum',
+               'concept:indicator-class-oscillator', 'concept:indicator-class-pattern',
+               'concept:indicator-class-volatility', 'concept:signal', 'property:role']
+roles         ['property:role-filter', 'property:role-trigger']
+schema        [{'subject': 'Concept',   'relation': 'kind-of',     'object': 'Procedure'},
+               {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
+               {'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
+               ... 10 shapes in total]
+```
+
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
 one and get an empty result you might misread as "there are none".
 
@@ -47,6 +63,18 @@ The expensive failure is writing a duplicate. Two searches, cheap:
 kg.find("divergence")                    # by name, summary, abbreviation
 kg.find(kind="oscillator", role="trigger")   # by what it is and how it is used
 ```
+
+```
+find("divergence") -> 9 matches, name matches first
+  procedure:signal-rsi-bearish-divergence
+  procedure:signal-rsi-bullish-divergence
+  procedure:signal-rsi-hidden-bearish-divergence
+  procedure:signal-rsi-hidden-bullish-divergence
+  procedure:indicator-klingervolumeoscillator      <- from here down, matched in prose only
+  procedure:indicator-kvo
+```
+
+So yes, it exists — four of them. Do not write a fifth.
 
 Results are ranked by *where* the query matched — name first, then abbreviation, then description —
 so the thing actually called "divergence" comes before things that merely mention it. If `find`
@@ -68,6 +96,18 @@ readers = kg.neighbors("procedure:indicator-rsi", relation="uses",
 for r in readers:
     print(r["id"], r["inputs"])      # which output each reader actually reads
 ```
+
+```
+8 readers
+  procedure:signal-rsi-bearish-divergence  {'rsi': {'type': 'series'}}
+  procedure:signal-rsi-bullish-divergence  {'rsi': {'type': 'series'}}
+  procedure:signal-rsi-cross-down          {'rsi': {'type': 'series'}}
+  procedure:signal-rsi-cross-up            {'rsi': {'type': 'series'}}
+  ...
+```
+
+All eight read the same single output, so a change to `rsi` touches all of them and a change to
+anything else touches none.
 
 The `inputs` on the edge is the point: a reader that only takes `rsi` is unaffected by a change to a
 second output, and the graph tells you which is which without opening a file.
@@ -91,6 +131,13 @@ triggers = kg.find(kind="momentum",   role="trigger", limit=None)
 filters  = kg.find(kind="volatility", role="filter",  limit=None)
 ```
 
+```
+momentum triggers   25      volatility filters  16
+  procedure:signal-adosc-cross-down       procedure:signal-atr-high-volatility
+  procedure:signal-adosc-cross-up         procedure:signal-bb-above-upper
+  procedure:signal-ao-zero-cross          procedure:signal-bb-below-lower
+```
+
 `kind` is what the computation *is*; `role` is the part it *plays*. They are independent — a signal
 can be momentum-class and used as either a trigger or a filter.
 
@@ -111,6 +158,16 @@ sig["inputs"]        # which OHLCV columns it needs
 kg.neighbors(sig["id"], relation="uses", direction="out")   # the indicators beneath it
 ```
 
+```
+params       {'window':    {'type': 'int',   'default': 14,   'min': 2,   'max': 100},
+              'threshold': {'type': 'float', 'default': 30.0, 'min': 0.0, 'max': 50.0}}
+warmup_bars  'window'
+inputs       ['close']
+uses         ['procedure:indicator-rsi']
+```
+
+So with the default `window=14` it needs 14 bars, and 50 is plenty. With `window=100` it is not.
+
 **Trap:** `warmup_bars` is a formula, not a number — `window * 3 - 1`, and worse. To answer "is 50
 bars enough", substitute the params you intend to use. Comparing the string numerically is
 meaningless.
@@ -126,6 +183,17 @@ for ind in ("procedure:indicator-rsi", "procedure:indicator-adx"):
     for name, spec in kg.get(ind)["outputs"].items():
         print(ind, name, spec["units"], spec["range"])
 ```
+
+```
+rsi      rsi       units=dimensionless  range=[0, 100]
+adx      adx       units=dimensionless  range=[0, 100]
+adx      adx_pos   units=dimensionless  range=[0, 100]
+adx      adx_neg   units=dimensionless  range=[0, 100]
+obv      obv       units=dimensionless  range=[-inf, inf]     <- NOT comparable with the above
+```
+
+RSI and ADX share units and bounds, so they belong on one axis. OBV shares the units but is
+unbounded, so it does not.
 
 Same units and a shared bounded range means comparable; anything unbounded does not belong on a
 shared scale with anything bounded.
@@ -145,6 +213,12 @@ kg.neighbors("procedure:signal-hanging-man-trigger",
              relation="supersedes", direction="in")          # what replaced it, and why
 ```
 
+```
+status         'deprecated'
+replaced by    procedure:signal-hammer-trigger
+why            'computes the same thing under the canonical name'
+```
+
 The `why` on the edge carries the reason — here, *"computes the same thing under the canonical
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
@@ -160,6 +234,12 @@ explicitly; nothing else surfaces it.
 
 ```python
 kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")
+```
+
+```
+procedure:signal-adosc-bearish
+procedure:indicator-adosc          [uses]
+concept:indicator-class-momentum   [instance-of]
 ```
 
 Each step names the relation traversed, so the answer explains itself:
