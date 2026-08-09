@@ -188,3 +188,23 @@ def test_relation_mappings_distinguish_exact_from_close(kg):
     assert RELATIONS["part-of"]["exact"] == "BFO:0000050"
     assert "exact" not in RELATIONS["uses"] and RELATIONS["uses"]["close"] == "prov:used"
     assert all(r in RELATIONS for r in BACKBONE)
+
+
+def test_find_ranks_name_matches_above_prose_matches(kg):
+    """A caller reads the first few results and stops. Burying the exact match is a wrong answer.
+
+    Regression: `find("divergence")` used to return five indicators that merely mention divergence
+    in their summary AHEAD of the four signals actually named for it, because results were sorted by
+    id alone.
+    """
+    rows = kg.find("divergence", limit=None).items
+    named = [i for i, r in enumerate(rows) if "divergence" in r["id"].lower()]
+    prose = [i for i, r in enumerate(rows) if "divergence" not in r["id"].lower()]
+    assert named and prose, "expected both kinds of match for this query"
+    assert max(named) < min(prose), "name matches must all rank above prose-only matches"
+
+
+def test_find_stays_deterministic_within_a_rank(kg):
+    a = [r["id"] for r in kg.find("cross", limit=None)]
+    assert a == [r["id"] for r in kg.find("cross", limit=None)]
+    assert a == sorted(a, key=lambda i: (0 if "cross" in i else 1, i))

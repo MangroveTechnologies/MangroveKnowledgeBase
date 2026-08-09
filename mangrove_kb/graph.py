@@ -403,18 +403,30 @@ class KnowledgeGraph:
             pool = borne if pool is None else (pool & borne)
 
         q = query.lower().strip()
-        rows: list[dict[str, Any]] = []
+        rows: list[tuple[int, str, dict[str, Any]]] = []
         for n in self.nodes.values():
             if pool is not None and n.id not in pool:
                 continue
             if primitive and n.primitive != primitive:
                 continue
-            if q and not (q in n.id.lower() or q in n.name.lower() or q in n.summary.lower()
-                          or q in str(n.props.get("abbreviation", "")).lower()):
-                continue
-            rows.append(n.brief())
-        rows.sort(key=lambda r: r["id"])          # deterministic: a public API must be stable
-        return _cap(rows, limit, "matches")
+            rank = 0
+            if q:
+                # WHERE a query matched decides rank. Sorting purely by id buried the four signals
+                # actually NAMED "divergence" beneath five that merely mention it in prose -- and a
+                # caller reading the first few results concludes the thing does not exist. Name
+                # before abbreviation before description; id breaks ties so results stay
+                # deterministic, which a public API needs.
+                if q in n.name.lower() or q in n.id.lower():
+                    rank = 0
+                elif q in str(n.props.get("abbreviation", "")).lower():
+                    rank = 1
+                elif q in n.summary.lower():
+                    rank = 2
+                else:
+                    continue
+            rows.append((rank, n.id, n.brief()))
+        rows.sort(key=lambda r: (r[0], r[1]))
+        return _cap([r[2] for r in rows], limit, "matches")
 
     # --- traversal -------------------------------------------------------------------------------
 

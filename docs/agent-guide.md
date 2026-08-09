@@ -1,0 +1,181 @@
+# Agent guide: using the knowledge graph
+
+Eight tasks an agent actually gets asked to do with this library, and how to do each one with
+`mangrove_kb.graph`. Every call here was executed against the committed graph; the outputs are real.
+
+The skill (`skills/knowledge-graph/SKILL.md`) is the reference for *which call*. This is the
+reference for *what a whole job looks like*, including the traps.
+
+```python
+from mangrove_kb.graph import KnowledgeGraph
+kg = KnowledgeGraph.load()
+```
+
+---
+
+## 1. Orient yourself in a library you have never seen
+
+**Task:** "Have a look at mangrove-kb and tell me what's in it."
+
+Do not start by listing files. Start with the graph's own summary:
+
+```python
+s = kg.stats()
+s["nodes"], s["edges"]          # 301, 749
+s["primitives"]                 # {'Procedure': 288, 'Concept': 6, 'Property': 4, ...}
+s["relations"]                  # {'instance-of': 286, 'uses': 231, 'has-role': 216, ...}
+s["kinds"]                      # the class vocabulary
+s["roles"]                      # ['property:role-filter', 'property:role-trigger']
+kg.schema()                     # the (subject, relation, object) shapes that actually occur
+```
+
+`schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
+one and get an empty result you might misread as "there are none".
+
+**Trap:** `stats()["kinds"]` returns full node ids (`concept:indicator-class-momentum`), but every
+filter also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
+
+---
+
+## 2. Check whether something already exists before building it
+
+**Task:** "Add a signal that fires when RSI diverges from price."
+
+The expensive failure is writing a duplicate. Two searches, cheap:
+
+```python
+kg.find("divergence")                    # by name, summary, abbreviation
+kg.find(kind="oscillator", role="trigger")   # by what it is and how it is used
+```
+
+Results are ranked by *where* the query matched — name first, then abbreviation, then description —
+so the thing actually called "divergence" comes before things that merely mention it. If `find`
+returns nothing, widen before concluding absence: try a shorter stem (`"diverg"`), then `kind=`
+alone. A negative result from one keyword is not evidence that nothing exists.
+
+**Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
+there are more. Pass `limit=None` when the count itself is the answer.
+
+---
+
+## 3. Work out what a change breaks
+
+**Task:** "I want to change RSI's output range. What depends on it?"
+
+```python
+readers = kg.neighbors("procedure:indicator-rsi", relation="uses",
+                       direction="in", limit=None)
+for r in readers:
+    print(r["id"], r["inputs"])      # which output each reader actually reads
+```
+
+The `inputs` on the edge is the point: a reader that only takes `rsi` is unaffected by a change to a
+second output, and the graph tells you which is which without opening a file.
+
+Widen to the neighbourhood when you need the shape rather than the list:
+
+```python
+kg.subgraph("procedure:indicator-rsi", radius=1)
+```
+
+---
+
+## 4. Compose a strategy from both axes
+
+**Task:** "Build a strategy with a momentum trigger and a volatility filter."
+
+This is the query the two axes exist for:
+
+```python
+triggers = kg.find(kind="momentum",   role="trigger", limit=None)
+filters  = kg.find(kind="volatility", role="filter",  limit=None)
+```
+
+`kind` is what the computation *is*; `role` is the part it *plays*. They are independent — a signal
+can be momentum-class and used as either a trigger or a filter.
+
+**Trap:** a signal can derive **two** classes. The RSI divergence signals read both an oscillator and
+a momentum indicator, so they appear under both. Do not assume the sets are disjoint.
+
+---
+
+## 5. Find out what a signal needs to run
+
+**Task:** "Can I use `rsi_oversold` on 50 bars of 1-minute data?"
+
+```python
+sig = kg.get("procedure:signal-rsi-oversold")
+sig["params"]        # every knob, with its range and default
+sig["warmup_bars"]   # an EXPRESSION in those params -- e.g. 'window'
+sig["inputs"]        # which OHLCV columns it needs
+kg.neighbors(sig["id"], relation="uses", direction="out")   # the indicators beneath it
+```
+
+**Trap:** `warmup_bars` is a formula, not a number — `window * 3 - 1`, and worse. To answer "is 50
+bars enough", substitute the params you intend to use. Comparing the string numerically is
+meaningless.
+
+---
+
+## 6. Decide whether two outputs are comparable
+
+**Task:** "Can I put RSI and ADX on the same axis?"
+
+```python
+for ind in ("procedure:indicator-rsi", "procedure:indicator-adx"):
+    for name, spec in kg.get(ind)["outputs"].items():
+        print(ind, name, spec["units"], spec["range"])
+```
+
+Same units and a shared bounded range means comparable; anything unbounded does not belong on a
+shared scale with anything bounded.
+
+**Trap:** unbounded is written `[-inf, inf]`, not `null`. A naive "does it have a range" check passes
+for unbounded outputs. Test the endpoints for infinity.
+
+---
+
+## 7. Check whether something is deprecated, and what replaced it
+
+**Task:** "Should I use `hanging_man_trigger`?"
+
+```python
+kg.get("procedure:signal-hanging-man-trigger")["status"]     # 'deprecated'
+kg.neighbors("procedure:signal-hanging-man-trigger",
+             relation="supersedes", direction="in")          # what replaced it, and why
+```
+
+The `why` on the edge carries the reason — here, *"computes the same thing under the canonical
+name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
+report which.
+
+**Trap:** `status` is on the node, not the edge, and only 2 of 301 nodes are deprecated. Check it
+explicitly; nothing else surfaces it.
+
+---
+
+## 8. Explain why something is classified the way it is
+
+**Task:** "Why does `adosc_bearish` come back when I ask for momentum signals?"
+
+```python
+kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")
+```
+
+Each step names the relation traversed, so the answer explains itself:
+`signal-adosc-bearish --uses--> indicator-adosc --instance-of--> momentum`.
+
+This is the call to reach for whenever a result surprises you. The class was not declared on the
+signal; it was derived, and `path` shows the derivation.
+
+**Trap:** `path` returns the **shortest** connection, which is not always the *meaningful* one —
+everything connects through the root eventually. Constrain it with `relations=` when you want a
+specific kind of explanation.
+
+---
+
+## What this guide does not tell you
+
+The graph describes what the library *does*, never whether it is a good idea. A signal existing, or
+carrying the `trigger` role, says nothing about whether it works on your data, your timeframe, or
+your instrument. Backtest before you believe anything.
