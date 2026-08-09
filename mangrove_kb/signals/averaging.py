@@ -16,7 +16,10 @@ from mangrove_kb.indicators import (
     ALMA,
     DEMA,
     EMA,
+    EPMA,
     HMA,
+    HeikinAshi,
+    Ichimoku,
     KAMA,
     MAMA,
     SMA,
@@ -1446,3 +1449,225 @@ def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
     curr_above = float(fast_wma.iloc[-1]) > float(slow_wma.iloc[-1])
 
     return prev_below and curr_above
+
+# ---------------------------------------------------------------------------
+# Moved from trend.py once EPMA, Ichimoku and HeikinAshi were classed `averaging`.
+# All three emit reference levels in price units; the class asks what the output IS.
+# ---------------------------------------------------------------------------
+
+@RuleRegistry.register("ichimoku_bullish")
+def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int = 26, window_senkou: int = 52) -> bool:
+    """
+    Check if Ichimoku indicates bullish signal (price above cloud).
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_tenkan (int): Tenkan-sen (conversion line) window. Range: 5-20. Default: 9.
+        window_kijun (int): Kijun-sen (base line) window. Range: 15-40. Default: 26.
+        window_senkou (int): Senkou Span B (leading span B) window. Range: 30-70. Default: 52.
+
+    Returns:
+        bool: True if price above cloud, False otherwise.
+    """
+    if len(df) < window_senkou:
+        return False
+
+    result = Ichimoku.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={'window1': window_tenkan, 'window2': window_kijun, 'window3': window_senkou, 'visual': False}
+    )
+    span_a = result['span_a']
+    span_b = result['span_b']
+
+    if pd.isna(span_a.iloc[-1]) or pd.isna(span_b.iloc[-1]):
+        return False
+
+    cloud_top = max(float(span_a.iloc[-1]), float(span_b.iloc[-1]))
+    close = float(df["Close"].iloc[-1])
+
+    return close > cloud_top
+
+@RuleRegistry.register("ichimoku_bearish")
+def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int = 26, window_senkou: int = 52) -> bool:
+    """
+    Check if Ichimoku indicates bearish signal (price below cloud).
+
+    Type: FILTER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_tenkan (int): Tenkan-sen (conversion line) window. Range: 5-20. Default: 9.
+        window_kijun (int): Kijun-sen (base line) window. Range: 15-40. Default: 26.
+        window_senkou (int): Senkou Span B (leading span B) window. Range: 30-70. Default: 52.
+
+    Returns:
+        bool: True if price below cloud, False otherwise.
+    """
+    if len(df) < window_senkou:
+        return False
+
+    result = Ichimoku.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={'window1': window_tenkan, 'window2': window_kijun, 'window3': window_senkou, 'visual': False}
+    )
+    span_a = result['span_a']
+    span_b = result['span_b']
+
+    if pd.isna(span_a.iloc[-1]) or pd.isna(span_b.iloc[-1]):
+        return False
+
+    cloud_bottom = min(float(span_a.iloc[-1]), float(span_b.iloc[-1]))
+    close = float(df["Close"].iloc[-1])
+
+    return close < cloud_bottom
+
+@RuleRegistry.register("ichimoku_tk_cross")
+def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int = 26, window_senkou: int = 52, direction: str = "bullish") -> bool:
+    """
+    Check if Tenkan-sen crosses Kijun-sen (TK cross).
+
+    Type: TRIGGER
+    Requires: High, Low
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_tenkan (int): Tenkan-sen (conversion line) window. Range: 5-20. Default: 9.
+        window_kijun (int): Kijun-sen (base line) window. Range: 15-40. Default: 26.
+        window_senkou (int): Senkou Span B (leading span B) window. Range: 30-70. Default: 52.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+
+    Returns:
+        bool: True if TK cross detected, False otherwise.
+    """
+    if len(df) < window_senkou + 1:
+        return False
+
+    result = Ichimoku.compute(
+        data={'high': df["High"], 'low': df["Low"]},
+        params={'window1': window_tenkan, 'window2': window_kijun, 'window3': window_senkou, 'visual': False}
+    )
+    tenkan = result['conversion_line']
+    kijun = result['base_line']
+
+    if len(tenkan) < 2 or pd.isna(tenkan.iloc[-1]) or pd.isna(kijun.iloc[-1]):
+        return False
+
+    if direction.lower() == "bullish":
+        prev_below = float(tenkan.iloc[-2]) <= float(kijun.iloc[-2])
+        curr_above = float(tenkan.iloc[-1]) > float(kijun.iloc[-1])
+        return prev_below and curr_above
+    elif direction.lower() == "bearish":
+        prev_above = float(tenkan.iloc[-2]) >= float(kijun.iloc[-2])
+        curr_below = float(tenkan.iloc[-1]) < float(kijun.iloc[-1])
+        return prev_above and curr_below
+
+    return False
+
+@RuleRegistry.register("is_above_epma")
+def is_above_epma(df: pd.DataFrame, window: int = 20) -> bool:
+    """
+    Check if the current price is above the End Point Moving Average (EPMA / LSMA).
+
+    EPMA is the endpoint of a linear regression over the window, projecting the
+    trend to "now" rather than averaging past values.
+
+    Type: FILTER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): EPMA window in bars. Range: 2-200. Default: 20.
+
+    Returns:
+        bool: True if close > EPMA, False otherwise.
+    """
+    return _ma_is_above(df, EPMA, 'epma', window)
+
+@RuleRegistry.register("epma_cross_up")
+def epma_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EPMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow EPMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bullish EPMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, EPMA, 'epma', window_fast, window_slow, "bullish")
+
+@RuleRegistry.register("epma_cross_down")
+def epma_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
+    """
+    Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window_fast (int): Fast EPMA window. Range: 2-100. Default: 10.
+        window_slow (int): Slow EPMA window. Range: 2-200. Default: 30.
+
+    Returns:
+        bool: True if bearish EPMA crossover detected on the current bar.
+    """
+    return _ma_crossover(df, EPMA, 'epma', window_fast, window_slow, "bearish")
+
+@RuleRegistry.register("heikin_ashi_bullish")
+def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
+    """
+    Check if the current Heikin-Ashi candle is bullish (HA_close > HA_open).
+
+    A bullish HA candle indicates buying pressure on the smoothed bar.
+    Strings of bullish HA candles indicate a sustained uptrend.
+
+    Type: FILTER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if HA_close > HA_open on the current bar.
+    """
+    if len(df) < 1:
+        return False
+    out = HeikinAshi.compute(
+        data={'open': df["Open"], 'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={}
+    )
+    if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
+        return False
+    return bool(out['ha_close'].iloc[-1] > out['ha_open'].iloc[-1])
+
+@RuleRegistry.register("heikin_ashi_bearish")
+def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
+    """
+    Check if the current Heikin-Ashi candle is bearish (HA_close < HA_open).
+
+    Type: FILTER
+    Requires: Open, High, Low, Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+
+    Returns:
+        bool: True if HA_close < HA_open on the current bar.
+    """
+    if len(df) < 1:
+        return False
+    out = HeikinAshi.compute(
+        data={'open': df["Open"], 'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={}
+    )
+    if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
+        return False
+    return bool(out['ha_close'].iloc[-1] < out['ha_open'].iloc[-1])

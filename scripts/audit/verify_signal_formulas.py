@@ -650,8 +650,9 @@ def spec_trend(df):
     indicator still in the `unclassed` class.
     """
     from mangrove_kb.indicators import (
-        ADX, ALMA, Aroon, CCI, DEMA, DPO, EMA, HMA, KST, MACD, MAMA, MassIndex,
-        MultiTFTrend, SMA, SMMA, STC, T3, TEMA, TRIMA, TRIX, Vortex, WMA, WilliamsAlligator,
+        ADX, ALMA, Aroon, CCI, DEMA, DPO, EMA, EPMA, HMA, HeikinAshi, Ichimoku, KST, MACD, MAMA,
+        MassIndex, MultiTFTrend, RSI, SMA, SMMA, STC, SwingDelta, T3, TEMA, TRIMA, TRIX, Vortex,
+        WMA, WilliamsAlligator,
     )
     C = df["Close"]
     HLC = {"high": df["High"], "low": df["Low"], "close": df["Close"]}
@@ -808,6 +809,50 @@ def spec_trend(df):
         return f
     spec["multi_tf_trend_bullish"] = (dict(mt), tf_trend(1))
     spec["multi_tf_trend_bearish"] = (dict(mt), tf_trend(-1))
+
+    # --- newly unblocked: EPMA and Ichimoku became `averaging`, HeikinAshi likewise, and the four
+    # divergence signals now read SwingDelta's measurements instead of Divergence's booleans.
+    spec["is_above_epma"] = ({"window": 20}, outside_above(C, ma(EPMA, "epma", 20)))
+    ef2, es2 = ma(EPMA, "epma", 10), ma(EPMA, "epma", 30)
+    spec["epma_cross_up"] = ({"window_fast": 10, "window_slow": 30}, crosses_above(ef2, es2))
+    spec["epma_cross_down"] = ({"window_fast": 10, "window_slow": 30}, crosses_below(ef2, es2))
+
+    ip = {"window_tenkan": 9, "window_kijun": 26, "window_senkou": 52}
+    ich = Ichimoku.compute({"high": df["High"], "low": df["Low"]},
+                           {"window1": 9, "window2": 26, "window3": 52, "visual": False})
+    sa, sb, conv, base = ich["span_a"], ich["span_b"], ich["conversion_line"], ich["base_line"]
+
+    def cloud(above):
+        def f(t):
+            a, b, c = sa.iloc[t], sb.iloc[t], C.iloc[t]
+            if not defined(a, b, c):
+                return False
+            return c > max(a, b) if above else c < min(a, b)
+        return f
+    spec["ichimoku_bullish"] = (dict(ip), cloud(True))
+    spec["ichimoku_bearish"] = (dict(ip), cloud(False))
+    spec["ichimoku_tk_cross"] = ({**ip, "direction": "bullish"}, crosses_above(conv, base))
+
+    ha = HeikinAshi.compute({"open": df["Open"], "high": df["High"], "low": df["Low"],
+                             "close": df["Close"]}, {})
+    spec["heikin_ashi_bullish"] = ({}, outside_above(ha["ha_close"], ha["ha_open"]))
+    spec["heikin_ashi_bearish"] = ({}, outside_below(ha["ha_close"], ha["ha_open"]))
+
+    dp = {"rsi_window": 14, "swing_window": 5, "min_swing_distance": 10}
+    rsi14 = RSI.compute({"close": C}, {"window": 14})["rsi"]
+    sd = SwingDelta.compute({"price": C, "indicator": rsi14},
+                            {"swing_window": 5, "min_swing_distance": 10})
+
+    def diverge(side, price_up, ind_up):
+        pd_, id_ = sd[f"{side}_price_delta"], sd[f"{side}_indicator_delta"]
+        def f(t):
+            a, b = pd_.iloc[t], id_.iloc[t]
+            return defined(a, b) and (a > 0) == price_up and (b > 0) == ind_up
+        return f
+    spec["rsi_bullish_divergence"] = (dict(dp), diverge("low", False, True))
+    spec["rsi_hidden_bullish_divergence"] = (dict(dp), diverge("low", True, False))
+    spec["rsi_bearish_divergence"] = (dict(dp), diverge("high", True, False))
+    spec["rsi_hidden_bearish_divergence"] = (dict(dp), diverge("high", False, True))
 
     # --- oscillator
     cci = CCI.compute(data=HLC, params={"window": 20, "constant": 0.015})["cci"]

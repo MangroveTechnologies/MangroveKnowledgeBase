@@ -1549,80 +1549,6 @@
    }
   },
   {
-   "id": "procedure:indicator-divergence",
-   "title": "Divergence",
-   "kind": "Procedure",
-   "summary": "Detects the four classic divergence types via swing-point matching: regular_bullish:  price makes lower low, indicator makes higher low (reversal up) regular_bearish:  price makes higher high, indicator makes lower high (reversal down) hidden_bullish:   price makes higher low,  indicator makes lower low  (continuation up) hidden_bearish:   price makes lower high,  indicator makes higher high (continuation down) Swing points are detected via scipy.signal.argrelextrema with a configurable comparison window. A divergence flag fires on the bar where the second swing point is confirmed (i.e., `swing_window` bars AFTER the actual extreme -- so it is not lookahead-biased in backtests).",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "trend_indicators",
-    "reference": null,
-    "warmup_bars": null,
-    "abbreviation": null,
-    "usage_example": "Divergence.compute(data={'price': df['Price'], 'indicator': df['Indicator']}, params={'swing_window': value, 'min_swing_distance': value})",
-    "formula": null,
-    "interpretation": null,
-    "applications": null,
-    "inputs": {
-     "price": {
-      "type": "series",
-      "description": null
-     },
-     "indicator": {
-      "type": "series",
-      "description": null
-     }
-    },
-    "params": {
-     "swing_window": {
-      "type": "int",
-      "default": 5,
-      "min": 2,
-      "max": 20,
-      "description": "Bars on each side to confirm swing extremum"
-     },
-     "min_swing_distance": {
-      "type": "int",
-      "default": 10,
-      "min": 3,
-      "max": 50,
-      "description": "Min bars between the two swing points compared"
-     }
-    },
-    "outputs": {
-     "regular_bullish": {
-      "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
-     },
-     "regular_bearish": {
-      "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
-     },
-     "hidden_bullish": {
-      "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
-     },
-     "hidden_bearish": {
-      "type": "series",
-      "units": null,
-      "range": null,
-      "canonical_name": null,
-      "description": null
-     }
-    }
-   }
-  },
-  {
    "id": "procedure:indicator-donchianchannel",
    "title": "DonchianChannel",
    "kind": "Procedure",
@@ -4059,6 +3985,80 @@
       ],
       "canonical_name": "%D",
       "description": "signal line: simple moving average of stoch_k over smooth_window. Bounded 0..100 as an average of values already in that range. With the fast %K above, this is Fast %D"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:indicator-swingdelta",
+   "title": "SwingDelta",
+   "kind": "Procedure",
+   "summary": "Divergence analysis compares two changes: what price did between its last two swing extremes, and what an indicator did between the two extremes that pair with them. This emits those changes. Whether opposite signs mean \"regular bullish divergence\" or anything else is a reading of the measurement, and belongs to the signal that makes it. low_price_delta[t]       price[pi2] - price[pi1]        between the last two swing LOWS low_indicator_delta[t]   indicator[ii2] - indicator[ii1]  between the paired indicator lows high_price_delta[t]      price[pi2] - price[pi1]        between the last two swing HIGHS high_indicator_delta[t]  indicator[ii2] - indicator[ii1]  between the paired indicator highs All four are NaN except on a confirmation bar. Swings are found with `argrelextrema` at `swing_window`, consecutive price extremes closer together than `min_swing_distance` are skipped, and each pair is matched to the indicator extremes nearest in time. A pair is reported at `max(price_idx, indicator_idx) + swing_window`, the bar on which both extremes are confirmed -- so sliding-window evaluation sees the same pairing as a full-series pass and nothing leaks backwards. Replaces `Divergence`, which emitted four booleans and so stated a conclusion rather than a measurement. That class still exists and still works; it is deprecated. NaN, not zero, when scipy is unavailable: a delta that could not be computed is unknown, which is not the same claim as a delta of zero. `Divergence` returned all-False there, asserting \"no divergence\" when nothing had been examined.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend_indicators",
+    "reference": null,
+    "warmup_bars": "swing_window",
+    "abbreviation": null,
+    "usage_example": "SwingDelta.compute(data={'price': df['Price'], 'indicator': df['Indicator']}, params={'swing_window': value, 'min_swing_distance': value})",
+    "formula": "low_price_delta[t] = price[pi2] - price[pi1] and low_indicator_delta[t] = indicator[ii2] - indicator[ii1] at t = max(pi2, ii2) + swing_window, where pi1, pi2 are the last two swing lows at least min_swing_distance apart and ii1, ii2 the indicator lows nearest them; the high_* pair is the same over swing highs",
+    "interpretation": "How much price moved between two confirmed swings, and how much a companion indicator moved between the two that pair with them. Opposite signs are what divergence analysis calls a divergence -- but the sign comparison is the reading, and it belongs to the signal.",
+    "applications": "Divergence detection of every classic kind. Which kind is a question about the two signs and which swing side they came from, so the four cases are four signals rather than four outputs here.",
+    "inputs": {
+     "price": {
+      "type": "series",
+      "description": null
+     },
+     "indicator": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "swing_window": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Bars on each side to confirm swing extremum"
+     },
+     "min_swing_distance": {
+      "type": "int",
+      "default": 10,
+      "min": 3,
+      "max": 50,
+      "description": "Min bars between the two swing points compared"
+     }
+    },
+    "outputs": {
+     "low_price_delta": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     },
+     "low_indicator_delta": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     },
+     "high_price_delta": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
+     },
+     "high_indicator_delta": {
+      "type": "series",
+      "units": null,
+      "range": null,
+      "canonical_name": null,
+      "description": null
      }
     }
    }
@@ -8905,6 +8905,106 @@
    }
   },
   {
+   "id": "procedure:signal-epma-cross-down",
+   "title": "epma_cross_down",
+   "kind": "Procedure",
+   "summary": "Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": null,
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'epma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "epma(window_fast)[t-1] >= epma(window_slow)[t-1] and epma(window_fast)[t] < epma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EPMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 30,
+      "min": 2,
+      "max": 200,
+      "description": "Slow EPMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bearish EPMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-epma-cross-up",
+   "title": "epma_cross_up",
+   "kind": "Procedure",
+   "summary": "Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": null,
+    "warmup_bars": "window_slow",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'epma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
+    "formula": "epma(window_fast)[t-1] <= epma(window_slow)[t-1] and epma(window_fast)[t] > epma(window_slow)[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window_fast": {
+      "type": "int",
+      "default": 10,
+      "min": 2,
+      "max": 100,
+      "description": "Fast EPMA window"
+     },
+     "window_slow": {
+      "type": "int",
+      "default": 30,
+      "min": 2,
+      "max": 200,
+      "description": "Slow EPMA window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if bullish EPMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-evening-star-trigger",
    "title": "evening_star_trigger",
    "kind": "Procedure",
@@ -9254,6 +9354,100 @@
    }
   },
   {
+   "id": "procedure:signal-heikin-ashi-bearish",
+   "title": "heikin_ashi_bearish",
+   "kind": "Procedure",
+   "summary": "Check if the current Heikin-Ashi candle is bearish (HA_close < HA_open).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": null,
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'heikin_ashi_bearish', 'params': {}}, df)",
+    "formula": "ha_close[t] < ha_open[t]",
+    "inputs": {
+     "open": {
+      "type": "series",
+      "description": "opening price of the bar"
+     },
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {},
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if HA_close < HA_open on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-heikin-ashi-bullish",
+   "title": "heikin_ashi_bullish",
+   "kind": "Procedure",
+   "summary": "Check if the current Heikin-Ashi candle is bullish (HA_close > HA_open). A bullish HA candle indicates buying pressure on the smoothed bar. Strings of bullish HA candles indicate a sustained uptrend.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": null,
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'heikin_ashi_bullish', 'params': {}}, df)",
+    "formula": "ha_close[t] > ha_open[t] -- the Heikin-Ashi candle closes up, which is not the same as close[t] > open[t]",
+    "inputs": {
+     "open": {
+      "type": "series",
+      "description": "opening price of the bar"
+     },
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {},
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if HA_close > HA_open on the current bar"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-hma-cross-down",
    "title": "hma_cross_down",
    "kind": "Procedure",
@@ -9349,6 +9543,196 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish HMA crossover detected on the current bar"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ichimoku-bearish",
+   "title": "ichimoku_bearish",
+   "kind": "Procedure",
+   "summary": "Check if Ichimoku indicates bearish signal (price below cloud).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud",
+    "warmup_bars": "window_senkou - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ichimoku_bearish', 'params': {'window_tenkan': value, 'window_kijun': value, 'window_senkou': value}}, df)",
+    "formula": "close[t] < min(span_a[t], span_b[t])",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window_tenkan": {
+      "type": "int",
+      "default": 9,
+      "min": 5,
+      "max": 20,
+      "description": "Tenkan-sen (conversion line) window"
+     },
+     "window_kijun": {
+      "type": "int",
+      "default": 26,
+      "min": 15,
+      "max": 40,
+      "description": "Kijun-sen (base line) window"
+     },
+     "window_senkou": {
+      "type": "int",
+      "default": 52,
+      "min": 30,
+      "max": 70,
+      "description": "Senkou Span B (leading span B) window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if price below cloud, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ichimoku-bullish",
+   "title": "ichimoku_bullish",
+   "kind": "Procedure",
+   "summary": "Check if Ichimoku indicates bullish signal (price above cloud).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud",
+    "warmup_bars": "window_senkou - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ichimoku_bullish', 'params': {'window_tenkan': value, 'window_kijun': value, 'window_senkou': value}}, df)",
+    "formula": "close[t] > max(span_a[t], span_b[t]) -- above the cloud, whichever span is on top",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window_tenkan": {
+      "type": "int",
+      "default": 9,
+      "min": 5,
+      "max": 20,
+      "description": "Tenkan-sen (conversion line) window"
+     },
+     "window_kijun": {
+      "type": "int",
+      "default": 26,
+      "min": 15,
+      "max": 40,
+      "description": "Kijun-sen (base line) window"
+     },
+     "window_senkou": {
+      "type": "int",
+      "default": 52,
+      "min": 30,
+      "max": 70,
+      "description": "Senkou Span B (leading span B) window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if price above cloud, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-ichimoku-tk-cross",
+   "title": "ichimoku_tk_cross",
+   "kind": "Procedure",
+   "summary": "Check if Tenkan-sen crosses Kijun-sen (TK cross).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud",
+    "warmup_bars": "window_senkou",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'ichimoku_tk_cross', 'params': {'window_tenkan': value, 'window_kijun': value, 'window_senkou': value, 'direction': value}}, df)",
+    "formula": "direction == 'bullish': conversion_line[t-1] <= base_line[t-1] and conversion_line[t] > base_line[t]; direction == 'bearish': conversion_line[t-1] >= base_line[t-1] and conversion_line[t] < base_line[t]",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     }
+    },
+    "params": {
+     "window_tenkan": {
+      "type": "int",
+      "default": 9,
+      "min": 5,
+      "max": 20,
+      "description": "Tenkan-sen (conversion line) window"
+     },
+     "window_kijun": {
+      "type": "int",
+      "default": 26,
+      "min": 15,
+      "max": 40,
+      "description": "Kijun-sen (base line) window"
+     },
+     "window_senkou": {
+      "type": "int",
+      "default": 52,
+      "min": 30,
+      "max": 70,
+      "description": "Senkou Span B (leading span B) window"
+     },
+     "direction": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Crossover direction, 'bullish' or 'bearish'"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if TK cross detected, False otherwise"
      }
     }
    }
@@ -9605,6 +9989,49 @@
       ],
       "canonical_name": "none",
       "description": "True if close > DEMA, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-is-above-epma",
+   "title": "is_above_epma",
+   "kind": "Procedure",
+   "summary": "Check if the current price is above the End Point Moving Average (EPMA / LSMA). EPMA is the endpoint of a linear regression over the window, projecting the trend to \"now\" rather than averaging past values.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'is_above_epma', 'params': {'window': value}}, df)",
+    "formula": "close[t] > epma[t]",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 20,
+      "min": 2,
+      "max": 200,
+      "description": "EPMA window in bars"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close > EPMA, False otherwise"
      }
     }
    }
@@ -13129,6 +13556,120 @@
    }
   },
   {
+   "id": "procedure:signal-rsi-bearish-divergence",
+   "title": "rsi_bearish_divergence",
+   "kind": "Procedure",
+   "summary": "Detect a regular bearish RSI divergence: price higher high, RSI lower high. Price rose between its last two confirmed swing highs while RSI fell between the matching two.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "rsi_window + 2 * swing_window + min_swing_distance - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_bearish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
+    "formula": "high_price_delta[t] > 0 and high_indicator_delta[t] < 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "rsi_window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI period"
+     },
+     "swing_window": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Bars on each side to confirm swing extremum"
+     },
+     "min_swing_distance": {
+      "type": "int",
+      "default": 10,
+      "min": 3,
+      "max": 50,
+      "description": "Min bars between the two swing points compared"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where the divergence is confirmed"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-bullish-divergence",
+   "title": "rsi_bullish_divergence",
+   "kind": "Procedure",
+   "summary": "Detect a regular bullish RSI divergence: price lower low, RSI higher low. Price fell between its last two confirmed swing lows while RSI rose between the matching two.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "rsi_window + 2 * swing_window + min_swing_distance - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_bullish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
+    "formula": "low_price_delta[t] < 0 and low_indicator_delta[t] > 0 -- price fell between its last two confirmed swing lows while RSI rose",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "rsi_window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI period"
+     },
+     "swing_window": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Bars on each side to confirm swing extremum"
+     },
+     "min_swing_distance": {
+      "type": "int",
+      "default": 10,
+      "min": 3,
+      "max": 50,
+      "description": "Min bars between the two swing points compared"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where the divergence is confirmed"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-rsi-cross-down",
    "title": "rsi_cross_down",
    "kind": "Procedure",
@@ -13224,6 +13765,120 @@
       ],
       "canonical_name": "none",
       "description": "True if RSI crosses above threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-hidden-bearish-divergence",
+   "title": "rsi_hidden_bearish_divergence",
+   "kind": "Procedure",
+   "summary": "Detect a hidden bearish RSI divergence: price lower high, RSI higher high. Price fell between its last two confirmed swing highs while RSI rose between the matching two.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "rsi_window + 2 * swing_window + min_swing_distance - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_hidden_bearish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
+    "formula": "high_price_delta[t] < 0 and high_indicator_delta[t] > 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "rsi_window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI period"
+     },
+     "swing_window": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Bars on each side to confirm swing extremum"
+     },
+     "min_swing_distance": {
+      "type": "int",
+      "default": 10,
+      "min": 3,
+      "max": 50,
+      "description": "Min bars between the two swing points compared"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where the divergence is confirmed"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-hidden-bullish-divergence",
+   "title": "rsi_hidden_bullish_divergence",
+   "kind": "Procedure",
+   "summary": "Detect a hidden bullish RSI divergence: price higher low, RSI lower low. Price rose between its last two confirmed swing lows while RSI fell between the matching two.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi",
+    "warmup_bars": "rsi_window + 2 * swing_window + min_swing_distance - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_hidden_bullish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
+    "formula": "low_price_delta[t] > 0 and low_indicator_delta[t] < 0",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "rsi_window": {
+      "type": "int",
+      "default": 14,
+      "min": 2,
+      "max": 100,
+      "description": "RSI period"
+     },
+     "swing_window": {
+      "type": "int",
+      "default": 5,
+      "min": 2,
+      "max": 20,
+      "description": "Bars on each side to confirm swing extremum"
+     },
+     "min_swing_distance": {
+      "type": "int",
+      "default": 10,
+      "min": 3,
+      "max": 50,
+      "description": "Min bars between the two swing points compared"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar where the divergence is confirmed"
      }
     }
    }
@@ -16551,14 +17206,6 @@
    "to_id": "concept:indicator-class-momentum"
   },
   {
-   "from": "Divergence",
-   "rel": "instance-of",
-   "to": "unclassed",
-   "why": "class membership",
-   "from_id": "procedure:indicator-divergence",
-   "to_id": "concept:indicator-class-unclassed"
-  },
-  {
    "from": "DonchianChannel",
    "rel": "instance-of",
    "to": "volatility",
@@ -16577,10 +17224,10 @@
   {
    "from": "EPMA",
    "rel": "instance-of",
-   "to": "unclassed",
+   "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-epma",
-   "to_id": "concept:indicator-class-unclassed"
+   "to_id": "concept:indicator-class-averaging"
   },
   {
    "from": "EaseOfMovement",
@@ -16609,18 +17256,18 @@
   {
    "from": "HeikinAshi",
    "rel": "instance-of",
-   "to": "unclassed",
+   "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-heikinashi",
-   "to_id": "concept:indicator-class-unclassed"
+   "to_id": "concept:indicator-class-averaging"
   },
   {
    "from": "Ichimoku",
    "rel": "instance-of",
-   "to": "unclassed",
+   "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-ichimoku",
-   "to_id": "concept:indicator-class-unclassed"
+   "to_id": "concept:indicator-class-averaging"
   },
   {
    "from": "KAMA",
@@ -16813,6 +17460,14 @@
    "why": "class membership",
    "from_id": "procedure:indicator-stochasticoscillator",
    "to_id": "concept:indicator-class-oscillator"
+  },
+  {
+   "from": "SwingDelta",
+   "rel": "instance-of",
+   "to": "momentum",
+   "why": "class membership",
+   "from_id": "procedure:indicator-swingdelta",
+   "to_id": "concept:indicator-class-momentum"
   },
   {
    "from": "T3",
@@ -19009,6 +19664,64 @@
    }
   },
   {
+   "from": "epma_cross_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-epma-cross-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "epma_cross_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-epma-cross-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "epma_cross_down",
+   "rel": "uses",
+   "to": "EPMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-epma-cross-down",
+   "to_id": "procedure:indicator-epma",
+   "inputs": {
+    "epma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "epma_cross_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-epma-cross-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "epma_cross_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-epma-cross-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "epma_cross_up",
+   "rel": "uses",
+   "to": "EPMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-epma-cross-up",
+   "to_id": "procedure:indicator-epma",
+   "inputs": {
+    "epma": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "evening_star_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -19207,6 +19920,70 @@
    }
   },
   {
+   "from": "heikin_ashi_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-heikin-ashi-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "heikin_ashi_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-heikin-ashi-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "heikin_ashi_bearish",
+   "rel": "uses",
+   "to": "HeikinAshi",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-heikin-ashi-bearish",
+   "to_id": "procedure:indicator-heikinashi",
+   "inputs": {
+    "ha_close": {
+     "type": "series"
+    },
+    "ha_open": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "heikin_ashi_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-heikin-ashi-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "heikin_ashi_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-heikin-ashi-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "heikin_ashi_bullish",
+   "rel": "uses",
+   "to": "HeikinAshi",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-heikin-ashi-bullish",
+   "to_id": "procedure:indicator-heikinashi",
+   "inputs": {
+    "ha_close": {
+     "type": "series"
+    },
+    "ha_open": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "hma_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -19260,6 +20037,102 @@
    "to_id": "procedure:indicator-hma",
    "inputs": {
     "hma": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ichimoku_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ichimoku-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ichimoku_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ichimoku-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ichimoku_bearish",
+   "rel": "uses",
+   "to": "Ichimoku",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ichimoku-bearish",
+   "to_id": "procedure:indicator-ichimoku",
+   "inputs": {
+    "span_a": {
+     "type": "series"
+    },
+    "span_b": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ichimoku_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ichimoku-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ichimoku_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-ichimoku-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "ichimoku_bullish",
+   "rel": "uses",
+   "to": "Ichimoku",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ichimoku-bullish",
+   "to_id": "procedure:indicator-ichimoku",
+   "inputs": {
+    "span_a": {
+     "type": "series"
+    },
+    "span_b": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "ichimoku_tk_cross",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-ichimoku-tk-cross",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "ichimoku_tk_cross",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-ichimoku-tk-cross",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "ichimoku_tk_cross",
+   "rel": "uses",
+   "to": "Ichimoku",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-ichimoku-tk-cross",
+   "to_id": "procedure:indicator-ichimoku",
+   "inputs": {
+    "base_line": {
+     "type": "series"
+    },
+    "conversion_line": {
      "type": "series"
     }
    }
@@ -19439,6 +20312,35 @@
    "to_id": "procedure:indicator-dema",
    "inputs": {
     "dema": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "is_above_epma",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-is-above-epma",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "is_above_epma",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-is-above-epma",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "is_above_epma",
+   "rel": "uses",
+   "to": "EPMA",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-is-above-epma",
+   "to_id": "procedure:indicator-epma",
+   "inputs": {
+    "epma": {
      "type": "series"
     }
    }
@@ -21421,6 +22323,64 @@
    }
   },
   {
+   "from": "rsi_bearish_divergence",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-bearish-divergence",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_bearish_divergence",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-bearish-divergence",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "rsi_bearish_divergence",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-bearish-divergence",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_bullish_divergence",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-bullish-divergence",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_bullish_divergence",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-bullish-divergence",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "rsi_bullish_divergence",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-bullish-divergence",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
    "from": "rsi_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -21471,6 +22431,64 @@
    "to": "RSI",
    "why": "reads indicator output",
    "from_id": "procedure:signal-rsi-cross-up",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_hidden_bearish_divergence",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-hidden-bearish-divergence",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_hidden_bearish_divergence",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-hidden-bearish-divergence",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "rsi_hidden_bearish_divergence",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-hidden-bearish-divergence",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_hidden_bullish_divergence",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-hidden-bullish-divergence",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_hidden_bullish_divergence",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-hidden-bullish-divergence",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "rsi_hidden_bullish_divergence",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-hidden-bullish-divergence",
    "to_id": "procedure:indicator-rsi",
    "inputs": {
     "rsi": {
@@ -23109,16 +24127,17 @@
   "classes": 7,
   "removed_not_indicators": [
    "ATRTrailingStop",
+   "Divergence",
    "PSAR",
    "SuperTrend"
   ],
-  "carried_forward_from_previous_build": 1102,
+  "carried_forward_from_previous_build": 1125,
   "bootstrapped_from_docstring": 0,
   "kb_doc_sections_matched": 41,
   "kb_doc_sections_unmatched": [],
-  "signals": 201,
+  "signals": 213,
   "signals_registered": 247,
-  "signals_out_of_scope": 46,
+  "signals_out_of_scope": 34,
   "signals_with_no_indicator": [
    "dark_cloud_cover_trigger",
    "piercing_line_trigger",

@@ -21,14 +21,14 @@ class TestSignalServiceMetadata:
         cannot be settled: seven read an indicator that emits a verdict rather than a
         measurement, fifteen read an indicator still in the unclassed class. ChandelierExit left
         that list -- it emits plain levels -- so its two signals are now Volatility."""
-        assert len(self.service.list_signals(category="Momentum")) == 52
+        assert len(self.service.list_signals(category="Momentum")) == 56
         assert len(self.service.list_signals(category="Oscillator")) == 30
-        assert len(self.service.list_signals(category="Averaging")) == 47
+        assert len(self.service.list_signals(category="Averaging")) == 55
         assert len(self.service.list_signals(category="Flow")) == 10
         assert len(self.service.list_signals(category="Pattern")) == 40
         assert len(self.service.list_signals(category="Volatility")) == 26
         # trend.py is not a class -- what is left there is what cannot be classified yet
-        assert len(self.service.list_signals(category="Trend")) == 22
+        assert len(self.service.list_signals(category="Trend")) == 10
 
     def test_list_signals_filter_by_type(self):
         triggers = self.service.list_signals(signal_type="TRIGGER")

@@ -18,6 +18,8 @@ from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.signals._common import zero_cross, moved_signals
 
 from mangrove_kb.indicators import (
+    RSI,
+    SwingDelta,
     ADOSC,
     ADX,
     Aroon,
@@ -1754,6 +1756,133 @@ def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bulli
         return prev_above and curr_below
 
     return False
+
+# ---------------------------------------------------------------------------
+# Divergence between price and RSI, read from SwingDelta's measurements
+# ---------------------------------------------------------------------------
+
+def _rsi_swing_deltas(df: pd.DataFrame, rsi_window: int, swing_window: int, min_swing_distance: int):
+    """The four swing deltas for price against its RSI, or None before enough bars.
+
+    The four signals below differ only in which pair of deltas they read and which sign each must
+    have. That comparison is the whole of the verdict; everything else -- finding the swings,
+    pairing them, waiting for confirmation -- is measurement and lives in `SwingDelta`.
+    """
+    closes = df["Close"]
+    if len(closes) < rsi_window + 2 * swing_window + min_swing_distance:
+        return None
+    rsi = RSI.compute(data={'close': closes}, params={'window': rsi_window})['rsi']
+    return SwingDelta.compute(
+        data={'price': closes, 'indicator': rsi},
+        params={'swing_window': swing_window, 'min_swing_distance': min_swing_distance},
+    )
+
+
+def _divergence(df, rsi_window, swing_window, min_swing_distance, side, price_sign, ind_sign):
+    out = _rsi_swing_deltas(df, rsi_window, swing_window, min_swing_distance)
+    if out is None:
+        return False
+    p = out[f"{side}_price_delta"].iloc[-1]
+    i = out[f"{side}_indicator_delta"].iloc[-1]
+    if pd.isna(p) or pd.isna(i):
+        return False
+    return bool((p > 0) == price_sign and (i > 0) == ind_sign)
+
+
+@RuleRegistry.register("rsi_bullish_divergence")
+def rsi_bullish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a regular bullish RSI divergence: price lower low, RSI higher low.
+
+    Price fell between its last two confirmed swing lows while RSI rose between the matching two.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between the two swing points compared. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on the bar where the divergence is confirmed.
+    """
+    return _divergence(df, rsi_window, swing_window, min_swing_distance, "low", False, True)
+
+
+@RuleRegistry.register("rsi_hidden_bullish_divergence")
+def rsi_hidden_bullish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a hidden bullish RSI divergence: price higher low, RSI lower low.
+
+    Price rose between its last two confirmed swing lows while RSI fell between the matching two.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between the two swing points compared. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on the bar where the divergence is confirmed.
+    """
+    return _divergence(df, rsi_window, swing_window, min_swing_distance, "low", True, False)
+
+
+@RuleRegistry.register("rsi_bearish_divergence")
+def rsi_bearish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a regular bearish RSI divergence: price higher high, RSI lower high.
+
+    Price rose between its last two confirmed swing highs while RSI fell between the matching two.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between the two swing points compared. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on the bar where the divergence is confirmed.
+    """
+    return _divergence(df, rsi_window, swing_window, min_swing_distance, "high", True, False)
+
+
+@RuleRegistry.register("rsi_hidden_bearish_divergence")
+def rsi_hidden_bearish_divergence(
+    df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
+) -> bool:
+    """
+    Detect a hidden bearish RSI divergence: price lower high, RSI higher high.
+
+    Price fell between its last two confirmed swing highs while RSI rose between the matching two.
+
+    Type: TRIGGER
+    Requires: Close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        rsi_window (int): RSI period. Range: 2-100. Default: 14.
+        swing_window (int): Bars on each side to confirm swing extremum. Range: 2-20. Default: 5.
+        min_swing_distance (int): Min bars between the two swing points compared. Range: 3-50. Default: 10.
+
+    Returns:
+        bool: True on the bar where the divergence is confirmed.
+    """
+    return _divergence(df, rsi_window, swing_window, min_swing_distance, "high", False, True)
 
 # Signals that were in this file when 1.3.4 shipped and are now in the file named for
 # their ontology class. Reached by name, with a DeprecationWarning; see

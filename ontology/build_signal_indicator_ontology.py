@@ -63,15 +63,19 @@ CLASSES_DEF = {
  'unclassed': "No class determined yet. Deliberately named so the gap stays visible.",
 }
 ASSIGN = {
- 'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator",
+ 'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator "
+               "EPMA Ichimoku HeikinAshi",
  'momentum': "ROC MOM TRIX MACD PPO KST AwesomeOscillator DPO PVO ForceIndex EaseOfMovement "
              "ADOSC KVO KlingerVolumeOscillator DailyReturn DailyLogReturn MassIndex ADX Aroon "
-             "Vortex MultiTFTrend",
+             "Vortex MultiTFTrend SwingDelta",
  'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
                "ChandelierLevels VolatilityEnvelope",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
- 'unclassed': "EPMA Ichimoku HeikinAshi TTMSqueeze Divergence",
+ # TTMSqueeze emits `squeeze_on` and `squeeze_fired` (both bool) beside `momentum` (a number) --
+ # a verdict and a measurement in one object, the same defect as MultiTFTrend. Pinned pending one
+ # decision covering both.
+ 'unclassed': "TTMSqueeze",
 }
 # Not indicators: their outputs are VERDICTS, not measurements. SuperTrend emits `direction`
 # (+1 long / -1 short) and NaNs its bands according to it; PSAR emits flip flags; ATRTrailingStop
@@ -88,7 +92,11 @@ ASSIGN = {
 # state machine", its outputs were already named vstop_hband / vstop_lband, and hband >= lband holds
 # on 100% of bars. It is now `VolatilityEnvelope`, class volatility.
 # See `signal-indicator-ontology.md`.
-REMOVED = "ATRTrailingStop SuperTrend PSAR".split()
+# Divergence joined this list: all four of its outputs are `dtype=bool` (11, 15, 10 and 5 Trues in
+# 1,294 bars) -- it concludes rather than measures. Its measurement was split out as `SwingDelta`,
+# which emits the two changes the conclusion is drawn from, and the four sign comparisons moved to
+# the signals. The class itself is kept, deprecated and working, for anything already calling it.
+REMOVED = "ATRTrailingStop SuperTrend PSAR Divergence".split()
 
 # --- ground truth from the installed package
 present, mod_of = set(), {}
@@ -1057,6 +1065,10 @@ SIGNAL_SCOPE = {
     # Volatility -- the five Bollinger signals were the worked example that settled the
     # node shape; the rest of the module follows.
     "cl_above_low_offset", "cl_below_high_offset", "ve_above_upper", "ve_below_lower",
+    "epma_cross_down", "epma_cross_up", "is_above_epma", "ichimoku_bearish", "ichimoku_bullish",
+    "ichimoku_tk_cross", "heikin_ashi_bearish", "heikin_ashi_bullish",
+    "rsi_bearish_divergence", "rsi_bullish_divergence", "rsi_hidden_bearish_divergence",
+    "rsi_hidden_bullish_divergence",
     "atr_high_volatility", 
     "bb_above_upper",
     "bb_below_lower", "bb_lower_breakout", "bb_squeeze",

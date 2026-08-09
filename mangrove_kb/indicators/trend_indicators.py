@@ -1328,6 +1328,91 @@ class STC(IndicatorInterface):
         return {'stc': pd.Series(stc, name="stc")}
 
 
+class SwingDelta(IndicatorInterface):
+    """How far price and a companion indicator moved between their last two confirmed swings.
+
+    Divergence analysis compares two changes: what price did between its last two swing extremes,
+    and what an indicator did between the two extremes that pair with them. This emits those
+    changes. Whether opposite signs mean "regular bullish divergence" or anything else is a reading
+    of the measurement, and belongs to the signal that makes it.
+
+        low_price_delta[t]       price[pi2] - price[pi1]        between the last two swing LOWS
+        low_indicator_delta[t]   indicator[ii2] - indicator[ii1]  between the paired indicator lows
+        high_price_delta[t]      price[pi2] - price[pi1]        between the last two swing HIGHS
+        high_indicator_delta[t]  indicator[ii2] - indicator[ii1]  between the paired indicator highs
+
+    All four are NaN except on a confirmation bar. Swings are found with `argrelextrema` at
+    `swing_window`, consecutive price extremes closer together than `min_swing_distance` are
+    skipped, and each pair is matched to the indicator extremes nearest in time. A pair is reported
+    at `max(price_idx, indicator_idx) + swing_window`, the bar on which both extremes are confirmed
+    -- so sliding-window evaluation sees the same pairing as a full-series pass and nothing leaks
+    backwards.
+
+    Replaces `Divergence`, which emitted four booleans and so stated a conclusion rather than a
+    measurement. That class still exists and still works; it is deprecated.
+
+    NaN, not zero, when scipy is unavailable: a delta that could not be computed is unknown, which
+    is not the same claim as a delta of zero. `Divergence` returned all-False there, asserting "no
+    divergence" when nothing had been examined.
+
+    Args:
+        data: {'price': pd.Series, 'indicator': pd.Series}
+        params: {'swing_window': int, 'min_swing_distance': int}
+
+    Returns:
+        {'low_price_delta': pd.Series, 'low_indicator_delta': pd.Series,
+         'high_price_delta': pd.Series, 'high_indicator_delta': pd.Series}
+    """
+    _data = ["price", "indicator"]
+    _params = ["swing_window", "min_swing_distance"]
+    _outputs = ["low_price_delta", "low_indicator_delta",
+                "high_price_delta", "high_indicator_delta"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        price = data['price']
+        indicator = data['indicator']
+        n = len(price)
+        blank = {k: pd.Series(np.full(n, np.nan), index=price.index, name=k) for k in cls._outputs}
+        try:
+            from scipy.signal import argrelextrema
+        except ImportError:
+            return blank
+
+        sw = int(params['swing_window'])
+        min_dist = int(params['min_swing_distance'])
+        p_arr = price.to_numpy(dtype=np.float64, copy=False)
+        i_arr = indicator.to_numpy(dtype=np.float64, copy=False)
+
+        out = {k: np.full(n, np.nan) for k in cls._outputs}
+
+        def pairs(price_idx, ind_idx):
+            if len(price_idx) < 2 or len(ind_idx) < 2:
+                return
+            for pos in range(1, len(price_idx)):
+                pi2, pi1 = price_idx[pos], price_idx[pos - 1]
+                if pi2 - pi1 < min_dist:
+                    continue
+                ind1 = ind_idx[np.argmin(np.abs(ind_idx - pi1))]
+                ind2 = ind_idx[np.argmin(np.abs(ind_idx - pi2))]
+                if ind1 == ind2:
+                    continue
+                fire = int(max(pi2, ind2)) + sw
+                if fire >= n:
+                    continue
+                yield pi1, pi2, ind1, ind2, fire
+
+        for side, p_idx, i_idx in (
+            ("low", argrelextrema(p_arr, np.less, order=sw)[0], argrelextrema(i_arr, np.less, order=sw)[0]),
+            ("high", argrelextrema(p_arr, np.greater, order=sw)[0], argrelextrema(i_arr, np.greater, order=sw)[0]),
+        ):
+            for pi1, pi2, ii1, ii2, fire in pairs(p_idx, i_idx):
+                out[f"{side}_price_delta"][fire] = p_arr[pi2] - p_arr[pi1]
+                out[f"{side}_indicator_delta"][fire] = i_arr[ii2] - i_arr[ii1]
+
+        return {k: pd.Series(v, index=price.index, name=k) for k, v in out.items()}
+
+
 class HeikinAshi(IndicatorInterface):
     """Heikin-Ashi candles.
 
@@ -1647,7 +1732,14 @@ class MultiTFTrend(IndicatorInterface):
 
 
 class Divergence(IndicatorInterface):
-    """Divergence detection between price and an indicator (RSI/MACD/OBV/...).
+    """DEPRECATED: use `SwingDelta`, which measures instead of concluding.
+
+    Divergence detection between price and an indicator (RSI/MACD/OBV/...).
+
+    All four outputs are booleans, so this states a conclusion rather than a measurement -- which
+    is what disqualified it from the ontology's indicator layer. `SwingDelta` emits the two changes
+    the conclusion is drawn from; the four sign comparisons live in the signals that read it. Kept
+    working and unchanged for anything that already calls it.
 
     Detects the four classic divergence types via swing-point matching:
       regular_bullish:  price makes lower low, indicator makes higher low (reversal up)

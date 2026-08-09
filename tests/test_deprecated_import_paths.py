@@ -152,13 +152,13 @@ def test_a_moved_name_does_not_join_the_old_module_namespace(path, names):
 def test_the_mangroveai_import_statement_verbatim():
     """Copied from MangroveAI/src/MangroveAI/examples/test_indicator_param_fixes.py.
 
-    Deliberately a MIX: the three ichimoku signals are still defined in trend.py (they read an
-    indicator whose class is undecided, so they have not moved), while the other four are now in
-    momentum.py. One statement, both paths -- which is the shape that broke.
+    Deliberately a MIX of destinations: Ichimoku became `averaging` once it was classed, the other
+    four are `momentum`. Not one of the seven is still defined in trend.py, and the statement has to
+    keep working anyway -- which is the shape that broke.
     """
     from mangrove_kb.signals.trend import (      # noqa: F401
         ichimoku_bullish, ichimoku_bearish, ichimoku_tk_cross,
         adx_bullish_di, vortex_bullish, vortex_bearish, vortex_crossover,
     )
-    assert ichimoku_bullish.__module__ == "mangrove_kb.signals.trend"
+    assert ichimoku_bullish.__module__ == "mangrove_kb.signals.averaging"
     assert vortex_bullish.__module__ == "mangrove_kb.signals.momentum"

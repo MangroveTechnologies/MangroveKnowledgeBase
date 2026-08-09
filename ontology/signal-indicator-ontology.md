@@ -69,9 +69,13 @@ two representations of one fact.
 | `oscillator` | 12 | bounded output where absolute thresholds are meaningful |
 | `volatility` | 8 | observed dispersion -- distance, width, or range |
 | `flow` | 5 | running accumulation; level is arbitrary, direction carries the meaning |
-| `unclassed` | 5 | not yet determined -- named so the gap stays visible |
+| `unclassed` | 1 | not yet determined -- named so the gap stays visible |
 
-`unclassed` holds `EPMA`, `Ichimoku`, `HeikinAshi`, `TTMSqueeze`, `Divergence`.
+`unclassed` holds `TTMSqueeze` alone. Of the original five: `EPMA`, `Ichimoku` and `HeikinAshi` are
+`averaging` -- each emits reference levels in price units, which is what the class asks about the
+output, whatever the indicator is used for. `Divergence` turned out not to be an indicator at all
+(four boolean outputs, no measurement) and was replaced by `SwingDelta`; see below. `TTMSqueeze`
+emits two booleans beside one number and is pinned with `MultiTFTrend`.
 
 ### Basis of division, and what it rejects
 
@@ -124,9 +128,20 @@ named `vstop_hband` / `vstop_lband`; and `hband >= lband` holds on 100% of bars,
 Chandelier offsets it is a genuine band pair. Only the word "Stop" was positional. It is now
 `VolatilityEnvelope`, class `volatility`, with signals `ve_above_upper` / `ve_below_lower`.
 
+**`Divergence` was not an indicator.** All four of its outputs were `dtype=bool` -- it stated that
+a divergence had occurred rather than measuring anything. What it measures underneath is two
+changes: how far price moved between its last two confirmed swings, and how far a companion
+indicator moved between the two that pair with them. That is now `SwingDelta`, class `momentum`,
+and the four sign comparisons moved into the four signals that read it. Proven equivalent: the sign
+predicates reproduce the old booleans bar-for-bar on all 1,294 fixture bars, and the rewritten
+signals disagree with the old implementation on zero of 1,254 expanding-window evaluations.
+`Divergence` itself is kept, deprecated and unchanged, for anything already calling it.
+
 **Known violation, pending a decision:** `MultiTFTrend` emits `higher_tf_trend`, a ternary
 -1 / 0 / +1 state, and is currently classed `momentum` with two signals that read the verdict
-directly. By the rule above it does not belong in the indicator layer as it stands; the measurement
+directly. `TTMSqueeze` is the same shape -- `squeeze_on` and `squeeze_fired` are booleans beside a
+real-valued `momentum` -- and is held in `unclassed` for the same reason. `SwingDelta` is the
+template for fixing both. By the rule above it does not belong in the indicator layer as it stands; the measurement
 is the normalised higher-timeframe slope, and the sign should be the signal's decision. Left in
 place deliberately rather than silently, so the rule and the data are not quietly inconsistent.
 

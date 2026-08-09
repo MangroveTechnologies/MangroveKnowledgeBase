@@ -13,6 +13,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.signals._common import renamed_signals
 
 # Import volatility indicator classes
 from mangrove_kb.indicators import (
@@ -983,3 +984,6 @@ RuleRegistry.alias("chandelier_long_stop_hit", "cl_below_high_offset")
 RuleRegistry.alias("chandelier_short_stop_hit", "cl_above_low_offset")
 RuleRegistry.alias("volatility_stop_upper", "ve_above_upper")
 RuleRegistry.alias("volatility_stop_lower", "ve_below_lower")
+
+
+__getattr__ = renamed_signals("mangrove_kb.signals.volatility")

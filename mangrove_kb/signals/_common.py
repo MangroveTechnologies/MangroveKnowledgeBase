@@ -92,6 +92,41 @@ def moved_signals(here: str, moved: dict):
             f"unchanged, so strategies and RuleRegistry are unaffected.",
             DeprecationWarning, stacklevel=2,
         )
-        return getattr(importlib.import_module(f"mangrove_kb.signals.{dest}"), name)
+        mod = importlib.import_module(f"mangrove_kb.signals.{dest}")
+        if hasattr(mod, name):
+            return getattr(mod, name)
+        # The signal was RENAMED as well as moved, so the old name is not a function anywhere --
+        # it only exists as a registry alias. `chandelier_long_stop_hit` is `cl_below_high_offset`
+        # in volatility.py. Resolving the alias here means one deprecation mechanism covers both
+        # kinds of change; without it, moving a renamed signal silently broke its old import path.
+        from mangrove_kb.registry import RuleRegistry
+        renamed = RuleRegistry._aliases.get(name)
+        if renamed and hasattr(mod, renamed):
+            return getattr(mod, renamed)
+        raise AttributeError(f"{here}.{name} moved to {dest}, but is not there under either name")
+
+    return __getattr__
+
+
+def renamed_signals(here: str):
+    """Build a module ``__getattr__`` for signals RENAMED without moving files.
+
+    `RuleRegistry.alias` keeps a retired name evaluating, which covers a stored strategy. It does
+    nothing for `from mangrove_kb.signals.volatility import volatility_stop_upper`, because that
+    name is no longer a function in the module -- and a rename in place has no `_MOVED` entry to
+    catch it either. This resolves any alias whose target is defined here.
+    """
+    def __getattr__(name):
+        from mangrove_kb.registry import RuleRegistry
+        target = RuleRegistry._aliases.get(name)
+        mod = importlib.import_module(here)
+        if target and target in vars(mod):
+            warnings.warn(
+                f"signal {name!r} has been renamed to {target!r}; the old name still resolves and "
+                f"evaluates but will be removed.",
+                DeprecationWarning, stacklevel=2,
+            )
+            return vars(mod)[target]
+        raise AttributeError(f"module {here!r} has no attribute {name!r}")
 
     return __getattr__
