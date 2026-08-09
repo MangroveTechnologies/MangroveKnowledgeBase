@@ -41,6 +41,12 @@ The builder emits it from `inf` / `-inf` in a docstring `Range:` line. Note that
 different: no parameter docstring declares `inf`, so a null `min`/`max` on a param means the source
 states no bound, and asserting infinity there would invent a fact.
 
+**Verify the range, do not reason about it.** `scripts/audit/audit_output_ranges.py` runs every
+indicator over all seven fixtures and reports any observed value outside its declared range -- 929
+checks. Run it after authoring a range. It would have caught all ten of the bad bounds above
+immediately, and it reports anything it could not exercise as UNVERIFIED rather than counting it as
+a pass.
+
 **Serialisation caveat.** `json.dumps` writes bare `Infinity`, which Python accepts and a
 JavaScript literal accepts (`Infinity` is a JS global) but the JSON spec does not. Every consumer
 today is one of those two -- the builder, the harness, the tests and the renderer, which embeds the
