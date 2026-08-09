@@ -436,8 +436,17 @@ boolean behaves, so it mixes two bases into one enum.
 ## Building
 
 ```
-python ontology/build_signal_indicator_ontology.py > ontology/signal-indicator-ontology.json
+python ontology/build_signal_indicator_ontology.py          # writes the file in place
+python ontology/build_signal_indicator_ontology.py --stdout # print instead, for a diff-check
 ```
+
+**Never redirect the builder into the ontology file.** This page documented
+`build.py > ontology/signal-indicator-ontology.json` for weeks, and that command destroys the file
+it is meant to rebuild: the shell truncates the target before the process starts, so the
+carry-forward reads an empty file and every hand-authored value is re-emitted as `null` -- with a
+clean exit code and no warning. The builder now writes the file itself and refuses to run against a
+file that has been emptied under it, but the shell truncates before it gets a vote, so the recovery
+is still `git checkout -- ontology/signal-indicator-ontology.json`.
 
 `ontology/signal-indicator-ontology.json` is the ontology of record and **is committed**. Authored
 values live in the nodes, so the builder carries every authored value forward from the existing file

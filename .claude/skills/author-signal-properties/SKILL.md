@@ -224,7 +224,7 @@ thing everywhere, so it is written once rather than 247 times that can drift. Tw
 
 ## Verify before finishing
 
-1. `python3 ontology/build_signal_indicator_ontology.py > /tmp/check.json` and diff against the
+1. `python3 ontology/build_signal_indicator_ontology.py --stdout > /tmp/check.json` and diff against the
    committed graph. **Your authored values must survive the rebuild** -- carry-forward preserves
    them. If one is gone, it is being overwritten by a lift and belongs at that source instead.
 2. Run it twice. The second run must be byte-identical: authoring is complete only when the build is

@@ -2,8 +2,15 @@
 
 STAGE 1 of a two-stage pipeline. This script only LIFTS -- it never authors:
 
-    build_signal_indicator_ontology.py  >  ontology/signal-indicator-ontology.json
-    author the null fields IN THE NODES                                    (by hand)
+    python ontology/build_signal_indicator_ontology.py     (writes the file in place)
+    author the null fields IN THE NODES                    (by hand)
+
+NEVER redirect this into the ontology file. `build.py > ontology/signal-indicator-ontology.json`
+was documented here for weeks and it DESTROYS the file it is meant to rebuild: the shell truncates
+the target before this process starts, so the carry-forward below reads an empty file and every one
+of the ~1,260 hand-authored values is silently re-emitted as null, with a clean exit code. It now
+writes the file itself, and aborts if the file it is about to read has been emptied under it. Use
+`--stdout` to print instead of writing, which is what a diff-check wants.
 
 The emitted JSON is the ontology of record and is committed to this repository. Authored values
 live in the nodes, so this builder must never destroy them: it reads the existing file and carries
@@ -56,6 +63,17 @@ KB = str(KB_REPO / "mangrove_kb" / "indicators")
 #: The graph itself. Read back in for carry-forward AND to derive signal input descriptions from
 #: what has been authored on the indicator nodes.
 NODE_FILE = pathlib.Path(__file__).resolve().parent / "signal-indicator-ontology.json"
+
+# An existing-but-empty NODE_FILE has exactly one cause: something truncated it between the last
+# build and this one, and in practice that something is `build.py > <NODE_FILE>`. Carrying on would
+# produce a structurally valid graph with every authored value blanked, and exit 0. A file that does
+# not exist yet is a legitimate first build; a file that exists and is empty never is.
+if NODE_FILE.exists() and not NODE_FILE.read_text().strip():
+    sys.exit(f"ABORT: {NODE_FILE} exists but is empty.\n"
+             "       Almost certainly `build.py > <that file>` -- the shell truncated it before\n"
+             "       this process started, so there is nothing left to carry forward. Restore it\n"
+             "       (git checkout -- ontology/signal-indicator-ontology.json) and re-run with no\n"
+             "       redirect; this script writes the file itself.")
 
 CLASSES_DEF = {
  'averaging': "Emits a reference level in price units, produced by averaging over a window.",
@@ -1484,5 +1502,17 @@ out = {"atoms": atoms, "relations": rels,
                     if a["id"].startswith("procedure:signal-") and a["props"]["warmup_bars"] is None),
                 "indicators_missing_description":
                     sorted(i for i in assigned if not _describe(CLASSES[i]))}}
-print(json.dumps(out, indent=1))
-print(f"\n// atoms={len(atoms)} relations={len(rels)} indicators={len(assigned)}", file=sys.stderr)
+_rendered = json.dumps(out, indent=1)
+
+# Written here rather than by the caller's shell, because the caller's shell is what destroyed it.
+# Via a temp file in the same directory and an atomic replace, so an interrupted or failing build
+# leaves the previous ontology intact instead of a half-written one -- this file is the record, and
+# the authored values in it exist nowhere else.
+if "--stdout" in sys.argv:
+    print(_rendered)
+else:
+    _tmp = NODE_FILE.with_suffix(".json.tmp")
+    _tmp.write_text(_rendered + "\n")
+    _tmp.replace(NODE_FILE)
+    print(f"// wrote {NODE_FILE}", file=sys.stderr)
+print(f"// atoms={len(atoms)} relations={len(rels)} indicators={len(assigned)}", file=sys.stderr)

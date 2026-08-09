@@ -183,7 +183,7 @@ fixed there - not a reason to introduce a sidecar file, a data module, or a new 
 
 1. Apply the authored values to the node in `ontology/signal-indicator-ontology.json`
 2. Rebuild in place and confirm nothing was lost:
-   `python3 ontology/build_signal_indicator_ontology.py > /tmp/check.json` then diff it against the
+   `python3 ontology/build_signal_indicator_ontology.py --stdout > /tmp/check.json` then diff it against the
    committed file. The builder carries authored values forward, so a rebuild must be a fixed point -
    any authored value that comes back `null` is a bug in the carry-forward, not a reason to re-author
 3. Print the node and confirm every field you authored is populated and nothing lifted was overwritten
