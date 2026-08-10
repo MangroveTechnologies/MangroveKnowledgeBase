@@ -62,6 +62,11 @@ CLAIMS = [
     ("mangrove_kb/graph.py",           r"All (\d+) signals resolve this way", "signals"),
     ("kb-next-steps.md",               r"(\d+) signals, [\d,]+ indicators",  "signals"),
     ("kb-next-steps.md",               r"[\d,]+ signals, (\d+) indicators",  "indicators"),
+    ("skills/knowledge-graph/GUIDE.md", r"nodes, edges  (\d+) [\d,]+",   "nodes"),
+    ("skills/knowledge-graph/GUIDE.md", r"nodes, edges  [\d,]+ (\d+)",   "edges"),
+    ("skills/knowledge-graph/GUIDE.md", r's\["edges"\]\s+# (\d+), [\d,]+', "nodes"),
+    ("skills/knowledge-graph/GUIDE.md", r's\["edges"\]\s+# [\d,]+, (\d+)', "edges"),
+    ("skills/knowledge-graph/GUIDE.md", r"only 2 of (\d+) nodes",         "nodes"),
     # STATUS.md states what is true NOW, which is exactly the kind of claim that rots first.
     ("STATUS.md",                      r"graph\s+(\d+) atoms, [\d,]+ relations", "nodes"),
     ("STATUS.md",                      r"graph\s+[\d,]+ atoms, (\d+) relations", "edges"),

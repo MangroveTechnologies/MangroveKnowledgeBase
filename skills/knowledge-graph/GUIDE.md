@@ -21,18 +21,18 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 301, 749
-s["primitives"]                 # {'Procedure': 288, 'Concept': 6, 'Property': 4, ...}
-s["relations"]                  # {'instance-of': 286, 'uses': 231, 'has-role': 216, ...}
+s["nodes"], s["edges"]          # 303, 755
+s["primitives"]                 # {'Procedure': 291, 'Concept': 6, 'Property': 4, ...}
+s["relations"]                  # {'instance-of': 289, 'uses': 233, 'has-role': 218, ...}
 s["kinds"]                      # the class vocabulary
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  301 749
-primitives    {'Procedure': 289, 'Concept': 6, 'Property': 4, 'Object': 1, 'Schema': 1}
-relations     {'instance-of': 287, 'uses': 231, 'has-role': 216, 'kind-of': 9,
+nodes, edges  303 755
+primitives    {'Procedure': 291, 'Concept': 6, 'Property': 4, 'Object': 1, 'Schema': 1}
+relations     {'instance-of': 289, 'uses': 233, 'has-role': 218, 'kind-of': 9,
                'part-of': 4, 'supersedes': 2}
 kinds         ['concept:indicator', 'concept:indicator-class-averaging',
                'concept:indicator-class-flow', 'concept:indicator-class-momentum',
@@ -225,7 +225,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 301 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 303 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 ---
