@@ -6,8 +6,8 @@ populations, hubs of degree 200+ -- is exactly what the API has to cope with.
 """
 import pytest
 
-from mangrove_kb.graph import (BACKBONE, RELATIONS, ROLE_RELATION, GraphError, KnowledgeGraph,
-                               NodeNotFound)
+from mangrove_kb.graph import (BACKBONE, RELATIONS, ROLE_RELATION, SEARCH_TIERS, GraphError,
+                               KnowledgeGraph, NodeNotFound, _flatten, _is_bounded)
 
 
 @pytest.fixture(scope="module")
@@ -205,6 +205,106 @@ def test_find_ranks_name_matches_above_prose_matches(kg):
 
 
 def test_find_stays_deterministic_within_a_rank(kg):
+    """Rank first, then id. Ties must not depend on dict iteration order."""
     a = [r["id"] for r in kg.find("cross", limit=None)]
     assert a == [r["id"] for r in kg.find("cross", limit=None)]
-    assert a == sorted(a, key=lambda i: (0 if "cross" in i else 1, i))
+
+    def tier(node_id):
+        """Which SEARCH_TIERS band this id matched in -- recomputed independently of find()."""
+        source = {"name": kg.nodes[node_id].name, "id": node_id,
+                  "summary": kg.nodes[node_id].summary, **kg.nodes[node_id].props}
+        for i, fields in enumerate(SEARCH_TIERS):
+            if "cross" in " ".join(_flatten(source.get(f)) for f in fields).lower():
+                return i
+        raise AssertionError(f"{node_id} matched in find() but in no tier")
+
+    assert a == sorted(a, key=lambda i: (tier(i), i))
+    assert len(set(map(tier, a))) > 1, "expected this query to hit more than one tier"
+
+
+# --- attribute queries ---------------------------------------------------------------------------
+
+def test_search_reads_the_authored_detail_not_only_the_headline(kg):
+    """The regression that motivated SEARCH_TIERS: a term explained only in prose was invisible.
+
+    `find("mean reversion")` returned nothing while two nodes described exactly that, and
+    `find("crossover")` returned 32 of the 62 nodes that mention it. The existence check is the
+    search's headline use, so a false negative there is the worst failure it has.
+    """
+    for term in ("mean reversion", "crossover", "overbought"):
+        found = {r["id"] for r in kg.find(term, limit=None)}
+        mentioned = {n.id for n in kg.nodes.values()
+                     if term in _flatten({"name": n.name, "id": n.id,
+                                          "summary": n.summary, **n.props}).lower()}
+        assert mentioned, f"expected {term!r} somewhere in the graph"
+        assert found == mentioned, f"{term!r}: {len(mentioned - found)} nodes mention it but do not match"
+
+
+def test_a_name_match_still_outranks_a_detail_match(kg):
+    """Widening the corpus must not push the obvious answer below the buried one."""
+    rows = kg.find("divergence", limit=None).items
+    named = [i for i, r in enumerate(rows) if "divergence" in r["id"].lower()]
+    assert named == list(range(len(named))), "name matches must occupy the top of the result"
+
+
+def test_status_and_requires_are_enumerable_and_enforced(kg):
+    s = kg.stats()
+    assert set(s["statuses"]) == kg.statuses() and "deprecated" in s["statuses"]
+    assert "volume" in s["input_columns"]
+
+    deprecated = {r["id"] for r in kg.find(status="deprecated", limit=None)}
+    assert deprecated == {n.id for n in kg.nodes.values() if n.status == "deprecated"}
+    assert deprecated, "the graph is expected to carry deprecations"
+
+    vol = {r["id"] for r in kg.find(requires="volume", limit=None)}
+    assert vol == {n.id for n in kg.nodes.values() if "volume" in (n.props.get("inputs") or {})}
+
+    # A guessed value must name the vocabulary rather than returning an empty result that reads
+    # as "there are none".
+    for call in (lambda: kg.find(status="retired"), lambda: kg.find(requires="vwap"),
+                 lambda: kg.outputs(units="furlongs")):
+        with pytest.raises(GraphError) as e:
+            call()
+        assert "known" in str(e.value) or "declared" in str(e.value)
+
+
+def test_outputs_indexes_values_not_nodes(kg):
+    """A row is one output. An indicator with three outputs contributes three rows."""
+    macd = [r for r in kg.outputs(limit=None) if r["id"] == "procedure:indicator-macd"]
+    assert {r["output"] for r in macd} == set(kg.get("procedure:indicator-macd")["outputs"])
+    assert len(macd) > 1
+    assert all(r["id"] and r["name"] for r in macd), "every row must name its producer"
+
+
+def test_bounded_examines_the_endpoints_not_the_presence_of_a_range(kg):
+    """Unbounded is written [-inf, inf], not null -- so `has a range` is the wrong test."""
+    assert _is_bounded([0, 100]) is True
+    assert _is_bounded([0, float("inf")]) is False
+    assert _is_bounded([float("-inf"), float("inf")]) is False
+    assert _is_bounded(None) is None
+
+    bounded = kg.outputs(bounded=True, limit=None)
+    assert bounded.total and all(r["bounded"] is True for r in bounded)
+    assert all(float("inf") not in map(float, r["range"]) for r in bounded)
+
+    unbounded = kg.outputs(bounded=False, limit=None)
+    assert all(r["bounded"] is False for r in unbounded)
+    # OBV declares a range and is still unbounded -- the case the naive test gets wrong.
+    assert any(r["id"] == "procedure:indicator-obv" for r in unbounded)
+
+
+def test_outputs_intersects_with_the_type_axis(kg):
+    """The query the novelty claim rests on: bounded outputs of a given class."""
+    rows = kg.outputs(bounded=True, kind="oscillator", limit=None)
+    assert rows.total, "expected bounded oscillator outputs"
+    in_class = kg.in_class("oscillator")
+    assert all(r["id"] in in_class for r in rows)
+    # ...and it is genuinely narrower than the same query without the axis.
+    assert rows.total < kg.outputs(bounded=True, limit=None).total
+
+
+def test_outputs_finds_a_producer_by_output_name(kg):
+    """`resolve()` only knows node ids and names; an output name needed a hand scan of every node."""
+    rows = kg.outputs("histogram", limit=None)
+    assert {r["id"] for r in rows} == {"procedure:indicator-macd"}
+    assert all("histogram" in r["output"] for r in rows)

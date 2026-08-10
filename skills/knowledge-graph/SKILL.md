@@ -6,7 +6,7 @@ description: >-
   each plays in a strategy. Reach for this before grepping the source or guessing at names: "which
   indicators produce a bounded oscillator", "what reads RSI", "what would break if I change this
   output", "is there already a signal for X", "what does this signal actually need". Uses
-  mangrove_kb.graph (stats · find · get · neighbors · subgraph · path).
+  mangrove_kb.graph (stats · find · get · outputs · neighbors · subgraph · path).
 ---
 
 # Ask the graph before you read the source
@@ -30,9 +30,11 @@ kg.stats()
 ```
 
 Returns the counts, the **complete vocabulary** every other call accepts as a filter — relation
-names, class names, role names, primitives — plus the graph's source path and version. Call it
-first. The one reliable way to get a wrong answer from this graph is to invent a relation or class
-name; `stats()` is how you avoid it.
+names, class names, role names, primitives, statuses, input columns, output units — plus the graph's
+source path and version. Call it first. The one reliable way to get a wrong answer from this graph is
+to invent a relation or class name; `stats()` is how you avoid it. Filters that take a vocabulary
+raise and name the legal values rather than returning an empty result you would read as "there are
+none".
 
 `kg.schema()` goes further: the list of `(subject, relation, object)` shapes that **actually occur**,
 so you can plan a traversal against what exists rather than discovering emptiness one query at a
@@ -80,7 +82,10 @@ kg.find(role="filter")                       # signals playing the filter part
 | what shapes can I even ask for? | `schema()` |
 | is there already a signal/indicator for X? | `find("keyword")` |
 | everything of a class, or in a role, or both | `find(kind=…, role=…)` |
+| what needs a volume column? what is retired? | `find(requires=…)`, `find(status=…)` |
 | what does this thing compute — formula, params, outputs? | `get(id)` |
+| which values are bounded / in these units? | `outputs(bounded=True, units=…)` |
+| what produces an output called X? | `outputs("X")` |
 | what reads this indicator? | `neighbors(id, relation="uses", direction="in")` |
 | what does this signal depend on? | `neighbors(id, relation="uses", direction="out")` |
 | what breaks if I change this? | `neighbors(id, direction="in")`, then widen with `subgraph` |
@@ -90,6 +95,13 @@ kg.find(role="filter")                       # signals playing the filter part
 `neighbors` takes `category=` as well as `relation=`, so you can follow every `structural` edge
 without naming each one — useful when you want "how is this classified" regardless of which
 structural relation carries it.
+
+`outputs()` is the one call that indexes **values rather than nodes**: a row is a single output, so
+an indicator with three outputs contributes three rows, and every row names its producer. It answers
+the questions `get()` can only answer one node at a time — *which computations emit a percentage*,
+*which are bounded and therefore belong on a shared axis*, *what produces the thing called
+`histogram`* (which `get()` and `resolve()` cannot answer at all, since `histogram` is nobody's node
+name). It intersects with the type axis: `outputs(bounded=True, kind="oscillator")`.
 
 ## The typed detail is the point
 
@@ -102,8 +114,12 @@ kg.get("procedure:indicator-rsi")["outputs"]
 ```
 
 Every node carries `formula`, `inputs`, `params`, `outputs`, `warmup_bars`, `reference`,
-`usage_example`. Outputs carry `units` and `range` — so *"which indicators produce a bounded
-output"* is answerable, and so is *"can I compare these two directly"*.
+`usage_example`. Outputs carry `units` and `range`, which is what makes *"can I compare these two
+directly"* a question with an exact answer — reach for `outputs()` when you want it across the whole
+library rather than for one node.
+
+All of that authored text is searchable, not just the name and the summary. `find("mean reversion")`
+finds the two indicators that explain themselves that way without ever using it as a name.
 
 And the edges carry data too. A `uses` edge records **which specific output** the signal reads:
 
@@ -123,6 +139,14 @@ indicators.
   that there are only ten; pass `limit=None` when you need the total.
 - **A miss offers candidates, not a dead end.** `NodeNotFound` carries suggestions. If you get one,
   the next move is in the message.
+- **Search reads the detail, so widen the query before concluding absence.** A term that appears only
+  in a formula or an output description still matches — it just ranks below the things named for it.
+  If `find` still returns nothing, that is close to real evidence; try a shorter stem first.
+- **Units say what a computation measures, so the vocabulary is heterogeneous by design.** A
+  percentage change, a price, a quotient and an index number are different things and are labelled
+  differently; one output's unit is *deferred* — SwingDelta's deltas carry whatever unit its
+  companion indicator has. `outputs(units=…)` is an exact match, so read `stats()["units"]` and
+  filter on what is there.
 - **`subgraph` states what it guarantees.** It returns every node within `radius` *and every edge
   between them* — not a truncated walk. You can reason over the fragment without going back.
 - **The graph is only as current as its build.** `stats()["source"]` names the file it read. If the
@@ -141,7 +165,7 @@ indicators.
 **"Is there already something that does X?"**
 
 ```python
-kg.find("divergence")                       # by name and description
+kg.find("divergence")                       # every authored field, ranked by where it hit
 kg.find(kind="volatility", role="trigger")  # by what it is and how it is used
 ```
 
@@ -166,4 +190,15 @@ kg.neighbors(sig["id"], relation="uses", direction="out")          # the indicat
 ```python
 kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")
 # each step names the relation traversed, so the answer explains itself
+```
+
+**"What can I plot on one panel, and what can I run without a volume feed?"**
+
+```python
+kg.outputs(bounded=True, kind="oscillator", limit=None)   # 48 outputs, each with units and range
+kg.outputs("histogram")                                   # who produces one — MACD, and only MACD
+
+ids = lambda r: {x["id"] for x in r}                      # rows are dicts; key on the id
+ids(kg.find(role="trigger", limit=None)) - ids(kg.find(requires="volume", role="trigger", limit=None))
+kg.find(status="deprecated", limit=None)                  # 2 — exclude these from anything new
 ```

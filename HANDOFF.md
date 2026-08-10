@@ -62,8 +62,15 @@ The plan, in order. Licence deliberately LAST, immediately before undrafting:
 
 ### Done — 1, tools
 
-`mangrove_kb/graph.py` + `tests/test_graph.py`. Six operations: `stats` `find` `get` `neighbors`
-`subgraph` `path`. All logic in the library so the MCP layer is a rename.
+`mangrove_kb/graph.py` + `tests/test_graph.py`. Seven operations: `stats` `find` `get` `outputs`
+`neighbors` `subgraph` `path`. All logic in the library so the MCP layer is a rename.
+
+A coverage review (2026-08-09) found the traversal half complete and the **attribute** half missing,
+and closed it: `find` now searches every authored field rather than name/abbreviation/summary only
+(`find("mean reversion")` returned 0 while two nodes described it), and takes `status=` / `requires=`;
+`outputs()` indexes values rather than nodes, so units, boundedness and "what produces `histogram`"
+are one call instead of a loop over 303 nodes. That query is what the novelty claim in
+`docs/research/graph-query-api-and-mcp-surface.md` §5 rests on, and it did not previously exist.
 
 The load-bearing constraint, and the thing most likely to be broken by a well-meaning edit: **roles
 are not types.** `instance-of`/`kind-of` is the rigid backbone and is transitively closed;

@@ -31,9 +31,9 @@ def guide():
     return GUIDE.read_text()
 
 
-def test_guide_exists_and_covers_eight_use_cases(guide):
-    headings = re.findall(r"^## (\d)\. ", guide, re.M)
-    assert headings == [str(i) for i in range(1, 9)], f"expected use cases 1-8, found {headings}"
+def test_guide_exists_and_covers_ten_use_cases(guide):
+    headings = re.findall(r"^## (\d+)\. ", guide, re.M)
+    assert headings == [str(i) for i in range(1, 11)], f"expected use cases 1-10, found {headings}"
 
 
 def test_uc1_orientation_values(kg, guide):
@@ -48,8 +48,8 @@ def test_uc1_orientation_values(kg, guide):
 
 def test_uc2_divergence_search(kg, guide):
     r = kg.find("divergence", limit=None)
-    assert r.total == 9, "the guide says 9 matches"
-    assert "9 matches" in guide
+    assert r.total == 37, "the guide says 37 matches"
+    assert "37 matches" in guide and "10 of 37" in guide
     top4 = [x["id"] for x in r.items[:4]]
     assert all("divergence" in i for i in top4), "name matches must still lead"
     for i in top4:
@@ -103,3 +103,57 @@ def test_uc8_derivation_path(kg, guide):
                                             "procedure:indicator-adosc",
                                             "concept:indicator-class-momentum"]
     assert [s["via"]["relation"] for s in p[1:]] == ["uses", "instance-of"]
+
+
+def test_uc9_output_index(kg, guide):
+    rows = kg.outputs(bounded=True, kind="oscillator", limit=None)
+    assert rows.total == 48, f"guide says 48 outputs, graph says {rows.total}"
+    assert "48 outputs" in guide
+    for name in ("bop", "cmf", "cmo", "mfi", "rsi", "stc"):        # the six the guide prints
+        assert any(r["output"] == name for r in rows), f"guide quotes {name}, no longer in the result"
+
+    hist = kg.outputs("histogram", limit=None).items
+    assert [r["id"] for r in hist] == ["procedure:indicator-macd"]
+    assert hist[0]["description"].startswith("macd minus signal. Crosses zero exactly when macd")
+    assert hist[0]["description"][:60] in guide
+
+    assert kg.outputs(units="percent", limit=None).total == 26 and "percent` matches 26" in guide
+    # The guide's trap rests on SwingDelta's unit being DEFERRED -- it is whatever the companion
+    # indicator carries. If that ever became a concrete unit the trap would be misinformation.
+    assert {r["id"] for r in kg.outputs(units="indicator units", limit=None)} == \
+           {"procedure:indicator-swingdelta"}
+
+
+def test_uc10_status_and_requires(kg, guide):
+    dep = kg.find(status="deprecated", limit=None)
+    assert dep.total == 2 and "deprecated        2" in guide
+    for x in dep:
+        assert x["id"] in guide
+
+    vol = kg.find(requires="volume", role="trigger", limit=None)
+    assert vol.total == 8 and "volume triggers   8" in guide
+
+    assert kg.stats()["input_columns"] == ["close", "high", "indicator", "low", "open",
+                                           "price", "volume"]
+    assert kg.stats()["statuses"] == ["deprecated", "ratified"]
+    assert "close, high, indicator, low, open," in guide and "deprecated, ratified" in guide
+
+
+def test_every_documented_example_actually_runs():
+    """Execute every ```python block in both docs. A doc whose examples raise is worse than none.
+
+    The other tests here re-derive each use case's *claim*. This runs the code as printed, which is
+    what catches a snippet that is merely wrong Python -- a `set()` over unhashable result rows, a
+    renamed keyword -- rather than wrong about the graph.
+    """
+    import re
+    ns = {"KnowledgeGraph": KnowledgeGraph, "kg": KnowledgeGraph.load()}
+    ran = 0
+    for doc in (GUIDE, GUIDE.parent / "SKILL.md"):
+        for i, block in enumerate(re.findall(r"```python\n(.*?)```", doc.read_text(), re.S), 1):
+            try:
+                exec(compile(block, f"{doc.name}#{i}", "exec"), ns)
+            except Exception as e:                       # noqa: BLE001 -- report which block
+                raise AssertionError(f"{doc.name} block {i} raised {type(e).__name__}: {e}\n{block}")
+            ran += 1
+    assert ran >= 20, f"expected the docs to carry runnable examples, found {ran}"

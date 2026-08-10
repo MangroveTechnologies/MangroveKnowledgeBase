@@ -74,6 +74,21 @@ ROLE_RELATION = "has-role"
 
 CATEGORIES: tuple[str, ...] = ("structural", "descriptive", "associative", "meta")
 
+#: What :meth:`KnowledgeGraph.find` reads, best match first. A query is ranked by *where* it hit, so
+#: the thing actually named for a term outranks the thing that merely mentions it.
+#:
+#: Tier 3 exists because searching only the headline fields produced false negatives on exactly the
+#: question the search is for -- "is there already something for X". ``find("mean reversion")``
+#: returned nothing while two nodes described it in prose, and ``find("crossover")`` returned 32 of
+#: the 62 nodes that mention it. The authored detail is where a computation is actually explained.
+SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
+    ("name", "id"),
+    ("abbreviation",),
+    ("summary",),
+    ("formula", "reference", "interpretation", "applications",
+     "inputs", "params", "outputs"),          # slot NAMES and their descriptions
+)
+
 #: Where the graph is looked for, in order. An explicit path always wins; ``MANGROVE_KB_ONTOLOGY``
 #: lets a caller point at a build output; then the copy shipped inside the package; then the
 #: repository layout, so the library works from a source checkout with no install step.
@@ -188,6 +203,38 @@ class Result:
         return out
 
 
+def _flatten(value: Any) -> str:
+    """Every string inside an authored property, whatever shape it was authored in.
+
+    ``interpretation`` and ``applications`` are a list on 64 nodes and a plain string on 7; the slot
+    dicts nest a description under each name. Searching has to see through both without caring.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        return " ".join(f"{k} {_flatten(v)}" for k, v in value.items())
+    if isinstance(value, (list, tuple)):
+        return " ".join(_flatten(v) for v in value)
+    return str(value)
+
+
+def _is_bounded(rng: Sequence[Any] | None) -> bool | None:
+    """Whether an output's range has two finite endpoints. ``None`` when it declares no range.
+
+    Unbounded is written ``[-inf, inf]``, not ``null`` -- so "does it have a range" is True for
+    unbounded outputs and is the wrong test. The endpoints have to be examined.
+    """
+    if not rng or len(rng) != 2:
+        return None
+    try:
+        lo, hi = float(rng[0]), float(rng[1])
+    except (TypeError, ValueError):
+        return None
+    return not (lo in (float("-inf"), float("inf")) or hi in (float("-inf"), float("inf")))
+
+
 def _cap(rows: list[dict[str, Any]], limit: int | None, what: str) -> Result:
     total = len(rows)
     if limit is None or total <= limit:
@@ -229,6 +276,14 @@ class KnowledgeGraph:
             self._out.setdefault(src, []).append(e)
             self._in.setdefault(dst, []).append(e)
 
+        # One lowercased haystack per node per tier, built once. The graph is a few hundred nodes,
+        # so this is cheaper than re-flattening the nested slot dicts on every search.
+        self._haystacks: dict[str, tuple[str, ...]] = {}
+        for n in self.nodes.values():
+            source = {"name": n.name, "id": n.id, "summary": n.summary, **n.props}
+            self._haystacks[n.id] = tuple(
+                " ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS)
+
     # --- loading ---------------------------------------------------------------------------------
 
     @classmethod
@@ -267,6 +322,9 @@ class KnowledgeGraph:
             "categories": {c: sum(1 for e in self.edges if e.category == c) for c in CATEGORIES},
             "roles": sorted(self.roles()),
             "kinds": sorted(self.kinds()),
+            "statuses": sorted(self.statuses()),
+            "input_columns": sorted(self.input_columns()),
+            "units": sorted(self.units()),
             "roots": sorted(n for n in self.nodes if not self._out.get(n)),
             "mappings": {r: {k: v for k, v in spec.items() if k in ("exact", "close")}
                          for r, spec in RELATIONS.items()},
@@ -279,6 +337,19 @@ class KnowledgeGraph:
     def kinds(self) -> set[str]:
         """Every class something is an instance or subclass of."""
         return {e.dst for e in self.edges if e.relation in BACKBONE}
+
+    def statuses(self) -> set[str]:
+        """Every status a node actually carries. Enumerable so ``find(status=...)`` cannot miss."""
+        return {n.status for n in self.nodes.values() if n.status}
+
+    def input_columns(self) -> set[str]:
+        """Every input column something declares -- the vocabulary ``find(requires=...)`` accepts."""
+        return {c for n in self.nodes.values() for c in (n.props.get("inputs") or {})}
+
+    def units(self) -> set[str]:
+        """Every unit an output is measured in -- the vocabulary ``outputs(units=...)`` accepts."""
+        return {str(o.get("units")) for n in self.nodes.values()
+                for o in (n.props.get("outputs") or {}).values() if o.get("units")}
 
     def schema(self) -> list[dict[str, str]]:
         """Which (primitive, relation, primitive) triples actually occur.
@@ -381,8 +452,9 @@ class KnowledgeGraph:
         return (direct | via_uses) - {cid}
 
     def find(self, query: str = "", *, kind: str | None = None, role: str | None = None,
-             primitive: str | None = None, limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
-        """Search by text, and/or filter by class and by role.
+             primitive: str | None = None, status: str | None = None,
+             requires: str | None = None, limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
+        """Search by text, and/or filter by class, role, status and required input.
 
         ``kind`` and ``role`` are separate parameters on purpose, and they intersect. ``kind`` is
         resolved by :meth:`in_class`, so it reaches indicators by their own ``instance-of`` edge and
@@ -393,6 +465,18 @@ class KnowledgeGraph:
             kg.find(kind="momentum", role="trigger")   # momentum-class signals used as triggers
             kg.find(kind="oscillator")                 # everything in the oscillator class
             kg.find(role="filter")                     # signals playing the filter part
+
+        ``status`` and ``requires`` are flat node predicates with small enumerable vocabularies --
+        both are listed by :meth:`stats`, so neither can be guessed wrong::
+
+            kg.find(status="deprecated")               # everything superseded, in one call
+            kg.find(requires="volume", role="trigger") # triggers that need a volume column
+
+        The text search reads every authored field, ranked by where it hit -- see
+        :data:`SEARCH_TIERS`. A name match outranks an abbreviation, which outranks the summary,
+        which outranks a mention buried in a formula or an output description. So widening the
+        search does not push the obvious answer down the page; it only stops the non-obvious one
+        from being invisible.
         """
         pool: set[str] | None = None
         if kind is not None:
@@ -401,6 +485,11 @@ class KnowledgeGraph:
             rid = self.resolve(role)
             borne = set(self.bearers(rid))
             pool = borne if pool is None else (pool & borne)
+        if status is not None and status not in (known := self.statuses()):
+            raise GraphError(f"unknown status {status!r}; known: {', '.join(sorted(known))}")
+        if requires is not None and requires not in (cols := self.input_columns()):
+            raise GraphError(f"nothing declares the input {requires!r}; "
+                             f"declared: {', '.join(sorted(cols))}")
 
         q = query.lower().strip()
         rows: list[tuple[int, str, dict[str, Any]]] = []
@@ -409,24 +498,73 @@ class KnowledgeGraph:
                 continue
             if primitive and n.primitive != primitive:
                 continue
+            if status is not None and n.status != status:
+                continue
+            if requires is not None and requires not in (n.props.get("inputs") or {}):
+                continue
             rank = 0
             if q:
                 # WHERE a query matched decides rank. Sorting purely by id buried the four signals
                 # actually NAMED "divergence" beneath five that merely mention it in prose -- and a
-                # caller reading the first few results concludes the thing does not exist. Name
-                # before abbreviation before description; id breaks ties so results stay
-                # deterministic, which a public API needs.
-                if q in n.name.lower() or q in n.id.lower():
-                    rank = 0
-                elif q in str(n.props.get("abbreviation", "")).lower():
-                    rank = 1
-                elif q in n.summary.lower():
-                    rank = 2
-                else:
+                # caller reading the first few results concludes the thing does not exist. The tier
+                # index IS the rank; id breaks ties so results stay deterministic, which a public
+                # API needs.
+                hay = self._haystacks[n.id]
+                hit = next((i for i, text in enumerate(hay) if q in text), None)
+                if hit is None:
                     continue
+                rank = hit
             rows.append((rank, n.id, n.brief()))
         rows.sort(key=lambda r: (r[0], r[1]))
         return _cap([r[2] for r in rows], limit, "matches")
+
+    def outputs(self, name: str = "", *, units: str | None = None, bounded: bool | None = None,
+                kind: str | None = None, limit: int | None = DEFAULT_LIMIT) -> Result:
+        """The output index: every value the library produces, filterable by what it *is*.
+
+        The other operations answer questions about a node's place in the graph. This one answers
+        questions about the values themselves -- *what produces an output called* ``histogram``,
+        *which computations emit a percentage*, *which are bounded and therefore comparable on one
+        axis*. Those were previously reachable only by fetching all 303 nodes and looping, which is
+        why they were not being asked.
+
+        A row is an **output**, not a node: an indicator with three outputs contributes three rows,
+        because "is this comparable with that" is a question about one output and not about its
+        producer. Each row names its producer so a caller can go on to :meth:`get` or
+        :meth:`neighbors`.
+
+        ``bounded=True`` selects outputs with two finite endpoints. Unbounded is written
+        ``[-inf, inf]`` rather than ``null``, so the naive "has a range" test passes for unbounded
+        outputs and gives the wrong answer -- this filter examines the endpoints instead::
+
+            kg.outputs(units="percent")                      # everything on a 0-100 scale
+            kg.outputs(bounded=True, kind="oscillator")      # comparable oscillator outputs
+            kg.outputs("histogram")                          # who produces one, and what it means
+        """
+        if units is not None and units not in (known := self.units()):
+            raise GraphError(f"unknown units {units!r}; known: {', '.join(sorted(known))}")
+        pool = self.in_class(kind) if kind is not None else None
+
+        needle = name.lower().strip()
+        rows: list[dict[str, Any]] = []
+        for n in self.nodes.values():
+            if pool is not None and n.id not in pool:
+                continue
+            for out_name, spec in (n.props.get("outputs") or {}).items():
+                if needle and needle not in out_name.lower():
+                    continue
+                if units is not None and spec.get("units") != units:
+                    continue
+                is_bounded = _is_bounded(spec.get("range"))
+                if bounded is not None and is_bounded is not bounded:
+                    continue
+                rows.append({"output": out_name, "id": n.id, "name": n.name,
+                             "type": spec.get("type"), "units": spec.get("units"),
+                             "range": spec.get("range"), "bounded": is_bounded,
+                             "canonical_name": spec.get("canonical_name"),
+                             "description": spec.get("description")})
+        rows.sort(key=lambda r: (r["id"], r["output"]))
+        return _cap(rows, limit, "outputs")
 
     # --- traversal -------------------------------------------------------------------------------
 
