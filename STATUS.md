@@ -25,25 +25,28 @@ change lands **last**, immediately before undrafting.
 2   skill + guide + drift guards          DONE
 3   backfill: docstrings + code = SSOT    DONE
 3b  query coverage: text + attributes     DONE
-4   graph + skills into the wheel         NEXT
-5   MCP rewrite                           deferred — kb_server gets overhauled
+4   graph + skills into the wheel         DONE
+5   MCP rewrite                           NEXT? — deferred by owner, kb_server gets overhauled
 6   viz for the public repo               BLOCKED — jarvis-viewer licence call
 7   LICENSE change, then undraft #105     LAST
 ```
 
-### 4 — next
+### 4 — done
 
-`pip install mangrove-kb` then `KnowledgeGraph.load()` raises: the wheel contains `mangrove_kb/` and
-nothing else. Verified by building it —
+`pip install mangrove-kb` used to give a package whose `KnowledgeGraph.load()` raised: the wheel
+carried `mangrove_kb/` and nothing else. `setup.py` now copies the graph into
+`mangrove_kb/data/` and the skill and guide into `mangrove_kb/skills/knowledge-graph/` at build time,
+so the repo keeps **one** canonical copy of each and there is no second file to drift.
 
-```
-python3 -m pip wheel --no-deps -w /tmp/w .
-python3 -c "import zipfile,glob;print([n for n in zipfile.ZipFile(glob.glob('/tmp/w/*.whl')[0]).namelist() if n.endswith('.json')])"
-```
+Verified by installing a built wheel into a clean venv outside the repo: it loads the packaged graph,
+303 nodes / 755 edges, and `skills/knowledge-graph/SKILL.md` is present.
+`tests/test_wheel_contents.py` builds a real wheel from a pristine copy of the tree and asserts all
+of it.
 
-Decided: **the graph and `skills/` both ship in the wheel.** The graph is now a pure build artifact,
-so generating it into `mangrove_kb/data/` at build time is the clean route. Add a test asserting the
-wheel really contains it, so the defect cannot return silently.
+**Do not build the wheel in place when checking this.** setuptools stages into `build/lib/` and never
+removes files it no longer produces, so a stale copy from an earlier build satisfies every assertion
+even with the build hook deleted — observed, not theorised. `pip --no-cache-dir` does not save you;
+the test copies the tree first.
 
 ## Open decisions — do not guess
 

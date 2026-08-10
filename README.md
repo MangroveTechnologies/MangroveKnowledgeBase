@@ -40,6 +40,18 @@ signal in the graph carries a **formula** stating the predicate it computes. The
 `ontology/signal-indicator-ontology.json` (303 nodes, 755 edges); the design is in
 `ontology/signal-indicator-ontology.md`.
 
+It ships **inside the package**, so it is there after `pip install mangrove-kb` with no checkout and
+no configuration:
+
+```python
+from mangrove_kb.graph import KnowledgeGraph
+kg = KnowledgeGraph.load()          # finds the packaged copy; a checkout uses ontology/ instead
+kg.stats()
+```
+
+The agent skill and guide are installed alongside it, at
+`mangrove_kb/skills/knowledge-graph/{SKILL.md,GUIDE.md}`.
+
 The seven classes: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern`,
 `unclassed`. There is deliberately no `trend` class and no `volume` class -- nothing measures trend,
 and volume is an input rather than a measurement. Signal files are named for the class they hold, so
