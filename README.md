@@ -49,8 +49,13 @@ kg = KnowledgeGraph.load()          # finds the packaged copy; a checkout uses o
 kg.stats()
 ```
 
-The agent skill and guide are installed alongside it, at
-`mangrove_kb/skills/knowledge-graph/{SKILL.md,GUIDE.md}`.
+Query it with `find` / `get` / `outputs` / `neighbors` / `subgraph` / `path`. Two documents explain
+how, and both are installed alongside the package at `mangrove_kb/skills/knowledge-graph/`:
+
+- **[SKILL.md](skills/knowledge-graph/SKILL.md)** -- which call answers which question, and the rules
+  of use. Written for an agent to load.
+- **[GUIDE.md](skills/knowledge-graph/GUIDE.md)** -- ten worked tasks end to end, with real output
+  and the trap in each.
 
 The seven classes: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern`,
 `unclassed`. There is deliberately no `trend` class and no `volume` class -- nothing measures trend,

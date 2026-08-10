@@ -12,6 +12,7 @@ pip install mangrove-kb
 - **99 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
+- **A knowledge graph of the library itself** -- 303 nodes, 755 edges, queryable, shipped in the package
 
 Dependencies: numpy, pandas. That's it.
 
@@ -144,6 +145,37 @@ result = NR7.compute(
 )
 nr7_bars = result["nr7"]
 ```
+
+## Ask the library about itself
+
+`mangrove-kb` ships a knowledge graph of its own contents -- what each indicator computes, what it
+consumes and produces, which signals read which of its outputs, and what part each signal plays in a
+strategy. It is generated from the source, so it is exact: no ranking model, no text extraction.
+
+```python
+from mangrove_kb.graph import KnowledgeGraph
+
+kg = KnowledgeGraph.load()          # no download, no config -- it is in the package
+kg.stats()                          # counts + the full vocabulary every filter accepts
+
+kg.find("divergence")                                # is there already a signal for this?
+kg.find(kind="momentum", role="trigger")             # by what it is AND how it is used
+kg.find(requires="volume", status="deprecated")      # by what it needs and whether it is current
+kg.get("procedure:indicator-rsi")["outputs"]         # typed outputs, with units and range
+kg.outputs(bounded=True, kind="oscillator")          # every value you could put on one axis
+kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # what would break
+kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")   # why is it classed so
+```
+
+**Read these two before using it** -- they are installed alongside the package at
+`mangrove_kb/skills/knowledge-graph/`, and readable here:
+
+- **[SKILL.md](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/skills/knowledge-graph/SKILL.md)** -- which call answers which question, and
+  the rules of use (results are capped and say so; roles are never types)
+- **[GUIDE.md](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/skills/knowledge-graph/GUIDE.md)** -- ten worked tasks end to end, with real
+  output and the trap in each
+
+If you are an agent, load `SKILL.md` -- it is written for you.
 
 ## Data Format
 
