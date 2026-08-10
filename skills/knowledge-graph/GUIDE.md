@@ -176,7 +176,7 @@ a momentum indicator, so they appear under both. Do not assume the sets are disj
 **Task:** "Can I use `rsi_oversold` on 50 bars of 1-minute data?"
 
 ```python
-sig = kg.get("procedure:signal-rsi-oversold")
+sig = kg.get("rsi_oversold")       # get() resolves a name; you do not need the id
 sig["params"]        # every knob, with its range and default
 sig["warmup_bars"]   # an EXPRESSION in those params -- e.g. 'window'
 sig["inputs"]        # which OHLCV columns it needs
@@ -232,9 +232,9 @@ the next use case.
 **Task:** "Should I use `hanging_man_trigger`?"
 
 ```python
-kg.get("procedure:signal-hanging-man-trigger")["status"]     # 'deprecated'
-kg.neighbors("procedure:signal-hanging-man-trigger",
-             relation="supersedes", direction="in")          # what replaced it, and why
+sig = kg.get("hanging_man_trigger")                          # the name they gave you resolves
+sig["status"]                                                # 'deprecated'
+kg.neighbors(sig["id"], relation="supersedes", direction="in")   # what replaced it, and why
 ```
 
 ```
@@ -257,7 +257,7 @@ explicitly; nothing else surfaces it.
 **Task:** "Why does `adosc_bearish` come back when I ask for momentum signals?"
 
 ```python
-kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")
+kg.path("adosc_bearish", "momentum")     # both ends resolve from the names you were given
 ```
 
 ```
@@ -286,17 +286,27 @@ specific kind of explanation.
 values themselves, so you can ask by what they *are*:
 
 ```python
-kg.outputs(bounded=True, kind="oscillator", limit=None)
+rows = kg.outputs(bounded=True, kind="oscillator", limit=None)
+rows.total                       # 48
+```
+
+**48 is not the answer**, and this is the trap worth internalising: `bounded=True` means *has two
+finite endpoints*, not *on the same scale*. Those 48 span five different ranges — 37 of them are
+`[0, 1]`, two are `[-1, 1]`, two `[-100, 100]`, one `[-100, 0]`. Putting them on one panel would be
+wrong. The range is on every row, so filter it:
+
+```python
+panel = [r for r in rows if r["range"] == [0, 100]]
 ```
 
 ```
-48 outputs
-  bop          bop        ratio          [-1, 1]
-  cmf          cmf        ratio          [-1, 1]
-  cmo          cmo        dimensionless  [-100, 100]
-  mfi          mfi        dimensionless  [0, 100]
-  rsi          rsi        dimensionless  [0, 100]
-  stc          stc        dimensionless  [0, 100]
+6 of 48 are actually on [0, 100]
+  mfi                   mfi                  dimensionless  [0, 100]
+  rsi                   rsi                  dimensionless  [0, 100]
+  stc                   stc                  dimensionless  [0, 100]
+  stochasticoscillator  stoch_d              dimensionless  [0, 100]
+  stochasticoscillator  stoch_k              dimensionless  [0, 100]
+  ultimateoscillator    ultimate_oscillator  dimensionless  [0, 100]
 ```
 
 A row is an **output**, not a node — MACD contributes three — because comparability is a property of

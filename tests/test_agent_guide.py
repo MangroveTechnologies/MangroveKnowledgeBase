@@ -108,9 +108,18 @@ def test_uc8_derivation_path(kg, guide):
 def test_uc9_output_index(kg, guide):
     rows = kg.outputs(bounded=True, kind="oscillator", limit=None)
     assert rows.total == 48, f"guide says 48 outputs, graph says {rows.total}"
-    assert "48 outputs" in guide
-    for name in ("bop", "cmf", "cmo", "mfi", "rsi", "stc"):        # the six the guide prints
-        assert any(r["output"] == name for r in rows), f"guide quotes {name}, no longer in the result"
+    assert "rows.total                       # 48" in guide
+
+    # The point of the case: bounded does NOT mean same-scale. If these ever collapsed to one
+    # range the guide's warning would be misinformation.
+    spread = {tuple(r["range"]) for r in rows}
+    assert len(spread) > 1, f"bounded oscillators now share one range ({spread}); the trap is gone"
+
+    panel = [r for r in rows if r["range"] == [0, 100]]
+    assert len(panel) == 6, f"guide says 6 of 48 are on [0, 100], graph says {len(panel)}"
+    assert "6 of 48 are actually on [0, 100]" in guide
+    for name in ("mfi", "rsi", "stc", "stoch_d", "stoch_k", "ultimate_oscillator"):
+        assert any(r["output"] == name for r in panel), f"guide quotes {name}, no longer on [0, 100]"
 
     hist = kg.outputs("histogram", limit=None).items
     assert [r["id"] for r in hist] == ["procedure:indicator-macd"]
@@ -219,3 +228,20 @@ def test_uc13_usage_example_runs_as_printed(kg, guide):
         runnable = example.replace("'window': value", f"'window': {default}")
         out = eval(runnable, {"df": df, **vars(indicators)})           # noqa: S307
         assert out, f"{node_id} usage_example produced nothing"
+
+
+def test_no_use_case_hardcodes_an_id_the_task_handed_over_as_a_name(kg, guide):
+    """A task that says `rsi_oversold` must not silently become `procedure:signal-rsi-oversold`.
+
+    The translation is not guessable -- underscores become hyphens and a `procedure:signal-` prefix
+    appears -- so hardcoding it teaches a reader to invent ids. `get()` and `path()` resolve names,
+    which is both shorter and the thing use case 11 exists to teach.
+    """
+    for name in ("rsi_oversold", "hanging_man_trigger", "adosc_bearish"):
+        node_id = kg.resolve(name)
+        assert kg.get(name)["id"] == node_id, "get() must accept the bare name"
+        section = next(c for c in re.split(r"^## ", guide, flags=re.M) if f'"{name}"' in c)
+        code = "\n".join(re.findall(r"```python\n(.*?)```", section, re.S))
+        assert f'"{name}"' in code, f"the section for {name} never uses the name it was given"
+        assert f'"{node_id}"' not in code, (
+            f"the section for {name} hardcodes {node_id} instead of resolving the name")
