@@ -55,6 +55,312 @@ GRAPH = _locate_graph()
 # claim about the model in display code where nothing could query it. The model now carries the root
 # and the view is pointed at it: the viewer's hard-coded id is a display problem and is fixed here,
 # in the one place display problems belong.
+# The viewer draws every colour through `cssv('--bg')` and friends, read live on each frame, so
+# rebranding is a matter of redefining those variables rather than touching the drawing code. The
+# palette is the platform's, lifted from mangrove-platform-frontend-web `src/app/globals.css` on
+# origin/dev -- the same OKLCH tokens, so the graph and the app agree without a second source.
+#
+# Three states, matching the platform: light, dark, and system (no attribute). Each colour is
+# defined on bare `:root` first, so nothing depends only on a media query; the dark values are
+# then applied under `prefers-color-scheme: dark` GUARDED by `:not([data-theme="light"])` so an
+# explicit light choice wins, and again under `[data-theme="dark"]` so an explicit dark choice
+# wins in a light OS. Redefining a colour in only one of those three places is how a toggle ends
+# up working in one direction.
+BRAND_STYLE = """
+<style>
+  :root{
+    --background:oklch(1 0 0); --foreground:oklch(0.145 0 0);
+    --sidebar:oklch(0.985 0 0); --card:oklch(1 0 0);
+    --muted-fg:oklch(0.556 0 0); --border:oklch(0.922 0 0); --chip-bg:oklch(0.97 0 0);
+    --dev-accent:#42a7c6; --dev-highlight:#ff9e18;
+    --ok:oklch(0.627 0.194 149.214); --bad:oklch(0.577 0.245 27.325);
+    --radius:0.625rem;
+    /* the viewer's own names, mapped onto the above */
+    --bg:var(--background); --panel:var(--sidebar); --ink:var(--foreground);
+    --muted:var(--muted-fg); --line:var(--border); --act:var(--dev-accent);
+    --chip:var(--chip-bg); --rat:var(--ok); --draft:var(--dev-highlight); --dep:var(--bad);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --background:oklch(0.145 0 0); --foreground:oklch(0.985 0 0);
+      --sidebar:oklch(0.205 0 0); --card:oklch(0.205 0 0);
+      --muted-fg:oklch(0.708 0 0); --border:oklch(0.269 0 0); --chip-bg:oklch(0.269 0 0);
+      --ok:oklch(0.696 0.17 162.48); --bad:oklch(0.704 0.191 22.216);
+    }
+  }
+  :root[data-theme="dark"]{
+    --background:oklch(0.145 0 0); --foreground:oklch(0.985 0 0);
+    --sidebar:oklch(0.205 0 0); --card:oklch(0.205 0 0);
+    --muted-fg:oklch(0.708 0 0); --border:oklch(0.269 0 0); --chip-bg:oklch(0.269 0 0);
+    --ok:oklch(0.696 0.17 162.48); --bad:oklch(0.704 0.191 22.216);
+  }
+  html,body{font-family:Geist,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+            "Helvetica Neue",Arial,sans-serif}
+  code,#inspect .mono,.nav{font-family:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+  #rail,#inspect{background:var(--panel)}
+  #rail h1{letter-spacing:-0.01em}
+  .btns button,#search-box{border-radius:calc(var(--radius) - 2px)}
+  .viewsel button.on,.lblsel button.on{background:var(--act);border-color:var(--act);color:#fff}
+
+  /* top bar */
+  #brandbar{display:flex;align-items:center;gap:12px;padding:10px 16px;flex:none;
+            border-bottom:1px solid var(--line);background:var(--panel)}
+  #brandbar .wordmark{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px;
+                      letter-spacing:-0.01em;color:var(--ink)}
+  #brandbar .wordmark svg{display:block}
+  #brandbar .tag{color:var(--muted);font-size:12px;font-weight:400}
+  #brandbar .spacer{flex:1}
+  #themesel{display:inline-flex;border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);
+            overflow:hidden}
+  #themesel button{background:transparent;border:0;color:var(--muted);cursor:pointer;
+                   padding:5px 10px;font-size:12px;line-height:1;display:flex;align-items:center}
+  #themesel button:hover{color:var(--ink)}
+  #themesel button[aria-pressed="true"]{background:var(--act);color:#fff}
+</style>
+"""
+
+#: Wordmark + theme switcher. Injected as the viewer's nav slot rather than appended, so it sits
+#: above the graph instead of floating over it.
+BRAND_BAR = """
+<div id="brandbar">
+  <span class="wordmark">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2 L12 22 M12 8 L6 14 M12 8 L18 14 M12 15 L7 20 M12 15 L17 20"
+            stroke="#42a7c6" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Mangrove <span class="tag">signal &amp; indicator knowledge graph</span>
+  </span>
+  <span class="spacer"></span>
+  <div id="themesel" role="group" aria-label="Colour theme">
+    <button data-theme-choice="light" title="Light">&#9788;</button>
+    <button data-theme-choice="dark" title="Dark">&#9789;</button>
+    <button data-theme-choice="system" title="Match system">&#9673;</button>
+  </div>
+</div>
+"""
+
+#: The switcher. `data-theme` is stamped on <html> BEFORE first paint by an inline script in the
+#: head, because setting it after the stylesheet applies gives a flash of the wrong theme on every
+#: load -- the same reason the platform runs a pre-hydration script.
+THEME_SCRIPT = """
+<script>
+(function(){
+  const KEY='mangrove-kb-theme';
+  function apply(pref){
+    const root=document.documentElement;
+    if(pref==='system'){ root.removeAttribute('data-theme'); }
+    else { root.setAttribute('data-theme', pref); }
+    document.querySelectorAll('#themesel button').forEach(b=>
+      b.setAttribute('aria-pressed', String(b.dataset.themeChoice===pref)));
+    // The 2D canvas re-reads every colour each frame, so it restyles itself. The 3D scene sets
+    // its background once at init, so it has to be told -- and only if it has been initialised.
+    if(typeof fg3d!=='undefined' && fg3d){
+      fg3d.backgroundColor(getComputedStyle(root).getPropertyValue('--bg').trim());
+    }
+  }
+  const stored=(function(){ try{ return localStorage.getItem(KEY); }catch(e){ return null; } })();
+  apply(stored||'system');
+  document.querySelectorAll('#themesel button').forEach(b=>b.addEventListener('click',()=>{
+    const pref=b.dataset.themeChoice;
+    try{ localStorage.setItem(KEY,pref); }catch(e){}
+    apply(pref);
+  }));
+  // A system-following page must repaint when the OS flips, not only on reload.
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{
+      const cur=(function(){ try{ return localStorage.getItem(KEY);}catch(e){return null;} })()||'system';
+      if(cur==='system') apply('system');
+    });
+  }
+})();
+</script>
+"""
+
+#: Runs in <head>, before the body exists, so the first paint is already the right theme.
+PREPAINT = """<script>(function(){try{var p=localStorage.getItem('mangrove-kb-theme');
+if(p&&p!=='system')document.documentElement.setAttribute('data-theme',p);}catch(e){}})();</script>"""
+
+#: This viewer is general-purpose: it names every primitive and relation category jarvis's ontology
+#: defines. This graph uses five primitives and four categories, so seven facet rows render with a
+#: count of 0 -- offering filters that do nothing and implying the graph is missing something. And
+#: ACT-R access, a cognitive-architecture signal from the tool this viewer came from, has no meaning
+#: here at all. Both are removed at load: a public product should not show its author's vocabulary.
+DECLUTTER = """
+<script>
+(function(){
+  function prune(){
+    let removed=0;
+    document.querySelectorAll('#prims .row, #cats .row').forEach(row=>{
+      const ct=row.querySelector('.ct');
+      if(ct && ct.textContent.trim()==='0'){ row.remove(); removed++; }
+    });
+    return removed;
+  }
+  // The facets are built from DATA at load, so one pass after that is enough. Counts are static --
+  // filtering hides nodes, it does not renumber the facets.
+  prune();
+
+  // ACT-R has no meaning outside jarvis. Say what the ring and halo mean HERE instead.
+  document.querySelectorAll('#rail p.sub').forEach(el=>{
+    if(el.textContent.includes('ACT-R')){
+      el.textContent='Solid arrow = ordering relation (DAG). Dashed = free / fringe. '
+                    +'Ring colour = status: green ratified, red deprecated.';
+    }
+  });
+  const ph=document.querySelector('#inspect .placeholder');
+  if(ph){ ph.textContent='Click any node or edge to pin its full detail here \u2014 what it computes, '
+                        +'its inputs, parameters and typed outputs, and everything it connects to.'; }
+  const h1=document.querySelector('#rail h1');
+  if(h1){ h1.textContent='signals & indicators'; }
+})();
+</script>
+"""
+
+def search_index() -> list[dict]:
+    """The corpus and ranking `KnowledgeGraph.find()` uses, precomputed for the page.
+
+    The viewer is one static file, so search cannot call into Python at query time. The failure
+    mode that matters is not "no search" -- it is a SECOND search, hand-written in JS, that ranks
+    differently from `kg.find()` and drifts. So the ranking is exported rather than reimplemented:
+    `SEARCH_TIERS` decides which haystack each field belongs to, `KnowledgeGraph` builds them, and
+    the page scores a query by the index of the first tier it hits, exactly as `find()` does.
+
+    `tests/test_viz.py` asserts the two agree on real queries, so a change to one that is not
+    mirrored in the other fails.
+    """
+    from ..graph import SEARCH_TIERS, KnowledgeGraph, _flatten
+
+    kg = KnowledgeGraph.load()
+    rows = []
+    for node in kg.nodes.values():
+        source = {"name": node.name, "id": node.id, "summary": node.summary, **node.props}
+        rows.append({
+            "id": node.id,
+            "name": node.name,
+            "summary": (node.summary or "")[:140],
+            # One lowercased string per tier. Tier order IS rank order.
+            "t": [" ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS],
+        })
+    rows.sort(key=lambda r: r["id"])
+    return rows
+
+
+#: Search box in the top bar. Ranks by which tier matched, then by id -- the same two keys, in the
+#: same order, as `KnowledgeGraph.find()`. Selecting a result pins it in the inspector and centres
+#: the camera on it, because a search that only tells you a thing exists has not finished the job.
+SEARCH_UI = """
+<style>
+  #searchwrap{position:relative}
+  #search{width:280px;padding:6px 10px;font-size:13px;color:var(--ink);background:var(--bg);
+          border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);outline:none}
+  #search:focus{border-color:var(--act);box-shadow:0 0 0 3px color-mix(in oklab,var(--act) 25%,transparent)}
+  #search::placeholder{color:var(--muted)}
+  /* right-aligned: the box sits near the right edge, so a left-aligned 420px panel hangs off
+     the viewport and clips the tier badge. */
+  #results{position:absolute;top:calc(100% + 6px);right:0;width:420px;max-height:60vh;overflow:auto;
+           background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+           box-shadow:0 12px 32px rgba(0,0,0,.28);z-index:60;display:none}
+  #results.open{display:block}
+  #results .r{padding:7px 11px;cursor:pointer;border-bottom:1px solid var(--line)}
+  #results .r:last-child{border-bottom:0}
+  #results .r.sel,#results .r:hover{background:color-mix(in oklab,var(--act) 16%,transparent)}
+  #results .rn{font-weight:600;font-size:13px}
+  #results .rs{color:var(--muted);font-size:11.5px;margin-top:1px;
+               overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #results .why{float:right;color:var(--muted);font-size:10.5px;text-transform:uppercase;
+                letter-spacing:.04em}
+  #results .none{padding:10px 11px;color:var(--muted)}
+</style>
+<script>
+(function(){
+  const IDX = __INDEX__;
+  const WHY = ['name','abbrev','summary','detail'];   // parallel to SEARCH_TIERS
+  const LIMIT = 40;
+
+  const bar=document.getElementById('brandbar');
+  const wrap=document.createElement('span'); wrap.id='searchwrap';
+  const box=document.createElement('input');
+  box.id='search'; box.type='search'; box.autocomplete='off';
+  box.placeholder='Search 303 nodes \u2014 name, formula, outputs\u2026';
+  const out=document.createElement('div'); out.id='results';
+  wrap.append(box,out); bar.insertBefore(wrap, document.getElementById('themesel'));
+
+  let hits=[], cur=-1;
+
+  function rank(q){
+    const res=[];
+    for(const r of IDX){
+      const tier=r.t.findIndex(h=>h.includes(q));
+      if(tier>=0) res.push({r,tier});
+    }
+    // rank, then id -- identical to find()'s sort key, so the two agree on ordering.
+    res.sort((a,b)=> a.tier-b.tier || (a.r.id<b.r.id?-1:a.r.id>b.r.id?1:0));
+    const shown=res.slice(0,LIMIT);
+    shown.total=res.length;                 // the list is capped; the count must not be
+    return shown;
+  }
+
+  function render(){
+    if(!hits.length){ out.innerHTML='<div class="none">no match</div>'; out.classList.add('open'); return; }
+    // A short list reads as "that is all there is". Result.truncated exists in the library for
+    // this reason; the page owes the reader the same honesty.
+    const more = hits.total>hits.length
+      ? '<div class="none">showing '+hits.length+' of '+hits.total
+        +' \u2014 narrow the query, or use kg.find("'+esc(box.value.trim())+'", limit=None)</div>'
+      : '';
+    out.innerHTML = hits.map((h,i)=>
+      '<div class="r'+(i===cur?' sel':'')+'" data-i="'+i+'">'
+      +'<span class="why">'+WHY[h.tier]+'</span>'
+      +'<div class="rn">'+esc(h.r.name)+'</div>'
+      +'<div class="rs">'+esc(h.r.summary||h.r.id)+'</div></div>').join('') + more;
+    out.classList.add('open');
+    out.querySelectorAll('.r').forEach(el=>el.onclick=()=>pick(+el.dataset.i));
+  }
+
+  function pick(i){
+    const hit=hits[i]; if(!hit) return;
+    out.classList.remove('open'); box.blur();
+    // Reuse the viewer's own selection path so the inspector, highlight and camera all agree.
+    const n = (typeof idx!=='undefined' && idx[hit.r.id]!=null) ? N[idx[hit.r.id]] : null;
+    if(!n) return;
+    if(typeof sel!=='undefined') sel=n;
+    if(typeof showNode==='function') showNode(n);
+    // draw() does translate(w/2 + view.x) then scale(view.z), so centring a node at (n.x, n.y)
+    // means view.x = -n.x * view.z -- not view.x = n.x, which lands it off-screen by the zoom.
+    if(typeof view!=='undefined' && n.x!=null){
+      view.z = Math.max(view.z, 1.1);
+      view.x = -n.x * view.z;
+      view.y = -n.y * view.z;
+    }
+    if(typeof mode!=='undefined' && mode==='3d' && typeof fg3d!=='undefined' && fg3d && n.x!=null){
+      const d=140, r=Math.hypot(n.x,n.y,n.z||0)||1;
+      fg3d.cameraPosition({x:n.x*(1+d/r), y:n.y*(1+d/r), z:(n.z||0)*(1+d/r)}, n, 900);
+    }
+    if(typeof wake==='function') wake(0.35);
+  }
+
+  box.addEventListener('input',()=>{
+    const q=box.value.trim().toLowerCase();
+    cur=-1;
+    if(q.length<2){ out.classList.remove('open'); hits=[]; return; }
+    hits=rank(q); render();
+  });
+  box.addEventListener('keydown',e=>{
+    if(!out.classList.contains('open')) return;
+    if(e.key==='ArrowDown'){ cur=Math.min(cur+1,hits.length-1); render(); e.preventDefault(); }
+    else if(e.key==='ArrowUp'){ cur=Math.max(cur-1,0); render(); e.preventDefault(); }
+    else if(e.key==='Enter'){ pick(cur<0?0:cur); e.preventDefault(); }
+    else if(e.key==='Escape'){ out.classList.remove('open'); box.blur(); }
+  });
+  document.addEventListener('click',e=>{ if(!wrap.contains(e.target)) out.classList.remove('open'); });
+  // "/" focuses search, the convention everywhere else.
+  document.addEventListener('keydown',e=>{
+    if(e.key==='/' && document.activeElement!==box){ box.focus(); e.preventDefault(); }
+  });
+})();
+</script>
+"""
+
 ROOT_ID = "object:mangrove-knowledge-space"
 VIEWER_ANCHOR = "const ANCHOR='object:self';"
 
@@ -391,15 +697,23 @@ def main() -> int:
                  f"would silently no-op without it")
 
     data = viz.data_from_rows(nodes, edges)
-    page = viz.render_page(data, title="Mangrove signal/indicator ontology")
+    page = viz.render_page(data, title="Mangrove signal & indicator knowledge graph",
+                           nav_html=BRAND_BAR)
+    # Before </head>, so the first paint is already the chosen theme rather than flashing to it.
+    page = page.replace("</head>", PREPAINT + "</head>", 1)
     if page.count(VIEWER_ANCHOR) != 1:
         sys.exit(f"expected exactly one {VIEWER_ANCHOR!r} in the viewer script, found "
                  f"{page.count(VIEWER_ANCHOR)}; upstream viz.py changed and collapse would "
                  f"silently no-op")
     page = page.replace(VIEWER_ANCHOR, f"const ANCHOR={json.dumps(ROOT_ID)};")
-    overlay = (INSPECTOR_LINKS
+    overlay = (BRAND_STYLE
+               + INSPECTOR_LINKS
                + COLLAPSE_PANEL.replace("__ROOT__", json.dumps(ROOT_ID))
-               + BACK_BUTTON)
+               + BACK_BUTTON
+               + THEME_SCRIPT
+               + DECLUTTER
+               + SEARCH_UI.replace("__INDEX__", json.dumps(search_index(),
+                                                            separators=(",", ":"))))
     print(page.replace("</body>", overlay + "</body>"))
     print(f"nodes={len(data['nodes'])} edges={len(data['edges'])}", file=sys.stderr)
     return 0
