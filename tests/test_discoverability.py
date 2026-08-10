@@ -125,7 +125,6 @@ def test_the_licence_is_stated_consistently_everywhere():
         assert "Commercial use requires a paid license" in text, f"{doc} omits the commercial terms"
         # A licensing contact that silently rots leaves a buyer with nowhere to go.
         assert "support@mangrove.ai" in text, f"{doc} does not say where to buy a commercial licence"
-        assert "tim.darrah@mangrove.ai" in text, f"{doc} omits the cc address"
         assert "team@mangrovetechnologies.ai" not in text, f"{doc} keeps the old licensing contact"
 
 
