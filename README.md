@@ -277,4 +277,8 @@ docker compose up -d mkb-knowledge-base
 
 ## License
 
-[MIT](LICENSE) -- Use it freely. Cite it proudly. Contribute back when you can.
+Free for noncommercial use under the [PolyForm Noncommercial License 1.0.0](LICENSE) -- personal study, hobby projects, research, teaching, and use by charitable, educational, public-research and government organizations.
+
+**Commercial use requires a paid license.** Using mangrove-kb in a product or service you sell, or internally in a for-profit business, needs one -- contact team@mangrovetechnologies.ai.
+
+Releases published before this change remain under the MIT license they shipped with.

@@ -209,4 +209,8 @@ This package is part of [MangroveKnowledgeBase](https://github.com/MangroveTechn
 
 ## License
 
-[MIT](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/LICENSE) -- Use it freely. Cite it proudly. Contribute back when you can.
+Free for noncommercial use under the [PolyForm Noncommercial License 1.0.0](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/LICENSE) -- personal study, hobby projects, research, teaching, and use by charitable, educational, public-research and government organizations.
+
+**Commercial use requires a paid license.** Using mangrove-kb in a product or service you sell, or internally in a for-profit business, needs one -- contact team@mangrovetechnologies.ai.
+
+Releases published before this change remain under the MIT license they shipped with.

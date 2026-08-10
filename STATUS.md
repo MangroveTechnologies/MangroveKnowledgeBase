@@ -29,8 +29,9 @@ change lands **last**, immediately before undrafting.
 4b  OHLCV column case: lowercase          DONE
 4c  discoverability + guide use cases     DONE
 5   MCP rewrite                           NEXT? — deferred by owner, kb_server gets overhauled
-6   viz for the public repo               BLOCKED — jarvis-viewer licence call
-7   LICENSE change, then undraft #105     LAST
+6   viz for the public repo               UNBLOCKED — see below
+7   LICENSE change                        DONE — PolyForm Noncommercial 1.0.0
+8   undraft #105                          NEXT
 ```
 
 ### 4 — done
@@ -65,15 +66,27 @@ Capitalised frames still work — `RuleRegistry.register` normalizes the five OH
 boundary, touching nothing else. Verified through the installed wheel: 213 signals, three column
 spellings, zero disagreements.
 
+### 7 — done
+
+`mangrove-kb` is **PolyForm Noncommercial 1.0.0**: free for noncommercial use, commercial use
+requires a paid licence from team@mangrovetechnologies.ai. The licence text is verbatim from
+`polyformproject/polyform-licenses`, under a preamble that states the commercial terms and the
+`Required Notice`. `pyproject.toml` carries the SPDX id and drops the OSI classifier — PolyForm is
+deliberately not OSI-approved. Verified in the built wheel's METADATA.
+
+Releases published before this change stay MIT; that cannot be revoked retroactively and the LICENSE
+says so.
+
+**This dissolved the viewer question.** The jarvis viewer was called a blocker on the grounds that
+CC BY-NC-SA cannot ship inside an MIT repo. Two things were wrong with that: jarvis has **no LICENSE
+file at all** (its GitHub licence metadata is `null` — the CC BY-NC-SA claim lives only in a header
+and an `ATTRIBUTION.md` we wrote ourselves), and the copyright holder on both sides is Mangrove. It
+was never a third-party constraint. With the package now noncommercial too, there is nothing to
+reconcile.
+
 ## Open decisions — do not guess
 
-1. **Licence for the jarvis viewer.** The renderer in the workspace's `tools/mangrove-kg` vendors
-   jarvis's `viz.py`, which is **CC BY-NC-SA 4.0**. This repo is MIT and public; NC/SA cannot ship
-   inside it. Dual-licence those files, write a fresh viewer, or ship tools-only. **Blocks 6.**
-2. **Package licence change.** Moving off MIT to restrict commercial use, landing immediately before
-   undrafting. Contributors `ApexFutz` and `Maciej` are employees and Mangrove holds rights — not a
-   blocker.
-3. **Ordering within issue #112** (below). Findings agreed, order not.
+1. **Ordering within issue #112** (below). Findings agreed, order not.
 
 ## Filed, not scheduled
 

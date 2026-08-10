@@ -100,3 +100,41 @@ def test_the_documents_do_not_contradict_each_other_on_the_graph_size():
     assert len(sizes) >= 3, f"only {sorted(sizes)} state the graph size"
     everything = set().union(*sizes.values())
     assert len(everything) == 1, f"documents disagree on node count: {sizes}"
+
+
+def test_the_licence_is_stated_consistently_everywhere():
+    """One repo, one licence. The terms are a promise to users, so they must not disagree.
+
+    The repo was MIT; it is now PolyForm Noncommercial 1.0.0 -- free for noncommercial use, paid for
+    commercial. Nothing may still describe it as MIT except a dated record of when it was.
+    """
+    licence = (REPO / "LICENSE").read_text()
+    assert "PolyForm Noncommercial License 1.0.0" in licence
+    assert "Commercial use requires a paid license" in licence
+    assert "Required Notice: Copyright Mangrove Technologies Inc." in licence
+    # The grant itself must be present verbatim, not paraphrased in our preamble.
+    assert "Any noncommercial purpose is a permitted purpose." in licence
+
+    pyproject = (REPO / "pyproject.toml").read_text()
+    assert 'license = {text = "PolyForm-Noncommercial-1.0.0"}' in pyproject
+    assert "OSI Approved" not in pyproject, "PolyForm is not an OSI-approved licence"
+
+    for doc in ("README.md", "PKG_README.md"):
+        text = (REPO / doc).read_text()
+        assert "PolyForm Noncommercial License 1.0.0" in text, f"{doc} does not state the licence"
+        assert "Commercial use requires a paid license" in text, f"{doc} omits the commercial terms"
+
+
+def test_nothing_still_claims_the_repo_is_mit():
+    """Except SESSION-SUMMARY.md, which records what was true on the day it was written."""
+    dated = {"SESSION-SUMMARY.md", "CHANGELOG.md", "LICENSE"}
+    offenders = []
+    for path in REPO.rglob("*"):
+        if not path.is_file() or path.suffix not in {".md", ".toml", ".py", ".json"}:
+            continue
+        rel = path.relative_to(REPO)
+        if ".git" in rel.parts or "build" in rel.parts or str(rel) in dated:
+            continue
+        if re.search(r"\bMIT[- ](?:licen[cs]ed|License)\b", path.read_text()):
+            offenders.append(str(rel))
+    assert not offenders, f"these still describe the repo as MIT: {offenders}"
