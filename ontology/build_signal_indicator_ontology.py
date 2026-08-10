@@ -1014,14 +1014,14 @@ def rel(a, r, b, why, ai, bi, **props):
 # markets and the rest of the knowledge base land under this same root.
 #
 # `Object`, not `Concept`. Per the primitive definitions, a Concept is a CATEGORY with graded
-# membership -- things are `instance-of` it. Nothing is an instance of this; Indicator, Signal and
-# Strategy are `part-of` it. It is a single individuated artifact that persists and has identity,
+# membership -- things are `instance-of` it. Nothing is an instance of this; technical analysis and
+# Strategy are `part-of` it, and the entity types sit under technical analysis. It is a single individuated artifact that persists and has identity,
 # which is a DOLCE endurant, i.e. an Object -- the same kind of thing as "MangroveTrader" in the
 # ontology doc's own examples.
 #
-# Without a root the graph has four disconnected tops -- Indicator, Signal, Strategy and Role -- and
-# nothing states that they belong to the same space. A viewer that walks containment from one root
-# can then only ever see part of the graph, and the missing part was Role.
+# Without a root the graph has disconnected tops -- originally Indicator, Signal, Strategy and Role
+# -- and nothing states that they belong to the same space. A viewer that walks containment from one
+# root can then only ever see part of the graph, and the missing part was Role.
 #
 # It exists here, in the source, for the same reason every other node does: it is part of the model.
 # A renderer that invents it in memory is asserting a fact about the ontology in display code, where
@@ -1030,9 +1030,9 @@ ROOT = "object:mangrove-knowledge-space"
 ROOT_TITLE = "Mangrove Knowledge Space"
 atom(ROOT, ROOT_TITLE, "Object",
      "Root of the Mangrove knowledge space -- the populated graph the jarvis ontology types. Its "
-     "first region is signals and indicators: the entity types (Indicator, Signal, Strategy), the "
-     "role axis, and everything classified under them. Strategies, markets and the rest of the "
-     "knowledge base attach here too.")
+     "first region is technical analysis: the Indicator and Signal layers, the six characters a "
+     "computation can measure, the role axis, and everything classified under them. Strategy "
+     "attaches directly; markets and the rest of the knowledge base land here too.")
 
 # entity types
 #
@@ -1055,9 +1055,21 @@ atom("concept:signal", "Signal", "Concept",
      "A boolean predicate over indicator output, evaluated per bar. Composed of (indicator, predicate, params).")
 atom("schema:strategy", "Strategy", "Schema",
      "A structured template composing signals into entry/exit rules plus configuration.")
-for _t, _tid in (("Indicator", "concept:indicator"), ("Signal", "concept:signal"),
-                 ("Strategy", "schema:strategy")):
-    rel(_t, "part-of", ROOT_TITLE, "entity type defined by the knowledge space", _tid, ROOT)
+# Indicator and Signal sit UNDER technical analysis, not beside it. An indicator reads a market from
+# its own price and volume history, which is what technical analysis IS -- making it a sibling of the
+# domain said it was something else. `part-of`, not `kind-of`, because these are the two LAYERS the
+# domain is built from, one stacked on the other; `kind-of technical analysis` is reserved for the
+# six characters that DIVIDE it, and means "a character measured" throughout the library.
+#
+# No containment is lost by dropping the direct root edges: `part-of` is transitive, so
+# Indicator part-of technical analysis part-of root still closes to the root.
+for _t, _tid in (("Indicator", "concept:indicator"), ("Signal", "concept:signal")):
+    rel(_t, "part-of", "technical analysis", "layer of the domain", _tid, TA_ID)
+# Strategy stays on the root: it is a Schema -- a template composing signals -- not a computation
+# that reads a market, so it is not under the analysis domain. It reaches the rest through
+# `Signal part-of Strategy`.
+rel("Strategy", "part-of", ROOT_TITLE, "entity type defined by the knowledge space",
+    "schema:strategy", ROOT)
 # Type-level composition, and the only thing this graph says about strategies. `part-of` in the
 # part->whole direction, matching `Role part-of Signal` below: neither claims every instance is part
 # of one, both state what the class is a constituent of.

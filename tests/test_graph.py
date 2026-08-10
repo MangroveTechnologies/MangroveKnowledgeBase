@@ -238,7 +238,7 @@ def test_all_paths_distinguishes_its_two_truncated_states(kg):
     """"Showing 10 of 47" is a claim that 47 exist. After an early stop you cannot make it."""
     complete = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
                             max_depth=4, sibling_hops=True, limit=3)
-    assert complete.truncated and "showing 3 of 197" in complete.note
+    assert complete.truncated and "showing 3 of 198" in complete.note
     assert "stopped" not in complete.note, "a finished search must not hedge"
 
     # The step bound is not decorative: the same query one hop deeper trips the default.

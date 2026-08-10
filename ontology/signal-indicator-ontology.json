@@ -4,7 +4,7 @@
    "id": "object:mangrove-knowledge-space",
    "title": "Mangrove Knowledge Space",
    "kind": "Object",
-   "summary": "Root of the Mangrove knowledge space -- the populated graph the jarvis ontology types. Its first region is signals and indicators: the entity types (Indicator, Signal, Strategy), the role axis, and everything classified under them. Strategies, markets and the rest of the knowledge base attach here too.",
+   "summary": "Root of the Mangrove knowledge space -- the populated graph the jarvis ontology types. Its first region is technical analysis: the Indicator and Signal layers, the six characters a computation can measure, the role axis, and everything classified under them. Strategy attaches directly; markets and the rest of the knowledge base land here too.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {}
@@ -17399,18 +17399,18 @@
   {
    "from": "Indicator",
    "rel": "part-of",
-   "to": "Mangrove Knowledge Space",
-   "why": "entity type defined by the knowledge space",
+   "to": "technical analysis",
+   "why": "layer of the domain",
    "from_id": "concept:indicator",
-   "to_id": "object:mangrove-knowledge-space"
+   "to_id": "concept:technical-analysis"
   },
   {
    "from": "Signal",
    "rel": "part-of",
-   "to": "Mangrove Knowledge Space",
-   "why": "entity type defined by the knowledge space",
+   "to": "technical analysis",
+   "why": "layer of the domain",
    "from_id": "concept:signal",
-   "to_id": "object:mangrove-knowledge-space"
+   "to_id": "concept:technical-analysis"
   },
   {
    "from": "Strategy",
