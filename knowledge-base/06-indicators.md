@@ -70,7 +70,7 @@ SMA(n) = (P_1 + P_2 + ... + P_n) / n
 - **Parameters**:
   - `window`: Parameter for SMA calculation
 - **Outputs**: `sma`
-- **Usage Example**: `SMA.compute(data={'close': df['Close']}, params={'window': value})`
+- **Usage Example**: `SMA.compute(data={'close': df['close']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -110,7 +110,7 @@ Where k = 2 / (n + 1)
 - **Parameters**:
   - `window`: Parameter for EMA calculation
 - **Outputs**: `ema`
-- **Usage Example**: `EMA.compute(data={'close': df['Close']}, params={'window': value})`
+- **Usage Example**: `EMA.compute(data={'close': df['close']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -188,7 +188,7 @@ ADX = EMA(DX, n periods, typically 14)
 - **Parameters**:
   - `window`: Parameter for ADX calculation
 - **Outputs**: `adx`, `adx_pos`, `adx_neg`
-- **Usage Example**: `ADX.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})`
+- **Usage Example**: `ADX.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -270,7 +270,7 @@ Chikou Span (Lagging Span) = Current close, plotted 26 periods back
   - `window_senkou`: Senkou Span B (leading span B) window
   - `visual`: Displacement for cloud projection
 - **Outputs**: `conversion_line`, `base_line`, `span_a`, `span_b`
-- **Usage Example**: `Ichimoku.compute(data={'high': df['High'], 'low': df['Low']}, params={'window_tenkan': value, 'window_kijun': value, 'window_senkou': value, 'visual': value})`
+- **Usage Example**: `Ichimoku.compute(data={'high': df['high'], 'low': df['low']}, params={'window_tenkan': value, 'window_kijun': value, 'window_senkou': value, 'visual': value})`
 
 #### Related Trading Signals
 
@@ -489,7 +489,7 @@ Standard period: 14
 - **Parameters**:
   - `window`: Parameter for RSI calculation
 - **Outputs**: `rsi`
-- **Usage Example**: `RSI.compute(data={'close': df['Close']}, params={'window': value})`
+- **Usage Example**: `RSI.compute(data={'close': df['close']}, params={'window': value})`
 - **Reference**: https://www.investopedia.com/terms/r/rsi.asp
 
 #### Related Trading Signals
@@ -536,7 +536,7 @@ Histogram = MACD Line - Signal Line
   - `window_fast`: Parameter for MACD calculation
   - `window_sign`: Parameter for MACD calculation
 - **Outputs**: `macd`, `signal`, `histogram`
-- **Usage Example**: `MACD.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})`
+- **Usage Example**: `MACD.compute(data={'close': df['close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})`
 
 #### Related Trading Signals
 
@@ -617,7 +617,7 @@ Typical period: 20
   - `window`: Parameter for CCI calculation
   - `constant`: Parameter for CCI calculation
 - **Outputs**: `cci`
-- **Usage Example**: `CCI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'constant': value})`
+- **Usage Example**: `CCI.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'constant': value})`
 
 #### Related Trading Signals
 
@@ -654,7 +654,7 @@ Typical periods: 9, 12, 25
 - **Parameters**:
   - `window`: Parameter for ROC calculation
 - **Outputs**: `roc`
-- **Usage Example**: `ROC.compute(data={'close': df['Close']}, params={'window': value})`
+- **Usage Example**: `ROC.compute(data={'close': df['close']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -718,7 +718,7 @@ Typical period: 14
 - **Parameters**:
   - `window`: Parameter for MFI calculation
 - **Outputs**: `mfi`
-- **Usage Example**: `MFI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})`
+- **Usage Example**: `MFI.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -964,7 +964,7 @@ Bandwidth = (Upper - Lower) / Middle * 100
   - `window`: Parameter for BollingerBands calculation
   - `window_dev`: Parameter for BollingerBands calculation
 - **Outputs**: `mavg`, `hband`, `lband`, `wband`, `pband`
-- **Usage Example**: `BollingerBands.compute(data={'close': df['Close']}, params={'window': value, 'window_dev': value})`
+- **Usage Example**: `BollingerBands.compute(data={'close': df['close']}, params={'window': value, 'window_dev': value})`
 
 `hband_indicator` and `lband_indicator` were removed: a boolean decision over a numeric series the
 indicator already emits is a signal, not a measurement. That content is the `bb_above_upper` and
@@ -1017,7 +1017,7 @@ Typical period: 14
 - **Parameters**:
   - `window`: Parameter for ATR calculation
 - **Outputs**: `atr`
-- **Usage Example**: `ATR.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})`
+- **Usage Example**: `ATR.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -1225,7 +1225,7 @@ If Close = Previous Close: OBV = Previous OBV
 - **Category**: Volume
 - **Required Data**: `close`, `volume`
 - **Outputs**: `obv`
-- **Usage Example**: `OBV.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={})`
+- **Usage Example**: `OBV.compute(data={'close': df['close'], 'volume': df['volume']}, params={})`
 
 #### Related Trading Signals
 
@@ -1299,7 +1299,7 @@ Typical Price = (High + Low + Close) / 3
 - **Parameters**:
   - `window`: Parameter for VWAP calculation
 - **Outputs**: `vwap`
-- **Usage Example**: `VWAP.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})`
+- **Usage Example**: `VWAP.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -1336,7 +1336,7 @@ Typical period: 20
 - **Parameters**:
   - `window`: Parameter for CMF calculation
 - **Outputs**: `cmf`
-- **Usage Example**: `CMF.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})`
+- **Usage Example**: `CMF.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'window': value})`
 
 #### Related Trading Signals
 
@@ -1727,7 +1727,7 @@ Where `n` is the lookback period (typically 12 bars).
 - **Parameters**:
   - `period`: Lookback period for ROC calculation (default: 12)
 - **Outputs**: `roc` (percentage change)
-- **Usage Example**: `ROC.compute(data={'close': df['Close']}, params={'period': 12})`
+- **Usage Example**: `ROC.compute(data={'close': df['close']}, params={'period': 12})`
 
 #### Related Trading Signals
 

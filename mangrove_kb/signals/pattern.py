@@ -81,7 +81,7 @@ def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
             True if doji detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -92,7 +92,7 @@ def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
     """
     if len(df) < 1:
         return False
-    result = _doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold)
+    result = _doji(df["open"], df["high"], df["low"], df["close"], body_threshold=body_threshold)
     return int(result.iloc[-1]) == 1
 
 
@@ -125,7 +125,7 @@ def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
             True if long-legged doji detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -137,7 +137,7 @@ def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     """
     if len(df) < 1:
         return False
-    result = _long_legged_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold, wick_threshold=wick_threshold)
+    result = _long_legged_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=body_threshold, wick_threshold=wick_threshold)
     return int(result.iloc[-1]) == 1
 
 
@@ -170,7 +170,7 @@ def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
             True if dragonfly doji detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -182,7 +182,7 @@ def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     """
     if len(df) < 1:
         return False
-    result = _dragonfly_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold, upper_wick_max=upper_wick_max)
+    result = _dragonfly_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=body_threshold, upper_wick_max=upper_wick_max)
     return int(result.iloc[-1]) == 1
 
 
@@ -215,7 +215,7 @@ def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
             True if gravestone doji detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -227,7 +227,7 @@ def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     """
     if len(df) < 1:
         return False
-    result = _gravestone_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold, lower_wick_max=lower_wick_max)
+    result = _gravestone_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=body_threshold, lower_wick_max=lower_wick_max)
     return int(result.iloc[-1]) == 1
 
 
@@ -260,7 +260,7 @@ def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
             True if hammer detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -272,7 +272,7 @@ def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = _hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, upper_wick_max=upper_wick_max)
+    result = _hammer(df["open"], df["high"], df["low"], df["close"], wick_ratio=wick_ratio, upper_wick_max=upper_wick_max)
     return int(result.iloc[-1]) == 1
 
 
@@ -309,7 +309,7 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
             True if shooting star detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -325,7 +325,7 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
         DeprecationWarning, stacklevel=3)
     if len(df) < 1:
         return False
-    result = _shooting_star(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, lower_wick_max=lower_wick_max)
+    result = _shooting_star(df["open"], df["high"], df["low"], df["close"], wick_ratio=wick_ratio, lower_wick_max=lower_wick_max)
     return int(result.iloc[-1]) == 1
 
 
@@ -363,7 +363,7 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
             True if hanging man detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -379,7 +379,7 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
         DeprecationWarning, stacklevel=3)
     if len(df) < 1:
         return False
-    result = _hanging_man(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, upper_wick_max=upper_wick_max)
+    result = _hanging_man(df["open"], df["high"], df["low"], df["close"], wick_ratio=wick_ratio, upper_wick_max=upper_wick_max)
     return int(result.iloc[-1]) == 1
 
 
@@ -413,7 +413,7 @@ def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
             True if inverted hammer detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -425,7 +425,7 @@ def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = _inverted_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, lower_wick_max=lower_wick_max)
+    result = _inverted_hammer(df["open"], df["high"], df["low"], df["close"], wick_ratio=wick_ratio, lower_wick_max=lower_wick_max)
     return int(result.iloc[-1]) == 1
 
 
@@ -456,7 +456,7 @@ def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
             True if bullish marubozu detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -467,7 +467,7 @@ def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     """
     if len(df) < 1:
         return False
-    result = _marubozu(df["Open"], df["High"], df["Low"], df["Close"], wick_tolerance=wick_tolerance)
+    result = _marubozu(df["open"], df["high"], df["low"], df["close"], wick_tolerance=wick_tolerance)
     return int(result.iloc[-1]) == 1
 
 
@@ -498,7 +498,7 @@ def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
             True if bearish marubozu detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -509,7 +509,7 @@ def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     """
     if len(df) < 1:
         return False
-    result = _marubozu(df["Open"], df["High"], df["Low"], df["Close"], wick_tolerance=wick_tolerance)
+    result = _marubozu(df["open"], df["high"], df["low"], df["close"], wick_tolerance=wick_tolerance)
     return int(result.iloc[-1]) == -1
 
 
@@ -542,7 +542,7 @@ def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
             True if spinning top detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -554,7 +554,7 @@ def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
     """
     if len(df) < 1:
         return False
-    result = _spinning_top(df["Open"], df["High"], df["Low"], df["Close"], body_max=body_max, wick_min=wick_min)
+    result = _spinning_top(df["open"], df["high"], df["low"], df["close"], body_max=body_max, wick_min=wick_min)
     return int(result.iloc[-1]) == 1
 
 
@@ -585,7 +585,7 @@ def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
             True if bullish engulfing detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, Close
+    Requires: open, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -595,7 +595,7 @@ def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _engulfing(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _engulfing(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == 1
 
 
@@ -621,7 +621,7 @@ def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
             True if bearish engulfing detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, Close
+    Requires: open, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -631,7 +631,7 @@ def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _engulfing(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _engulfing(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == -1
 
 
@@ -657,7 +657,7 @@ def bullish_harami_trigger(df: pd.DataFrame) -> bool:
             True if bullish harami detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, Close
+    Requires: open, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -667,7 +667,7 @@ def bullish_harami_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _harami(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _harami(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == 1
 
 
@@ -693,7 +693,7 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
             True if bearish harami detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, Close
+    Requires: open, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -703,7 +703,7 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _harami(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _harami(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == -1
 
 
@@ -741,7 +741,7 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
             True if piercing line detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -753,7 +753,7 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
     """
     if len(df) < 2:
         return False
-    result = _piercing_line(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=min_penetration, require_gap=require_gap)
+    result = _piercing_line(df["open"], df["high"], df["low"], df["close"], min_penetration=min_penetration, require_gap=require_gap)
     return int(result.iloc[-1]) == 1
 
 
@@ -791,7 +791,7 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
             True if dark cloud cover detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -803,7 +803,7 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
     """
     if len(df) < 2:
         return False
-    result = _dark_cloud_cover(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=min_penetration, require_gap=require_gap)
+    result = _dark_cloud_cover(df["open"], df["high"], df["low"], df["close"], min_penetration=min_penetration, require_gap=require_gap)
     return int(result.iloc[-1]) == -1
 
 
@@ -835,7 +835,7 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
             True if tweezer tops detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -846,7 +846,7 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _tweezer_tops(df["Open"], df["High"], df["Low"], df["Close"], tolerance=tolerance)
+    result = _tweezer_tops(df["open"], df["high"], df["low"], df["close"], tolerance=tolerance)
     return int(result.iloc[-1]) == -1
 
 
@@ -878,7 +878,7 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
             True if tweezer bottoms detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -889,7 +889,7 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _tweezer_bottoms(df["Open"], df["High"], df["Low"], df["Close"], tolerance=tolerance)
+    result = _tweezer_bottoms(df["open"], df["high"], df["low"], df["close"], tolerance=tolerance)
     return int(result.iloc[-1]) == 1
 
 
@@ -925,7 +925,7 @@ def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
             True if morning star detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -936,7 +936,7 @@ def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     """
     if len(df) < 3:
         return False
-    result = _morning_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold)
+    result = _morning_star(df["open"], df["high"], df["low"], df["close"], body_threshold=body_threshold)
     return int(result.iloc[-1]) == 1
 
 
@@ -967,7 +967,7 @@ def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
             True if evening star detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -978,7 +978,7 @@ def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     """
     if len(df) < 3:
         return False
-    result = _evening_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=body_threshold)
+    result = _evening_star(df["open"], df["high"], df["low"], df["close"], body_threshold=body_threshold)
     return int(result.iloc[-1]) == -1
 
 
@@ -1009,7 +1009,7 @@ def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) 
             True if three white soldiers detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1020,7 +1020,7 @@ def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) 
     """
     if len(df) < 3:
         return False
-    result = _three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=min_body_ratio)
+    result = _three_white_soldiers(df["open"], df["high"], df["low"], df["close"], min_body_ratio=min_body_ratio)
     return int(result.iloc[-1]) == 1
 
 
@@ -1051,7 +1051,7 @@ def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> 
             True if three black crows detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1062,7 +1062,7 @@ def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> 
     """
     if len(df) < 3:
         return False
-    result = _three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=min_body_ratio)
+    result = _three_black_crows(df["open"], df["high"], df["low"], df["close"], min_body_ratio=min_body_ratio)
     return int(result.iloc[-1]) == -1
 
 
@@ -1088,7 +1088,7 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
             True if three inside up detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, Close
+    Requires: open, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1098,7 +1098,7 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 3:
         return False
-    result = _three_inside_up(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _three_inside_up(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == 1
 
 
@@ -1124,7 +1124,7 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
             True if three inside down detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, Close
+    Requires: open, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1134,7 +1134,7 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 3:
         return False
-    result = _three_inside_down(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _three_inside_down(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == -1
 
 
@@ -1165,7 +1165,7 @@ def inside_bar_trigger(df: pd.DataFrame) -> bool:
             True if inside bar detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1175,7 +1175,7 @@ def inside_bar_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _inside_bar(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _inside_bar(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == 1
 
 
@@ -1201,7 +1201,7 @@ def outside_bar_trigger(df: pd.DataFrame) -> bool:
             True if outside bar detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1211,7 +1211,7 @@ def outside_bar_trigger(df: pd.DataFrame) -> bool:
     """
     if len(df) < 2:
         return False
-    result = _outside_bar(df["Open"], df["High"], df["Low"], df["Close"])
+    result = _outside_bar(df["open"], df["high"], df["low"], df["close"])
     return int(result.iloc[-1]) == 1
 
 
@@ -1244,7 +1244,7 @@ def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
             True if bullish pin bar detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1256,7 +1256,7 @@ def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = _pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, body_position=body_position)
+    result = _pin_bar(df["open"], df["high"], df["low"], df["close"], wick_ratio=wick_ratio, body_position=body_position)
     return int(result.iloc[-1]) == 1
 
 
@@ -1289,7 +1289,7 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
             True if bearish pin bar detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1301,7 +1301,7 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     """
     if len(df) < 1:
         return False
-    result = _pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=wick_ratio, body_position=body_position)
+    result = _pin_bar(df["open"], df["high"], df["low"], df["close"], wick_ratio=wick_ratio, body_position=body_position)
     return int(result.iloc[-1]) == -1
 
 
@@ -1334,7 +1334,7 @@ def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 
             True if bullish two-bar reversal detected, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1345,7 +1345,7 @@ def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 
     """
     if len(df) < 2:
         return False
-    result = _two_bar_reversal(df["Open"], df["High"], df["Low"], df["Close"], close_proximity=close_proximity)
+    result = _two_bar_reversal(df["open"], df["high"], df["low"], df["close"], close_proximity=close_proximity)
     return int(result.iloc[-1]) == 1
 
 
@@ -1378,7 +1378,7 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 
             True if bearish two-bar reversal detected, False otherwise
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1389,7 +1389,7 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 
     """
     if len(df) < 2:
         return False
-    result = _two_bar_reversal(df["Open"], df["High"], df["Low"], df["Close"], close_proximity=close_proximity)
+    result = _two_bar_reversal(df["open"], df["high"], df["low"], df["close"], close_proximity=close_proximity)
     return int(result.iloc[-1]) == -1
 
 
@@ -1419,7 +1419,7 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
             True if narrow range detected on current bar, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1430,7 +1430,7 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
     """
     if len(df) < window:
         return False
-    result = _narrow_range(df["Open"], df["High"], df["Low"], df["Close"], window=window)
+    result = _narrow_range(df["open"], df["high"], df["low"], df["close"], window=window)
     return int(result.iloc[-1]) == 1
 
 
@@ -1468,7 +1468,7 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
             True if any bullish pattern found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1481,29 +1481,29 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     w = window
 
-    if _hit(_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
+    if _hit(_hammer(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(_inverted_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
+    if _hit(_inverted_hammer(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(lower=0), w):
+    if _hit(_engulfing(df["open"], df["high"], df["low"], df["close"]).clip(lower=0), w):
         return True
-    if _hit(_harami(df["Open"], df["High"], df["Low"], df["Close"]).clip(lower=0), w):
+    if _hit(_harami(df["open"], df["high"], df["low"], df["close"]).clip(lower=0), w):
         return True
-    if _hit(_piercing_line(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False), w):
+    if _hit(_piercing_line(df["open"], df["high"], df["low"], df["close"], min_penetration=0.5, require_gap=False), w):
         return True
-    if _hit(_dragonfly_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, upper_wick_max=0.1), w):
+    if _hit(_dragonfly_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=0.1, upper_wick_max=0.1), w):
         return True
-    if _hit(_tweezer_bottoms(df["Open"], df["High"], df["Low"], df["Close"], tolerance=0.01), w):
+    if _hit(_tweezer_bottoms(df["open"], df["high"], df["low"], df["close"], tolerance=0.01), w):
         return True
-    if _hit(_pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, body_position=0.33).clip(lower=0), w):
+    if _hit(_pin_bar(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, body_position=0.33).clip(lower=0), w):
         return True
 
     if len(df) >= 3:
-        if _hit(_morning_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3), w):
+        if _hit(_morning_star(df["open"], df["high"], df["low"], df["close"], body_threshold=0.3), w):
             return True
-        if _hit(_three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5), w):
+        if _hit(_three_white_soldiers(df["open"], df["high"], df["low"], df["close"], min_body_ratio=0.5), w):
             return True
-        if _hit(_three_inside_up(df["Open"], df["High"], df["Low"], df["Close"]), w):
+        if _hit(_three_inside_up(df["open"], df["high"], df["low"], df["close"]), w):
             return True
 
     return False
@@ -1538,7 +1538,7 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
             True if any bearish pattern found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1551,29 +1551,29 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     w = window
 
-    if _hit(_hanging_man(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
+    if _hit(_hanging_man(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(_shooting_star(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
+    if _hit(_shooting_star(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(upper=0).abs(), w):
+    if _hit(_engulfing(df["open"], df["high"], df["low"], df["close"]).clip(upper=0).abs(), w):
         return True
-    if _hit(_harami(df["Open"], df["High"], df["Low"], df["Close"]).clip(upper=0).abs(), w):
+    if _hit(_harami(df["open"], df["high"], df["low"], df["close"]).clip(upper=0).abs(), w):
         return True
-    if _hit(_dark_cloud_cover(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False).abs(), w):
+    if _hit(_dark_cloud_cover(df["open"], df["high"], df["low"], df["close"], min_penetration=0.5, require_gap=False).abs(), w):
         return True
-    if _hit(_gravestone_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, lower_wick_max=0.1), w):
+    if _hit(_gravestone_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=0.1, lower_wick_max=0.1), w):
         return True
-    if _hit(_tweezer_tops(df["Open"], df["High"], df["Low"], df["Close"], tolerance=0.01).abs(), w):
+    if _hit(_tweezer_tops(df["open"], df["high"], df["low"], df["close"], tolerance=0.01).abs(), w):
         return True
-    if _hit(_pin_bar(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, body_position=0.33).clip(upper=0).abs(), w):
+    if _hit(_pin_bar(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, body_position=0.33).clip(upper=0).abs(), w):
         return True
 
     if len(df) >= 3:
-        if _hit(_evening_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3).abs(), w):
+        if _hit(_evening_star(df["open"], df["high"], df["low"], df["close"], body_threshold=0.3).abs(), w):
             return True
-        if _hit(_three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5).abs(), w):
+        if _hit(_three_black_crows(df["open"], df["high"], df["low"], df["close"], min_body_ratio=0.5).abs(), w):
             return True
-        if _hit(_three_inside_down(df["Open"], df["High"], df["Low"], df["Close"]).abs(), w):
+        if _hit(_three_inside_down(df["open"], df["high"], df["low"], df["close"]).abs(), w):
             return True
 
     return False
@@ -1607,7 +1607,7 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
             True if bullish reversal pattern found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1620,19 +1620,19 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     w = window
 
-    if _hit(_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
+    if _hit(_hammer(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(_inverted_hammer(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
+    if _hit(_inverted_hammer(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(lower=0), w):
+    if _hit(_engulfing(df["open"], df["high"], df["low"], df["close"]).clip(lower=0), w):
         return True
-    if _hit(_piercing_line(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False), w):
+    if _hit(_piercing_line(df["open"], df["high"], df["low"], df["close"], min_penetration=0.5, require_gap=False), w):
         return True
-    if _hit(_dragonfly_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, upper_wick_max=0.1), w):
+    if _hit(_dragonfly_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=0.1, upper_wick_max=0.1), w):
         return True
 
     if len(df) >= 3:
-        if _hit(_morning_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3), w):
+        if _hit(_morning_star(df["open"], df["high"], df["low"], df["close"], body_threshold=0.3), w):
             return True
 
     return False
@@ -1666,7 +1666,7 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
             True if bearish reversal pattern found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1679,19 +1679,19 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     w = window
 
-    if _hit(_hanging_man(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, upper_wick_max=0.1), w):
+    if _hit(_hanging_man(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, upper_wick_max=0.1), w):
         return True
-    if _hit(_shooting_star(df["Open"], df["High"], df["Low"], df["Close"], wick_ratio=2.0, lower_wick_max=0.1), w):
+    if _hit(_shooting_star(df["open"], df["high"], df["low"], df["close"], wick_ratio=2.0, lower_wick_max=0.1), w):
         return True
-    if _hit(_engulfing(df["Open"], df["High"], df["Low"], df["Close"]).clip(upper=0).abs(), w):
+    if _hit(_engulfing(df["open"], df["high"], df["low"], df["close"]).clip(upper=0).abs(), w):
         return True
-    if _hit(_dark_cloud_cover(df["Open"], df["High"], df["Low"], df["Close"], min_penetration=0.5, require_gap=False).abs(), w):
+    if _hit(_dark_cloud_cover(df["open"], df["high"], df["low"], df["close"], min_penetration=0.5, require_gap=False).abs(), w):
         return True
-    if _hit(_gravestone_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1, lower_wick_max=0.1), w):
+    if _hit(_gravestone_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=0.1, lower_wick_max=0.1), w):
         return True
 
     if len(df) >= 3:
-        if _hit(_evening_star(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.3).abs(), w):
+        if _hit(_evening_star(df["open"], df["high"], df["low"], df["close"], body_threshold=0.3).abs(), w):
             return True
 
     return False
@@ -1724,7 +1724,7 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
             True if bullish continuation pattern found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1737,9 +1737,9 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     w = window
 
-    if _hit(_three_white_soldiers(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5), w):
+    if _hit(_three_white_soldiers(df["open"], df["high"], df["low"], df["close"], min_body_ratio=0.5), w):
         return True
-    if _hit(_three_inside_up(df["Open"], df["High"], df["Low"], df["Close"]), w):
+    if _hit(_three_inside_up(df["open"], df["high"], df["low"], df["close"]), w):
         return True
     return False
 
@@ -1771,7 +1771,7 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
             True if bearish continuation pattern found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1784,9 +1784,9 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     w = window
 
-    if _hit(_three_black_crows(df["Open"], df["High"], df["Low"], df["Close"], min_body_ratio=0.5).abs(), w):
+    if _hit(_three_black_crows(df["open"], df["high"], df["low"], df["close"], min_body_ratio=0.5).abs(), w):
         return True
-    if _hit(_three_inside_down(df["Open"], df["High"], df["Low"], df["Close"]).abs(), w):
+    if _hit(_three_inside_down(df["open"], df["high"], df["low"], df["close"]).abs(), w):
         return True
     return False
 
@@ -1818,7 +1818,7 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
             True if indecision pattern found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1831,14 +1831,14 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
         return False
     w = window
 
-    if _hit(_doji(df["Open"], df["High"], df["Low"], df["Close"], body_threshold=0.1), w):
+    if _hit(_doji(df["open"], df["high"], df["low"], df["close"], body_threshold=0.1), w):
         return True
-    if _hit(_spinning_top(df["Open"], df["High"], df["Low"], df["Close"], body_max=0.3, wick_min=0.2), w):
+    if _hit(_spinning_top(df["open"], df["high"], df["low"], df["close"], body_max=0.3, wick_min=0.2), w):
         return True
-    if _hit(_inside_bar(df["Open"], df["High"], df["Low"], df["Close"]), w):
+    if _hit(_inside_bar(df["open"], df["high"], df["low"], df["close"]), w):
         return True
     if len(df) >= 7:
-        if _hit(_narrow_range(df["Open"], df["High"], df["Low"], df["Close"], window=7), w):
+        if _hit(_narrow_range(df["open"], df["high"], df["low"], df["close"], window=7), w):
             return True
     return False
 
@@ -1870,7 +1870,7 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
             True if marubozu found in recent window, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1881,7 +1881,7 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
     """
     if len(df) < 1:
         return False
-    result = _marubozu(df["Open"], df["High"], df["Low"], df["Close"], wick_tolerance=0.05)
+    result = _marubozu(df["open"], df["high"], df["low"], df["close"], wick_tolerance=0.05)
     recent = result.iloc[-window:]
     return (recent != 0).any()
 

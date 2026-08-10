@@ -117,12 +117,12 @@ All indicators use a stateless `compute()` classmethod API:
 from mangrove_kb.indicators import RSI, MACD, BollingerBands
 
 # RSI
-result = RSI.compute(data={'close': df['Close']}, params={'window': 14})
+result = RSI.compute(data={'close': df['close']}, params={'window': 14})
 rsi_values = result['rsi']
 
 # MACD
 result = MACD.compute(
-    data={'close': df['Close']},
+    data={'close': df['close']},
     params={'window_fast': 12, 'window_slow': 26, 'window_sign': 9}
 )
 macd_line, signal_line = result['macd'], result['signal']
@@ -186,7 +186,7 @@ curl "http://localhost:8081/api/signals"
 curl -X POST http://localhost:8081/api/evaluate \
   -H "Content-Type: application/json" \
   -H "X-402-Payment: proof" \
-  -d '{"name":"rsi_oversold","ohlcv":{"Close":[100,101,99,98]},"params":{"window":14,"threshold":30}}'
+  -d '{"name":"rsi_oversold","ohlcv":{"close":[100,101,99,98]},"params":{"window":14,"threshold":30}}'
 ```
 
 ## Repository Structure

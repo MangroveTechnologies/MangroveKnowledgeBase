@@ -138,7 +138,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line",
     "warmup_bars": "0",
     "abbreviation": "ADI",
-    "usage_example": "ADI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={})",
+    "usage_example": "ADI.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={})",
     "formula": "Money Flow Multiplier = ((Close - Low) - (High - Close)) / (High - Low)\nMoney Flow Volume = Money Flow Multiplier * Volume\nADL = Previous ADL + Money Flow Volume",
     "interpretation": [
      "Rising ADL: Accumulation",
@@ -198,7 +198,7 @@
     "reference": null,
     "warmup_bars": "slow - 1",
     "abbreviation": "ADOSC",
-    "usage_example": "ADOSC.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'fast': value, 'slow': value})",
+    "usage_example": "ADOSC.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'fast': value, 'slow': value})",
     "formula": "Money Flow Multiplier = ((close - low) - (high - close)) / (high - low)\nMoney Flow Volume     = Money Flow Multiplier * volume\nADL                   = running total of Money Flow Volume\n\nChaikin Oscillator    = EMA(ADL, fast) - EMA(ADL, slow)\n\nStandard defaults fast=3, slow=10. 'ADOSC' is the TA-Lib function name;\nthe literature name is Chaikin Oscillator.",
     "interpretation": [
      "Momentum of accumulation/distribution, not of price",
@@ -273,7 +273,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx",
     "warmup_bars": "2 * window - 1",
     "abbreviation": "ADX",
-    "usage_example": "ADX.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
+    "usage_example": "ADX.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})",
     "formula": "+DI = 100 * EMA(+DM) / ATR\n-DI = 100 * EMA(-DM) / ATR\nDX = 100 * |+DI - -DI| / (+DI + -DI)\nADX = EMA(DX, n periods, typically 14)",
     "interpretation": [
      "ADX > 25: Strong trend",
@@ -356,7 +356,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "ALMA",
-    "usage_example": "ALMA.compute(data={'close': df['Close']}, params={'window': value, 'offset': value, 'sigma': value})",
+    "usage_example": "ALMA.compute(data={'close': df['close']}, params={'window': value, 'offset': value, 'sigma': value})",
     "formula": "m = offset * (n - 1)\ns = n / sigma\nw(k) = exp( -((k - m)^2) / (2 * s^2) )\n\nALMA = sum( w(k) * price(k) ) / sum( w(k) )\n\nDefaults: window 9, offset 0.85, sigma 6.",
     "interpretation": [
      "Gaussian-weighted average whose peak position and width are both user-set",
@@ -426,7 +426,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-true-range-atr",
     "warmup_bars": "window - 1",
     "abbreviation": "ATR",
-    "usage_example": "ATR.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
+    "usage_example": "ATR.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})",
     "formula": "True Range = max(\n  High - Low,\n  |High - Previous Close|,\n  |Low - Previous Close|\n)\nATR = EMA(True Range, n periods)\n\nTypical period: 14",
     "interpretation": [
      "Higher ATR: More volatility",
@@ -490,7 +490,7 @@
     "reference": "https://www.investopedia.com/terms/a/aroon.asp",
     "warmup_bars": "window",
     "abbreviation": "Aroon",
-    "usage_example": "Aroon.compute(data={'high': df['High'], 'low': df['Low']}, params={'window': value})",
+    "usage_example": "Aroon.compute(data={'high': df['high'], 'low': df['low']}, params={'window': value})",
     "formula": "Aroon Up = ((Period - Days Since Highest High) / Period) * 100\nAroon Down = ((Period - Days Since Lowest Low) / Period) * 100\nStandard period: 25",
     "interpretation": [
      "Aroon Up > 70 and Aroon Down < 30: Strong uptrend",
@@ -568,7 +568,7 @@
     "reference": null,
     "warmup_bars": "window2 - 1",
     "abbreviation": "AO",
-    "usage_example": "AwesomeOscillator.compute(data={'high': df['High'], 'low': df['Low']}, params={'window1': value, 'window2': value})",
+    "usage_example": "AwesomeOscillator.compute(data={'high': df['high'], 'low': df['low']}, params={'window1': value, 'window2': value})",
     "formula": "Midpoint = (High + Low) / 2\nAO = SMA(Midpoint, 5) - SMA(Midpoint, 34)",
     "interpretation": [
      "AO > 0: Bullish momentum",
@@ -634,7 +634,7 @@
     "reference": null,
     "warmup_bars": "0",
     "abbreviation": "BOP",
-    "usage_example": "BOP.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
+    "usage_example": "BOP.compute(data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']}, params={})",
     "formula": "BOP = (Close - Open) / (High - Low)\n\nSingle bar, no lookback. Algebraically identical to Livshin's original\nsix-term Balance of Market Power construction. Normally plotted as a\n14-period moving average of this raw value.",
     "interpretation": [
      "Positive: buyers in control (close above open); negative: sellers in control",
@@ -696,7 +696,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands",
     "warmup_bars": "window - 1",
     "abbreviation": "BB",
-    "usage_example": "BollingerBands.compute(data={'close': df['Close']}, params={'window': value, 'window_dev': value})",
+    "usage_example": "BollingerBands.compute(data={'close': df['close']}, params={'window': value, 'window_dev': value})",
     "formula": "Middle Band = SMA(Close, 20)\nUpper Band = SMA + (2 * Standard Deviation)\nLower Band = SMA - (2 * Standard Deviation)\n\nBandwidth = (Upper - Lower) / Middle * 100\n%B = (Close - Lower) / (Upper - Lower)",
     "interpretation": [
      "Price at upper band: Potentially overbought / strong trend",
@@ -799,7 +799,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci",
     "warmup_bars": "window - 1",
     "abbreviation": "CCI",
-    "usage_example": "CCI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'constant': value})",
+    "usage_example": "CCI.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'constant': value})",
     "formula": "Typical Price (TP) = (High + Low + Close) / 3\nCCI = (TP - SMA(TP, n)) / (0.015 * Mean Deviation)\nMean Deviation = Average of |TP - SMA(TP)|\n\nTypical period: 20",
     "interpretation": [
      "CCI > +100: Strong uptrend / overbought",
@@ -869,7 +869,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf",
     "warmup_bars": "window - 1",
     "abbreviation": "CMF",
-    "usage_example": "CMF.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
+    "usage_example": "CMF.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'window': value})",
     "formula": "CMF = Sum(Money Flow Volume, n) / Sum(Volume, n)\n\nTypical period: 20",
     "interpretation": [
      "CMF > 0: Buying pressure",
@@ -936,7 +936,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "CMO",
-    "usage_example": "CMO.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "CMO.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "Su = SUM of up-move magnitudes over n periods\nSd = SUM of down-move magnitudes over n periods\n\nCMO = 100 * (Su - Sd) / (Su + Sd)\n\nDefault period contested: 20 (Fidelity, TradingView) or 9 (secondary sources)",
     "interpretation": [
      "Positive: net upward momentum over the window; negative: net downward",
@@ -993,7 +993,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
-    "usage_example": "CandleGeometry.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
+    "usage_example": "CandleGeometry.compute(data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']}, params={})",
     "formula": "body        = |close - open|\nsigned_body = close - open\nrange       = high - low\nupper_wick  = high - max(open, close)\nlower_wick  = min(open, close) - low\nbody_ratio  = body / range        (0 where range is 0)",
     "interpretation": [
      "A small body relative to range is indecision; a large one is conviction.",
@@ -1103,7 +1103,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
     "warmup_bars": "0",
     "abbreviation": null,
-    "usage_example": "CandleRaw.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
+    "usage_example": "CandleRaw.compute(data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']}, params={})",
     "formula": "open  = open\nhigh  = high\nlow   = low\nclose = close",
     "interpretation": [
      "Identity: a reading is the price it was given, in the instrument's own units.",
@@ -1190,7 +1190,7 @@
     "reference": null,
     "warmup_bars": "1",
     "abbreviation": null,
-    "usage_example": "CandleRelation.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
+    "usage_example": "CandleRelation.compute(data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']}, params={})",
     "formula": "body_low_delta   = (min(o,c) - prev min(o,c)) / prev_close * 100\nbody_high_delta  = (max(o,c) - prev max(o,c)) / prev_close * 100\nrange_low_delta  = (low  - prev_low)  / prev_close * 100\nrange_high_delta = (high - prev_high) / prev_close * 100\nbody_size_ratio  = body  / prev_body\nrange_size_ratio = range / prev_range\ngap              = (open - prev_close) / prev_close * 100\nrange_overlap    = (min(high,prev_high) - max(low,prev_low)) / prev_close * 100",
     "interpretation": [
      "Negative low_delta with positive high_delta means this bar CONTAINS the",
@@ -1320,7 +1320,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit",
     "warmup_bars": "window - 1",
     "abbreviation": "CE",
-    "usage_example": "ChandelierLevels.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'multiplier': value})",
+    "usage_example": "ChandelierLevels.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'multiplier': value})",
     "formula": "high_offset[t] = max(high[t-window+1..t]) - multiplier * atr[t]; low_offset[t] = min(low[t-window+1..t]) + multiplier * atr[t]",
     "interpretation": "How far price has retraced from the window's extreme, measured in units of that window's own volatility. The two are anchored to OPPOSITE extremes, so they are not an upper and a lower band and can cross: at window=22, multiplier=3.0 on 1,294 BTC daily bars, high_offset sits below low_offset on only 73% of them.",
     "applications": "Published as the Chandelier Exit, a trailing stop -- but that is a use of the level, not what it measures. As a measurement it marks a volatility-scaled retracement from the recent high or low.",
@@ -1390,7 +1390,7 @@
     "reference": null,
     "warmup_bars": "0",
     "abbreviation": "none",
-    "usage_example": "CumulativeReturn.compute(data={'close': df['Close']}, params={})",
+    "usage_example": "CumulativeReturn.compute(data={'close': df['close']}, params={})",
     "formula": "CumulativeReturn[t] = (close[t] / close[0] - 1) * 100\n\nEquivalently, from periodic simple returns:  (PROD (1 + r_i)) - 1\nOr from log returns:                        exp(SUM z_i) - 1\n\nNot annualised. Contrast CAGR = (1 + CumulativeReturn)^(1/years) - 1.\nElementary finance quantity, not a named technical indicator.",
     "interpretation": [
      "Aggregate gain or loss since the start of the series, with compounding, independent of how long that took",
@@ -1438,7 +1438,7 @@
     "reference": null,
     "warmup_bars": "2 * (window - 1)",
     "abbreviation": "DEMA",
-    "usage_example": "DEMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "DEMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "DEMA = 2 * EMA(n) - EMA(EMA(n))",
     "interpretation": [
      "Less lag than standard EMA",
@@ -1492,7 +1492,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo",
     "warmup_bars": "window - 1",
     "abbreviation": "DPO",
-    "usage_example": "DPO.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "DPO.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "DPO = Close - SMA(Close, period) shifted back (period/2 + 1) days",
     "interpretation": [
      "Positive DPO: Price above detrended average",
@@ -1547,7 +1547,7 @@
     "reference": "https://stackoverflow.com/questions/31287552/logarithmic-returns-in-pandas-dataframe",
     "warmup_bars": "1",
     "abbreviation": "none",
-    "usage_example": "DailyLogReturn.compute(data={'close': df['Close']}, params={})",
+    "usage_example": "DailyLogReturn.compute(data={'close': df['close']}, params={})",
     "formula": "r = ln(close / prior close) * 100\n  = (ln(close) - ln(prior close)) * 100\n\nRelation to the simple return: r = ln(1 + R).\nElementary finance quantity, not a named technical indicator.",
     "interpretation": [
      "The continuously compounded one-bar growth rate",
@@ -1596,7 +1596,7 @@
     "reference": null,
     "warmup_bars": "1",
     "abbreviation": "none",
-    "usage_example": "DailyReturn.compute(data={'close': df['Close']}, params={})",
+    "usage_example": "DailyReturn.compute(data={'close': df['close']}, params={})",
     "formula": "R = (close / prior close - 1) * 100\n\nElementary finance quantity, not a named technical indicator. Identical to a\n1-period Rate of Change.",
     "interpretation": [
      "Fractional one-bar price change, scale-free and comparable across instruments",
@@ -1644,7 +1644,7 @@
     "reference": "https://www.investopedia.com/terms/d/donchianchannels.asp",
     "warmup_bars": "window - 1 if include_current_bar else window",
     "abbreviation": "DC",
-    "usage_example": "DonchianChannel.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'include_current_bar': value})",
+    "usage_example": "DonchianChannel.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'include_current_bar': value})",
     "formula": "Upper Channel = Highest High over the n periods PRECEDING the current bar\nLower Channel = Lowest Low over the n periods PRECEDING the current bar\nMiddle Line = (Upper + Lower) / 2\nWidth = (Upper - Lower) / Middle * 100\nStandard period: 20",
     "interpretation": [
      "Price at upper channel: Strong uptrend / potential overbought",
@@ -1755,7 +1755,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "EMA",
-    "usage_example": "EMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "EMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "EMA_t = (Price_t * k) + (EMA_(t-1) * (1-k))\nWhere k = 2 / (n + 1)",
     "interpretation": [
      "More responsive than SMA to recent price changes",
@@ -1808,7 +1808,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "EPMA",
-    "usage_example": "EPMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "EPMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "epma[t] = sum(w_i * close[t-window+1+i]) for i in 0..window-1, w_i = (6i + 4 - 2*window) / (window*(window+1))",
     "interpretation": "Where the window's linear trend says price IS now, rather than where it has been on average. The FIR weights are the closed form of a least-squares fit evaluated at its endpoint, so it turns faster than an SMA of the same length and overshoots more.",
     "applications": "Used like any other moving average -- price against the line, or two windows crossing -- but it leads them, which is the point and also the cost.",
@@ -1853,7 +1853,7 @@
     "reference": "https://en.wikipedia.org/wiki/Ease_of_movement",
     "warmup_bars": "window - 1",
     "abbreviation": "EMV",
-    "usage_example": "EaseOfMovement.compute(data={'high': df['High'], 'low': df['Low'], 'volume': df['Volume']}, params={'window': value})",
+    "usage_example": "EaseOfMovement.compute(data={'high': df['high'], 'low': df['low'], 'volume': df['volume']}, params={'window': value})",
     "formula": "Distance Moved = ((High + Low) / 2) - ((Previous High + Previous Low) / 2)\nBox Ratio = (Volume / 10000) / (High - Low)\nEMV = Distance Moved / Box Ratio\nEMV SMA = SMA(EMV, 14)",
     "interpretation": [
      "Positive EMV: Price rising easily with volume",
@@ -1926,7 +1926,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index",
     "warmup_bars": "window",
     "abbreviation": "FI",
-    "usage_example": "ForceIndex.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
+    "usage_example": "ForceIndex.compute(data={'close': df['close'], 'volume': df['volume']}, params={'window': value})",
     "formula": "Force Index = (Close - Previous Close) * Volume\nSmoothed Force Index = EMA(Force Index, period)",
     "interpretation": [
      "Positive Force Index: Bulls in control",
@@ -1985,7 +1985,7 @@
     "reference": "https://alanhull.com/hull-moving-average",
     "warmup_bars": "window + floor(sqrt(window)) - 2",
     "abbreviation": "HMA",
-    "usage_example": "HMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "HMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "WMA1 = WMA(price, n/2)\nWMA2 = WMA(price, n)\nraw  = 2*WMA1 - WMA2\nHMA  = WMA(raw, sqrt(n))\n\nRounding of n/2 and sqrt(n) is unsettled: floor (Tulip, Chart manual) vs\nround-to-nearest (StockCharts). Hull's own listing defers to the platform.",
     "interpretation": [
      "Very fast yet smooth -- Hull's aim was responsiveness without sacrificing smoothness",
@@ -2041,7 +2041,7 @@
     "reference": null,
     "warmup_bars": "0",
     "abbreviation": "HA",
-    "usage_example": "HeikinAshi.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
+    "usage_example": "HeikinAshi.compute(data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']}, params={})",
     "formula": "ha_close[t] = (open[t]+high[t]+low[t]+close[t])/4; ha_open[t] = (ha_open[t-1]+ha_close[t-1])/2; ha_high[t] = max(high[t], ha_open[t], ha_close[t]); ha_low[t] = min(low[t], ha_open[t], ha_close[t])",
     "interpretation": "A smoothed re-drawing of the bars themselves rather than a line laid over them. ha_open is recursive, so each candle carries the previous one, which is what suppresses the single-bar noise and also what makes a run of same-colour candles persist longer than the raw bars would.",
     "applications": "Trend legibility: consecutive same-colour candles read as a continuing move. Because ha_open depends on its own history, these are NOT the bars the market traded and should not be used for fills.",
@@ -2120,7 +2120,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud",
     "warmup_bars": "max(window1, window2, window3) - 1",
     "abbreviation": null,
-    "usage_example": "Ichimoku.compute(data={'high': df['High'], 'low': df['Low']}, params={'window1': value, 'window2': value, 'window3': value, 'visual': value})",
+    "usage_example": "Ichimoku.compute(data={'high': df['high'], 'low': df['low']}, params={'window1': value, 'window2': value, 'window3': value, 'visual': value})",
     "formula": "conversion_line[t] = (max(high[t-w1+1..t]) + min(low[t-w1+1..t]))/2; base_line[t] the same over w2; span_a[t] = (conversion_line[t] + base_line[t])/2; span_b[t] = (max(high[t-w3+1..t]) + min(low[t-w3+1..t]))/2",
     "interpretation": [
      "Price above cloud: Bullish",
@@ -2232,7 +2232,7 @@
     "reference": "https://www.tradingview.com/ideas/kama/",
     "warmup_bars": "window - 1",
     "abbreviation": "KAMA",
-    "usage_example": "KAMA.compute(data={'close': df['Close']}, params={'window': value, 'pow1': value, 'pow2': value})",
+    "usage_example": "KAMA.compute(data={'close': df['close']}, params={'window': value, 'pow1': value, 'pow2': value})",
     "formula": "ER = Change / Volatility (Efficiency Ratio)\nSC = (ER * (Fast - Slow) + Slow)^2 (Smoothing Constant)\nKAMA = Previous KAMA + SC * (Price - Previous KAMA)",
     "interpretation": [
      "Adapts to market conditions automatically",
@@ -2301,7 +2301,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst",
     "warmup_bars": "max(roc1 + window1, roc2 + window2, roc3 + window3, roc4 + window4) + nsig - 2",
     "abbreviation": "KST",
-    "usage_example": "KST.compute(data={'close': df['Close']}, params={'roc1': value, 'roc2': value, 'roc3': value, 'roc4': value, 'window1': value, 'window2': value, 'window3': value, 'window4': value, 'nsig': value})",
+    "usage_example": "KST.compute(data={'close': df['close']}, params={'roc1': value, 'roc2': value, 'roc3': value, 'roc4': value, 'window1': value, 'window2': value, 'window3': value, 'window4': value, 'nsig': value})",
     "formula": "ROC1 = SMA(ROC(10), 10)\nROC2 = SMA(ROC(15), 10)\nROC3 = SMA(ROC(20), 10)\nROC4 = SMA(ROC(30), 15)\nKST = (ROC1 * 1) + (ROC2 * 2) + (ROC3 * 3) + (ROC4 * 4)\nSignal = SMA(KST, 9)",
     "interpretation": [
      "KST above Signal: Bullish momentum",
@@ -2433,7 +2433,7 @@
     "reference": "https://www.tradingview.com/scripts/klingeroscillator/",
     "warmup_bars": "slow + signal_window - 2",
     "abbreviation": "KVO",
-    "usage_example": "KVO.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'fast': value, 'slow': value, 'signal_window': value})",
+    "usage_example": "KVO.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'fast': value, 'slow': value, 'signal_window': value})",
     "formula": "trend = sign(typical_price - prev_typical_price)\nsigned_volume = volume * trend\nKVO = EMA(signed_volume, fast) - EMA(signed_volume, slow)\nSignal = EMA(KVO, signal_window)\nDefaults: fast 34, slow 55, signal_window 13\n\nThis is the SIMPLIFIED variant. Klinger's original volume force is on KlingerVolumeOscillator.",
     "interpretation": [
      "KVO above zero: Bullish volume pressure",
@@ -2524,7 +2524,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels",
     "warmup_bars": "window - 1",
     "abbreviation": "KC",
-    "usage_example": "KeltnerChannel.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'window_atr': value, 'original_version': value, 'multiplier': value})",
+    "usage_example": "KeltnerChannel.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'window_atr': value, 'original_version': value, 'multiplier': value})",
     "formula": "Middle Line = EMA(Close, 20)\nUpper Channel = EMA + (2 * ATR)\nLower Channel = EMA - (2 * ATR)",
     "interpretation": [
      "Similar to Bollinger Bands but uses ATR for width",
@@ -2646,7 +2646,7 @@
     "reference": "https://www.sierrachart.com/index.php?page=doc/StudiesReference.php",
     "warmup_bars": "slow + signal_window - 2",
     "abbreviation": "KVO",
-    "usage_example": "KlingerVolumeOscillator.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'fast': value, 'slow': value, 'signal_window': value})",
+    "usage_example": "KlingerVolumeOscillator.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'fast': value, 'slow': value, 'signal_window': value})",
     "formula": "tp    = (high + low + close) / 3\ntrend = +1 if tp > prev_tp else -1        (binary -- no flat branch)\ndm    = high - low\ncm    = prev_cm + dm   if trend == prev_trend   (accumulate within a trend)\n        prev_dm + dm   otherwise                (reset on a trend change)\n\nVolume Force = Volume * |2 * (dm/cm - 1)| * trend * 100\nKVO    = EMA(Volume Force, 34) - EMA(Volume Force, 55)\nSignal = EMA(KVO, 13)",
     "interpretation": [
      "KVO above zero: Bullish volume pressure",
@@ -2738,7 +2738,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
     "warmup_bars": "window_slow + window_sign - 2",
     "abbreviation": "MACD",
-    "usage_example": "MACD.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
+    "usage_example": "MACD.compute(data={'close': df['close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
     "formula": "MACD Line = EMA(12) - EMA(26)\nSignal Line = EMA(9) of MACD Line\nHistogram = MACD Line - Signal Line",
     "interpretation": [
      "MACD above zero: Bullish momentum",
@@ -2828,7 +2828,7 @@
     "reference": "http://traders.com/documentation/feedbk_docs/2014/01/traderstips.html",
     "warmup_bars": "warmup_bars",
     "abbreviation": "MAMA",
-    "usage_example": "MAMA.compute(data={'high': df['High'], 'low': df['Low']}, params={'fast_limit': value, 'slow_limit': value, 'warmup_bars': value})",
+    "usage_example": "MAMA.compute(data={'high': df['high'], 'low': df['low']}, params={'fast_limit': value, 'slow_limit': value, 'warmup_bars': value})",
     "formula": "Hilbert-transform discriminator measures the dominant cycle period and phase.\n\n  DeltaPhase = Phase[1] - Phase        (floored at 1)\n  alpha      = FastLimit / DeltaPhase  (clamped to [SlowLimit, FastLimit])\n\n  MAMA = alpha*Price + (1 - alpha)*MAMA[1]\n  FAMA = 0.5*alpha*MAMA + (1 - 0.5*alpha)*FAMA[1]\n\nDefaults: FastLimit 0.5, SlowLimit 0.05. Canonical input: median price (H+L)/2.\nInternal period clamped to [6, 50] bars, rate-limited to [0.67x, 1.5x].",
     "interpretation": [
      "Adapts to the cycle PHASE RATE OF CHANGE, not volatility -- the difference from KAMA and VIDYA",
@@ -2912,7 +2912,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi",
     "warmup_bars": "window - 1",
     "abbreviation": "MFI",
-    "usage_example": "MFI.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
+    "usage_example": "MFI.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'window': value})",
     "formula": "Typical Price = (High + Low + Close) / 3\nRaw Money Flow = Typical Price * Volume\nMoney Flow Ratio = Positive Money Flow / Negative Money Flow\nMFI = 100 - (100 / (1 + Money Flow Ratio))\n\nTypical period: 14",
     "interpretation": [
      "MFI > 80: Overbought",
@@ -2979,7 +2979,7 @@
     "reference": null,
     "warmup_bars": "window",
     "abbreviation": "MOM",
-    "usage_example": "MOM.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "MOM.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "MOM = close - close[n bars ago]\n\nThe absolute-difference form. Note two other quantities also travel under the\nname 'Momentum': the percent form (this corpus's ROC) and a ratio form,\nclose/close[n] * 100, which is centred on 100 rather than 0.",
     "interpretation": [
      "Positive while an uptrend is sustained, negative while a downtrend is",
@@ -3035,7 +3035,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index",
     "warmup_bars": "window_slow - 1",
     "abbreviation": "MI",
-    "usage_example": "MassIndex.compute(data={'high': df['High'], 'low': df['Low']}, params={'window_fast': value, 'window_slow': value})",
+    "usage_example": "MassIndex.compute(data={'high': df['high'], 'low': df['low']}, params={'window_fast': value, 'window_slow': value})",
     "formula": "Single EMA = EMA(High - Low, 9)\nDouble EMA = EMA(Single EMA, 9)\nMass Index = Sum(Single EMA / Double EMA, 25)",
     "interpretation": [
      "Mass Index > 27 then < 26.5: \"Reversal bulge\" pattern",
@@ -3101,7 +3101,7 @@
     "reference": null,
     "warmup_bars": "1 - 1",
     "abbreviation": null,
-    "usage_example": "MultiTFSlope.compute(data={'close': df['Close']}, params={'higher_tf': value, 'window': value})",
+    "usage_example": "MultiTFSlope.compute(data={'close': df['close']}, params={'higher_tf': value, 'window': value})",
     "formula": "higher_tf_slope[t] = diff(ema(resample(close, higher_tf), window)) / rolling_mean(|ema|, window), forward-filled from the last CLOSED higher-tf bar",
     "interpretation": "Direction and steepness of a higher timeframe's trend, normalised by its own magnitude so the number is unitless and comparable across assets.",
     "applications": "Higher-timeframe confirmation. Where to put the threshold is the judgement, and it moved to the signals with `slope_threshold`.",
@@ -3153,7 +3153,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "NATR",
-    "usage_example": "NATR.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
+    "usage_example": "NATR.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})",
     "formula": "NATR = 100 * ATR(n) / Close\n\nwhere ATR(n) is Wilder's Average True Range over n periods (default 14)",
     "interpretation": [
      "Volatility as a percentage of price rather than in price units",
@@ -3219,7 +3219,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi",
     "warmup_bars": "0",
     "abbreviation": "NVI",
-    "usage_example": "NVI.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
+    "usage_example": "NVI.compute(data={'close': df['close'], 'volume': df['volume']}, params={'window': value})",
     "formula": "If Volume < Previous Volume:\n  NVI = Previous NVI + ((Close - Previous Close) / Previous Close) * Previous NVI\nElse:\n  NVI = Previous NVI",
     "interpretation": [
      "Rising NVI on down volume: Smart money accumulating",
@@ -3289,7 +3289,7 @@
     "reference": "https://en.wikipedia.org/wiki/On-balance_volume",
     "warmup_bars": "0",
     "abbreviation": "OBV",
-    "usage_example": "OBV.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={})",
+    "usage_example": "OBV.compute(data={'close': df['close'], 'volume': df['volume']}, params={})",
     "formula": "If Close > Previous Close: OBV = Previous OBV + Volume\nIf Close < Previous Close: OBV = Previous OBV - Volume\nIf Close = Previous Close: OBV = Previous OBV",
     "interpretation": [
      "Rising OBV: Accumulation (buying pressure)",
@@ -3340,7 +3340,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo",
     "warmup_bars": "window_slow + window_sign - 2",
     "abbreviation": "PPO",
-    "usage_example": "PPO.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
+    "usage_example": "PPO.compute(data={'close': df['close']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
     "formula": "PPO = ((EMA(12) - EMA(26)) / EMA(26)) * 100\nSignal Line = EMA(PPO, 9)",
     "interpretation": [
      "Positive PPO: Short-term momentum above long-term",
@@ -3430,7 +3430,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo",
     "warmup_bars": "window_slow + window_sign - 2",
     "abbreviation": "PVO",
-    "usage_example": "PVO.compute(data={'volume': df['Volume']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
+    "usage_example": "PVO.compute(data={'volume': df['volume']}, params={'window_slow': value, 'window_fast': value, 'window_sign': value})",
     "formula": "PVO = ((EMA(Volume, 12) - EMA(Volume, 26)) / EMA(Volume, 26)) * 100\nSignal Line = EMA(PVO, 9)",
     "interpretation": [
      "Positive PVO: Short-term volume above average",
@@ -3519,7 +3519,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc",
     "warmup_bars": "window",
     "abbreviation": "ROC",
-    "usage_example": "ROC.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "ROC.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "ROC(n) = ((Close - Close[n]) / Close[n]) * 100",
     "interpretation": [
      "**Positive ROC**: Price is rising over the period (bullish momentum)",
@@ -3574,7 +3574,7 @@
     "reference": "https://www.investopedia.com/terms/r/rsi.asp",
     "warmup_bars": "window - 1",
     "abbreviation": "RSI",
-    "usage_example": "RSI.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "RSI.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "RS = Average Gain over n periods / Average Loss over n periods\nRSI = 100 - (100 / (1 + RS))\n\nStandard period: 14",
     "interpretation": [
      "RSI > 70: Overbought (potential pullback)",
@@ -3631,7 +3631,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "SMA",
-    "usage_example": "SMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "SMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "SMA(n) = (P_1 + P_2 + ... + P_n) / n",
     "interpretation": [
      "Price above SMA = Bullish bias",
@@ -3685,7 +3685,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "SMMA",
-    "usage_example": "SMMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "SMMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "alpha = 1 / n\nSMMA_t = alpha * P_t + (1 - alpha) * SMMA_{t-1}\n       = (SMMA_{t-1} * (n-1) + P_t) / n\n\nEquivalently an EMA at alpha = 1/n, i.e. EMA(2n-1).\nAlso published as RMA (Running), MMA (Modified), and Wilder's Smoothing.",
     "interpretation": [
      "Wilder's smoothing -- the averaging engine inside RSI and ATR",
@@ -3741,7 +3741,7 @@
     "reference": null,
     "warmup_bars": "max(window, window_atr) - 1",
     "abbreviation": "STARC",
-    "usage_example": "STARCBands.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'window_atr': value, 'multiplier': value})",
+    "usage_example": "STARCBands.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'window_atr': value, 'multiplier': value})",
     "formula": "Middle Line = SMA(price, sma_length)\nUpper Band  = Middle + (Multiplier * ATR(atr_length))\nLower Band  = Middle - (Multiplier * ATR(atr_length))\n\nReported original parameterisation: SMA 6, Multiplier 2, ATR 15 (unverified against a primary Stoller source)",
     "interpretation": [
      "Bands sit a volatility-scaled distance around a short-term SMA, expanding and contracting with ATR",
@@ -3839,7 +3839,7 @@
     "reference": "https://www.investopedia.com/articles/forex/10/schaff-trend-cycle-indicator.asp",
     "warmup_bars": "window_slow + 2 * cycle + smooth1 + smooth2 - 5",
     "abbreviation": "STC",
-    "usage_example": "STC.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value})",
+    "usage_example": "STC.compute(data={'close': df['close']}, params={'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value})",
     "formula": "MACD Line = EMA(23) - EMA(50)\n%K of MACD = Stochastic of MACD Line\nSTC = Double smoothed %K",
     "interpretation": [
      "STC > 75: Overbought",
@@ -3923,7 +3923,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
     "warmup_bars": "max(bb_window, kc_window, mom_window) - 1",
     "abbreviation": "TTM",
-    "usage_example": "SqueezeDepth.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value})",
+    "usage_example": "SqueezeDepth.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value})",
     "formula": "squeeze_depth[t] = min(kc_hband[t] - bb_hband[t], bb_lband[t] - kc_lband[t]); momentum[t] = EPMA(close - ((highest_high + lowest_low)/2 + sma(close))/2, mom_window)[t]",
     "interpretation": "How far inside the Keltner Channel the Bollinger Bands sit. Positive is Carter's squeeze, and the magnitude says by how much -- which the boolean it replaces discarded. Crossing down through zero is the release.",
     "applications": "Volatility-contraction setups. The threshold at zero and the direction read from momentum are both judgements, so they live in the signals.",
@@ -4014,7 +4014,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
     "warmup_bars": "2 * window + smooth1 + smooth2 - 4",
     "abbreviation": "StochRSI",
-    "usage_example": "StochRSI.compute(data={'close': df['Close']}, params={'window': value, 'smooth1': value, 'smooth2': value})",
+    "usage_example": "StochRSI.compute(data={'close': df['close']}, params={'window': value, 'smooth1': value, 'smooth2': value})",
     "formula": "StochRSI = (RSI - Lowest RSI) / (Highest RSI - Lowest RSI)\n\n  over the lookback window (default 14, applied to both the RSI and the stochastic range)\n\nOptional smoothing:\n  %K = n-period SMA of StochRSI   (default 3)\n  %D = m-period SMA of %K         (default 3)",
     "interpretation": [
      "Measures where RSI sits within its own recent range -- a second derivative of price, not a reading of price",
@@ -4104,7 +4104,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full",
     "warmup_bars": "window + smooth_window - 2",
     "abbreviation": "Stoch",
-    "usage_example": "StochasticOscillator.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value, 'smooth_window': value})",
+    "usage_example": "StochasticOscillator.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'smooth_window': value})",
     "formula": "%K = 100 * (Close - Lowest Low) / (Highest High - Lowest Low)\n%D = SMA(%K, 3)\n\nTypical period: 14 for %K\nFast Stochastic: Raw %K and %D\nSlow Stochastic: %K smoothed, %D of smoothed %K",
     "interpretation": [
      "Above 80: Overbought",
@@ -4185,7 +4185,7 @@
     "reference": null,
     "warmup_bars": "swing_window",
     "abbreviation": null,
-    "usage_example": "SwingDelta.compute(data={'price': df['Price'], 'indicator': df['Indicator']}, params={'swing_window': value, 'min_swing_distance': value})",
+    "usage_example": "SwingDelta.compute(data={'price': df['price'], 'indicator': df['indicator']}, params={'swing_window': value, 'min_swing_distance': value})",
     "formula": "low_price_delta[t] = price[pi2] - price[pi1] and low_indicator_delta[t] = indicator[ii2] - indicator[ii1] at t = max(pi2, ii2) + swing_window, where pi1, pi2 are the last two swing lows at least min_swing_distance apart and ii1, ii2 the indicator lows nearest them; the high_* pair is the same over swing highs",
     "interpretation": "How much price moved between two confirmed swings, and how much a companion indicator moved between the two that pair with them. Opposite signs are what divergence analysis calls a divergence -- but the sign comparison is the reading, and it belongs to the signal.",
     "applications": "Divergence detection of every classic kind. Which kind is a question about the two signs and which swing side they came from, so the four cases are four signals rather than four outputs here.",
@@ -4271,7 +4271,7 @@
     "reference": null,
     "warmup_bars": "6 * (window - 1)",
     "abbreviation": "T3",
-    "usage_example": "T3.compute(data={'close': df['Close']}, params={'window': value, 'volume_factor': value})",
+    "usage_example": "T3.compute(data={'close': df['close']}, params={'window': value, 'volume_factor': value})",
     "formula": "GD(n,v) = EMA(n)*(1+v) - EMA(EMA(n))*v      # generalised DEMA\nT3(n)   = GD(GD(GD(n)))\n\nExpanded over six chained EMAs, with a = volume factor:\n  c1 = -a^3\n  c2 =  3a^2 + 3a^3\n  c3 = -6a^2 - 3a - 3a^3\n  c4 =  1 + 3a + 3a^2 + a^3\n  T3 = c1*e6 + c2*e5 + c3*e4 + c4*e3\n\nTillson's default volume factor: 0.7.",
     "interpretation": [
      "Sits between an EMA and a DEMA of the same length in responsiveness",
@@ -4334,7 +4334,7 @@
     "reference": null,
     "warmup_bars": "3 * (window - 1)",
     "abbreviation": "TEMA",
-    "usage_example": "TEMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "TEMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "TEMA = 3 * EMA - 3 * EMA(EMA) + EMA(EMA(EMA))",
     "interpretation": [
      "Minimal lag among moving average variants",
@@ -4388,7 +4388,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "TRIMA",
-    "usage_example": "TRIMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "TRIMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "odd  n:  TRIMA = SMA( SMA(price, (n+1)/2), (n+1)/2 )\neven n:  TRIMA = SMA( SMA(price, n/2),     n/2 + 1 )\n\nEquivalent to symmetric triangular weights, e.g.\n  n=7 -> 1,2,3,4,3,2,1     n=4 -> 1,2,2,1",
     "interpretation": [
      "Center-weighted: the middle of the window carries most weight, both ends least",
@@ -4444,7 +4444,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix",
     "warmup_bars": "3 * (window - 1) + 1",
     "abbreviation": "TRIX",
-    "usage_example": "TRIX.compute(data={'close': df['Close']}, params={'window': value, 'window_sign': value})",
+    "usage_example": "TRIX.compute(data={'close': df['close']}, params={'window': value, 'window_sign': value})",
     "formula": "EMA1 = EMA(Close, period)\nEMA2 = EMA(EMA1, period)\nEMA3 = EMA(EMA2, period)\nTRIX = (EMA3 - Previous EMA3) / Previous EMA3 * 100",
     "interpretation": [
      "Positive TRIX: Bullish momentum",
@@ -4516,7 +4516,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index",
     "warmup_bars": "window_slow + window_fast - 1",
     "abbreviation": "TSI",
-    "usage_example": "TSI.compute(data={'close': df['Close']}, params={'window_slow': value, 'window_fast': value})",
+    "usage_example": "TSI.compute(data={'close': df['close']}, params={'window_slow': value, 'window_fast': value})",
     "formula": "PC = Close - Previous Close\nDouble Smoothed PC = EMA(EMA(PC, 25), 13)\nDouble Smoothed Absolute PC = EMA(EMA(|PC|, 25), 13)\nTSI = (Double Smoothed PC / Double Smoothed Absolute PC) * 100",
     "interpretation": [
      "TSI > 0: Bullish momentum",
@@ -4578,7 +4578,7 @@
     "reference": null,
     "warmup_bars": "0",
     "abbreviation": "TR",
-    "usage_example": "TrueRange.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
+    "usage_example": "TrueRange.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={})",
     "formula": "TR = max( High - Low,\n         |High - PrevClose|,\n         |Low  - PrevClose| )",
     "interpretation": [
      "Single-bar volatility that includes gaps, unlike a plain high-low range",
@@ -4635,7 +4635,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index",
     "warmup_bars": "window - 1",
     "abbreviation": "UI",
-    "usage_example": "UlcerIndex.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "UlcerIndex.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "Percentage Drawdown = ((Close - 14-period High Close) / 14-period High Close) * 100\nUlcer Index = Square Root of Mean of Squared Drawdowns",
     "interpretation": [
      "Low Ulcer Index: Low downside risk",
@@ -4691,7 +4691,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator",
     "warmup_bars": "window3",
     "abbreviation": "UO",
-    "usage_example": "UltimateOscillator.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window1': value, 'window2': value, 'window3': value, 'weight1': value, 'weight2': value, 'weight3': value})",
+    "usage_example": "UltimateOscillator.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window1': value, 'window2': value, 'window3': value, 'weight1': value, 'weight2': value, 'weight3': value})",
     "formula": "BP = Close - Min(Low, Previous Close)\nTR = Max(High, Previous Close) - Min(Low, Previous Close)\nAverage7 = Sum(BP, 7) / Sum(TR, 7)\nAverage14 = Sum(BP, 14) / Sum(TR, 14)\nAverage28 = Sum(BP, 28) / Sum(TR, 28)\nUO = 100 * ((4 * Average7) + (2 * Average14) + Average28) / 7",
     "interpretation": [
      "UO > 70: Overbought",
@@ -4789,7 +4789,7 @@
     "reference": "https://en.wikipedia.org/wiki/Volume-price_trend",
     "warmup_bars": "smoothing_factor - 1",
     "abbreviation": "VPT",
-    "usage_example": "VPT.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'smoothing_factor': value})",
+    "usage_example": "VPT.compute(data={'close': df['close'], 'volume': df['volume']}, params={'smoothing_factor': value})",
     "formula": "VPT = Previous VPT + Volume * ((Close - Previous Close) / Previous Close)",
     "interpretation": [
      "Rising VPT: Accumulation / bullish volume-price relationship",
@@ -4848,7 +4848,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap",
     "warmup_bars": "window - 1",
     "abbreviation": "VWAP",
-    "usage_example": "VWAP.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
+    "usage_example": "VWAP.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close'], 'volume': df['volume']}, params={'window': value})",
     "formula": "VWAP = Rolling_Sum(Typical Price * Volume, window) / Rolling_Sum(Volume, window)\nTypical Price = (High + Low + Close) / 3",
     "interpretation": [
      "Price above VWAP: Buyers in control",
@@ -4915,7 +4915,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "VWMA",
-    "usage_example": "VWMA.compute(data={'close': df['Close'], 'volume': df['Volume']}, params={'window': value})",
+    "usage_example": "VWMA.compute(data={'close': df['close'], 'volume': df['volume']}, params={'window': value})",
     "formula": "VWMA(n) = sum(Price_i * Volume_i) / sum(Volume_i)   over the last n bars\n\nEquivalently SMA(price*volume, n) / SMA(volume, n). Standard price input is close.",
     "interpretation": [
      "Volume-weighted, so heavily traded bars dominate and quiet bars contribute little",
@@ -4975,7 +4975,7 @@
     "reference": null,
     "warmup_bars": "window",
     "abbreviation": "VE",
-    "usage_example": "VolatilityEnvelope.compute(data={'close': df['Close']}, params={'window': value, 'multiplier': value})",
+    "usage_example": "VolatilityEnvelope.compute(data={'close': df['close']}, params={'window': value, 'multiplier': value})",
     "formula": "vstop_hband[t] = close[t-1] * (1 + multiplier * stdev(pct_change(close)[t-window+1..t])); vstop_lband[t] = close[t-1] * (1 - multiplier * stdev(pct_change(close)[t-window+1..t]))",
     "interpretation": "The range today would stay inside if returns behaved like the recent window. Centred on the PREVIOUS close, so being outside it is a statement about today's move rather than an artefact of centring on today's own close. Symmetric, so vstop_hband >= vstop_lband always holds.",
     "applications": "A move beyond the envelope is one that is large relative to the asset's own recent return variability, which is why the bands are scaled by stdev of RETURNS rather than of price -- the measure is scale-invariant and comparable across assets.",
@@ -5037,7 +5037,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator",
     "warmup_bars": "window - 1",
     "abbreviation": "VI",
-    "usage_example": "Vortex.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
+    "usage_example": "Vortex.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})",
     "formula": "+VM = |High - Previous Low|\n-VM = |Low - Previous High|\nTR = True Range\n+VI = Sum(+VM, n) / Sum(TR, n)\n-VI = Sum(-VM, n) / Sum(TR, n)",
     "interpretation": [
      "+VI > -VI: Bullish trend",
@@ -5121,7 +5121,7 @@
     "reference": null,
     "warmup_bars": "window - 1",
     "abbreviation": "WMA",
-    "usage_example": "WMA.compute(data={'close': df['Close']}, params={'window': value})",
+    "usage_example": "WMA.compute(data={'close': df['close']}, params={'window': value})",
     "formula": "WMA = (P_n * n + P_(n-1) * (n-1) + ... + P_1 * 1) / (n + (n-1) + ... + 1)\nWhere weights decrease linearly from most recent to oldest",
     "interpretation": [
      "More responsive than SMA but smoother than EMA",
@@ -5175,7 +5175,7 @@
     "reference": null,
     "warmup_bars": "max(jaw + jaw_offset, teeth + teeth_offset, lips + lips_offset) - 1",
     "abbreviation": "Alligator",
-    "usage_example": "WilliamsAlligator.compute(data={'high': df['High'], 'low': df['Low']}, params={'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value})",
+    "usage_example": "WilliamsAlligator.compute(data={'high': df['high'], 'low': df['low']}, params={'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value})",
     "formula": "Median Price = (High + Low) / 2\n\n  Jaw   (blue)  = SMMA(Median, 13), displaced 8 bars\n  Teeth (red)   = SMMA(Median,  8), displaced 5 bars\n  Lips  (green) = SMMA(Median,  5), displaced 3 bars\n\nPeriods are Fibonacci numbers. Williams' collective term: Balance Lines.",
     "interpretation": [
      "Sleeping: the lines intertwine -- consolidation, no trend, stand aside",
@@ -5292,7 +5292,7 @@
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r",
     "warmup_bars": "window - 1",
     "abbreviation": "%R",
-    "usage_example": "WilliamsR.compute(data={'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={'window': value})",
+    "usage_example": "WilliamsR.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})",
     "formula": "%R = (Highest High - Close) / (Highest High - Lowest Low) * -100\n\nTypical period: 14",
     "interpretation": [
      "-20 to 0: Overbought",

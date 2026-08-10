@@ -50,7 +50,7 @@ def adi_bearish(df: pd.DataFrame, window: int = 20) -> bool:
             True if ADI trending down, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -62,7 +62,7 @@ def adi_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = ADI.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"],
+    result = ADI.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"],
     }, params={})
     adi = result['adi']
 
@@ -98,7 +98,7 @@ def adi_bullish(df: pd.DataFrame, window: int = 20) -> bool:
             True if ADI trending up, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -110,7 +110,7 @@ def adi_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = ADI.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"],
+    result = ADI.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"],
     }, params={})
     adi = result['adi']
 
@@ -142,7 +142,7 @@ def cumulative_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool
             True if cumulative return > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -154,7 +154,7 @@ def cumulative_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool
     if len(df) < 2:
         return False
 
-    result = CumulativeReturn.compute(data={'close': df["Close"]}, params={})
+    result = CumulativeReturn.compute(data={'close': df["close"]}, params={})
     cr = result['cumulative_return']
 
     if pd.isna(cr.iloc[-1]):
@@ -185,7 +185,7 @@ def cumulative_return_target(df: pd.DataFrame, target: float = 10.0) -> bool:
             True if cumulative return >= target, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -197,7 +197,7 @@ def cumulative_return_target(df: pd.DataFrame, target: float = 10.0) -> bool:
     if len(df) < 2:
         return False
 
-    result = CumulativeReturn.compute(data={'close': df["Close"]}, params={})
+    result = CumulativeReturn.compute(data={'close': df["close"]}, params={})
     cr = result['cumulative_return']
 
     if pd.isna(cr.iloc[-1]):
@@ -231,7 +231,7 @@ def nvi_bearish(df: pd.DataFrame, window: int = 255) -> bool:
             True if NVI < NVI EMA, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -243,7 +243,7 @@ def nvi_bearish(df: pd.DataFrame, window: int = 255) -> bool:
     if len(df) < window:
         return False
 
-    result = NVI.compute(data={"close": df["Close"], "volume": df["Volume"]}, params={"window": window})
+    result = NVI.compute(data={"close": df["close"], "volume": df["volume"]}, params={"window": window})
     nvi = result["nvi"]
     nvi_ema = result["nvi_ema"]
 
@@ -278,7 +278,7 @@ def nvi_bullish(df: pd.DataFrame, window: int = 255) -> bool:
             True if NVI > NVI EMA, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -290,7 +290,7 @@ def nvi_bullish(df: pd.DataFrame, window: int = 255) -> bool:
     if len(df) < window:
         return False
 
-    result = NVI.compute(data={"close": df["Close"], "volume": df["Volume"]}, params={"window": window})
+    result = NVI.compute(data={"close": df["close"], "volume": df["volume"]}, params={"window": window})
     nvi = result["nvi"]
     nvi_ema = result["nvi_ema"]
 
@@ -324,7 +324,7 @@ def obv_bearish(df: pd.DataFrame, window: int = 20) -> bool:
             True if OBV trending down, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -336,7 +336,7 @@ def obv_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = OBV.compute(data={'close': df["Close"], 'volume': df["Volume"],
+    result = OBV.compute(data={'close': df["close"], 'volume': df["volume"],
     }, params={})
     obv = result['obv']
 
@@ -370,7 +370,7 @@ def obv_bullish(df: pd.DataFrame, window: int = 20) -> bool:
             True if OBV trending up, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -382,7 +382,7 @@ def obv_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = OBV.compute(data={'close': df["Close"], 'volume': df["Volume"],
+    result = OBV.compute(data={'close': df["close"], 'volume': df["volume"],
     }, params={})
     obv = result['obv']
 
@@ -415,7 +415,7 @@ def vpt_bearish(df: pd.DataFrame, window: int = 20) -> bool:
             True if VPT trending down, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -427,7 +427,7 @@ def vpt_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = VPT.compute(data={'close': df["Close"], 'volume': df["Volume"],
+    result = VPT.compute(data={'close': df["close"], 'volume': df["volume"],
     }, params={'smoothing_factor': None})
     vpt = result['vpt']
 
@@ -460,7 +460,7 @@ def vpt_bullish(df: pd.DataFrame, window: int = 20) -> bool:
             True if VPT trending up, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -472,7 +472,7 @@ def vpt_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = VPT.compute(data={'close': df["Close"], 'volume': df["Volume"],
+    result = VPT.compute(data={'close': df["close"], 'volume': df["volume"],
     }, params={'smoothing_factor': None})
     vpt = result['vpt']
 

@@ -28,6 +28,35 @@ def _to_native(value):
     return value
 
 
+#: The canonical OHLCV column names. Lowercase, matching the indicator layer -- `ATR._data` is
+#: `['high', 'low', 'close']` and `ATR.compute` reads `data['high']`.
+OHLCV = ("open", "high", "low", "close", "volume")
+
+
+def _canonical_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Return `df` with its OHLCV columns lowercased. Everything else is left exactly as it is.
+
+    Signals used to require capitalised columns while indicators required lowercase ones, so the
+    library contradicted itself at the boundary between them and the knowledge graph could not state
+    a single truth: it published `['high', 'low', 'close']` for every signal, and passing a frame
+    with those columns raised ``KeyError: 'High'``. Lowercase wins because it is already the
+    indicator contract and the wider convention.
+
+    Capitalised frames keep working -- this is a rename at the boundary, not a break. Normalizing
+    here, at the single point every signal is registered through, is the same argument that puts
+    :func:`_to_native` here.
+
+    **Only the five OHLCV names are touched.** Lowercasing the whole frame would quietly rewrite a
+    caller's own columns -- SwingDelta reads a companion indicator column, and `MyIndicator` becoming
+    `myindicator` would be a silent data bug introduced by a convenience.
+    """
+    present = set(df.columns)
+    renames = {c: c.lower() for c in df.columns
+               if isinstance(c, str) and c.lower() in OHLCV and c != c.lower()
+               and c.lower() not in present}      # a frame holding BOTH `Close` and `close` keeps both
+    return df.rename(columns=renames) if renames else df
+
+
 class RuleRegistry:
     _registry = {}
 
@@ -43,6 +72,13 @@ class RuleRegistry:
         def wrapper(fn):
             @functools.wraps(fn)
             def coerced(*args, **kwargs):
+                # Every signal takes the frame first; `evaluate` and every caller pass it
+                # positionally, but accept it by name too rather than silently skipping the
+                # normalization for a caller who spells it out.
+                if args and isinstance(args[0], pd.DataFrame):
+                    args = (_canonical_columns(args[0]),) + args[1:]
+                elif isinstance(kwargs.get("df"), pd.DataFrame):
+                    kwargs = {**kwargs, "df": _canonical_columns(kwargs["df"])}
                 return _to_native(fn(*args, **kwargs))
 
             cls._registry[name] = coerced

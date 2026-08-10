@@ -57,7 +57,7 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Check if PSAR indicates bullish trend (PSAR below price).
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -71,7 +71,7 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
         return False
 
     result = PSAR.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'step': step, 'max_step': max_step}
     )
     psar = result['psar']
@@ -79,7 +79,7 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     if pd.isna(psar.iloc[-1]):
         return False
 
-    return float(psar.iloc[-1]) < float(df["Close"].iloc[-1])
+    return float(psar.iloc[-1]) < float(df["close"].iloc[-1])
 
 
 @RuleRegistry.register("psar_bearish")
@@ -93,7 +93,7 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Check if PSAR indicates bearish trend (PSAR above price).
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -107,7 +107,7 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
         return False
 
     result = PSAR.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'step': step, 'max_step': max_step}
     )
     psar = result['psar']
@@ -115,7 +115,7 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     if pd.isna(psar.iloc[-1]):
         return False
 
-    return float(psar.iloc[-1]) > float(df["Close"].iloc[-1])
+    return float(psar.iloc[-1]) > float(df["close"].iloc[-1])
 
 
 @RuleRegistry.register("psar_reversal")
@@ -129,7 +129,7 @@ def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, d
     Check if PSAR flips sides (potential reversal).
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -144,7 +144,7 @@ def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, d
         return False
 
     result = PSAR.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'step': step, 'max_step': max_step}
     )
     psar = result['psar']
@@ -152,7 +152,7 @@ def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, d
     if len(psar) < 2 or pd.isna(psar.iloc[-1]) or pd.isna(psar.iloc[-2]):
         return False
 
-    close = df["Close"]
+    close = df["close"]
 
     if direction.lower() == "bullish":
         # Was above price (bearish), now below (bullish)
@@ -230,7 +230,7 @@ def _supertrend_direction(df: pd.DataFrame, window: int, multiplier: float):
     if len(df) < window + 1:
         return None
     out = SuperTrend.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'multiplier': multiplier},
     )
     return out['direction']
@@ -247,7 +247,7 @@ def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0)
     Check if SuperTrend is in the long regime (+1 direction).
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -274,7 +274,7 @@ def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0
     Check if SuperTrend is in the short regime (-1 direction).
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -303,7 +303,7 @@ def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3
     Classic SuperTrend bullish entry signal.
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -335,7 +335,7 @@ def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float =
     Classic SuperTrend bearish entry signal.
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.

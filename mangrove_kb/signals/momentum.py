@@ -72,7 +72,7 @@ def roc_positive(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
             True if ROC > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -85,7 +85,7 @@ def roc_positive(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
     if len(df) < window:
         return False
 
-    result = ROC.compute(data={'close': df["Close"]}, params={'window': window})
+    result = ROC.compute(data={'close': df["close"]}, params={'window': window})
     roc = result['roc']
 
     if pd.isna(roc.iloc[-1]):
@@ -118,7 +118,7 @@ def roc_negative(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
             True if ROC < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -131,7 +131,7 @@ def roc_negative(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
     if len(df) < window:
         return False
 
-    result = ROC.compute(data={'close': df["Close"]}, params={'window': window})
+    result = ROC.compute(data={'close': df["close"]}, params={'window': window})
     roc = result['roc']
 
     if pd.isna(roc.iloc[-1]):
@@ -164,7 +164,7 @@ def roc_momentum_shift(df: pd.DataFrame, window: int = 12, direction: str = "bul
             True if momentum shift detected, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -177,7 +177,7 @@ def roc_momentum_shift(df: pd.DataFrame, window: int = 12, direction: str = "bul
     if len(df) < window + 1:
         return False
 
-    result = ROC.compute(data={'close': df["Close"]}, params={'window': window})
+    result = ROC.compute(data={'close': df["close"]}, params={'window': window})
     roc = result['roc']
 
     if len(roc) < 2 or pd.isna(roc.iloc[-1]) or pd.isna(roc.iloc[-2]):
@@ -221,7 +221,7 @@ def ao_bullish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
             True if AO > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -236,7 +236,7 @@ def ao_bullish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
         return False
 
     result = AwesomeOscillator.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window1': window_fast, 'window2': window_slow}
     )
     ao = result['ao']
@@ -273,7 +273,7 @@ def ao_bearish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
             True if AO < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -288,7 +288,7 @@ def ao_bearish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
         return False
 
     result = AwesomeOscillator.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window1': window_fast, 'window2': window_slow}
     )
     ao = result['ao']
@@ -325,7 +325,7 @@ def ao_zero_cross(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34,
             True if zero cross detected, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -340,7 +340,7 @@ def ao_zero_cross(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34,
         return False
 
     result = AwesomeOscillator.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window1': window_fast, 'window2': window_slow}
     )
     ao = result['ao']
@@ -388,7 +388,7 @@ def ppo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
             True if PPO crosses above signal, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -403,7 +403,7 @@ def ppo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
         return False
 
     result = PPO.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window_slow': window_slow, 'window_fast': window_fast, 'window_sign': window_sign}
     )
     ppo = result['ppo']
@@ -443,7 +443,7 @@ def ppo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
             True if PPO crosses below signal, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -458,7 +458,7 @@ def ppo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
         return False
 
     result = PPO.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window_slow': window_slow, 'window_fast': window_fast, 'window_sign': window_sign}
     )
     ppo = result['ppo']
@@ -502,7 +502,7 @@ def pvo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
             True if PVO crosses above signal, False otherwise
 
     Type: TRIGGER
-    Requires: Volume
+    Requires: volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -517,7 +517,7 @@ def pvo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
         return False
 
     result = PVO.compute(
-        data={'volume': df["Volume"]},
+        data={'volume': df["volume"]},
         params={'window_slow': window_slow, 'window_fast': window_fast, 'window_sign': window_sign}
     )
     pvo = result['pvo']
@@ -557,7 +557,7 @@ def pvo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
             True if PVO crosses below signal, False otherwise
 
     Type: TRIGGER
-    Requires: Volume
+    Requires: volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -572,7 +572,7 @@ def pvo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
         return False
 
     result = PVO.compute(
-        data={'volume': df["Volume"]},
+        data={'volume': df["volume"]},
         params={'window_slow': window_slow, 'window_fast': window_fast, 'window_sign': window_sign}
     )
     pvo = result['pvo']
@@ -622,7 +622,7 @@ def mom_bullish(df: pd.DataFrame, window: int = 10) -> bool:
             True if MOM > 0, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -631,7 +631,7 @@ def mom_bullish(df: pd.DataFrame, window: int = 10) -> bool:
     Returns:
         bool: True if MOM > 0, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) <= window:
         return False
     mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
@@ -664,7 +664,7 @@ def mom_bearish(df: pd.DataFrame, window: int = 10) -> bool:
             True if MOM < 0, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -673,7 +673,7 @@ def mom_bearish(df: pd.DataFrame, window: int = 10) -> bool:
     Returns:
         bool: True if MOM < 0, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) <= window:
         return False
     mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
@@ -705,7 +705,7 @@ def mom_cross_up(df: pd.DataFrame, window: int = 10) -> bool:
             True if MOM crosses above zero on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -714,7 +714,7 @@ def mom_cross_up(df: pd.DataFrame, window: int = 10) -> bool:
     Returns:
         bool: True if MOM crosses above zero on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) <= window + 1:
         return False
     mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
@@ -744,7 +744,7 @@ def mom_cross_down(df: pd.DataFrame, window: int = 10) -> bool:
             True if MOM crosses below zero on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -753,7 +753,7 @@ def mom_cross_down(df: pd.DataFrame, window: int = 10) -> bool:
     Returns:
         bool: True if MOM crosses below zero on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) <= window + 1:
         return False
     mom = MOM.compute(data={'close': closes}, params={'window': window})['mom']
@@ -813,7 +813,7 @@ def macd_line_positive(df: pd.DataFrame, window_fast: int = 12, window_slow: int
             True if the MACD line > 0, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -823,7 +823,7 @@ def macd_line_positive(df: pd.DataFrame, window_fast: int = 12, window_slow: int
     Returns:
         bool: True if the MACD line > 0, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow:
         return False
     macd_line = _macd_line(closes, window_fast, window_slow)
@@ -856,7 +856,7 @@ def macd_line_negative(df: pd.DataFrame, window_fast: int = 12, window_slow: int
             True if the MACD line < 0, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -866,7 +866,7 @@ def macd_line_negative(df: pd.DataFrame, window_fast: int = 12, window_slow: int
     Returns:
         bool: True if the MACD line < 0, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow:
         return False
     macd_line = _macd_line(closes, window_fast, window_slow)
@@ -899,7 +899,7 @@ def macd_line_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int
             True if the MACD line crosses above zero on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -909,7 +909,7 @@ def macd_line_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int
     Returns:
         bool: True if the MACD line crosses above zero on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
     return zero_cross(_macd_line(closes, window_fast, window_slow), "up")
@@ -939,7 +939,7 @@ def macd_line_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: i
             True if the MACD line crosses below zero on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -949,7 +949,7 @@ def macd_line_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: i
     Returns:
         bool: True if the MACD line crosses below zero on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
     return zero_cross(_macd_line(closes, window_fast, window_slow), "down")
@@ -963,7 +963,7 @@ def _kvo_lines(df: pd.DataFrame, fast: int, slow: int, signal_window: int):
     if len(df) < slow + signal_window + 1:
         return None
     out = KVO.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]},
         params={'fast': fast, 'slow': slow, 'signal_window': signal_window},
     )
     return out['kvo'], out['kvo_signal']
@@ -996,7 +996,7 @@ def adosc_bearish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
             True if ADOSC < 0, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1009,7 +1009,7 @@ def adosc_bearish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     if len(df) < slow + 1:
         return False
     adosc = ADOSC.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]},
         params={'fast': fast, 'slow': slow},
     )['adosc']
     if pd.isna(adosc.iloc[-1]):
@@ -1046,7 +1046,7 @@ def adosc_bullish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
             True if ADOSC > 0, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1059,7 +1059,7 @@ def adosc_bullish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     if len(df) < slow + 1:
         return False
     adosc = ADOSC.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]},
         params={'fast': fast, 'slow': slow},
     )['adosc']
     if pd.isna(adosc.iloc[-1]):
@@ -1094,7 +1094,7 @@ def adosc_cross_down(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
             True if ADOSC crosses below zero on the current bar
 
     Type: TRIGGER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1107,7 +1107,7 @@ def adosc_cross_down(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     if len(df) < slow + 2:
         return False
     adosc = ADOSC.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]},
         params={'fast': fast, 'slow': slow},
     )['adosc']
     if len(adosc) < 2 or pd.isna(adosc.iloc[-1]) or pd.isna(adosc.iloc[-2]):
@@ -1142,7 +1142,7 @@ def adosc_cross_up(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
             True if ADOSC crosses above zero on the current bar
 
     Type: TRIGGER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1155,7 +1155,7 @@ def adosc_cross_up(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     if len(df) < slow + 2:
         return False
     adosc = ADOSC.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]},
         params={'fast': fast, 'slow': slow},
     )['adosc']
     if len(adosc) < 2 or pd.isna(adosc.iloc[-1]) or pd.isna(adosc.iloc[-2]):
@@ -1185,7 +1185,7 @@ def daily_return_negative(df: pd.DataFrame, threshold: float = 0.0) -> bool:
             True if daily return < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1197,7 +1197,7 @@ def daily_return_negative(df: pd.DataFrame, threshold: float = 0.0) -> bool:
     if len(df) < 2:
         return False
 
-    result = DailyReturn.compute(data={'close': df["Close"]}, params={})
+    result = DailyReturn.compute(data={'close': df["close"]}, params={})
     dr = result['daily_return']
 
     if pd.isna(dr.iloc[-1]):
@@ -1228,7 +1228,7 @@ def daily_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool:
             True if daily return > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1240,7 +1240,7 @@ def daily_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool:
     if len(df) < 2:
         return False
 
-    result = DailyReturn.compute(data={'close': df["Close"]}, params={})
+    result = DailyReturn.compute(data={'close': df["close"]}, params={})
     dr = result['daily_return']
 
     if pd.isna(dr.iloc[-1]):
@@ -1275,7 +1275,7 @@ def eom_bearish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
             True if EOM < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Volume
+    Requires: high, low, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1290,7 +1290,7 @@ def eom_bearish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
 
     # IndicatorInterface-style indicators use a stateless compute() API.
     result = EaseOfMovement.compute(
-        data={"high": df["High"], "low": df["Low"], "volume": df["Volume"]},
+        data={"high": df["high"], "low": df["low"], "volume": df["volume"]},
         params={"window": window},
     )
     eom = result["eom"]
@@ -1327,7 +1327,7 @@ def eom_bullish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
             True if EOM > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Volume
+    Requires: high, low, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1343,7 +1343,7 @@ def eom_bullish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
     # IndicatorInterface-style indicators use a stateless compute() API.
     # EaseOfMovement outputs {'eom': ..., 'sma_eom': ...}; we use the raw eom series here.
     result = EaseOfMovement.compute(
-        data={"high": df["High"], "low": df["Low"], "volume": df["Volume"]},
+        data={"high": df["high"], "low": df["low"], "volume": df["volume"]},
         params={"window": window},
     )
     eom = result["eom"]
@@ -1379,7 +1379,7 @@ def force_bearish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
             True if Force Index < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1392,7 +1392,7 @@ def force_bearish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
     if len(df) < window:
         return False
 
-    result = ForceIndex.compute(data={'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    result = ForceIndex.compute(data={'close': df["close"], 'volume': df["volume"]}, params={'window': window,
     })
     fi = result['fi']
 
@@ -1427,7 +1427,7 @@ def force_bullish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
             True if Force Index > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1440,7 +1440,7 @@ def force_bullish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
     if len(df) < window:
         return False
 
-    result = ForceIndex.compute(data={'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    result = ForceIndex.compute(data={'close': df["close"], 'volume': df["volume"]}, params={'window': window,
     })
     fi = result['fi']
 
@@ -1480,7 +1480,7 @@ def kvo_bearish(
             True if KVO < signal line on the current bar
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1530,7 +1530,7 @@ def kvo_bearish_cross(
             True if KVO crosses below signal line on the current bar
 
     Type: TRIGGER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1580,7 +1580,7 @@ def kvo_bullish(
             True if KVO > signal line on the current bar
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1631,7 +1631,7 @@ def kvo_bullish_cross(
             True if KVO crosses above signal line on the current bar
 
     Type: TRIGGER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1682,7 +1682,7 @@ def adx_bullish_di(df: pd.DataFrame, window: int = 14) -> bool:
             True if +DI > -DI, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1695,7 +1695,7 @@ def adx_bullish_di(df: pd.DataFrame, window: int = 14) -> bool:
         return False
 
     result = ADX.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     di_pos = result['adx_pos']
@@ -1733,7 +1733,7 @@ def adx_strong_trend(df: pd.DataFrame, window: int = 14, threshold: float = 25.0
             True if ADX > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1747,7 +1747,7 @@ def adx_strong_trend(df: pd.DataFrame, window: int = 14, threshold: float = 25.0
         return False
 
     result = ADX.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     adx = result['adx']
@@ -1782,7 +1782,7 @@ def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullis
             True if crossover detected, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1796,7 +1796,7 @@ def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullis
         return False
 
     result = Aroon.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window': window}
     )
     aroon_up = result['aroon_up']
@@ -1844,7 +1844,7 @@ def aroon_down_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0
             True if Aroon Down > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1858,7 +1858,7 @@ def aroon_down_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0
         return False
 
     result = Aroon.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window': window}
     )
     aroon_down = result['aroon_down']
@@ -1893,7 +1893,7 @@ def aroon_up_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) 
             True if Aroon Up > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1907,7 +1907,7 @@ def aroon_up_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) 
         return False
 
     result = Aroon.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window': window}
     )
     aroon_up = result['aroon_up']
@@ -1940,7 +1940,7 @@ def dpo_negative(df: pd.DataFrame, window: int = 20) -> bool:
             True if DPO < 0, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1952,7 +1952,7 @@ def dpo_negative(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = DPO.compute(data={'close': df["Close"]}, params={'window': window})
+    result = DPO.compute(data={'close': df["close"]}, params={'window': window})
     dpo = result['dpo']
 
     if pd.isna(dpo.iloc[-1]):
@@ -1983,7 +1983,7 @@ def dpo_positive(df: pd.DataFrame, window: int = 20) -> bool:
             True if DPO > 0, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1995,7 +1995,7 @@ def dpo_positive(df: pd.DataFrame, window: int = 20) -> bool:
     if len(df) < window:
         return False
 
-    result = DPO.compute(data={'close': df["Close"]}, params={'window': window})
+    result = DPO.compute(data={'close': df["close"]}, params={'window': window})
     dpo = result['dpo']
 
     if pd.isna(dpo.iloc[-1]):
@@ -2034,7 +2034,7 @@ def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
             True if KST crosses below signal, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2055,7 +2055,7 @@ def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
         return False
 
     result = KST.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={
             'roc1': roc1, 'roc2': roc2, 'roc3': roc3, 'roc4': roc4,
             'window1': window_sma1, 'window2': window_sma2, 'window3': window_sma3, 'window4': window_sma4,
@@ -2104,7 +2104,7 @@ def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
             True if KST crosses above signal, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2125,7 +2125,7 @@ def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
         return False
 
     result = KST.compute(
-        data={"close": df["Close"]},
+        data={"close": df["close"]},
         params={
             "roc1": roc1,
             "roc2": roc2,
@@ -2178,7 +2178,7 @@ def macd_bearish_cross(
             True if bearish crossover detected, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2189,7 +2189,7 @@ def macd_bearish_cross(
     Returns:
         bool: True if bearish crossover detected, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     min_periods = window_slow + window_sign
     if len(closes) < min_periods:
         return False
@@ -2244,7 +2244,7 @@ def macd_bullish_cross(
             True if bullish crossover detected, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2255,7 +2255,7 @@ def macd_bullish_cross(
     Returns:
         bool: True if bullish crossover detected, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     min_periods = window_slow + window_sign
     if len(closes) < min_periods:
         return False
@@ -2309,7 +2309,7 @@ def macd_positive(
             True if MACD histogram > 0, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2320,7 +2320,7 @@ def macd_positive(
     Returns:
         bool: True if MACD histogram > 0, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     min_periods = window_slow + window_sign
     if len(closes) < min_periods:
         return False
@@ -2364,7 +2364,7 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
             True if reversal bulge detected, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2380,7 +2380,7 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
         return False
 
     result = MassIndex.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window_fast': window_fast, 'window_slow': window_slow}
     )
     mi = result['mass_index']
@@ -2421,7 +2421,7 @@ def multi_tf_trend_bearish(
             True if higher-TF trend == -1 on the current bar
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
@@ -2432,7 +2432,7 @@ def multi_tf_trend_bearish(
     Returns:
         bool: True if higher-TF trend == -1 on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
         return False
     out = MultiTFSlope.compute(data={'close': closes},
@@ -2471,7 +2471,7 @@ def multi_tf_trend_bullish(
             True if higher-TF trend == +1 on the current bar
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
@@ -2482,7 +2482,7 @@ def multi_tf_trend_bullish(
     Returns:
         bool: True if higher-TF trend == +1 on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
         return False
     out = MultiTFSlope.compute(data={'close': closes},
@@ -2516,7 +2516,7 @@ def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
             True if TRIX < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2529,7 +2529,7 @@ def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
     if len(df) < window * 3:
         return False
 
-    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window, 'window_sign': 9})
+    result = TRIX.compute(data={'close': df["close"]}, params={'window': window, 'window_sign': 9})
     trix = result['trix']
 
     if pd.isna(trix.iloc[-1]):
@@ -2561,7 +2561,7 @@ def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
             True if TRIX > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2574,7 +2574,7 @@ def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
     if len(df) < window * 3:
         return False
 
-    result = TRIX.compute(data={'close': df["Close"]}, params={'window': window, 'window_sign': 9})
+    result = TRIX.compute(data={'close': df["close"]}, params={'window': window, 'window_sign': 9})
     trix = result['trix']
 
     if pd.isna(trix.iloc[-1]):
@@ -2607,7 +2607,7 @@ def vortex_bearish(df: pd.DataFrame, window: int = 14) -> bool:
             True if -VI > +VI, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2620,7 +2620,7 @@ def vortex_bearish(df: pd.DataFrame, window: int = 14) -> bool:
         return False
 
     result = Vortex.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     vi_pos = result['vortex_pos']
@@ -2656,7 +2656,7 @@ def vortex_bullish(df: pd.DataFrame, window: int = 14) -> bool:
             True if +VI > -VI, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2669,7 +2669,7 @@ def vortex_bullish(df: pd.DataFrame, window: int = 14) -> bool:
         return False
 
     result = Vortex.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     vi_pos = result['vortex_pos']
@@ -2706,7 +2706,7 @@ def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bulli
             True if crossover detected, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2720,7 +2720,7 @@ def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bulli
         return False
 
     result = Vortex.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     vi_pos = result['vortex_pos']
@@ -2754,7 +2754,7 @@ def _rsi_swing_deltas(df: pd.DataFrame, rsi_window: int, swing_window: int, min_
     have. That comparison is the whole of the verdict; everything else -- finding the swings,
     pairing them, waiting for confirmation -- is measurement and lives in `SwingDelta`.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < rsi_window + 2 * swing_window + min_swing_distance:
         return None
     rsi = RSI.compute(data={'close': closes}, params={'window': rsi_window})['rsi']
@@ -2804,7 +2804,7 @@ def rsi_bullish_divergence(
             True on the bar where the divergence is confirmed
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2847,7 +2847,7 @@ def rsi_hidden_bullish_divergence(
             True on the bar where the divergence is confirmed
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2890,7 +2890,7 @@ def rsi_bearish_divergence(
             True on the bar where the divergence is confirmed
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2933,7 +2933,7 @@ def rsi_hidden_bearish_divergence(
             True on the bar where the divergence is confirmed
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.

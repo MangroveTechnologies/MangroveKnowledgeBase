@@ -419,7 +419,7 @@ class TestIndividualParsing:
 
         assert result["rule_name"] == "rsi_overbought"
         assert result["type"] == "FILTER"
-        assert result["requires"] == ["Close"]
+        assert result["requires"] == ["close"]
         assert "window" in result["params"]
         assert "threshold" in result["params"]
         assert "df" not in result["params"]
@@ -438,7 +438,7 @@ class TestIndividualParsing:
 
         assert result["rule_name"] == "sma_cross_up"
         assert result["type"] == "TRIGGER"
-        assert result["requires"] == ["Close"]
+        assert result["requires"] == ["close"]
 
         window_fast = result["params"]["window_fast"]
         assert window_fast["type"] == "int"
@@ -494,13 +494,13 @@ class TestIndividualParsing:
         """Verify parsing of multiple required columns."""
         func = RuleRegistry._registry["uo_overbought"]
         result = parse_signal_docstring(func)
-        assert sorted(result["requires"]) == ["Close", "High", "Low"]
+        assert sorted(result["requires"]) == ["close", "high", "low"]
 
     def test_parse_requires_hlcv(self):
         """Verify parsing of High, Low, Close, Volume."""
         func = RuleRegistry._registry["adi_bullish"]
         result = parse_signal_docstring(func)
-        assert sorted(result["requires"]) == ["Close", "High", "Low", "Volume"]
+        assert sorted(result["requires"]) == ["close", "high", "low", "volume"]
 
     def test_parse_kst_many_params(self):
         """Verify parsing of a signal with many parameters (KST)."""

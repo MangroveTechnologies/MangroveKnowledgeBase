@@ -377,7 +377,7 @@ def parse_signal_docstring(func) -> dict:
             "rule_name": "rsi_overbought",
             "description": "Check if RSI is above the overbought threshold...",
             "type": "FILTER",
-            "requires": ["Close"],
+            "requires": ["close"],
             "params": {
                 "window": {
                     "type": "int",

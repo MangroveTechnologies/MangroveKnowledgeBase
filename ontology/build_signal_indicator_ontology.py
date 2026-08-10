@@ -571,7 +571,10 @@ def _usage_example(cls):
     it back would make a derived artifact the source. This is the one node field that is always
     populated, for all 94.
     """
-    data = ", ".join(f"'{d}': df['{d.title()}']" for d in cls._data)
+    # `df['{d}']`, not `df['{d.title()}']`. The frame column and the dict key are both lowercase
+    # now; capitalising the column here was the same mistake as lowercasing `Requires:`, printing a
+    # copy-pasteable example that does not run against the frame this package produces.
+    data = ", ".join(f"'{d}': df['{d}']" for d in cls._data)
     params = ", ".join(f"'{p}': value" for p in cls._params)
     return f"{cls.__name__}.compute(data={{{data}}}, params={{{params}}})"
 def _load_classes():
@@ -880,10 +883,14 @@ def _signal_lift(name, fn, facts):
         tok = tok.strip()
         if not tok:
             continue
-        # OHLCV is declared capitalised (`Close`) because that is the DataFrame column; the series
-        # itself is lowercase everywhere else in this graph. Non-price series keep their own casing.
-        key = tok.lower() if tok.lower() in ("open", "high", "low", "close", "volume") else tok
-        inputs[key] = {"type": "series", "description": SIGNAL_INPUT_DESC.get(key)}
+        # Taken exactly as declared. This used to lowercase OHLCV, on the reasoning that the graph
+        # should speak one vocabulary -- but signals genuinely required capitalised DataFrame
+        # columns while indicators required lowercase dict keys, so the normalization did not unify
+        # two spellings of one thing, it erased a real difference and published a contract that
+        # raised `KeyError: 'High'` for anyone who followed it. The library now canonicalises OHLCV
+        # to lowercase at the registry boundary, so the declaration and the runtime agree and there
+        # is nothing left to paper over.
+        inputs[tok] = {"type": "series", "description": SIGNAL_INPUT_DESC.get(tok)}
 
     params = {}
     blk = re.search(r"Args:(.*?)(?:Returns:|\Z)", doc, re.S)

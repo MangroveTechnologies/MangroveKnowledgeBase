@@ -31,7 +31,7 @@ def zero_cross(series: pd.Series, direction: str) -> bool:
 
 def _ma_is_above(df: pd.DataFrame, indicator_cls, output_key: str, window: int) -> bool:
     """Helper: check if current close is above the given MA."""
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window:
         return False
     result = indicator_cls.compute(data={'close': closes}, params={'window': window})
@@ -49,7 +49,7 @@ def _ma_crossover(
     direction: str,
 ) -> bool:
     """Helper: detect fast/slow MA crossover in the given direction."""
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
     fast = indicator_cls.compute(data={'close': closes}, params={'window': window_fast})[output_key]

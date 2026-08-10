@@ -26,12 +26,12 @@ from mangrove_kb import sample_ohlcv
 df = sample_ohlcv()  # self-contained sample data; or pd.read_csv("your_ohlcv_data.csv")
 
 # RSI
-result = RSI.compute(data={"close": df["Close"]}, params={"window": 14})
+result = RSI.compute(data={"close": df["close"]}, params={"window": 14})
 rsi = result["rsi"]  # pd.Series
 
 # MACD
 result = MACD.compute(
-    data={"close": df["Close"]},
+    data={"close": df["close"]},
     params={"window_fast": 12, "window_slow": 26, "window_sign": 9},
 )
 macd_line = result["macd"]
@@ -40,7 +40,7 @@ histogram = result["histogram"]
 
 # Bollinger Bands
 result = BollingerBands.compute(
-    data={"close": df["Close"]},
+    data={"close": df["close"]},
     params={"window": 20, "window_dev": 2},
 )
 upper, middle, lower = result["hband"], result["mavg"], result["lband"]
@@ -119,7 +119,7 @@ metadata = parse_all_signals([momentum, trend, volume, volatility, patterns])
 # Example: inspect rsi_oversold
 sig = metadata["rsi_oversold"]
 print(sig["type"])        # "FILTER"
-print(sig["requires"])    # ["Close"]
+print(sig["requires"])    # ["close"]
 print(sig["params"])      # {"window": {"type": "int", "min": 2, "max": 100, "default": 14}, ...}
 ```
 
@@ -132,14 +132,14 @@ from mangrove_kb.indicators import Hammer, BullishEngulfing, MorningStar, NR7
 
 # Hammer detection (returns 1 where detected, 0 otherwise)
 result = Hammer.compute(
-    data={"open": df["Open"], "high": df["High"], "low": df["Low"], "close": df["Close"]},
+    data={"open": df["open"], "high": df["high"], "low": df["low"], "close": df["close"]},
     params={"wick_ratio": 2.0, "upper_wick_max": 0.1},
 )
 hammers = result["hammer"]  # pd.Series of 0/1
 
 # NR7 (Narrowest Range of 7 bars)
 result = NR7.compute(
-    data={"high": df["High"], "low": df["Low"]},
+    data={"high": df["high"], "low": df["low"]},
     params={"window": 7},
 )
 nr7_bars = result["nr7"]
@@ -147,14 +147,20 @@ nr7_bars = result["nr7"]
 
 ## Data Format
 
-All functions expect a pandas DataFrame with capitalized OHLCV columns:
+All functions expect a pandas DataFrame with lowercase OHLCV columns:
 
 ```
-Timestamp  Open      High      Low       Close     Volume
+Timestamp  open      high      low       close     volume
 2024-01-01 42000.0   42500.0   41800.0   42300.0   15000.0
 ```
 
-Required columns depend on the signal/indicator (check `Requires:` in docstrings or metadata).
+Capitalized columns are accepted too -- signals normalize OHLCV column case at the
+registry boundary -- but lowercase is the canonical form, the one `sample_ohlcv()`
+produces and the one the knowledge graph publishes for every node.
+
+Required columns depend on the signal/indicator: ask the graph
+(`kg.get(id)["inputs"]`, or `kg.find(requires="volume")`), or read `Requires:` in the
+docstring.
 
 ## Part of the Mangrove Ecosystem
 

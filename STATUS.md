@@ -26,6 +26,7 @@ change lands **last**, immediately before undrafting.
 3   backfill: docstrings + code = SSOT    DONE
 3b  query coverage: text + attributes     DONE
 4   graph + skills into the wheel         DONE
+4b  OHLCV column case: lowercase          DONE
 5   MCP rewrite                           NEXT? — deferred by owner, kb_server gets overhauled
 6   viz for the public repo               BLOCKED — jarvis-viewer licence call
 7   LICENSE change, then undraft #105     LAST
@@ -47,6 +48,21 @@ of it.
 removes files it no longer produces, so a stale copy from an earlier build satisfies every assertion
 even with the build hook deleted — observed, not theorised. `pip --no-cache-dir` does not save you;
 the test copies the tree first.
+
+### 4b — done
+
+Dogfooding the installed wheel as a new consumer found the graph publishing an input contract that
+did not run: it declared `['high','low','close']` for every signal while the signal bodies read
+`df["High"]`, so 211 of 218 raised `KeyError: 'High'` for anyone who followed it. The builder was
+faithful — it lowercased `Requires: Close` on purpose, "so the graph speaks one vocabulary", which
+erased a real difference between the indicator layer (lowercase dict keys) and the signal layer
+(capitalised frame columns).
+
+Lowercase is now canonical everywhere: signal bodies read lowercase, `sample_ohlcv()` returns
+lowercase, the builder takes `Requires:` as declared and generates lowercase `usage_example`s.
+Capitalised frames still work — `RuleRegistry.register` normalizes the five OHLCV names at the
+boundary, touching nothing else. Verified through the installed wheel: 213 signals, three column
+spellings, zero disagreements.
 
 ## Open decisions — do not guess
 

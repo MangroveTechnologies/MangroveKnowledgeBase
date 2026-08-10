@@ -65,7 +65,7 @@ def bb_upper_breakout(
             True on the bar where close crosses above upper band
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -75,7 +75,7 @@ def bb_upper_breakout(
     Returns:
         bool: True on the bar where close crosses above upper band.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
 
@@ -124,7 +124,7 @@ def bb_lower_breakout(
             True on the bar where close crosses below lower band
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -134,7 +134,7 @@ def bb_lower_breakout(
     Returns:
         bool: True on the bar where close crosses below lower band.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
 
@@ -183,7 +183,7 @@ def bb_squeeze(
             True on the bar where band width crosses below threshold
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -194,7 +194,7 @@ def bb_squeeze(
     Returns:
         bool: True on the bar where band width crosses below threshold.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
 
@@ -256,7 +256,7 @@ def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
             True if close > upper band on the current bar
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
 
@@ -278,7 +278,7 @@ def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
     Returns:
         bool: True if close > upper band on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window:
         return False
 
@@ -317,7 +317,7 @@ def bb_below_lower(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
             True if close < lower band on the current bar
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -327,7 +327,7 @@ def bb_below_lower(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
     Returns:
         bool: True if close < lower band on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window:
         return False
 
@@ -370,7 +370,7 @@ def kc_above_upper(
             True if close > upper band on the current bar
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -381,12 +381,12 @@ def kc_above_upper(
     Returns:
         bool: True if close > upper band on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < max(window, window_atr):
         return False
 
     hband = KeltnerChannel.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': closes},
+        data={'high': df["high"], 'low': df["low"], 'close': closes},
         params={'window': window, 'window_atr': window_atr,
                 'original_version': False, 'multiplier': multiplier},
     )['hband']
@@ -426,7 +426,7 @@ def kc_below_lower(
             True if close < lower band on the current bar
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -437,12 +437,12 @@ def kc_below_lower(
     Returns:
         bool: True if close < lower band on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < max(window, window_atr):
         return False
 
     lband = KeltnerChannel.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': closes},
+        data={'high': df["high"], 'low': df["low"], 'close': closes},
         params={'window': window, 'window_atr': window_atr,
                 'original_version': False, 'multiplier': multiplier},
     )['lband']
@@ -485,7 +485,7 @@ def atr_high_volatility(
             True if ATR% > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -499,7 +499,7 @@ def atr_high_volatility(
         return False
 
     result = ATR.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     atr = result['atr']
@@ -507,7 +507,7 @@ def atr_high_volatility(
     if pd.isna(atr.iloc[-1]):
         return False
 
-    close = float(df["Close"].iloc[-1])
+    close = float(df["close"].iloc[-1])
     if close == 0:
         return False
 
@@ -548,7 +548,7 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
             True on the bar where close crosses above upper band
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -564,7 +564,7 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
         return False
 
     result = KeltnerChannel.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'original_version': original_version,
                 # The original formulation ignores both; the indicator requires None there.
                 'window_atr': None if original_version else window_atr,
@@ -575,8 +575,8 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
     if pd.isna(hband.iloc[-1]) or pd.isna(hband.iloc[-2]):
         return False
 
-    prev_close = float(df["Close"].iloc[-2])
-    curr_close = float(df["Close"].iloc[-1])
+    prev_close = float(df["close"].iloc[-2])
+    curr_close = float(df["close"].iloc[-1])
     prev_hband = float(hband.iloc[-2])
     curr_hband = float(hband.iloc[-1])
 
@@ -612,7 +612,7 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
             True on the bar where close crosses below lower band
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -628,7 +628,7 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
         return False
 
     result = KeltnerChannel.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'original_version': original_version,
                 # The original formulation ignores both; the indicator requires None there.
                 'window_atr': None if original_version else window_atr,
@@ -639,8 +639,8 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
     if pd.isna(lband.iloc[-1]) or pd.isna(lband.iloc[-2]):
         return False
 
-    prev_close = float(df["Close"].iloc[-2])
-    curr_close = float(df["Close"].iloc[-1])
+    prev_close = float(df["close"].iloc[-2])
+    curr_close = float(df["close"].iloc[-1])
     prev_lband = float(lband.iloc[-2])
     curr_lband = float(lband.iloc[-1])
 
@@ -679,7 +679,7 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
             True on the bar where close breaks above the prior upper band
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -692,7 +692,7 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
         return False
 
     result = DonchianChannel.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'include_current_bar': False}
     )
     hband = result['hband']
@@ -700,8 +700,8 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     if pd.isna(hband.iloc[-1]) or pd.isna(hband.iloc[-2]):
         return False
 
-    prev_close = float(df["Close"].iloc[-2])
-    curr_close = float(df["Close"].iloc[-1])
+    prev_close = float(df["close"].iloc[-2])
+    curr_close = float(df["close"].iloc[-1])
     prev_hband = float(hband.iloc[-2])
     curr_hband = float(hband.iloc[-1])
 
@@ -736,7 +736,7 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
             True on the bar where close breaks below the prior lower band
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -749,7 +749,7 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
         return False
 
     result = DonchianChannel.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'include_current_bar': False}
     )
     lband = result['lband']
@@ -757,8 +757,8 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     if pd.isna(lband.iloc[-1]) or pd.isna(lband.iloc[-2]):
         return False
 
-    prev_close = float(df["Close"].iloc[-2])
-    curr_close = float(df["Close"].iloc[-1])
+    prev_close = float(df["close"].iloc[-2])
+    curr_close = float(df["close"].iloc[-1])
     prev_lband = float(lband.iloc[-2])
     curr_lband = float(lband.iloc[-1])
 
@@ -794,7 +794,7 @@ def ulcer_high_risk(df: pd.DataFrame, window: int = 14, threshold: float = 10.0)
             True if Ulcer Index > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -808,7 +808,7 @@ def ulcer_high_risk(df: pd.DataFrame, window: int = 14, threshold: float = 10.0)
         return False
 
     result = UlcerIndex.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window': window}
     )
     ui = result['ulcer_index']
@@ -844,7 +844,7 @@ def ulcer_low_risk(df: pd.DataFrame, window: int = 14, threshold: float = 5.0) -
             True if Ulcer Index < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -858,7 +858,7 @@ def ulcer_low_risk(df: pd.DataFrame, window: int = 14, threshold: float = 5.0) -
         return False
 
     result = UlcerIndex.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window': window}
     )
     ui = result['ulcer_index']
@@ -902,7 +902,7 @@ def natr_high_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 
             True if NATR > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -914,7 +914,7 @@ def natr_high_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 
     """
     if len(df) < window + 1:
         return False
-    natr = NATR.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={'window': window})['natr']
+    natr = NATR.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"]}, params={'window': window})['natr']
     if pd.isna(natr.iloc[-1]):
         return False
     return bool(natr.iloc[-1] > threshold)
@@ -947,7 +947,7 @@ def natr_low_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 1
             True if NATR < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -959,7 +959,7 @@ def natr_low_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 1
     """
     if len(df) < window + 1:
         return False
-    natr = NATR.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={'window': window})['natr']
+    natr = NATR.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"]}, params={'window': window})['natr']
     if pd.isna(natr.iloc[-1]):
         return False
     return bool(natr.iloc[-1] < threshold)
@@ -970,7 +970,7 @@ def _atr_trailing_stop_direction(df: pd.DataFrame, window: int, multiplier: floa
     if len(df) < window + 2:
         return None
     out = ATRTrailingStop.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'multiplier': multiplier},
     )
     return out['direction']
@@ -986,7 +986,7 @@ def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float
     Check if ATR Trailing Stop is in the long regime (+1 direction).
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1012,7 +1012,7 @@ def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: floa
     Check if ATR Trailing Stop is in the short regime (-1 direction).
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1040,7 +1040,7 @@ def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: fl
     Bullish trend-following entry signal.
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1071,7 +1071,7 @@ def atr_trailing_stop_flip_down(df: pd.DataFrame, window: int = 14, multiplier: 
     Bearish trend-following entry signal.
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1118,7 +1118,7 @@ def starc_upper_breakout(
             True if close > upper band, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1132,13 +1132,13 @@ def starc_upper_breakout(
     if len(df) < max(window, window_atr) + 1:
         return False
     out = STARCBands.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'window_atr': window_atr, 'multiplier': multiplier},
     )
     hband = out['starc_hband']
     if pd.isna(hband.iloc[-1]):
         return False
-    return bool(df["Close"].iloc[-1] > hband.iloc[-1])
+    return bool(df["close"].iloc[-1] > hband.iloc[-1])
 
 
 @RuleRegistry.register("starc_lower_breakout")
@@ -1169,7 +1169,7 @@ def starc_lower_breakout(
             True if close < lower band, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1183,13 +1183,13 @@ def starc_lower_breakout(
     if len(df) < max(window, window_atr) + 1:
         return False
     out = STARCBands.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'window_atr': window_atr, 'multiplier': multiplier},
     )
     lband = out['starc_lband']
     if pd.isna(lband.iloc[-1]):
         return False
-    return bool(df["Close"].iloc[-1] < lband.iloc[-1])
+    return bool(df["close"].iloc[-1] < lband.iloc[-1])
 
 
 @RuleRegistry.register("ve_above_upper")
@@ -1219,7 +1219,7 @@ def ve_above_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) 
             True if close >= vstop_hband, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1231,12 +1231,12 @@ def ve_above_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) 
     """
     if len(df) < window + 1:
         return False
-    out = VolatilityEnvelope.compute(data={'close': df["Close"]},
+    out = VolatilityEnvelope.compute(data={'close': df["close"]},
                                      params={'window': window, 'multiplier': multiplier})
     hband = out['vstop_hband']
     if pd.isna(hband.iloc[-1]):
         return False
-    return bool(df["Close"].iloc[-1] >= hband.iloc[-1])
+    return bool(df["close"].iloc[-1] >= hband.iloc[-1])
 
 
 @RuleRegistry.register("ve_below_lower")
@@ -1264,7 +1264,7 @@ def ve_below_lower(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) 
             True if close <= vstop_lband, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1276,12 +1276,12 @@ def ve_below_lower(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) 
     """
     if len(df) < window + 1:
         return False
-    out = VolatilityEnvelope.compute(data={'close': df["Close"]},
+    out = VolatilityEnvelope.compute(data={'close': df["close"]},
                                      params={'window': window, 'multiplier': multiplier})
     lband = out['vstop_lband']
     if pd.isna(lband.iloc[-1]):
         return False
-    return bool(df["Close"].iloc[-1] <= lband.iloc[-1])
+    return bool(df["close"].iloc[-1] <= lband.iloc[-1])
 
 
 # ---------------------------------------------------------------------------
@@ -1298,7 +1298,7 @@ def _chandelier_offsets(df: pd.DataFrame, window: int, multiplier: float):
     if len(df) < window:
         return None
     out = ChandelierLevels.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'multiplier': multiplier},
     )
     return out['high_offset'], out['low_offset']
@@ -1333,7 +1333,7 @@ def cl_below_high_offset(df: pd.DataFrame, window: int = 22, multiplier: float =
             True if close < high_offset, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1349,7 +1349,7 @@ def cl_below_high_offset(df: pd.DataFrame, window: int = 22, multiplier: float =
     high_offset, _ = offsets
     if pd.isna(high_offset.iloc[-1]):
         return False
-    return bool(df["Close"].iloc[-1] < high_offset.iloc[-1])
+    return bool(df["close"].iloc[-1] < high_offset.iloc[-1])
 
 
 @RuleRegistry.register("cl_above_low_offset")
@@ -1381,7 +1381,7 @@ def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 
             True if close > low_offset, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1397,7 +1397,7 @@ def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 
     _, low_offset = offsets
     if pd.isna(low_offset.iloc[-1]):
         return False
-    return bool(df["Close"].iloc[-1] > low_offset.iloc[-1])
+    return bool(df["close"].iloc[-1] > low_offset.iloc[-1])
 
 
 @RuleRegistry.register("cl_high_offset_break")
@@ -1430,7 +1430,7 @@ def cl_high_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float =
             True on the bar where close crosses below high_offset
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1448,7 +1448,7 @@ def cl_high_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float =
     high_offset, _ = offsets
     if pd.isna(high_offset.iloc[-1]) or pd.isna(high_offset.iloc[-2]):
         return False
-    close = df["Close"]
+    close = df["close"]
     return bool(close.iloc[-2] >= high_offset.iloc[-2] and close.iloc[-1] < high_offset.iloc[-1])
 
 
@@ -1484,7 +1484,7 @@ def cl_low_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float = 
             True on the bar where close crosses above low_offset
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1502,7 +1502,7 @@ def cl_low_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float = 
     _, low_offset = offsets
     if pd.isna(low_offset.iloc[-1]) or pd.isna(low_offset.iloc[-2]):
         return False
-    close = df["Close"]
+    close = df["close"]
     return bool(close.iloc[-2] <= low_offset.iloc[-2] and close.iloc[-1] > low_offset.iloc[-1])
 
 
@@ -1523,7 +1523,7 @@ def _squeeze(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, need=1):
     if len(df) < max(bb_window, kc_window) + need:
         return None
     return SqueezeDepth.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'bb_window': bb_window, 'bb_std': bb_std, 'kc_window': kc_window,
                 'kc_atr_mult': kc_atr_mult, 'mom_window': mom_window},
     )
@@ -1562,7 +1562,7 @@ def ttm_squeeze_active(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.
             True if squeeze_depth > 0
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1625,7 +1625,7 @@ def ttm_squeeze_fired_bullish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
             True on the bar the squeeze releases with momentum > 0
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1672,7 +1672,7 @@ def ttm_squeeze_fired_bearish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
             True on the bar the squeeze releases with momentum < 0
 
     Type: TRIGGER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.

@@ -182,7 +182,7 @@ class TestPatternParams:
 class TestPatternRequires:
     """Validate Requires fields match expected OHLC columns."""
 
-    VALID_COLUMNS = {"Open", "High", "Low", "Close", "Volume"}
+    VALID_COLUMNS = {"open", "high", "low", "close", "volume"}
 
     def test_requires_valid_columns(self, parsed_patterns):
         for name, meta in parsed_patterns.items():
@@ -210,7 +210,7 @@ class TestSpecificPatterns:
     def test_doji_trigger(self, parsed_patterns):
         meta = parsed_patterns["doji_trigger"]
         assert meta["type"] == "TRIGGER"
-        assert meta["requires"] == ["Open", "High", "Low", "Close"]
+        assert meta["requires"] == ["open", "high", "low", "close"]
         assert "body_threshold" in meta["params"]
         p = meta["params"]["body_threshold"]
         assert p["type"] == "float"
@@ -234,13 +234,13 @@ class TestSpecificPatterns:
     def test_bullish_engulfing_trigger(self, parsed_patterns):
         meta = parsed_patterns["bullish_engulfing_trigger"]
         assert meta["type"] == "TRIGGER"
-        assert meta["requires"] == ["Open", "Close"]
+        assert meta["requires"] == ["open", "close"]
         assert meta["params"] == {}
 
     def test_nr7_trigger(self, parsed_patterns):
         meta = parsed_patterns["nr7_trigger"]
         assert meta["type"] == "TRIGGER"
-        assert meta["requires"] == ["High", "Low"]
+        assert meta["requires"] == ["high", "low"]
         p = meta["params"]["window"]
         assert p["type"] == "int"
         assert p["default"] == 7

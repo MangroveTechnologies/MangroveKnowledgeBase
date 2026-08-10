@@ -55,7 +55,7 @@ def rsi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 70.0) 
             True if RSI > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -65,7 +65,7 @@ def rsi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 70.0) 
     Returns:
         bool: True if RSI > threshold, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
 
@@ -103,7 +103,7 @@ def rsi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 30.0) ->
             True if RSI < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -113,7 +113,7 @@ def rsi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 30.0) ->
     Returns:
         bool: True if RSI < threshold, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
 
@@ -151,7 +151,7 @@ def rsi_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) ->
             True if RSI crosses above threshold, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -161,7 +161,7 @@ def rsi_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) ->
     Returns:
         bool: True if RSI crosses above threshold, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
 
@@ -207,7 +207,7 @@ def rsi_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
             True if RSI crosses below threshold, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -217,7 +217,7 @@ def rsi_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     Returns:
         bool: True if RSI crosses below threshold, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
 
@@ -266,7 +266,7 @@ def stoch_overbought(
             True if %K > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -281,7 +281,7 @@ def stoch_overbought(
         return False
 
     result = StochasticOscillator.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'smooth_window': smooth_window}
     )
     stoch_k = result['stoch_k']
@@ -321,7 +321,7 @@ def stoch_oversold(
             True if %K < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -336,7 +336,7 @@ def stoch_oversold(
         return False
 
     result = StochasticOscillator.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'smooth_window': smooth_window}
     )
     stoch_k = result['stoch_k']
@@ -374,7 +374,7 @@ def stochrsi_overbought(df: pd.DataFrame, window: int = 14, smooth1: int = 3, sm
             True if StochRSI > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -390,7 +390,7 @@ def stochrsi_overbought(df: pd.DataFrame, window: int = 14, smooth1: int = 3, sm
         return False
 
     result = StochRSI.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window': window, 'smooth1': smooth1, 'smooth2': smooth2}
     )
     stochrsi = result['stochrsi']
@@ -428,7 +428,7 @@ def stochrsi_oversold(df: pd.DataFrame, window: int = 14, smooth1: int = 3, smoo
             True if StochRSI < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -444,7 +444,7 @@ def stochrsi_oversold(df: pd.DataFrame, window: int = 14, smooth1: int = 3, smoo
         return False
 
     result = StochRSI.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window': window, 'smooth1': smooth1, 'smooth2': smooth2}
     )
     stochrsi = result['stochrsi']
@@ -482,7 +482,7 @@ def williams_r_overbought(df: pd.DataFrame, window: int = 14, threshold: float =
             True if Williams %R > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -496,7 +496,7 @@ def williams_r_overbought(df: pd.DataFrame, window: int = 14, threshold: float =
         return False
 
     result = WilliamsR.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     wr = result['wr']
@@ -534,7 +534,7 @@ def williams_r_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -
             True if Williams %R < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -548,7 +548,7 @@ def williams_r_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -
         return False
 
     result = WilliamsR.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window}
     )
     wr = result['wr']
@@ -583,7 +583,7 @@ def cmo_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
             True if CMO >= threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -593,7 +593,7 @@ def cmo_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     Returns:
         bool: True if CMO >= threshold, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
     cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
@@ -626,7 +626,7 @@ def cmo_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
             True if CMO <= threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -636,7 +636,7 @@ def cmo_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
     Returns:
         bool: True if CMO <= threshold, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 1:
         return False
     cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
@@ -669,7 +669,7 @@ def cmo_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
             True if CMO crosses above threshold on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -679,7 +679,7 @@ def cmo_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
     Returns:
         bool: True if CMO crosses above threshold on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 2:
         return False
     cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
@@ -712,7 +712,7 @@ def cmo_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
             True if CMO crosses below threshold on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -722,7 +722,7 @@ def cmo_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     Returns:
         bool: True if CMO crosses below threshold on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window + 2:
         return False
     cmo = CMO.compute(data={'close': closes}, params={'window': window})['cmo']
@@ -757,7 +757,7 @@ def tsi_bullish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
             True if TSI > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -772,7 +772,7 @@ def tsi_bullish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
         return False
 
     result = TSI.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window_slow': window_slow, 'window_fast': window_fast}
     )
     tsi = result['tsi']
@@ -809,7 +809,7 @@ def tsi_bearish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
             True if TSI < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -824,7 +824,7 @@ def tsi_bearish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
         return False
 
     result = TSI.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window_slow': window_slow, 'window_fast': window_fast}
     )
     tsi = result['tsi']
@@ -859,7 +859,7 @@ def bop_bullish(df: pd.DataFrame) -> bool:
             True if BOP > 0, False otherwise (including NaN when high==low)
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -870,7 +870,7 @@ def bop_bullish(df: pd.DataFrame) -> bool:
     if len(df) < 1:
         return False
     bop = BOP.compute(
-        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']},
         params={},
     )['bop']
     if pd.isna(bop.iloc[-1]):
@@ -901,7 +901,7 @@ def bop_bearish(df: pd.DataFrame) -> bool:
             True if BOP < 0, False otherwise
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -912,7 +912,7 @@ def bop_bearish(df: pd.DataFrame) -> bool:
     if len(df) < 1:
         return False
     bop = BOP.compute(
-        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']},
         params={},
     )['bop']
     if pd.isna(bop.iloc[-1]):
@@ -943,7 +943,7 @@ def bop_cross_up(df: pd.DataFrame) -> bool:
             True if BOP crosses above zero on the current bar
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -954,7 +954,7 @@ def bop_cross_up(df: pd.DataFrame) -> bool:
     if len(df) < 2:
         return False
     bop = BOP.compute(
-        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']},
         params={},
     )['bop']
     return zero_cross(bop, "up")
@@ -983,7 +983,7 @@ def bop_cross_down(df: pd.DataFrame) -> bool:
             True if BOP crosses below zero on the current bar
 
     Type: TRIGGER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -994,7 +994,7 @@ def bop_cross_down(df: pd.DataFrame) -> bool:
     if len(df) < 2:
         return False
     bop = BOP.compute(
-        data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']},
+        data={'open': df['open'], 'high': df['high'], 'low': df['low'], 'close': df['close']},
         params={},
     )['bop']
     return zero_cross(bop, "down")
@@ -1028,7 +1028,7 @@ def uo_overbought(df: pd.DataFrame, window_short: int = 7, window_medium: int = 
             True if UO > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1044,7 +1044,7 @@ def uo_overbought(df: pd.DataFrame, window_short: int = 7, window_medium: int = 
         return False
 
     result = UltimateOscillator.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window1': window_short, 'window2': window_medium, 'window3': window_long,
                 'weight1': 4.0, 'weight2': 2.0, 'weight3': 1.0}
     )
@@ -1084,7 +1084,7 @@ def uo_oversold(df: pd.DataFrame, window_short: int = 7, window_medium: int = 14
             True if UO < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1100,7 +1100,7 @@ def uo_oversold(df: pd.DataFrame, window_short: int = 7, window_medium: int = 14
         return False
 
     result = UltimateOscillator.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window1': window_short, 'window2': window_medium, 'window3': window_long,
                 'weight1': 4.0, 'weight2': 2.0, 'weight3': 1.0}
     )
@@ -1139,7 +1139,7 @@ def cmf_bearish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
             True if CMF < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1152,7 +1152,7 @@ def cmf_bearish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
     if len(df) < window:
         return False
 
-    result = CMF.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    result = CMF.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]}, params={'window': window,
     })
     cmf = result['cmf']
 
@@ -1189,7 +1189,7 @@ def cmf_bullish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
             True if CMF > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1202,7 +1202,7 @@ def cmf_bullish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
     if len(df) < window:
         return False
 
-    result = CMF.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    result = CMF.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]}, params={'window': window,
     })
     cmf = result['cmf']
 
@@ -1239,7 +1239,7 @@ def mfi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 80.0) 
             True if MFI > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1252,7 +1252,7 @@ def mfi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 80.0) 
     if len(df) < window:
         return False
 
-    result = MFI.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    result = MFI.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]}, params={'window': window,
     })
     mfi = result['mfi']
 
@@ -1289,7 +1289,7 @@ def mfi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 20.0) ->
             True if MFI < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1302,7 +1302,7 @@ def mfi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 20.0) ->
     if len(df) < window:
         return False
 
-    result = MFI.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window,
+    result = MFI.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]}, params={'window': window,
     })
     mfi = result['mfi']
 
@@ -1344,7 +1344,7 @@ def cci_overbought(df: pd.DataFrame, window: int = 20, constant: float = 0.015, 
             True if CCI > threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1359,7 +1359,7 @@ def cci_overbought(df: pd.DataFrame, window: int = 20, constant: float = 0.015, 
         return False
 
     result = CCI.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'constant': constant}
     )
     cci = result['cci']
@@ -1396,7 +1396,7 @@ def cci_oversold(df: pd.DataFrame, window: int = 20, constant: float = 0.015, th
             True if CCI < threshold, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close
+    Requires: high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1411,7 +1411,7 @@ def cci_oversold(df: pd.DataFrame, window: int = 20, constant: float = 0.015, th
         return False
 
     result = CCI.compute(
-        data={'high': df["High"], 'low': df["Low"], 'close': df["Close"]},
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'constant': constant}
     )
     cci = result['cci']
@@ -1448,7 +1448,7 @@ def stc_overbought(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 2
             True if STC > threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1466,7 +1466,7 @@ def stc_overbought(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 2
         return False
 
     result = STC.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={
             'window_slow': window_slow,
             'window_fast': window_fast,
@@ -1509,7 +1509,7 @@ def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23,
             True if STC < threshold, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1527,7 +1527,7 @@ def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23,
         return False
 
     result = STC.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={
             'window_slow': window_slow,
             'window_fast': window_fast,

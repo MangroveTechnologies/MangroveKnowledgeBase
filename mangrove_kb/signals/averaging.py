@@ -64,7 +64,7 @@ def kama_cross_up(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int =
             True if price crosses above KAMA, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -79,7 +79,7 @@ def kama_cross_up(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int =
         return False
 
     result = KAMA.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window': window, 'pow1': pow1, 'pow2': pow2}
     )
     kama = result['kama']
@@ -87,7 +87,7 @@ def kama_cross_up(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int =
     if len(kama) < 2 or pd.isna(kama.iloc[-1]) or pd.isna(kama.iloc[-2]):
         return False
 
-    close = df["Close"]
+    close = df["close"]
     prev_below = float(close.iloc[-2]) <= float(kama.iloc[-2])
     curr_above = float(close.iloc[-1]) > float(kama.iloc[-1])
 
@@ -119,7 +119,7 @@ def kama_cross_down(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int
             True if price crosses below KAMA, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -134,7 +134,7 @@ def kama_cross_down(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int
         return False
 
     result = KAMA.compute(
-        data={'close': df["Close"]},
+        data={'close': df["close"]},
         params={'window': window, 'pow1': pow1, 'pow2': pow2}
     )
     kama = result['kama']
@@ -142,7 +142,7 @@ def kama_cross_down(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int
     if len(kama) < 2 or pd.isna(kama.iloc[-1]) or pd.isna(kama.iloc[-2]):
         return False
 
-    close = df["Close"]
+    close = df["close"]
     prev_above = float(close.iloc[-2]) >= float(kama.iloc[-2])
     curr_below = float(close.iloc[-1]) < float(kama.iloc[-1])
 
@@ -175,7 +175,7 @@ def is_above_vwma(df: pd.DataFrame, window: int = 20) -> bool:
             True if close > VWMA, False otherwise
 
     Type: FILTER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -186,8 +186,8 @@ def is_above_vwma(df: pd.DataFrame, window: int = 20) -> bool:
     """
     if len(df) < window:
         return False
-    closes = df["Close"]
-    volume = df["Volume"]
+    closes = df["close"]
+    volume = df["volume"]
     result = VWMA.compute(data={'close': closes, 'volume': volume}, params={'window': window})
     vwma = result['vwma']
     if vwma.empty or pd.isna(vwma.iloc[-1]):
@@ -221,7 +221,7 @@ def vwap_above(df: pd.DataFrame, window: int = 14) -> bool:
             True if Close > VWAP, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -233,13 +233,13 @@ def vwap_above(df: pd.DataFrame, window: int = 14) -> bool:
     if len(df) < window:
         return False
 
-    result = VWAP.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window})
+    result = VWAP.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]}, params={'window': window})
     vwap = result['vwap']
 
     if pd.isna(vwap.iloc[-1]):
         return False
 
-    return float(df["Close"].iloc[-1]) > float(vwap.iloc[-1])
+    return float(df["close"].iloc[-1]) > float(vwap.iloc[-1])
 
 
 @RuleRegistry.register("vwap_below")
@@ -268,7 +268,7 @@ def vwap_below(df: pd.DataFrame, window: int = 14) -> bool:
             True if Close < VWAP, False otherwise
 
     Type: FILTER
-    Requires: High, Low, Close, Volume
+    Requires: high, low, close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -280,13 +280,13 @@ def vwap_below(df: pd.DataFrame, window: int = 14) -> bool:
     if len(df) < window:
         return False
 
-    result = VWAP.compute(data={'high': df["High"], 'low': df["Low"], 'close': df["Close"], 'volume': df["Volume"]}, params={'window': window})
+    result = VWAP.compute(data={'high': df["high"], 'low': df["low"], 'close': df["close"], 'volume': df["volume"]}, params={'window': window})
     vwap = result['vwap']
 
     if pd.isna(vwap.iloc[-1]):
         return False
 
-    return float(df["Close"].iloc[-1]) < float(vwap.iloc[-1])
+    return float(df["close"].iloc[-1]) < float(vwap.iloc[-1])
 
 
 @RuleRegistry.register("vwma_cross_down")
@@ -315,7 +315,7 @@ def vwma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
             True if bearish VWMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -327,7 +327,7 @@ def vwma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     """
     if len(df) < window_slow + 1:
         return False
-    data = {'close': df["Close"], 'volume': df["Volume"]}
+    data = {'close': df["close"], 'volume': df["volume"]}
     fast = VWMA.compute(data=data, params={'window': window_fast})['vwma']
     slow = VWMA.compute(data=data, params={'window': window_slow})['vwma']
     if len(fast) < 2 or len(slow) < 2:
@@ -366,7 +366,7 @@ def vwma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
             True if bullish VWMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close, Volume
+    Requires: close, volume
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -378,7 +378,7 @@ def vwma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     """
     if len(df) < window_slow + 1:
         return False
-    data = {'close': df["Close"], 'volume': df["Volume"]}
+    data = {'close': df["close"], 'volume': df["volume"]}
     fast = VWMA.compute(data=data, params={'window': window_fast})['vwma']
     slow = VWMA.compute(data=data, params={'window': window_slow})['vwma']
     if len(fast) < 2 or len(slow) < 2:
@@ -401,7 +401,7 @@ def _alligator_lines(df: pd.DataFrame, jaw: int, teeth: int, lips: int,
     if len(df) < jaw + jaw_offset + 1:
         return None
     out = WilliamsAlligator.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={
             'jaw': jaw, 'teeth': teeth, 'lips': lips,
             'jaw_offset': jaw_offset, 'teeth_offset': teeth_offset, 'lips_offset': lips_offset,
@@ -418,7 +418,7 @@ def _mama_compute(df: pd.DataFrame, fast_limit: float, slow_limit: float, warmup
     """
     if len(df) <= warmup_bars:
         return None
-    result = MAMA.compute(data={'high': df["High"], 'low': df["Low"]},
+    result = MAMA.compute(data={'high': df["high"], 'low': df["low"]},
                           params={'fast_limit': fast_limit, 'slow_limit': slow_limit,
                                   'warmup_bars': warmup_bars})
     mama, fama = result['mama'], result['fama']
@@ -486,7 +486,7 @@ def alligator_bearish(
             True if lips < teeth < jaw on the current bar
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -542,7 +542,7 @@ def alligator_bullish(
             True if lips > teeth > jaw on the current bar
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -599,7 +599,7 @@ def alligator_sleeping(
             True if lines are tangled (no strict bullish or bearish alignment)
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -655,7 +655,7 @@ def alma_cross_down(
             True if bearish ALMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -667,7 +667,7 @@ def alma_cross_down(
     Returns:
         bool: True if bearish ALMA crossover detected on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
     common = {'offset': offset, 'sigma': sigma}
@@ -713,7 +713,7 @@ def alma_cross_up(
             True if bullish ALMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -725,7 +725,7 @@ def alma_cross_up(
     Returns:
         bool: True if bullish ALMA crossover detected on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
     common = {'offset': offset, 'sigma': sigma}
@@ -764,7 +764,7 @@ def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
             True if bearish DEMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -801,7 +801,7 @@ def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
             True if bullish DEMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -838,7 +838,7 @@ def ema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
             True if bearish crossover detected, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -848,7 +848,7 @@ def ema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
     Returns:
         bool: True if bearish crossover detected, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
 
@@ -895,7 +895,7 @@ def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
             True if bullish crossover detected, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -905,7 +905,7 @@ def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
     Returns:
         bool: True if bullish crossover detected, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
 
@@ -959,7 +959,7 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
             True if crossover detected in the specified direction, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -970,7 +970,7 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
     Returns:
         bool: True if crossover detected in the specified direction, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow + 1:
         return False
 
@@ -1026,7 +1026,7 @@ def hma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25
             True if bearish HMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1063,7 +1063,7 @@ def hma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) 
             True if bullish HMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1101,7 +1101,7 @@ def is_above_alma(df: pd.DataFrame, window: int = 21, offset: float = 0.85, sigm
             True if close > ALMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1112,7 +1112,7 @@ def is_above_alma(df: pd.DataFrame, window: int = 21, offset: float = 0.85, sigm
     Returns:
         bool: True if close > ALMA, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window:
         return False
     result = ALMA.compute(data={'close': closes}, params={'window': window, 'offset': offset, 'sigma': sigma})
@@ -1146,7 +1146,7 @@ def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
             True if close > DEMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1181,7 +1181,7 @@ def is_above_hma(df: pd.DataFrame, window: int = 16) -> bool:
             True if close > HMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1219,7 +1219,7 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
             True if close > MAMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1234,7 +1234,7 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
     if out is None:
         return False
     mama, _ = out
-    return bool(df["Close"].iloc[-1] > mama.iloc[-1])
+    return bool(df["close"].iloc[-1] > mama.iloc[-1])
 
 @RuleRegistry.register("is_above_sma")
 def is_above_sma(df: pd.DataFrame, window: int) -> bool:
@@ -1262,7 +1262,7 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
             True if close > SMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1271,7 +1271,7 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
     Returns:
         bool: True if close > SMA, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window:
         return False
 
@@ -1307,7 +1307,7 @@ def is_above_smma(df: pd.DataFrame, window: int = 14) -> bool:
             True if close > SMMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1343,7 +1343,7 @@ def is_above_t3(df: pd.DataFrame, window: int = 10, volume_factor: float = 0.7) 
             True if close > T3, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1353,7 +1353,7 @@ def is_above_t3(df: pd.DataFrame, window: int = 10, volume_factor: float = 0.7) 
     Returns:
         bool: True if close > T3, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window * 6:
         return False
     result = T3.compute(data={'close': closes}, params={'window': window, 'volume_factor': volume_factor})
@@ -1386,7 +1386,7 @@ def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
             True if close > TEMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1422,7 +1422,7 @@ def is_above_trima(df: pd.DataFrame, window: int = 20) -> bool:
             True if close > TRIMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1456,7 +1456,7 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
             True if ribbon is bearish-aligned on the current bar
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1465,7 +1465,7 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Returns:
         bool: True if ribbon is bearish-aligned on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     windows_list = list(windows)
     if len(closes) < max(windows_list):
         return False
@@ -1497,7 +1497,7 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
             True if ribbon is bullish-aligned on the current bar
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1506,7 +1506,7 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Returns:
         bool: True if ribbon is bullish-aligned on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     windows_list = list(windows)
     if len(closes) < max(windows_list):
         return False
@@ -1536,7 +1536,7 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
             True if ribbon is neither bullish nor bearish aligned
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1545,7 +1545,7 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Returns:
         bool: True if ribbon is neither bullish nor bearish aligned.
     """
-    closes = df["Close"]
+    closes = df["close"]
     windows_list = list(windows)
     if len(closes) < max(windows_list):
         return False
@@ -1576,7 +1576,7 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
             True if bearish MAMA/FAMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1619,7 +1619,7 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
             True if bullish MAMA/FAMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1661,7 +1661,7 @@ def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
             True if close > EMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1670,7 +1670,7 @@ def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
     Returns:
         bool: True if close > EMA, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window:
         return False
 
@@ -1710,7 +1710,7 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
             True if bearish crossover detected in the current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1750,7 +1750,7 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
             True if bullish crossover detected in the current bar, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1794,7 +1794,7 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
             True if crossover detected in the specified direction, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1805,7 +1805,7 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
     Returns:
         bool: True if crossover detected in the specified direction, False otherwise.
     """
-    closes = df["Close"]
+    closes = df["close"]
     # window_slow + 1, not window_slow: a crossing compares two bars, and with exactly window_slow
     # bars the slow SMA has a single value, so there is no previous bar to compare against. The
     # NaN check below already returned False there, so this changes no result -- it makes the bound
@@ -1867,7 +1867,7 @@ def smma_cross_down(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 
             True if bearish SMMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1903,7 +1903,7 @@ def smma_cross_up(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50
             True if bullish SMMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1945,7 +1945,7 @@ def t3_cross_down(
             True if bearish T3 crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1956,7 +1956,7 @@ def t3_cross_down(
     Returns:
         bool: True if bearish T3 crossover detected on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow * 6 + 1:
         return False
     common = {'volume_factor': volume_factor}
@@ -2001,7 +2001,7 @@ def t3_cross_up(
             True if bullish T3 crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2012,7 +2012,7 @@ def t3_cross_up(
     Returns:
         bool: True if bullish T3 crossover detected on the current bar.
     """
-    closes = df["Close"]
+    closes = df["close"]
     if len(closes) < window_slow * 6 + 1:
         return False
     common = {'volume_factor': volume_factor}
@@ -2051,7 +2051,7 @@ def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
             True if bearish TEMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2088,7 +2088,7 @@ def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
             True if bullish TEMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2124,7 +2124,7 @@ def trima_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int =
             True if bearish TRIMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2160,7 +2160,7 @@ def trima_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 3
             True if bullish TRIMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2196,7 +2196,7 @@ def wma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
             True if fast WMA crosses below slow WMA, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2209,9 +2209,9 @@ def wma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
     if len(df) < window_slow + 1:
         return False
 
-    fast_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_fast})
+    fast_result = WMA.compute(data={'close': df["close"]}, params={'window': window_fast})
     fast_wma = fast_result['wma']
-    slow_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_slow})
+    slow_result = WMA.compute(data={'close': df["close"]}, params={'window': window_slow})
     slow_wma = slow_result['wma']
 
     if len(fast_wma) < 2 or pd.isna(fast_wma.iloc[-1]) or pd.isna(slow_wma.iloc[-1]):
@@ -2246,7 +2246,7 @@ def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
             True if fast WMA crosses above slow WMA, False otherwise
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2259,9 +2259,9 @@ def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
     if len(df) < window_slow + 1:
         return False
 
-    fast_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_fast})
+    fast_result = WMA.compute(data={'close': df["close"]}, params={'window': window_fast})
     fast_wma = fast_result['wma']
-    slow_result = WMA.compute(data={'close': df["Close"]}, params={'window': window_slow})
+    slow_result = WMA.compute(data={'close': df["close"]}, params={'window': window_slow})
     slow_wma = slow_result['wma']
 
     if len(fast_wma) < 2 or pd.isna(fast_wma.iloc[-1]) or pd.isna(slow_wma.iloc[-1]):
@@ -2303,7 +2303,7 @@ def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
             True if price above cloud, False otherwise
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2318,7 +2318,7 @@ def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
         return False
 
     result = Ichimoku.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window1': window_tenkan, 'window2': window_kijun, 'window3': window_senkou, 'visual': False}
     )
     span_a = result['span_a']
@@ -2328,7 +2328,7 @@ def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
         return False
 
     cloud_top = max(float(span_a.iloc[-1]), float(span_b.iloc[-1]))
-    close = float(df["Close"].iloc[-1])
+    close = float(df["close"].iloc[-1])
 
     return close > cloud_top
 
@@ -2358,7 +2358,7 @@ def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
             True if price below cloud, False otherwise
 
     Type: FILTER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2373,7 +2373,7 @@ def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
         return False
 
     result = Ichimoku.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window1': window_tenkan, 'window2': window_kijun, 'window3': window_senkou, 'visual': False}
     )
     span_a = result['span_a']
@@ -2383,7 +2383,7 @@ def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
         return False
 
     cloud_bottom = min(float(span_a.iloc[-1]), float(span_b.iloc[-1]))
-    close = float(df["Close"].iloc[-1])
+    close = float(df["close"].iloc[-1])
 
     return close < cloud_bottom
 
@@ -2414,7 +2414,7 @@ def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: in
             True if TK cross detected, False otherwise
 
     Type: TRIGGER
-    Requires: High, Low
+    Requires: high, low
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2430,7 +2430,7 @@ def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: in
         return False
 
     result = Ichimoku.compute(
-        data={'high': df["High"], 'low': df["Low"]},
+        data={'high': df["high"], 'low': df["low"]},
         params={'window1': window_tenkan, 'window2': window_kijun, 'window3': window_senkou, 'visual': False}
     )
     tenkan = result['conversion_line']
@@ -2474,7 +2474,7 @@ def is_above_epma(df: pd.DataFrame, window: int = 20) -> bool:
             True if close > EPMA, False otherwise
 
     Type: FILTER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2508,7 +2508,7 @@ def epma_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30
             True if bullish EPMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2543,7 +2543,7 @@ def epma_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 
             True if bearish EPMA crossover detected on the current bar
 
     Type: TRIGGER
-    Requires: Close
+    Requires: close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2579,7 +2579,7 @@ def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
             True if HA_close > HA_open on the current bar
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2590,7 +2590,7 @@ def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
     if len(df) < 1:
         return False
     out = HeikinAshi.compute(
-        data={'open': df["Open"], 'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={}
+        data={'open': df["open"], 'high': df["high"], 'low': df["low"], 'close': df["close"]}, params={}
     )
     if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
         return False
@@ -2618,7 +2618,7 @@ def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
             True if HA_close < HA_open on the current bar
 
     Type: FILTER
-    Requires: Open, High, Low, Close
+    Requires: open, high, low, close
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -2629,7 +2629,7 @@ def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
     if len(df) < 1:
         return False
     out = HeikinAshi.compute(
-        data={'open': df["Open"], 'high': df["High"], 'low': df["Low"], 'close': df["Close"]}, params={}
+        data={'open': df["open"], 'high': df["high"], 'low': df["low"], 'close': df["close"]}, params={}
     )
     if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
         return False
