@@ -11,7 +11,7 @@ description: >-
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of itself: **303 nodes, 755 edges** covering 71 indicators and
+`mangrove_kb` ships a knowledge graph of itself: **303 nodes, 1049 edges** covering 71 indicators and
 218 signals. It is generated from the source, so it is exact — not extracted from prose, not
 approximate, no ranking model in the way. Every answer is a fact about the code as it is.
 
@@ -50,27 +50,33 @@ Every signal is classified two ways at once, and they mean different things.
 
 | axis | relation | question it answers | inherited? |
 |---|---|---|---|
-| **class** | `instance-of` / `kind-of`, and via `uses` | what *kind* of computation is this? | yes, transitively |
+| **class** | `instance-of` (indicators) · `about` (signals) | what character is this computation concerned with? | over `kind-of`, yes |
 | **role** | `has-role` | what *part* does it play in a strategy? | **never** |
 
-Classes are `averaging`, `flow`, `momentum`, `oscillator`, `pattern`, `volatility`. Roles are
-`trigger` and `filter`.
+Classes are `averaging`, `flow`, `momentum`, `oscillator`, `pattern`, `volatility` — the six
+characters a computation can measure. They are `kind-of` **technical analysis**, not `kind-of`
+Indicator: they span indicators *and* signals. Roles are `trigger` and `filter`.
 
 **A role is not a type.** `filter` is not a kind of signal — it is a part some signals play, and the
 same computation could play another part in another strategy. So role is never inherited and never
 appears as a class. Treat "is a momentum signal" and "is being used as a filter" as answers to
 different questions, because the graph does.
 
-**A signal's class is derived, not declared.** A signal does not carry a class of its own; it takes
-the character of what it computes over:
+**An indicator *measures* its class; a signal is *about* its class.** The two get different
+relations, because they are different claims. `momentum` is defined as measuring rate of change —
+ADOSC does that, `adosc_bearish` emits a boolean and does not, so it is `about` momentum rather than
+an instance of it:
 
 ```
-adosc_bearish --uses--> ADOSC --instance-of--> momentum --kind-of--> Indicator
+ADOSC          --instance-of--> momentum      it measures rate of change
+adosc_bearish  --about-------->  momentum      it is concerned with it, because of what it reads
+adosc_bearish  --uses--------->  ADOSC         ...and this is the reason
 ```
 
-`find(kind=...)` walks that for you. All 218 signals resolve. Four of them derive **two** classes —
-the RSI divergence signals read both an oscillator and a momentum indicator, and genuinely belong to
-both. Do not assume class is single-valued.
+`find(kind=...)` returns both. All 218 signals carry an `about` edge, every one derived from a `uses`
+edge the builder checks it against — so the claim is in the file and the reason is one hop away.
+Four signals carry **two** — the RSI divergence signals read both an oscillator and a momentum
+indicator, and are genuinely about both. Do not assume class is single-valued.
 
 ```python
 kg.find(kind="momentum", role="trigger")     # momentum-class signals used as triggers
@@ -207,9 +213,17 @@ and it is what makes this a map of a runnable library rather than an encyclopedi
 **"How is this signal connected to that class?"**
 
 ```python
-kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")
-# each step names the relation traversed, so the answer explains itself
+kg.path("procedure:signal-adosc-bearish", "concept:momentum")
+# the claim: one hop, --about--> momentum
+
+kg.path("procedure:signal-adosc-bearish", "concept:momentum",
+        relations=["uses", "instance-of"])
+# the reason: --uses--> ADOSC --instance-of--> momentum
 ```
+
+`path` returns the **shortest** route, so it takes the `about` shortcut unless you constrain it.
+Naming the relations you want an explanation in terms of is how you get the derivation instead of
+the assertion.
 
 **"What can I plot on one panel, and what can I run without a volume feed?"**
 

@@ -128,6 +128,11 @@ for f in glob.glob(f'{KB}/*_indicators.py'):
 patterns = sorted(c for c in present if mod_of[c] == 'pattern')
 ASSIGN['pattern'] = ' '.join(patterns)
 
+#: The domain the six classes divide. Declared beside ASSIGN because ASSIGN is already the
+#: hand-maintained statement of what those classes are; the node they hang from belongs with them
+#: rather than in a file of its own.
+TA_ID = "concept:technical-analysis"
+
 assigned = {i: cls for cls, s in ASSIGN.items() for i in s.split()}
 # --- integrity checks: fail loudly rather than emit a wrong graph
 unknown = sorted(set(assigned) - present)
@@ -1030,15 +1035,34 @@ atom(ROOT, ROOT_TITLE, "Object",
      "knowledge base attach here too.")
 
 # entity types
-atom("concept:indicator", "Indicator", "Procedure",
+#
+# The primitive follows one test, from the primitive definitions themselves: a Concept is a CATEGORY
+# -- things are `instance-of` it. 71 indicators and 218 signals are, so Indicator and Signal are
+# Concepts. They were `Procedure`, which is what their INSTANCES are: RSI is a procedure, "Indicator"
+# is the category RSI belongs to. The primitive flipped halfway up the backbone.
+#
+# Strategy stays `Schema` -- a strategy IS a structured template, which is the primitive's own gloss
+# -- and its id says so. Nothing is `instance-of` it and nothing ever will be: the space of possible
+# strategies is unbounded and enumerating it is not the point of this graph. It earns its place by
+# anchoring the role axis (a role is the part a signal plays IN a strategy) and the composition
+# statement below.
+#
+# An id may say what a thing IS; it must never say what a thing BELONGS TO. `concept:strategy` broke
+# the first half and `concept:indicator-class-momentum` broke the second -- see the class axis below.
+atom("concept:indicator", "Indicator", "Concept",
      "A computation over one or more input series producing one or more numeric output series.")
-atom("concept:signal", "Signal", "Procedure",
+atom("concept:signal", "Signal", "Concept",
      "A boolean predicate over indicator output, evaluated per bar. Composed of (indicator, predicate, params).")
-atom("concept:strategy", "Strategy", "Schema",
+atom("schema:strategy", "Strategy", "Schema",
      "A structured template composing signals into entry/exit rules plus configuration.")
 for _t, _tid in (("Indicator", "concept:indicator"), ("Signal", "concept:signal"),
-                 ("Strategy", "concept:strategy")):
+                 ("Strategy", "schema:strategy")):
     rel(_t, "part-of", ROOT_TITLE, "entity type defined by the knowledge space", _tid, ROOT)
+# Type-level composition, and the only thing this graph says about strategies. `part-of` in the
+# part->whole direction, matching `Role part-of Signal` below: neither claims every instance is part
+# of one, both state what the class is a constituent of.
+rel("Signal", "part-of", "Strategy", "component composed into strategies",
+    "concept:signal", "schema:strategy")
 
 # role axis
 #
@@ -1048,14 +1072,33 @@ for _t, _tid in (("Indicator", "concept:indicator"), ("Signal", "concept:signal"
 atom("property:role", "Role", "Property",
      "The position a signal occupies within a strategy. Contextual, not intrinsic.")
 rel("Role", "part-of", "Signal", "axis along which signals are placed", "property:role", "concept:signal")
-for r in ("trigger", "filter", "arm"):
+# `arm` was declared here and never used: zero signals carried it, and SKILL.md documents the role
+# vocabulary as trigger and filter. A value nothing takes is not a vocabulary, it is a claim the
+# graph cannot support -- `stats()` offered it as a legal filter that always returns nothing.
+for r in ("trigger", "filter"):
     atom(f"property:role-{r}", r, "Property", f"Signal role: {r}.")
     rel(r, "kind-of", "Role", "role value", f"property:role-{r}", "property:role")
 
 # class axis + members
+#
+# The classes hang off `technical analysis`, NOT off Indicator. `kind-of` means every instance of the
+# subtype is an instance of the supertype, and the two candidates come out opposite under that test:
+# every instance of momentum is a technical-analysis computation (true), every instance of momentum
+# is an indicator (false -- signals are `about` momentum too, see the signal loop). The edge being
+# removed fails the test; the edge replacing it passes.
+#
+# The ids lose `indicator-class-` for the same reason. An id may say what a thing IS -- `concept:`
+# already does that -- but never what it BELONGS TO, and `indicator-class-momentum` encoded exactly
+# the claim being deleted. `concept:momentum` states the concept and lets the edges say the rest.
+atom(TA_ID, "technical analysis", "Concept",
+     "Reading a market from its own price and volume history. The characters a computation can "
+     "measure -- momentum, volatility, flow and the rest -- divide this space; the indicators that "
+     "measure them and the signals that read them both attach to those divisions.")
+rel("technical analysis", "part-of", ROOT_TITLE,
+    "the domain this knowledge space covers", TA_ID, ROOT)
 for cls, desc in CLASSES_DEF.items():
-    atom(f"concept:indicator-class-{cls}", cls, "Concept", desc)
-    rel(cls, "kind-of", "Indicator", "indicator class", f"concept:indicator-class-{cls}", "concept:indicator")
+    atom(f"concept:{cls}", cls, "Concept", desc)
+    rel(cls, "kind-of", "technical analysis", "character measured", f"concept:{cls}", TA_ID)
 for ind, cls in sorted(assigned.items()):
     lifted = _lift(CLASSES[ind])
     # Description precedence, best source first: the docstring's own prose (closest to the code),
@@ -1067,13 +1110,19 @@ for ind, cls in sorted(assigned.items()):
          # class is the instance-of edge below -- NEVER also a property, or there are two
          # representations of one fact.
          source_module=f"{mod_of[ind]}_indicators", **lifted)
+    # Two assertions, both rigid: WHAT it is, and WHAT it measures. The first used to be reached
+    # transitively through `class kind-of Indicator`; with that edge gone it is stated directly, and
+    # it is also what makes `concept:indicator` a Concept -- nothing was `instance-of` it before.
+    rel(ind, "instance-of", "Indicator", "entity type",
+        f"procedure:indicator-{ind.lower()}", "concept:indicator")
     rel(ind, "instance-of", cls, "class membership",
-        f"procedure:indicator-{ind.lower()}", f"concept:indicator-class-{cls}")
+        f"procedure:indicator-{ind.lower()}", f"concept:{cls}")
 
 # --- signals.
 #
-# Three edges each, and no new relation vocabulary: `instance-of` (structural) to the Signal entity
-# type, `uses` (associative) to the indicator it invokes, `has-role` (descriptive) to its role.
+# Four edges each: `instance-of` (structural) to the Signal entity type, `uses` (associative) to the
+# indicator it invokes, `has-role` (descriptive) to its role, and `about` (descriptive) to the
+# character it is concerned with.
 #
 # `uses` rather than `derived-from`: the vendored ontology glosses it as "runtime
 # invocation/orchestration (skill->tool, procedure->tool)", and a signal is a Procedure that calls
@@ -1081,8 +1130,15 @@ for ind, cls in sorted(assigned.items()):
 # `requires` is the KST surmise relation, which this would distort. Reasoning in full in
 # `example-bollinger-signals-subgraph.md`.
 #
-# The class is NOT emitted: it is reached by following `uses` to the indicator and then that
-# indicator's `instance-of`. Same rule as the indicator layer, one level out.
+# `about` rather than `instance-of` for the class: an indicator MEASURES momentum, a signal is
+# CONCERNED WITH it. Momentum is defined as measuring rate of change; a signal emits a boolean, so it
+# is not an instance of that class and must not say it is. `dcterms:subject` is the exact mapping --
+# momentum is the signal's subject, not its type -- and being descriptive rather than structural
+# keeps it out of the rigid backbone, so nothing is inherited along it.
+#
+# The edges are a PROJECTION of two things this same pass already computes -- the `uses` edges from
+# the AST walk, and `assigned` -- never an authored value, so they cannot drift from what they are
+# derived from. The invariant below holds them to it.
 import mangrove_kb.signals  # noqa: E402,F401  -- registers every signal
 
 # Which signals get nodes. The signal layer is being brought in deliberately, one group at a time,
@@ -1234,7 +1290,10 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
 
     m = _SIG_TYPE.search(doc)
     role = m.group(1).strip().lower() if m else None
-    if role in ("trigger", "filter", "arm"):
+    # Kept in step with the role values emitted above. `arm` was accepted here and had a node, but no
+    # signal ever declared it; a signal declaring it now lands on the unknown-role report, which is
+    # where an undeclared vocabulary value belongs.
+    if role in ("trigger", "filter"):
         rel(sname, "has-role", role, "role", sid, f"property:role-{role}")
     else:
         signal_unknown_role.append(sname)
@@ -1264,6 +1323,12 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
                        for out in facts["consumes"][ind]}
         rel(sname, "uses", ind, "reads indicator output",
             sid, f"procedure:indicator-{ind.lower()}", inputs=edge_inputs)
+    # A set, and sorted: four signals read two indicators of DIFFERENT classes -- the RSI divergence
+    # pair read an oscillator and a momentum indicator -- and are genuinely about both, while several
+    # read two of the SAME class and must not get the edge twice.
+    for _cls in sorted({assigned[i] for i in known}):
+        rel(sname, "about", _cls, "character it is concerned with, via the indicator it reads",
+            sid, f"concept:{_cls}")
     if not known:
         signal_no_indicator.append(sname)
 
@@ -1305,6 +1370,25 @@ if dangling:
     print(f"ABORT {len(dangling)} dangling edges:\n  " + "\n  ".join(dangling), file=sys.stderr)
     sys.exit(1)
 
+# --- invariant: every `about` edge is backed by the `uses` edge it was derived from. The 222 `about`
+# edges are a projection, not an authored value, and the only thing keeping them honest is that one
+# loop emits both. That guarantee is incidental today; this makes it checked. A signal claiming a
+# character it has no route to is the failure it prevents -- `path()` could not explain it, and the
+# graph would assert a classification nothing in it supports.
+_uses_classes = {}
+for r in rels:
+    if r["rel"] == "uses":
+        _ind = r["to_id"].removeprefix("procedure:indicator-")
+        _match = next((i for i in assigned if i.lower() == _ind), None)
+        if _match:
+            _uses_classes.setdefault(r["from_id"], set()).add(assigned[_match])
+unbacked = [f"{r['from']} --about--> {r['to']}" for r in rels if r["rel"] == "about"
+            and r["to_id"].removeprefix("concept:") not in _uses_classes.get(r["from_id"], set())]
+if unbacked:
+    print(f"ABORT {len(unbacked)} `about` edges with no `uses` edge behind them:\n  "
+          + "\n  ".join(unbacked), file=sys.stderr)
+    sys.exit(1)
+
 # --- invariant: every `uses` edge declares what it carries. An edge saying only "this signal reads
 # this indicator" is a question, not an answer -- the whole reason the output list lives on the edge
 # is so a consumer can tell `bb_squeeze` (wband) from `bb_upper_breakout` (hband) without reading
@@ -1338,8 +1422,12 @@ if signal_no_indicator:
 # just `oscillator` where the file says `momentum`. Only the absence of a class was being reported,
 # so a WRONG class passed silently. A signal reading two indicators of different classes satisfies
 # this as long as its own module is among them.
-_class_of = {r["from_id"]: r["to_id"].replace("concept:indicator-class-", "")
-             for r in rels if r["rel"] == "instance-of"}
+# Restricted to the six class nodes by identity, not by stripping a prefix off the id: indicators
+# now carry a second `instance-of` edge (to Indicator), so a comprehension over every `instance-of`
+# would keep whichever edge happened to be emitted last. The class set is known here -- use it.
+_CLASS_IDS = {f"concept:{c}": c for c in CLASSES_DEF}
+_class_of = {r["from_id"]: _CLASS_IDS[r["to_id"]]
+             for r in rels if r["rel"] == "instance-of" and r["to_id"] in _CLASS_IDS}
 _uses = {}
 for r in rels:
     if r["rel"] == "uses":

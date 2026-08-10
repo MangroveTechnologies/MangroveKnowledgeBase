@@ -39,10 +39,10 @@ def test_guide_exists_and_covers_thirteen_use_cases(guide):
 def test_uc1_orientation_values(kg, guide):
     s = kg.stats()
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
-    assert len(kg.schema()) == 10, "the guide says '10 shapes in total'"
-    assert "10 shapes in total" in guide
+    assert len(kg.schema()) == 11, "the guide says '11 shapes in total'"
+    assert "11 shapes in total" in guide
     for k in s["kinds"]:                      # every kind the guide lists must still exist
-        if k.startswith("concept:indicator-class-"):
+        if k.startswith("concept:"):
             assert k in guide, f"guide's kind list is missing {k}"
 
 
@@ -97,12 +97,23 @@ def test_uc7_deprecation(kg, guide):
 
 
 def test_uc8_derivation_path(kg, guide):
-    p = kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")
-    assert p is not None and len(p) == 3, "the guide shows a three-step derivation"
-    assert [s["node"]["id"] for s in p] == ["procedure:signal-adosc-bearish",
-                                            "procedure:indicator-adosc",
-                                            "concept:indicator-class-momentum"]
-    assert [s["via"]["relation"] for s in p[1:]] == ["uses", "instance-of"]
+    """The guide shows two answers: the claim, and the reason behind it.
+
+    Unconstrained, `path` takes the one-hop `about` edge -- the claim. Constrained to the relations
+    the claim was derived from, it shows the three-step derivation. Both are asserted, because the
+    use case is worthless if the second one ever silently becomes the first.
+    """
+    claim = kg.path("procedure:signal-adosc-bearish", "concept:momentum")
+    assert claim is not None and len(claim) == 2, "the guide shows a one-hop `about` claim"
+    assert claim[-1]["via"]["relation"] == "about"
+
+    why = kg.path("procedure:signal-adosc-bearish", "concept:momentum",
+                  relations=["uses", "instance-of"])
+    assert why is not None and len(why) == 3, "the guide shows a three-step derivation"
+    assert [s["node"]["id"] for s in why] == ["procedure:signal-adosc-bearish",
+                                              "procedure:indicator-adosc",
+                                              "concept:momentum"]
+    assert [s["via"]["relation"] for s in why[1:]] == ["uses", "instance-of"]
 
 
 def test_uc9_output_index(kg, guide):
@@ -211,7 +222,7 @@ def test_uc12_graph_to_evaluation(kg, guide):
                                   "params": {"window": 14, "threshold_pct": 3.0}}, df) is True
 
     sg = kg.subgraph(t["id"], radius=1)
-    assert (len(sg["nodes"]), len(sg["edges"])) == (4, 3), "the guide prints 4 nodes, 3 edges"
+    assert (len(sg["nodes"]), len(sg["edges"])) == (5, 5), "the guide prints 5 nodes, 5 edges"
 
 
 def test_uc13_usage_example_runs_as_printed(kg, guide):

@@ -55,7 +55,7 @@ each atom's `kind` field rather than as a separate node, matching how the main g
 
 ```json
 {
-  "id": "concept:indicator-class-volatility",
+  "id": "concept:volatility",
   "title": "volatility",
   "kind": "Concept",
   "summary": "Measures observed dispersion -- distance, width, or range."

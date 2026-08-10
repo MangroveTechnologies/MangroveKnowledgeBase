@@ -12,7 +12,7 @@ pip install mangrove-kb
 - **80 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
-- **A knowledge graph of the library itself** -- 303 nodes, 755 edges, queryable, shipped in the package
+- **A knowledge graph of the library itself** -- 303 nodes, 1049 edges, queryable, shipped in the package
 
 Dependencies: numpy, pandas. That's it.
 
@@ -164,7 +164,7 @@ kg.find(requires="volume", status="deprecated")      # by what it needs and whet
 kg.get("procedure:indicator-rsi")["outputs"]         # typed outputs, with units and range
 kg.outputs(bounded=True, kind="oscillator")          # every value you could put on one axis
 kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # what would break
-kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")   # why is it classed so
+kg.path("procedure:signal-adosc-bearish", "concept:momentum")   # why is it classed so
 ```
 
 **Read these two before using it** -- they are installed alongside the package at

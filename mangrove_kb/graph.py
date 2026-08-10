@@ -62,6 +62,10 @@ RELATIONS: dict[str, dict[str, Any]] = {
     "kind-of":     {"category": "structural",  "transitive": True,  "exact": "rdfs:subClassOf"},
     "part-of":     {"category": "structural",  "transitive": True,  "exact": "BFO:0000050"},
     "has-role":    {"category": "descriptive", "transitive": False, "exact": "RO:0000087"},
+    # An indicator MEASURES its class; a signal is CONCERNED WITH it. `dcterms:subject` because
+    # momentum is the signal's subject, not its type -- a signal emits a boolean and measures
+    # nothing. Descriptive, so it stays out of BACKBONE and nothing is inherited along it.
+    "about":       {"category": "descriptive", "transitive": False, "exact": "dcterms:subject"},
     "uses":        {"category": "associative", "transitive": False, "close": "prov:used"},
     "supersedes":  {"category": "meta",        "transitive": False, "exact": "dcterms:replaces"},
 }
@@ -432,24 +436,32 @@ class KnowledgeGraph:
     def in_class(self, cls: str) -> set[str]:
         """Everything in a class -- **including what derives its class through what it uses**.
 
-        A class reaches its members two ways, and both are edges in the graph:
+        A class reaches its members two ways, and the two say different things:
 
-        * directly, over the rigid backbone -- an indicator ``instance-of`` its class;
-        * through the computation it is built on -- a signal ``uses`` an indicator that is
-          ``instance-of`` the class. ``adosc_bearish --uses--> ADOSC --instance-of--> momentum``.
+        * an indicator is ``instance-of`` its class -- it *measures* that character;
+        * a signal is ``about`` its class -- it is *concerned with* that character, because of the
+          indicator it reads. ``adosc_bearish --about--> momentum``.
 
-        The second is not a workaround for a missing edge; it is how a signal's class is *stated* in
-        this model. A signal does not declare a class of its own -- it inherits the character of
-        the computation it reads, and the graph already says so. All 218 signals resolve this way. (The node property ``source_module`` happens to carry the same string, but it is
-        provenance, not the assertion -- the graph is the source of truth.)
+        The second is deliberately not ``instance-of``. ``momentum`` is defined as measuring rate of
+        change; a signal emits a boolean and measures nothing, so it is not an instance of the class
+        and the graph does not say it is. It is still returned here, because "everything to do with
+        momentum" is the question this method exists to answer -- but the edge naming the two claims
+        keeps them distinguishable, which is what lets :meth:`path` explain a signal's class instead
+        of merely asserting it.
 
-        Roles are still excluded here: derivation runs over ``uses`` and the backbone, never over
+        The ``about`` edges are a projection of ``uses`` plus the class table, emitted by the builder
+        in the same pass and checked there against the ``uses`` edge behind each one.
+        All 218 signals resolve this way, every one reading a classified indicator. (The node
+        property ``source_module`` carries the same string, but it is provenance, not the assertion
+        -- the graph is the source of truth.)
+
+        Roles are excluded: membership runs over the backbone and ``about``, never over
         ``has-role``, so nothing is ever classified by the part it plays.
         """
         cid = self.resolve(cls)
         direct = set(self.descendants(cid)) | {cid}
-        via_uses = {e.src for e in self.edges if e.relation == "uses" and e.dst in direct}
-        return (direct | via_uses) - {cid}
+        via_about = {e.src for e in self.edges if e.relation == "about" and e.dst in direct}
+        return (direct | via_about) - {cid}
 
     def find(self, query: str = "", *, kind: str | None = None, role: str | None = None,
              primitive: str | None = None, status: str | None = None,

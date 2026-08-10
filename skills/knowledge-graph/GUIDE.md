@@ -21,34 +21,34 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 303, 755
-s["primitives"]                 # {'Procedure': 291, 'Concept': 6, 'Property': 4, ...}
-s["relations"]                  # {'instance-of': 289, 'uses': 233, 'has-role': 218, ...}
+s["nodes"], s["edges"]          # 303, 1049
+s["primitives"]                 # {'Procedure': 289, 'Concept': 9, 'Property': 3, ...}
+s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 222, ...}
 s["kinds"]                      # the class vocabulary
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  303 755
-primitives    {'Procedure': 291, 'Concept': 6, 'Property': 4, 'Object': 1, 'Schema': 1}
-relations     {'instance-of': 289, 'uses': 233, 'has-role': 218, 'kind-of': 9,
-               'part-of': 4, 'supersedes': 2}
-kinds         ['concept:indicator', 'concept:indicator-class-averaging',
-               'concept:indicator-class-flow', 'concept:indicator-class-momentum',
-               'concept:indicator-class-oscillator', 'concept:indicator-class-pattern',
-               'concept:indicator-class-volatility', 'concept:signal', 'property:role']
+nodes, edges  303 1049
+primitives    {'Procedure': 289, 'Concept': 9, 'Property': 3, 'Object': 1, 'Schema': 1}
+relations     {'instance-of': 360, 'uses': 233, 'about': 222, 'has-role': 218,
+               'kind-of': 8, 'part-of': 6, 'supersedes': 2}
+kinds         ['concept:averaging', 'concept:flow', 'concept:indicator',
+               'concept:momentum', 'concept:oscillator', 'concept:pattern',
+               'concept:signal', 'concept:technical-analysis',
+               'concept:volatility', 'property:role']
 roles         ['property:role-filter', 'property:role-trigger']
-schema        [{'subject': 'Concept',   'relation': 'kind-of',     'object': 'Procedure'},
+schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
+               {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               {'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
-               ... 10 shapes in total]
+               ... 11 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
 one and get an empty result you might misread as "there are none".
 
-**Trap:** `stats()["kinds"]` returns full node ids (`concept:indicator-class-momentum`), but every
+**Trap:** `stats()["kinds"]` returns full node ids (`concept:momentum`), but every
 filter also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 ---
@@ -262,19 +262,30 @@ kg.path("adosc_bearish", "momentum")     # both ends resolve from the names you 
 
 ```
 procedure:signal-adosc-bearish
-procedure:indicator-adosc          [uses]
-concept:indicator-class-momentum   [instance-of]
+concept:momentum   [about]
 ```
 
-Each step names the relation traversed, so the answer explains itself:
-`signal-adosc-bearish --uses--> indicator-adosc --instance-of--> momentum`.
+That is the claim, not the reason: the signal is *about* momentum. A signal is never `instance-of` a
+class — momentum is defined as measuring rate of change and a signal emits a boolean — so the edge
+says what is true and stops there. For the reason, ask for the route that does not use the shortcut:
 
-This is the call to reach for whenever a result surprises you. The class was not declared on the
-signal; it was derived, and `path` shows the derivation.
+```python
+kg.path("adosc_bearish", "momentum", relations=["uses", "instance-of"])
+```
 
-**Trap:** `path` returns the **shortest** connection, which is not always the *meaningful* one —
-everything connects through the root eventually. Constrain it with `relations=` when you want a
-specific kind of explanation.
+```
+procedure:signal-adosc-bearish
+procedure:indicator-adosc          [uses]
+concept:momentum   [instance-of]
+```
+
+`signal-adosc-bearish --uses--> indicator-adosc --instance-of--> momentum` — it is about momentum
+because it reads ADOSC, and ADOSC measures momentum. Every `about` edge has one of these behind it;
+the builder fails if it does not.
+
+**Trap:** `path` returns the **shortest** connection, which is rarely the *explanatory* one — here
+the one-hop `about` edge wins, and everything connects through the root eventually. Constrain it with
+`relations=` whenever you want a particular kind of explanation rather than the nearest link.
 
 ---
 
@@ -482,9 +493,13 @@ every edge inside it:
 
 ```python
 kg.subgraph(t["id"], radius=1)
-# 4 nodes, 3 edges:
-#   concept:signal, procedure:indicator-adosc,
+# 5 nodes, 5 edges:
+#   concept:momentum, concept:signal, procedure:indicator-adosc,
 #   procedure:signal-adosc-cross-down, property:role-trigger
+#
+# The class is IN the neighbourhood -- the signal's `about` edge reaches it in one hop, and
+# `indicator-adosc --instance-of--> momentum` comes along because subgraph returns every edge
+# BETWEEN the nodes it returns, so the derivation is visible in the fragment itself.
 ```
 
 **Trap:** `RuleRegistry.evaluate` needs the signal\'s module imported before the name is registered.

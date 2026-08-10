@@ -719,16 +719,26 @@ BACK_BUTTON = """
 # id prefix -> the sub-label shown as `kind` in the inspector (the ontology primitive
 # travels separately in `primitive_type`, exactly as the full graph surface does it).
 KIND_BY_PREFIX = {
-    "concept:indicator-class-": "indicator class",
     "concept:": "entity type",
     "property:role-": "role value",
     "property:role": "role axis",
     "procedure:indicator-": "indicator",
     "procedure:signal-": "signal",
+    "schema:": "schema",
 }
 
 
-def _kind(node_id: str) -> str:
+def _kind(node_id: str, classes: frozenset[str] = frozenset()) -> str:
+    """The sub-label shown in the inspector.
+
+    The six character classes are identified by their EDGE -- `kind-of technical analysis` -- and not
+    by their id. They used to be spelled `concept:indicator-class-momentum`, which made a prefix test
+    work and also asserted, in the identifier itself, that they belonged to Indicator. The id is now
+    `concept:momentum` and says only what the node is, so the classification has to come from where it
+    is actually stated. Everything else is still unambiguous by prefix.
+    """
+    if node_id in classes:
+        return "class"
     for prefix in sorted(KIND_BY_PREFIX, key=len, reverse=True):
         if node_id.startswith(prefix):
             return KIND_BY_PREFIX[prefix]
@@ -742,10 +752,14 @@ def main() -> int:
         return 1
     g = json.loads(GRAPH.read_text())
 
+    #: The character classes, read off the edge that makes them one. See :func:`_kind`.
+    _classes = frozenset(r["from_id"] for r in g["relations"]
+                         if r["rel"] == "kind-of" and r["to_id"] == "concept:technical-analysis")
+
     nodes = [{
         "id": a["id"],
         "name": a["title"],
-        "kind": _kind(a["id"]),
+        "kind": _kind(a["id"], _classes),
         "primitive_type": a["kind"],
         "status": a.get("status"),
         "epistemic": a.get("epistemic"),

@@ -1,7 +1,7 @@
 """Deprecated import path. `patterns.py` is now `pattern.py`.
 
 Signal files are named for the ontology class they hold, and the class is `pattern` -- singular,
-matching `concept:indicator-class-pattern` in the ontology and the `Pattern` category the API
+matching `concept:pattern` in the ontology and the `Pattern` category the API
 reports. The plural was the only file name that did not match its class.
 
 **Registered signal names are unchanged.** A stored strategy is unaffected: it names a signal, and

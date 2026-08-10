@@ -87,7 +87,7 @@ CLAIMS = [
     ("skills/knowledge-graph/SKILL.md", r"\*\*[\d,]+ nodes, (\d+) edges\*\*", "edges"),
     ("skills/knowledge-graph/SKILL.md", r"covering (\d+) indicators",        "indicators"),
     ("skills/knowledge-graph/SKILL.md", r"and\s+(\d+) signals",              "signals"),
-    ("skills/knowledge-graph/SKILL.md", r"All (\d+) signals resolve",        "signals"),
+    ("skills/knowledge-graph/SKILL.md", r"All (\d+) signals carry an",       "signals"),
     ("mangrove_kb/graph.py",           r"\((\d+) of [\d,]+ nodes carry both\)", "signals"),
     ("mangrove_kb/graph.py",           r"\([\d,]+ of (\d+) nodes carry both\)", "nodes"),
     ("mangrove_kb/graph.py",           r"All (\d+) signals resolve this way", "signals"),
@@ -108,6 +108,10 @@ CLAIMS = [
     ("README.md",      r"registered signals, \*\*(\d+) are modelled",  "signals"),
     ("PKG_README.md",  r"\*\*(\d+) trading signals\*\*",             "registered_signals"),
     ("PKG_README.md",  r"\*\*(\d+) technical indicators\*\*",        "indicator_classes"),
+    # The PyPI front page stated 755 edges after the graph reached 1049, and nothing caught it:
+    # the guard covered its signal and indicator counts but not the graph size.
+    ("PKG_README.md",  r"-- (\d+) nodes, [\d,]+ edges, queryable",     "nodes"),
+    ("PKG_README.md",  r"-- [\d,]+ nodes, (\d+) edges, queryable",     "edges"),
 ]
 
 #: Files whose numbers are historical and MUST NOT be "corrected". Listed so the exclusion is a

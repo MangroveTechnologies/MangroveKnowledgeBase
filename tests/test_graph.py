@@ -60,11 +60,11 @@ def test_roles_are_never_inherited(kg):
 
 
 def test_backbone_closure_is_transitive_but_roles_are_one_hop(kg):
-    momentum = kg.descendants("concept:indicator-class-momentum")
+    momentum = kg.descendants("concept:momentum")
     assert momentum, "expected members in the momentum class"
     # every member reaches the class transitively over the backbone
     for m in momentum:
-        assert "concept:indicator-class-momentum" in kg.ancestors(m)
+        assert "concept:momentum" in kg.ancestors(m)
     # bearers are exactly the direct has-role sources -- no closure
     direct = {e.src for e in kg.edges
               if e.relation == ROLE_RELATION and e.dst == "property:role-trigger"}
@@ -77,14 +77,14 @@ def test_class_is_derived_through_uses_not_declared(kg):
     Regression for a real mistake: this was first read as "signals have no class", because they
     carry no DIRECT class edge. They carry it one hop out, via `uses`, and 209 of 216 resolve.
     """
-    momentum = kg.in_class("concept:indicator-class-momentum")
+    momentum = kg.in_class("concept:momentum")
     assert any(m.startswith("procedure:signal-") for m in momentum), \
         "signals must reach their class through the indicator they use"
     assert any(m.startswith("procedure:indicator-") for m in momentum), \
         "indicators must reach their class directly"
     for sig in (m for m in momentum if m.startswith("procedure:signal-")):
         used = {n["id"] for n in kg.neighbors(sig, relation="uses", direction="out", limit=None)}
-        assert used & set(kg.descendants("concept:indicator-class-momentum"))
+        assert used & set(kg.descendants("concept:momentum"))
 
 
 def test_both_axes_in_one_call(kg):
@@ -92,20 +92,28 @@ def test_both_axes_in_one_call(kg):
     r = kg.find(kind="momentum", role="trigger", limit=None)
     assert r.total > 0, "kind x role must not be empty -- class is derivable for signals"
     triggers = set(kg.bearers("property:role-trigger"))
-    momentum = kg.in_class("concept:indicator-class-momentum")
+    momentum = kg.in_class("concept:momentum")
     for row in r:
         assert row["id"] in triggers and row["id"] in momentum
 
 
 def test_derivation_never_runs_over_roles(kg):
-    """Class derivation follows uses + the backbone. A role must never confer class membership."""
+    """Class derivation follows `about` + the backbone. A role must never confer class membership.
+
+    Scoped to the six CHARACTER classes, and they are selected by the edge that makes them one --
+    `kind-of technical analysis` -- not by an id prefix. `concept:signal` is also a `concept:` and
+    legitimately contains every trigger-bearing signal, so a prefix test here would assert the
+    opposite of what it means.
+    """
+    classes = {n["id"] for n in kg.neighbors("concept:technical-analysis", relation="kind-of",
+                                             direction="in", limit=None).items}
+    assert len(classes) == 6, f"expected the six character classes, got {sorted(classes)}"
     for role in kg.roles():
         bearers = set(kg.bearers(role))
-        for cls in kg.stats()["kinds"]:
-            if cls.startswith("concept:indicator-class-"):
-                members = kg.in_class(cls)
-                assert not (members >= bearers), \
-                    f"{cls} swallowed every bearer of {role} -- roles are leaking into class"
+        for cls in classes:
+            members = kg.in_class(cls)
+            assert not (members >= bearers), \
+                f"{cls} swallowed every bearer of {role} -- roles are leaking into class"
 
 
 # --- bounded results -----------------------------------------------------------------------------
@@ -159,10 +167,10 @@ def test_bad_arguments_name_the_legal_values(kg):
 # --- traversal -----------------------------------------------------------------------------------
 
 def test_path_is_undirected_and_reports_the_relation(kg):
-    p = kg.path("procedure:signal-rsi-oversold", "concept:indicator-class-oscillator")
+    p = kg.path("procedure:signal-rsi-oversold", "concept:oscillator")
     assert p is not None
     assert p[0]["node"]["id"] == "procedure:signal-rsi-oversold"
-    assert p[-1]["node"]["id"] == "concept:indicator-class-oscillator"
+    assert p[-1]["node"]["id"] == "concept:oscillator"
     assert all("via" in step for step in p[1:])
 
 

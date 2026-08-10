@@ -93,6 +93,9 @@ RELATIONS: dict[str, RelSpec] = {
     "has-property": RelSpec("descriptive"),
     "has-state":    RelSpec("descriptive"),
     "has-role":     RelSpec("descriptive"),
+    "about":        RelSpec("descriptive"),             # subject/topic — dcterms:subject. What a thing
+                                                        # is CONCERNED WITH, never what it IS: a signal
+                                                        # is about momentum, an indicator measures it.
     # ---- associative leaves (the root `associated-with` is the generic member) --------------
     "similar-to":     RelSpec("associative"),           # shared features / structure
     "contrasts-with": RelSpec("associative"),           # notable difference

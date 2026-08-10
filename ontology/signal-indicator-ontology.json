@@ -12,7 +12,7 @@
   {
    "id": "concept:indicator",
    "title": "Indicator",
-   "kind": "Procedure",
+   "kind": "Concept",
    "summary": "A computation over one or more input series producing one or more numeric output series.",
    "epistemic": "observed",
    "status": "ratified",
@@ -21,14 +21,14 @@
   {
    "id": "concept:signal",
    "title": "Signal",
-   "kind": "Procedure",
+   "kind": "Concept",
    "summary": "A boolean predicate over indicator output, evaluated per bar. Composed of (indicator, predicate, params).",
    "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
   {
-   "id": "concept:strategy",
+   "id": "schema:strategy",
    "title": "Strategy",
    "kind": "Schema",
    "summary": "A structured template composing signals into entry/exit rules plus configuration.",
@@ -64,16 +64,16 @@
    "props": {}
   },
   {
-   "id": "property:role-arm",
-   "title": "arm",
-   "kind": "Property",
-   "summary": "Signal role: arm.",
+   "id": "concept:technical-analysis",
+   "title": "technical analysis",
+   "kind": "Concept",
+   "summary": "Reading a market from its own price and volume history. The characters a computation can measure -- momentum, volatility, flow and the rest -- divide this space; the indicators that measure them and the signals that read them both attach to those divisions.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {}
   },
   {
-   "id": "concept:indicator-class-averaging",
+   "id": "concept:averaging",
    "title": "averaging",
    "kind": "Concept",
    "summary": "Emits a reference level in price units, produced by averaging over a window.",
@@ -82,7 +82,7 @@
    "props": {}
   },
   {
-   "id": "concept:indicator-class-momentum",
+   "id": "concept:momentum",
    "title": "momentum",
    "kind": "Concept",
    "summary": "Measures rate of change -- how fast, and in which direction, the input is moving.",
@@ -91,7 +91,7 @@
    "props": {}
   },
   {
-   "id": "concept:indicator-class-oscillator",
+   "id": "concept:oscillator",
    "title": "oscillator",
    "kind": "Concept",
    "summary": "Bounded output where absolute thresholds are meaningful (overbought/oversold).",
@@ -100,7 +100,7 @@
    "props": {}
   },
   {
-   "id": "concept:indicator-class-volatility",
+   "id": "concept:volatility",
    "title": "volatility",
    "kind": "Concept",
    "summary": "Measures observed dispersion -- distance, width, or range.",
@@ -109,7 +109,7 @@
    "props": {}
   },
   {
-   "id": "concept:indicator-class-flow",
+   "id": "concept:flow",
    "title": "flow",
    "kind": "Concept",
    "summary": "Running accumulation whose level is arbitrary but whose direction carries meaning.",
@@ -118,7 +118,7 @@
    "props": {}
   },
   {
-   "id": "concept:indicator-class-pattern",
+   "id": "concept:pattern",
    "title": "pattern",
    "kind": "Concept",
    "summary": "Shape of one or a few bars (candlestick geometry).",
@@ -17417,8 +17417,16 @@
    "rel": "part-of",
    "to": "Mangrove Knowledge Space",
    "why": "entity type defined by the knowledge space",
-   "from_id": "concept:strategy",
+   "from_id": "schema:strategy",
    "to_id": "object:mangrove-knowledge-space"
+  },
+  {
+   "from": "Signal",
+   "rel": "part-of",
+   "to": "Strategy",
+   "why": "component composed into strategies",
+   "from_id": "concept:signal",
+   "to_id": "schema:strategy"
   },
   {
    "from": "Role",
@@ -17445,59 +17453,67 @@
    "to_id": "property:role"
   },
   {
-   "from": "arm",
-   "rel": "kind-of",
-   "to": "Role",
-   "why": "role value",
-   "from_id": "property:role-arm",
-   "to_id": "property:role"
+   "from": "technical analysis",
+   "rel": "part-of",
+   "to": "Mangrove Knowledge Space",
+   "why": "the domain this knowledge space covers",
+   "from_id": "concept:technical-analysis",
+   "to_id": "object:mangrove-knowledge-space"
   },
   {
    "from": "averaging",
    "rel": "kind-of",
-   "to": "Indicator",
-   "why": "indicator class",
-   "from_id": "concept:indicator-class-averaging",
-   "to_id": "concept:indicator"
+   "to": "technical analysis",
+   "why": "character measured",
+   "from_id": "concept:averaging",
+   "to_id": "concept:technical-analysis"
   },
   {
    "from": "momentum",
    "rel": "kind-of",
-   "to": "Indicator",
-   "why": "indicator class",
-   "from_id": "concept:indicator-class-momentum",
-   "to_id": "concept:indicator"
+   "to": "technical analysis",
+   "why": "character measured",
+   "from_id": "concept:momentum",
+   "to_id": "concept:technical-analysis"
   },
   {
    "from": "oscillator",
    "rel": "kind-of",
-   "to": "Indicator",
-   "why": "indicator class",
-   "from_id": "concept:indicator-class-oscillator",
-   "to_id": "concept:indicator"
+   "to": "technical analysis",
+   "why": "character measured",
+   "from_id": "concept:oscillator",
+   "to_id": "concept:technical-analysis"
   },
   {
    "from": "volatility",
    "rel": "kind-of",
-   "to": "Indicator",
-   "why": "indicator class",
-   "from_id": "concept:indicator-class-volatility",
-   "to_id": "concept:indicator"
+   "to": "technical analysis",
+   "why": "character measured",
+   "from_id": "concept:volatility",
+   "to_id": "concept:technical-analysis"
   },
   {
    "from": "flow",
    "rel": "kind-of",
-   "to": "Indicator",
-   "why": "indicator class",
-   "from_id": "concept:indicator-class-flow",
-   "to_id": "concept:indicator"
+   "to": "technical analysis",
+   "why": "character measured",
+   "from_id": "concept:flow",
+   "to_id": "concept:technical-analysis"
   },
   {
    "from": "pattern",
    "rel": "kind-of",
+   "to": "technical analysis",
+   "why": "character measured",
+   "from_id": "concept:pattern",
+   "to_id": "concept:technical-analysis"
+  },
+  {
+   "from": "ADI",
+   "rel": "instance-of",
    "to": "Indicator",
-   "why": "indicator class",
-   "from_id": "concept:indicator-class-pattern",
+   "why": "entity type",
+   "from_id": "procedure:indicator-adi",
    "to_id": "concept:indicator"
   },
   {
@@ -17506,7 +17522,15 @@
    "to": "flow",
    "why": "class membership",
    "from_id": "procedure:indicator-adi",
-   "to_id": "concept:indicator-class-flow"
+   "to_id": "concept:flow"
+  },
+  {
+   "from": "ADOSC",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-adosc",
+   "to_id": "concept:indicator"
   },
   {
    "from": "ADOSC",
@@ -17514,7 +17538,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-adosc",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "ADX",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-adx",
+   "to_id": "concept:indicator"
   },
   {
    "from": "ADX",
@@ -17522,7 +17554,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-adx",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "ALMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-alma",
+   "to_id": "concept:indicator"
   },
   {
    "from": "ALMA",
@@ -17530,7 +17570,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-alma",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "ATR",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-atr",
+   "to_id": "concept:indicator"
   },
   {
    "from": "ATR",
@@ -17538,7 +17586,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-atr",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "Aroon",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-aroon",
+   "to_id": "concept:indicator"
   },
   {
    "from": "Aroon",
@@ -17546,7 +17602,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-aroon",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "AwesomeOscillator",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-awesomeoscillator",
+   "to_id": "concept:indicator"
   },
   {
    "from": "AwesomeOscillator",
@@ -17554,7 +17618,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-awesomeoscillator",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "BOP",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-bop",
+   "to_id": "concept:indicator"
   },
   {
    "from": "BOP",
@@ -17562,7 +17634,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-bop",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "BollingerBands",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-bollingerbands",
+   "to_id": "concept:indicator"
   },
   {
    "from": "BollingerBands",
@@ -17570,7 +17650,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-bollingerbands",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "CCI",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-cci",
+   "to_id": "concept:indicator"
   },
   {
    "from": "CCI",
@@ -17578,7 +17666,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-cci",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "CMF",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-cmf",
+   "to_id": "concept:indicator"
   },
   {
    "from": "CMF",
@@ -17586,7 +17682,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-cmf",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "CMO",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-cmo",
+   "to_id": "concept:indicator"
   },
   {
    "from": "CMO",
@@ -17594,7 +17698,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-cmo",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "CandleGeometry",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-candlegeometry",
+   "to_id": "concept:indicator"
   },
   {
    "from": "CandleGeometry",
@@ -17602,7 +17714,15 @@
    "to": "pattern",
    "why": "class membership",
    "from_id": "procedure:indicator-candlegeometry",
-   "to_id": "concept:indicator-class-pattern"
+   "to_id": "concept:pattern"
+  },
+  {
+   "from": "CandleRaw",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-candleraw",
+   "to_id": "concept:indicator"
   },
   {
    "from": "CandleRaw",
@@ -17610,7 +17730,15 @@
    "to": "pattern",
    "why": "class membership",
    "from_id": "procedure:indicator-candleraw",
-   "to_id": "concept:indicator-class-pattern"
+   "to_id": "concept:pattern"
+  },
+  {
+   "from": "CandleRelation",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-candlerelation",
+   "to_id": "concept:indicator"
   },
   {
    "from": "CandleRelation",
@@ -17618,7 +17746,15 @@
    "to": "pattern",
    "why": "class membership",
    "from_id": "procedure:indicator-candlerelation",
-   "to_id": "concept:indicator-class-pattern"
+   "to_id": "concept:pattern"
+  },
+  {
+   "from": "ChandelierLevels",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-chandelierlevels",
+   "to_id": "concept:indicator"
   },
   {
    "from": "ChandelierLevels",
@@ -17626,7 +17762,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-chandelierlevels",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "CumulativeReturn",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-cumulativereturn",
+   "to_id": "concept:indicator"
   },
   {
    "from": "CumulativeReturn",
@@ -17634,7 +17778,15 @@
    "to": "flow",
    "why": "class membership",
    "from_id": "procedure:indicator-cumulativereturn",
-   "to_id": "concept:indicator-class-flow"
+   "to_id": "concept:flow"
+  },
+  {
+   "from": "DEMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-dema",
+   "to_id": "concept:indicator"
   },
   {
    "from": "DEMA",
@@ -17642,7 +17794,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-dema",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "DPO",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-dpo",
+   "to_id": "concept:indicator"
   },
   {
    "from": "DPO",
@@ -17650,7 +17810,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-dpo",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "DailyLogReturn",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-dailylogreturn",
+   "to_id": "concept:indicator"
   },
   {
    "from": "DailyLogReturn",
@@ -17658,7 +17826,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-dailylogreturn",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "DailyReturn",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-dailyreturn",
+   "to_id": "concept:indicator"
   },
   {
    "from": "DailyReturn",
@@ -17666,7 +17842,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-dailyreturn",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "DonchianChannel",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-donchianchannel",
+   "to_id": "concept:indicator"
   },
   {
    "from": "DonchianChannel",
@@ -17674,7 +17858,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-donchianchannel",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "EMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-ema",
+   "to_id": "concept:indicator"
   },
   {
    "from": "EMA",
@@ -17682,7 +17874,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-ema",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "EPMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-epma",
+   "to_id": "concept:indicator"
   },
   {
    "from": "EPMA",
@@ -17690,7 +17890,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-epma",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "EaseOfMovement",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-easeofmovement",
+   "to_id": "concept:indicator"
   },
   {
    "from": "EaseOfMovement",
@@ -17698,7 +17906,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-easeofmovement",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "ForceIndex",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-forceindex",
+   "to_id": "concept:indicator"
   },
   {
    "from": "ForceIndex",
@@ -17706,7 +17922,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-forceindex",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "HMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-hma",
+   "to_id": "concept:indicator"
   },
   {
    "from": "HMA",
@@ -17714,7 +17938,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-hma",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "HeikinAshi",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-heikinashi",
+   "to_id": "concept:indicator"
   },
   {
    "from": "HeikinAshi",
@@ -17722,7 +17954,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-heikinashi",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "Ichimoku",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-ichimoku",
+   "to_id": "concept:indicator"
   },
   {
    "from": "Ichimoku",
@@ -17730,7 +17970,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-ichimoku",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "KAMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-kama",
+   "to_id": "concept:indicator"
   },
   {
    "from": "KAMA",
@@ -17738,7 +17986,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-kama",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "KST",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-kst",
+   "to_id": "concept:indicator"
   },
   {
    "from": "KST",
@@ -17746,7 +18002,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-kst",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "KVO",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-kvo",
+   "to_id": "concept:indicator"
   },
   {
    "from": "KVO",
@@ -17754,7 +18018,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-kvo",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "KeltnerChannel",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-keltnerchannel",
+   "to_id": "concept:indicator"
   },
   {
    "from": "KeltnerChannel",
@@ -17762,7 +18034,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-keltnerchannel",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "KlingerVolumeOscillator",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-klingervolumeoscillator",
+   "to_id": "concept:indicator"
   },
   {
    "from": "KlingerVolumeOscillator",
@@ -17770,7 +18050,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-klingervolumeoscillator",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "MACD",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-macd",
+   "to_id": "concept:indicator"
   },
   {
    "from": "MACD",
@@ -17778,7 +18066,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-macd",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "MAMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-mama",
+   "to_id": "concept:indicator"
   },
   {
    "from": "MAMA",
@@ -17786,7 +18082,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-mama",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "MFI",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-mfi",
+   "to_id": "concept:indicator"
   },
   {
    "from": "MFI",
@@ -17794,7 +18098,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-mfi",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "MOM",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-mom",
+   "to_id": "concept:indicator"
   },
   {
    "from": "MOM",
@@ -17802,7 +18114,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-mom",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "MassIndex",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-massindex",
+   "to_id": "concept:indicator"
   },
   {
    "from": "MassIndex",
@@ -17810,7 +18130,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-massindex",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "MultiTFSlope",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-multitfslope",
+   "to_id": "concept:indicator"
   },
   {
    "from": "MultiTFSlope",
@@ -17818,7 +18146,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-multitfslope",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "NATR",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-natr",
+   "to_id": "concept:indicator"
   },
   {
    "from": "NATR",
@@ -17826,7 +18162,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-natr",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "NVI",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-nvi",
+   "to_id": "concept:indicator"
   },
   {
    "from": "NVI",
@@ -17834,7 +18178,15 @@
    "to": "flow",
    "why": "class membership",
    "from_id": "procedure:indicator-nvi",
-   "to_id": "concept:indicator-class-flow"
+   "to_id": "concept:flow"
+  },
+  {
+   "from": "OBV",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-obv",
+   "to_id": "concept:indicator"
   },
   {
    "from": "OBV",
@@ -17842,7 +18194,15 @@
    "to": "flow",
    "why": "class membership",
    "from_id": "procedure:indicator-obv",
-   "to_id": "concept:indicator-class-flow"
+   "to_id": "concept:flow"
+  },
+  {
+   "from": "PPO",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-ppo",
+   "to_id": "concept:indicator"
   },
   {
    "from": "PPO",
@@ -17850,7 +18210,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-ppo",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "PVO",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-pvo",
+   "to_id": "concept:indicator"
   },
   {
    "from": "PVO",
@@ -17858,7 +18226,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-pvo",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "ROC",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-roc",
+   "to_id": "concept:indicator"
   },
   {
    "from": "ROC",
@@ -17866,7 +18242,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-roc",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "RSI",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-rsi",
+   "to_id": "concept:indicator"
   },
   {
    "from": "RSI",
@@ -17874,7 +18258,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-rsi",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "SMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-sma",
+   "to_id": "concept:indicator"
   },
   {
    "from": "SMA",
@@ -17882,7 +18274,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-sma",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "SMMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-smma",
+   "to_id": "concept:indicator"
   },
   {
    "from": "SMMA",
@@ -17890,7 +18290,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-smma",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "STARCBands",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-starcbands",
+   "to_id": "concept:indicator"
   },
   {
    "from": "STARCBands",
@@ -17898,7 +18306,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-starcbands",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "STC",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-stc",
+   "to_id": "concept:indicator"
   },
   {
    "from": "STC",
@@ -17906,7 +18322,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-stc",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "SqueezeDepth",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-squeezedepth",
+   "to_id": "concept:indicator"
   },
   {
    "from": "SqueezeDepth",
@@ -17914,7 +18338,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-squeezedepth",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "StochRSI",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-stochrsi",
+   "to_id": "concept:indicator"
   },
   {
    "from": "StochRSI",
@@ -17922,7 +18354,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-stochrsi",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "StochasticOscillator",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-stochasticoscillator",
+   "to_id": "concept:indicator"
   },
   {
    "from": "StochasticOscillator",
@@ -17930,7 +18370,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-stochasticoscillator",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "SwingDelta",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-swingdelta",
+   "to_id": "concept:indicator"
   },
   {
    "from": "SwingDelta",
@@ -17938,7 +18386,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-swingdelta",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "T3",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-t3",
+   "to_id": "concept:indicator"
   },
   {
    "from": "T3",
@@ -17946,7 +18402,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-t3",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "TEMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-tema",
+   "to_id": "concept:indicator"
   },
   {
    "from": "TEMA",
@@ -17954,7 +18418,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-tema",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "TRIMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-trima",
+   "to_id": "concept:indicator"
   },
   {
    "from": "TRIMA",
@@ -17962,7 +18434,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-trima",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "TRIX",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-trix",
+   "to_id": "concept:indicator"
   },
   {
    "from": "TRIX",
@@ -17970,7 +18450,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-trix",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "TSI",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-tsi",
+   "to_id": "concept:indicator"
   },
   {
    "from": "TSI",
@@ -17978,7 +18466,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-tsi",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "TrueRange",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-truerange",
+   "to_id": "concept:indicator"
   },
   {
    "from": "TrueRange",
@@ -17986,7 +18482,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-truerange",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "UlcerIndex",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-ulcerindex",
+   "to_id": "concept:indicator"
   },
   {
    "from": "UlcerIndex",
@@ -17994,7 +18498,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-ulcerindex",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "UltimateOscillator",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-ultimateoscillator",
+   "to_id": "concept:indicator"
   },
   {
    "from": "UltimateOscillator",
@@ -18002,7 +18514,15 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-ultimateoscillator",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "VPT",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-vpt",
+   "to_id": "concept:indicator"
   },
   {
    "from": "VPT",
@@ -18010,7 +18530,15 @@
    "to": "flow",
    "why": "class membership",
    "from_id": "procedure:indicator-vpt",
-   "to_id": "concept:indicator-class-flow"
+   "to_id": "concept:flow"
+  },
+  {
+   "from": "VWAP",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-vwap",
+   "to_id": "concept:indicator"
   },
   {
    "from": "VWAP",
@@ -18018,7 +18546,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-vwap",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "VWMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-vwma",
+   "to_id": "concept:indicator"
   },
   {
    "from": "VWMA",
@@ -18026,7 +18562,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-vwma",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "VolatilityEnvelope",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-volatilityenvelope",
+   "to_id": "concept:indicator"
   },
   {
    "from": "VolatilityEnvelope",
@@ -18034,7 +18578,15 @@
    "to": "volatility",
    "why": "class membership",
    "from_id": "procedure:indicator-volatilityenvelope",
-   "to_id": "concept:indicator-class-volatility"
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "Vortex",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-vortex",
+   "to_id": "concept:indicator"
   },
   {
    "from": "Vortex",
@@ -18042,7 +18594,15 @@
    "to": "momentum",
    "why": "class membership",
    "from_id": "procedure:indicator-vortex",
-   "to_id": "concept:indicator-class-momentum"
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "WMA",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-wma",
+   "to_id": "concept:indicator"
   },
   {
    "from": "WMA",
@@ -18050,7 +18610,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-wma",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "WilliamsAlligator",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-williamsalligator",
+   "to_id": "concept:indicator"
   },
   {
    "from": "WilliamsAlligator",
@@ -18058,7 +18626,15 @@
    "to": "averaging",
    "why": "class membership",
    "from_id": "procedure:indicator-williamsalligator",
-   "to_id": "concept:indicator-class-averaging"
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "WilliamsR",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-williamsr",
+   "to_id": "concept:indicator"
   },
   {
    "from": "WilliamsR",
@@ -18066,7 +18642,7 @@
    "to": "oscillator",
    "why": "class membership",
    "from_id": "procedure:indicator-williamsr",
-   "to_id": "concept:indicator-class-oscillator"
+   "to_id": "concept:oscillator"
   },
   {
    "from": "adi_bearish",
@@ -18098,6 +18674,14 @@
    }
   },
   {
+   "from": "adi_bearish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adi-bearish",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "adi_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -18127,6 +18711,14 @@
    }
   },
   {
+   "from": "adi_bullish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adi-bullish",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "adosc_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -18156,6 +18748,14 @@
    }
   },
   {
+   "from": "adosc_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adosc-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "adosc_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -18183,6 +18783,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "adosc_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adosc-bullish",
+   "to_id": "concept:momentum"
   },
   {
    "from": "adosc_cross_down",
@@ -18214,6 +18822,14 @@
    }
   },
   {
+   "from": "adosc_cross_down",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adosc-cross-down",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "adosc_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -18241,6 +18857,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "adosc_cross_up",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adosc-cross-up",
+   "to_id": "concept:momentum"
   },
   {
    "from": "adx_bullish_di",
@@ -18275,6 +18899,14 @@
    }
   },
   {
+   "from": "adx_bullish_di",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adx-bullish-di",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "adx_strong_trend",
    "rel": "instance-of",
    "to": "Signal",
@@ -18304,6 +18936,14 @@
    }
   },
   {
+   "from": "adx_strong_trend",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-adx-strong-trend",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "alligator_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -18337,6 +18977,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "alligator_bearish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-alligator-bearish",
+   "to_id": "concept:averaging"
   },
   {
    "from": "alligator_bullish",
@@ -18374,6 +19022,14 @@
    }
   },
   {
+   "from": "alligator_bullish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-alligator-bullish",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "alligator_sleeping",
    "rel": "instance-of",
    "to": "Signal",
@@ -18407,6 +19063,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "alligator_sleeping",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-alligator-sleeping",
+   "to_id": "concept:averaging"
   },
   {
    "from": "alma_cross_down",
@@ -18438,6 +19102,14 @@
    }
   },
   {
+   "from": "alma_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-alma-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "alma_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -18467,6 +19139,14 @@
    }
   },
   {
+   "from": "alma_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-alma-cross-up",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "ao_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -18496,6 +19176,14 @@
    }
   },
   {
+   "from": "ao_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ao-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "ao_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -18523,6 +19211,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ao_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ao-bullish",
+   "to_id": "concept:momentum"
   },
   {
    "from": "ao_zero_cross",
@@ -18552,6 +19248,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ao_zero_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ao-zero-cross",
+   "to_id": "concept:momentum"
   },
   {
    "from": "aroon_crossover",
@@ -18586,6 +19290,14 @@
    }
   },
   {
+   "from": "aroon_crossover",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-aroon-crossover",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "aroon_down_trend",
    "rel": "instance-of",
    "to": "Signal",
@@ -18615,6 +19327,14 @@
    }
   },
   {
+   "from": "aroon_down_trend",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-aroon-down-trend",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "aroon_up_trend",
    "rel": "instance-of",
    "to": "Signal",
@@ -18642,6 +19362,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "aroon_up_trend",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-aroon-up-trend",
+   "to_id": "concept:momentum"
   },
   {
    "from": "atr_high_volatility",
@@ -18673,6 +19401,14 @@
    }
   },
   {
+   "from": "atr_high_volatility",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-atr-high-volatility",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "bb_above_upper",
    "rel": "instance-of",
    "to": "Signal",
@@ -18702,6 +19438,14 @@
    }
   },
   {
+   "from": "bb_above_upper",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bb-above-upper",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "bb_below_lower",
    "rel": "instance-of",
    "to": "Signal",
@@ -18731,6 +19475,14 @@
    }
   },
   {
+   "from": "bb_below_lower",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bb-below-lower",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "bb_lower_breakout",
    "rel": "instance-of",
    "to": "Signal",
@@ -18758,6 +19510,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "bb_lower_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bb-lower-breakout",
+   "to_id": "concept:volatility"
   },
   {
    "from": "bb_squeeze",
@@ -18789,6 +19549,14 @@
    }
   },
   {
+   "from": "bb_squeeze",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bb-squeeze",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "bb_upper_breakout",
    "rel": "instance-of",
    "to": "Signal",
@@ -18818,6 +19586,14 @@
    }
   },
   {
+   "from": "bb_upper_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bb-upper-breakout",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "bearish_engulfing_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -18850,6 +19626,14 @@
    }
   },
   {
+   "from": "bearish_engulfing_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bearish-engulfing-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "bearish_harami_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -18880,6 +19664,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "bearish_harami_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bearish-harami-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "bearish_pattern_recent",
@@ -18958,6 +19750,14 @@
    }
   },
   {
+   "from": "bearish_pattern_recent",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bearish-pattern-recent",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "bearish_pin_bar_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -18996,6 +19796,14 @@
    }
   },
   {
+   "from": "bearish_pin_bar_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bearish-pin-bar-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "bop_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -19025,6 +19833,14 @@
    }
   },
   {
+   "from": "bop_bearish",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bop-bearish",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "bop_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -19052,6 +19868,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "bop_bullish",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bop-bullish",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "bop_cross_down",
@@ -19083,6 +19907,14 @@
    }
   },
   {
+   "from": "bop_cross_down",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bop-cross-down",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "bop_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -19110,6 +19942,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "bop_cross_up",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bop-cross-up",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "bullish_engulfing_trigger",
@@ -19144,6 +19984,14 @@
    }
   },
   {
+   "from": "bullish_engulfing_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bullish-engulfing-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "bullish_harami_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -19174,6 +20022,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "bullish_harami_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bullish-harami-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "bullish_pattern_recent",
@@ -19252,6 +20108,14 @@
    }
   },
   {
+   "from": "bullish_pattern_recent",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bullish-pattern-recent",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "bullish_pin_bar_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -19288,6 +20152,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "bullish_pin_bar_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-bullish-pin-bar-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "cci_overbought",
@@ -19319,6 +20191,14 @@
    }
   },
   {
+   "from": "cci_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cci-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "cci_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -19348,6 +20228,14 @@
    }
   },
   {
+   "from": "cci_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cci-oversold",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "cl_above_low_offset",
    "rel": "instance-of",
    "to": "Signal",
@@ -19380,6 +20268,14 @@
    }
   },
   {
+   "from": "cl_above_low_offset",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cl-above-low-offset",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "cl_below_high_offset",
    "rel": "instance-of",
    "to": "Signal",
@@ -19410,6 +20306,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "cl_below_high_offset",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cl-below-high-offset",
+   "to_id": "concept:volatility"
   },
   {
    "from": "cl_high_offset_break",
@@ -19444,6 +20348,14 @@
    }
   },
   {
+   "from": "cl_high_offset_break",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cl-high-offset-break",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "cl_low_offset_break",
    "rel": "instance-of",
    "to": "Signal",
@@ -19474,6 +20386,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "cl_low_offset_break",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cl-low-offset-break",
+   "to_id": "concept:volatility"
   },
   {
    "from": "cmf_bearish",
@@ -19505,6 +20425,14 @@
    }
   },
   {
+   "from": "cmf_bearish",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cmf-bearish",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "cmf_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -19534,6 +20462,14 @@
    }
   },
   {
+   "from": "cmf_bullish",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cmf-bullish",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "cmo_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -19563,6 +20499,14 @@
    }
   },
   {
+   "from": "cmo_cross_down",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cmo-cross-down",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "cmo_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -19590,6 +20534,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "cmo_cross_up",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cmo-cross-up",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "cmo_overbought",
@@ -19621,6 +20573,14 @@
    }
   },
   {
+   "from": "cmo_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cmo-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "cmo_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -19648,6 +20608,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "cmo_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cmo-oversold",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "continuation_pattern_bearish",
@@ -19698,6 +20666,14 @@
    }
   },
   {
+   "from": "continuation_pattern_bearish",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-continuation-pattern-bearish",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "continuation_pattern_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -19746,6 +20722,14 @@
    }
   },
   {
+   "from": "continuation_pattern_bullish",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-continuation-pattern-bullish",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "cumulative_return_positive",
    "rel": "instance-of",
    "to": "Signal",
@@ -19775,6 +20759,14 @@
    }
   },
   {
+   "from": "cumulative_return_positive",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cumulative-return-positive",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "cumulative_return_target",
    "rel": "instance-of",
    "to": "Signal",
@@ -19802,6 +20794,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "cumulative_return_target",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-cumulative-return-target",
+   "to_id": "concept:flow"
   },
   {
    "from": "daily_return_negative",
@@ -19833,6 +20833,14 @@
    }
   },
   {
+   "from": "daily_return_negative",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-daily-return-negative",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "daily_return_positive",
    "rel": "instance-of",
    "to": "Signal",
@@ -19860,6 +20868,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "daily_return_positive",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-daily-return-positive",
+   "to_id": "concept:momentum"
   },
   {
    "from": "dark_cloud_cover_trigger",
@@ -19898,6 +20914,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "dark_cloud_cover_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dark-cloud-cover-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "dc_lower_breakout",
@@ -19929,6 +20953,14 @@
    }
   },
   {
+   "from": "dc_lower_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dc-lower-breakout",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "dc_upper_breakout",
    "rel": "instance-of",
    "to": "Signal",
@@ -19958,6 +20990,14 @@
    }
   },
   {
+   "from": "dc_upper_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dc-upper-breakout",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "dema_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -19987,6 +21027,14 @@
    }
   },
   {
+   "from": "dema_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dema-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "dema_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -20014,6 +21062,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "dema_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dema-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "doji_trigger",
@@ -20046,6 +21102,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "doji_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-doji-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "dpo_negative",
@@ -20077,6 +21141,14 @@
    }
   },
   {
+   "from": "dpo_negative",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dpo-negative",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "dpo_positive",
    "rel": "instance-of",
    "to": "Signal",
@@ -20106,6 +21178,14 @@
    }
   },
   {
+   "from": "dpo_positive",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dpo-positive",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "dragonfly_doji_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -20144,6 +21224,14 @@
    }
   },
   {
+   "from": "dragonfly_doji_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-dragonfly-doji-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "ema_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -20171,6 +21259,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ema_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ema-cross-down",
+   "to_id": "concept:averaging"
   },
   {
    "from": "ema_cross_up",
@@ -20202,6 +21298,14 @@
    }
   },
   {
+   "from": "ema_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ema-cross-up",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "ema_crossover",
    "rel": "instance-of",
    "to": "Signal",
@@ -20229,6 +21333,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ema_crossover",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ema-crossover",
+   "to_id": "concept:averaging"
   },
   {
    "from": "eom_bearish",
@@ -20260,6 +21372,14 @@
    }
   },
   {
+   "from": "eom_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-eom-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "eom_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -20289,6 +21409,14 @@
    }
   },
   {
+   "from": "eom_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-eom-bullish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "epma_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -20318,6 +21446,14 @@
    }
   },
   {
+   "from": "epma_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-epma-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "epma_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -20345,6 +21481,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "epma_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-epma-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "evening_star_trigger",
@@ -20379,6 +21523,14 @@
    }
   },
   {
+   "from": "evening_star_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-evening-star-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "force_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -20408,6 +21560,14 @@
    }
   },
   {
+   "from": "force_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-force-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "force_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -20435,6 +21595,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "force_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-force-bullish",
+   "to_id": "concept:momentum"
   },
   {
    "from": "gravestone_doji_trigger",
@@ -20475,6 +21643,14 @@
    }
   },
   {
+   "from": "gravestone_doji_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-gravestone-doji-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "hammer_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -20510,6 +21686,14 @@
    }
   },
   {
+   "from": "hammer_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-hammer-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "hanging_man_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -20543,6 +21727,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "hanging_man_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-hanging-man-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "heikin_ashi_bearish",
@@ -20577,6 +21769,14 @@
    }
   },
   {
+   "from": "heikin_ashi_bearish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-heikin-ashi-bearish",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "heikin_ashi_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -20609,6 +21809,14 @@
    }
   },
   {
+   "from": "heikin_ashi_bullish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-heikin-ashi-bullish",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "hma_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -20638,6 +21846,14 @@
    }
   },
   {
+   "from": "hma_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-hma-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "hma_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -20665,6 +21881,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "hma_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-hma-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "ichimoku_bearish",
@@ -20699,6 +21923,14 @@
    }
   },
   {
+   "from": "ichimoku_bearish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ichimoku-bearish",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "ichimoku_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -20729,6 +21961,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ichimoku_bullish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ichimoku-bullish",
+   "to_id": "concept:averaging"
   },
   {
    "from": "ichimoku_tk_cross",
@@ -20763,6 +22003,14 @@
    }
   },
   {
+   "from": "ichimoku_tk_cross",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ichimoku-tk-cross",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "indecision_pattern_recent",
    "rel": "instance-of",
    "to": "Signal",
@@ -20817,6 +22065,14 @@
    }
   },
   {
+   "from": "indecision_pattern_recent",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-indecision-pattern-recent",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "inside_bar_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -20847,6 +22103,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "inside_bar_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-inside-bar-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "inverted_hammer_trigger",
@@ -20882,6 +22146,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "inverted_hammer_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-inverted-hammer-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "is_above_alma",
@@ -20913,6 +22185,14 @@
    }
   },
   {
+   "from": "is_above_alma",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-alma",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "is_above_dema",
    "rel": "instance-of",
    "to": "Signal",
@@ -20940,6 +22220,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "is_above_dema",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-dema",
+   "to_id": "concept:averaging"
   },
   {
    "from": "is_above_epma",
@@ -20971,6 +22259,14 @@
    }
   },
   {
+   "from": "is_above_epma",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-epma",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "is_above_hma",
    "rel": "instance-of",
    "to": "Signal",
@@ -20998,6 +22294,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "is_above_hma",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-hma",
+   "to_id": "concept:averaging"
   },
   {
    "from": "is_above_mama",
@@ -21032,6 +22336,14 @@
    }
   },
   {
+   "from": "is_above_mama",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-mama",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "is_above_sma",
    "rel": "instance-of",
    "to": "Signal",
@@ -21059,6 +22371,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "is_above_sma",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-sma",
+   "to_id": "concept:averaging"
   },
   {
    "from": "is_above_smma",
@@ -21090,6 +22410,14 @@
    }
   },
   {
+   "from": "is_above_smma",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-smma",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "is_above_t3",
    "rel": "instance-of",
    "to": "Signal",
@@ -21117,6 +22445,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "is_above_t3",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-t3",
+   "to_id": "concept:averaging"
   },
   {
    "from": "is_above_tema",
@@ -21148,6 +22484,14 @@
    }
   },
   {
+   "from": "is_above_tema",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-tema",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "is_above_trima",
    "rel": "instance-of",
    "to": "Signal",
@@ -21175,6 +22519,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "is_above_trima",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-trima",
+   "to_id": "concept:averaging"
   },
   {
    "from": "is_above_vwma",
@@ -21206,6 +22558,14 @@
    }
   },
   {
+   "from": "is_above_vwma",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-is-above-vwma",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "kama_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -21235,6 +22595,14 @@
    }
   },
   {
+   "from": "kama_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kama-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "kama_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -21262,6 +22630,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "kama_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kama-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "kc_above_upper",
@@ -21293,6 +22669,14 @@
    }
   },
   {
+   "from": "kc_above_upper",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kc-above-upper",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "kc_below_lower",
    "rel": "instance-of",
    "to": "Signal",
@@ -21322,6 +22706,14 @@
    }
   },
   {
+   "from": "kc_below_lower",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kc-below-lower",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "kc_lower_breakout",
    "rel": "instance-of",
    "to": "Signal",
@@ -21351,6 +22743,14 @@
    }
   },
   {
+   "from": "kc_lower_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kc-lower-breakout",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "kc_upper_breakout",
    "rel": "instance-of",
    "to": "Signal",
@@ -21378,6 +22778,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "kc_upper_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kc-upper-breakout",
+   "to_id": "concept:volatility"
   },
   {
    "from": "kst_bearish_cross",
@@ -21412,6 +22820,14 @@
    }
   },
   {
+   "from": "kst_bearish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kst-bearish-cross",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "kst_bullish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -21444,6 +22860,14 @@
    }
   },
   {
+   "from": "kst_bullish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kst-bullish-cross",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "kvo_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -21474,6 +22898,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "kvo_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kvo-bearish",
+   "to_id": "concept:momentum"
   },
   {
    "from": "kvo_bearish_cross",
@@ -21508,6 +22940,14 @@
    }
   },
   {
+   "from": "kvo_bearish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kvo-bearish-cross",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "kvo_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -21540,6 +22980,14 @@
    }
   },
   {
+   "from": "kvo_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kvo-bullish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "kvo_bullish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -21570,6 +23018,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "kvo_bullish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-kvo-bullish-cross",
+   "to_id": "concept:momentum"
   },
   {
    "from": "long_legged_doji_trigger",
@@ -21610,6 +23066,14 @@
    }
   },
   {
+   "from": "long_legged_doji_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-long-legged-doji-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "ma_ribbon_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -21637,6 +23101,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ma_ribbon_bearish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ma-ribbon-bearish",
+   "to_id": "concept:averaging"
   },
   {
    "from": "ma_ribbon_bullish",
@@ -21668,6 +23140,14 @@
    }
   },
   {
+   "from": "ma_ribbon_bullish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ma-ribbon-bullish",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "ma_ribbon_tangled",
    "rel": "instance-of",
    "to": "Signal",
@@ -21695,6 +23175,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ma_ribbon_tangled",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ma-ribbon-tangled",
+   "to_id": "concept:averaging"
   },
   {
    "from": "macd_bearish_cross",
@@ -21729,6 +23217,14 @@
    }
   },
   {
+   "from": "macd_bearish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-macd-bearish-cross",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "macd_bullish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -21761,6 +23257,14 @@
    }
   },
   {
+   "from": "macd_bullish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-macd-bullish-cross",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "macd_line_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -21790,6 +23294,14 @@
    }
   },
   {
+   "from": "macd_line_cross_down",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-macd-line-cross-down",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "macd_line_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -21817,6 +23329,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "macd_line_cross_up",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-macd-line-cross-up",
+   "to_id": "concept:momentum"
   },
   {
    "from": "macd_line_negative",
@@ -21848,6 +23368,14 @@
    }
   },
   {
+   "from": "macd_line_negative",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-macd-line-negative",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "macd_line_positive",
    "rel": "instance-of",
    "to": "Signal",
@@ -21875,6 +23403,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "macd_line_positive",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-macd-line-positive",
+   "to_id": "concept:momentum"
   },
   {
    "from": "macd_positive",
@@ -21906,6 +23442,14 @@
    }
   },
   {
+   "from": "macd_positive",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-macd-positive",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "mama_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -21938,6 +23482,14 @@
    }
   },
   {
+   "from": "mama_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mama-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "mama_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -21968,6 +23520,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "mama_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mama-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "marubozu_bearish_trigger",
@@ -22008,6 +23568,14 @@
    }
   },
   {
+   "from": "marubozu_bearish_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-marubozu-bearish-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "marubozu_bullish_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -22044,6 +23612,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "marubozu_bullish_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-marubozu-bullish-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "mass_reversal_signal",
@@ -22075,6 +23651,14 @@
    }
   },
   {
+   "from": "mass_reversal_signal",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mass-reversal-signal",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "mfi_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -22104,6 +23688,14 @@
    }
   },
   {
+   "from": "mfi_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mfi-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "mfi_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -22131,6 +23723,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "mfi_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mfi-oversold",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "mom_bearish",
@@ -22162,6 +23762,14 @@
    }
   },
   {
+   "from": "mom_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mom-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "mom_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22189,6 +23797,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "mom_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mom-bullish",
+   "to_id": "concept:momentum"
   },
   {
    "from": "mom_cross_down",
@@ -22220,6 +23836,14 @@
    }
   },
   {
+   "from": "mom_cross_down",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mom-cross-down",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "mom_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -22247,6 +23871,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "mom_cross_up",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-mom-cross-up",
+   "to_id": "concept:momentum"
   },
   {
    "from": "morning_star_trigger",
@@ -22281,6 +23913,14 @@
    }
   },
   {
+   "from": "morning_star_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-morning-star-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "multi_tf_trend_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22310,6 +23950,14 @@
    }
   },
   {
+   "from": "multi_tf_trend_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-multi-tf-trend-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "multi_tf_trend_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22337,6 +23985,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "multi_tf_trend_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-multi-tf-trend-bullish",
+   "to_id": "concept:momentum"
   },
   {
    "from": "natr_high_volatility",
@@ -22368,6 +24024,14 @@
    }
   },
   {
+   "from": "natr_high_volatility",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-natr-high-volatility",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "natr_low_volatility",
    "rel": "instance-of",
    "to": "Signal",
@@ -22395,6 +24059,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "natr_low_volatility",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-natr-low-volatility",
+   "to_id": "concept:volatility"
   },
   {
    "from": "nr7_trigger",
@@ -22426,6 +24098,14 @@
    }
   },
   {
+   "from": "nr7_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-nr7-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "nvi_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22458,6 +24138,14 @@
    }
   },
   {
+   "from": "nvi_bearish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-nvi-bearish",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "nvi_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22490,6 +24178,14 @@
    }
   },
   {
+   "from": "nvi_bullish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-nvi-bullish",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "obv_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22519,6 +24215,14 @@
    }
   },
   {
+   "from": "obv_bearish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-obv-bearish",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "obv_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22546,6 +24250,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "obv_bullish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-obv-bullish",
+   "to_id": "concept:flow"
   },
   {
    "from": "outside_bar_trigger",
@@ -22580,6 +24292,14 @@
    }
   },
   {
+   "from": "outside_bar_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-outside-bar-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "piercing_line_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -22618,6 +24338,14 @@
    }
   },
   {
+   "from": "piercing_line_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-piercing-line-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "ppo_bearish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -22650,6 +24378,14 @@
    }
   },
   {
+   "from": "ppo_bearish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ppo-bearish-cross",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "ppo_bullish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -22680,6 +24416,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ppo_bullish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ppo-bullish-cross",
+   "to_id": "concept:momentum"
   },
   {
    "from": "price_above_ema",
@@ -22711,6 +24455,14 @@
    }
   },
   {
+   "from": "price_above_ema",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-price-above-ema",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "pvo_bearish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -22743,6 +24495,14 @@
    }
   },
   {
+   "from": "pvo_bearish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-pvo-bearish-cross",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "pvo_bullish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -22773,6 +24533,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "pvo_bullish_cross",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-pvo-bullish-cross",
+   "to_id": "concept:momentum"
   },
   {
    "from": "reversal_pattern_bearish",
@@ -22851,6 +24619,14 @@
    }
   },
   {
+   "from": "reversal_pattern_bearish",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-reversal-pattern-bearish",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "reversal_pattern_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -22927,6 +24703,14 @@
    }
   },
   {
+   "from": "reversal_pattern_bullish",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-reversal-pattern-bullish",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "roc_momentum_shift",
    "rel": "instance-of",
    "to": "Signal",
@@ -22956,6 +24740,14 @@
    }
   },
   {
+   "from": "roc_momentum_shift",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-roc-momentum-shift",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "roc_negative",
    "rel": "instance-of",
    "to": "Signal",
@@ -22985,6 +24777,14 @@
    }
   },
   {
+   "from": "roc_negative",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-roc-negative",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "roc_positive",
    "rel": "instance-of",
    "to": "Signal",
@@ -23012,6 +24812,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "roc_positive",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-roc-positive",
+   "to_id": "concept:momentum"
   },
   {
    "from": "rsi_bearish_divergence",
@@ -23059,6 +24867,22 @@
    }
   },
   {
+   "from": "rsi_bearish_divergence",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-bearish-divergence",
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "rsi_bearish_divergence",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-bearish-divergence",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "rsi_bullish_divergence",
    "rel": "instance-of",
    "to": "Signal",
@@ -23104,6 +24928,22 @@
    }
   },
   {
+   "from": "rsi_bullish_divergence",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-bullish-divergence",
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "rsi_bullish_divergence",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-bullish-divergence",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "rsi_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -23133,6 +24973,14 @@
    }
   },
   {
+   "from": "rsi_cross_down",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-cross-down",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "rsi_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -23160,6 +25008,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "rsi_cross_up",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-cross-up",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "rsi_hidden_bearish_divergence",
@@ -23207,6 +25063,22 @@
    }
   },
   {
+   "from": "rsi_hidden_bearish_divergence",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-hidden-bearish-divergence",
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "rsi_hidden_bearish_divergence",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-hidden-bearish-divergence",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "rsi_hidden_bullish_divergence",
    "rel": "instance-of",
    "to": "Signal",
@@ -23252,6 +25124,22 @@
    }
   },
   {
+   "from": "rsi_hidden_bullish_divergence",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-hidden-bullish-divergence",
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "rsi_hidden_bullish_divergence",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-hidden-bullish-divergence",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "rsi_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -23281,6 +25169,14 @@
    }
   },
   {
+   "from": "rsi_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "rsi_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -23308,6 +25204,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "rsi_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-oversold",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "shooting_star_trigger",
@@ -23345,6 +25249,14 @@
    }
   },
   {
+   "from": "shooting_star_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-shooting-star-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "sma_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -23372,6 +25284,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "sma_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-sma-cross-down",
+   "to_id": "concept:averaging"
   },
   {
    "from": "sma_cross_up",
@@ -23403,6 +25323,14 @@
    }
   },
   {
+   "from": "sma_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-sma-cross-up",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "sma_crossover",
    "rel": "instance-of",
    "to": "Signal",
@@ -23430,6 +25358,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "sma_crossover",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-sma-crossover",
+   "to_id": "concept:averaging"
   },
   {
    "from": "smma_cross_down",
@@ -23461,6 +25397,14 @@
    }
   },
   {
+   "from": "smma_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-smma-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "smma_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -23488,6 +25432,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "smma_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-smma-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "spinning_top_trigger",
@@ -23526,6 +25478,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "spinning_top_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-spinning-top-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "starc_lower_breakout",
@@ -23557,6 +25517,14 @@
    }
   },
   {
+   "from": "starc_lower_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-starc-lower-breakout",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "starc_upper_breakout",
    "rel": "instance-of",
    "to": "Signal",
@@ -23586,6 +25554,14 @@
    }
   },
   {
+   "from": "starc_upper_breakout",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-starc-upper-breakout",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "stc_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -23615,6 +25591,14 @@
    }
   },
   {
+   "from": "stc_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-stc-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "stc_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -23642,6 +25626,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "stc_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-stc-oversold",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "stoch_overbought",
@@ -23673,6 +25665,14 @@
    }
   },
   {
+   "from": "stoch_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-stoch-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "stoch_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -23702,6 +25702,14 @@
    }
   },
   {
+   "from": "stoch_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-stoch-oversold",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "stochrsi_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -23731,6 +25739,14 @@
    }
   },
   {
+   "from": "stochrsi_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-stochrsi-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "stochrsi_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -23758,6 +25774,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "stochrsi_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-stochrsi-oversold",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "strong_body_recent",
@@ -23798,6 +25822,14 @@
    }
   },
   {
+   "from": "strong_body_recent",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-strong-body-recent",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "t3_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -23827,6 +25859,14 @@
    }
   },
   {
+   "from": "t3_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-t3-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "t3_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -23854,6 +25894,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "t3_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-t3-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "tema_cross_down",
@@ -23885,6 +25933,14 @@
    }
   },
   {
+   "from": "tema_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-tema-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "tema_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -23912,6 +25968,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "tema_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-tema-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "three_black_crows_trigger",
@@ -23946,6 +26010,14 @@
    }
   },
   {
+   "from": "three_black_crows_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-three-black-crows-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "three_inside_down_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -23978,6 +26050,14 @@
    }
   },
   {
+   "from": "three_inside_down_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-three-inside-down-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "three_inside_up_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -24008,6 +26088,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "three_inside_up_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-three-inside-up-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "three_white_soldiers_trigger",
@@ -24042,6 +26130,14 @@
    }
   },
   {
+   "from": "three_white_soldiers_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-three-white-soldiers-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "trima_cross_down",
    "rel": "instance-of",
    "to": "Signal",
@@ -24071,6 +26167,14 @@
    }
   },
   {
+   "from": "trima_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-trima-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "trima_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -24098,6 +26202,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "trima_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-trima-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "trix_bearish",
@@ -24129,6 +26241,14 @@
    }
   },
   {
+   "from": "trix_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-trix-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "trix_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24158,6 +26278,14 @@
    }
   },
   {
+   "from": "trix_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-trix-bullish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "tsi_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24187,6 +26315,14 @@
    }
   },
   {
+   "from": "tsi_bearish",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-tsi-bearish",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "tsi_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24214,6 +26350,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "tsi_bullish",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-tsi-bullish",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "ttm_squeeze_active",
@@ -24243,6 +26387,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "ttm_squeeze_active",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ttm-squeeze-active",
+   "to_id": "concept:volatility"
   },
   {
    "from": "ttm_squeeze_fired_bearish",
@@ -24277,6 +26429,14 @@
    }
   },
   {
+   "from": "ttm_squeeze_fired_bearish",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bearish",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "ttm_squeeze_fired_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24309,6 +26469,14 @@
    }
   },
   {
+   "from": "ttm_squeeze_fired_bullish",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ttm-squeeze-fired-bullish",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "tweezer_bottoms_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -24336,6 +26504,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "tweezer_bottoms_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-tweezer-bottoms-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "tweezer_tops_trigger",
@@ -24367,6 +26543,14 @@
    }
   },
   {
+   "from": "tweezer_tops_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-tweezer-tops-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "two_bar_reversal_bearish_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -24396,6 +26580,14 @@
    }
   },
   {
+   "from": "two_bar_reversal_bearish_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-two-bar-reversal-bearish-trigger",
+   "to_id": "concept:pattern"
+  },
+  {
    "from": "two_bar_reversal_bullish_trigger",
    "rel": "instance-of",
    "to": "Signal",
@@ -24423,6 +26615,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "two_bar_reversal_bullish_trigger",
+   "rel": "about",
+   "to": "pattern",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-two-bar-reversal-bullish-trigger",
+   "to_id": "concept:pattern"
   },
   {
    "from": "ulcer_high_risk",
@@ -24454,6 +26654,14 @@
    }
   },
   {
+   "from": "ulcer_high_risk",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ulcer-high-risk",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "ulcer_low_risk",
    "rel": "instance-of",
    "to": "Signal",
@@ -24483,6 +26691,14 @@
    }
   },
   {
+   "from": "ulcer_low_risk",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ulcer-low-risk",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "uo_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -24512,6 +26728,14 @@
    }
   },
   {
+   "from": "uo_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-uo-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "uo_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -24539,6 +26763,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "uo_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-uo-oversold",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "ve_above_upper",
@@ -24570,6 +26802,14 @@
    }
   },
   {
+   "from": "ve_above_upper",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ve-above-upper",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "ve_below_lower",
    "rel": "instance-of",
    "to": "Signal",
@@ -24599,6 +26839,14 @@
    }
   },
   {
+   "from": "ve_below_lower",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-ve-below-lower",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "vortex_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24631,6 +26879,14 @@
    }
   },
   {
+   "from": "vortex_bearish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vortex-bearish",
+   "to_id": "concept:momentum"
+  },
+  {
    "from": "vortex_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24661,6 +26917,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "vortex_bullish",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vortex-bullish",
+   "to_id": "concept:momentum"
   },
   {
    "from": "vortex_crossover",
@@ -24693,6 +26957,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "vortex_crossover",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vortex-crossover",
+   "to_id": "concept:momentum"
   },
   {
    "from": "vpt_bearish",
@@ -24724,6 +26996,14 @@
    }
   },
   {
+   "from": "vpt_bearish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vpt-bearish",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "vpt_bullish",
    "rel": "instance-of",
    "to": "Signal",
@@ -24753,6 +27033,14 @@
    }
   },
   {
+   "from": "vpt_bullish",
+   "rel": "about",
+   "to": "flow",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vpt-bullish",
+   "to_id": "concept:flow"
+  },
+  {
    "from": "vwap_above",
    "rel": "instance-of",
    "to": "Signal",
@@ -24782,6 +27070,14 @@
    }
   },
   {
+   "from": "vwap_above",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vwap-above",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "vwap_below",
    "rel": "instance-of",
    "to": "Signal",
@@ -24809,6 +27105,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "vwap_below",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vwap-below",
+   "to_id": "concept:averaging"
   },
   {
    "from": "vwma_cross_down",
@@ -24840,6 +27144,14 @@
    }
   },
   {
+   "from": "vwma_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vwma-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "vwma_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -24869,6 +27181,14 @@
    }
   },
   {
+   "from": "vwma_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-vwma-cross-up",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "williams_r_overbought",
    "rel": "instance-of",
    "to": "Signal",
@@ -24898,6 +27218,14 @@
    }
   },
   {
+   "from": "williams_r_overbought",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-williams-r-overbought",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "williams_r_oversold",
    "rel": "instance-of",
    "to": "Signal",
@@ -24925,6 +27253,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "williams_r_oversold",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-williams-r-oversold",
+   "to_id": "concept:oscillator"
   },
   {
    "from": "wma_cross_down",
@@ -24956,6 +27292,14 @@
    }
   },
   {
+   "from": "wma_cross_down",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-wma-cross-down",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "wma_cross_up",
    "rel": "instance-of",
    "to": "Signal",
@@ -24983,6 +27327,14 @@
      "type": "series"
     }
    }
+  },
+  {
+   "from": "wma_cross_up",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-wma-cross-up",
+   "to_id": "concept:averaging"
   },
   {
    "from": "hammer_trigger",
