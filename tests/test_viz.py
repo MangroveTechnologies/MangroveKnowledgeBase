@@ -216,3 +216,31 @@ def test_both_facet_levels_reach_the_draw_calls(page):
     # Exactly the four predicates: nodes gate on `kind` in 2D and 3D, edges on
     # `relation` in 2D and 3D. A count that drifts means a surface was missed or doubled.
     assert page.count("on.kind[") == 2 and page.count("on.rel[") == 2
+
+
+def test_only_exceptional_status_is_ringed_and_selection_grows_outward(page):
+    """A ring on `ratified` is a ring on 301 of 303 nodes -- decoration, not information.
+
+    Dropping the key makes `STATUS[n.status]` undefined for it, so the ring is skipped rather than
+    drawn in the background colour. `draft` and `deprecated` keep theirs, and deprecated is yellow:
+    the signal still runs, it just has a canonical replacement, and red read as broken.
+
+    Selection is drawn at r+2.2 on its own path. A stroke is centred on its path, so stroking the
+    fill circle spent half its width covering the node -- the marker shrank the thing it marked.
+    """
+    assert "const STATUS={draft:'--draft',deprecated:'--dep'};" in page, \
+        "ratified must carry no ring"
+    assert "ratified:'--rat'" not in page
+
+    assert "--dep:var(--warn)" in page and "--warn:#eab308" in page, "deprecated rings are yellow"
+    # Every colour in all three theme states, or the toggle works in one direction only.
+    assert page.count("--warn:#facc15") == 2, "--warn needs a dark value under both dark selectors"
+
+    assert "if(sc){ctx.lineWidth=1.2;" in page, "the status ring should be thin"
+    assert "if(sc){ctx.lineWidth=2;" not in page
+
+    sel = ("if(n===sel||n===hov){ctx.lineWidth=2.4;ctx.strokeStyle=cssv('--ok');"
+           "ctx.beginPath();ctx.arc(n.x,n.y,r+2.2,0,6.2832);ctx.stroke();}")
+    assert sel in page, "selection must be a green ring on its OWN path, outside the fill"
+    assert "if(n===sel||n===hov){ctx.lineWidth=2;ctx.strokeStyle=cssv('--ink');ctx.stroke();}" \
+        not in page, "the old selection stroke reused the fill path and ate the node's area"

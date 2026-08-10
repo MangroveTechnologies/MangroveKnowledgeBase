@@ -84,21 +84,24 @@ BRAND_STYLE = """
     /* the viewer's own names, mapped onto the above */
     --bg:var(--background); --panel:var(--sidebar); --ink:var(--foreground);
     --muted:var(--muted-fg); --line:var(--border); --act:var(--dev-accent);
-    --chip:var(--chip-bg); --rat:var(--ok); --draft:var(--dev-highlight); --dep:var(--bad);
+    /* Deprecation is a caution, not a failure -- the signal still runs, it just has a canonical
+       replacement. Red read as "broken". Yellow, and dark enough to stay legible on white. */
+    --warn:#eab308;
+    --chip:var(--chip-bg); --rat:var(--ok); --draft:var(--dev-highlight); --dep:var(--warn);
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --background:#0a0a0a; --foreground:#fafafa;
       --sidebar:#171717; --card:#171717;
       --muted-fg:#a1a1a1; --border:#262626; --chip-bg:#262626;
-      --ok:#00bc7d; --bad:#ff6467;
+      --ok:#00bc7d; --bad:#ff6467; --warn:#facc15;
     }
   }
   :root[data-theme="dark"]{
     --background:#0a0a0a; --foreground:#fafafa;
     --sidebar:#171717; --card:#171717;
     --muted-fg:#a1a1a1; --border:#262626; --chip-bg:#262626;
-    --ok:#00bc7d; --bad:#ff6467;
+    --ok:#00bc7d; --bad:#ff6467; --warn:#facc15;
   }
   html,body{font-family:Geist,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
             "Helvetica Neue",Arial,sans-serif}
@@ -397,7 +400,8 @@ FACETS = """
       el.textContent = 'Shades group with their parent: the darker teal is indicators inside '
                      + 'Procedure, the darker blue is has-role inside descriptive. '
                      + 'Solid arrow = ordering relation (DAG). Dashed = free / fringe. '
-                     + 'Ring colour = status: green ratified, red deprecated.';
+                     + 'Green ring = selected. Yellow ring = deprecated; ratified is unmarked, '
+                     + 'because 301 of 303 nodes are.';
     }
   });
 })();
@@ -983,6 +987,20 @@ def main() -> int:
          ".nodeColor(n=>(window.KC&&window.KC[n.kind])||PC[n.primitive||'null'])"),
         (".linkColor(e=>CC[e.category||'null'])",
          ".linkColor(e=>(window.RC&&window.RC[e.relation])||CC[e.category||'null'])"),
+        # A ring on `ratified` is a ring on 301 of 303 nodes -- noise, not signal. Dropping the key
+        # makes STATUS[n.status] undefined for it, so the ring is skipped entirely and only the
+        # exceptions are marked. `draft` and `deprecated` keep theirs.
+        ("const STATUS={ratified:'--rat',draft:'--draft',deprecated:'--dep'};",
+         "const STATUS={draft:'--draft',deprecated:'--dep'};"),
+        ("const sc=STATUS[n.status];if(sc){ctx.lineWidth=2;",
+         "const sc=STATUS[n.status];if(sc){ctx.lineWidth=1.2;"),
+        # Selection is drawn OUTSIDE the node, not on its edge. A stroke is centred on its path, so
+        # stroking the fill circle at width 2 spent half that width covering the node -- the marker
+        # shrank what it was marking. At r+2.2 the whole ring sits clear of the fill, so a selected
+        # node is the same size as an unselected one with a halo added.
+        ("if(n===sel||n===hov){ctx.lineWidth=2;ctx.strokeStyle=cssv('--ink');ctx.stroke();}",
+         "if(n===sel||n===hov){ctx.lineWidth=2.4;ctx.strokeStyle=cssv('--ok');"
+         "ctx.beginPath();ctx.arc(n.x,n.y,r+2.2,0,6.2832);ctx.stroke();}"),
     ):
         if page.count(old) != 1:
             sys.exit(f"expected exactly one {old!r} in the viewer script, found {page.count(old)}; "
