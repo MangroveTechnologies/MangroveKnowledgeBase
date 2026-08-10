@@ -31,9 +31,9 @@ def guide():
     return GUIDE.read_text()
 
 
-def test_guide_exists_and_covers_ten_use_cases(guide):
+def test_guide_exists_and_covers_thirteen_use_cases(guide):
     headings = re.findall(r"^## (\d+)\. ", guide, re.M)
-    assert headings == [str(i) for i in range(1, 11)], f"expected use cases 1-10, found {headings}"
+    assert headings == [str(i) for i in range(1, 14)], f"expected use cases 1-13, found {headings}"
 
 
 def test_uc1_orientation_values(kg, guide):
@@ -157,3 +157,65 @@ def test_every_documented_example_actually_runs():
                 raise AssertionError(f"{doc.name} block {i} raised {type(e).__name__}: {e}\n{block}")
             ran += 1
     assert ran >= 20, f"expected the docs to carry runnable examples, found {ran}"
+
+
+def test_uc11_resolve_and_recover(kg, guide):
+    from mangrove_kb.graph import NodeNotFound
+
+    assert kg.resolve("rsi_oversold") == "procedure:signal-rsi-oversold"
+    assert kg.resolve("RSI") == "procedure:indicator-rsi"
+    assert kg.resolve("bollinger") == "procedure:indicator-bollingerbands"
+
+    with pytest.raises(NodeNotFound) as e:
+        kg.resolve("rsi_over")
+    assert set(e.value.suggestions) >= {"procedure:signal-rsi-overbought",
+                                        "procedure:signal-rsi-oversold"}
+    for s in e.value.suggestions[:2]:
+        assert s in guide, f"guide quotes suggestions that no longer come back: {s}"
+
+    with pytest.raises(NodeNotFound):
+        kg.resolve("rsi oversold")          # a phrase matches nothing; the guide says so
+
+    # The guide warns the first hit is not necessarily the intended one.
+    assert kg.find("oversold").items[0]["id"] == "procedure:signal-cci-oversold"
+
+
+def test_uc12_graph_to_evaluation(kg, guide):
+    """The join the whole loop rests on: a node's `name` IS the registered signal name."""
+    from mangrove_kb import RuleRegistry, sample_ohlcv
+    import mangrove_kb.signals.momentum, mangrove_kb.signals.volatility  # noqa: F401
+
+    t = kg.get(kg.find(kind="momentum", role="trigger", limit=None).items[0]["id"])
+    f = kg.get(kg.find(kind="volatility", role="filter", limit=None).items[0]["id"])
+    assert (t["name"], f["name"]) == ("adosc_cross_down", "atr_high_volatility")
+    assert t["name"] in guide and f["name"] in guide
+    assert sorted(set(t["inputs"]) | set(f["inputs"])) == ["close", "high", "low", "volume"]
+    assert (t["warmup_bars"], f["warmup_bars"]) == ("slow + 1", "window - 1")
+
+    shared = ({n["id"] for n in kg.neighbors(t["id"], relation="uses", direction="out")}
+              & {n["id"] for n in kg.neighbors(f["id"], relation="uses", direction="out")})
+    assert not shared, "the guide says these two are independent"
+
+    df = sample_ohlcv()
+    assert RuleRegistry.evaluate({"name": t["name"], "params": {"fast": 3, "slow": 10}}, df) is True
+    assert RuleRegistry.evaluate({"name": f["name"],
+                                  "params": {"window": 14, "threshold_pct": 3.0}}, df) is True
+
+    sg = kg.subgraph(t["id"], radius=1)
+    assert (len(sg["nodes"]), len(sg["edges"])) == (4, 3), "the guide prints 4 nodes, 3 edges"
+
+
+def test_uc13_usage_example_runs_as_printed(kg, guide):
+    """`usage_example` is advertised as copy-pasteable, so it has to be."""
+    from mangrove_kb import sample_ohlcv
+    import mangrove_kb.indicators as indicators
+
+    df = sample_ohlcv()
+    for node_id in ("procedure:indicator-rsi", "procedure:indicator-adx"):
+        example = kg.get(node_id)["usage_example"]
+        assert example in guide, f"the guide quotes a usage_example that changed: {example}"
+        # `value` is a placeholder -- substitute the declared default, then run it verbatim.
+        default = kg.get(node_id)["params"]["window"]["default"]
+        runnable = example.replace("'window': value", f"'window': {default}")
+        out = eval(runnable, {"df": df, **vars(indicators)})           # noqa: S307
+        assert out, f"{node_id} usage_example produced nothing"

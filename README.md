@@ -54,7 +54,7 @@ how, and both are installed alongside the package at `mangrove_kb/skills/knowled
 
 - **[SKILL.md](skills/knowledge-graph/SKILL.md)** -- which call answers which question, and the rules
   of use. Written for an agent to load.
-- **[GUIDE.md](skills/knowledge-graph/GUIDE.md)** -- ten worked tasks end to end, with real output
+- **[GUIDE.md](skills/knowledge-graph/GUIDE.md)** -- thirteen worked tasks end to end, with real output
   and the trap in each.
 
 The seven classes: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern`,

@@ -1,6 +1,6 @@
 # Agent guide: using the knowledge graph
 
-Ten tasks an agent actually gets asked to do with this library, and how to do each one with
+Thirteen tasks an agent actually gets asked to do with this library, and how to do each one with
 `mangrove_kb.graph`. Every call here was executed against the committed graph; the outputs are real.
 
 The skill (`SKILL.md`, beside this file) is the reference for *which call*. This is the
@@ -325,6 +325,177 @@ a node you already suspect; this is the sweep that finds the ones you did not.
 `GraphError` naming the seven real columns, not a quiet zero you would read as "nothing needs it".
 
 ---
+
+---
+
+---
+
+## 11. Turn what the user said into a node
+
+**Someone says:** *"is there an rsi oversold signal?"*
+
+They gave you a name, not a node id. Every use case above starts from an id like
+`procedure:signal-rsi-oversold`, and nothing hands you one — you have to get there first.
+
+```python
+kg.resolve("rsi_oversold")     # exact function name
+kg.resolve("RSI")              # or an indicator name
+kg.resolve("bollinger")        # or an unambiguous fragment
+```
+
+```
+procedure:signal-rsi-oversold
+procedure:indicator-rsi
+procedure:indicator-bollingerbands
+```
+
+`resolve` takes an id, a name, or any fragment that matches exactly one node. When the fragment
+matches several, it does not pick one — it raises and hands you the candidates:
+
+```python
+from mangrove_kb.graph import NodeNotFound
+
+try:
+    kg.resolve("rsi_over")
+except NodeNotFound as e:
+    print(e.suggestions)
+```
+
+```
+['procedure:signal-rsi-overbought', 'procedure:signal-rsi-oversold',
+ 'procedure:signal-stochrsi-overbought', 'procedure:signal-stochrsi-oversold']
+```
+
+**That message is the next step, not a failure.** Catch it and either pick from `e.suggestions` or
+show them to the user. The one case it cannot help with is a phrase — `resolve("rsi oversold")` with
+a space matches nothing, because no node is named that. Fall back to search:
+
+```python
+def lookup(words):
+    """Whatever the user typed -> a node, or a shortlist to ask them about."""
+    try:
+        return kg.get(words)
+    except NodeNotFound as e:
+        if e.suggestions:
+            return kg.get(e.suggestions[0])
+        return kg.find(words)               # phrases, typos, descriptions
+
+lookup("rsi_oversold")["id"]                # 'procedure:signal-rsi-oversold'
+lookup("rsi_over")["id"]                    # 'procedure:signal-rsi-overbought' -- first suggestion
+[r["id"] for r in lookup("rsi oversold")]   # a phrase falls through to find()
+```
+
+**Trap:** `find("oversold")` ranks by *where* the term matched, and `cci_oversold` sorts before
+`rsi_oversold` because rank ties break on id alphabetically. If the user named an indicator too,
+filter on it — `kg.find("oversold", kind="oscillator")` — or resolve the indicator first and look at
+what reads it. Do not assume the first hit is the one they meant.
+
+---
+
+## 12. Go from the graph to an answer about live data
+
+**Someone says:** *"set me up a momentum entry with a volatility filter, and tell me whether it fires
+right now."*
+
+Every use case up to here stops at a query result. This is the one that closes the loop: the graph
+names a function, and the same package runs it.
+
+```python
+trigger = kg.find(kind="momentum",   role="trigger", limit=None).items[0]
+filt    = kg.find(kind="volatility", role="filter",  limit=None).items[0]
+
+t, f = kg.get(trigger["id"]), kg.get(filt["id"])
+sorted(set(t["inputs"]) | set(f["inputs"]))     # the columns your data must have
+t["warmup_bars"], f["warmup_bars"]              # expressions in each one's own params
+```
+
+```
+trigger  procedure:signal-adosc-cross-down     filter  procedure:signal-atr-high-volatility
+inputs   ['close', 'high', 'low', 'volume']
+warmup   'slow + 1'  /  'window - 1'
+```
+
+Check they are not the same bet wearing two hats — two signals reading one indicator are not
+independent confirmation:
+
+```python
+set(n["id"] for n in kg.neighbors(t["id"], relation="uses", direction="out")) \
+    & set(n["id"] for n in kg.neighbors(f["id"], relation="uses", direction="out"))
+# set()  -- adosc and atr, genuinely independent
+```
+
+Now run them. **The node\'s `name` is the registered signal name** — that is the join between the
+graph and the code:
+
+```python
+from mangrove_kb import RuleRegistry, sample_ohlcv
+
+df = sample_ohlcv()          # or your own frame with those columns
+fired = RuleRegistry.evaluate({"name": t["name"], "params": {"fast": 3, "slow": 10}}, df)
+gated = RuleRegistry.evaluate({"name": f["name"], "params": {"window": 14, "threshold_pct": 3.0}}, df)
+fired and gated
+```
+
+```
+adosc_cross_down     True
+atr_high_volatility  True
+composed             True
+```
+
+So the answer to the user is: *yes — `adosc_cross_down` fired and `atr_high_volatility` confirms the
+regime, on 200 bars where both needed at most 13.*
+
+Want the shape rather than the list, to explain the setup? `subgraph` returns the neighbourhood and
+every edge inside it:
+
+```python
+kg.subgraph(t["id"], radius=1)
+# 4 nodes, 3 edges:
+#   concept:signal, procedure:indicator-adosc,
+#   procedure:signal-adosc-cross-down, property:role-trigger
+```
+
+**Trap:** `RuleRegistry.evaluate` needs the signal\'s module imported before the name is registered.
+`from mangrove_kb.signals import momentum, volatility` (or whichever class the graph gave you — the
+module is named for it) before evaluating, or you get `Unknown rule name`.
+
+---
+
+## 13. Compute an indicator the graph told you about
+
+**Someone says:** *"can I plot RSI and ADX on one panel? show me the current values."*
+
+Use case 6 answered the first half from `units` and `range`. The second half needs the indicator
+actually run, and the node carries a copy-pasteable call:
+
+```python
+kg.get("procedure:indicator-rsi")["usage_example"]
+kg.get("procedure:indicator-adx")["usage_example"]
+```
+
+```
+RSI.compute(data={'close': df['close']}, params={'window': value})
+ADX.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})
+```
+
+Substitute your params and run it:
+
+```python
+from mangrove_kb.indicators import RSI, ADX
+
+rsi = RSI.compute(data={"close": df["close"]}, params={"window": 14})["rsi"]
+adx = ADX.compute(data={"high": df["high"], "low": df["low"], "close": df["close"]},
+                  params={"window": 14})["adx"]
+rsi.iloc[-1], adx.iloc[-1]
+```
+
+```
+rsi  25.72      adx  63.05
+both dimensionless on [0, 100]  ->  one panel is fine
+```
+
+**Trap:** `usage_example` writes `params={'window': value}` — `value` is a placeholder, not a
+default. The real defaults are in `kg.get(id)["params"]`, with `min` and `max` beside them.
 
 ---
 

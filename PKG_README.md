@@ -172,7 +172,7 @@ kg.path("procedure:signal-adosc-bearish", "concept:indicator-class-momentum")   
 
 - **[SKILL.md](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/skills/knowledge-graph/SKILL.md)** -- which call answers which question, and
   the rules of use (results are capped and say so; roles are never types)
-- **[GUIDE.md](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/skills/knowledge-graph/GUIDE.md)** -- ten worked tasks end to end, with real
+- **[GUIDE.md](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/skills/knowledge-graph/GUIDE.md)** -- thirteen worked tasks end to end, with real
   output and the trap in each
 
 If you are an agent, load `SKILL.md` -- it is written for you.

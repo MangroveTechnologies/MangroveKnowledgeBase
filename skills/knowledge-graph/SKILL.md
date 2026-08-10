@@ -78,6 +78,7 @@ kg.find(role="filter")                       # signals playing the filter part
 
 | question | call |
 |---|---|
+| the user gave me a name, not an id | `resolve("rsi_oversold")`, or `get()` which resolves too |
 | what is in here at all? | `stats()` — always first |
 | what shapes can I even ask for? | `schema()` |
 | is there already a signal/indicator for X? | `find("keyword")` |
@@ -91,6 +92,7 @@ kg.find(role="filter")                       # signals playing the filter part
 | what breaks if I change this? | `neighbors(id, direction="in")`, then widen with `subgraph` |
 | the neighbourhood around something | `subgraph(id, radius=1)` |
 | how are these two related? | `path(a, b)` |
+| now actually run what I found | `RuleRegistry.evaluate({"name": node["name"], ...}, df)` |
 
 `neighbors` takes `category=` as well as `relation=`, so you can follow every `structural` edge
 without naming each one — useful when you want "how is this classified" regardless of which
@@ -184,6 +186,19 @@ sig["params"]                         # {'window': {...}, 'threshold': {...}} �
 sig["warmup_bars"]                    # 'window' — an EXPRESSION in those params, evaluate it yourself
 kg.neighbors(sig["id"], relation="uses", direction="out")          # the indicators beneath it
 ```
+
+**"Take what I found and run it."**
+
+```python
+from mangrove_kb import RuleRegistry, sample_ohlcv
+from mangrove_kb.signals import momentum            # import the class module to register it
+
+node = kg.get("procedure:signal-adosc-cross-down")
+RuleRegistry.evaluate({"name": node["name"], "params": {"fast": 3, "slow": 10}}, sample_ohlcv())
+```
+
+A node's `name` **is** the registered signal name — that is the join between the graph and the code,
+and it is what makes this a map of a runnable library rather than an encyclopedia.
 
 **"How is this signal connected to that class?"**
 

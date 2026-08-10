@@ -27,6 +27,7 @@ change lands **last**, immediately before undrafting.
 3b  query coverage: text + attributes     DONE
 4   graph + skills into the wheel         DONE
 4b  OHLCV column case: lowercase          DONE
+4c  discoverability + guide use cases     DONE
 5   MCP rewrite                           NEXT? — deferred by owner, kb_server gets overhauled
 6   viz for the public repo               BLOCKED — jarvis-viewer licence call
 7   LICENSE change, then undraft #105     LAST
