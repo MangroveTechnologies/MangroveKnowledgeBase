@@ -57,12 +57,32 @@ filter also accepts the short name (`"momentum"`). Both work; the ids are what y
 
 **Task:** "Add a signal that fires when RSI diverges from price."
 
-The expensive failure is writing a duplicate. Two searches, cheap:
+The expensive failure is writing a duplicate. They named two things — a word (*divergence*) and an
+indicator (*RSI*) — so ask about both. Three searches, cheap:
 
 ```python
-kg.find("divergence")                        # by the word they used
-kg.find(kind="oscillator", role="trigger")   # by what it is and how it is used
+kg.neighbors(kg.resolve("RSI"), relation="uses", direction="in", limit=None)  # what is built on RSI
+kg.find("divergence")                                                        # the word they used
+kg.find(kind="oscillator", role="trigger")                                   # what it is + how it is used
 ```
+
+**Start with the indicator.** Everything built on RSI is one hop away, and the hop is exact — nothing
+ranked, nothing guessed:
+
+```
+8 signals read RSI
+  procedure:signal-rsi-bearish-divergence          <- the four divergences
+  procedure:signal-rsi-bullish-divergence
+  procedure:signal-rsi-hidden-bearish-divergence
+  procedure:signal-rsi-hidden-bullish-divergence
+  procedure:signal-rsi-cross-down                  procedure:signal-rsi-overbought
+  procedure:signal-rsi-cross-up                    procedure:signal-rsi-oversold
+```
+
+That already answers it: four RSI divergence signals exist. Do not write a fifth.
+
+Text search is the wider net, for when they did *not* name an indicator, or named one you do not
+have:
 
 ```
 find("divergence") -> 37 matches, name matches first
@@ -76,34 +96,14 @@ find("divergence") -> 37 matches, name matches first
   procedure:indicator-swingdelta
 ```
 
-So yes, it exists — four of them. Do not write a fifth.
-
 Results are ranked by *where* the query matched: name, then abbreviation, then summary, then the
 authored detail (formula, interpretation, applications, and the names and descriptions of inputs,
 params and outputs). The thing actually called "divergence" comes before things that merely mention
 it, so the long tail costs you nothing — read down until the matches stop being about your term.
 
-They also named an indicator, so ask it directly — everything built on RSI is one hop away, and this
-is the search that settles it:
-
-```python
-kg.neighbors(kg.resolve("RSI"), relation="uses", direction="in", limit=None)
-```
-
-```
-8 signals read RSI
-  procedure:signal-rsi-bearish-divergence          <- the four divergences
-  procedure:signal-rsi-bullish-divergence
-  procedure:signal-rsi-hidden-bearish-divergence
-  procedure:signal-rsi-hidden-bullish-divergence
-  procedure:signal-rsi-cross-down                  procedure:signal-rsi-overbought
-  procedure:signal-rsi-cross-up                    procedure:signal-rsi-oversold
-```
-
-That is the whole answer to "does an RSI divergence signal exist" — eight signals read RSI, four of
-them are divergences, and nothing was ranked or guessed. Prefer this shape whenever the request names
-an indicator: text search finds things that *mention* a word, `neighbors` finds things that *use* the
-computation.
+**The rule worth carrying:** text search finds things that *mention* a word; `neighbors` finds things
+that *use* the computation. When the request names an indicator, the second one is the answer and the
+first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
