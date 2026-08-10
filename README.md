@@ -23,8 +23,8 @@ Whether you're a quant who can improve an RSI calculation, a trader who spots a 
 
 MangroveKnowledgeBase is a standalone repository providing:
 
-- **247 trading signal functions** (117 TRIGGER, 130 FILTER), in files named for the ontology class of the indicator each one reads: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern` -- plus `onchain` and `defi_pro`, which read provider feeds rather than price
-- **70 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
+- **249 trading signal functions** (119 TRIGGER, 130 FILTER), in files named for the ontology class of the indicator each one reads: `averaging`, `momentum`, `oscillator`, `volatility`, `flow`, `pattern` -- plus `onchain` and `defi_pro`, which read provider feeds rather than price
+- **80 technical indicator classes** with a stateless `compute()` API (including 27 candlestick/multi-bar pattern indicators)
 - **A signal/indicator knowledge graph** -- 303 nodes and 755 edges giving every indicator a class and every signal a machine-readable formula, verified by execution against real market data
 - **A unified server** with dual protocol access (REST API + MCP) serving 11 trading education documents with full-text search, signal/indicator metadata (free), and signal evaluation/indicator computation (x402 gated)
 - **Self-describing metadata** -- every signal carries its type, required data columns, and parameter ranges directly in its docstring
@@ -71,7 +71,7 @@ to the signal. The originals are kept, deprecated, and still work.
 
 ### What is NOT in the graph, and why
 
-Of 247 registered signals, **216 are modelled**. The other 31 are accounted for:
+Of 249 registered signals, **218 are modelled**. The other 31 are accounted for:
 
 | | n | reason |
 |---|---|---|

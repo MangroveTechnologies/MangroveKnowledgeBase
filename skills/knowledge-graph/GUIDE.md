@@ -60,7 +60,7 @@ filter also accepts the short name (`"momentum"`). Both work; the ids are what y
 The expensive failure is writing a duplicate. Two searches, cheap:
 
 ```python
-kg.find("divergence")                    # by name, summary, abbreviation
+kg.find("divergence")                        # by the word they used
 kg.find(kind="oscillator", role="trigger")   # by what it is and how it is used
 ```
 
@@ -82,6 +82,28 @@ Results are ranked by *where* the query matched: name, then abbreviation, then s
 authored detail (formula, interpretation, applications, and the names and descriptions of inputs,
 params and outputs). The thing actually called "divergence" comes before things that merely mention
 it, so the long tail costs you nothing — read down until the matches stop being about your term.
+
+They also named an indicator, so ask it directly — everything built on RSI is one hop away, and this
+is the search that settles it:
+
+```python
+kg.neighbors(kg.resolve("RSI"), relation="uses", direction="in", limit=None)
+```
+
+```
+8 signals read RSI
+  procedure:signal-rsi-bearish-divergence          <- the four divergences
+  procedure:signal-rsi-bullish-divergence
+  procedure:signal-rsi-hidden-bearish-divergence
+  procedure:signal-rsi-hidden-bullish-divergence
+  procedure:signal-rsi-cross-down                  procedure:signal-rsi-overbought
+  procedure:signal-rsi-cross-up                    procedure:signal-rsi-oversold
+```
+
+That is the whole answer to "does an RSI divergence signal exist" — eight signals read RSI, four of
+them are divergences, and nothing was ranked or guessed. Prefer this shape whenever the request names
+an indicator: text search finds things that *mention* a word, `neighbors` finds things that *use* the
+computation.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
@@ -165,7 +187,7 @@ kg.neighbors(sig["id"], relation="uses", direction="out")   # the indicators ben
 params       {'window':    {'type': 'int',   'default': 14,   'min': 2,   'max': 100},
               'threshold': {'type': 'float', 'default': 30.0, 'min': 0.0, 'max': 50.0}}
 warmup_bars  'window'
-inputs       ['close']
+inputs       {'close': {'type': 'series', 'description': 'closing price'}}
 uses         ['procedure:indicator-rsi']
 ```
 
@@ -182,7 +204,7 @@ meaningless.
 **Task:** "Can I put RSI and ADX on the same axis?"
 
 ```python
-for ind in ("procedure:indicator-rsi", "procedure:indicator-adx"):
+for ind in ("procedure:indicator-rsi", "procedure:indicator-adx", "procedure:indicator-obv"):
     for name, spec in kg.get(ind)["outputs"].items():
         print(ind, name, spec["units"], spec["range"])
 ```

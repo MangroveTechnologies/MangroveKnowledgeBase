@@ -23,6 +23,10 @@ from mangrove_kb.graph import KnowledgeGraph
 kg = KnowledgeGraph.load()
 ```
 
+This file is the reference for **which call**. [`GUIDE.md`](GUIDE.md), beside it, is the reference for
+**what a whole job looks like** — thirteen tasks end to end, with real output and the trap in each,
+from "the user said a name, not an id" through to running what you found.
+
 ## Start here
 
 ```python

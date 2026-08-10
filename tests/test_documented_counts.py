@@ -22,7 +22,9 @@ generating them needs either templating markers in every sentence (unreadable in
 rewriting of prose (which will eventually corrupt a sentence). A guard needs neither and catches the
 same drift at the same moment.
 """
+import inspect
 import re
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -34,12 +36,41 @@ REPO = Path(__file__).resolve().parent.parent
 
 @pytest.fixture(scope="module")
 def counts():
+    """Graph counts AND library counts -- the two are different and both get quoted.
+
+    The graph holds what is *modelled* (71 indicators, 218 signals); the library ships more than it
+    models (249 registered signals, 80 indicator classes). Documents quote both, and quoting the
+    wrong denominator is how README came to claim 247/70 and PKG_README 223/99 while SKILL.md --
+    the only one previously guarded -- was right.
+    """
+    import importlib
+
+    from mangrove_kb import indicators
+    from mangrove_kb.registry import RuleRegistry
+
+    for module in ("averaging", "flow", "momentum", "oscillator", "pattern", "trend",
+                   "volatility", "onchain", "defi_pro"):
+        importlib.import_module(f"mangrove_kb.signals.{module}")
+
     kg = KnowledgeGraph.load()
+    registered = RuleRegistry.names()
+    types = Counter()
+    for name in registered:
+        doc = inspect.getdoc(RuleRegistry._registry[name]) or ""
+        m = re.search(r"^Type:\s*(.+)$", doc, re.M)
+        if m:
+            types[m.group(1).strip()] += 1
+
     return {
         "nodes": len(kg.nodes),
         "edges": len(kg.edges),
         "indicators": sum(1 for n in kg.nodes if n.startswith("procedure:indicator-")),
         "signals": sum(1 for n in kg.nodes if n.startswith("procedure:signal-")),
+        "registered_signals": len(registered),
+        "indicator_classes": sum(1 for c in vars(indicators).values()
+                                 if isinstance(c, type) and hasattr(c, "_outputs")),
+        "triggers": types["TRIGGER"],
+        "filters": types["FILTER"],
     }
 
 
@@ -67,6 +98,16 @@ CLAIMS = [
     ("skills/knowledge-graph/GUIDE.md", r's\["edges"\]\s+# (\d+), [\d,]+', "nodes"),
     ("skills/knowledge-graph/GUIDE.md", r's\["edges"\]\s+# [\d,]+, (\d+)', "edges"),
     ("skills/knowledge-graph/GUIDE.md", r"only 2 of (\d+) nodes",         "nodes"),
+    # The library-wide headline numbers. README claimed 247/70 and PKG_README 223/99 against a
+    # real 249/80 -- three documents, three different answers, none of them guarded.
+    ("README.md",      r"\*\*(\d+) trading signal functions\*\*",    "registered_signals"),
+    ("README.md",      r"functions\*\* \((\d+) TRIGGER",              "triggers"),
+    ("README.md",      r"TRIGGER, (\d+) FILTER",                       "filters"),
+    ("README.md",      r"\*\*(\d+) technical indicator classes\*\*", "indicator_classes"),
+    ("README.md",      r"Of (\d+) registered signals",                 "registered_signals"),
+    ("README.md",      r"registered signals, \*\*(\d+) are modelled",  "signals"),
+    ("PKG_README.md",  r"\*\*(\d+) trading signals\*\*",             "registered_signals"),
+    ("PKG_README.md",  r"\*\*(\d+) technical indicators\*\*",        "indicator_classes"),
     # STATUS.md states what is true NOW, which is exactly the kind of claim that rots first.
     ("STATUS.md",                      r"graph\s+(\d+) atoms, [\d,]+ relations", "nodes"),
     ("STATUS.md",                      r"graph\s+[\d,]+ atoms, (\d+) relations", "edges"),

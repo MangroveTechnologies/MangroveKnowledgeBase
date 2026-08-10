@@ -60,3 +60,43 @@ def test_the_pypi_graph_snippet_runs(pkg_readme):
     block = next(b for b in re.findall(r"```python\n(.*?)```", pkg_readme, re.S)
                  if "KnowledgeGraph" in b)
     exec(compile(block, "PKG_README.md", "exec"), {})
+
+
+DOCS = ("README.md", "PKG_README.md", SKILL, GUIDE)
+
+
+def test_the_four_documents_reference_each_other():
+    """SKILL.md linked nothing, so an agent that loaded only the skill never learned the guide
+    existed. Each document must point at the others a reader would need next."""
+    text = {d: (REPO / d).read_text() for d in DOCS}
+    expected = {
+        "README.md":     [SKILL, GUIDE],
+        "PKG_README.md": [SKILL, GUIDE],
+        SKILL:           [GUIDE],
+        GUIDE:           [SKILL],
+    }
+    for doc, targets in expected.items():
+        for t in targets:
+            name = Path(t).name
+            assert t in text[doc] or name in text[doc], f"{doc} does not reference {name}"
+
+
+def _prose_only(text: str) -> str:
+    """Documents with the fences stripped.
+
+    A worked example prints its own numbers -- `# 4 nodes, 3 edges` for a radius-1 subgraph -- and
+    those are not claims about the graph's size. Only prose is.
+    """
+    return re.sub(r"```.*?```", "", text, flags=re.S)
+
+
+def test_the_documents_do_not_contradict_each_other_on_the_graph_size():
+    """Three documents once gave three different signal counts. Whatever they quote must agree."""
+    sizes = {}
+    for d in DOCS:
+        found = set(re.findall(r"(\d+) nodes(?:,| and) [\d,]+ edges", _prose_only((REPO / d).read_text())))
+        if found:
+            sizes[d] = found
+    assert len(sizes) >= 3, f"only {sorted(sizes)} state the graph size"
+    everything = set().union(*sizes.values())
+    assert len(everything) == 1, f"documents disagree on node count: {sizes}"
