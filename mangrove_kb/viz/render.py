@@ -20,6 +20,7 @@ repository's when run from a checkout. Point `MANGROVE_KB_ONTOLOGY` at a file to
 """
 from __future__ import annotations
 
+import base64
 import json
 import os
 import sys
@@ -69,11 +70,16 @@ GRAPH = _locate_graph()
 BRAND_STYLE = """
 <style>
   :root{
-    --background:oklch(1 0 0); --foreground:oklch(0.145 0 0);
-    --sidebar:oklch(0.985 0 0); --card:oklch(1 0 0);
-    --muted-fg:oklch(0.556 0 0); --border:oklch(0.922 0 0); --chip-bg:oklch(0.97 0 0);
+    /* The platform authors these in OKLCH. They are written here as their exact sRGB hex, because
+       the 3D view hands `--bg` straight to three.js, whose colour parser understands hex/rgb/hsl
+       and NOT oklch -- an unparseable value threw inside the bundle and the entire WebGL scene
+       stopped rendering while the DOM labels kept drawing, so the graph looked like floating text.
+       Converted, not eyeballed: oklch(0.145 0 0) is #0a0a0a. */
+    --background:#ffffff; --foreground:#0a0a0a;
+    --sidebar:#fafafa; --card:#ffffff;
+    --muted-fg:#737373; --border:#e5e5e5; --chip-bg:#f5f5f5;
     --dev-accent:#42a7c6; --dev-highlight:#ff9e18;
-    --ok:oklch(0.627 0.194 149.214); --bad:oklch(0.577 0.245 27.325);
+    --ok:#00a63e; --bad:#e7000b;
     --radius:0.625rem;
     /* the viewer's own names, mapped onto the above */
     --bg:var(--background); --panel:var(--sidebar); --ink:var(--foreground);
@@ -82,17 +88,17 @@ BRAND_STYLE = """
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
-      --background:oklch(0.145 0 0); --foreground:oklch(0.985 0 0);
-      --sidebar:oklch(0.205 0 0); --card:oklch(0.205 0 0);
-      --muted-fg:oklch(0.708 0 0); --border:oklch(0.269 0 0); --chip-bg:oklch(0.269 0 0);
-      --ok:oklch(0.696 0.17 162.48); --bad:oklch(0.704 0.191 22.216);
+      --background:#0a0a0a; --foreground:#fafafa;
+      --sidebar:#171717; --card:#171717;
+      --muted-fg:#a1a1a1; --border:#262626; --chip-bg:#262626;
+      --ok:#00bc7d; --bad:#ff6467;
     }
   }
   :root[data-theme="dark"]{
-    --background:oklch(0.145 0 0); --foreground:oklch(0.985 0 0);
-    --sidebar:oklch(0.205 0 0); --card:oklch(0.205 0 0);
-    --muted-fg:oklch(0.708 0 0); --border:oklch(0.269 0 0); --chip-bg:oklch(0.269 0 0);
-    --ok:oklch(0.696 0.17 162.48); --bad:oklch(0.704 0.191 22.216);
+    --background:#0a0a0a; --foreground:#fafafa;
+    --sidebar:#171717; --card:#171717;
+    --muted-fg:#a1a1a1; --border:#262626; --chip-bg:#262626;
+    --ok:#00bc7d; --bad:#ff6467;
   }
   html,body{font-family:Geist,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
             "Helvetica Neue",Arial,sans-serif}
@@ -107,7 +113,19 @@ BRAND_STYLE = """
             border-bottom:1px solid var(--line);background:var(--panel)}
   #brandbar .wordmark{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px;
                       letter-spacing:-0.01em;color:var(--ink)}
-  #brandbar .wordmark svg{display:block}
+  #brandbar .logo{display:block;height:22px;width:auto}
+  /* Which wordmark shows follows the SAME three-state rule as the palette: a base rule, a guarded
+     media query, and an explicit-attribute rule. Driving it from one media query alone would leave
+     the toggle showing the wrong logo. */
+  #brandbar .dark-only{display:none}
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]) #brandbar .light-only{display:none}
+    :root:not([data-theme="light"]) #brandbar .dark-only{display:block}
+  }
+  :root[data-theme="dark"] #brandbar .light-only{display:none}
+  :root[data-theme="dark"] #brandbar .dark-only{display:block}
+  :root[data-theme="light"] #brandbar .light-only{display:block}
+  :root[data-theme="light"] #brandbar .dark-only{display:none}
   #brandbar .tag{color:var(--muted);font-size:12px;font-weight:400}
   #brandbar .spacer{flex:1}
   #themesel{display:inline-flex;border:1px solid var(--line);border-radius:calc(var(--radius) - 2px);
@@ -119,16 +137,29 @@ BRAND_STYLE = """
 </style>
 """
 
+def _logo_data_uri(filename: str) -> str:
+    """The shipped Mangrove wordmark, inlined as a data URI.
+
+    A data URI rather than an inline <svg>: both variants define the same `.st0`-`.st3` class names
+    internally, so inlining them together would have the second one restyle the first. And an
+    external <img src> would break the page's one hard promise -- that it opens from disk with no
+    network.
+    """
+    raw = (Path(__file__).resolve().parent / "assets" / filename).read_bytes()
+    return "data:image/svg+xml;base64," + base64.b64encode(raw).decode("ascii")
+
+
+LOGO_LIGHT = _logo_data_uri("Mangrove-Horiz-FullColor.svg")
+LOGO_DARK = _logo_data_uri("Mangrove-Horiz-FullColor-WhiteType.svg")
+
 #: Wordmark + theme switcher. Injected as the viewer's nav slot rather than appended, so it sits
 #: above the graph instead of floating over it.
 BRAND_BAR = """
 <div id="brandbar">
   <span class="wordmark">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 2 L12 22 M12 8 L6 14 M12 8 L18 14 M12 15 L7 20 M12 15 L17 20"
-            stroke="#42a7c6" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    Mangrove <span class="tag">signal &amp; indicator knowledge graph</span>
+    <img class="logo light-only" src="__LOGO_LIGHT__" alt="Mangrove">
+    <img class="logo dark-only" src="__LOGO_DARK__" alt="Mangrove">
+    <span class="tag">signal &amp; indicator knowledge graph</span>
   </span>
   <span class="spacer"></span>
   <div id="themesel" role="group" aria-label="Colour theme">
@@ -212,6 +243,18 @@ DECLUTTER = """
                         +'its inputs, parameters and typed outputs, and everything it connects to.'; }
   const h1=document.querySelector('#rail h1');
   if(h1){ h1.textContent='signals & indicators'; }
+
+  // 3D nodes are drawn at nodeRelSize(4), which is a legible dot in a graph of a few dozen. At 303
+  // nodes the camera pulls back far enough that they read as specks under their own labels. The 3D
+  // view initialises lazily on first toggle, so this waits for it rather than assuming it exists.
+  const v3d=document.getElementById('v3d');
+  if(v3d) v3d.addEventListener('click',()=>{
+    let tries=0;
+    (function grow(){
+      if(typeof fg3d!=='undefined' && fg3d && fg3d.nodeRelSize){ fg3d.nodeRelSize(7); return; }
+      if(tries++ < 40) setTimeout(grow, 100);
+    })();
+  });
 })();
 </script>
 """
@@ -360,6 +403,37 @@ SEARCH_UI = """
 })();
 </script>
 """
+
+#: The Mangrove brand palette, taken from the logo itself (`assets/Mangrove-Horiz-FullColor.svg`
+#: defines exactly these four), plus two shades derived from them so nine facets can be told apart
+#: without leaving the brand.
+BRAND = {
+    "teal":       "#42a7c6",     # the primary mark colour
+    "sky":        "#74c3d5",
+    "orange":     "#ff9e18",
+    "ember":      "#ff4713",
+    "deep_teal":  "#2b7f99",     # shade of teal
+    "sun":        "#ffc266",     # tint of orange
+}
+
+#: The viewer ships a general-purpose categorical palette -- #4e79a7, #59a14f, #e15759 -- which is
+#: nobody's brand. Node colour is the single loudest thing on the page, so leaving it made the
+#: rebrand cosmetic. Assigned by weight: the bulk of the graph is `Procedure`, so it takes the
+#: primary mark colour, and the rarer primitives take the accents that stand out against it.
+PRIMITIVE_COLOR = {
+    "Procedure": BRAND["teal"],
+    "Concept":   BRAND["orange"],
+    "Property":  BRAND["sky"],
+    "Object":    BRAND["ember"],
+    "Schema":    BRAND["deep_teal"],
+}
+
+CATEGORY_COLOR = {
+    "structural":  BRAND["teal"],
+    "descriptive": BRAND["sky"],
+    "associative": BRAND["orange"],
+    "meta":        BRAND["ember"],
+}
 
 ROOT_ID = "object:mangrove-knowledge-space"
 VIEWER_ANCHOR = "const ANCHOR='object:self';"
@@ -697,8 +771,13 @@ def main() -> int:
                  f"would silently no-op without it")
 
     data = viz.data_from_rows(nodes, edges)
+    # Recolour into the brand. Only the keys this graph actually uses are overridden; anything the
+    # viewer defines and this graph does not carry keeps its default and is pruned from the rail.
+    data["primitiveColor"] = {**data["primitiveColor"], **PRIMITIVE_COLOR}
+    data["categoryColor"] = {**data["categoryColor"], **CATEGORY_COLOR}
     page = viz.render_page(data, title="Mangrove signal & indicator knowledge graph",
-                           nav_html=BRAND_BAR)
+                           nav_html=BRAND_BAR.replace("__LOGO_LIGHT__", LOGO_LIGHT)
+                                             .replace("__LOGO_DARK__", LOGO_DARK))
     # Before </head>, so the first paint is already the chosen theme rather than flashing to it.
     page = page.replace("</head>", PREPAINT + "</head>", 1)
     if page.count(VIEWER_ANCHOR) != 1:
