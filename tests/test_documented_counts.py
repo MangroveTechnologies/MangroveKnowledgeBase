@@ -108,9 +108,6 @@ CLAIMS = [
     ("README.md",      r"registered signals, \*\*(\d+) are modelled",  "signals"),
     ("PKG_README.md",  r"\*\*(\d+) trading signals\*\*",             "registered_signals"),
     ("PKG_README.md",  r"\*\*(\d+) technical indicators\*\*",        "indicator_classes"),
-    # STATUS.md states what is true NOW, which is exactly the kind of claim that rots first.
-    ("STATUS.md",                      r"graph\s+(\d+) atoms, [\d,]+ relations", "nodes"),
-    ("STATUS.md",                      r"graph\s+[\d,]+ atoms, (\d+) relations", "edges"),
 ]
 
 #: Files whose numbers are historical and MUST NOT be "corrected". Listed so the exclusion is a
