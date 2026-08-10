@@ -166,11 +166,17 @@ momentum triggers   25      volatility filters  16
   procedure:signal-ao-zero-cross          procedure:signal-bb-below-lower
 ```
 
-`kind` is what the computation *is*; `role` is the part it *plays*. They are independent — a signal
-can be momentum-class and used as either a trigger or a filter.
+`kind` is the character a computation is concerned with; `role` is the part it *plays*. They are
+independent — a signal can be momentum-class and used as either a trigger or a filter.
 
-**Trap:** a signal can derive **two** classes. The RSI divergence signals read both an oscillator and
-a momentum indicator, so they appear under both. Do not assume the sets are disjoint.
+**`kind` means something different on each layer, and the graph says which.** An indicator
+`instance-of` momentum *measures* rate of change. A signal is `about` momentum — it emits a boolean,
+so it measures nothing; it is concerned with momentum because of the indicator it reads. `find(kind=)`
+returns both, because "everything to do with momentum" is the useful question, but the two edges stay
+distinguishable so you can always ask *why* (use case 8).
+
+**Trap:** a signal can be about **two** classes. The RSI divergence signals read both an oscillator
+and a momentum indicator, so they appear under both. Do not assume the sets are disjoint.
 
 ---
 
