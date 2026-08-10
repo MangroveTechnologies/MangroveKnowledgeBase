@@ -41,9 +41,8 @@ def test_uc1_orientation_values(kg, guide):
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
     assert len(kg.schema()) == 11, "the guide says '11 shapes in total'"
     assert "11 shapes in total" in guide
-    for k in s["kinds"]:                      # every kind the guide lists must still exist
-        if k.startswith("concept:"):
-            assert k in guide, f"guide's kind list is missing {k}"
+    for c in s["classes"]:                    # every class the guide lists must still exist
+        assert c in guide, f"guide's class list is missing {c}"
 
 
 def test_uc2_divergence_search(kg, guide):
@@ -97,12 +96,24 @@ def test_uc7_deprecation(kg, guide):
 
 
 def test_uc8_derivation_path(kg, guide):
-    """The guide shows two answers: the claim, and the reason behind it.
+    """The guide answers this with `uses` first, then `all_paths`, and only warns about `path`.
 
-    Unconstrained, `path` takes the one-hop `about` edge -- the claim. Constrained to the relations
-    the claim was derived from, it shows the three-step derivation. Both are asserted, because the
-    use case is worthless if the second one ever silently becomes the first.
+    The lead answer must not depend on shortest-path behaviour at all -- that dependency is what
+    broke this use case when the `about` edge was added, turning a three-step explanation into a
+    one-hop assertion with no warning.
     """
+    used = kg.neighbors("adosc_bearish", relation="uses", direction="out", limit=None)
+    assert [n["id"] for n in used.items] == ["procedure:indicator-adosc"], \
+        "the guide's lead answer is one `uses` hop"
+    assert "concept:momentum" in {e.dst for e in kg.edges
+                                  if e.src == "procedure:indicator-adosc"
+                                  and e.relation == "instance-of"}
+
+    both = kg.all_paths("adosc_bearish", "momentum")
+    assert both.total == 2 and both.truncated is False, "the guide prints 2 paths"
+    assert [[s["via"]["relation"] for s in p[1:]] for p in both.items] == \
+        [["about"], ["uses", "instance-of"]], "the guide prints the claim then the reason"
+
     claim = kg.path("procedure:signal-adosc-bearish", "concept:momentum")
     assert claim is not None and len(claim) == 2, "the guide shows a one-hop `about` claim"
     assert claim[-1]["via"]["relation"] == "about"

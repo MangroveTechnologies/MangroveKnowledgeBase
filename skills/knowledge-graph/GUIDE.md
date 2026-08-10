@@ -24,7 +24,7 @@ s = kg.stats()
 s["nodes"], s["edges"]          # 303, 1049
 s["primitives"]                 # {'Procedure': 289, 'Concept': 9, 'Property': 3, ...}
 s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 222, ...}
-s["kinds"]                      # the class vocabulary
+s["classes"]                    # the six character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
@@ -34,10 +34,8 @@ nodes, edges  303 1049
 primitives    {'Procedure': 289, 'Concept': 9, 'Property': 3, 'Object': 1, 'Schema': 1}
 relations     {'instance-of': 360, 'uses': 233, 'about': 222, 'has-role': 218,
                'kind-of': 8, 'part-of': 6, 'supersedes': 2}
-kinds         ['concept:averaging', 'concept:flow', 'concept:indicator',
-               'concept:momentum', 'concept:oscillator', 'concept:pattern',
-               'concept:signal', 'concept:technical-analysis',
-               'concept:volatility', 'property:role']
+classes       ['concept:averaging', 'concept:flow', 'concept:momentum',
+               'concept:oscillator', 'concept:pattern', 'concept:volatility']
 roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
@@ -48,8 +46,13 @@ schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Co
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
 one and get an empty result you might misread as "there are none".
 
-**Trap:** `stats()["kinds"]` returns full node ids (`concept:momentum`), but every
-filter also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
+**Trap:** `stats()["classes"]` returns full node ids (`concept:momentum`), but every filter
+also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
+
+`classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (295 of 303) — legal, occasionally
+useful, and not classes. A filter that returns almost everything reads like a query and acts like a
+no-op, so they are documented here rather than advertised as vocabulary.
 
 ---
 
@@ -256,36 +259,47 @@ explicitly; nothing else surfaces it.
 
 **Task:** "Why does `adosc_bearish` come back when I ask for momentum signals?"
 
-```python
-kg.path("adosc_bearish", "momentum")     # both ends resolve from the names you were given
-```
-
-```
-procedure:signal-adosc-bearish
-concept:momentum   [about]
-```
-
-That is the claim, not the reason: the signal is *about* momentum. A signal is never `instance-of` a
-class — momentum is defined as measuring rate of change and a signal emits a boolean — so the edge
-says what is true and stops there. For the reason, ask for the route that does not use the shortcut:
+**Answer it with `uses`.** The question is *what does this signal read*, and that is one call — no
+search, no shortest-path behaviour to depend on:
 
 ```python
-kg.path("adosc_bearish", "momentum", relations=["uses", "instance-of"])
+sig = kg.neighbors("adosc_bearish", relation="uses", direction="out")   # -> indicator-adosc
+kg.get("adosc_bearish")            # and its own `about` edge names the class
 ```
 
 ```
-procedure:signal-adosc-bearish
-procedure:indicator-adosc          [uses]
-concept:momentum   [instance-of]
+adosc_bearish --uses--> ADOSC,  and ADOSC --instance-of--> momentum
 ```
 
-`signal-adosc-bearish --uses--> indicator-adosc --instance-of--> momentum` — it is about momentum
-because it reads ADOSC, and ADOSC measures momentum. Every `about` edge has one of these behind it;
-the builder fails if it does not.
+It is about momentum because it reads ADOSC, and ADOSC measures momentum. Every `about` edge has a
+`uses` edge behind it — the builder aborts if one does not — so this always terminates in an answer.
+
+**When you do not already know the shape**, ask for every route rather than one:
+
+```python
+kg.all_paths("adosc_bearish", "momentum")
+```
+
+```
+2 paths
+  adosc_bearish --about--> momentum                                  the claim
+  adosc_bearish --uses--> indicator-adosc --instance-of--> momentum  the reason
+```
+
+Both, in one call, shortest first. That is the difference between `all_paths` and `path`: `path`
+returns the first of these and never mentions the second.
 
 **Trap:** `path` returns the **shortest** connection, which is rarely the *explanatory* one — here
-the one-hop `about` edge wins, and everything connects through the root eventually. Constrain it with
-`relations=` whenever you want a particular kind of explanation rather than the nearest link.
+the one-hop `about` edge wins and the derivation disappears. This is not hypothetical: the guide
+used to show a three-step `path` here, and adding the `about` edge silently turned it into one step.
+If you use `path` for an explanation, constrain it — `relations=["uses", "instance-of"]` — or use
+`all_paths` and read them all.
+
+**Trap:** `all_paths` excludes routes through a shared parent by default. `adosc_bearish
+--instance-of--> Signal <--instance-of-- adosc_bullish` says "they are both signals", and with
+`concept:signal` at degree 218 those detours outnumber the real answers 9,638 to 2 at
+`max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
+related?" "they both read RSI"*.
 
 ---
 

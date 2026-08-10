@@ -76,6 +76,15 @@ BACKBONE: tuple[str, ...] = ("instance-of", "kind-of")
 #: Anti-rigid. Never closed, never inherited, never returned as a type. See the module docstring.
 ROLE_RELATION = "has-role"
 
+#: The character axis. The classes a computation can be classified into are exactly the immediate
+#: subclasses of this node -- what a computation MEASURES, which is orthogonal to what KIND of thing
+#: it is. Named here rather than inferred because every alternative was a guess: deriving the class
+#: list from "everything the backbone points at" swept in the entity types (`concept:indicator`,
+#: `concept:signal`) and the role axis, so `stats()` advertised `find(kind=...)` arguments that
+#: return every indicator, every signal, or the two role values -- filters that read as a query and
+#: act as a no-op.
+CLASS_AXIS_ROOT = "concept:technical-analysis"
+
 CATEGORIES: tuple[str, ...] = ("structural", "descriptive", "associative", "meta")
 
 #: What :meth:`KnowledgeGraph.find` reads, best match first. A query is ranked by *where* it hit, so
@@ -325,7 +334,7 @@ class KnowledgeGraph:
             "relations": dict(Counter(e.relation for e in self.edges).most_common()),
             "categories": {c: sum(1 for e in self.edges if e.category == c) for c in CATEGORIES},
             "roles": sorted(self.roles()),
-            "kinds": sorted(self.kinds()),
+            "classes": sorted(self.classes()),
             "statuses": sorted(self.statuses()),
             "input_columns": sorted(self.input_columns()),
             "units": sorted(self.units()),
@@ -338,9 +347,21 @@ class KnowledgeGraph:
         """Every role actually borne by something. Enumerable so ``find(role=...)`` cannot miss."""
         return {e.dst for e in self.edges if e.relation == ROLE_RELATION}
 
-    def kinds(self) -> set[str]:
-        """Every class something is an instance or subclass of."""
-        return {e.dst for e in self.edges if e.relation in BACKBONE}
+    def classes(self) -> set[str]:
+        """The character classes -- the vocabulary ``find(kind=...)`` is *for*.
+
+        The six divisions of technical analysis: what a computation measures. An indicator is
+        ``instance-of`` one; a signal is ``about`` one.
+
+        This deliberately does **not** return every node the backbone points at. That set also holds
+        ``concept:indicator`` (71 results), ``concept:signal`` (218), ``concept:technical-analysis``
+        (295 of 303 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
+        class vocabulary invites a filter that looks like a query and returns almost everything.
+        They remain legal ``kind=`` arguments, and :meth:`find` documents them; they are just not
+        classes.
+        """
+        return {e.src for e in self.edges
+                if e.relation == "kind-of" and e.dst == CLASS_AXIS_ROOT}
 
     def statuses(self) -> set[str]:
         """Every status a node actually carries. Enumerable so ``find(status=...)`` cannot miss."""
@@ -679,6 +700,12 @@ class KnowledgeGraph:
         Edges are followed in either direction: "how are these two related" is not a question about
         edge orientation. Returns ``None`` when nothing connects them within ``max_depth`` -- which
         is a real answer about this graph, not a failure.
+
+        **Shortest is rarely the explanatory route.** It returns ONE path and says nothing about the
+        others, so adding an edge silently changes the answer -- which is exactly what happened when
+        signals gained a direct ``about`` edge to their class and this method stopped showing the
+        ``uses`` derivation behind it. Constrain with ``relations=`` to ask for an explanation in
+        particular terms, or use :meth:`all_paths` to see every route rather than one.
         """
         a, b = self.resolve(from_ref), self.resolve(to_ref)
         if a == b:
@@ -715,3 +742,94 @@ class KnowledgeGraph:
             cur = parent
         chain.append({"node": self.nodes[a].brief()})
         return list(reversed(chain))
+
+    def all_paths(self, from_ref: str, to_ref: str, *, max_depth: int = 4,
+                  relations: Sequence[str] | None = None,
+                  sibling_hops: bool = False,
+                  limit: int | None = DEFAULT_LIMIT,
+                  max_steps: int = 200_000) -> Result:
+        """Every simple route between two nodes, shortest first -- not one arbitrary one.
+
+        ``sibling_hops`` controls the routes that pass *through a shared parent* -- entering and
+        leaving a node on two edges that both point AT it::
+
+            adosc_bearish --instance-of--> Signal <--instance-of-- adosc_bullish --about--> momentum
+
+        That says "they are both signals", which is true and explains nothing. Excluded by default,
+        because on this graph it is not a minority of the answers: between ``adosc_bearish`` and
+        ``momentum`` there are 2 real routes and, at ``max_depth=5``, 9,638 of 9,785 paths are these
+        detours through ``concept:signal`` (degree 218). Pass ``sibling_hops=True`` when the shared
+        parent IS the answer -- *"how are these two related?" "they both read RSI"* is the same shape
+        and genuinely informative.
+
+        Three bounds, kept separate because they mean different things and a single "cap" hides
+        which one you hit:
+
+        ``max_depth``  how LONG a path may be. Default 4, not :meth:`path`'s 6: the count of simple
+                       paths grows combinatorially with length, and past four hops the extra routes
+                       are almost all detours through a hub rather than explanations.
+        ``limit``      how MANY paths come back. The house convention -- ``total`` and ``truncated``
+                       report the rest.
+        ``max_steps``  how HARD to search before giving up. This graph has hubs of degree 218
+                       (``concept:signal`` touches every signal), and enumerating simple paths
+                       across one is combinatorial, so an unbounded search does not return.
+
+        **The two truncated states are not the same claim, and the note says which one you got.**
+        If the search finished, ``total`` is exact and the note reads *"showing 10 of 47"*. If
+        ``max_steps`` tripped, the search did NOT finish, ``total`` is only what was found so far,
+        and the note says so. Reporting "10 of 47" after an incomplete search would be the precise
+        failure :class:`Result` exists to prevent -- a number that reads as complete and is not.
+        """
+        a, b = self.resolve(from_ref), self.resolve(to_ref)
+        if a == b:
+            return Result([[{"node": self.nodes[a].brief()}]], 1)
+        allowed = set(relations) if relations else None
+
+        found: list[list[dict[str, Any]]] = []
+        steps = 0
+        exhausted = True
+
+        def walk(cur: str, depth: int, on_path: set[str], acc: list[dict[str, Any]],
+                 arrived_on: Edge | None = None) -> None:
+            nonlocal steps, exhausted
+            if not exhausted or depth >= max_depth:
+                return
+            for e in self._out.get(cur, []) + self._in.get(cur, []):
+                if not exhausted:
+                    return
+                if allowed and e.relation not in allowed:
+                    continue
+                other = e.dst if e.src == cur else e.src
+                if other in on_path:
+                    continue
+                # Both edges point at `cur`: we came up an arrow and are about to go back down a
+                # different one. That is a sibling, not a connection. See the docstring.
+                if (not sibling_hops and arrived_on is not None
+                        and arrived_on.dst == cur and e.dst == cur):
+                    continue
+                steps += 1
+                if steps > max_steps:
+                    exhausted = False
+                    return
+                step = {"node": self.nodes[other].brief(),
+                        "via": {"relation": e.relation, "category": e.category,
+                                "from": e.src, "to": e.dst}}
+                if other == b:
+                    found.append(acc + [step])
+                    continue          # a simple path ends at the target; do not walk through it
+                walk(other, depth + 1, on_path | {other}, acc + [step], e)
+
+        walk(a, 0, {a}, [{"node": self.nodes[a].brief()}])
+        found.sort(key=len)           # shortest first: the explanation is usually the short one
+
+        #: Both incomplete notes carry this verbatim, so a caller can test for the state rather than
+        #: parse two different sentences. An exhausted search never contains it.
+        incomplete = (f"the search stopped after {max_steps} steps, so there may be more; "
+                      f"lower max_depth or constrain relations= to search a smaller space")
+        total = len(found)
+        if limit is None or total <= limit:
+            return Result(found, total, not exhausted,
+                          "" if exhausted else f"{total} paths found, but {incomplete}")
+        note = (f"showing {limit} of {total} paths; raise limit or narrow the query" if exhausted
+                else f"showing {limit} of {total} paths found so far -- {incomplete}")
+        return Result(found[:limit], total, True, note)

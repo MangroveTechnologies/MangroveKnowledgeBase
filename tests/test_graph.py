@@ -28,8 +28,13 @@ def test_stats_enumerates_every_filter_value(kg):
     s = kg.stats()
     for role in s["roles"]:
         assert kg.find(role=role, limit=1) is not None
-    for kind in s["kinds"]:
-        assert kg.find(kind=kind, limit=1) is not None
+    for cls in s["classes"]:
+        assert kg.find(kind=cls, limit=1) is not None
+    assert len(s["classes"]) == 6, (
+        "classes is the CHARACTER vocabulary -- the six divisions of technical analysis. "
+        "It once returned every backbone target, which swept in concept:indicator (71 "
+        "results), concept:signal (218), concept:technical-analysis (295 of 303) and "
+        "property:role (the role values), advertising filters that act as no-ops.")
     assert set(s["relations"]) <= set(RELATIONS), "graph uses a relation the library cannot classify"
 
 
@@ -71,20 +76,33 @@ def test_backbone_closure_is_transitive_but_roles_are_one_hop(kg):
     assert set(kg.bearers("property:role-trigger")) == direct
 
 
-def test_class_is_derived_through_uses_not_declared(kg):
-    """A signal's class comes from the indicator it uses -- the graph states it, nothing is buried.
+def test_signals_are_about_their_class_and_indicators_are_instances(kg):
+    """The two claims are different and carry different relations.
 
-    Regression for a real mistake: this was first read as "signals have no class", because they
-    carry no DIRECT class edge. They carry it one hop out, via `uses`, and 209 of 216 resolve.
+    An indicator MEASURES its character and is `instance-of` the class. A signal emits a boolean,
+    measures nothing, and is `about` the class instead. `in_class` returns both, because "everything
+    to do with momentum" is the useful question -- but the edges stay distinguishable, and that is
+    what lets `path` explain a signal's class rather than merely assert it.
+
+    Every `about` edge must still have the `uses` edge it was projected from behind it. The builder
+    aborts otherwise; this checks the shipped graph, not the build.
     """
     momentum = kg.in_class("concept:momentum")
-    assert any(m.startswith("procedure:signal-") for m in momentum), \
-        "signals must reach their class through the indicator they use"
-    assert any(m.startswith("procedure:indicator-") for m in momentum), \
-        "indicators must reach their class directly"
-    for sig in (m for m in momentum if m.startswith("procedure:signal-")):
+    signals = {m for m in momentum if m.startswith("procedure:signal-")}
+    indicators = {m for m in momentum if m.startswith("procedure:indicator-")}
+    assert signals and indicators, "the class must span both layers"
+
+    about = {e.src for e in kg.edges if e.relation == "about" and e.dst == "concept:momentum"}
+    assert about == signals, "signals reach the class by `about`, and only signals do"
+    for i in indicators:
+        assert "concept:momentum" in {e.dst for e in kg.edges
+                                      if e.src == i and e.relation == "instance-of"}, \
+            f"{i} must be an INSTANCE of the class it measures"
+
+    for sig in signals:
         used = {n["id"] for n in kg.neighbors(sig, relation="uses", direction="out", limit=None)}
-        assert used & set(kg.descendants("concept:momentum"))
+        assert used & set(kg.descendants("concept:momentum")), \
+            f"{sig} is `about` momentum with no `uses` edge behind it"
 
 
 def test_both_axes_in_one_call(kg):
@@ -177,6 +195,64 @@ def test_path_is_undirected_and_reports_the_relation(kg):
 def test_path_returns_none_rather_than_raising(kg):
     assert kg.path("procedure:indicator-rsi", "procedure:indicator-rsi") is not None
     assert kg.path("procedure:indicator-rsi", "property:role-trigger", max_depth=1) is None
+
+
+def test_all_paths_returns_every_route_not_one(kg):
+    """`path` picks one shortest route and says nothing about the rest; this returns them all.
+
+    Both routes to a signal's class matter and they say different things: the `about` edge is the
+    claim, the `uses` chain is the reason. `path` shows only the first.
+    """
+    r = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum", limit=None)
+    routes = [[s["via"]["relation"] for s in p[1:]] for p in r.items]
+    assert routes == [["about"], ["uses", "instance-of"]], \
+        "expected the claim and the derivation, shortest first"
+    assert r.truncated is False and r.total == 2
+
+
+def test_all_paths_excludes_sibling_hops_by_default(kg):
+    """Entering and leaving a node on two edges that both point AT it is a sibling, not a route.
+
+    `adosc_bearish --instance-of--> Signal <--instance-of-- adosc_bullish` says "both are signals".
+    On this graph that is not a minority: `concept:signal` has degree 218, and allowing it turns 2
+    real routes into 9,785 at max_depth=5.
+    """
+    deep = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
+                        max_depth=5, limit=None)
+    assert deep.total == 2, "depth must not multiply the answer through a hub"
+
+    loose = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
+                         max_depth=5, sibling_hops=True, limit=None)
+    assert loose.total > 1000, "the detours are real; the default is what suppresses them"
+
+    # ...and when the shared parent IS the answer, asking for it works.
+    both = kg.all_paths("procedure:signal-rsi-oversold", "procedure:signal-rsi-overbought",
+                        max_depth=2, sibling_hops=True, limit=None)
+    assert {p[1]["node"]["id"] for p in both.items} >= {"procedure:indicator-rsi"}, \
+        "'they both read RSI' is a sibling hop and a legitimate answer"
+    assert kg.all_paths("procedure:signal-rsi-oversold", "procedure:signal-rsi-overbought",
+                        max_depth=2, limit=None).total == 0
+
+
+def test_all_paths_distinguishes_its_two_truncated_states(kg):
+    """"Showing 10 of 47" is a claim that 47 exist. After an early stop you cannot make it."""
+    complete = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
+                            max_depth=4, sibling_hops=True, limit=3)
+    assert complete.truncated and "showing 3 of 197" in complete.note
+    assert "stopped" not in complete.note, "a finished search must not hedge"
+
+    # The step bound is not decorative: the same query one hop deeper trips the default.
+    deep = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
+                        max_depth=5, sibling_hops=True, limit=None)
+    assert deep.truncated and "stopped after 200000 steps" in deep.note, \
+        "an unbounded walk across a degree-218 hub must stop and say so, not run"
+
+    stopped = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
+                           max_depth=4, sibling_hops=True, limit=3, max_steps=200)
+    assert stopped.truncated and "stopped after 200 steps" in stopped.note
+    assert "there may be more" in stopped.note, \
+        "an unfinished search must say its total is a floor -- and both incomplete\n         notes must carry the same marker, so a caller tests instead of parsing prose"
+    assert stopped.total < complete.total, "it stopped early, so it found fewer"
 
 
 def test_uses_edges_carry_which_output_is_read(kg):

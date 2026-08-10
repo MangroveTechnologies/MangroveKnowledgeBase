@@ -6,7 +6,7 @@ description: >-
   each plays in a strategy. Reach for this before grepping the source or guessing at names: "which
   indicators produce a bounded oscillator", "what reads RSI", "what would break if I change this
   output", "is there already a signal for X", "what does this signal actually need". Uses
-  mangrove_kb.graph (stats · find · get · outputs · neighbors · subgraph · path).
+  mangrove_kb.graph (stats · find · get · outputs · neighbors · subgraph · path · all_paths).
 ---
 
 # Ask the graph before you read the source
@@ -16,7 +16,7 @@ description: >-
 approximate, no ranking model in the way. Every answer is a fact about the code as it is.
 
 It answers things grep cannot: *what reads this indicator's third output*, *which signals produce a
-bounded value*, *what is the shortest connection between this signal and that class*.
+bounded value*, *every way this signal connects to that class, and which of them is the reason*.
 
 ```python
 from mangrove_kb.graph import KnowledgeGraph
@@ -101,7 +101,8 @@ kg.find(role="filter")                       # signals playing the filter part
 | what does this signal depend on? | `neighbors(id, relation="uses", direction="out")` |
 | what breaks if I change this? | `neighbors(id, direction="in")`, then widen with `subgraph` |
 | the neighbourhood around something | `subgraph(id, radius=1)` |
-| how are these two related? | `path(a, b)` |
+| how are these two related? | `path(a, b)` — one shortest route |
+| every way these two connect, and why | `all_paths(a, b)` — all routes, shortest first |
 | now actually run what I found | `RuleRegistry.evaluate({"name": node["name"], ...}, df)` |
 
 `neighbors` takes `category=` as well as `relation=`, so you can follow every `structural` edge
@@ -222,8 +223,17 @@ kg.path("procedure:signal-adosc-bearish", "concept:momentum",
 ```
 
 `path` returns the **shortest** route, so it takes the `about` shortcut unless you constrain it.
-Naming the relations you want an explanation in terms of is how you get the derivation instead of
-the assertion.
+`all_paths` gives you both at once, shortest first, and is the better default when you do not already
+know the shape of the answer:
+
+```python
+kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum")
+# 2 paths: the `about` claim, then the `uses` -> `instance-of` reason
+```
+
+It excludes routes through a shared parent by default — `X --instance-of--> Signal <--instance-of-- Y`
+says "both are signals" and, with that hub at degree 218, those detours outnumber the real answers
+9,638 to 2 at `max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer.
 
 **"What can I plot on one panel, and what can I run without a volume feed?"**
 
