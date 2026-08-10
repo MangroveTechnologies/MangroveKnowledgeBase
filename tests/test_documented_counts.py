@@ -62,6 +62,9 @@ CLAIMS = [
     ("mangrove_kb/graph.py",           r"All (\d+) signals resolve this way", "signals"),
     ("kb-next-steps.md",               r"(\d+) signals, [\d,]+ indicators",  "signals"),
     ("kb-next-steps.md",               r"[\d,]+ signals, (\d+) indicators",  "indicators"),
+    # STATUS.md states what is true NOW, which is exactly the kind of claim that rots first.
+    ("STATUS.md",                      r"graph\s+(\d+) atoms, [\d,]+ relations", "nodes"),
+    ("STATUS.md",                      r"graph\s+[\d,]+ atoms, (\d+) relations", "edges"),
 ]
 
 #: Files whose numbers are historical and MUST NOT be "corrected". Listed so the exclusion is a

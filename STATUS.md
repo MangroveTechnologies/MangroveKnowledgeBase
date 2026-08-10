@@ -8,8 +8,10 @@ where this file and the code disagree, the code is right.
 ```
 branch   feat/indicator-output-metadata      PR #105 (DRAFT) -> main
 graph    303 atoms, 755 relations
-tests    319 passed, 17 skipped
 ```
+
+The graph counts above are pinned by `tests/test_documented_counts.py`, so they cannot drift out of
+date quietly. Nothing else in this file is machine-checked.
 
 ## Plan
 
