@@ -1,6 +1,6 @@
 # Scope: backfill authored values into docstrings, make the build deterministic
 
-**Status:** phase 1 complete; phases 2-6 open. **Owner:** unassigned. **Blocks:** nothing. **Unblocks:** shipping
+**Status:** COMPLETE (p1-p6). **Owner:** unassigned. **Blocks:** nothing. **Unblocks:** shipping
 the graph in the wheel.
 
 ## The problem
@@ -195,11 +195,11 @@ graph.**
 | # | phase | done when |
 |---|---|---|
 | 1 | ~~settle the docstring format on 2–3 real indicators, both directions~~ | **DONE** — lossless on BollingerBands + bb_above_upper |
-| 2 | extend the parser to read it | parses the phase-1 examples |
-| 3 | run the generator across all 22 files | every authored value is in a docstring |
-| 4 | rebuild with carry-forward off, diff | byte-identical to the committed graph |
-| 5 | delete `_carry`, the KB lift, the precedence chain | builder reads source only |
-| 6 | pin it | test asserts clean-tree rebuild == committed graph |
+| 2 | ~~extend the parser to read it~~ | **DONE** — `parse_authored`, format enforced |
+| 3 | ~~run the generator across all 22 files~~ | **DONE** — 289 docstrings across 12 files |
+| 4 | ~~rebuild with carry-forward off, diff~~ | **DONE** — atoms + relations identical |
+| 5 | ~~delete `_carry`, the KB lift, the precedence chain~~ | **DONE** — one builder, one JSON, 122 lines removed |
+| 6 | ~~pin it~~ | **DONE** — `tests/test_build_is_deterministic.py` |
 
 Phase 4 is the gate. If it does not come out identical, the format is lossy and phase 1 was wrong.
 
@@ -211,3 +211,24 @@ Phase 4 is the gate. If it does not come out identical, the format is lossy and 
 - **Collision with in-flight authoring.** The generator rewrites files another session may be
   editing. This needs coordinating, not just scheduling.
 - **`help()` regression** — verify a rendered docstring by eye in phase 1, not at the end.
+
+
+---
+
+## Outcome
+
+Four fields were AUTHORED that this scope classified as derived. Each was found by a diff, not by
+reading:
+
+- **`warmup_bars`** — 53 indicators disagreed with any `min_periods` guess.
+- **param `description`** — for all 126 indicator params.
+- **param `default` / `min` / `max`** — for the params of indicators no signal wraps, which had
+  survived only by carry-forward.
+- **the `DEPRECATED:` marker** — line-anchored, so re-wrapping the summary silently lost one
+  `supersedes` edge.
+
+The pattern: anything that survived only in the JSON looked derived, because nothing in the source
+disagreed with it. The diff is what distinguished them.
+
+`ontology/signal-indicator-ontology.md` and both `.claude/skills/author-*-properties` skills were
+updated — they instructed authoring into the JSON, which the next build now overwrites.

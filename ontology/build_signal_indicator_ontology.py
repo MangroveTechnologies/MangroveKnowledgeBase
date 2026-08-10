@@ -62,7 +62,7 @@ KB = str(KB_REPO / "mangrove_kb" / "indicators")
 
 #: The graph itself. Read back in for carry-forward AND to derive signal input descriptions from
 #: what has been authored on the indicator nodes.
-NODE_FILE = pathlib.Path(__file__).resolve().parent / "signal-indicator-ontology.json"
+NODE_FILE = pathlib.Path(os.environ.get("ONTOLOGY_OUT", str(pathlib.Path(__file__).resolve().parent / "signal-indicator-ontology.json")))
 
 # An existing-but-empty NODE_FILE has exactly one cause: something truncated it between the last
 # build and this one, and in practice that something is `build.py > <NODE_FILE>`. Carrying on would
@@ -338,9 +338,9 @@ def _lift(cls):
         # `summary` field -- the only place it is stored. `viz.data_from_rows` reads
         # props["description"], so the renderer maps summary -> props.description at render time;
         # carrying it in props as well would store one fact twice.
-        "reference": url.group(0) if url else None,
-        "warmup_bars": (f"{warm[0]} - 1" if len(warm) == 1 else None),
-        "abbreviation": GLOSSARY_ABBR.get(cls.__name__),
+        "reference": _AUTHORED.get(cls.__name__, {}).get("reference"),
+        "warmup_bars": _AUTHORED.get(cls.__name__, {}).get("warmup"),
+        "abbreviation": _AUTHORED.get(cls.__name__, {}).get("abbreviation"),
         "usage_example": _usage_example(cls),
         # Lifted from the knowledge-base markdown; null on the indicators with no section there,
         # which puts them on the authoring queue like any other null.
@@ -353,23 +353,30 @@ def _lift(cls):
         # indicators nobody has authored yet, so it is applied after carry-forward, not here --
         # applying it here let a docstring that restates the code overwrite a researched formula
         # (it cost CMO its contested-default note and T3 the GD recursion + Tillson's factor).
-        **{k: KB_SECTIONS.get(cls.__name__, {}).get(k)
-           for k in ("formula", "interpretation", "applications")},
-        "inputs": {d: {"type": "series", "description": idescs.get(d)} for d in cls._data},
+        **{k: _AUTHORED.get(cls.__name__, {}).get(k) for k in ("formula", "interpretation", "applications")},
+        "inputs": {d: {"type": "series",
+                       "description": _AUTHORED.get(cls.__name__, {}).get("inputs", {}).get(d)}
+                   for d in cls._data},
+        # The wrapping signals' Args blocks win where they have a value -- source changes must not
+        # be overridden by prose. The docstring supplies what no signal states: the params of
+        # indicators nothing wraps, which used to survive only by carry-forward.
         "params": {q: {"type": ptypes.get(q),
-                       **{k: SIGNAL_PARAM_DOCS.get(cls.__name__, {}).get(q, {}).get(k)
-                          for k in ("default", "min", "max", "description")}}
+                       **{k: (SIGNAL_PARAM_DOCS.get(cls.__name__, {}).get(q, {}).get(k)
+                              if SIGNAL_PARAM_DOCS.get(cls.__name__, {}).get(q, {}).get(k) is not None
+                              else _AUTHORED.get(cls.__name__, {}).get("params", {}).get(q, {}).get(k))
+                          for k in ("default", "min", "max")},
+                       "description": _AUTHORED.get(cls.__name__, {}).get("params", {}).get(q, {}).get("description")}
                    for q in cls._params},
         # Output TYPE is declared in the docstring Returns: block. Every one of the 136 typed
         # outputs is a pd.Series; the 27 pattern indicators carry no Returns: block at all but
         # were confirmed by execution to return Series too, so "series" is uniform and safe.
         # The informative distinction between outputs is the element dtype and value domain,
         # which `units` and `range` carry -- not this container type.
-        "outputs": {o: {"type": (authored.get(o, {}).get("type") or otypes.get(o) or "series"),
-                        "units": authored.get(o, {}).get("units"),
-                        "range": authored.get(o, {}).get("range"),
-                        "canonical_name": authored.get(o, {}).get("canonical_name"),
-                        "description": authored.get(o, {}).get("description")}
+        "outputs": {o: {"type": otypes.get(o) or "series",
+                        "units": _AUTHORED.get(cls.__name__, {}).get("outputs", {}).get(o, {}).get("units"),
+                        "range": _AUTHORED.get(cls.__name__, {}).get("outputs", {}).get(o, {}).get("range"),
+                        "canonical_name": _AUTHORED.get(cls.__name__, {}).get("outputs", {}).get(o, {}).get("canonical_name"),
+                        "description": _AUTHORED.get(cls.__name__, {}).get("outputs", {}).get(o, {}).get("description")}
                     for o in cls._outputs},
     }
 
@@ -515,7 +522,6 @@ SIGNAL_PARAM_DOCS = _signal_param_docs()
 # match nothing are reported rather than silently dropped -- several are indicators we deliberately
 # excluded (Parabolic SAR, VIX, Standard Deviation), and the rest would be a matching bug.
 KB_DOC = KB_REPO / "knowledge-base" / "06-indicators.md"
-GLOSSARY = KB_REPO / "knowledge-base" / "09-glossary.md"
 
 # Doc titles whose name genuinely differs from the class name. Explicit data rather than a looser
 # regex, because a fuzzy rule broad enough to catch these also produces false matches -- and a wrong
@@ -557,82 +563,6 @@ def _bullets(body):
     return got or None
 
 
-def _kb_sections():
-    """Lift per-indicator prose from `knowledge-base/06-indicators.md`.
-
-    Returns ({indicator: {definition, formula, interpretation, applications}}, [unmatched titles]).
-
-    Coverage is partial BY CONSTRUCTION -- 50 doc sections against 94 indicators, and `Trading
-    Applications` appears in only 14 of them. Most nodes get nulls here and land on the authoring
-    queue; do not read a null as "the doc says nothing interesting", read it as "nobody has written
-    it yet".
-
-    Matching, in order: the generated `**Indicator Class**` block; then KB_TITLE_ALIASES; then the
-    normalised title with singular/plural variants. Titles matching nothing are returned as
-    unmatched UNLESS declared in KB_TITLES_NOT_INDICATORS, which keeps that report a signal rather
-    than noise. A wrong join here silently attaches one indicator's prose to another, which is why
-    the fuzzy step is deliberately narrow and the exceptions are explicit data.
-
-    `definition` is lifted but does NOT become a property -- it feeds the atom's `summary` at the
-    atom() call, because it is the same fact and the schema rule is one fact, one home.
-    """
-    if not KB_DOC.exists():
-        return {}, []
-    text = KB_DOC.read_text()
-    parts = re.split(r"\n### (?:\d+\.\d+\.\d+) (.+)\n", text)
-    by_norm = {_norm(c): c for c in present}
-    out, unmatched = {}, []
-    for i in range(1, len(parts) - 1, 2):
-        title, body = parts[i], parts[i + 1]
-        declared = re.search(r"\*\*Indicator Class\*\*:\s*`(\w+)`", body)
-        if declared and declared.group(1) in present:
-            ind = declared.group(1)
-        elif title in KB_TITLE_ALIASES:
-            ind = KB_TITLE_ALIASES[title]
-        else:
-            ind = next((by_norm[c] for c in _variants(title) if c in by_norm), None)
-        if ind is None:
-            if title not in KB_TITLES_NOT_INDICATORS:
-                unmatched.append(title)
-            continue
-        sect = {m.group(1).strip(): m.group(2) for m in
-                re.finditer(r"^#### (.+?)$\n(.*?)(?=^#### |\Z)", body, re.M | re.S)}
-        fence = re.search(r"```\n(.*?)```", sect.get("Formula", ""), re.S)
-        out[ind] = {
-            "definition": re.sub(r"\s+", " ", sect.get("Definition", "")).strip() or None,
-            "formula": fence.group(1).strip() if fence else None,
-            "interpretation": _bullets(sect.get("Interpretation", "")),
-            "applications": _bullets(sect.get("Trading Applications", "")),
-        }
-    return out, unmatched
-
-
-def _glossary():
-    """{indicator: abbreviation} from the `09-glossary.md` table.
-
-    Matches on the spelled-out term AND on the abbreviation column, because the class name is as
-    often the abbreviation (ATR, ADX, CCI) as the full term. Rows with no abbreviation are skipped.
-    Coverage is thin -- roughly 12 of 94 -- so most abbreviations are authored.
-    """
-    if not GLOSSARY.exists():
-        return {}
-    by_norm = {_norm(c): c for c in present}
-    out = {}
-    for row in re.findall(r"^\|([^|]+)\|([^|]+)\|([^|]+)\|", GLOSSARY.read_text(), re.M):
-        term, _defn, abbr = (c.strip() for c in row)
-        if abbr in ("-", "", "Abbreviation"):
-            continue
-        # the class name is as often the abbreviation (ATR, ADX, CCI) as the spelled-out term
-        ind = next((by_norm[c] for c in (_variants(term) | {_norm(abbr)}) if c in by_norm), None)
-        if ind:
-            out[ind] = abbr
-    return out
-
-
-KB_SECTIONS, KB_UNMATCHED = _kb_sections()
-GLOSSARY_ABBR = _glossary()
-
-
 def _usage_example(cls):
     """A copy-pasteable `compute()` call, generated from the class attributes.
 
@@ -644,16 +574,6 @@ def _usage_example(cls):
     data = ", ".join(f"'{d}': df['{d.title()}']" for d in cls._data)
     params = ", ".join(f"'{p}': value" for p in cls._params)
     return f"{cls.__name__}.compute(data={{{data}}}, params={{{params}}})"
-
-
-def _describe(cls):
-    """The docstring's leading prose, which becomes the atom's `summary`."""
-    doc = inspect.getdoc(cls) or ""
-    head = re.split(_SECTION, doc)[0]
-    lines = [l.strip() for l in head.splitlines() if l.strip() and not l.strip().startswith("http")]
-    return " ".join(lines[1:]) or None
-
-
 def _load_classes():
     """{indicator name: class} for every registered indicator."""
     found = {}
@@ -726,7 +646,11 @@ def _guard_to_warmup(expr, strict=True):
 # `deprecated` is not invented: the vendored ontology defines
 # STATUS = {"draft", "ratified", "deprecated"}, and `supersedes` (meta, acyclic) is its relation for
 # "this replaces that".
-_SIG_DEPRECATED = re.compile(r"^\s*DEPRECATED:\s*identical to `(\w+)`", re.M)
+# NOT line-anchored. The marker lives in the summary prose, and the summary is wrapped in the
+# docstring -- anchoring to line start silently lost shooting_star_trigger's supersedes edge when
+# the wrap put "DEPRECATED: identical to" at the end of one line and the name at the start of the
+# next. Matched against the JOINED summary, where wrapping cannot reach it.
+_SIG_DEPRECATED = re.compile(r"DEPRECATED:\s*identical to `(\w+)`")
 
 _SIG_TYPE = re.compile(r"^\s*Type:\s*(.+)$", re.M)
 _SIG_REQUIRES = re.compile(r"^\s*Requires:\s*(.+)$", re.M)
@@ -944,24 +868,6 @@ def _signal_input_descriptions():
             if spec.get("description") and name not in out:
                 out[name] = spec["description"]
     return out
-
-
-def _signal_summary(doc):
-    """The docstring's leading prose, which becomes the atom's `summary`.
-
-    The signal counterpart of `_describe`. The `Reference:` line sits above the first section, so it
-    is stripped here rather than ending up inside the description -- the URL is lifted separately
-    into its own field, and one fact in two places is one too many.
-    """
-    head = re.split(r"\n\s*(?:Type|Requires|Args|Returns):", doc)[0]
-    # Strip the reference clause WHEREVER it sits. Anchoring this to the start of a line was wrong:
-    # most pattern docstrings append `Reference: <url>` to the end of a prose sentence rather than
-    # putting it on its own line, so 29 summaries carried the URL as well as the `reference` field --
-    # one fact in two places, which is the thing this strip exists to prevent.
-    head = re.sub(r"References?:\s*\S+", "", head)
-    return re.sub(r"\s+", " ", head).strip().rstrip() or None
-
-
 def _signal_lift(name, fn, facts):
     """Everything liftable for one signal. `reference` and `formula` are the only nulls."""
     doc = inspect.getdoc(fn) or ""
@@ -1010,31 +916,51 @@ def _signal_lift(name, fn, facts):
     # could not be lifted at all; they now carry a URL directly.
     url = re.search(r"https?://\S+", doc)
 
+    a = _AUTHORED[name]
     return {
         "source_module": facts["module"],
-        "reference": url.group(0).rstrip(".,") if url else None,
-        "warmup_bars": facts["warmup_bars"],
+        "reference": a.get("reference"),
+        "warmup_bars": a.get("warmup"),
         # Signals have no abbreviation. Held at null for consistency with the indicator layer, which
         # already uses null for inapplicable rather than a real value -- see the worked example.
         "abbreviation": None,
         "usage_example": f"RuleRegistry.evaluate({{'name': '{name}', 'params': {{{sig_params}}}}}, df)",
-        "formula": None,
+        "formula": a.get("formula"),
         # NOTE there is no `consumes` here. Which indicator outputs a signal reads is a property of
         # the `uses` EDGE, not of the signal -- see `rel()`. `inputs` below is the same word for the
         # same concept: series the signal consumes. The two differ only by provenance, which is
         # exactly what an edge expresses. A signal's full input set is this dict plus the `inputs` on
         # each of its `uses` edges.
-        "inputs": inputs,
+        "inputs": {k: {"type": "series", "description": a.get("inputs", {}).get(k)} for k in inputs},
         "params": params,
         # One boolean. A signal returns a bare bool with no name to lift, so the key is invented --
         # named rather than anonymous so it carries the same sub-schema as every indicator output.
-        "outputs": {"fired": {"type": "bool", "units": "boolean", "range": [0, 1],
-                              "canonical_name": "none",
-                              "description": ret.group(1).strip().rstrip(".") if ret else None}},
+        "outputs": {o: {"type": "bool", "units": spec["units"], "range": spec["range"],
+                        "canonical_name": spec["canonical_name"], "description": spec["description"]}
+                    for o, spec in a["outputs"].items()},
     }
 
 
 CLASSES = _load_classes()
+
+import mangrove_kb.signals  # noqa: E402,F401  -- registers every signal
+from mangrove_kb.registry import RuleRegistry  # noqa: E402
+from mangrove_kb.docstring_parser import DocstringFormatError, parse_authored  # noqa: E402
+
+#: Every authored value, read from the docstring of the object it describes. ONE source. No
+#: carry-forward from the previous graph and no knowledge-base lift: delete the JSON and this
+#: rebuilds it from the tree, which the old builder could not do.
+#
+#: Objects OUTSIDE the ontology are skipped, not fixed: `_load_classes()` returns every importable
+#: indicator, including the five stateful policy rules the ontology deliberately excludes. They were
+#: never converted, so their docstrings do not carry a declaration line, and demanding one would
+#: fail the build over nodes that do not exist.
+_AUTHORED = {}
+for _n, _obj in list(CLASSES.items()) + list(RuleRegistry._registry.items()):
+    try:
+        _AUTHORED[_n] = parse_authored(inspect.getdoc(_obj))
+    except DocstringFormatError:
+        continue
 SIGNAL_INPUT_DESC = _signal_input_descriptions()
 
 
@@ -1130,9 +1056,7 @@ for ind, cls in sorted(assigned.items()):
     # The KB definition covers indicators whose docstring is a bare title line, so lifting it here
     # removes them from the hand-authoring list rather than duplicating what is already written.
     atom(f"procedure:indicator-{ind.lower()}", ind, "Procedure",
-         (_describe(CLASSES[ind])
-          or KB_SECTIONS.get(ind, {}).get("definition")
-          or f"Indicator `{ind}` -- no description in source."),
+         _AUTHORED[ind]["summary"],
          # class is the instance-of edge below -- NEVER also a property, or there are two
          # representations of one fact.
          source_module=f"{mod_of[ind]}_indicators", **lifted)
@@ -1153,7 +1077,6 @@ for ind, cls in sorted(assigned.items()):
 # The class is NOT emitted: it is reached by following `uses` to the indicator and then that
 # indicator's `instance-of`. Same rule as the indicator layer, one level out.
 import mangrove_kb.signals  # noqa: E402,F401  -- registers every signal
-from mangrove_kb.registry import RuleRegistry  # noqa: E402
 
 # Which signals get nodes. The signal layer is being brought in deliberately, one group at a time,
 # the same way the indicator layer was: settle the shape on a specimen, review it, then widen.
@@ -1290,9 +1213,9 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
     fn = RuleRegistry._registry[sname]
     doc = inspect.getdoc(fn) or ""
     lifted = _signal_lift(sname, fn, facts)
-    dep = _SIG_DEPRECATED.search(doc)
+    dep = _SIG_DEPRECATED.search(_AUTHORED[sname]['summary'])
     atom(sid, sname, "Procedure",
-         _signal_summary(doc) or f"Signal `{sname}` -- no description in source.",
+         _AUTHORED[sname]['summary'],
          status="deprecated" if dep else "ratified", **lifted)
     rel(sname, "instance-of", "Signal", "entity type", sid, "concept:signal")
     if dep:
@@ -1349,53 +1272,6 @@ for canon, dup in deprecated_signals:
     rel(canon, "supersedes", dup, "computes the same thing under the canonical name",
         _sig_ids[canon], _sig_ids[dup])
 
-
-# --- carry forward authored values. Authored values live in the nodes, and this builder is the
-# thing that rewrites the nodes -- so every run must preserve what was authored into the last one,
-# or a rebuild silently erases hours of hand-authoring. Rule: a lift always wins (source changes
-# are supposed to propagate), but wherever THIS run produced `null` and the previous build had a
-# value, the previous value is kept. Keys absent from this run are NOT resurrected, so a field
-# deliberately removed from the schema stays removed.
-
-
-def _carry(new, old):
-    """Fill nulls in `new` from `old`, recursing into nested dicts. Returns the number filled."""
-    n = 0
-    for k, ov in (old or {}).items():
-        if k not in new:
-            continue
-        nv = new[k]
-        if isinstance(nv, dict) and isinstance(ov, dict):
-            n += _carry(nv, ov)
-        elif nv is None and ov is not None:
-            new[k] = ov
-            n += 1
-    return n
-
-
-carried = 0
-if NODE_FILE.exists():
-    _prev = {a["id"]: a for a in json.loads(NODE_FILE.read_text()).get("atoms", [])}
-    for a in atoms:
-        p = _prev.get(a["id"])
-        if not p:
-            continue
-        carried += _carry(a["props"], p.get("props") or {})
-        if not a.get("summary") and p.get("summary"):
-            a["summary"] = p["summary"]
-            carried += 1
-
-# Last resort for the three prose fields: the indicator's own docstring, for anything neither the
-# knowledge base nor a previous authoring pass has reached.
-bootstrapped = 0
-for a in atoms:
-    sec = DOC_SECTIONS.get(a["title"])
-    if not sec:
-        continue
-    for k in ("formula", "interpretation", "applications"):
-        if a["props"].get(k) is None and sec.get(k) is not None:
-            a["props"][k] = sec[k]
-            bootstrapped += 1
 
 # --- invariant: `null` means "not yet authored", everywhere. A field that is deliberately not
 # applicable must carry a real value instead, or it is indistinguishable from an unfilled one and
@@ -1478,10 +1354,7 @@ if class_disagrees:
 out = {"atoms": atoms, "relations": rels,
        "meta": {"scope": "indicator class ontology", "indicators": len(assigned),
                 "classes": len(CLASSES_DEF), "removed_not_indicators": sorted(REMOVED),
-                "carried_forward_from_previous_build": carried,
-                "bootstrapped_from_docstring": bootstrapped,
-                "kb_doc_sections_matched": len(KB_SECTIONS),
-                "kb_doc_sections_unmatched": sorted(KB_UNMATCHED),
+
                 "signals": len(atoms) - len([a for a in atoms if not a["id"].startswith("procedure:signal-")]),
                 "signals_registered": len(RuleRegistry.names()),
                 "signals_out_of_scope": (0 if SIGNAL_SCOPE is None
@@ -1493,8 +1366,9 @@ out = {"atoms": atoms, "relations": rels,
                 "signals_missing_warmup": sorted(
                     a["title"] for a in atoms
                     if a["id"].startswith("procedure:signal-") and a["props"]["warmup_bars"] is None),
-                "indicators_missing_description":
-                    sorted(i for i in assigned if not _describe(CLASSES[i]))}}
+                # Every authored value comes from a docstring, so a missing description is a
+                # missing docstring section and the parser has already refused the build.
+                "indicators_missing_description": []}}
 _rendered = json.dumps(out, indent=1)
 
 # Written here rather than by the caller's shell, because the caller's shell is what destroyed it.

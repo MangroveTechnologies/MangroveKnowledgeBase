@@ -41,11 +41,28 @@ logger = logging.getLogger(__name__)
 def bb_upper_breakout(
     df: pd.DataFrame, window: int = 20, window_dev: int = 2
 ) -> bool:
-    """
-    Detect price breaking above the upper Bollinger Band.
+    """Signal: bb_upper_breakout
 
-    Fires on the bar where price crosses above the upper band,
-    not while price remains above it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
+    Detect price breaking above the upper Bollinger Band. Fires on the bar where price crosses above
+    the upper band, not while price remains above it. Crypto assets frequently test bands during
+    high volatility; use with volume confirmation.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
+    Warmup: window
+
+    Formula:
+        close[t-1] <= hband[t-1] and close[t] > hband[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: MA period for center band
+        window_dev [default=2, min=1, max=5]: Standard deviation multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close crosses above upper band
 
     Type: TRIGGER
     Requires: Close
@@ -83,11 +100,28 @@ def bb_upper_breakout(
 def bb_lower_breakout(
     df: pd.DataFrame, window: int = 20, window_dev: int = 2
 ) -> bool:
-    """
-    Detect price breaking below the lower Bollinger Band.
+    """Signal: bb_lower_breakout
 
-    Fires on the bar where price crosses below the lower band,
-    not while price remains below it. Crypto assets frequently test bands during high volatility; use with volume confirmation.
+    Detect price breaking below the lower Bollinger Band. Fires on the bar where price crosses below
+    the lower band, not while price remains below it. Crypto assets frequently test bands during
+    high volatility; use with volume confirmation.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
+    Warmup: window
+
+    Formula:
+        close[t-1] >= lband[t-1] and close[t] < lband[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: MA period for center band
+        window_dev [default=2, min=1, max=5]: Standard deviation multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close crosses below lower band
 
     Type: TRIGGER
     Requires: Close
@@ -125,11 +159,28 @@ def bb_lower_breakout(
 def bb_squeeze(
     df: pd.DataFrame, window: int = 20, window_dev: int = 2, threshold: float = 5.0
 ) -> bool:
-    """
-    Detect Bollinger Band squeeze onset (low volatility, potential breakout).
+    """Signal: bb_squeeze
 
-    Fires on the bar where band width drops below the threshold,
-    not while it remains below.
+    Detect Bollinger Band squeeze onset (low volatility, potential breakout). Fires on the bar where
+    band width drops below the threshold, not while it remains below.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/bollinger-bandwidth
+    Warmup: window
+
+    Formula:
+        wband[t-1] >= threshold and wband[t] < threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: MA period for center band
+        window_dev [default=2, min=1, max=5]: Standard deviation multiplier
+        threshold [default=5.0, min=1.0, max=20.0]: Band width percentage threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where band width crosses below threshold
 
     Type: TRIGGER
     Requires: Close
@@ -183,8 +234,26 @@ def bb_squeeze(
 def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> bool:
     """Signal: bb_above_upper
 
-    Check if price is currently above the upper Bollinger Band. A state, not an event: true for every
-    bar close sits above the band, unlike bb_upper_breakout which fires only on the bar that crosses it.
+    Check if price is currently above the upper Bollinger Band. A state, not an event: true for
+    every bar close sits above the band, unlike bb_upper_breakout which fires only on the bar that
+    crosses it.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
+    Warmup: window - 1
+
+    Formula:
+        close[t] > hband[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: MA period for center band
+        window_dev [default=2, min=1, max=5]: Standard deviation multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > upper band on the current bar
 
     Type: FILTER
     Requires: Close
@@ -224,11 +293,28 @@ def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
 
 @RuleRegistry.register("bb_below_lower")
 def bb_below_lower(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> bool:
-    """
-    Check if price is currently below the lower Bollinger Band.
+    """Signal: bb_below_lower
 
-    A state, not an event: true for every bar close sits below the band, unlike
-    bb_lower_breakout which fires only on the bar that crosses it.
+    Check if price is currently below the lower Bollinger Band. A state, not an event: true for
+    every bar close sits below the band, unlike bb_lower_breakout which fires only on the bar that
+    crosses it.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
+    Warmup: window - 1
+
+    Formula:
+        close[t] < lband[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: MA period for center band
+        window_dev [default=2, min=1, max=5]: Standard deviation multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close < lower band on the current bar
 
     Type: FILTER
     Requires: Close
@@ -258,10 +344,30 @@ def bb_below_lower(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
 def kc_above_upper(
     df: pd.DataFrame, window: int = 20, window_atr: int = 10, multiplier: float = 2.0
 ) -> bool:
-    """
-    Check if price is currently above the upper Keltner Channel band.
+    """Signal: kc_above_upper
 
-    A state, not an event: true for every bar close sits above the band.
+    Check if price is currently above the upper Keltner Channel band. A state, not an event: true
+    for every bar close sits above the band.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
+    Warmup: max(window, window_atr) - 1
+
+    Formula:
+        close[t] > hband[t] -- a STATE: true for every bar close sits above the band, unlike kc_upper_breakout which fires only on the bar that crosses it
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=10, max=50]: EMA period for the center band
+        window_atr [default=10, min=5, max=30]: ATR period
+        multiplier [default=2.0, min=0.5, max=5.0]: ATR multiplier for band width
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > upper band on the current bar
 
     Type: FILTER
     Requires: High, Low, Close
@@ -294,10 +400,30 @@ def kc_above_upper(
 def kc_below_lower(
     df: pd.DataFrame, window: int = 20, window_atr: int = 10, multiplier: float = 2.0
 ) -> bool:
-    """
-    Check if price is currently below the lower Keltner Channel band.
+    """Signal: kc_below_lower
 
-    A state, not an event: true for every bar close sits below the band.
+    Check if price is currently below the lower Keltner Channel band. A state, not an event: true
+    for every bar close sits below the band.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
+    Warmup: max(window, window_atr) - 1
+
+    Formula:
+        close[t] < lband[t] -- a STATE: true for every bar close sits below the band, unlike kc_lower_breakout which fires only on the bar that crosses it
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=10, max=50]: EMA period for the center band
+        window_atr [default=10, min=5, max=30]: ATR period
+        multiplier [default=2.0, min=0.5, max=5.0]: ATR multiplier for band width
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close < lower band on the current bar
 
     Type: FILTER
     Requires: High, Low, Close
@@ -334,11 +460,29 @@ def kc_below_lower(
 def atr_high_volatility(
     df: pd.DataFrame, window: int = 14, threshold_pct: float = 3.0
 ) -> bool:
-    """
-    Check if ATR indicates high volatility relative to price.
+    """Signal: atr_high_volatility
 
-    High volatility (ATR as % of close > threshold) can indicate
-    potential trading opportunities or increased risk.
+    Check if ATR indicates high volatility relative to price. High volatility (ATR as % of close >
+    threshold) can indicate potential trading opportunities or increased risk.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-true-range-atr
+    Warmup: window - 1
+
+    Formula:
+        atr[t] / close[t] * 100 > threshold_pct -- ATR normalised by price here rather than read raw, so the threshold is comparable across instruments. False when close is zero.
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=50]: ATR period
+        threshold_pct [default=3.0, min=0.5, max=10.0]: ATR as percentage of close threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ATR% > threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -377,10 +521,31 @@ def atr_high_volatility(
 
 @RuleRegistry.register("kc_upper_breakout")
 def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, multiplier: float = 2.0, original_version: bool = False) -> bool:
-    """
-    Detect price breaking above upper Keltner Channel band.
+    """Signal: kc_upper_breakout
 
-    Fires on the bar where price crosses above the upper band.
+    Detect price breaking above upper Keltner Channel band. Fires on the bar where price crosses
+    above the upper band.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
+    Warmup: max(window, window_atr)
+
+    Formula:
+        close[t-1] <= hband[t-1] and close[t] > hband[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=10, max=50]: EMA period
+        window_atr [default=10, min=5, max=30]: ATR period
+        multiplier [default=2.0, min=0.5]: ATR multiplier for band width
+        original_version [default=False]: Use original Keltner Channel formula instead of EMA+ATR
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close crosses above upper band
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -420,10 +585,31 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
 
 @RuleRegistry.register("kc_lower_breakout")
 def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, multiplier: float = 2.0, original_version: bool = False) -> bool:
-    """
-    Detect price breaking below lower Keltner Channel band.
+    """Signal: kc_lower_breakout
 
-    Fires on the bar where price crosses below the lower band.
+    Detect price breaking below lower Keltner Channel band. Fires on the bar where price crosses
+    below the lower band.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
+    Warmup: max(window, window_atr)
+
+    Formula:
+        close[t-1] >= lband[t-1] and close[t] < lband[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=10, max=50]: EMA period
+        window_atr [default=10, min=5, max=30]: ATR period
+        multiplier [default=2.0, min=0.5]: ATR multiplier for band width
+        original_version [default=False]: Use original Keltner Channel formula instead of EMA+ATR
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close crosses below lower band
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -467,13 +653,30 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
 
 @RuleRegistry.register("dc_upper_breakout")
 def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
-    """
-    Detect price breaking above upper Donchian Channel (new high).
+    """Signal: dc_upper_breakout
 
-    Fires on the bar where close exceeds the prior period's upper band.
-    The channel is computed from the N bars BEFORE the current bar so the
-    current bar's high doesn't inflate the band it's compared against --
-    that is the Donchian convention and the indicator's own behaviour.
+    Detect price breaking above upper Donchian Channel (new high). Fires on the bar where close
+    exceeds the prior period's upper band. The channel is computed from the N bars BEFORE the
+    current bar so the current bar's high doesn't inflate the band it's compared against -- that is
+    the Donchian convention and the indicator's own behaviour.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/price-channels
+    Warmup: window + 1
+
+    Formula:
+        close[t-1] <= hband[t-1] and close[t] > hband[t] -- the channel spans the bars PRECEDING each bar (include_current_bar=False), which is what makes a break possible at all
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: Lookback period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close breaks above the prior upper band
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -507,13 +710,30 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("dc_lower_breakout")
 def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
-    """
-    Detect price breaking below lower Donchian Channel (new low).
+    """Signal: dc_lower_breakout
 
-    Fires on the bar where close drops below the prior period's lower band.
-    The channel is computed from the N bars BEFORE the current bar so the
-    current bar's low doesn't deflate the band it's compared against --
-    that is the Donchian convention and the indicator's own behaviour.
+    Detect price breaking below lower Donchian Channel (new low). Fires on the bar where close drops
+    below the prior period's lower band. The channel is computed from the N bars BEFORE the current
+    bar so the current bar's low doesn't deflate the band it's compared against -- that is the
+    Donchian convention and the indicator's own behaviour.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/price-channels
+    Warmup: window + 1
+
+    Formula:
+        close[t-1] >= lband[t-1] and close[t] < lband[t] -- the channel spans the bars PRECEDING each bar (include_current_bar=False)
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: Lookback period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close breaks below the prior lower band
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -551,10 +771,27 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("ulcer_high_risk")
 def ulcer_high_risk(df: pd.DataFrame, window: int = 14, threshold: float = 10.0) -> bool:
-    """
-    Check if Ulcer Index indicates high downside risk.
+    """Signal: ulcer_high_risk
 
-    Higher Ulcer Index values indicate greater downside volatility.
+    Check if Ulcer Index indicates high downside risk. Higher Ulcer Index values indicate greater
+    downside volatility.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index
+    Warmup: window - 1
+
+    Formula:
+        ulcer_index[t] > threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=50]: Lookback period
+        threshold [default=10.0, min=5.0, max=30.0]: High risk threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Ulcer Index > threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -584,10 +821,27 @@ def ulcer_high_risk(df: pd.DataFrame, window: int = 14, threshold: float = 10.0)
 
 @RuleRegistry.register("ulcer_low_risk")
 def ulcer_low_risk(df: pd.DataFrame, window: int = 14, threshold: float = 5.0) -> bool:
-    """
-    Check if Ulcer Index indicates low downside risk.
+    """Signal: ulcer_low_risk
 
-    Lower Ulcer Index values indicate lower downside volatility.
+    Check if Ulcer Index indicates low downside risk. Lower Ulcer Index values indicate lower
+    downside volatility.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index
+    Warmup: window - 1
+
+    Formula:
+        ulcer_index[t] < threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=50]: Lookback period
+        threshold [default=5.0, min=1.0, max=15.0]: Low risk threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Ulcer Index < threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -622,12 +876,30 @@ def ulcer_low_risk(df: pd.DataFrame, window: int = 14, threshold: float = 5.0) -
 
 @RuleRegistry.register("natr_high_volatility")
 def natr_high_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 2.0) -> bool:
-    """
-    Check if normalized ATR is above a high-volatility threshold.
+    """Signal: natr_high_volatility
 
-    NATR = 100 * ATR / close, so the threshold is a percentage. Values above
-    ~2-3% typically indicate elevated volatility in equities; crypto markets
-    can run 4-6%+ routinely.
+    Check if normalized ATR is above a high-volatility threshold. NATR = 100 * ATR / close, so the
+    threshold is a percentage. Values above ~2-3% typically indicate elevated volatility in
+    equities; crypto markets can run 4-6%+ routinely.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/volatility_indicators.html
+    Warmup: window
+
+    Formula:
+        natr[t] > threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=100]: NATR window
+        threshold [default=2.0, min=0.5]: High volatility threshold as percentage
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if NATR > threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -650,10 +922,29 @@ def natr_high_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 
 
 @RuleRegistry.register("natr_low_volatility")
 def natr_low_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 1.0) -> bool:
-    """
-    Check if normalized ATR is below a low-volatility threshold.
+    """Signal: natr_low_volatility
 
-    Useful as a squeeze / consolidation filter.
+    Check if normalized ATR is below a low-volatility threshold. Useful as a squeeze / consolidation
+    filter.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/volatility_indicators.html
+    Warmup: window
+
+    Formula:
+        natr[t] < threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=100]: NATR window
+        threshold [default=1.0, min=0.1]: Low volatility threshold as percentage
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if NATR < threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -803,8 +1094,28 @@ def atr_trailing_stop_flip_down(df: pd.DataFrame, window: int = 14, multiplier: 
 def starc_upper_breakout(
     df: pd.DataFrame, window: int = 20, window_atr: int = 15, multiplier: float = 2.0
 ) -> bool:
-    """
+    """Signal: starc_upper_breakout
+
     Check if close is above the STARC upper band (breakout).
+
+    Warmup: max(window, window_atr)
+
+    Formula:
+        close[t] > starc_hband[t] -- a STATE despite the name: true for every bar close sits above the band, not only the bar that crosses it
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: SMA window
+        window_atr [default=15, min=5, max=100]: ATR window
+        multiplier [default=2.0, min=0.5]: ATR multiplier for band width
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > upper band, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -834,8 +1145,28 @@ def starc_upper_breakout(
 def starc_lower_breakout(
     df: pd.DataFrame, window: int = 20, window_atr: int = 15, multiplier: float = 2.0
 ) -> bool:
-    """
+    """Signal: starc_lower_breakout
+
     Check if close is below the STARC lower band (breakdown).
+
+    Warmup: max(window, window_atr)
+
+    Formula:
+        close[t] < starc_lband[t] -- a STATE despite the name: true for every bar close sits below the band
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: SMA window
+        window_atr [default=15, min=5, max=100]: ATR window
+        multiplier [default=2.0, min=0.5]: ATR multiplier for band width
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close < lower band, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -863,15 +1194,29 @@ def starc_lower_breakout(
 
 @RuleRegistry.register("ve_above_upper")
 def ve_above_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
-    """
-    Check if close is at or above the volatility envelope's upper band.
+    """Signal: ve_above_upper
 
-    Today's close is at least `multiplier` standard deviations above YESTERDAY's close, where the
-    deviation is measured on recent returns. The envelope is centred on the previous close, not the
-    current bar -- the old wording said "above the current bar", which would make the comparison
-    vacuous.
+    Check if close is at or above the volatility envelope's upper band. Today's close is at least
+    `multiplier` standard deviations above YESTERDAY's close, where the deviation is measured on
+    recent returns. The envelope is centred on the previous close, not the current bar -- the old
+    wording said "above the current bar", which would make the comparison vacuous. A STATE, not an
+    event: true for every bar close stays at or beyond the band.
 
-    A STATE, not an event: true for every bar close stays at or beyond the band.
+    Warmup: window
+
+    Formula:
+        close[t] >= vstop_hband[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: Rolling stdev window
+        multiplier [default=2.0, min=0.5]: Stdev multiplier for the band distance
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close >= vstop_hband, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -896,11 +1241,27 @@ def ve_above_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) 
 
 @RuleRegistry.register("ve_below_lower")
 def ve_below_lower(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) -> bool:
-    """
-    Check if close is at or below the volatility envelope's lower band.
+    """Signal: ve_below_lower
 
-    Mirror of `ve_above_upper`: today's close is at least `multiplier` standard deviations below
-    yesterday's. A STATE, not an event.
+    Check if close is at or below the volatility envelope's lower band. Mirror of `ve_above_upper`:
+    today's close is at least `multiplier` standard deviations below yesterday's. A STATE, not an
+    event.
+
+    Warmup: window
+
+    Formula:
+        close[t] <= vstop_lband[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=5, max=100]: Rolling stdev window
+        multiplier [default=2.0, min=0.5]: Stdev multiplier for the band distance
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close <= vstop_lband, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -945,12 +1306,31 @@ def _chandelier_offsets(df: pd.DataFrame, window: int, multiplier: float):
 
 @RuleRegistry.register("cl_below_high_offset")
 def cl_below_high_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
-    """
-    Check if close is below the Chandelier high offset (close < high_offset).
+    """Signal: cl_below_high_offset
 
-    A STATE, not an event: true for every bar close sits below the level, not only the bar that
-    crosses it. Registered twice -- `chandelier_long_stop_hit` is the released name and names a use
-    (an exit for a long) rather than what is measured.
+    Check if close is below the Chandelier high offset (close < high_offset). A STATE, not an event:
+    true for every bar close sits below the level, not only the bar that crosses it. Registered
+    twice -- `chandelier_long_stop_hit` is the released name and names a use (an exit for a long)
+    rather than what is measured.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
+    Warmup: window - 1
+
+    Formula:
+        close[t] < high_offset[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=22, min=5, max=100]: Rolling extreme and ATR window
+        multiplier [default=3.0, min=0.5]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close < high_offset, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -974,12 +1354,31 @@ def cl_below_high_offset(df: pd.DataFrame, window: int = 22, multiplier: float =
 
 @RuleRegistry.register("cl_above_low_offset")
 def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
-    """
-    Check if close is above the Chandelier low offset (close > low_offset).
+    """Signal: cl_above_low_offset
 
-    A STATE, not an event. The two offsets are anchored to opposite extremes and can cross, so this
-    and `cl_below_high_offset` are both true on some bars -- 15 of 1,294 BTC daily bars at the
-    defaults. That is not a contradiction: they are two independent levels, not a band pair.
+    Check if close is above the Chandelier low offset (close > low_offset). A STATE, not an event.
+    The two offsets are anchored to opposite extremes and can cross, so this and
+    `cl_below_high_offset` are both true on some bars -- 15 of 1,294 BTC daily bars at the defaults.
+    That is not a contradiction: they are two independent levels, not a band pair.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
+    Warmup: window - 1
+
+    Formula:
+        close[t] > low_offset[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=22, min=5, max=100]: Rolling extreme and ATR window
+        multiplier [default=3.0, min=0.5]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > low_offset, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -1003,13 +1402,32 @@ def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 
 
 @RuleRegistry.register("cl_high_offset_break")
 def cl_high_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
-    """
-    Detect close crossing below the Chandelier high offset.
+    """Signal: cl_high_offset_break
 
-    The EVENT paired with `cl_below_high_offset`'s state. The state is true for every bar close
-    stays under the level -- 356 of 1,294 BTC daily bars at the defaults -- while this fires only on
-    the bar that breaches it. A strategy wanting the event cannot recover it from the state without
-    keeping its own history, which is why both exist.
+    Detect close crossing below the Chandelier high offset. The EVENT paired with
+    `cl_below_high_offset`'s state. The state is true for every bar close stays under the level --
+    356 of 1,294 BTC daily bars at the defaults -- while this fires only on the bar that breaches
+    it. A strategy wanting the event cannot recover it from the state without keeping its own
+    history, which is why both exist.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
+    Warmup: window
+
+    Formula:
+        close[t-1] >= high_offset[t-1] and close[t] < high_offset[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=22, min=5, max=100]: Rolling extreme and ATR window
+        multiplier [default=3.0, min=0.5]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close crosses below high_offset
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -1036,18 +1454,34 @@ def cl_high_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float =
 
 @RuleRegistry.register("cl_low_offset_break")
 def cl_low_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float = 3.0) -> bool:
-    """
-    Detect close crossing above the Chandelier low offset.
+    """Signal: cl_low_offset_break
 
-    The EVENT paired with `cl_above_low_offset`'s state, which holds for 477 of 1,294 BTC daily bars
-    at the defaults.
+    Detect close crossing above the Chandelier low offset. The EVENT paired with
+    `cl_above_low_offset`'s state, which holds for 477 of 1,294 BTC daily bars at the defaults. The
+    two offsets are anchored to OPPOSITE extremes -- high_offset below the rolling high, low_offset
+    above the rolling low -- so they cross constantly: high_offset sits BELOW low_offset on 73% of
+    BTC daily bars at the defaults. They are two independent levels, not a band pair, and nothing
+    here may assume high_offset >= low_offset. Simultaneous firing with `cl_high_offset_break` is
+    therefore not excluded by construction, though it does not occur on any of the seven fixtures.
 
-    The two offsets are anchored to OPPOSITE extremes -- high_offset below the rolling high,
-    low_offset above the rolling low -- so they cross constantly: high_offset sits BELOW low_offset
-    on 73% of BTC daily bars at the defaults. They are two independent levels, not a band pair, and
-    nothing here may assume high_offset >= low_offset. Simultaneous firing with
-    `cl_high_offset_break` is therefore not excluded by construction, though it does not occur on
-    any of the seven fixtures.
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
+    Warmup: window
+
+    Formula:
+        close[t-1] <= low_offset[t-1] and close[t] > low_offset[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=22, min=5, max=100]: Rolling extreme and ATR window
+        multiplier [default=3.0, min=0.5]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where close crosses above low_offset
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -1099,12 +1533,33 @@ def _squeeze(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, need=1):
 def ttm_squeeze_active(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.0,
                        kc_window: int = 20, kc_atr_mult: float = 1.5,
                        mom_window: int = 12) -> bool:
-    """
-    Check if the Bollinger Bands are inside the Keltner Channel (the squeeze is on).
+    """Signal: ttm_squeeze_active
 
-    `squeeze_depth` is how far inside the Keltner Channel the narrower Bollinger band sits, so a
-    positive depth IS the squeeze. The indicator measures the distance; this decides that a
-    positive distance counts.
+    Check if the Bollinger Bands are inside the Keltner Channel (the squeeze is on). `squeeze_depth`
+    is how far inside the Keltner Channel the narrower Bollinger band sits, so a positive depth IS
+    the squeeze. The indicator measures the distance; this decides that a positive distance counts.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
+    Warmup: max(bb_window, kc_window) + need - 1
+
+    Formula:
+        squeeze_depth[t] > 0 -- Bollinger Bands entirely inside the Keltner Channel
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        bb_window [default=20, min=5, max=100]: Bollinger window
+        bb_std [default=2.0, min=0.5]: Bollinger standard deviations
+        kc_window [default=20, min=5, max=100]: Keltner window
+        kc_atr_mult [default=1.5, min=0.5]: Keltner ATR multiplier
+        mom_window [default=12, min=5, max=50]: Momentum window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if squeeze_depth > 0
 
     Type: FILTER
     Requires: High, Low, Close
@@ -1141,11 +1596,33 @@ def _squeeze_fired(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, mo
 def ttm_squeeze_fired_bullish(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.0,
                               kc_window: int = 20, kc_atr_mult: float = 1.5,
                               mom_window: int = 12) -> bool:
-    """
-    Detect a squeeze releasing with positive momentum.
+    """Signal: ttm_squeeze_fired_bullish
 
-    The release is `squeeze_depth` crossing down through zero -- the Bollinger bands leaving the
-    Keltner channel. Direction comes from Carter's momentum on the same bar.
+    Detect a squeeze releasing with positive momentum. The release is `squeeze_depth` crossing down
+    through zero -- the Bollinger bands leaving the Keltner channel. Direction comes from Carter's
+    momentum on the same bar.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
+    Warmup: max(bb_window, kc_window) + need - 1
+
+    Formula:
+        squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] > 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        bb_window [default=20, min=5, max=100]: Bollinger window
+        bb_std [default=2.0, min=0.5]: Bollinger standard deviations
+        kc_window [default=20, min=5, max=100]: Keltner window
+        kc_atr_mult [default=1.5, min=0.5]: Keltner ATR multiplier
+        mom_window [default=12, min=5, max=50]: Momentum window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar the squeeze releases with momentum > 0
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -1168,10 +1645,31 @@ def ttm_squeeze_fired_bullish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
 def ttm_squeeze_fired_bearish(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.0,
                               kc_window: int = 20, kc_atr_mult: float = 1.5,
                               mom_window: int = 12) -> bool:
-    """
-    Detect a squeeze releasing with negative momentum.
+    """Signal: ttm_squeeze_fired_bearish
 
-    Mirror of `ttm_squeeze_fired_bullish`.
+    Detect a squeeze releasing with negative momentum. Mirror of `ttm_squeeze_fired_bullish`.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
+    Warmup: max(bb_window, kc_window) + need - 1
+
+    Formula:
+        squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] < 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        bb_window [default=20, min=5, max=100]: Bollinger window
+        bb_std [default=2.0, min=0.5]: Bollinger standard deviations
+        kc_window [default=20, min=5, max=100]: Keltner window
+        kc_atr_mult [default=1.5, min=0.5]: Keltner ATR multiplier
+        mom_window [default=12, min=5, max=50]: Momentum window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar the squeeze releases with momentum < 0
 
     Type: TRIGGER
     Requires: High, Low, Close

@@ -436,23 +436,24 @@ boolean behaves, so it mixes two bases into one enum.
 ## Building
 
 ```
-python ontology/build_signal_indicator_ontology.py          # writes the file in place
-python ontology/build_signal_indicator_ontology.py --stdout # print instead, for a diff-check
+python ontology/build_signal_indicator_ontology.py                 # writes the file in place
+ONTOLOGY_OUT=/tmp/check.json python ontology/build_signal_indicator_ontology.py   # elsewhere, to diff
 ```
 
-**Never redirect the builder into the ontology file.** This page documented
-`build.py > ontology/signal-indicator-ontology.json` for weeks, and that command destroys the file
-it is meant to rebuild: the shell truncates the target before the process starts, so the
-carry-forward reads an empty file and every hand-authored value is re-emitted as `null` -- with a
-clean exit code and no warning. The builder now writes the file itself and refuses to run against a
-file that has been emptied under it, but the shell truncates before it gets a vote, so the recovery
-is still `git checkout -- ontology/signal-indicator-ontology.json`.
+**The graph is a build artifact.** Delete it and rebuild; the committed file comes back exactly.
+Nothing is carried forward from the previous build, and nothing is lifted from
+`knowledge-base/*.md` -- every authored value lives in the **docstring** of the class or function it
+describes, and everything else is derived from the code. `tests/test_build_is_deterministic.py`
+builds to an empty path and asserts the result matches the committed graph, so a source that starts
+reading the old file fails the suite.
 
-`ontology/signal-indicator-ontology.json` is the ontology of record and **is committed**. Authored
-values live in the nodes, so the builder carries every authored value forward from the existing file
-and a rebuild is a fixed point -- running it twice produces identical output. A lift wins where a
-source supplies one; wherever a run produces `null` and the previous build had a value, the previous
-value is kept.
+Authoring therefore means editing a docstring, never the JSON: an edit to the JSON is overwritten by
+the next build.
+
+**Still never redirect the builder into the ontology file.** This page documented
+`build.py > ontology/signal-indicator-ontology.json` for weeks, and the shell truncates the target
+before the process starts. It matters less now that nothing is read back, but the recovery is the
+same: `git checkout -- ontology/signal-indicator-ontology.json`.
 
 The builder reads this repository's `mangrove_kb` package for ground truth and **aborts** rather than
 emit a graph if any assigned indicator does not exist, any present indicator is neither assigned nor

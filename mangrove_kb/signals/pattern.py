@@ -56,11 +56,29 @@ def _hit(series: pd.Series, window: int) -> bool:
 
 @RuleRegistry.register("doji_trigger")
 def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
-    """
-    Check if a doji pattern is detected on the current bar.
+    """Signal: doji_trigger
 
-    A doji forms when open and close are nearly equal relative to the
-    candle's range, signaling indecision. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Check if a doji pattern is detected on the current bar. A doji forms when open and close are
+    nearly equal relative to the candle's range, signaling indecision.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        range[t] > 0 and body[t] <= range[t] * body_threshold
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        body_threshold [default=0.1, min=0.01]: Maximum body-to-range ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if doji detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -81,11 +99,30 @@ def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
 @RuleRegistry.register("long_legged_doji_trigger")
 def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
                               wick_threshold: float = 0.25) -> bool:
-    """
-    Check if a long-legged doji is detected on the current bar.
+    """Signal: long_legged_doji_trigger
 
-    A doji with both upper and lower wicks at least wick_threshold of
-    the total range, indicating extreme indecision. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Check if a long-legged doji is detected on the current bar. A doji with both upper and lower
+    wicks at least wick_threshold of the total range, indicating extreme indecision.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        range[t] > 0 and body[t] <= range[t] * body_threshold and upper_wick[t] >= range[t] * wick_threshold and lower_wick[t] >= range[t] * wick_threshold
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        body_threshold [default=0.1, min=0.01]: Maximum body-to-range ratio
+        wick_threshold [default=0.25, min=0.1]: Minimum wick-to-range ratio for both wicks
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if long-legged doji detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -107,11 +144,30 @@ def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
 @RuleRegistry.register("dragonfly_doji_trigger")
 def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
                             upper_wick_max: float = 0.1) -> bool:
-    """
-    Check if a dragonfly doji is detected on the current bar.
+    """Signal: dragonfly_doji_trigger
 
-    A doji with open/close near the high and a long lower shadow.
-    Bullish signal at support. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Check if a dragonfly doji is detected on the current bar. A doji with open/close near the high
+    and a long lower shadow. Bullish signal at support.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        range[t] > 0 and body[t] <= range[t] * body_threshold and upper_wick[t] <= range[t] * upper_wick_max and lower_wick[t] > body[t]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        body_threshold [default=0.1, min=0.01]: Maximum body-to-range ratio
+        upper_wick_max [default=0.1, min=0.01]: Maximum upper wick-to-range ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if dragonfly doji detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -133,11 +189,30 @@ def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
 @RuleRegistry.register("gravestone_doji_trigger")
 def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
                              lower_wick_max: float = 0.1) -> bool:
-    """
-    Check if a gravestone doji is detected on the current bar.
+    """Signal: gravestone_doji_trigger
 
-    A doji with open/close near the low and a long upper shadow.
-    Bearish signal at resistance. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Check if a gravestone doji is detected on the current bar. A doji with open/close near the low
+    and a long upper shadow. Bearish signal at resistance.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        range[t] > 0 and body[t] <= range[t] * body_threshold and lower_wick[t] <= range[t] * lower_wick_max and upper_wick[t] > body[t]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        body_threshold [default=0.1, min=0.01]: Maximum body-to-range ratio
+        lower_wick_max [default=0.1, min=0.01]: Maximum lower wick-to-range ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if gravestone doji detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -159,11 +234,30 @@ def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
 @RuleRegistry.register("hammer_trigger")
 def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
                     upper_wick_max: float = 0.1) -> bool:
-    """
-    Check if a hammer shape is detected on the current bar.
+    """Signal: hammer_trigger
 
-    Small body at upper end with long lower wick and minimal upper wick.
-    Bullish reversal after downtrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Check if a hammer shape is detected on the current bar. Small body at upper end with long lower
+    wick and minimal upper wick. Bullish reversal after downtrend.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 0
+
+    Formula:
+        body[t] > 0 and lower_wick[t] >= body[t] * wick_ratio and upper_wick[t] <= body[t] * upper_wick_max
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_ratio [default=2.0, min=1.5]: Minimum lower wick to body ratio
+        upper_wick_max [default=0.1, min=0.01]: Maximum upper wick to body ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if hammer detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -185,17 +279,34 @@ def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 @RuleRegistry.register("shooting_star_trigger")
 def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
                            lower_wick_max: float = 0.1) -> bool:
-    """
-    Check if a shooting star shape is detected on the current bar.
+    """Signal: shooting_star_trigger
 
-    Small body at lower end with long upper wick and minimal lower wick.
-    Bearish reversal after uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Check if a shooting star shape is detected on the current bar. Small body at lower end with long
+    upper wick and minimal lower wick. Bearish reversal after uptrend. DEPRECATED: identical to
+    `inverted_hammer_trigger`. `_shooting_star` calls `_inverted_hammer` and renames the output, so
+    the two fire on exactly the same bars -- verified identical across 499 bars. The distinction is
+    the prior trend, which this implementation does not encode. Kept because the name is referenced
+    outside this repository. Use `inverted_hammer_trigger`.
 
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Warmup: 0
 
-    DEPRECATED: identical to `inverted_hammer_trigger`. `_shooting_star` calls `_inverted_hammer`
-    and renames the output, so the two fire on exactly the same bars -- verified identical across
-    499 bars. The distinction is the prior trend, which this implementation does not encode. Kept
-    because the name is referenced outside this repository. Use `inverted_hammer_trigger`.
+    Formula:
+        body[t] > 0 and upper_wick[t] >= body[t] * wick_ratio and lower_wick[t] <= body[t] * lower_wick_max -- identical arithmetic to inverted_hammer_trigger; the two differ only by the prior trend, which this implementation does not encode
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_ratio [default=2.0, min=1.5]: Minimum upper wick to body ratio
+        lower_wick_max [default=0.1, min=0.01]: Maximum lower wick to body ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if shooting star detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -221,18 +332,35 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 @RuleRegistry.register("hanging_man_trigger")
 def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
                          upper_wick_max: float = 0.1) -> bool:
-    """
-    Check if a hanging man shape is detected on the current bar.
+    """Signal: hanging_man_trigger
 
-    Same shape as hammer (small body, long lower wick) but interpreted as a
-    bearish reversal when appearing after an uptrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
-
-
+    Check if a hanging man shape is detected on the current bar. Same shape as hammer (small body,
+    long lower wick) but interpreted as a bearish reversal when appearing after an uptrend.
     DEPRECATED: identical to `hammer_trigger`. `_hanging_man` calls `_hammer` and renames the
     output, so the two fire on exactly the same bars -- verified identical across 499 bars. A
     hanging man IS a hammer; what distinguishes them is the prior trend, which this implementation
     does not encode. Kept because the name is referenced outside this repository (MangroveOracle's
     signals_metadata.json, strategy cohort files, experiment outputs). Use `hammer_trigger`.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+    Warmup: 0
+
+    Formula:
+        body[t] > 0 and lower_wick[t] >= body[t] * wick_ratio and upper_wick[t] <= body[t] * upper_wick_max -- identical arithmetic to hammer_trigger; the two differ only by the prior trend, which this implementation does not encode
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_ratio [default=2.0, min=1.5]: Minimum lower wick to body ratio
+        upper_wick_max [default=0.1, min=0.01]: Maximum upper wick to body ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if hanging man detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -258,11 +386,31 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 @RuleRegistry.register("inverted_hammer_trigger")
 def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
                               lower_wick_max: float = 0.1) -> bool:
-    """
-    Check if an inverted hammer shape is detected on the current bar.
+    """Signal: inverted_hammer_trigger
 
-    Same shape as shooting star (small body, long upper wick) but interpreted as a
-    bullish reversal when appearing after a downtrend. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Check if an inverted hammer shape is detected on the current bar. Same shape as shooting star
+    (small body, long upper wick) but interpreted as a bullish reversal when appearing after a
+    downtrend.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 0
+
+    Formula:
+        body[t] > 0 and upper_wick[t] >= body[t] * wick_ratio and lower_wick[t] <= body[t] * lower_wick_max
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_ratio [default=2.0, min=1.5]: Minimum upper wick to body ratio
+        lower_wick_max [default=0.1, min=0.01]: Maximum lower wick to body ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if inverted hammer detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -283,11 +431,29 @@ def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 
 @RuleRegistry.register("marubozu_bullish_trigger")
 def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> bool:
-    """
-    Check if a bullish marubozu is detected on the current bar.
+    """Signal: marubozu_bullish_trigger
 
-    Full-bodied bullish candle with minimal or no wicks.
-    Signals strong buying conviction. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Check if a bullish marubozu is detected on the current bar. Full-bodied bullish candle with
+    minimal or no wicks. Signals strong buying conviction.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        range[t] > 0 and upper_wick[t] <= range[t] * wick_tolerance and lower_wick[t] <= range[t] * wick_tolerance and signed_body[t] > 0
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_tolerance [default=0.05, min=0.0]: Maximum wick-to-range ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish marubozu detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -307,11 +473,29 @@ def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
 
 @RuleRegistry.register("marubozu_bearish_trigger")
 def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> bool:
-    """
-    Check if a bearish marubozu is detected on the current bar.
+    """Signal: marubozu_bearish_trigger
 
-    Full-bodied bearish candle with minimal or no wicks.
-    Signals strong selling conviction. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Check if a bearish marubozu is detected on the current bar. Full-bodied bearish candle with
+    minimal or no wicks. Signals strong selling conviction.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        range[t] > 0 and upper_wick[t] <= range[t] * wick_tolerance and lower_wick[t] <= range[t] * wick_tolerance and signed_body[t] < 0
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_tolerance [default=0.05, min=0.0]: Maximum wick-to-range ratio
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish marubozu detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -332,11 +516,30 @@ def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
 @RuleRegistry.register("spinning_top_trigger")
 def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
                           wick_min: float = 0.2) -> bool:
-    """
-    Check if a spinning top is detected on the current bar.
+    """Signal: spinning_top_trigger
 
-    Small body with significant wicks on both sides, signaling indecision.
+    Check if a spinning top is detected on the current bar. Small body with significant wicks on
+    both sides, signaling indecision.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        range[t] > 0 and body[t] <= range[t] * body_max and upper_wick[t] >= range[t] * wick_min and lower_wick[t] >= range[t] * wick_min
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        body_max [default=0.3, min=0.1]: Maximum body-to-range ratio
+        wick_min [default=0.2, min=0.1]: Minimum wick-to-range ratio for both wicks
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if spinning top detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -362,11 +565,24 @@ def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
 
 @RuleRegistry.register("bullish_engulfing_trigger")
 def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if a bullish engulfing pattern completed on the current bar.
+    """Signal: bullish_engulfing_trigger
 
-    Current bullish candle's body completely contains the previous bearish
-    candle's body. Strong bullish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Check if a bullish engulfing pattern completed on the current bar. Current bullish candle's body
+    completely contains the previous bearish candle's body. Strong bullish reversal.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 1
+
+    Formula:
+        close[t-1] < open[t-1] and close[t] > open[t] and body_low_delta[t] < 0 and body_high_delta[t] > 0
+
+    Inputs:
+        open: opening price of the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish engulfing detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, Close
@@ -385,11 +601,24 @@ def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("bearish_engulfing_trigger")
 def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if a bearish engulfing pattern completed on the current bar.
+    """Signal: bearish_engulfing_trigger
 
-    Current bearish candle's body completely contains the previous bullish
-    candle's body. Strong bearish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Check if a bearish engulfing pattern completed on the current bar. Current bearish candle's body
+    completely contains the previous bullish candle's body. Strong bearish reversal.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Warmup: 1
+
+    Formula:
+        close[t-1] > open[t-1] and close[t] < open[t] and body_low_delta[t] < 0 and body_high_delta[t] > 0
+
+    Inputs:
+        open: opening price of the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish engulfing detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, Close
@@ -408,11 +637,24 @@ def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("bullish_harami_trigger")
 def bullish_harami_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if a bullish harami pattern completed on the current bar.
+    """Signal: bullish_harami_trigger
 
-    Current small bullish candle's body is inside the previous large bearish
-    candle's body. Potential bullish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Check if a bullish harami pattern completed on the current bar. Current small bullish candle's
+    body is inside the previous large bearish candle's body. Potential bullish reversal.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 1
+
+    Formula:
+        close[t-1] < open[t-1] and close[t] > open[t] and body_low_delta[t] > 0 and body_high_delta[t] < 0
+
+    Inputs:
+        open: opening price of the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish harami detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, Close
@@ -431,11 +673,24 @@ def bullish_harami_trigger(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("bearish_harami_trigger")
 def bearish_harami_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if a bearish harami pattern completed on the current bar.
+    """Signal: bearish_harami_trigger
 
-    Current small bearish candle's body is inside the previous large bullish
-    candle's body. Potential bearish reversal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Check if a bearish harami pattern completed on the current bar. Current small bearish candle's
+    body is inside the previous large bullish candle's body. Potential bearish reversal.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Warmup: 1
+
+    Formula:
+        close[t-1] > open[t-1] and close[t] < open[t] and body_low_delta[t] > 0 and body_high_delta[t] < 0
+
+    Inputs:
+        open: opening price of the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish harami detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, Close
@@ -454,19 +709,36 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("piercing_line_trigger")
 def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, require_gap: bool = False) -> bool:
-    """
-    Check if a piercing line pattern completed on the current bar.
+    """Signal: piercing_line_trigger
 
-    Bullish reversal: bearish candle followed by bullish candle opening below
-    prior low (classic) or prior close (relaxed) and closing above midpoint of
-    prior body.
+    Check if a piercing line pattern completed on the current bar. Bullish reversal: bearish candle
+    followed by bullish candle opening below prior low (classic) or prior close (relaxed) and
+    closing above midpoint of prior body. DEFAULT IS THE RELAXED FORM, because the classic one
+    cannot fire here. It requires the bar to open below the prior LOW, and a 24/7 market does not
+    gap: measured on 1,294 BTC daily bars, the open is below the prior low ZERO times, so
+    require_gap=True yields 0 fires against 63 for the relaxed form. Set require_gap=True only for a
+    market that actually closes.
 
-    DEFAULT IS THE RELAXED FORM, because the classic one cannot fire here. It
-    requires the bar to open below the prior LOW, and a 24/7 market does not
-    gap: measured on 1,294 BTC daily bars, the open is below the prior low
-    ZERO times, so require_gap=True yields 0 fires against 63 for the relaxed
-    form. Set require_gap=True only for a market that actually closes.
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 1
+
+    Formula:
+        close[t-1] < open[t-1] and close[t] > open[t] and open[t] < close[t-1] and close[t] > close[t-1] + (open[t-1] - close[t-1]) * min_penetration -- open[t] < low[t-1] instead when require_gap is true, which cannot occur in a 24/7 market
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        min_penetration [default=0.5, min=0.3]: Minimum penetration into previous body
+        require_gap [default=False]: If True, requires open below previous low (classic Nison),
+        which cannot occur in a 24/7 market. If False, requires open below previous close
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if piercing line detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -487,19 +759,36 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
 
 @RuleRegistry.register("dark_cloud_cover_trigger")
 def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, require_gap: bool = False) -> bool:
-    """
-    Check if a dark cloud cover pattern completed on the current bar.
+    """Signal: dark_cloud_cover_trigger
 
-    Bearish reversal: bullish candle followed by bearish candle opening above
-    prior high (classic) or prior close (relaxed) and closing below midpoint of
-    prior body.
+    Check if a dark cloud cover pattern completed on the current bar. Bearish reversal: bullish
+    candle followed by bearish candle opening above prior high (classic) or prior close (relaxed)
+    and closing below midpoint of prior body. DEFAULT IS THE RELAXED FORM, because the classic one
+    cannot fire here. It requires the bar to open above the prior HIGH, and a 24/7 market does not
+    gap: measured on 1,294 BTC daily bars, the open is above the prior high ZERO times, so
+    require_gap=True yields 0 fires against 67 for the relaxed form. Set require_gap=True only for a
+    market that actually closes.
 
-    DEFAULT IS THE RELAXED FORM, because the classic one cannot fire here. It
-    requires the bar to open above the prior HIGH, and a 24/7 market does not
-    gap: measured on 1,294 BTC daily bars, the open is above the prior high
-    ZERO times, so require_gap=True yields 0 fires against 67 for the relaxed
-    form. Set require_gap=True only for a market that actually closes.
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Warmup: 1
+
+    Formula:
+        close[t-1] > open[t-1] and close[t] < open[t] and open[t] > close[t-1] and close[t] < close[t-1] - (close[t-1] - open[t-1]) * min_penetration -- open[t] > high[t-1] instead when require_gap is true, which cannot occur in a 24/7 market
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        min_penetration [default=0.5, min=0.3]: Minimum penetration into previous body
+        require_gap [default=False]: If True, requires open above previous high (classic Nison),
+        which cannot occur in a 24/7 market. If False, requires open above previous close
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if dark cloud cover detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -520,11 +809,30 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
 
 @RuleRegistry.register("tweezer_tops_trigger")
 def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
-    """
-    Check if a tweezer tops pattern completed on the current bar.
+    """Signal: tweezer_tops_trigger
 
-    Two consecutive candles with approximately equal highs, first bullish
-    and second bearish. Bearish reversal. Reference: https://thepatternsite.com/TweezersTop.html
+    Check if a tweezer tops pattern completed on the current bar. Two consecutive candles with
+    approximately equal highs, first bullish and second bearish. Bearish reversal.
+
+    Reference: https://thepatternsite.com/TweezersTop.html
+    Warmup: 1
+
+    Formula:
+        abs(high[t] - high[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] > open[t-1] and close[t] < open[t]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        tolerance [default=0.01, min=0.001]: Maximum high-to-high difference as fraction of average
+        range
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if tweezer tops detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -544,11 +852,30 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
 
 @RuleRegistry.register("tweezer_bottoms_trigger")
 def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
-    """
-    Check if a tweezer bottoms pattern completed on the current bar.
+    """Signal: tweezer_bottoms_trigger
 
-    Two consecutive candles with approximately equal lows, first bearish
-    and second bullish. Bullish reversal. Reference: https://thepatternsite.com/TweezersBottom.html
+    Check if a tweezer bottoms pattern completed on the current bar. Two consecutive candles with
+    approximately equal lows, first bearish and second bullish. Bullish reversal.
+
+    Reference: https://thepatternsite.com/TweezersBottom.html
+    Warmup: 1
+
+    Formula:
+        abs(low[t] - low[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] < open[t-1] and close[t] > open[t]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        tolerance [default=0.01, min=0.001]: Maximum low-to-low difference as fraction of average
+        range
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if tweezer bottoms detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -573,11 +900,29 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
 
 @RuleRegistry.register("morning_star_trigger")
 def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
-    """
-    Check if a morning star pattern completed on the current bar.
+    """Signal: morning_star_trigger
 
-    Three-candle bullish reversal: bearish candle, small-bodied star, then
-    bullish candle closing above midpoint of first. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Check if a morning star pattern completed on the current bar. Three-candle bullish reversal:
+    bearish candle, small-bodied star, then bullish candle closing above midpoint of first.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 2
+
+    Formula:
+        close[t-2] < open[t-2] and body[t-1] <= range[t-1] * body_threshold and close[t] > open[t] and close[t] > (open[t-2] + close[t-2]) / 2
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        body_threshold [default=0.3, min=0.1]: Maximum body-to-range ratio for middle candle
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if morning star detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -597,11 +942,29 @@ def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
 
 @RuleRegistry.register("evening_star_trigger")
 def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
-    """
-    Check if an evening star pattern completed on the current bar.
+    """Signal: evening_star_trigger
 
-    Three-candle bearish reversal: bullish candle, small-bodied star, then
-    bearish candle closing below midpoint of first. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Check if an evening star pattern completed on the current bar. Three-candle bearish reversal:
+    bullish candle, small-bodied star, then bearish candle closing below midpoint of first.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Warmup: 2
+
+    Formula:
+        close[t-2] > open[t-2] and body[t-1] <= range[t-1] * body_threshold and close[t] < open[t] and close[t] < (open[t-2] + close[t-2]) / 2
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        body_threshold [default=0.3, min=0.1]: Maximum body-to-range ratio for middle candle
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if evening star detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -621,11 +984,29 @@ def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
 
 @RuleRegistry.register("three_white_soldiers_trigger")
 def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> bool:
-    """
-    Check if three white soldiers pattern completed on the current bar.
+    """Signal: three_white_soldiers_trigger
 
-    Three consecutive bullish candles with higher closes, each opening within
-    the previous body. Strong bullish signal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+    Check if three white soldiers pattern completed on the current bar. Three consecutive bullish
+    candles with higher closes, each opening within the previous body. Strong bullish signal.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+    Warmup: 2
+
+    Formula:
+        all three bars bullish, each closing higher than the last, each opening inside the prior body, and every body >= its own range * min_body_ratio
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        min_body_ratio [default=0.5, min=0.3]: Minimum body-to-range ratio per candle
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if three white soldiers detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -645,11 +1026,29 @@ def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) 
 
 @RuleRegistry.register("three_black_crows_trigger")
 def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> bool:
-    """
-    Check if three black crows pattern completed on the current bar.
+    """Signal: three_black_crows_trigger
 
-    Three consecutive bearish candles with lower closes, each opening within
-    the previous body. Strong bearish signal. Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+    Check if three black crows pattern completed on the current bar. Three consecutive bearish
+    candles with lower closes, each opening within the previous body. Strong bearish signal.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+    Warmup: 2
+
+    Formula:
+        all three bars bearish, each closing lower than the last, each opening inside the prior body, and every body >= its own range * min_body_ratio
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        min_body_ratio [default=0.5, min=0.3]: Minimum body-to-range ratio per candle
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if three black crows detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -669,11 +1068,24 @@ def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> 
 
 @RuleRegistry.register("three_inside_up_trigger")
 def three_inside_up_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if three inside up pattern completed on the current bar.
+    """Signal: three_inside_up_trigger
 
-    Bearish candle, bullish harami, then bullish close above first candle's open.
-    Confirmed bullish reversal. Reference: https://thepatternsite.com/ThreeInsideUp.html
+    Check if three inside up pattern completed on the current bar. Bearish candle, bullish harami,
+    then bullish close above first candle's open. Confirmed bullish reversal.
+
+    Reference: https://thepatternsite.com/ThreeInsideUp.html
+    Warmup: 2
+
+    Formula:
+        close[t-2] < open[t-2] and close[t-1] > open[t-1] and open[t-1] > close[t-2] and close[t-1] < open[t-2] and close[t] > open[t] and close[t] > open[t-2]
+
+    Inputs:
+        open: opening price of the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if three inside up detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, Close
@@ -692,11 +1104,24 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("three_inside_down_trigger")
 def three_inside_down_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if three inside down pattern completed on the current bar.
+    """Signal: three_inside_down_trigger
 
-    Bullish candle, bearish harami, then bearish close below first candle's open.
-    Confirmed bearish reversal. Reference: https://thepatternsite.com/ThreeInsideDown.html
+    Check if three inside down pattern completed on the current bar. Bullish candle, bearish harami,
+    then bearish close below first candle's open. Confirmed bearish reversal.
+
+    Reference: https://thepatternsite.com/ThreeInsideDown.html
+    Warmup: 2
+
+    Formula:
+        close[t-2] > open[t-2] and close[t-1] < open[t-1] and open[t-1] < close[t-2] and close[t-1] > open[t-2] and close[t] < open[t] and close[t] < open[t-2]
+
+    Inputs:
+        open: opening price of the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if three inside down detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, Close
@@ -720,11 +1145,24 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("inside_bar_trigger")
 def inside_bar_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if an inside bar is detected on the current bar.
+    """Signal: inside_bar_trigger
 
-    Current bar's range is completely contained within the previous bar's range.
-    Signals consolidation and potential breakout. Reference: https://thepatternsite.com/InsideDays.html
+    Check if an inside bar is detected on the current bar. Current bar's range is completely
+    contained within the previous bar's range. Signals consolidation and potential breakout.
+
+    Reference: https://thepatternsite.com/InsideDays.html
+    Warmup: 1
+
+    Formula:
+        range_high_delta[t] < 0 and range_low_delta[t] > 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if inside bar detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: High, Low
@@ -743,11 +1181,24 @@ def inside_bar_trigger(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("outside_bar_trigger")
 def outside_bar_trigger(df: pd.DataFrame) -> bool:
-    """
-    Check if an outside bar is detected on the current bar.
+    """Signal: outside_bar_trigger
 
-    Current bar's range completely engulfs the previous bar's range.
-    Signals increased volatility. Reference: https://thepatternsite.com/OutsideDays.html
+    Check if an outside bar is detected on the current bar. Current bar's range completely engulfs
+    the previous bar's range. Signals increased volatility.
+
+    Reference: https://thepatternsite.com/OutsideDays.html
+    Warmup: 1
+
+    Formula:
+        range_high_delta[t] > 0 and range_low_delta[t] < 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if outside bar detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: High, Low
@@ -767,11 +1218,30 @@ def outside_bar_trigger(df: pd.DataFrame) -> bool:
 @RuleRegistry.register("bullish_pin_bar_trigger")
 def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
                              body_position: float = 0.33) -> bool:
-    """
-    Check if a bullish pin bar is detected on the current bar.
+    """Signal: bullish_pin_bar_trigger
 
-    Long lower wick with body in the upper portion of the range.
-    Bullish reversal at support. Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
+    Check if a bullish pin bar is detected on the current bar. Long lower wick with body in the
+    upper portion of the range. Bullish reversal at support.
+
+    Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
+    Warmup: 0
+
+    Formula:
+        body[t] > 0 and lower_wick[t] >= body[t] * wick_ratio and min(open[t], close[t]) > low[t] + range[t] * (1 - body_position)
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_ratio [default=2.0, min=1.5]: Minimum dominant wick to body ratio
+        body_position [default=0.33, min=0.1]: Maximum body distance from end as fraction of range
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish pin bar detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -793,11 +1263,30 @@ def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 @RuleRegistry.register("bearish_pin_bar_trigger")
 def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
                               body_position: float = 0.33) -> bool:
-    """
-    Check if a bearish pin bar is detected on the current bar.
+    """Signal: bearish_pin_bar_trigger
 
-    Long upper wick with body in the lower portion of the range.
-    Bearish reversal at resistance. Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
+    Check if a bearish pin bar is detected on the current bar. Long upper wick with body in the
+    lower portion of the range. Bearish reversal at resistance.
+
+    Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
+    Warmup: 0
+
+    Formula:
+        body[t] > 0 and upper_wick[t] >= body[t] * wick_ratio and max(open[t], close[t]) < high[t] - range[t] * (1 - body_position)
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        wick_ratio [default=2.0, min=1.5]: Minimum dominant wick to body ratio
+        body_position [default=0.33, min=0.1]: Maximum body distance from end as fraction of range
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish pin bar detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -818,12 +1307,31 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 
 @RuleRegistry.register("two_bar_reversal_bullish_trigger")
 def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 0.25) -> bool:
-    """
-    Check if a bullish two-bar reversal completed on the current bar.
+    """Signal: two_bar_reversal_bullish_trigger
 
-    Bearish bar followed by bullish bar that takes out the low then
-    closes above the prior open. The close_proximity parameter controls how
-    close the close must be to the high/low extreme. Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
+    Check if a bullish two-bar reversal completed on the current bar. Bearish bar followed by
+    bullish bar that takes out the low then closes above the prior open. The close_proximity
+    parameter controls how close the close must be to the high/low extreme.
+
+    Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
+    Warmup: 1
+
+    Formula:
+        close[t-1] < open[t-1] and (close[t-1] - low[t-1]) <= range[t-1] * close_proximity and close[t] > open[t] and (high[t] - close[t]) <= range[t] * close_proximity and low[t] <= low[t-1] and close[t] > open[t-1]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        close_proximity [default=0.25, min=0.1]: How close the close must be to the extreme, as a
+        fraction of range. Lower is stricter
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish two-bar reversal detected, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -843,12 +1351,31 @@ def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 
 
 @RuleRegistry.register("two_bar_reversal_bearish_trigger")
 def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 0.25) -> bool:
-    """
-    Check if a bearish two-bar reversal completed on the current bar.
+    """Signal: two_bar_reversal_bearish_trigger
 
-    Bullish bar followed by bearish bar that takes out the high then
-    closes below the prior open. The close_proximity parameter controls how
-    close the close must be to the high/low extreme. Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
+    Check if a bearish two-bar reversal completed on the current bar. Bullish bar followed by
+    bearish bar that takes out the high then closes below the prior open. The close_proximity
+    parameter controls how close the close must be to the high/low extreme.
+
+    Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
+    Warmup: 1
+
+    Formula:
+        close[t-1] > open[t-1] and (high[t-1] - close[t-1]) <= range[t-1] * close_proximity and close[t] < open[t] and (close[t] - low[t]) <= range[t] * close_proximity and high[t] >= high[t-1] and close[t] < open[t-1]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        close_proximity [default=0.25, min=0.1]: How close the close must be to the extreme, as a
+        fraction of range. Lower is stricter
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish two-bar reversal detected, False otherwise
 
     Type: TRIGGER
     Requires: Open, High, Low, Close
@@ -868,12 +1395,28 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 
 
 @RuleRegistry.register("nr7_trigger")
 def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
-    """
-    Check if a narrow range day is detected on the current bar.
+    """Signal: nr7_trigger
 
-    Current bar has the smallest range within the window period.
-    Signals volatility compression and imminent breakout.
-    Default window=7 for NR7; use 4 for NR4. Reference: https://thepatternsite.com/nr7.html
+    Check if a narrow range day is detected on the current bar. Current bar has the smallest range
+    within the window period. Signals volatility compression and imminent breakout. Default window=7
+    for NR7; use 4 for NR4.
+
+    Reference: https://thepatternsite.com/nr7.html
+    Warmup: window - 1
+
+    Formula:
+        range[t] < min(range[t-window+1 .. t-1])
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window [default=7, min=4, max=20]: Number of bars to compare range against
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if narrow range detected on current bar, False otherwise
 
     Type: TRIGGER
     Requires: High, Low
@@ -898,14 +1441,31 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
 
 @RuleRegistry.register("bullish_pattern_recent")
 def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if any bullish candlestick pattern was detected within recent window.
+    """Signal: bullish_pattern_recent
 
-    Scans for hammer, inverted hammer, bullish engulfing, bullish harami,
-    piercing line, morning star, dragonfly doji, three white soldiers,
-    three inside up, tweezer bottoms, and bullish pin bar within the recent window.
+    Check if any bullish candlestick pattern was detected within recent window. Scans for hammer,
+    inverted hammer, bullish engulfing, bullish harami, piercing line, morning star, dragonfly doji,
+    three white soldiers, three inside up, tweezer bottoms, and bullish pin bar within the recent
+    window.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 2
+
+    Formula:
+        any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, bullish harami, piercing_line, dragonfly_doji, tweezer_bottoms, bullish pin_bar, morning_star, three_white_soldiers, three_inside_up
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if any bullish pattern found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -951,14 +1511,31 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
 
 @RuleRegistry.register("bearish_pattern_recent")
 def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if any bearish candlestick pattern was detected within recent window.
+    """Signal: bearish_pattern_recent
 
-    Scans for hanging man, shooting star, bearish engulfing, bearish harami,
-    dark cloud cover, evening star, gravestone doji, three black crows,
-    three inside down, tweezer tops, and bearish pin bar within the recent window.
+    Check if any bearish candlestick pattern was detected within recent window. Scans for hanging
+    man, shooting star, bearish engulfing, bearish harami, dark cloud cover, evening star,
+    gravestone doji, three black crows, three inside down, tweezer tops, and bearish pin bar within
+    the recent window.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Warmup: 2
+
+    Formula:
+        any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, bearish harami, dark_cloud_cover, gravestone_doji, tweezer_tops, bearish pin_bar, evening_star, three_black_crows, three_inside_down
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if any bearish pattern found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1004,13 +1581,30 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
 
 @RuleRegistry.register("reversal_pattern_bullish")
 def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if a bullish reversal pattern was detected within recent window.
+    """Signal: reversal_pattern_bullish
 
-    Scans for hammer, inverted hammer, bullish engulfing, morning star,
-    piercing line, and dragonfly doji -- the classic bullish reversal patterns.
+    Check if a bullish reversal pattern was detected within recent window. Scans for hammer,
+    inverted hammer, bullish engulfing, morning star, piercing line, and dragonfly doji -- the
+    classic bullish reversal patterns.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
+    Warmup: 2
+
+    Formula:
+        any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, piercing_line, dragonfly_doji, morning_star
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish reversal pattern found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1046,13 +1640,30 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
 
 @RuleRegistry.register("reversal_pattern_bearish")
 def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if a bearish reversal pattern was detected within recent window.
+    """Signal: reversal_pattern_bearish
 
-    Scans for hanging man, shooting star, bearish engulfing, evening star,
-    dark cloud cover, and gravestone doji -- the classic bearish reversal patterns.
+    Check if a bearish reversal pattern was detected within recent window. Scans for hanging man,
+    shooting star, bearish engulfing, evening star, dark cloud cover, and gravestone doji -- the
+    classic bearish reversal patterns.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
+    Warmup: 2
+
+    Formula:
+        any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, dark_cloud_cover, gravestone_doji, evening_star
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish reversal pattern found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1088,12 +1699,29 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
 
 @RuleRegistry.register("continuation_pattern_bullish")
 def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if a bullish continuation pattern was detected within recent window.
+    """Signal: continuation_pattern_bullish
 
-    Scans for three white soldiers and three inside up.
+    Check if a bullish continuation pattern was detected within recent window. Scans for three white
+    soldiers and three inside up.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+    Warmup: 2
+
+    Formula:
+        any bar in [t-window+1 .. t] fires any of: three_white_soldiers, three_inside_up
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish continuation pattern found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1118,12 +1746,29 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
 
 @RuleRegistry.register("continuation_pattern_bearish")
 def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if a bearish continuation pattern was detected within recent window.
+    """Signal: continuation_pattern_bearish
 
-    Scans for three black crows and three inside down.
+    Check if a bearish continuation pattern was detected within recent window. Scans for three black
+    crows and three inside down.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
+    Warmup: 2
+
+    Formula:
+        any bar in [t-window+1 .. t] fires any of: three_black_crows, three_inside_down
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish continuation pattern found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1148,12 +1793,29 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
 
 @RuleRegistry.register("indecision_pattern_recent")
 def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if an indecision pattern was detected within recent window.
+    """Signal: indecision_pattern_recent
 
-    Scans for doji, spinning top, inside bar, and NR7.
+    Check if an indecision pattern was detected within recent window. Scans for doji, spinning top,
+    inside bar, and NR7.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 6
+
+    Formula:
+        any bar in [t-window+1 .. t] fires any of: doji, spinning_top, inside_bar, narrow_range(7)
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if indecision pattern found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1183,12 +1845,29 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
 
 @RuleRegistry.register("strong_body_recent")
 def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
-    """
-    Check if a marubozu (strong body) was detected within recent window.
+    """Signal: strong_body_recent
 
-    Scans for both bullish and bearish marubozu patterns.
+    Check if a marubozu (strong body) was detected within recent window. Scans for both bullish and
+    bearish marubozu patterns.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
+
+    Formula:
+        any bar in [t-window+1 .. t] fires marubozu, bullish or bearish
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=5, min=1, max=20]: Number of recent bars to check
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if marubozu found in recent window, False otherwise
 
     Type: FILTER
     Requires: Open, High, Low, Close

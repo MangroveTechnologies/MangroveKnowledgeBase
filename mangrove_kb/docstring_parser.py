@@ -21,6 +21,7 @@ public metadata schema.
 """
 
 import inspect
+import ast
 import re
 import textwrap
 from typing import Any, Optional
@@ -55,9 +56,9 @@ _ARGS_HEADER_RE = re.compile(r"^\s*Args:\s*$", re.MULTILINE)
 _DECL_RE = re.compile(r"^\s*(Indicator|Signal):\s*(\S+)\s*$")
 
 #: Sections carrying a single inline value.
-_INLINE_SECTIONS = ("Abbreviation", "Reference")
+_INLINE_SECTIONS = ("Abbreviation", "Reference", "Warmup")
 #: Sections carrying an indented block.
-_BLOCK_SECTIONS = ("Formula", "Inputs", "Outputs", "Interpretation", "Applications")
+_BLOCK_SECTIONS = ("Formula", "Inputs", "Params", "Outputs", "Interpretation", "Applications")
 #: Sections the pre-existing parser already owns; listed so the description stops at them too.
 _LEGACY_SECTIONS = ("Type", "Requires", "Disabled", "Disabled-Reason", "Args", "Returns")
 
@@ -68,7 +69,7 @@ _SECTION_START_RE = re.compile(r"^(" + "|".join(_ALL_SECTIONS) + r"):")
 #: is an authoring mistake, and the graph has no field to receive it.
 PERMITTED = {
     "Indicator": set(_INLINE_SECTIONS) | set(_BLOCK_SECTIONS) | {"Args", "Returns"},
-    "Signal": {"Reference", "Formula", "Inputs", "Outputs", "Type", "Requires",
+    "Signal": {"Reference", "Warmup", "Formula", "Inputs", "Params", "Outputs", "Type", "Requires",
                "Disabled", "Disabled-Reason", "Args", "Returns"},
 }
 
@@ -552,6 +553,15 @@ class DocstringFormatError(ValueError):
     """The docstring does not conform to the authored-metadata format."""
 
 
+def _join_wrapped(paragraph: str) -> str:
+    """Rejoin a wrapped paragraph into one line, preserving internal spacing.
+
+    `re.sub(r"\\s+", " ")` would also collapse runs of spaces INSIDE a line, and some authored text
+    uses them to align columns. Strip each line's edges, join with one space, leave the middles.
+    """
+    return " ".join(line.strip() for line in paragraph.splitlines() if line.strip()).strip()
+
+
 def _num(raw: str) -> Any:
     """A range bound. `inf`/`-inf` are real values here, never a stand-in for null."""
     raw = raw.strip()
@@ -609,7 +619,7 @@ def parse_authored(docstring: str) -> dict:
     res: dict = {"kind": kind, "name": name}
 
     prose = textwrap.dedent("\n".join(secs["_prose"])).strip("\n")
-    paragraphs = [re.sub(r"\s+", " ", p.strip()) for p in prose.split("\n\n") if p.strip()]
+    paragraphs = [_join_wrapped(p) for p in prose.split("\n\n") if p.strip()]
     # The SUMMARY is the first paragraph only. Everything after it is preserved prose -- design
     # rationale, caveats -- which belongs in the docstring but is not a graph field. Collapsing all
     # of it into the summary was the bug this split exists to prevent.
@@ -618,6 +628,8 @@ def parse_authored(docstring: str) -> dict:
 
     for sec in _INLINE_SECTIONS:
         if sec in secs and secs[sec]:
+            # Every inline value is a STRING, including a numeric-looking warmup: the graph holds
+            # '0' and '1', not 0 and 1. Coercing to int here made 60 nodes differ by type alone.
             res[sec.lower()] = secs[sec][0].strip()
 
     if "Formula" in secs:
@@ -625,14 +637,70 @@ def parse_authored(docstring: str) -> dict:
 
     for sec in ("Interpretation", "Applications"):
         if sec in secs:
-            res[sec.lower()] = [l.strip()[2:].strip() for l in secs[sec] if l.strip().startswith("- ")]
+            body = [l for l in secs[sec] if l.strip()]
+            if any(l.strip().startswith("- ") for l in body):
+                items: list[list[str]] = []
+                for line in body:
+                    if line.strip().startswith("- "):
+                        items.append([line.strip()[2:]])
+                    elif items:
+                        items[-1].append(line.strip())  # continuation of a wrapped item
+                res[sec.lower()] = [" ".join(part).strip() for part in items]
+            else:
+                # Prose, not a list. Seven nodes hold a plain string here; rendering it as a
+                # single bullet would silently change its type on the way back.
+                res[sec.lower()] = _join_wrapped("\n".join(body))
 
-    if "Inputs" in secs:
+    for _sec, _key in (("Inputs", "inputs"), ("Params", "params")):
+        if _sec not in secs:
+            continue
+        acc: dict[str, list[str]] = {}
+        cur = None
+        for line in secs[_sec]:
+            if not line.strip():
+                continue
+            head, sep, desc = line.strip().partition(":")
+            if sep and (" " not in head or " [" in head):
+                cur = head.strip(); acc[cur] = [desc.strip()]
+            elif cur is not None:
+                acc[cur].append(line.strip())
+            else:
+                raise DocstringFormatError(
+                    f"text under {_sec} before any entry: {line.strip()!r}")
+        joined = {k: " ".join(v).strip() for k, v in acc.items()}
+        if _key == "inputs":
+            res[_key] = joined
+        else:
+            # `name [default=20, min=5, max=100]` -- only the values a human authored. The TYPE is
+            # never here: it is read from the signature, and restating it would let the two disagree.
+            out: dict[str, dict[str, Any]] = {}
+            for k, text in joined.items():
+                head, br, rest = k.partition(" [")
+                spec: dict[str, Any] = {"description": text or None}
+                if br:
+                    for part in rest.rstrip("]").split(","):
+                        kk, _, vv = part.partition("=")
+                        if kk.strip() in ("default", "min", "max"):
+                            spec[kk.strip()] = ast.literal_eval(vv.strip())
+                out[head.strip()] = spec
+            res[_key] = out
+
+    if False:
         res["inputs"] = {}
+        current_input = None
         for line in secs["Inputs"]:
-            if line.strip() and ":" in line:
-                key, _, desc = line.strip().partition(":")
-                res["inputs"][key.strip()] = desc.strip()
+            if not line.strip():
+                continue
+            head, sep, desc = line.strip().partition(":")
+            if sep and " " not in head:                 # `name: description` starts a new input
+                current_input = head.strip()
+                res["inputs"][current_input] = [desc.strip()]
+            elif current_input is not None:
+                res["inputs"][current_input].append(line.strip())   # wrapped continuation
+            else:
+                raise DocstringFormatError(
+                    f"text under Inputs before any input line: {line.strip()!r}")
+        res["inputs"] = {k: " ".join(v).strip() for k, v in res["inputs"].items()}
 
     if "Outputs" in secs:
         res["outputs"] = {}

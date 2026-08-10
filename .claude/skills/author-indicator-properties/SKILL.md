@@ -173,19 +173,21 @@ post-processing script, no new format. Do not edit the indicator source or its d
 find yourself reaching for the Write tool while running this skill, stop - that is the tell that you
 have drifted from doing the task into building infrastructure for it.
 
-The values are already durable, so do not invent somewhere for them to live. They go in the nodes;
-`ontology/signal-indicator-ontology.json` is committed to the repository; and the builder carries
-every authored value forward on rebuild, which is verified by the fact that running it twice is a
-fixed point. If a rebuild ever drops an authored value, that is a bug in the carry-forward to be
-fixed there - not a reason to introduce a sidecar file, a data module, or a new format.
+**Authored values go in the DOCSTRING of the indicator class.** Not in the JSON. The graph is a
+build artifact now -- it is generated from the docstrings and the code, and regenerating it from a
+clean tree reproduces the committed file exactly. Editing the JSON writes into something the next
+build overwrites.
+
+There is no carry-forward any more, and nothing to invent a home for. The docstring IS the home.
 
 ## Verify before reporting
 
-1. Apply the authored values to the node in `ontology/signal-indicator-ontology.json`
-2. Rebuild in place and confirm nothing was lost:
-   `python3 ontology/build_signal_indicator_ontology.py --stdout > /tmp/check.json` then diff it against the
-   committed file. The builder carries authored values forward, so a rebuild must be a fixed point -
-   any authored value that comes back `null` is a bug in the carry-forward, not a reason to re-author
+1. Write the authored values into the indicator's docstring, in the authored-metadata format
+   (`Abbreviation:`, `Reference:`, `Warmup:`, `Formula:`, `Inputs:`, `Params:`, `Outputs:`,
+   `Interpretation:`, `Applications:`). The docstring must open `Indicator: <ClassName>`.
+2. Rebuild and diff:
+   `ONTOLOGY_OUT=/tmp/check.json python3 ontology/build_signal_indicator_ontology.py` then diff
+   against the committed file. Only the node you authored may change - anything else is a bug
 3. Print the node and confirm every field you authored is populated and nothing lifted was overwritten
 4. Show the **full JSON of the single node**, typed into the reply as a fenced block - the user cannot
    expand collapsed tool output

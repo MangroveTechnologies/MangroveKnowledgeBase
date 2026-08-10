@@ -41,8 +41,27 @@ _DEFAULT_RIBBON_WINDOWS = (5, 8, 13, 21, 34, 55, 89, 144)
 
 @RuleRegistry.register("kama_cross_up")
 def kama_cross_up(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int = 30) -> bool:
-    """
+    """Signal: kama_cross_up
+
     Check if price crosses above KAMA (bullish signal).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama
+    Warmup: window + max(pow1, pow2) - 1
+
+    Formula:
+        close[t-1] <= kama[t-1] and close[t] > kama[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=30]: Efficiency ratio period
+        pow1 [default=2, min=1, max=10]: Fast smoothing constant
+        pow2 [default=30, min=10, max=50]: Slow smoothing constant
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if price crosses above KAMA, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -77,8 +96,27 @@ def kama_cross_up(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int =
 
 @RuleRegistry.register("kama_cross_down")
 def kama_cross_down(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int = 30) -> bool:
-    """
+    """Signal: kama_cross_down
+
     Check if price crosses below KAMA (bearish signal).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama
+    Warmup: window + max(pow1, pow2) - 1
+
+    Formula:
+        close[t-1] >= kama[t-1] and close[t] < kama[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=30]: Efficiency ratio period
+        pow1 [default=2, min=1, max=10]: Fast smoothing constant
+        pow2 [default=30, min=10, max=50]: Slow smoothing constant
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if price crosses below KAMA, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -113,11 +151,28 @@ def kama_cross_down(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int
 
 @RuleRegistry.register("is_above_vwma")
 def is_above_vwma(df: pd.DataFrame, window: int = 20) -> bool:
-    """
-    Check if the current price is above the Volume-Weighted Moving Average (VWMA).
+    """Signal: is_above_vwma
 
-    VWMA weights each bar's close by its volume, emphasizing high-participation
-    bars. Useful as a filter that incorporates conviction from volume.
+    Check if the current price is above the Volume-Weighted Moving Average (VWMA). VWMA weights each
+    bar's close by its volume, emphasizing high-participation bars. Useful as a filter that
+    incorporates conviction from volume.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window - 1
+
+    Formula:
+        close[t] > vwma[t]
+
+    Inputs:
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        window [default=20, min=2, max=200]: VWMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > VWMA, False otherwise
 
     Type: FILTER
     Requires: Close, Volume
@@ -142,8 +197,28 @@ def is_above_vwma(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("vwap_above")
 def vwap_above(df: pd.DataFrame, window: int = 14) -> bool:
-    """
+    """Signal: vwap_above
+
     Check if price is above VWAP (bullish bias).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap
+    Warmup: window - 1
+
+    Formula:
+        close[t] > vwap[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        window [default=14, min=5, max=50]: VWAP period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Close > VWAP, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close, Volume
@@ -169,8 +244,28 @@ def vwap_above(df: pd.DataFrame, window: int = 14) -> bool:
 
 @RuleRegistry.register("vwap_below")
 def vwap_below(df: pd.DataFrame, window: int = 14) -> bool:
-    """
+    """Signal: vwap_below
+
     Check if price is below VWAP (bearish bias).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap
+    Warmup: window - 1
+
+    Formula:
+        close[t] < vwap[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        window [default=14, min=5, max=50]: VWAP period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Close < VWAP, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close, Volume
@@ -196,10 +291,28 @@ def vwap_below(df: pd.DataFrame, window: int = 14) -> bool:
 
 @RuleRegistry.register("vwma_cross_down")
 def vwma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect a bearish VWMA crossover (fast VWMA crosses below slow VWMA).
+    """Signal: vwma_cross_down
 
-    Volume-weighted version of the classic SMA death cross.
+    Detect a bearish VWMA crossover (fast VWMA crosses below slow VWMA). Volume-weighted version of
+    the classic SMA death cross.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
+
+    Formula:
+        vwma(window_fast)[t-1] >= vwma(window_slow)[t-1] and vwma(window_fast)[t] < vwma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast VWMA window
+        window_slow [default=21, min=2, max=200]: Slow VWMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish VWMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close, Volume
@@ -228,11 +341,29 @@ def vwma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
 
 @RuleRegistry.register("vwma_cross_up")
 def vwma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect a bullish VWMA crossover (fast VWMA crosses above slow VWMA).
+    """Signal: vwma_cross_up
 
-    Volume-weighted version of the classic SMA golden cross. High-volume bars
-    carry more weight, so the signal is less susceptible to low-volume noise.
+    Detect a bullish VWMA crossover (fast VWMA crosses above slow VWMA). Volume-weighted version of
+    the classic SMA golden cross. High-volume bars carry more weight, so the signal is less
+    susceptible to low-volume noise.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
+
+    Formula:
+        vwma(window_fast)[t-1] <= vwma(window_slow)[t-1] and vwma(window_fast)[t] > vwma(window_slow)[t] -- two VWMAs of different windows, not price against one
+
+    Inputs:
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast VWMA window
+        window_slow [default=21, min=2, max=200]: Slow VWMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish VWMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close, Volume
@@ -327,10 +458,32 @@ def alligator_bearish(
     jaw: int = 13, teeth: int = 8, lips: int = 5,
     jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
 ) -> bool:
-    """
-    Check if Williams Alligator lines are in bearish alignment (lips < teeth < jaw).
+    """Signal: alligator_bearish
 
-    Strong downtrend, all lines spreading downward.
+    Check if Williams Alligator lines are in bearish alignment (lips < teeth < jaw). Strong
+    downtrend, all lines spreading downward.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator
+    Warmup: jaw + jaw_offset
+
+    Formula:
+        lips[t] < teeth[t] < jaw[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        jaw [default=13, min=5, max=50]: Jaw SMMA period
+        teeth [default=8, min=3, max=30]: Teeth SMMA period
+        lips [default=5, min=2, max=20]: Lips SMMA period
+        jaw_offset [default=8, min=0, max=20]: Jaw forward shift
+        teeth_offset [default=5, min=0, max=15]: Teeth forward shift
+        lips_offset [default=3, min=0, max=10]: Lips forward shift
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if lips < teeth < jaw on the current bar
 
     Type: FILTER
     Requires: High, Low
@@ -361,11 +514,32 @@ def alligator_bullish(
     jaw: int = 13, teeth: int = 8, lips: int = 5,
     jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
 ) -> bool:
-    """
-    Check if Williams Alligator lines are in bullish alignment (lips > teeth > jaw).
+    """Signal: alligator_bullish
 
-    Bill Williams's "hungry alligator" state: strong uptrend, all lines
-    spreading upward.
+    Check if Williams Alligator lines are in bullish alignment (lips > teeth > jaw). Bill Williams's
+    "hungry alligator" state: strong uptrend, all lines spreading upward.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator
+    Warmup: jaw + jaw_offset
+
+    Formula:
+        lips[t] > teeth[t] > jaw[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        jaw [default=13, min=5, max=50]: Jaw SMMA period
+        teeth [default=8, min=3, max=30]: Teeth SMMA period
+        lips [default=5, min=2, max=20]: Lips SMMA period
+        jaw_offset [default=8, min=0, max=20]: Jaw forward shift
+        teeth_offset [default=5, min=0, max=15]: Teeth forward shift
+        lips_offset [default=3, min=0, max=10]: Lips forward shift
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if lips > teeth > jaw on the current bar
 
     Type: FILTER
     Requires: High, Low
@@ -396,11 +570,33 @@ def alligator_sleeping(
     jaw: int = 13, teeth: int = 8, lips: int = 5,
     jaw_offset: int = 8, teeth_offset: int = 5, lips_offset: int = 3,
 ) -> bool:
-    """
-    Check if the Williams Alligator is sleeping (lines tangled, no trend).
+    """Signal: alligator_sleeping
 
-    True when lines are neither strictly bullish-aligned nor bearish-aligned.
-    Used as a no-trade filter during consolidation.
+    Check if the Williams Alligator is sleeping (lines tangled, no trend). True when lines are
+    neither strictly bullish-aligned nor bearish-aligned. Used as a no-trade filter during
+    consolidation.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator
+    Warmup: jaw + jaw_offset
+
+    Formula:
+        not (lips[t] > teeth[t] > jaw[t]) and not (lips[t] < teeth[t] < jaw[t]) -- neither alignment holds; the lines are tangled
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        jaw [default=13, min=5, max=50]: Jaw SMMA period
+        teeth [default=8, min=3, max=30]: Teeth SMMA period
+        lips [default=5, min=2, max=20]: Lips SMMA period
+        jaw_offset [default=8, min=0, max=20]: Jaw forward shift
+        teeth_offset [default=5, min=0, max=15]: Teeth forward shift
+        lips_offset [default=3, min=0, max=10]: Lips forward shift
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if lines are tangled (no strict bullish or bearish alignment)
 
     Type: FILTER
     Requires: High, Low
@@ -436,8 +632,27 @@ def alma_cross_down(
     offset: float = 0.85,
     sigma: float = 6.0,
 ) -> bool:
-    """
+    """Signal: alma_cross_down
+
     Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).
+
+    Warmup: window_slow
+
+    Formula:
+        alma(window_fast)[t-1] >= alma(window_slow)[t-1] and alma(window_fast)[t] < alma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast ALMA window
+        window_slow [default=21, min=2, max=200]: Slow ALMA window
+        offset [default=0.85, min=0.0]: Weight center, 0=oldest, 1=newest
+        sigma [default=6.0, min=0.1]: Gaussian spread. Higher = smoother
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish ALMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -474,10 +689,28 @@ def alma_cross_up(
     offset: float = 0.85,
     sigma: float = 6.0,
 ) -> bool:
-    """
-    Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA).
+    """Signal: alma_cross_up
 
-    Both ALMAs use the same offset and sigma; only the window differs.
+    Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA). Both ALMAs use the same
+    offset and sigma; only the window differs.
+
+    Warmup: window_slow
+
+    Formula:
+        alma(window_fast)[t-1] <= alma(window_slow)[t-1] and alma(window_fast)[t] > alma(window_slow)[t] -- both ALMAs share offset and sigma; only the window differs
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast ALMA window
+        window_slow [default=21, min=2, max=200]: Slow ALMA window
+        offset [default=0.85, min=0.0]: Weight center, 0=oldest, 1=newest
+        sigma [default=6.0, min=0.1]: Gaussian spread. Higher = smoother
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish ALMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -508,10 +741,27 @@ def alma_cross_up(
 
 @RuleRegistry.register("dema_cross_down")
 def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA).
+    """Signal: dema_cross_down
 
-    Lower-lag equivalent of an SMA/EMA death cross.
+    Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA). Lower-lag equivalent of an
+    SMA/EMA death cross.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
+    Warmup: window_slow
+
+    Formula:
+        dema(window_fast)[t-1] >= dema(window_slow)[t-1] and dema(window_fast)[t] < dema(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast DEMA window
+        window_slow [default=21, min=2, max=200]: Slow DEMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish DEMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -528,10 +778,27 @@ def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
 
 @RuleRegistry.register("dema_cross_up")
 def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA).
+    """Signal: dema_cross_up
 
-    Lower-lag equivalent of an SMA/EMA golden cross.
+    Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA). Lower-lag equivalent of an
+    SMA/EMA golden cross.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
+    Warmup: window_slow
+
+    Formula:
+        dema(window_fast)[t-1] <= dema(window_slow)[t-1] and dema(window_fast)[t] > dema(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast DEMA window
+        window_slow [default=21, min=2, max=200]: Slow DEMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish DEMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -548,8 +815,27 @@ def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
 
 @RuleRegistry.register("ema_cross_down")
 def ema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    """Signal: ema_cross_down
+
+    Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21
+    (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
+
+    Formula:
+        ema(window_fast)[t-1] >= ema(window_slow)[t-1] and ema(window_fast)[t] < ema(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast EMA window
+        window_slow [default=21, min=5, max=200]: Slow EMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish crossover detected, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -586,8 +872,27 @@ def ema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
 
 @RuleRegistry.register("ema_cross_up")
 def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    """Signal: ema_cross_up
+
+    Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21
+    (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
+
+    Formula:
+        ema(window_fast)[t-1] <= ema(window_slow)[t-1] and ema(window_fast)[t] > ema(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast EMA window
+        window_slow [default=21, min=5, max=200]: Slow EMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish crossover detected, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -624,20 +929,34 @@ def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
 
 @RuleRegistry.register("ema_crossover")
 def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, direction: str = "bullish") -> bool:
-    """
-    Detect an EMA crossover signal with configurable direction (bullish or bearish).
+    """Signal: ema_crossover
 
-    Uses EMA indicator to calculate window_fast and window_slow EMAs. Returns True when a crossover
-    is detected in the specified direction.
+    Detect an EMA crossover signal with configurable direction (bullish or bearish). Uses EMA
+    indicator to calculate window_fast and window_slow EMAs. Returns True when a crossover is
+    detected in the specified direction. Bullish crossover: window_fast EMA crosses above
+    window_slow EMA Bearish crossover: window_fast EMA crosses below window_slow EMA The crossover
+    detection compares the previous and current bars: - Bullish: prev window_fast <= prev
+    window_slow AND current window_fast > current window_slow - Bearish: prev window_fast >= prev
+    window_slow AND current window_fast < current window_slow Common periods: 9/21 (short-term),
+    50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-    Bullish crossover: window_fast EMA crosses above window_slow EMA
-    Bearish crossover: window_fast EMA crosses below window_slow EMA
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
 
-    The crossover detection compares the previous and current bars:
-    - Bullish: prev window_fast <= prev window_slow AND current window_fast > current window_slow
-    - Bearish: prev window_fast >= prev window_slow AND current window_fast < current window_slow
+    Formula:
+        direction == 'bullish': ema(window_fast)[t-1] <= ema(window_slow)[t-1] and ema(window_fast)[t] > ema(window_slow)[t]; direction == 'bearish': ema(window_fast)[t-1] >= ema(window_slow)[t-1] and ema(window_fast)[t] < ema(window_slow)[t]
 
-    Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [min=1, max=200]: Fast EMA window in bars
+        window_slow [min=1, max=200]: Slow EMA window in bars
+        direction: Crossover direction, 'bullish' or 'bearish'
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if crossover detected in the specified direction, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -684,10 +1003,27 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
 
 @RuleRegistry.register("hma_cross_down")
 def hma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) -> bool:
-    """
-    Detect a bearish HMA crossover (fast HMA crosses below slow HMA).
+    """Signal: hma_cross_down
 
-    Low-lag crossover; fires earlier than SMA/EMA equivalents.
+    Detect a bearish HMA crossover (fast HMA crosses below slow HMA). Low-lag crossover; fires
+    earlier than SMA/EMA equivalents.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
+    Warmup: window_slow
+
+    Formula:
+        hma(window_fast)[t-1] >= hma(window_slow)[t-1] and hma(window_fast)[t] < hma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=4, max=100]: Fast HMA window
+        window_slow [default=25, min=4, max=200]: Slow HMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish HMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -704,10 +1040,27 @@ def hma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25
 
 @RuleRegistry.register("hma_cross_up")
 def hma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) -> bool:
-    """
-    Detect a bullish HMA crossover (fast HMA crosses above slow HMA).
+    """Signal: hma_cross_up
 
-    Low-lag crossover; fires earlier than SMA/EMA equivalents.
+    Detect a bullish HMA crossover (fast HMA crosses above slow HMA). Low-lag crossover; fires
+    earlier than SMA/EMA equivalents.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
+    Warmup: window_slow
+
+    Formula:
+        hma(window_fast)[t-1] <= hma(window_slow)[t-1] and hma(window_fast)[t] > hma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=4, max=100]: Fast HMA window
+        window_slow [default=25, min=4, max=200]: Slow HMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish HMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -724,11 +1077,28 @@ def hma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) 
 
 @RuleRegistry.register("is_above_alma")
 def is_above_alma(df: pd.DataFrame, window: int = 21, offset: float = 0.85, sigma: float = 6.0) -> bool:
-    """
-    Check if the current price is above the Arnaud Legoux Moving Average (ALMA).
+    """Signal: is_above_alma
 
-    ALMA is a Gaussian-weighted MA that can be tuned to react faster (offset
-    near 1, lower sigma) or smoother (offset near 0, higher sigma).
+    Check if the current price is above the Arnaud Legoux Moving Average (ALMA). ALMA is a
+    Gaussian-weighted MA that can be tuned to react faster (offset near 1, lower sigma) or smoother
+    (offset near 0, higher sigma).
+
+    Warmup: window - 1
+
+    Formula:
+        close[t] > alma[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=21, min=2, max=200]: ALMA window in bars
+        offset [default=0.85, min=0.0]: Weight center, 0=oldest, 1=newest
+        sigma [default=6.0, min=0.1]: Gaussian spread. Higher = smoother
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > ALMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -753,11 +1123,27 @@ def is_above_alma(df: pd.DataFrame, window: int = 21, offset: float = 0.85, sigm
 
 @RuleRegistry.register("is_above_dema")
 def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
-    """
-    Check if the current price is above the Double Exponential Moving Average (DEMA).
+    """Signal: is_above_dema
 
-    DEMA reduces lag compared to a standard EMA by combining two EMA passes.
-    Useful for trend-following filters where responsiveness matters.
+    Check if the current price is above the Double Exponential Moving Average (DEMA). DEMA reduces
+    lag compared to a standard EMA by combining two EMA passes. Useful for trend-following filters
+    where responsiveness matters.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
+    Warmup: window - 1
+
+    Formula:
+        close[t] > dema[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=21, min=2, max=200]: DEMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > DEMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -773,11 +1159,26 @@ def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
 
 @RuleRegistry.register("is_above_hma")
 def is_above_hma(df: pd.DataFrame, window: int = 16) -> bool:
-    """
-    Check if the current price is above the Hull Moving Average (HMA).
+    """Signal: is_above_hma
 
-    HMA tracks price with very low lag while remaining smoother than WMA.
-    A common crypto trend filter.
+    Check if the current price is above the Hull Moving Average (HMA). HMA tracks price with very
+    low lag while remaining smoother than WMA. A common crypto trend filter.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
+    Warmup: window - 1
+
+    Formula:
+        close[t] > hma[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=16, min=4, max=200]: HMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > HMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -793,10 +1194,29 @@ def is_above_hma(df: pd.DataFrame, window: int = 16) -> bool:
 
 @RuleRegistry.register("is_above_mama")
 def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
-    """
-    Check if the current price is above the MESA Adaptive Moving Average (MAMA).
+    """Signal: is_above_mama
 
-    MAMA adapts its smoothing to volatility via a Hilbert transform.
+    Check if the current price is above the MESA Adaptive Moving Average (MAMA). MAMA adapts its
+    smoothing to volatility via a Hilbert transform.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: warmup_bars
+
+    Formula:
+        close[t] > mama[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        fast_limit [default=0.5, min=0.1]: Upper alpha bound (fast response)
+        slow_limit [default=0.05, min=0.01]: Lower alpha bound (slow response)
+        warmup_bars [default=64, min=6, max=200]: Leading bars discarded as contaminated by the zero
+        seed
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > MAMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -818,12 +1238,28 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
 
 @RuleRegistry.register("is_above_sma")
 def is_above_sma(df: pd.DataFrame, window: int) -> bool:
-    """
-    Check if the current price is above the Simple Moving Average.
+    """Signal: is_above_sma
 
-    Uses SMA indicator to calculate the SMA for the given window and returns True
-    if the most recent close price is strictly greater than the SMA value.
-    Returns False if insufficient data is available. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    Check if the current price is above the Simple Moving Average. Uses SMA indicator to calculate
+    the SMA for the given window and returns True if the most recent close price is strictly greater
+    than the SMA value. Returns False if insufficient data is available. Common periods: 9/21
+    (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window - 1
+
+    Formula:
+        close[t] > sma[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [min=1, max=200]: SMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > SMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -849,11 +1285,26 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
 
 @RuleRegistry.register("is_above_smma")
 def is_above_smma(df: pd.DataFrame, window: int = 14) -> bool:
-    """
-    Check if the current price is above the Smoothed Moving Average (SMMA / Wilder's).
+    """Signal: is_above_smma
 
-    SMMA uses Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing
-    a slower, more stable trend line. Same family used inside RSI and ATR.
+    Check if the current price is above the Smoothed Moving Average (SMMA / Wilder's). SMMA uses
+    Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing a slower, more stable trend
+    line. Same family used inside RSI and ATR.
+
+    Warmup: window - 1
+
+    Formula:
+        close[t] > smma[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=14, min=2, max=200]: SMMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > SMMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -869,10 +1320,27 @@ def is_above_smma(df: pd.DataFrame, window: int = 14) -> bool:
 
 @RuleRegistry.register("is_above_t3")
 def is_above_t3(df: pd.DataFrame, window: int = 10, volume_factor: float = 0.7) -> bool:
-    """
-    Check if the current price is above the Tillson T3 moving average.
+    """Signal: is_above_t3
 
-    T3 is a smooth low-lag MA that combines 6 EMAs via the volume factor.
+    Check if the current price is above the Tillson T3 moving average. T3 is a smooth low-lag MA
+    that combines 6 EMAs via the volume factor.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window * 6 - 1
+
+    Formula:
+        close[t] > t3[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=10, min=2, max=200]: T3 window in bars
+        volume_factor [default=0.7, min=0.0]: Tillson volume factor, controls smoothness
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > T3, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -896,10 +1364,26 @@ def is_above_t3(df: pd.DataFrame, window: int = 10, volume_factor: float = 0.7) 
 
 @RuleRegistry.register("is_above_tema")
 def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
-    """
-    Check if the current price is above the Triple Exponential Moving Average (TEMA).
+    """Signal: is_above_tema
 
-    TEMA has even less lag than DEMA by combining three EMA passes.
+    Check if the current price is above the Triple Exponential Moving Average (TEMA). TEMA has even
+    less lag than DEMA by combining three EMA passes.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
+    Warmup: window - 1
+
+    Formula:
+        close[t] > tema[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=21, min=2, max=200]: TEMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > TEMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -915,11 +1399,27 @@ def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
 
 @RuleRegistry.register("is_above_trima")
 def is_above_trima(df: pd.DataFrame, window: int = 20) -> bool:
-    """
-    Check if the current price is above the Triangular Moving Average (TRIMA).
+    """Signal: is_above_trima
 
-    TRIMA is a double-smoothed SMA that weights the middle of the window more
-    heavily, producing a smoother trend line than SMA.
+    Check if the current price is above the Triangular Moving Average (TRIMA). TRIMA is a
+    double-smoothed SMA that weights the middle of the window more heavily, producing a smoother
+    trend line than SMA.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window - 1
+
+    Formula:
+        close[t] > trima[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=2, max=200]: TRIMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > TRIMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -935,8 +1435,25 @@ def is_above_trima(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("ma_ribbon_bearish")
 def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
-    """
+    """Signal: ma_ribbon_bearish
+
     Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
+    Warmup: max(windows_list) - 1
+
+    Formula:
+        sma(windows[0])[t] < sma(windows[1])[t] < ... < sma(windows[-1])[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        windows [min=2, max=1000]: Strictly increasing tuple of SMA periods
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ribbon is bearish-aligned on the current bar
 
     Type: FILTER
     Requires: Close
@@ -956,12 +1473,28 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
 
 @RuleRegistry.register("ma_ribbon_bullish")
 def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
-    """
-    Check if all MAs in the ribbon are in strict bullish alignment (faster above slower).
+    """Signal: ma_ribbon_bullish
 
-    Uses 8 Fibonacci-spaced SMAs by default. Strict alignment means
-    SMA(5) > SMA(8) > SMA(13) > ... > SMA(144). This is a strong trend filter
-    -- when true, the market is in a clear uptrend across all horizons.
+    Check if all MAs in the ribbon are in strict bullish alignment (faster above slower). Uses 8
+    Fibonacci-spaced SMAs by default. Strict alignment means SMA(5) > SMA(8) > SMA(13) > ... >
+    SMA(144). This is a strong trend filter -- when true, the market is in a clear uptrend across
+    all horizons.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
+    Warmup: max(windows_list) - 1
+
+    Formula:
+        sma(windows[0])[t] > sma(windows[1])[t] > ... > sma(windows[-1])[t] -- shortest window on top, every gap the same sign
+
+    Inputs:
+        close: closing price
+
+    Params:
+        windows [min=2, max=1000]: Strictly increasing tuple of SMA periods
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ribbon is bullish-aligned on the current bar
 
     Type: FILTER
     Requires: Close
@@ -981,10 +1514,26 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
 
 @RuleRegistry.register("ma_ribbon_tangled")
 def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS) -> bool:
-    """
-    Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter).
+    """Signal: ma_ribbon_tangled
 
-    Useful as a no-trade filter during choppy markets.
+    Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter). Useful as
+    a no-trade filter during choppy markets.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
+    Warmup: max(windows_list) - 1
+
+    Formula:
+        neither the bullish nor the bearish ordering holds across all of windows
+
+    Inputs:
+        close: closing price
+
+    Params:
+        windows [min=2, max=1000]: Strictly increasing tuple of SMA periods
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ribbon is neither bullish nor bearish aligned
 
     Type: FILTER
     Requires: Close
@@ -1004,10 +1553,27 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
 
 @RuleRegistry.register("mama_cross_down")
 def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
-    """
-    Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA).
+    """Signal: mama_cross_down
 
-    Classic Ehlers exit signal: MAMA falling below FAMA signals a downtrend.
+    Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA). Classic Ehlers exit signal: MAMA
+    falling below FAMA signals a downtrend.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: warmup_bars
+
+    Formula:
+        mama[t-1] >= fama[t-1] and mama[t] < fama[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        fast_limit [default=0.5, min=0.1]: Upper alpha bound
+        slow_limit [default=0.05, min=0.01]: Lower alpha bound
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish MAMA/FAMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1030,10 +1596,27 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
 
 @RuleRegistry.register("mama_cross_up")
 def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float = 0.05, warmup_bars: int = 64) -> bool:
-    """
-    Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA).
+    """Signal: mama_cross_up
 
-    Classic Ehlers entry signal: MAMA rising above FAMA signals an uptrend.
+    Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA). Classic Ehlers entry signal:
+    MAMA rising above FAMA signals an uptrend.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: warmup_bars
+
+    Formula:
+        mama[t-1] <= fama[t-1] and mama[t] > fama[t] -- MAMA against its own following adaptive line FAMA, not a second window
+
+    Inputs:
+        close: closing price
+
+    Params:
+        fast_limit [default=0.5, min=0.1]: Upper alpha bound
+        slow_limit [default=0.05, min=0.01]: Lower alpha bound
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish MAMA/FAMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1056,8 +1639,26 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
 
 @RuleRegistry.register("price_above_ema")
 def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
-    """
-    Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    """Signal: price_above_ema
+
+    Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust
+    for crypto's 24/7 markets.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window - 1
+
+    Formula:
+        close[t] > ema[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=2, max=200]: EMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > EMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -1083,14 +1684,30 @@ def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("sma_cross_down")
 def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
-    """
-    Detect a bearish SMA crossover as an exit signal.
+    """Signal: sma_cross_down
 
-    Returns True when the window_fast SMA crosses below the window_slow SMA (death cross).
-    This is a momentum-driven exit signal, indicating a transition from
-    bullish to bearish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    Detect a bearish SMA crossover as an exit signal. Returns True when the window_fast SMA crosses
+    below the window_slow SMA (death cross). This is a momentum-driven exit signal, indicating a
+    transition from bullish to bearish momentum. Common periods: 9/21 (short-term), 50/200
+    (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper
+    around sma_crossover.
 
-    Note: This is a backwards-compatible wrapper around sma_crossover.
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
+
+    Formula:
+        sma(window_fast)[t-1] >= sma(window_slow)[t-1] and sma(window_fast)[t] < sma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [min=1, max=200]: Fast SMA window in bars
+        window_slow [min=1, max=200]: Slow SMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish crossover detected in the current bar, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1107,14 +1724,30 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
 
 @RuleRegistry.register("sma_cross_up")
 def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
-    """
-    Detect a bullish SMA crossover as an entry signal.
+    """Signal: sma_cross_up
 
-    Returns True when the window_fast SMA crosses above the window_slow SMA (golden cross).
-    This is a momentum-driven entry signal, indicating a transition from
-    bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    Detect a bullish SMA crossover as an entry signal. Returns True when the window_fast SMA crosses
+    above the window_slow SMA (golden cross). This is a momentum-driven entry signal, indicating a
+    transition from bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200
+    (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper
+    around sma_crossover.
 
-    Note: This is a backwards-compatible wrapper around sma_crossover.
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
+
+    Formula:
+        sma(window_fast)[t-1] <= sma(window_slow)[t-1] and sma(window_fast)[t] > sma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [min=1, max=200]: Fast SMA window in bars
+        window_slow [min=1, max=200]: Slow SMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish crossover detected in the current bar, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1131,20 +1764,34 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
 
 @RuleRegistry.register("sma_crossover")
 def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, direction: str = "bullish") -> bool:
-    """
-    Detect an SMA crossover signal with configurable direction (bullish or bearish).
+    """Signal: sma_crossover
 
-    Uses SMA indicator to calculate window_fast and window_slow SMAs. Returns True when a crossover
-    is detected in the specified direction.
+    Detect an SMA crossover signal with configurable direction (bullish or bearish). Uses SMA
+    indicator to calculate window_fast and window_slow SMAs. Returns True when a crossover is
+    detected in the specified direction. Bullish crossover (golden cross): window_fast SMA crosses
+    above window_slow SMA Bearish crossover (death cross): window_fast SMA crosses below window_slow
+    SMA The crossover detection compares the previous and current bars: - Bullish: prev window_fast
+    <= prev window_slow AND current window_fast > current window_slow - Bearish: prev window_fast >=
+    prev window_slow AND current window_fast < current window_slow Common periods: 9/21
+    (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
-    Bullish crossover (golden cross): window_fast SMA crosses above window_slow SMA
-    Bearish crossover (death cross): window_fast SMA crosses below window_slow SMA
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
+    Warmup: window_slow
 
-    The crossover detection compares the previous and current bars:
-    - Bullish: prev window_fast <= prev window_slow AND current window_fast > current window_slow
-    - Bearish: prev window_fast >= prev window_slow AND current window_fast < current window_slow
+    Formula:
+        direction == 'bullish': sma(window_fast)[t-1] <= sma(window_slow)[t-1] and sma(window_fast)[t] > sma(window_slow)[t]; direction == 'bearish': sma(window_fast)[t-1] >= sma(window_slow)[t-1] and sma(window_fast)[t] < sma(window_slow)[t]
 
-    Common periods: 9/21 (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [min=1, max=200]: Fast SMA window in bars
+        window_slow [min=1, max=200]: Slow SMA window in bars
+        direction: Crossover direction, 'bullish' or 'bearish'
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if crossover detected in the specified direction, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1198,10 +1845,26 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
 
 @RuleRegistry.register("smma_cross_down")
 def smma_cross_down(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50) -> bool:
-    """
-    Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA).
+    """Signal: smma_cross_down
 
-    Slower, more stable crossover than EMA cross; fewer false triggers.
+    Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA). Slower, more stable
+    crossover than EMA cross; fewer false triggers.
+
+    Warmup: window_slow
+
+    Formula:
+        smma(window_fast)[t-1] >= smma(window_slow)[t-1] and smma(window_fast)[t] < smma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=14, min=2, max=100]: Fast SMMA window
+        window_slow [default=50, min=2, max=200]: Slow SMMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish SMMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1218,10 +1881,26 @@ def smma_cross_down(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 
 
 @RuleRegistry.register("smma_cross_up")
 def smma_cross_up(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50) -> bool:
-    """
-    Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA).
+    """Signal: smma_cross_up
 
-    Slower, more stable crossover than EMA cross; fewer false triggers.
+    Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA). Slower, more stable
+    crossover than EMA cross; fewer false triggers.
+
+    Warmup: window_slow
+
+    Formula:
+        smma(window_fast)[t-1] <= smma(window_slow)[t-1] and smma(window_fast)[t] > smma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=14, min=2, max=100]: Fast SMMA window
+        window_slow [default=50, min=2, max=200]: Slow SMMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish SMMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1243,8 +1922,27 @@ def t3_cross_down(
     window_slow: int = 10,
     volume_factor: float = 0.7,
 ) -> bool:
-    """
+    """Signal: t3_cross_down
+
     Detect a bearish T3 crossover (fast T3 crosses below slow T3).
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window_slow * 6
+
+    Formula:
+        t3(window_fast)[t-1] >= t3(window_slow)[t-1] and t3(window_fast)[t] < t3(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=5, min=2, max=100]: Fast T3 window
+        window_slow [default=10, min=2, max=200]: Slow T3 window
+        volume_factor [default=0.7, min=0.0]: Tillson volume factor
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish T3 crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1279,10 +1977,28 @@ def t3_cross_up(
     window_slow: int = 10,
     volume_factor: float = 0.7,
 ) -> bool:
-    """
-    Detect a bullish T3 crossover (fast T3 crosses above slow T3).
+    """Signal: t3_cross_up
 
-    Very smooth, low-lag crossover. Both T3s share the same volume_factor.
+    Detect a bullish T3 crossover (fast T3 crosses above slow T3). Very smooth, low-lag crossover.
+    Both T3s share the same volume_factor.
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window_slow * 6
+
+    Formula:
+        t3(window_fast)[t-1] <= t3(window_slow)[t-1] and t3(window_fast)[t] > t3(window_slow)[t] -- both T3s share volume_factor
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=5, min=2, max=100]: Fast T3 window
+        window_slow [default=10, min=2, max=200]: Slow T3 window
+        volume_factor [default=0.7, min=0.0]: Tillson volume factor
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish T3 crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1312,10 +2028,27 @@ def t3_cross_up(
 
 @RuleRegistry.register("tema_cross_down")
 def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA).
+    """Signal: tema_cross_down
 
-    Very low-lag cross signal; expect more whipsaw in noisy markets.
+    Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA). Very low-lag cross signal;
+    expect more whipsaw in noisy markets.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
+    Warmup: window_slow
+
+    Formula:
+        tema(window_fast)[t-1] >= tema(window_slow)[t-1] and tema(window_fast)[t] < tema(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast TEMA window
+        window_slow [default=21, min=2, max=200]: Slow TEMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish TEMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1332,10 +2065,27 @@ def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
 
 @RuleRegistry.register("tema_cross_up")
 def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
-    Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA).
+    """Signal: tema_cross_up
 
-    Very low-lag cross signal; expect more whipsaw in noisy markets.
+    Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA). Very low-lag cross signal;
+    expect more whipsaw in noisy markets.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
+    Warmup: window_slow
+
+    Formula:
+        tema(window_fast)[t-1] <= tema(window_slow)[t-1] and tema(window_fast)[t] > tema(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=100]: Fast TEMA window
+        window_slow [default=21, min=2, max=200]: Slow TEMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish TEMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1352,8 +2102,26 @@ def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
 
 @RuleRegistry.register("trima_cross_down")
 def trima_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
-    """
+    """Signal: trima_cross_down
+
     Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window_slow
+
+    Formula:
+        trima(window_fast)[t-1] >= trima(window_slow)[t-1] and trima(window_fast)[t] < trima(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=10, min=2, max=100]: Fast TRIMA window
+        window_slow [default=30, min=2, max=200]: Slow TRIMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish TRIMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1370,8 +2138,26 @@ def trima_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int =
 
 @RuleRegistry.register("trima_cross_up")
 def trima_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
-    """
+    """Signal: trima_cross_up
+
     Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window_slow
+
+    Formula:
+        trima(window_fast)[t-1] <= trima(window_slow)[t-1] and trima(window_fast)[t] > trima(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=10, min=2, max=100]: Fast TRIMA window
+        window_slow [default=30, min=2, max=200]: Slow TRIMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish TRIMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1388,8 +2174,26 @@ def trima_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 3
 
 @RuleRegistry.register("wma_cross_down")
 def wma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
+    """Signal: wma_cross_down
+
     Check if fast WMA crosses below slow WMA (bearish).
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window_slow
+
+    Formula:
+        wma(window_fast)[t-1] >= wma(window_slow)[t-1] and wma(window_fast)[t] < wma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=50]: Fast WMA window
+        window_slow [default=21, min=10, max=100]: Slow WMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if fast WMA crosses below slow WMA, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1420,8 +2224,26 @@ def wma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
 
 @RuleRegistry.register("wma_cross_up")
 def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
-    """
+    """Signal: wma_cross_up
+
     Check if fast WMA crosses above slow WMA (bullish).
+
+    Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
+    Warmup: window_slow
+
+    Formula:
+        wma(window_fast)[t-1] <= wma(window_slow)[t-1] and wma(window_fast)[t] > wma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=9, min=2, max=50]: Fast WMA window
+        window_slow [default=21, min=10, max=100]: Slow WMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if fast WMA crosses above slow WMA, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1457,8 +2279,28 @@ def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
 
 @RuleRegistry.register("ichimoku_bullish")
 def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int = 26, window_senkou: int = 52) -> bool:
-    """
+    """Signal: ichimoku_bullish
+
     Check if Ichimoku indicates bullish signal (price above cloud).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud
+    Warmup: window_senkou - 1
+
+    Formula:
+        close[t] > max(span_a[t], span_b[t]) -- above the cloud, whichever span is on top
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window_tenkan [default=9, min=5, max=20]: Tenkan-sen (conversion line) window
+        window_kijun [default=26, min=15, max=40]: Kijun-sen (base line) window
+        window_senkou [default=52, min=30, max=70]: Senkou Span B (leading span B) window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if price above cloud, False otherwise
 
     Type: FILTER
     Requires: High, Low
@@ -1492,8 +2334,28 @@ def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
 
 @RuleRegistry.register("ichimoku_bearish")
 def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int = 26, window_senkou: int = 52) -> bool:
-    """
+    """Signal: ichimoku_bearish
+
     Check if Ichimoku indicates bearish signal (price below cloud).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud
+    Warmup: window_senkou - 1
+
+    Formula:
+        close[t] < min(span_a[t], span_b[t])
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window_tenkan [default=9, min=5, max=20]: Tenkan-sen (conversion line) window
+        window_kijun [default=26, min=15, max=40]: Kijun-sen (base line) window
+        window_senkou [default=52, min=30, max=70]: Senkou Span B (leading span B) window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if price below cloud, False otherwise
 
     Type: FILTER
     Requires: High, Low
@@ -1527,8 +2389,29 @@ def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
 
 @RuleRegistry.register("ichimoku_tk_cross")
 def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int = 26, window_senkou: int = 52, direction: str = "bullish") -> bool:
-    """
+    """Signal: ichimoku_tk_cross
+
     Check if Tenkan-sen crosses Kijun-sen (TK cross).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud
+    Warmup: window_senkou
+
+    Formula:
+        direction == 'bullish': conversion_line[t-1] <= base_line[t-1] and conversion_line[t] > base_line[t]; direction == 'bearish': conversion_line[t-1] >= base_line[t-1] and conversion_line[t] < base_line[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window_tenkan [default=9, min=5, max=20]: Tenkan-sen (conversion line) window
+        window_kijun [default=26, min=15, max=40]: Kijun-sen (base line) window
+        window_senkou [default=52, min=30, max=70]: Senkou Span B (leading span B) window
+        direction: Crossover direction, 'bullish' or 'bearish'
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if TK cross detected, False otherwise
 
     Type: TRIGGER
     Requires: High, Low
@@ -1569,11 +2452,26 @@ def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: in
 
 @RuleRegistry.register("is_above_epma")
 def is_above_epma(df: pd.DataFrame, window: int = 20) -> bool:
-    """
-    Check if the current price is above the End Point Moving Average (EPMA / LSMA).
+    """Signal: is_above_epma
 
-    EPMA is the endpoint of a linear regression over the window, projecting the
-    trend to "now" rather than averaging past values.
+    Check if the current price is above the End Point Moving Average (EPMA / LSMA). EPMA is the
+    endpoint of a linear regression over the window, projecting the trend to "now" rather than
+    averaging past values.
+
+    Warmup: window - 1
+
+    Formula:
+        close[t] > epma[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=2, max=200]: EPMA window in bars
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close > EPMA, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -1589,8 +2487,25 @@ def is_above_epma(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("epma_cross_up")
 def epma_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
-    """
+    """Signal: epma_cross_up
+
     Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).
+
+    Warmup: window_slow
+
+    Formula:
+        epma(window_fast)[t-1] <= epma(window_slow)[t-1] and epma(window_fast)[t] > epma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=10, min=2, max=100]: Fast EPMA window
+        window_slow [default=30, min=2, max=200]: Slow EPMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish EPMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1607,8 +2522,25 @@ def epma_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30
 
 @RuleRegistry.register("epma_cross_down")
 def epma_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30) -> bool:
-    """
+    """Signal: epma_cross_down
+
     Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).
+
+    Warmup: window_slow
+
+    Formula:
+        epma(window_fast)[t-1] >= epma(window_slow)[t-1] and epma(window_fast)[t] < epma(window_slow)[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=10, min=2, max=100]: Fast EPMA window
+        window_slow [default=30, min=2, max=200]: Slow EPMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish EPMA crossover detected on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -1625,11 +2557,26 @@ def epma_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 
 
 @RuleRegistry.register("heikin_ashi_bullish")
 def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
-    """
-    Check if the current Heikin-Ashi candle is bullish (HA_close > HA_open).
+    """Signal: heikin_ashi_bullish
 
-    A bullish HA candle indicates buying pressure on the smoothed bar.
-    Strings of bullish HA candles indicate a sustained uptrend.
+    Check if the current Heikin-Ashi candle is bullish (HA_close > HA_open). A bullish HA candle
+    indicates buying pressure on the smoothed bar. Strings of bullish HA candles indicate a
+    sustained uptrend.
+
+    Warmup: 0
+
+    Formula:
+        ha_close[t] > ha_open[t] -- the Heikin-Ashi candle closes up, which is not the same as close[t] > open[t]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if HA_close > HA_open on the current bar
 
     Type: FILTER
     Requires: Open, High, Low, Close
@@ -1651,8 +2598,24 @@ def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
 
 @RuleRegistry.register("heikin_ashi_bearish")
 def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
-    """
+    """Signal: heikin_ashi_bearish
+
     Check if the current Heikin-Ashi candle is bearish (HA_close < HA_open).
+
+    Warmup: 0
+
+    Formula:
+        ha_close[t] < ha_open[t]
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if HA_close < HA_open on the current bar
 
     Type: FILTER
     Requires: Open, High, Low, Close

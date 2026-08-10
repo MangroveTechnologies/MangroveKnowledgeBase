@@ -82,31 +82,46 @@ def _body_ratio(open_s: pd.Series, high_s: pd.Series,
 # detectors above are not, and are tracked for reclassification.
 
 class CandleRaw(IndicatorInterface):
-    """Candle Raw
+    """Indicator: CandleRaw
 
-    The bar itself, unmodified: open, high, low and close returned exactly as
-    received. It computes nothing, and that is the point.
+    The bar itself, unmodified: open, high, low and close returned exactly as received. It computes
+    nothing, and that is the point. Four candlestick patterns -- piercing line, dark cloud cover,
+    and the two three-inside reversals -- are defined purely by where the raw prices of two or three
+    consecutive bars sit relative to each other, with no derived quantity in between. The
+    penetration depth of a piercing line is a comparison between this close and the previous body,
+    not a property of either bar. Rather than invent a measurement those patterns do not use, this
+    names what they actually read, so they state their input like every other signal. Its class is
+    `pattern` for the same reason CandleGeometry's and CandleRelation's is: they describe the shape
+    of one bar and of a bar against its predecessor, and the open-high-low-close IS the bar's shape
+    before any decomposition. The three form one layer -- raw, decomposed, related.
 
-    Four candlestick patterns -- piercing line, dark cloud cover, and the two
-    three-inside reversals -- are defined purely by where the raw prices of two or
-    three consecutive bars sit relative to each other, with no derived quantity in
-    between. The penetration depth of a piercing line is a comparison between this
-    close and the previous body, not a property of either bar. Rather than invent a
-    measurement those patterns do not use, this names what they actually read, so
-    they state their input like every other signal.
-
-    Its class is `pattern` for the same reason CandleGeometry's and CandleRelation's
-    is: they describe the shape of one bar and of a bar against its predecessor, and
-    the open-high-low-close IS the bar's shape before any decomposition. The three
-    form one layer -- raw, decomposed, related.
-
-    https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
 
     Formula:
         open  = open
         high  = high
         low   = low
         close = close
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Outputs:
+        open [price, 0..inf]:
+            the bar's opening price, unchanged. Non-negative for any instrument that cannot trade
+            below zero, which is every instrument this library is used on
+        high [price, 0..inf]:
+            the bar's highest traded price, unchanged. Never below `open`, `low` or `close`, since
+            it is their maximum by definition
+        low [price, 0..inf]:
+            the bar's lowest traded price, unchanged. Never above `open`, `high` or `close`
+        close [price, 0..inf]:
+            the bar's closing price, unchanged. This is the output most patterns compare against the
+            previous bar's body
 
     Interpretation:
         - Identity: a reading is the price it was given, in the instrument's own units.
@@ -117,12 +132,6 @@ class CandleRaw(IndicatorInterface):
     Applications:
         - The input layer for patterns defined by raw price position, not by a measurement.
         - Giving a signal that reads raw price a stated dependency and therefore a class.
-
-    UNITS: all four outputs are in the instrument's own PRICE units, so their
-    magnitudes are not comparable across instruments or price regimes. Nothing is
-    normalised here, because normalising would make it something other than the
-    bar. Reach for CandleGeometry's `body_ratio` or CandleRelation's percent
-    deltas when a scale-free reading is wanted.
 
     Args:
         data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -158,14 +167,14 @@ class CandleRaw(IndicatorInterface):
 
 
 class CandleGeometry(IndicatorInterface):
-    """Candle Geometry
+    """Indicator: CandleGeometry
 
-    Decomposes each bar into the numeric measurements candlestick analysis is
-    built from: how large the body is, how far the bar travelled, how long each
-    wick is, and what fraction of the range the body occupies. Direction is
-    carried by the sign of the body rather than by a separate flag.
+    Decomposes each bar into the numeric measurements candlestick analysis is built from: how large
+    the body is, how far the bar travelled, how long each wick is, and what fraction of the range
+    the body occupies. Direction is carried by the sign of the body rather than by a separate flag.
 
-    https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
+    Warmup: 0
 
     Formula:
         body        = |close - open|
@@ -174,6 +183,33 @@ class CandleGeometry(IndicatorInterface):
         upper_wick  = high - max(open, close)
         lower_wick  = min(open, close) - low
         body_ratio  = body / range        (0 where range is 0)
+
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Outputs:
+        body [price, 0..inf]:
+            absolute body size, |close - open|. Non-negative by construction, and never larger than
+            range, since open and close both lie within the bar's high-low span
+        signed_body [price, -inf..inf]:
+            close - open, so the SIGN carries direction -- positive is an up bar, negative a down
+            bar, zero a flat one. Replaces the boolean is_bullish/is_bearish pair this indicator
+            supersedes, keeping every output numeric
+        range [price, 0..inf]:
+            full travel of the bar, high - low. Non-negative, and zero on a bar that did not move at
+            all
+        upper_wick [price, 0..inf]:
+            high - max(open, close) -- the rejection above the body. Non-negative
+        lower_wick [price, 0..inf]:
+            min(open, close) - low -- the rejection below the body. Non-negative
+        body_ratio [ratio, 0..1]:
+            body as a fraction of range. Hard-bounded 0-1 because the body can never exceed the
+            range: 0 is a doji, 1 a marubozu with no wicks at all. The only scale-free output here,
+            so it is what makes shape comparable across instruments. Returns 0 on a zero-range bar,
+            which is a convention rather than a measurement -- no source prescribes one
 
     Interpretation:
         - A small body relative to range is indecision; a large one is conviction.
@@ -187,11 +223,6 @@ class CandleGeometry(IndicatorInterface):
         - Screening for conviction bars (high body_ratio) or indecision (low).
         - Quantifying rejection at a level from wick length.
         - Comparing bar shape across instruments via body_ratio, which is scale-free.
-
-    UNITS: body, signed_body, range and both wicks are in the instrument's own
-    PRICE units, so their magnitudes are not comparable across instruments or
-    price regimes. `body_ratio` is the scale-free member and is the one to reach
-    for when comparing shape across symbols.
 
     Args:
         data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
@@ -262,32 +293,11 @@ class CandleGeometry(IndicatorInterface):
 
 
 class CandleRelation(IndicatorInterface):
-    """Candle Relation
+    """Indicator: CandleRelation
 
-    Measures the current bar against the previous one along three independent
-    axes, because they answer different questions and none implies the others.
+    Measures the current bar against the previous one along three independent axes, because they answer different questions and none implies the others. LEVEL -- where this bar sits. Each `*_delta` is the signed distance between an edge of the current bar and the same edge of the previous one, so a pair of signs states containment directly: low_delta < 0 and high_delta > 0    current span CONTAINS the previous low_delta > 0 and high_delta < 0    current span is CONTAINED BY it signs agree                         the spans overlap, or are disjoint This is what Engulfing, Harami, InsideBar and OutsideBar each reduce to. Level is NOT recoverable from size: a bar can be smaller than its predecessor while sitting entirely above it, so "smaller" is not "nested". SIZE -- how much bigger. The `*_size_ratio` outputs are current span over previous span, so 2.0 means twice as large and 0.5 means half. Unbounded above, floored at 0, and 0 where the previous span was zero. GAP -- whether trading jumped between the bars. `gap` is the opening gap, open against the previous close. `range_overlap` is the shared extent of the two ranges: positive means they overlap by that much, and NEGATIVE means a true gap with no overlap at all, its magnitude being the size of the void. One output covers gap-up and gap-down, the direction coming from the sign.
 
-    LEVEL -- where this bar sits. Each `*_delta` is the signed distance between
-    an edge of the current bar and the same edge of the previous one, so a pair
-    of signs states containment directly:
-
-        low_delta < 0 and high_delta > 0    current span CONTAINS the previous
-        low_delta > 0 and high_delta < 0    current span is CONTAINED BY it
-        signs agree                         the spans overlap, or are disjoint
-
-    This is what Engulfing, Harami, InsideBar and OutsideBar each reduce to.
-    Level is NOT recoverable from size: a bar can be smaller than its
-    predecessor while sitting entirely above it, so "smaller" is not "nested".
-
-    SIZE -- how much bigger. The `*_size_ratio` outputs are current span over
-    previous span, so 2.0 means twice as large and 0.5 means half. Unbounded
-    above, floored at 0, and 0 where the previous span was zero.
-
-    GAP -- whether trading jumped between the bars. `gap` is the opening gap,
-    open against the previous close. `range_overlap` is the shared extent of the
-    two ranges: positive means they overlap by that much, and NEGATIVE means a
-    true gap with no overlap at all, its magnitude being the size of the void.
-    One output covers gap-up and gap-down, the direction coming from the sign.
+    Warmup: 1
 
     Formula:
         body_low_delta   = (min(o,c) - prev min(o,c)) / prev_close * 100
@@ -299,26 +309,53 @@ class CandleRelation(IndicatorInterface):
         gap              = (open - prev_close) / prev_close * 100
         range_overlap    = (min(high,prev_high) - max(low,prev_low)) / prev_close * 100
 
+    Inputs:
+        open: opening price of the bar
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Outputs:
+        body_low_delta [percent, -inf..inf]:
+            distance from the previous bar's lower body edge to this one's, as a percent of the
+            previous close. Negative means this body starts below the last one
+        body_high_delta [percent, -inf..inf]:
+            the same for the upper body edge. Paired with body_low_delta the signs state
+            containment: negative low with positive high is engulfing, the inverse is harami
+        range_low_delta [percent, -inf..inf]:
+            distance between the two bars' lows. Positive means this bar's low sits above the last
+            one's
+        range_high_delta [percent, -inf..inf]:
+            distance between the two bars' highs. With range_low_delta this is InsideBar and
+            OutsideBar: both edges drawn inward is inside, both outward is outside
+        body_size_ratio [ratio, 0..inf]:
+            this bar's body over the previous bar's, so 2.0 is twice as large and 0.5 is half.
+            Non-negative, no ceiling, and 0 where the previous body was zero-width. NaN on the first
+            bar, which has no predecessor
+        range_size_ratio [ratio, 0..inf]:
+            the same for the full high-low range. Answers "how much bigger is this bar"
+            independently of where it sits
+        gap [percent, -100..inf]:
+            open minus the previous close, as a percent of that close. Positive is a gap up,
+            negative a gap down. Floored at -100, since the open cannot fall below zero
+        range_overlap [percent, -inf..inf]:
+            shared extent of the two bars' ranges, as a percent of the previous close. Positive
+            means they overlap by that much; NEGATIVE means no overlap at all -- a true gap -- and
+            the magnitude is how far apart they are. This is the output to read for "did we gap",
+            with direction taken from the sign of `gap`
+
     Interpretation:
         - Negative low_delta with positive high_delta means this bar CONTAINS the
-          previous one; the inverse means it is contained by it.
         - A size ratio above 1 means expansion, below 1 contraction.
         - Negative range_overlap means the bars do not touch -- a true gap.
         - Level and size are independent: a bar can be smaller yet sit outside.
         - Warmup is one bar: every output is NaN on the first, which has no
-          predecessor to relate to.
 
     Applications:
         - The relational layer beneath Engulfing, Harami, InsideBar and OutsideBar.
         - Gap detection and gap sizing, without a price-scale dependency.
         - Volatility expansion or contraction from the size ratios.
         - Comparing two-bar structure across instruments and price regimes.
-
-    UNITS: every distance here -- the four deltas, the gap, and the overlap -- is
-    a PERCENT of the previous close, not a price. That makes readings comparable
-    across instruments and price regimes: a 2% gap is 2% whether the instrument
-    trades at 5 or at 50,000. The two size ratios are already scale-free. So no
-    output is in price units, and nothing here needs rescaling to be compared.
 
     Args:
         data: {'open': pd.Series, 'high': pd.Series, 'low': pd.Series, 'close': pd.Series}

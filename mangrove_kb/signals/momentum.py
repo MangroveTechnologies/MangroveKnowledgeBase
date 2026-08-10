@@ -50,8 +50,26 @@ logger = logging.getLogger(__name__)
 
 @RuleRegistry.register("roc_positive")
 def roc_positive(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> bool:
-    """
+    """Signal: roc_positive
+
     Check if Rate of Change indicates positive momentum.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
+    Warmup: window - 1
+
+    Formula:
+        roc[t] > threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=12, min=1, max=50]: ROC period
+        threshold [default=0.0, min=-10.0, max=10.0]: Positive momentum threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ROC > threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -78,8 +96,26 @@ def roc_positive(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
 
 @RuleRegistry.register("roc_negative")
 def roc_negative(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> bool:
-    """
+    """Signal: roc_negative
+
     Check if Rate of Change indicates negative momentum.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
+    Warmup: window - 1
+
+    Formula:
+        roc[t] < threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=12, min=1, max=50]: ROC period
+        threshold [default=0.0, min=-10.0, max=10.0]: Negative momentum threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ROC < threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -106,8 +142,26 @@ def roc_negative(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
 
 @RuleRegistry.register("roc_momentum_shift")
 def roc_momentum_shift(df: pd.DataFrame, window: int = 12, direction: str = "bullish") -> bool:
-    """
+    """Signal: roc_momentum_shift
+
     Check if ROC crosses zero (momentum shift).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
+    Warmup: window
+
+    Formula:
+        roc[t-1] <= 0 and roc[t] > 0 when direction is bullish; roc[t-1] >= 0 and roc[t] < 0 when bearish
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=12, min=1, max=50]: ROC period
+        direction: Direction: 'bullish' for cross above zero, 'bearish' for cross below
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if momentum shift detected, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -143,8 +197,28 @@ def roc_momentum_shift(df: pd.DataFrame, window: int = 12, direction: str = "bul
 
 @RuleRegistry.register("ao_bullish")
 def ao_bullish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, threshold: float = 0.0) -> bool:
-    """
+    """Signal: ao_bullish
+
     Check if Awesome Oscillator indicates bullish momentum.
+
+    Reference: https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/
+    Warmup: window_slow - 1
+
+    Formula:
+        ao[t] > threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window_fast [default=5, min=2, max=15]: Fast SMA window
+        window_slow [default=34, min=20, max=60]: Slow SMA window
+        threshold [default=0.0, min=0.0]: Bullish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if AO > threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low
@@ -175,8 +249,28 @@ def ao_bullish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
 
 @RuleRegistry.register("ao_bearish")
 def ao_bearish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, threshold: float = 0.0) -> bool:
-    """
+    """Signal: ao_bearish
+
     Check if Awesome Oscillator indicates bearish momentum.
+
+    Reference: https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/
+    Warmup: window_slow - 1
+
+    Formula:
+        ao[t] < threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window_fast [default=5, min=2, max=15]: Fast SMA window
+        window_slow [default=34, min=20, max=60]: Slow SMA window
+        threshold [default=0.0, min=0.0]: Bearish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if AO < threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low
@@ -207,8 +301,28 @@ def ao_bearish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
 
 @RuleRegistry.register("ao_zero_cross")
 def ao_zero_cross(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, direction: str = "bullish") -> bool:
-    """
+    """Signal: ao_zero_cross
+
     Check if Awesome Oscillator crosses zero line.
+
+    Reference: https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/
+    Warmup: window_slow
+
+    Formula:
+        ao[t-1] <= 0 and ao[t] > 0 when direction is bullish; ao[t-1] >= 0 and ao[t] < 0 when bearish
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window_fast [default=5, min=2, max=15]: Fast SMA window
+        window_slow [default=34, min=20, max=60]: Slow SMA window
+        direction: Direction: 'bullish' for cross above, 'bearish' for cross below
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if zero cross detected, False otherwise
 
     Type: TRIGGER
     Requires: High, Low
@@ -251,8 +365,27 @@ def ao_zero_cross(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34,
 
 @RuleRegistry.register("ppo_bullish_cross")
 def ppo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int = 12, window_sign: int = 9) -> bool:
-    """
+    """Signal: ppo_bullish_cross
+
     Check if PPO crosses above signal line (bullish).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo
+    Warmup: window_slow + window_sign - 1
+
+    Formula:
+        ppo[t-1] <= ppo_signal[t-1] and ppo[t] > ppo_signal[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_slow [default=26, min=15, max=50]: Slow EMA period
+        window_fast [default=12, min=5, max=20]: Fast EMA period
+        window_sign [default=9, min=3, max=15]: Signal line period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if PPO crosses above signal, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -287,8 +420,27 @@ def ppo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
 
 @RuleRegistry.register("ppo_bearish_cross")
 def ppo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int = 12, window_sign: int = 9) -> bool:
-    """
+    """Signal: ppo_bearish_cross
+
     Check if PPO crosses below signal line (bearish).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo
+    Warmup: window_slow + window_sign - 1
+
+    Formula:
+        ppo[t-1] >= ppo_signal[t-1] and ppo[t] < ppo_signal[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_slow [default=26, min=15, max=50]: Slow EMA period
+        window_fast [default=12, min=5, max=20]: Fast EMA period
+        window_sign [default=9, min=3, max=15]: Signal line period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if PPO crosses below signal, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -327,8 +479,27 @@ def ppo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
 
 @RuleRegistry.register("pvo_bullish_cross")
 def pvo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int = 12, window_sign: int = 9) -> bool:
-    """
+    """Signal: pvo_bullish_cross
+
     Check if PVO crosses above signal line (bullish volume).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo
+    Warmup: window_slow + window_sign - 1
+
+    Formula:
+        pvo[t-1] <= pvo_signal[t-1] and pvo[t] > pvo_signal[t] -- computed from VOLUME, not price
+
+    Inputs:
+        volume: units traded during the bar
+
+    Params:
+        window_slow [default=26, min=15, max=50]: Slow EMA period
+        window_fast [default=12, min=5, max=20]: Fast EMA period
+        window_sign [default=9, min=3, max=15]: Signal line period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if PVO crosses above signal, False otherwise
 
     Type: TRIGGER
     Requires: Volume
@@ -363,8 +534,27 @@ def pvo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
 
 @RuleRegistry.register("pvo_bearish_cross")
 def pvo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int = 12, window_sign: int = 9) -> bool:
-    """
+    """Signal: pvo_bearish_cross
+
     Check if PVO crosses below signal line (bearish volume).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo
+    Warmup: window_slow + window_sign - 1
+
+    Formula:
+        pvo[t-1] >= pvo_signal[t-1] and pvo[t] < pvo_signal[t] -- computed from VOLUME, not price
+
+    Inputs:
+        volume: units traded during the bar
+
+    Params:
+        window_slow [default=26, min=15, max=50]: Slow EMA period
+        window_fast [default=12, min=5, max=20]: Fast EMA period
+        window_sign [default=9, min=3, max=15]: Signal line period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if PVO crosses below signal, False otherwise
 
     Type: TRIGGER
     Requires: Volume
@@ -410,10 +600,26 @@ def pvo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
 
 @RuleRegistry.register("mom_bullish")
 def mom_bullish(df: pd.DataFrame, window: int = 10) -> bool:
-    """
-    Check if Momentum (close - close[-n]) is positive.
+    """Signal: mom_bullish
 
-    Indicates upward price momentum over the lookback window.
+    Check if Momentum (close - close[-n]) is positive. Indicates upward price momentum over the
+    lookback window.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
+    Warmup: window
+
+    Formula:
+        mom[t] > 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=10, min=1, max=200]: Lookback period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if MOM > 0, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -436,10 +642,26 @@ def mom_bullish(df: pd.DataFrame, window: int = 10) -> bool:
 
 @RuleRegistry.register("mom_bearish")
 def mom_bearish(df: pd.DataFrame, window: int = 10) -> bool:
-    """
-    Check if Momentum (close - close[-n]) is negative.
+    """Signal: mom_bearish
 
-    Indicates downward price momentum over the lookback window.
+    Check if Momentum (close - close[-n]) is negative. Indicates downward price momentum over the
+    lookback window.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
+    Warmup: window
+
+    Formula:
+        mom[t] < 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=10, min=1, max=200]: Lookback period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if MOM < 0, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -462,8 +684,25 @@ def mom_bearish(df: pd.DataFrame, window: int = 10) -> bool:
 
 @RuleRegistry.register("mom_cross_up")
 def mom_cross_up(df: pd.DataFrame, window: int = 10) -> bool:
-    """
+    """Signal: mom_cross_up
+
     Detect Momentum crossing above zero (bullish zero-line cross).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
+    Warmup: window + 1
+
+    Formula:
+        mom[t-1] <= 0 and mom[t] > 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=10, min=1, max=200]: Lookback period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if MOM crosses above zero on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -484,8 +723,25 @@ def mom_cross_up(df: pd.DataFrame, window: int = 10) -> bool:
 
 @RuleRegistry.register("mom_cross_down")
 def mom_cross_down(df: pd.DataFrame, window: int = 10) -> bool:
-    """
+    """Signal: mom_cross_down
+
     Detect Momentum crossing below zero (bearish zero-line cross).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
+    Warmup: window + 1
+
+    Formula:
+        mom[t-1] >= 0 and mom[t] < 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=10, min=1, max=200]: Lookback period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if MOM crosses below zero on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -535,8 +791,26 @@ def _macd_line(closes: pd.Series, window_fast: int, window_slow: int) -> pd.Seri
 
 @RuleRegistry.register("macd_line_positive")
 def macd_line_positive(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
-    """
+    """Signal: macd_line_positive
+
     Check if the MACD line (EMA fast - EMA slow) is above zero (bullish momentum regime).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
+    Warmup: window_slow - 1
+
+    Formula:
+        macd[t] > 0 -- the MACD LINE, not the histogram
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=12, min=2, max=100]: Fast EMA period
+        window_slow [default=26, min=5, max=200]: Slow EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the MACD line > 0, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -560,8 +834,26 @@ def macd_line_positive(df: pd.DataFrame, window_fast: int = 12, window_slow: int
 
 @RuleRegistry.register("macd_line_negative")
 def macd_line_negative(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
-    """
+    """Signal: macd_line_negative
+
     Check if the MACD line is below zero (bearish momentum regime).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
+    Warmup: window_slow - 1
+
+    Formula:
+        macd[t] < 0 -- the MACD LINE, not the histogram
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=12, min=2, max=100]: Fast EMA period
+        window_slow [default=26, min=5, max=200]: Slow EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the MACD line < 0, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -585,8 +877,26 @@ def macd_line_negative(df: pd.DataFrame, window_fast: int = 12, window_slow: int
 
 @RuleRegistry.register("macd_line_cross_up")
 def macd_line_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
-    """
+    """Signal: macd_line_cross_up
+
     Detect the MACD line crossing above zero (bullish momentum onset).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
+    Warmup: window_slow
+
+    Formula:
+        macd[t-1] <= 0 and macd[t] > 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=12, min=2, max=100]: Fast EMA period
+        window_slow [default=26, min=5, max=200]: Slow EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the MACD line crosses above zero on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -607,8 +917,26 @@ def macd_line_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int
 
 @RuleRegistry.register("macd_line_cross_down")
 def macd_line_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26) -> bool:
-    """
+    """Signal: macd_line_cross_down
+
     Detect the MACD line crossing below zero (bearish momentum onset).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
+    Warmup: window_slow
+
+    Formula:
+        macd[t-1] >= 0 and macd[t] < 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=12, min=2, max=100]: Fast EMA period
+        window_slow [default=26, min=5, max=200]: Slow EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the MACD line crosses below zero on the current bar
 
     Type: TRIGGER
     Requires: Close
@@ -643,8 +971,29 @@ def _kvo_lines(df: pd.DataFrame, fast: int, slow: int, signal_window: int):
 
 @RuleRegistry.register("adosc_bearish")
 def adosc_bearish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
-    """
+    """Signal: adosc_bearish
+
     Check if Chaikin A/D Oscillator is negative (distribution regime).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
+    Warmup: slow
+
+    Formula:
+        adosc[t] < 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=3, min=2, max=20]: Fast EMA period for AD
+        slow [default=10, min=5, max=50]: Slow EMA period for AD
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ADOSC < 0, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close, Volume
@@ -670,11 +1019,31 @@ def adosc_bearish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
 
 @RuleRegistry.register("adosc_bullish")
 def adosc_bullish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
-    """
-    Check if Chaikin A/D Oscillator is positive (accumulation regime).
+    """Signal: adosc_bullish
 
-    Positive ADOSC = AD line's fast EMA above its slow EMA, indicating
-    short-term buying pressure relative to longer-term trend.
+    Check if Chaikin A/D Oscillator is positive (accumulation regime). Positive ADOSC = AD line's
+    fast EMA above its slow EMA, indicating short-term buying pressure relative to longer-term
+    trend.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
+    Warmup: slow
+
+    Formula:
+        adosc[t] > 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=3, min=2, max=20]: Fast EMA period for AD
+        slow [default=10, min=5, max=50]: Slow EMA period for AD
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ADOSC > 0, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close, Volume
@@ -700,8 +1069,29 @@ def adosc_bullish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
 
 @RuleRegistry.register("adosc_cross_down")
 def adosc_cross_down(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
-    """
+    """Signal: adosc_cross_down
+
     Detect ADOSC crossing below zero (distribution onset).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
+    Warmup: slow + 1
+
+    Formula:
+        adosc[t-1] >= 0 and adosc[t] < 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=3, min=2, max=20]: Fast EMA period for AD
+        slow [default=10, min=5, max=50]: Slow EMA period for AD
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ADOSC crosses below zero on the current bar
 
     Type: TRIGGER
     Requires: High, Low, Close, Volume
@@ -727,8 +1117,29 @@ def adosc_cross_down(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
 
 @RuleRegistry.register("adosc_cross_up")
 def adosc_cross_up(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
-    """
+    """Signal: adosc_cross_up
+
     Detect ADOSC crossing above zero (accumulation onset).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
+    Warmup: slow + 1
+
+    Formula:
+        adosc[t-1] <= 0 and adosc[t] > 0
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=3, min=2, max=20]: Fast EMA period for AD
+        slow [default=10, min=5, max=50]: Slow EMA period for AD
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ADOSC crosses above zero on the current bar
 
     Type: TRIGGER
     Requires: High, Low, Close, Volume
@@ -754,8 +1165,24 @@ def adosc_cross_up(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
 
 @RuleRegistry.register("daily_return_negative")
 def daily_return_negative(df: pd.DataFrame, threshold: float = 0.0) -> bool:
-    """
+    """Signal: daily_return_negative
+
     Check if daily return is negative.
+
+    Warmup: 1
+
+    Formula:
+        daily_return[t] < threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        threshold [default=0.0, min=0.0]: Maximum return threshold in percent
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if daily return < threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -781,8 +1208,24 @@ def daily_return_negative(df: pd.DataFrame, threshold: float = 0.0) -> bool:
 
 @RuleRegistry.register("daily_return_positive")
 def daily_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool:
-    """
+    """Signal: daily_return_positive
+
     Check if daily return is positive.
+
+    Warmup: 1
+
+    Formula:
+        daily_return[t] > threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        threshold [default=0.0, min=0.0]: Minimum return threshold in percent
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if daily return > threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -808,8 +1251,28 @@ def daily_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool:
 
 @RuleRegistry.register("eom_bearish")
 def eom_bearish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> bool:
-    """
+    """Signal: eom_bearish
+
     Check if Ease of Movement indicates bearish (easy downward movement).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv
+    Warmup: window - 1
+
+    Formula:
+        eom[t] < threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        volume: units traded during the bar
+
+    Params:
+        window [default=14, min=5, max=30]: EOM period
+        threshold [default=0.0, min=0.0]: Bearish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if EOM < threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low, Volume
@@ -840,8 +1303,28 @@ def eom_bearish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
 
 @RuleRegistry.register("eom_bullish")
 def eom_bullish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> bool:
-    """
+    """Signal: eom_bullish
+
     Check if Ease of Movement indicates bullish (easy upward movement).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv
+    Warmup: window - 1
+
+    Formula:
+        eom[t] > threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        volume: units traded during the bar
+
+    Params:
+        window [default=14, min=5, max=30]: EOM period
+        threshold [default=0.0, min=0.0]: Bullish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if EOM > threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low, Volume
@@ -873,8 +1356,27 @@ def eom_bullish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
 
 @RuleRegistry.register("force_bearish")
 def force_bearish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) -> bool:
-    """
+    """Signal: force_bearish
+
     Check if Force Index indicates bearish momentum.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index
+    Warmup: window - 1
+
+    Formula:
+        fi[t] < threshold
+
+    Inputs:
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        window [default=13, min=5, max=30]: EMA period for smoothing
+        threshold [default=0.0, min=0.0]: Bearish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Force Index < threshold, False otherwise
 
     Type: FILTER
     Requires: Close, Volume
@@ -902,8 +1404,27 @@ def force_bearish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
 
 @RuleRegistry.register("force_bullish")
 def force_bullish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) -> bool:
-    """
+    """Signal: force_bullish
+
     Check if Force Index indicates bullish momentum.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index
+    Warmup: window - 1
+
+    Formula:
+        fi[t] > threshold
+
+    Inputs:
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        window [default=13, min=5, max=30]: EMA period for smoothing
+        threshold [default=0.0, min=0.0]: Bullish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Force Index > threshold, False otherwise
 
     Type: FILTER
     Requires: Close, Volume
@@ -933,8 +1454,30 @@ def force_bullish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
 def kvo_bearish(
     df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
 ) -> bool:
-    """
+    """Signal: kvo_bearish
+
     Check if KVO is below its signal line (bearish volume regime).
+
+    Reference: https://www.tradingview.com/scripts/klingeroscillator/
+    Warmup: slow + signal_window
+
+    Formula:
+        kvo[t] < kvo_signal[t] -- same simplified-variant caveat
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=34, min=5, max=100]: Fast EMA period for signed volume
+        slow [default=55, min=10, max=200]: Slow EMA period for signed volume
+        signal_window [default=13, min=2, max=50]: Signal-line EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if KVO < signal line on the current bar
 
     Type: FILTER
     Requires: High, Low, Close, Volume
@@ -961,8 +1504,30 @@ def kvo_bearish(
 def kvo_bearish_cross(
     df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
 ) -> bool:
-    """
+    """Signal: kvo_bearish_cross
+
     Detect KVO crossing below its signal line (bearish volume onset).
+
+    Reference: https://www.tradingview.com/scripts/klingeroscillator/
+    Warmup: slow + signal_window
+
+    Formula:
+        kvo[t-1] >= kvo_signal[t-1] and kvo[t] < kvo_signal[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=34, min=5, max=100]: Fast EMA period for signed volume
+        slow [default=55, min=10, max=200]: Slow EMA period for signed volume
+        signal_window [default=13, min=2, max=50]: Signal-line EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if KVO crosses below signal line on the current bar
 
     Type: TRIGGER
     Requires: High, Low, Close, Volume
@@ -989,8 +1554,30 @@ def kvo_bearish_cross(
 def kvo_bullish(
     df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
 ) -> bool:
-    """
+    """Signal: kvo_bullish
+
     Check if KVO is above its signal line (bullish volume regime).
+
+    Reference: https://www.tradingview.com/scripts/klingeroscillator/
+    Warmup: slow + signal_window
+
+    Formula:
+        kvo[t] > kvo_signal[t] -- the SIMPLIFIED KVO variant; its level is roughly 150x smaller than Klinger's original and the two are not comparable
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=34, min=5, max=100]: Fast EMA period for signed volume
+        slow [default=55, min=10, max=200]: Slow EMA period for signed volume
+        signal_window [default=13, min=2, max=50]: Signal-line EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if KVO > signal line on the current bar
 
     Type: FILTER
     Requires: High, Low, Close, Volume
@@ -1017,10 +1604,31 @@ def kvo_bullish(
 def kvo_bullish_cross(
     df: pd.DataFrame, fast: int = 34, slow: int = 55, signal_window: int = 13
 ) -> bool:
-    """
-    Detect KVO crossing above its signal line (bullish volume onset).
+    """Signal: kvo_bullish_cross
 
-    Classic Klinger entry trigger; often confirms a price divergence.
+    Detect KVO crossing above its signal line (bullish volume onset). Classic Klinger entry trigger;
+    often confirms a price divergence.
+
+    Reference: https://www.tradingview.com/scripts/klingeroscillator/
+    Warmup: slow + signal_window
+
+    Formula:
+        kvo[t-1] <= kvo_signal[t-1] and kvo[t] > kvo_signal[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+        volume: units traded during the bar
+
+    Params:
+        fast [default=34, min=5, max=100]: Fast EMA period for signed volume
+        slow [default=55, min=10, max=200]: Slow EMA period for signed volume
+        signal_window [default=13, min=2, max=50]: Signal-line EMA period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if KVO crosses above signal line on the current bar
 
     Type: TRIGGER
     Requires: High, Low, Close, Volume
@@ -1050,10 +1658,28 @@ def kvo_bullish_cross(
 
 @RuleRegistry.register("adx_bullish_di")
 def adx_bullish_di(df: pd.DataFrame, window: int = 14) -> bool:
-    """
-    Check if +DI is greater than -DI (bullish directional movement).
+    """Signal: adx_bullish_di
 
-    When +DI > -DI, bulls have the upper hand.
+    Check if +DI is greater than -DI (bullish directional movement). When +DI > -DI, bulls have the
+    upper hand.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx
+    Warmup: window * 2 - 1
+
+    Formula:
+        adx_pos[t] > adx_neg[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=50]: ADX period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if +DI > -DI, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -1082,10 +1708,29 @@ def adx_bullish_di(df: pd.DataFrame, window: int = 14) -> bool:
 
 @RuleRegistry.register("adx_strong_trend")
 def adx_strong_trend(df: pd.DataFrame, window: int = 14, threshold: float = 25.0) -> bool:
-    """
-    Check if ADX indicates a strong trend.
+    """Signal: adx_strong_trend
 
-    ADX values above 25 typically indicate a strong trend (either up or down).
+    Check if ADX indicates a strong trend. ADX values above 25 typically indicate a strong trend
+    (either up or down).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx
+    Warmup: window * 2 - 1
+
+    Formula:
+        adx[t] > threshold -- trend STRENGTH, undirected
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=50]: ADX period
+        threshold [default=25.0, min=15.0, max=50.0]: Trend strength threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if ADX > threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -1114,8 +1759,27 @@ def adx_strong_trend(df: pd.DataFrame, window: int = 14, threshold: float = 25.0
 
 @RuleRegistry.register("aroon_crossover")
 def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullish") -> bool:
-    """
+    """Signal: aroon_crossover
+
     Check if Aroon lines cross (trend change signal).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon
+    Warmup: window
+
+    Formula:
+        direction == 'bullish': aroon_up[t-1] <= aroon_down[t-1] and aroon_up[t] > aroon_down[t]; direction == 'bearish': aroon_up[t-1] >= aroon_down[t-1] and aroon_up[t] < aroon_down[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window [default=25, min=10, max=50]: Lookback period
+        direction: Crossover direction, 'bullish' or 'bearish'
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if crossover detected, False otherwise
 
     Type: TRIGGER
     Requires: High, Low
@@ -1157,8 +1821,27 @@ def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullis
 
 @RuleRegistry.register("aroon_down_trend")
 def aroon_down_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) -> bool:
-    """
+    """Signal: aroon_down_trend
+
     Check if Aroon Down indicates strong downtrend.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon
+    Warmup: window - 1
+
+    Formula:
+        aroon_down[t] > threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window [default=25, min=10, max=50]: Lookback period
+        threshold [default=70.0, min=50.0, max=100.0]: Strong trend threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Aroon Down > threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low
@@ -1187,8 +1870,27 @@ def aroon_down_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0
 
 @RuleRegistry.register("aroon_up_trend")
 def aroon_up_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) -> bool:
-    """
+    """Signal: aroon_up_trend
+
     Check if Aroon Up indicates strong uptrend.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon
+    Warmup: window - 1
+
+    Formula:
+        aroon_up[t] > threshold
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window [default=25, min=10, max=50]: Lookback period
+        threshold [default=70.0, min=50.0, max=100.0]: Strong trend threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if Aroon Up > threshold, False otherwise
 
     Type: FILTER
     Requires: High, Low
@@ -1217,8 +1919,25 @@ def aroon_up_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) 
 
 @RuleRegistry.register("dpo_negative")
 def dpo_negative(df: pd.DataFrame, window: int = 20) -> bool:
-    """
+    """Signal: dpo_negative
+
     Check if DPO is negative (price below detrended average).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo
+    Warmup: window - 1
+
+    Formula:
+        dpo[t] < 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=10, max=50]: DPO period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if DPO < 0, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -1243,8 +1962,25 @@ def dpo_negative(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("dpo_positive")
 def dpo_positive(df: pd.DataFrame, window: int = 20) -> bool:
-    """
+    """Signal: dpo_positive
+
     Check if DPO is positive (price above detrended average).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo
+    Warmup: window - 1
+
+    Formula:
+        dpo[t] > 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=20, min=10, max=50]: DPO period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if DPO > 0, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -1269,8 +2005,33 @@ def dpo_positive(df: pd.DataFrame, window: int = 20) -> bool:
 
 @RuleRegistry.register("kst_bearish_cross")
 def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: int = 20, roc4: int = 30, window_sma1: int = 10, window_sma2: int = 10, window_sma3: int = 10, window_sma4: int = 15, nsig: int = 9) -> bool:
-    """
+    """Signal: kst_bearish_cross
+
     Check if KST crosses below signal line (bearish).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst
+    Warmup: roc4 + window_sma4 + nsig - 1
+
+    Formula:
+        kst[t-1] >= kst_signal[t-1] and kst[t] < kst_signal[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        roc1 [default=10, min=1, max=200]: ROC1 period
+        roc2 [default=15, min=1, max=200]: ROC2 period
+        roc3 [default=20, min=1, max=200]: ROC3 period
+        roc4 [default=30, min=1, max=200]: ROC4 period
+        window_sma1 [default=10, min=2, max=200]: SMA1 smoothing window for ROC1
+        window_sma2 [default=10, min=2, max=200]: SMA2 smoothing window for ROC2
+        window_sma3 [default=10, min=2, max=200]: SMA3 smoothing window for ROC3
+        window_sma4 [default=15, min=2, max=200]: SMA4 smoothing window for ROC4
+        nsig [default=9, min=1, max=200]: Signal line period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if KST crosses below signal, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1314,8 +2075,33 @@ def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
 
 @RuleRegistry.register("kst_bullish_cross")
 def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: int = 20, roc4: int = 30, window_sma1: int = 10, window_sma2: int = 10, window_sma3: int = 10, window_sma4: int = 15, nsig: int = 9) -> bool:
-    """
+    """Signal: kst_bullish_cross
+
     Check if KST crosses above signal line (bullish).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst
+    Warmup: roc4 + window_sma4 + nsig - 1
+
+    Formula:
+        kst[t-1] <= kst_signal[t-1] and kst[t] > kst_signal[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        roc1 [default=10, min=1, max=200]: ROC1 period
+        roc2 [default=15, min=1, max=200]: ROC2 period
+        roc3 [default=20, min=1, max=200]: ROC3 period
+        roc4 [default=30, min=1, max=200]: ROC4 period
+        window_sma1 [default=10, min=2, max=200]: SMA1 smoothing window for ROC1
+        window_sma2 [default=10, min=2, max=200]: SMA2 smoothing window for ROC2
+        window_sma3 [default=10, min=2, max=200]: SMA3 smoothing window for ROC3
+        window_sma4 [default=15, min=2, max=200]: SMA4 smoothing window for ROC4
+        nsig [default=9, min=1, max=200]: Signal line period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if KST crosses above signal, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1367,11 +2153,29 @@ def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
 def macd_bearish_cross(
     df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26, window_sign: int = 9
 ) -> bool:
-    """
-    Detect MACD bearish crossover (MACD line crosses below signal line).
+    """Signal: macd_bearish_cross
 
-    A bearish MACD crossover occurs when the MACD line crosses below
-    the signal line, indicating potential downward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+    Detect MACD bearish crossover (MACD line crosses below signal line). A bearish MACD crossover
+    occurs when the MACD line crosses below the signal line, indicating potential downward momentum.
+    Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
+    Warmup: window_slow + window_sign - 1
+
+    Formula:
+        macd[t-1] >= signal[t-1] and macd[t] < signal[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=12, min=2, max=50]: Fast EMA window
+        window_slow [default=26, min=10, max=100]: Slow EMA window
+        window_sign [default=9, min=2, max=50]: Signal line EMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bearish crossover detected, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1415,11 +2219,29 @@ def macd_bearish_cross(
 def macd_bullish_cross(
     df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26, window_sign: int = 9
 ) -> bool:
-    """
-    Detect MACD bullish crossover (MACD line crosses above signal line).
+    """Signal: macd_bullish_cross
 
-    A bullish MACD crossover occurs when the MACD line crosses above
-    the signal line, indicating potential upward momentum. Crypto's high volatility may produce frequent signals; use with trend confirmation.
+    Detect MACD bullish crossover (MACD line crosses above signal line). A bullish MACD crossover
+    occurs when the MACD line crosses above the signal line, indicating potential upward momentum.
+    Crypto's high volatility may produce frequent signals; use with trend confirmation.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
+    Warmup: window_slow + window_sign - 1
+
+    Formula:
+        macd[t-1] <= signal[t-1] and macd[t] > signal[t]
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=12, min=2, max=50]: Fast EMA window
+        window_slow [default=26, min=10, max=100]: Slow EMA window
+        window_sign [default=9, min=2, max=50]: Signal line EMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if bullish crossover detected, False otherwise
 
     Type: TRIGGER
     Requires: Close
@@ -1463,8 +2285,28 @@ def macd_bullish_cross(
 def macd_positive(
     df: pd.DataFrame, window_fast: int = 12, window_slow: int = 26, window_sign: int = 9
 ) -> bool:
-    """
-    Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce frequent signals; use with trend confirmation.
+    """Signal: macd_positive
+
+    Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce
+    frequent signals; use with trend confirmation.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
+    Warmup: min_periods - 1
+
+    Formula:
+        histogram[t] > 0 -- the HISTOGRAM, macd minus signal; macd_line_positive is the one that reads the MACD line itself
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window_fast [default=12, min=2, max=50]: Fast EMA window
+        window_slow [default=26, min=10, max=100]: Slow EMA window
+        window_sign [default=9, min=2, max=50]: Signal line EMA window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if MACD histogram > 0, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -1496,10 +2338,30 @@ def macd_positive(
 
 @RuleRegistry.register("mass_reversal_signal")
 def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25, threshold_high: float = 27.0, threshold_low: float = 26.5) -> bool:
-    """
-    Check if Mass Index signals potential reversal (reversal bulge).
+    """Signal: mass_reversal_signal
 
-    A reversal bulge occurs when Mass Index rises above 27 then falls below 26.5.
+    Check if Mass Index signals potential reversal (reversal bulge). A reversal bulge occurs when
+    Mass Index rises above 27 then falls below 26.5.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index
+    Warmup: window_slow + window_fast - 1
+
+    Formula:
+        any(mass_index[t-9 .. t] > threshold_high) and mass_index[t] < threshold_low -- the reversal bulge: a spike above, then a fall back through the lower level
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+
+    Params:
+        window_fast [default=9, min=5, max=15]: Fast EMA period
+        window_slow [default=25, min=15, max=40]: Sum period
+        threshold_high [default=27.0, min=25.0, max=30.0]: Upper threshold
+        threshold_low [default=26.5, min=24.0, max=27.0]: Lower threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if reversal bulge detected, False otherwise
 
     Type: TRIGGER
     Requires: High, Low
@@ -1537,8 +2399,26 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
 def multi_tf_trend_bearish(
     df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
 ) -> bool:
-    """
+    """Signal: multi_tf_trend_bearish
+
     Check if the higher-timeframe EMA is falling.
+
+    Warmup: window * (base bars per higher_tf period)
+
+    Formula:
+        higher_tf_trend[t] == -1
+
+    Inputs:
+        close: closing price
+
+    Params:
+        higher_tf: Pandas offset alias for the higher timeframe
+        window [default=10, min=2, max=100]: EMA period on the resampled close
+        slope_threshold [default=0.0, min=0.0]: Relative slope threshold for non-flat classification
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if higher-TF trend == -1 on the current bar
 
     Type: FILTER
     Requires: Close
@@ -1566,13 +2446,29 @@ def multi_tf_trend_bearish(
 def multi_tf_trend_bullish(
     df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
 ) -> bool:
-    """
-    Check if the higher-timeframe EMA is rising (trend confirmation filter).
+    """Signal: multi_tf_trend_bullish
 
-    Requires a DatetimeIndex. Resamples to the specified higher timeframe,
-    computes an EMA on the resampled closes, and returns True if the EMA
-    slope is positive. Broadcasts back to the current bar's timestamp so
-    lower-TF signals can be filtered by higher-TF trend.
+    Check if the higher-timeframe EMA is rising (trend confirmation filter). Requires a
+    DatetimeIndex. Resamples to the specified higher timeframe, computes an EMA on the resampled
+    closes, and returns True if the EMA slope is positive. Broadcasts back to the current bar's
+    timestamp so lower-TF signals can be filtered by higher-TF trend.
+
+    Warmup: window * (base bars per higher_tf period)
+
+    Formula:
+        higher_tf_trend[t] == 1
+
+    Inputs:
+        close: closing price
+
+    Params:
+        higher_tf: Pandas offset alias for the higher timeframe
+        window [default=10, min=2, max=100]: EMA period on the resampled close
+        slope_threshold [default=0.0, min=0.0]: Relative slope threshold for non-flat classification
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if higher-TF trend == +1 on the current bar
 
     Type: FILTER
     Requires: Close
@@ -1598,8 +2494,26 @@ def multi_tf_trend_bullish(
 
 @RuleRegistry.register("trix_bearish")
 def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> bool:
-    """
+    """Signal: trix_bearish
+
     Check if TRIX indicates bearish momentum.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix
+    Warmup: window * 3 - 1
+
+    Formula:
+        trix[t] < threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=15, min=5, max=30]: TRIX period
+        threshold [default=0.0, min=0.0]: Bearish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if TRIX < threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -1625,8 +2539,26 @@ def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
 
 @RuleRegistry.register("trix_bullish")
 def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> bool:
-    """
+    """Signal: trix_bullish
+
     Check if TRIX indicates bullish momentum.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix
+    Warmup: window * 3 - 1
+
+    Formula:
+        trix[t] > threshold
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=15, min=5, max=30]: TRIX period
+        threshold [default=0.0, min=0.0]: Bullish threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if TRIX > threshold, False otherwise
 
     Type: FILTER
     Requires: Close
@@ -1652,8 +2584,27 @@ def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
 
 @RuleRegistry.register("vortex_bearish")
 def vortex_bearish(df: pd.DataFrame, window: int = 14) -> bool:
-    """
+    """Signal: vortex_bearish
+
     Check if Vortex Indicator shows bearish trend (-VI > +VI).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator
+    Warmup: window - 1
+
+    Formula:
+        vortex_neg[t] > vortex_pos[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=30]: Vortex period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if -VI > +VI, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -1682,8 +2633,27 @@ def vortex_bearish(df: pd.DataFrame, window: int = 14) -> bool:
 
 @RuleRegistry.register("vortex_bullish")
 def vortex_bullish(df: pd.DataFrame, window: int = 14) -> bool:
-    """
+    """Signal: vortex_bullish
+
     Check if Vortex Indicator shows bullish trend (+VI > -VI).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator
+    Warmup: window - 1
+
+    Formula:
+        vortex_pos[t] > vortex_neg[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=30]: Vortex period
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if +VI > -VI, False otherwise
 
     Type: FILTER
     Requires: High, Low, Close
@@ -1712,8 +2682,28 @@ def vortex_bullish(df: pd.DataFrame, window: int = 14) -> bool:
 
 @RuleRegistry.register("vortex_crossover")
 def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bullish") -> bool:
-    """
+    """Signal: vortex_crossover
+
     Check if Vortex lines cross (trend change).
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator
+    Warmup: window
+
+    Formula:
+        direction == 'bullish': vortex_pos[t-1] <= vortex_neg[t-1] and vortex_pos[t] > vortex_neg[t]; direction == 'bearish': vortex_pos[t-1] >= vortex_neg[t-1] and vortex_pos[t] < vortex_neg[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=14, min=5, max=30]: Vortex period
+        direction: Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish'
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if crossover detected, False otherwise
 
     Type: TRIGGER
     Requires: High, Low, Close
@@ -1789,10 +2779,29 @@ def _divergence(df, rsi_window, swing_window, min_swing_distance, side, price_si
 def rsi_bullish_divergence(
     df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
 ) -> bool:
-    """
-    Detect a regular bullish RSI divergence: price lower low, RSI higher low.
+    """Signal: rsi_bullish_divergence
 
-    Price fell between its last two confirmed swing lows while RSI rose between the matching two.
+    Detect a regular bullish RSI divergence: price lower low, RSI higher low. Price fell between its
+    last two confirmed swing lows while RSI rose between the matching two.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
+    Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1
+
+    Formula:
+        low_price_delta[t] < 0 and low_indicator_delta[t] > 0 -- price fell between its last two confirmed swing lows while RSI rose
+
+    Inputs:
+        close: closing price
+
+    Params:
+        rsi_window [default=14, min=2, max=100]: RSI period
+        swing_window [default=5, min=2, max=20]: Bars on each side to confirm swing extremum
+        min_swing_distance [default=10, min=3, max=50]: Min bars between the two swing points
+        compared
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where the divergence is confirmed
 
     Type: TRIGGER
     Requires: Close
@@ -1813,10 +2822,29 @@ def rsi_bullish_divergence(
 def rsi_hidden_bullish_divergence(
     df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
 ) -> bool:
-    """
-    Detect a hidden bullish RSI divergence: price higher low, RSI lower low.
+    """Signal: rsi_hidden_bullish_divergence
 
-    Price rose between its last two confirmed swing lows while RSI fell between the matching two.
+    Detect a hidden bullish RSI divergence: price higher low, RSI lower low. Price rose between its
+    last two confirmed swing lows while RSI fell between the matching two.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
+    Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1
+
+    Formula:
+        low_price_delta[t] > 0 and low_indicator_delta[t] < 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        rsi_window [default=14, min=2, max=100]: RSI period
+        swing_window [default=5, min=2, max=20]: Bars on each side to confirm swing extremum
+        min_swing_distance [default=10, min=3, max=50]: Min bars between the two swing points
+        compared
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where the divergence is confirmed
 
     Type: TRIGGER
     Requires: Close
@@ -1837,10 +2865,29 @@ def rsi_hidden_bullish_divergence(
 def rsi_bearish_divergence(
     df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
 ) -> bool:
-    """
-    Detect a regular bearish RSI divergence: price higher high, RSI lower high.
+    """Signal: rsi_bearish_divergence
 
-    Price rose between its last two confirmed swing highs while RSI fell between the matching two.
+    Detect a regular bearish RSI divergence: price higher high, RSI lower high. Price rose between
+    its last two confirmed swing highs while RSI fell between the matching two.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
+    Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1
+
+    Formula:
+        high_price_delta[t] > 0 and high_indicator_delta[t] < 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        rsi_window [default=14, min=2, max=100]: RSI period
+        swing_window [default=5, min=2, max=20]: Bars on each side to confirm swing extremum
+        min_swing_distance [default=10, min=3, max=50]: Min bars between the two swing points
+        compared
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where the divergence is confirmed
 
     Type: TRIGGER
     Requires: Close
@@ -1861,10 +2908,29 @@ def rsi_bearish_divergence(
 def rsi_hidden_bearish_divergence(
     df: pd.DataFrame, rsi_window: int = 14, swing_window: int = 5, min_swing_distance: int = 10,
 ) -> bool:
-    """
-    Detect a hidden bearish RSI divergence: price lower high, RSI higher high.
+    """Signal: rsi_hidden_bearish_divergence
 
-    Price fell between its last two confirmed swing highs while RSI rose between the matching two.
+    Detect a hidden bearish RSI divergence: price lower high, RSI higher high. Price fell between
+    its last two confirmed swing highs while RSI rose between the matching two.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
+    Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1
+
+    Formula:
+        high_price_delta[t] < 0 and high_indicator_delta[t] > 0
+
+    Inputs:
+        close: closing price
+
+    Params:
+        rsi_window [default=14, min=2, max=100]: RSI period
+        swing_window [default=5, min=2, max=20]: Bars on each side to confirm swing extremum
+        min_swing_distance [default=10, min=3, max=50]: Min bars between the two swing points
+        compared
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar where the divergence is confirmed
 
     Type: TRIGGER
     Requires: Close

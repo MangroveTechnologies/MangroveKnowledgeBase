@@ -1101,7 +1101,7 @@
    "props": {
     "source_module": "pattern_indicators",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
-    "warmup_bars": 0,
+    "warmup_bars": "0",
     "abbreviation": null,
     "usage_example": "CandleRaw.compute(data={'open': df['Open'], 'high': df['High'], 'low': df['Low'], 'close': df['Close']}, params={})",
     "formula": "open  = open\nhigh  = high\nlow   = low\nclose = close",
@@ -25013,27 +25013,12 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "carried_forward_from_previous_build": 1272,
-  "bootstrapped_from_docstring": 0,
-  "kb_doc_sections_matched": 41,
-  "kb_doc_sections_unmatched": [],
   "signals": 218,
   "signals_registered": 249,
   "signals_out_of_scope": 31,
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],
-  "indicators_missing_description": [
-   "BollingerBands",
-   "CumulativeReturn",
-   "DailyLogReturn",
-   "DailyReturn",
-   "EMA",
-   "Ichimoku",
-   "NVI",
-   "SMA",
-   "UlcerIndex",
-   "WMA"
-  ]
+  "indicators_missing_description": []
  }
 }

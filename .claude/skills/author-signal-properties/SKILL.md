@@ -224,10 +224,13 @@ thing everywhere, so it is written once rather than 247 times that can drift. Tw
 
 ## Verify before finishing
 
-1. `python3 ontology/build_signal_indicator_ontology.py --stdout > /tmp/check.json` and diff against the
-   committed graph. **Your authored values must survive the rebuild** -- carry-forward preserves
-   them. If one is gone, it is being overwritten by a lift and belongs at that source instead.
-2. Run it twice. The second run must be byte-identical: authoring is complete only when the build is
+1. Author into the signal function's DOCSTRING, never into the JSON -- the graph is generated from
+   the docstrings and the code, so an edit to the JSON is overwritten by the next build. The
+   docstring must open `Signal: <function_name>`.
+2. `ONTOLOGY_OUT=/tmp/check.json python3 ontology/build_signal_indicator_ontology.py` and diff
+   against the committed graph. Only the node you authored may change. If a value you wrote does
+   not appear, it is being overwritten by a lift and belongs at that source instead.
+3. Run it twice. The second run must be byte-identical: authoring is complete only when the build is
    a fixed point.
 3. No new nulls anywhere else in the node. `abbreviation` stays null on every signal by convention;
    nothing else should be.

@@ -18,7 +18,6 @@ from mangrove_kb.docstring_parser import DocstringFormatError, PERMITTED, parse_
 from mangrove_kb.graph import KnowledgeGraph
 
 REPO = Path(__file__).resolve().parent.parent
-PROPOSAL = REPO / "DOCSTRING-FORMAT-PROPOSAL.md"
 
 
 @pytest.fixture(scope="module")
@@ -27,13 +26,15 @@ def kg():
 
 
 def _examples():
-    """The worked examples, read from the proposal while it exists.
+    """The two worked examples, now read from the SOURCE, which is where they live.
 
-    Once phase 3 lands they come from the source tree instead and this fixture goes away.
+    They came from a proposal file while the format was being settled. Reading the real objects
+    means the tests break if someone edits the docstring, which is the point.
     """
-    if not PROPOSAL.is_file():
-        pytest.skip("proposal file removed -- examples now live in the source tree")
-    return re.findall(r'```python\n"""(.*?)"""\n```', PROPOSAL.read_text(), re.S)
+    import inspect
+    from mangrove_kb.indicators import BollingerBands
+    from mangrove_kb.signals.volatility import bb_above_upper
+    return [inspect.getdoc(BollingerBands), inspect.getdoc(bb_above_upper)]
 
 
 @pytest.mark.parametrize("idx,node_id", [(0, "procedure:indicator-bollingerbands"),
