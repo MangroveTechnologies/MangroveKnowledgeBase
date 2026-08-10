@@ -153,3 +153,66 @@ def test_search_says_when_it_truncates(page):
     assert "const shown=res.slice(0,LIMIT);" in page
     assert "shown.total=res.length;" in page, \
         "the reported total must be the full match count, not the truncated one"
+
+
+# --- two-level facets ----------------------------------------------------------------------------
+
+def test_every_sub_kind_has_a_colour_and_shades_its_parent():
+    """Sub-kinds are shades of their parent's hue, never new hues.
+
+    The rail grouped 289 of 303 nodes into one "Procedure" row. Splitting it is only useful if the
+    split is visible on the canvas too -- but a distinct colour per sub-kind is thirteen colours
+    against a four-hue brand palette, and it loses the thing the grouping is for.
+    """
+    import json
+    from mangrove_kb.viz.render import (CATEGORY_COLOR, DOMAIN_ID, KIND_COLOR, PRIMITIVE_COLOR,
+                                        RELATION_COLOR, _kind)
+    from mangrove_kb.graph import RELATIONS
+
+    g = json.loads((REPO / "ontology" / "signal-indicator-ontology.json").read_text())
+    classes = frozenset(r["from_id"] for r in g["relations"]
+                        if r["rel"] == "kind-of" and r["to_id"] == DOMAIN_ID)
+
+    kinds = {_kind(a["id"], classes) for a in g["atoms"]}
+    assert kinds <= set(KIND_COLOR), f"node kinds with no colour: {sorted(kinds - set(KIND_COLOR))}"
+    assert "node" not in kinds, "a node fell through to the fallback label; give its prefix a name"
+    assert set(RELATIONS) == set(RELATION_COLOR), "every relation needs a colour"
+
+    # Distinct within a parent (so the split is visible), and never equal to another parent's hue
+    # (so a shade is never mistaken for a different family).
+    for palette, parents in ((KIND_COLOR, PRIMITIVE_COLOR), (RELATION_COLOR, CATEGORY_COLOR)):
+        assert len(set(palette.values())) == len(palette), f"two sub-kinds share a colour: {palette}"
+        for name, colour in palette.items():
+            clashes = [p for p, c in parents.items() if c == colour]
+            assert len(clashes) <= 1, f"{name} takes a hue owned by several parents: {clashes}"
+
+
+def test_the_root_and_the_domain_have_their_own_labels():
+    """`Object` used to render as kind "node" -- the fallback -- and technical analysis was lumped
+    in with Indicator and Signal as an "entity type". Two are layers of the domain; one IS it."""
+    from mangrove_kb.viz.render import DOMAIN_ID, _kind
+    assert _kind("object:mangrove-knowledge-space") == "root:knowledge-graph"
+    assert _kind(DOMAIN_ID) == "domain"
+    assert _kind("concept:indicator") == "entity type"
+    assert _kind("procedure:indicator-rsi") == "indicator"
+    assert _kind("procedure:signal-rsi-oversold") == "signal"
+
+
+def test_both_facet_levels_reach_the_draw_calls(page):
+    """The sub-kind colour must apply on every surface that paints, not just the rail.
+
+    Five lookups paint: 2D edge stroke, 2D arrowhead, 2D node fill, 3D nodeColor, 3D linkColor. If
+    upstream `viz.py` rewrites one, `render.py` aborts -- but only the ones it knows about, so pin
+    the count here as well.
+    """
+    assert page.count("window.KC&&window.KC[n.kind]") == 2, "node colour: 2D fill + 3D nodeColor"
+    assert page.count("window.RC&&window.RC[e.relation]") == 3, \
+        "edge colour: 2D stroke + 2D arrowhead + 3D linkColor"
+    assert '"kindColor"' in page and '"relationColor"' in page, "the palettes must reach the page"
+    # Both levels are AND-ed in all four predicates -- 2D and 3D, nodes and edges.
+    for pred in ("visN = function", "visE = function",
+                 "nodeVisById = function", "linkVis3 = function"):
+        assert pred in page, f"{pred} is not overridden; one surface would ignore the sub-filter"
+    # Exactly the four predicates: nodes gate on `kind` in 2D and 3D, edges on
+    # `relation` in 2D and 3D. A count that drifts means a surface was missed or doubled.
+    assert page.count("on.kind[") == 2 and page.count("on.rel[") == 2

@@ -291,6 +291,119 @@ def search_index() -> list[dict]:
 #: Search box in the top bar. Ranks by which tier matched, then by id -- the same two keys, in the
 #: same order, as `KnowledgeGraph.find()`. Selecting a result pins it in the inspector and centres
 #: the camera on it, because a search that only tells you a thing exists has not finished the job.
+#: The rail grouped nodes by ontology primitive and edges by category, and stopped there -- so 289 of
+#: 303 nodes were one undifferentiated "Procedure" row, and `about` and `has-role` were both just
+#: "descriptive". Both second levels were already on every node and edge (`kind`, `relation`); the
+#: viewer simply never read them. This nests them: parent stays the primitive/category, child is the
+#: derived kind. Thirteen node rows and eleven edge rows, not 200 -- the sub-level is the KIND of
+#: thing, never the thing itself.
+#:
+#: Parent and child are AND-ed rather than the parent being a bulk setter for its children. Unticking
+#: `Procedure` hides every procedure whatever the child boxes say, and the children grey out to show
+#: it -- so the canvas can never be empty for a reason that is not visible in the rail.
+FACETS = """
+<style>
+  #prims .row.sub, #cats .row.sub{ padding-left:1.15rem; font-size:.94em; }
+  #prims .row.sub .sw, #cats .row.sub .sw{ width:.55rem; height:.55rem; border-radius:2px; }
+  #prims .row.par, #cats .row.par{ font-weight:600; margin-top:.15rem; }
+  #prims .row.sub input:disabled + .sw, #cats .row.sub input:disabled + .sw{ opacity:.3; }
+  #prims .row.sub input:disabled ~ span, #cats .row.sub input:disabled ~ span{ opacity:.45; }
+</style>
+<script>
+(function(){
+  const KC = DATA.kindColor || {}, RC = DATA.relationColor || {};
+  window.KC = KC; window.RC = RC;          // read by the draw calls, which fall back when absent
+
+  function tree(items, parentKey, childKey){
+    const t = {};
+    items.forEach(x => {
+      const p = x[parentKey] || 'null', c = x[childKey] || 'null';
+      (t[p] = t[p] || {})[c] = (t[p][c] || 0) + 1;
+    });
+    return t;
+  }
+  const nodeTree = tree(DATA.nodes, 'primitive', 'kind');
+  const edgeTree = tree(DATA.edges, 'category', 'relation');
+
+  function row(box, cls, label, color, checked, onchange){
+    const r = document.createElement('label'); r.className = 'row ' + cls;
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = checked;
+    const sw = document.createElement('span'); sw.className = 'sw'; sw.style.background = color;
+    const tx = document.createElement('span'); tx.textContent = label;
+    const ct = document.createElement('span'); ct.className = 'ct';
+    cb.onchange = () => onchange(cb.checked);
+    r.append(cb, sw, tx, ct);
+    box.append(r);
+    return {row: r, cb: cb, ct: ct};
+  }
+
+  // A child is only reachable while its parent is on; disabling says so instead of leaving a box
+  // that looks live and does nothing.
+  const kids = {prim: {}, cat: {}};
+  function sync(store){
+    Object.entries(kids[store]).forEach(([parent, list]) => {
+      const live = on[store][parent];
+      list.forEach(c => { c.cb.disabled = !live; });
+    });
+  }
+
+  function build(boxId, t, store, childStore, palette, parentPalette){
+    const box = document.getElementById(boxId);
+    box.innerHTML = '';
+    Object.entries(t).sort((a, b) => sum(b[1]) - sum(a[1])).forEach(([parent, children]) => {
+      const p = row(box, 'par', parent === 'null' ? '(untyped)' : parent,
+                    parentPalette[parent] || parentPalette['null'], on[store][parent] !== false,
+                    v => { on[store][parent] = v; sync(store); wake(0.3);
+                           if (mode === '3d') refresh3d(); });
+      p.ct.textContent = sum(children);
+      kids[store][parent] = [];
+      Object.entries(children).sort((a, b) => b[1] - a[1]).forEach(([child, n]) => {
+        on[childStore][child] = true;
+        const c = row(box, 'sub', child === 'null' ? '(untyped)' : child,
+                      palette[child] || parentPalette[parent] || parentPalette['null'], true,
+                      v => { on[childStore][child] = v; wake(0.3);
+                             if (mode === '3d') refresh3d(); });
+        c.ct.textContent = n;
+        kids[store][parent].push(c);
+      });
+    });
+    sync(store);
+  }
+  const sum = o => Object.values(o).reduce((a, b) => a + b, 0);
+
+  on.kind = {}; on.rel = {};
+  build('prims', nodeTree, 'prim', 'kind', KC, DATA.primitiveColor);
+  build('cats',  edgeTree, 'cat',  'rel',  RC, DATA.categoryColor);
+
+  // Both levels must pass. Reassigning the viewer's own predicates rather than copying the draw
+  // loop, so 2D, 3D and collapse all keep using one definition of "visible".
+  visN = function(n){ return on.prim[n.primitive || 'null'] && on.kind[n.kind || 'null']
+                             && !hidden.has(n.id); };
+  visE = function(e){ return on.cat[e.category || 'null'] && on.rel[e.relation || 'null']
+                             && visN(N[e.s]) && visN(N[e.t]); };
+  nodeVisById = function(id){ const n = N[idx[id]];
+    return !!n && on.prim[n.primitive || 'null'] && on.kind[n.kind || 'null'] && !hidden.has(id); };
+  linkVis3 = function(e){ return on.cat[e.category || 'null'] && on.rel[e.relation || 'null']
+                                 && nodeVisById(e.src) && nodeVisById(e.dst); };
+
+  // The rail's all/none buttons set the parent store only; re-sync the children's enabled state
+  // after they run, or "none" leaves live-looking boxes under a dead parent.
+  document.querySelectorAll('.btns button[data-g]').forEach(b => {
+    b.addEventListener('click', () => { sync('prim'); sync('cat'); }, false);
+  });
+
+  document.querySelectorAll('#rail p.sub').forEach(el => {
+    if (el.textContent.includes('Ring colour')) {
+      el.textContent = 'Shades group with their parent: the darker teal is indicators inside '
+                     + 'Procedure, the darker blue is has-role inside descriptive. '
+                     + 'Solid arrow = ordering relation (DAG). Dashed = free / fringe. '
+                     + 'Ring colour = status: green ratified, red deprecated.';
+    }
+  });
+})();
+</script>
+"""
+
 SEARCH_UI = """
 <style>
   #searchwrap{position:relative}
@@ -433,6 +546,49 @@ CATEGORY_COLOR = {
     "descriptive": BRAND["sky"],
     "associative": BRAND["orange"],
     "meta":        BRAND["ember"],
+}
+
+def _shade(hex_color: str, amount: float) -> str:
+    """Lighten (``amount`` > 0) or darken (< 0) a hex colour, toward white or black.
+
+    Sub-kinds are shades of their parent's hue rather than new hues. The alternative -- a distinct
+    colour per sub-kind -- is thirteen colours competing with a four-hue brand palette, and it loses
+    the thing the grouping is for: that every one of those 289 dots is a Procedure, and the signals
+    are a recognisable family within it.
+    """
+    r, g, b = (int(hex_color[i:i + 2], 16) for i in (1, 3, 5))
+    t = 255 if amount > 0 else 0
+    k = abs(amount)
+    return "#%02x%02x%02x" % tuple(round(c + (t - c) * k) for c in (r, g, b))
+
+
+#: Node sub-kind -> colour, each a shade of the primitive it belongs to. The parent's own hue goes to
+#: the sub-kind a reader thinks of as the default member of it (`signal` outnumbers `indicator` 218
+#: to 71, so `indicator` is the one that takes the tint).
+KIND_COLOR = {
+    "signal":                PRIMITIVE_COLOR["Procedure"],
+    "indicator":             _shade(PRIMITIVE_COLOR["Procedure"], -0.35),
+    "class":                 PRIMITIVE_COLOR["Concept"],
+    "entity type":           _shade(PRIMITIVE_COLOR["Concept"], -0.35),
+    "domain":                _shade(PRIMITIVE_COLOR["Concept"], 0.35),
+    "role value":            PRIMITIVE_COLOR["Property"],
+    "role axis":             _shade(PRIMITIVE_COLOR["Property"], -0.35),
+    "root:knowledge-graph":  PRIMITIVE_COLOR["Object"],
+    "schema":                PRIMITIVE_COLOR["Schema"],
+}
+
+#: Relation -> colour, each a shade of its category. Deliberately NOT dash: `viz.py` already spends
+#: the dash pattern on acyclic-vs-free and says so in its legend, and both descriptive relations are
+#: non-acyclic, so dashing would have differentiated nothing while overloading a signal that means
+#: something else.
+RELATION_COLOR = {
+    "instance-of": CATEGORY_COLOR["structural"],
+    "kind-of":     _shade(CATEGORY_COLOR["structural"], -0.35),
+    "part-of":     _shade(CATEGORY_COLOR["structural"], 0.35),
+    "about":       CATEGORY_COLOR["descriptive"],
+    "has-role":    _shade(CATEGORY_COLOR["descriptive"], -0.35),
+    "uses":        CATEGORY_COLOR["associative"],
+    "supersedes":  CATEGORY_COLOR["meta"],
 }
 
 ROOT_ID = "object:mangrove-knowledge-space"
@@ -725,7 +881,13 @@ KIND_BY_PREFIX = {
     "procedure:indicator-": "indicator",
     "procedure:signal-": "signal",
     "schema:": "schema",
+    "object:": "root:knowledge-graph",
 }
+
+#: The domain the character classes divide. Its own row, because "entity type" used to hold it
+#: alongside Indicator and Signal, and those are not the same thing: two are the LAYERS the domain is
+#: built from, one is the domain. The sidebar should mirror the hierarchy, not flatten it.
+DOMAIN_ID = "concept:technical-analysis"
 
 
 def _kind(node_id: str, classes: frozenset[str] = frozenset()) -> str:
@@ -739,6 +901,8 @@ def _kind(node_id: str, classes: frozenset[str] = frozenset()) -> str:
     """
     if node_id in classes:
         return "class"
+    if node_id == DOMAIN_ID:
+        return "domain"
     for prefix in sorted(KIND_BY_PREFIX, key=len, reverse=True):
         if node_id.startswith(prefix):
             return KIND_BY_PREFIX[prefix]
@@ -789,6 +953,9 @@ def main() -> int:
     # viewer defines and this graph does not carry keeps its default and is pruned from the rail.
     data["primitiveColor"] = {**data["primitiveColor"], **PRIMITIVE_COLOR}
     data["categoryColor"] = {**data["categoryColor"], **CATEGORY_COLOR}
+    # The second level of each facet. The viewer has no key for these; FACETS reads them.
+    data["kindColor"] = KIND_COLOR
+    data["relationColor"] = RELATION_COLOR
     page = viz.render_page(data, title="Mangrove signal & indicator knowledge graph",
                            nav_html=BRAND_BAR.replace("__LOGO_LIGHT__", LOGO_LIGHT)
                                              .replace("__LOGO_DARK__", LOGO_DARK))
@@ -799,12 +966,36 @@ def main() -> int:
                  f"{page.count(VIEWER_ANCHOR)}; upstream viz.py changed and collapse would "
                  f"silently no-op")
     page = page.replace(VIEWER_ANCHOR, f"const ANCHOR={json.dumps(ROOT_ID)};")
+
+    # Colour by the DERIVED kind where one is known, falling back to the primitive/category. Written
+    # as a guarded inline expression rather than a helper because the viewer draws its first frame
+    # during init, before any appended overlay has run -- a helper would be undefined and throw.
+    # Asserted per site: if upstream viz.py rewrites one of these, the sub-kind colours would
+    # silently stop applying to exactly one surface and everything would still render.
+    for old, new in (
+        ("ctx.strokeStyle=CC[e.category||'null']",
+         "ctx.strokeStyle=(window.RC&&window.RC[e.relation])||CC[e.category||'null']"),
+        ("ctx.fillStyle=CC[e.category||'null']",
+         "ctx.fillStyle=(window.RC&&window.RC[e.relation])||CC[e.category||'null']"),
+        ("ctx.fillStyle=PC[n.primitive||'null']",
+         "ctx.fillStyle=(window.KC&&window.KC[n.kind])||PC[n.primitive||'null']"),
+        (".nodeColor(n=>PC[n.primitive||'null'])",
+         ".nodeColor(n=>(window.KC&&window.KC[n.kind])||PC[n.primitive||'null'])"),
+        (".linkColor(e=>CC[e.category||'null'])",
+         ".linkColor(e=>(window.RC&&window.RC[e.relation])||CC[e.category||'null'])"),
+    ):
+        if page.count(old) != 1:
+            sys.exit(f"expected exactly one {old!r} in the viewer script, found {page.count(old)}; "
+                     f"upstream viz.py changed and the sub-kind colours would silently not apply")
+        page = page.replace(old, new)
+
     overlay = (BRAND_STYLE
                + INSPECTOR_LINKS
                + COLLAPSE_PANEL.replace("__ROOT__", json.dumps(ROOT_ID))
                + BACK_BUTTON
                + THEME_SCRIPT
                + DECLUTTER
+               + FACETS          # after DECLUTTER: it rebuilds the rows DECLUTTER prunes
                + SEARCH_UI.replace("__INDEX__", json.dumps(search_index(),
                                                             separators=(",", ":"))))
     print(page.replace("</body>", overlay + "</body>"))
