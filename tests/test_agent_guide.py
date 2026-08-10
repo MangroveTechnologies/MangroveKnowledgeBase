@@ -237,11 +237,17 @@ def test_no_use_case_hardcodes_an_id_the_task_handed_over_as_a_name(kg, guide):
     appears -- so hardcoding it teaches a reader to invent ids. `get()` and `path()` resolve names,
     which is both shorter and the thing use case 11 exists to teach.
     """
+    sections = re.split(r"^## ", guide, flags=re.M)
     for name in ("rsi_oversold", "hanging_man_trigger", "adosc_bearish"):
         node_id = kg.resolve(name)
         assert kg.get(name)["id"] == node_id, "get() must accept the bare name"
-        section = next(c for c in re.split(r"^## ", guide, flags=re.M) if f'"{name}"' in c)
-        code = "\n".join(re.findall(r"```python\n(.*?)```", section, re.S))
-        assert f'"{name}"' in code, f"the section for {name} never uses the name it was given"
-        assert f'"{node_id}"' not in code, (
-            f"the section for {name} hardcodes {node_id} instead of resolving the name")
+
+        # EVERY section that names it, not the first one found. Picking the first let a broken
+        # section 5 fall through to section 11 -- which uses the name correctly -- and pass.
+        naming = [c for c in sections if f'"{name}"' in c or f"`{name}`" in c]
+        assert naming, f"no use case mentions {name}"
+        for section in naming:
+            title = section.splitlines()[0].strip()
+            code = "\n".join(re.findall(r"```python\n(.*?)```", section, re.S))
+            assert f'"{node_id}"' not in code, (
+                f"'{title}' hardcodes {node_id} instead of resolving {name!r}")
