@@ -54,11 +54,22 @@ The plan, in order. Licence deliberately LAST, immediately before undrafting:
 1  tools — mangrove_kb/graph.py           DONE
 2  skill + guide + drift guards           DONE
 3  backfill: docstrings+code = SSOT       DONE   (p1-p6)
+3b query coverage: text + attributes      DONE   (15d95f6)
 4  graph + skills into the wheel          NEXT
 5  MCP rewrite                            deferred by owner ("kb_server is going to get overhauled")
 6  viz for the public repo                BLOCKED — needs a licence decision
 7  LICENSE change, then undraft #105      LAST
+
+   composition coverage                   FILED, NOT SCHEDULED — issue #112
 ```
+
+**Issue #112** — https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/112 — records
+that the graph covers *discovery* and not *composition*: signal direction/polarity is modelled
+nowhere (`rsi_oversold` and `rsi_overbought` are both `Type: TRIGGER`), `warmup_bars` can be read but
+not evaluated, no relation expresses contradicts/confirms/correlates, the strategy schema validates
+nothing, and the authoring skills plus `parse_authored` ship in neither `skills/` nor the wheel.
+Findings agreed; **ordering is not** — the owner did not accept "direction first". Settle the order
+before picking any of it up. This is not part of getting #105 out of draft.
 
 ### Done — 1, tools
 
