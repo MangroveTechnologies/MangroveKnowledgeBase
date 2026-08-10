@@ -69,7 +69,7 @@ spellings, zero disagreements.
 ### 7 — done
 
 `mangrove-kb` is **PolyForm Noncommercial 1.0.0**: free for noncommercial use, commercial use
-requires a paid licence from team@mangrovetechnologies.ai. The licence text is verbatim from
+requires a paid licence from support@mangrove.ai (cc tim.darrah@mangrove.ai). The licence text is verbatim from
 `polyformproject/polyform-licenses`, under a preamble that states the commercial terms and the
 `Required Notice`. `pyproject.toml` carries the SPDX id and drops the OSI classifier — PolyForm is
 deliberately not OSI-approved. Verified in the built wheel's METADATA.

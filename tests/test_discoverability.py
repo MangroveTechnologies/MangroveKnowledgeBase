@@ -119,10 +119,14 @@ def test_the_licence_is_stated_consistently_everywhere():
     assert 'license = {text = "PolyForm-Noncommercial-1.0.0"}' in pyproject
     assert "OSI Approved" not in pyproject, "PolyForm is not an OSI-approved licence"
 
-    for doc in ("README.md", "PKG_README.md"):
+    for doc in ("README.md", "PKG_README.md", "LICENSE"):
         text = (REPO / doc).read_text()
         assert "PolyForm Noncommercial License 1.0.0" in text, f"{doc} does not state the licence"
         assert "Commercial use requires a paid license" in text, f"{doc} omits the commercial terms"
+        # A licensing contact that silently rots leaves a buyer with nowhere to go.
+        assert "support@mangrove.ai" in text, f"{doc} does not say where to buy a commercial licence"
+        assert "tim.darrah@mangrove.ai" in text, f"{doc} omits the cc address"
+        assert "team@mangrovetechnologies.ai" not in text, f"{doc} keeps the old licensing contact"
 
 
 def test_nothing_still_claims_the_repo_is_mit():
