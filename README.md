@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://discord.gg/xUcn4R6zJR"><img src="https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
+  <a href="https://discord.gg/Yycbw6P93B"><img src="https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
   <a href="https://pepy.tech/projects/mangrove-kb"><img src="https://static.pepy.tech/badge/mangrove-kb" alt="PyPI Downloads"></a>
 </p>
 
@@ -327,8 +327,8 @@ on a half-authored one rather than emitting it.
 
 ## Links
 
-Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem. Questions, ideas, or want
-to contribute? [**Join us on Discord**](https://discord.gg/xUcn4R6zJR).
+Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem —
+[**join us on Discord**](https://discord.gg/Yycbw6P93B).
 
 **If you find this useful, please star the repo** — it helps others discover it and keeps the project
 growing.

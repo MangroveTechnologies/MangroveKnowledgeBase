@@ -1,16 +1,16 @@
 # Signal Audit Report
 
-**Date**: 2026-08-09 13:23
+**Date**: 2026-08-10 21:13
 **Data**: BTC/USD Daily, 1294 bars (2022-08-01 to 2026-02-14)
 
 ## 1. Smoke Test Summary
 
-**247/247** signals run without error and return bool.
+**249/249** signals run without error and return bool.
 
 | Metric | Count |
 |--------|-------|
-| Total signals tested | 247 |
-| Passed (no error + returns bool) | 247 |
+| Total signals tested | 249 |
+| Passed (no error + returns bool) | 249 |
 | Errored (raised exception) | 0 |
 | Bad return type (not bool) | 0 |
 
@@ -19,7 +19,7 @@
 | Type | Count |
 |------|-------|
 | FILTER | 130 |
-| TRIGGER | 117 |
+| TRIGGER | 119 |
 | UNKNOWN | 0 |
 
 ### No signals crashed.
@@ -109,6 +109,6 @@ standard indicator FILTERs that read `iloc[-1]` and compare against a threshold.
 
 ## 5. Conclusion
 
-- **Smoke test**: 247/247 signals pass (no crashes, return bool)
+- **Smoke test**: 249/249 signals pass (no crashes, return bool)
 - **Crossover accuracy**: 10/10 tested signals match ground truth
 - **FILTER code review**: 109/130 pass static checks

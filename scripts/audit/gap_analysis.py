@@ -1,6 +1,6 @@
 """Gap analysis: MangroveKnowledgeBase indicators/signals vs reference libraries.
 
-Compares our 99 indicators and 223 signals against:
+Compares our indicators and signals against:
   1. Bukosabino `ta` library (43 indicator classes)
   2. TA-Lib (158 functions across 8 groups)
   3. stock-indicators-python (85 indicator functions)
@@ -13,10 +13,21 @@ from __future__ import annotations
 
 import inspect
 import json
+import os
 import re
+import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
+
+
+class SkipAudit(Exception):
+    """Raised when a reference library this audit needs is not on this machine.
+
+    Exits 77 -- the conventional "skipped" code -- so `run_all.py` can report SKIP rather
+    than counting it as a pass. A skipped check reported as green is how a suite comes to
+    claim coverage it does not have.
+    """
 
 
 # ---------------------------------------------------------------------------
@@ -66,32 +77,33 @@ def get_our_indicators() -> dict[str, list[str]]:
 
 
 def get_our_signals() -> dict[str, list[str]]:
-    """Return dict of category -> list of signal function names."""
-    from mangrove_kb.signals import momentum, trend, volume, volatility, pattern, oscillator, averaging
+    """Return dict of category -> list of signal function names.
 
-    categorized: dict[str, list[str]] = {
-        "Momentum": [],
-        "Trend": [],
-        "Volume": [],
-        "Volatility": [],
-        "Patterns": [],
-    }
+    Discovered, not hand-listed. The map here named five modules against the old category scheme and
+    referenced `patterns` while importing `pattern` -- a NameError that made this script fail on
+    every run. It was also stale in a way a typo fix would not have caught: the signal layer was
+    reorganised onto the ontology classes, and the hand-written map had no entry for `averaging`
+    (55 functions), `oscillator` (30) or `flow` (10), so a third of the library was invisible to the
+    gap analysis while it reported a total.
 
-    module_map = {
-        "Momentum": momentum,
-        "Trend": trend,
-        "Volume": volume,
-        "Volatility": volatility,
-        "Patterns": patterns,
-    }
+    `patterns` is a deprecated shim re-exporting `pattern`; including it would count every pattern
+    signal twice, so modules marked `__deprecated__` are skipped.
+    """
+    import mangrove_kb.signals as signals_pkg
 
-    for cat, mod in module_map.items():
-        for name, obj in inspect.getmembers(mod):
-            if inspect.isfunction(obj) and obj.__module__ == mod.__name__:
-                if not name.startswith("_"):
-                    categorized[cat].append(name)
-        categorized[cat].sort()
+    modules = [m for m in vars(signals_pkg).values()
+               if getattr(m, "__name__", "").startswith("mangrove_kb.signals.")
+               and not m.__name__.rsplit(".", 1)[-1].startswith("_")
+               and not getattr(m, "__deprecated__", False)]
 
+    categorized: dict[str, list[str]] = {}
+    for mod in sorted(modules, key=lambda m: m.__name__):
+        cat = mod.__name__.rsplit(".", 1)[-1].capitalize()
+        names = sorted(name for name, obj in inspect.getmembers(mod)
+                       if inspect.isfunction(obj) and obj.__module__ == mod.__name__
+                       and not name.startswith("_"))
+        if names:
+            categorized[cat] = names
     return categorized
 
 
@@ -130,7 +142,14 @@ def get_talib_functions() -> dict[str, list[tuple[str, str]]]:
     Since TA-Lib C library may not be installed, we parse the .pyi stub
     file to get function names, then classify by known TA-Lib groups.
     """
-    pyi_path = Path("/home/darrahts/mangrove/MangroveResearch/ta-lib-python-master/talib/_ta_lib.pyi")
+    # TA-Lib's Python stubs are not on PyPI as a file we can read, so this needs a checkout.
+    # Overridable, and absent on any machine that is not this one -- including CI.
+    pyi_path = Path(os.environ.get(
+        "TALIB_PYI", "/home/darrahts/mangrove/MangroveResearch/ta-lib-python-master/talib/_ta_lib.pyi"))
+    if not pyi_path.is_file():
+        print(f"SKIP: TA-Lib stubs not found at {pyi_path}. Set TALIB_PYI to a checkout of\n"
+              f"      ta-lib-python to include TA-Lib in the gap analysis.", file=sys.stderr)
+        raise SkipAudit()
 
     # Extract all uppercase function names (actual indicators, not stream_ variants)
     func_names = []
@@ -1141,4 +1160,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SkipAudit:
+        sys.exit(77)          # see SkipAudit: reported as SKIP, never as a pass

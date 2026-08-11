@@ -302,7 +302,7 @@ def _lift(cls):
 
     # param TYPES are the one structural fact absent from the class attributes (_params holds
     # names only), so they come from the docstring params block -- verified to agree with
-    # _params for all 99 indicators.
+    # _params for every indicator.
     ptypes = {}
     blk = re.search(r"params:\s*\{(.*?)\}", doc, re.S)
     if blk:

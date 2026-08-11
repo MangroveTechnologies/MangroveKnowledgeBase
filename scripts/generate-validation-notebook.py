@@ -172,7 +172,7 @@ def plot_filter_signal(name, df, fire_indices, category):
     plt.show()"""))
 
     # Summary scan
-    cells.append(md_cell("## Summary Scan\n\nEvaluate all 223 signals and collect fire counts."))
+    cells.append(md_cell("## Summary Scan\n\nEvaluate every registered signal and collect fire counts."))
     cells.append(code_cell("""results = {}
 errors = {}
 

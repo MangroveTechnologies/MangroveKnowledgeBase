@@ -1,19 +1,19 @@
 # Gap Analysis: MangroveKnowledgeBase vs Reference Libraries
 
-**Generated**: 2026-04-15 22:39
-**Our library**: 70 indicators, 136 signals
+**Generated**: 2026-08-10 21:01
+**Our library**: 79 indicators, 249 signals
 
 ## Summary Statistics
 
 | Library | Their Total | Our Coverage | Coverage % | Notes |
 |---------|-----------|-------------|-----------|-------|
 | Bukosabino `ta` | 43 | 43/43 matched | 100% | Full coverage of this library |
-| TA-Lib (trading) | 135 | 42/70 of ours map to TA-Lib | 60% | Excludes 26 math/utility functions |
+| TA-Lib (trading) | 135 | 32/79 of ours map to TA-Lib | 41% | Excludes 26 math/utility functions |
 | TA-Lib (all) | 161 | -- | -- | Includes math transforms, operators |
-| stock-indicators-python | 82 | 36/70 of ours map | 51% | Largest reference with 82 indicators |
+| stock-indicators-python | 82 | 50/79 of ours map | 63% | Largest reference with 82 indicators |
 
 **Missing indicator count by priority**:
-- Priority A (should add): 25
+- Priority A (should add): 5
 - Priority B (nice to have): 30
 - Priority C (skip): 96
 
@@ -24,86 +24,95 @@ Our indicators and which reference libraries have an equivalent:
 | # | Indicator | Category | Bukosabino ta | TA-Lib | stock-indicators |
 |---|-----------|----------|:---:|:---:|:---:|
 | 1 | AwesomeOscillator | Momentum | Y | - | Y |
-| 2 | KAMA | Momentum | Y | Y | Y |
-| 3 | PPO | Momentum | Y | Y | - |
-| 4 | PVO | Momentum | Y | - | Y |
-| 5 | ROC | Momentum | Y | Y | Y |
-| 6 | RSI | Momentum | Y | Y | Y |
-| 7 | StochRSI | Momentum | Y | Y | Y |
-| 8 | StochasticOscillator | Momentum | Y | Y | Y |
-| 9 | TSI | Momentum | Y | - | Y |
-| 10 | UltimateOscillator | Momentum | Y | Y | Y |
-| 11 | WilliamsR | Momentum | Y | Y | Y |
-| 12 | DarkCloudCover | Pattern | - | Y | - |
-| 13 | Doji | Pattern | - | Y | Y |
-| 14 | DragonflyDoji | Pattern | - | Y | - |
-| 15 | Engulfing | Pattern | - | Y | - |
-| 16 | EveningStar | Pattern | - | Y | - |
-| 17 | GravestoneDoji | Pattern | - | Y | - |
-| 18 | Hammer | Pattern | - | Y | - |
-| 19 | HangingMan | Pattern | - | Y | - |
-| 20 | Harami | Pattern | - | Y | - |
-| 21 | InsideBar | Pattern | - | - | - |
-| 22 | InvertedHammer | Pattern | - | Y | - |
-| 23 | LongLeggedDoji | Pattern | - | Y | - |
-| 24 | Marubozu | Pattern | - | Y | Y |
-| 25 | MorningStar | Pattern | - | Y | - |
-| 26 | NarrowRange | Pattern | - | - | - |
-| 27 | OutsideBar | Pattern | - | - | - |
-| 28 | PiercingLine | Pattern | - | Y | - |
-| 29 | PinBar | Pattern | - | - | - |
-| 30 | ShootingStar | Pattern | - | Y | - |
-| 31 | SpinningTop | Pattern | - | Y | - |
-| 32 | ThreeBlackCrows | Pattern | - | Y | - |
-| 33 | ThreeInsideDown | Pattern | - | Y | - |
-| 34 | ThreeInsideUp | Pattern | - | Y | - |
-| 35 | ThreeWhiteSoldiers | Pattern | - | Y | - |
-| 36 | TweezerBottoms | Pattern | - | - | - |
-| 37 | TweezerTops | Pattern | - | - | - |
-| 38 | TwoBarReversal | Pattern | - | - | - |
-| 39 | CumulativeReturn | Return | Y | - | - |
-| 40 | DailyLogReturn | Return | Y | - | - |
-| 41 | DailyReturn | Return | Y | - | - |
-| 42 | ADX | Trend | Y | Y | Y |
-| 43 | Aroon | Trend | Y | Y | Y |
-| 44 | CCI | Trend | Y | Y | Y |
-| 45 | DPO | Trend | Y | - | Y |
-| 46 | EMA | Trend | Y | Y | Y |
-| 47 | Ichimoku | Trend | Y | - | Y |
-| 48 | KST | Trend | Y | - | - |
-| 49 | MACD | Trend | Y | Y | Y |
-| 50 | MassIndex | Trend | Y | - | - |
-| 51 | PSAR | Trend | Y | Y | Y |
-| 52 | SMA | Trend | Y | Y | Y |
-| 53 | STC | Trend | Y | - | Y |
-| 54 | TRIX | Trend | Y | Y | Y |
-| 55 | Vortex | Trend | Y | - | Y |
-| 56 | WMA | Trend | Y | Y | Y |
-| 57 | ATR | Volatility | Y | Y | Y |
-| 58 | BollingerBands | Volatility | Y | Y | Y |
-| 59 | DonchianChannel | Volatility | Y | - | Y |
-| 60 | KeltnerChannel | Volatility | Y | - | Y |
-| 61 | UlcerIndex | Volatility | Y | - | Y |
-| 62 | ADI | Volume | Y | Y | Y |
-| 63 | CMF | Volume | Y | - | Y |
-| 64 | EaseOfMovement | Volume | Y | - | - |
-| 65 | ForceIndex | Volume | Y | - | Y |
-| 66 | MFI | Volume | Y | Y | Y |
-| 67 | NVI | Volume | Y | - | - |
-| 68 | OBV | Volume | Y | Y | Y |
-| 69 | VPT | Volume | Y | - | - |
-| 70 | VWAP | Volume | Y | - | Y |
+| 2 | BOP | Momentum | - | Y | Y |
+| 3 | CMO | Momentum | - | Y | Y |
+| 4 | KAMA | Momentum | Y | Y | Y |
+| 5 | MOM | Momentum | - | Y | - |
+| 6 | PPO | Momentum | Y | Y | - |
+| 7 | PVO | Momentum | Y | - | Y |
+| 8 | ROC | Momentum | Y | Y | Y |
+| 9 | RSI | Momentum | Y | Y | Y |
+| 10 | StochRSI | Momentum | Y | Y | Y |
+| 11 | StochasticOscillator | Momentum | Y | Y | Y |
+| 12 | TSI | Momentum | Y | - | Y |
+| 13 | UltimateOscillator | Momentum | Y | Y | Y |
+| 14 | WilliamsR | Momentum | Y | Y | Y |
+| 15 | CandleGeometry | Pattern | - | - | - |
+| 16 | CandleRaw | Pattern | - | - | - |
+| 17 | CandleRelation | Pattern | - | - | - |
+| 18 | CumulativeReturn | Return | Y | - | - |
+| 19 | DailyLogReturn | Return | Y | - | - |
+| 20 | DailyReturn | Return | Y | - | - |
+| 21 | ADX | Trend | Y | Y | Y |
+| 22 | ALMA | Trend | - | - | Y |
+| 23 | Aroon | Trend | Y | Y | Y |
+| 24 | CCI | Trend | Y | Y | Y |
+| 25 | DEMA | Trend | - | Y | Y |
+| 26 | DPO | Trend | Y | - | Y |
+| 27 | Divergence | Trend | - | - | - |
+| 28 | EMA | Trend | Y | Y | Y |
+| 29 | EPMA | Trend | - | - | Y |
+| 30 | HMA | Trend | - | - | Y |
+| 31 | HeikinAshi | Trend | - | - | Y |
+| 32 | Ichimoku | Trend | Y | - | Y |
+| 33 | KST | Trend | Y | - | - |
+| 34 | MACD | Trend | Y | Y | Y |
+| 35 | MAMA | Trend | - | Y | Y |
+| 36 | MassIndex | Trend | Y | - | - |
+| 37 | MultiTFSlope | Trend | - | - | - |
+| 38 | MultiTFTrend | Trend | - | - | - |
+| 39 | PSAR | Trend | Y | Y | Y |
+| 40 | SMA | Trend | Y | Y | Y |
+| 41 | SMMA | Trend | - | - | Y |
+| 42 | STC | Trend | Y | - | Y |
+| 43 | SuperTrend | Trend | - | - | Y |
+| 44 | SwingDelta | Trend | - | - | - |
+| 45 | T3 | Trend | - | Y | Y |
+| 46 | TEMA | Trend | - | Y | Y |
+| 47 | TRIMA | Trend | - | Y | - |
+| 48 | TRIX | Trend | Y | Y | Y |
+| 49 | Vortex | Trend | Y | - | Y |
+| 50 | WMA | Trend | Y | Y | Y |
+| 51 | WilliamsAlligator | Trend | - | - | - |
+| 52 | ATR | Volatility | Y | Y | Y |
+| 53 | ATRTrailingStop | Volatility | - | - | - |
+| 54 | BollingerBands | Volatility | Y | Y | Y |
+| 55 | ChandelierExit | Volatility | - | - | - |
+| 56 | ChandelierLevels | Volatility | - | - | - |
+| 57 | DonchianChannel | Volatility | Y | - | Y |
+| 58 | KeltnerChannel | Volatility | Y | - | Y |
+| 59 | NATR | Volatility | - | Y | - |
+| 60 | STARCBands | Volatility | - | - | Y |
+| 61 | SqueezeDepth | Volatility | - | - | - |
+| 62 | TTMSqueeze | Volatility | - | - | - |
+| 63 | TrueRange | Volatility | - | - | - |
+| 64 | UlcerIndex | Volatility | Y | - | Y |
+| 65 | VolatilityEnvelope | Volatility | - | - | - |
+| 66 | VolatilityStop | Volatility | - | - | Y |
+| 67 | ADI | Volume | Y | Y | Y |
+| 68 | ADOSC | Volume | - | Y | - |
+| 69 | CMF | Volume | Y | - | Y |
+| 70 | EaseOfMovement | Volume | Y | - | - |
+| 71 | ForceIndex | Volume | Y | - | Y |
+| 72 | KVO | Volume | - | - | Y |
+| 73 | KlingerVolumeOscillator | Volume | - | - | - |
+| 74 | MFI | Volume | Y | Y | Y |
+| 75 | NVI | Volume | Y | - | - |
+| 76 | OBV | Volume | Y | Y | Y |
+| 77 | VPT | Volume | Y | - | - |
+| 78 | VWAP | Volume | Y | - | Y |
+| 79 | VWMA | Volume | - | - | Y |
 
 ### Coverage by Category
 
 | Category | Count | In Bukosabino | In TA-Lib | In stock-indicators |
 |----------|-------|:---:|:---:|:---:|
-| Momentum | 11 | 11/11 | 8/11 | 10/11 |
-| Pattern | 27 | 0/27 | 20/27 | 2/27 |
+| Momentum | 14 | 11/14 | 11/14 | 12/14 |
+| Pattern | 3 | 0/3 | 0/3 | 0/3 |
 | Return | 3 | 3/3 | 0/3 | 0/3 |
-| Trend | 15 | 15/15 | 9/15 | 13/15 |
-| Volatility | 5 | 5/5 | 2/5 | 5/5 |
-| Volume | 9 | 9/9 | 3/9 | 6/9 |
+| Trend | 31 | 15/31 | 14/31 | 23/31 |
+| Volatility | 15 | 5/15 | 3/15 | 7/15 |
+| Volume | 13 | 9/13 | 4/13 | 8/13 |
 
 ## Missing Indicators by Priority
 
@@ -113,31 +122,11 @@ Standard indicators widely used in production trading systems.
 
 | # | Indicator | Description | Found In |
 |---|-----------|-------------|----------|
-| 1 | **ADOSC** | A/D Oscillator (Chaikin) | TA-Lib |
-| 2 | **APO** | Absolute Price Oscillator | TA-Lib |
-| 3 | **BOP** | Balance of Power | TA-Lib, stock-indicators-python |
-| 4 | **CMO** | Chande Momentum Oscillator | TA-Lib, stock-indicators-python |
-| 5 | **DEMA** | Double EMA | TA-Lib, stock-indicators-python |
-| 6 | **MAMA** | MESA Adaptive MA | TA-Lib, stock-indicators-python |
-| 7 | **MOM** | Momentum | TA-Lib |
-| 8 | **NATR** | Normalized ATR | TA-Lib |
-| 9 | **T3** | Triple EMA (T3) | TA-Lib, stock-indicators-python |
-| 10 | **TEMA** | Triple EMA | TA-Lib, stock-indicators-python |
-| 11 | **TRANGE** | True Range | TA-Lib, stock-indicators-python |
-| 12 | **TRIMA** | Triangular MA | TA-Lib |
-| 13 | **alligator** | Williams Alligator (SMMA-based trend) | stock-indicators-python |
-| 14 | **alma** | Arnaud Legoux Moving Average | stock-indicators-python |
-| 15 | **atr_stop** | ATR Trailing Stop | stock-indicators-python |
-| 16 | **chandelier** | Chandelier Exit | stock-indicators-python |
-| 17 | **epma** | Endpoint Moving Average | stock-indicators-python |
-| 18 | **heikin_ashi** | Heikin-Ashi Candles | stock-indicators-python |
-| 19 | **hma** | Hull Moving Average | stock-indicators-python |
-| 20 | **kvo** | Klinger Volume Oscillator | stock-indicators-python |
-| 21 | **smma** | Smoothed Moving Average (SMMA/RMA) | stock-indicators-python |
-| 22 | **starc_bands** | STARC Bands | stock-indicators-python |
-| 23 | **super_trend** | SuperTrend | stock-indicators-python |
-| 24 | **volatility_stop** | Volatility Stop | stock-indicators-python |
-| 25 | **vwma** | Volume Weighted Moving Average | stock-indicators-python |
+| 1 | **APO** | Absolute Price Oscillator | TA-Lib |
+| 2 | **TRANGE** | True Range | TA-Lib, stock-indicators-python |
+| 3 | **alligator** | Williams Alligator (SMMA-based trend) | stock-indicators-python |
+| 4 | **atr_stop** | ATR Trailing Stop | stock-indicators-python |
+| 5 | **chandelier** | Chandelier Exit | stock-indicators-python |
 
 ### Priority B -- Nice to Have
 
@@ -290,11 +279,14 @@ Redundant variants, math utilities, or very niche patterns.
 | Category | Indicator | Signal Count | Signals |
 |----------|-----------|:-----------:|---------|
 | Momentum | AwesomeOscillator | 3 | `ao_bearish`, `ao_bullish`, `ao_zero_cross` |
+| Momentum | BOP | 0 | *none* |
+| Momentum | CMO | 0 | *none* |
 | Momentum | KAMA | 2 | `kama_cross_down`, `kama_cross_up` |
+| Momentum | MOM | 0 | *none* |
 | Momentum | PPO | 2 | `ppo_bearish_cross`, `ppo_bullish_cross` |
 | Momentum | PVO | 2 | `pvo_bearish_cross`, `pvo_bullish_cross` |
 | Momentum | ROC | 3 | `roc_momentum_shift`, `roc_negative`, `roc_positive` |
-| Momentum | RSI | 4 | `rsi_cross_down`, `rsi_cross_up`, `rsi_overbought`, `rsi_oversold` |
+| Momentum | RSI | 8 | `rsi_bearish_divergence`, `rsi_bullish_divergence`, `rsi_hidden_bearish_divergence`, `rsi_hidden_bullish_divergence`, `rsi_cross_down`, `rsi_cross_up`, `rsi_overbought`, `rsi_oversold` |
 | Momentum | StochRSI | 2 | `stochrsi_overbought`, `stochrsi_oversold` |
 | Momentum | StochasticOscillator | 2 | `stoch_overbought`, `stoch_oversold` |
 | Momentum | TSI | 2 | `tsi_bearish`, `tsi_bullish` |
@@ -304,38 +296,101 @@ Redundant variants, math utilities, or very niche patterns.
 | Return | DailyLogReturn | 0 | *none* |
 | Return | DailyReturn | 2 | `daily_return_negative`, `daily_return_positive` |
 | Trend | ADX | 2 | `adx_bullish_di`, `adx_strong_trend` |
+| Trend | ALMA | 0 | *none* |
 | Trend | Aroon | 3 | `aroon_crossover`, `aroon_down_trend`, `aroon_up_trend` |
 | Trend | CCI | 2 | `cci_overbought`, `cci_oversold` |
+| Trend | DEMA | 0 | *none* |
 | Trend | DPO | 2 | `dpo_negative`, `dpo_positive` |
+| Trend | Divergence | 0 | *none* |
 | Trend | EMA | 4 | `ema_cross_down`, `ema_cross_up`, `ema_crossover`, `price_above_ema` |
+| Trend | EPMA | 0 | *none* |
+| Trend | HMA | 0 | *none* |
+| Trend | HeikinAshi | 0 | *none* |
 | Trend | Ichimoku | 3 | `ichimoku_bearish`, `ichimoku_bullish`, `ichimoku_tk_cross` |
 | Trend | KST | 2 | `kst_bearish_cross`, `kst_bullish_cross` |
-| Trend | MACD | 3 | `macd_bearish_cross`, `macd_bullish_cross`, `macd_positive` |
+| Trend | MACD | 7 | `macd_bearish_cross`, `macd_bullish_cross`, `macd_line_cross_down`, `macd_line_cross_up`, `macd_line_negative`, `macd_line_positive`, `macd_positive` |
+| Trend | MAMA | 0 | *none* |
 | Trend | MassIndex | 1 | `mass_reversal_signal` |
+| Trend | MultiTFSlope | 0 | *none* |
+| Trend | MultiTFTrend | 0 | *none* |
 | Trend | PSAR | 3 | `psar_bearish`, `psar_bullish`, `psar_reversal` |
 | Trend | SMA | 4 | `is_above_sma`, `sma_cross_down`, `sma_cross_up`, `sma_crossover` |
+| Trend | SMMA | 0 | *none* |
 | Trend | STC | 2 | `stc_overbought`, `stc_oversold` |
+| Trend | SuperTrend | 0 | *none* |
+| Trend | SwingDelta | 0 | *none* |
+| Trend | T3 | 0 | *none* |
+| Trend | TEMA | 0 | *none* |
+| Trend | TRIMA | 0 | *none* |
 | Trend | TRIX | 2 | `trix_bearish`, `trix_bullish` |
 | Trend | Vortex | 3 | `vortex_bearish`, `vortex_bullish`, `vortex_crossover` |
 | Trend | WMA | 2 | `wma_cross_down`, `wma_cross_up` |
-| Volatility | ATR | 1 | `atr_high_volatility` |
-| Volatility | BollingerBands | 3 | `bb_lower_breakout`, `bb_squeeze`, `bb_upper_breakout` |
+| Trend | WilliamsAlligator | 0 | *none* |
+| Volatility | ATR | 5 | `atr_high_volatility`, `atr_trailing_stop_flip_down`, `atr_trailing_stop_flip_up`, `atr_trailing_stop_long`, `atr_trailing_stop_short` |
+| Volatility | ATRTrailingStop | 0 | *none* |
+| Volatility | BollingerBands | 5 | `bb_above_upper`, `bb_below_lower`, `bb_lower_breakout`, `bb_squeeze`, `bb_upper_breakout` |
+| Volatility | ChandelierExit | 0 | *none* |
+| Volatility | ChandelierLevels | 0 | *none* |
 | Volatility | DonchianChannel | 2 | `dc_lower_breakout`, `dc_upper_breakout` |
-| Volatility | KeltnerChannel | 2 | `kc_lower_breakout`, `kc_upper_breakout` |
+| Volatility | KeltnerChannel | 4 | `kc_above_upper`, `kc_below_lower`, `kc_lower_breakout`, `kc_upper_breakout` |
+| Volatility | NATR | 0 | *none* |
+| Volatility | STARCBands | 0 | *none* |
+| Volatility | SqueezeDepth | 0 | *none* |
+| Volatility | TTMSqueeze | 0 | *none* |
+| Volatility | TrueRange | 0 | *none* |
 | Volatility | UlcerIndex | 2 | `ulcer_high_risk`, `ulcer_low_risk` |
+| Volatility | VolatilityEnvelope | 0 | *none* |
+| Volatility | VolatilityStop | 0 | *none* |
 | Volume | ADI | 2 | `adi_bearish`, `adi_bullish` |
+| Volume | ADOSC | 0 | *none* |
 | Volume | CMF | 2 | `cmf_bearish`, `cmf_bullish` |
 | Volume | EaseOfMovement | 2 | `eom_bearish`, `eom_bullish` |
 | Volume | ForceIndex | 2 | `force_bearish`, `force_bullish` |
+| Volume | KVO | 0 | *none* |
+| Volume | KlingerVolumeOscillator | 0 | *none* |
 | Volume | MFI | 2 | `mfi_overbought`, `mfi_oversold` |
 | Volume | NVI | 2 | `nvi_bearish`, `nvi_bullish` |
 | Volume | OBV | 2 | `obv_bearish`, `obv_bullish` |
 | Volume | VPT | 2 | `vpt_bearish`, `vpt_bullish` |
 | Volume | VWAP | 2 | `vwap_above`, `vwap_below` |
+| Volume | VWMA | 0 | *none* |
 
 ### Indicators with No Signal Coverage
 
+- **ADOSC**
+- **ALMA**
+- **ATRTrailingStop**
+- **BOP**
+- **CMO**
+- **ChandelierExit**
+- **ChandelierLevels**
+- **DEMA**
 - **DailyLogReturn**
+- **Divergence**
+- **EPMA**
+- **HMA**
+- **HeikinAshi**
+- **KVO**
+- **KlingerVolumeOscillator**
+- **MAMA**
+- **MOM**
+- **MultiTFSlope**
+- **MultiTFTrend**
+- **NATR**
+- **SMMA**
+- **STARCBands**
+- **SqueezeDepth**
+- **SuperTrend**
+- **SwingDelta**
+- **T3**
+- **TEMA**
+- **TRIMA**
+- **TTMSqueeze**
+- **TrueRange**
+- **VWMA**
+- **VolatilityEnvelope**
+- **VolatilityStop**
+- **WilliamsAlligator**
 
 ### Missing Signal Patterns
 
@@ -403,13 +458,11 @@ Applicable to: ADX, ATR, BollingerBands
 
 ### Immediate (Priority A Indicators)
 
-Add these 25 indicators to reach parity with standard trading libraries:
+Add these 5 indicators to reach parity with standard trading libraries:
 
-- **Moving Averages**: DEMA, MAMA, T3, TEMA, TRIMA, alma, epma, hma, smma, vwma
-- **Trend**: alligator, chandelier, heikin_ashi, super_trend
-- **Momentum**: APO, BOP, CMO, MOM
-- **Volatility**: NATR, TRANGE, atr_stop, starc_bands, volatility_stop
-- **Volume**: ADOSC, kvo
+- **Trend**: alligator, chandelier
+- **Momentum**: APO
+- **Volatility**: TRANGE, atr_stop
 
 ### High-Impact Signal Patterns
 

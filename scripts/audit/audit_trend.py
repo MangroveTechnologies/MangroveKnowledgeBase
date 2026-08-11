@@ -12,8 +12,9 @@ from audit import load_btc_daily
 from audit.compare import compare_indicator
 from audit.config import get_tolerance
 
-# Reference library
-sys.path.insert(0, "/home/darrahts/mangrove/MangroveResearch/ta-master")
+# Reference library: bukosabino `ta`, the public PyPI package -- `pip install ta`. This used to
+# insert an absolute checkout path, which pinned the audit to one machine and made it
+# unrunnable in CI. Same library, same version, found the normal way.
 import ta.trend as ta_trend
 
 # Our implementations

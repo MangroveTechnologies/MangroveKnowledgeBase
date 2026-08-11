@@ -177,7 +177,7 @@ def test_the_readme_keeps_the_community_links():
     anyone asking for it, and it was caught by eye, not by a test.
     """
     text = (REPO / "README.md").read_text()
-    for token, what in (("discord.gg/xUcn4R6zJR", "the Discord invite"),
+    for token, what in (("discord.gg/Yycbw6P93B", "the Discord invite"),
                         ("pepy.tech/projects/mangrove-kb", "the downloads badge"),
                         ("please star the repo", "the star ask"),
                         ("github.com/MangroveTechnologies)", "the ecosystem link")):
