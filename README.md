@@ -366,14 +366,21 @@ Releases published before this change remain under the MIT license they shipped 
 
 ---
 
+## Contributing
+
+Mangrove is named after the mangrove tree — an ecosystem where everything is interconnected,
+resilient, and thriving. We think trading knowledge works the same way: the best strategies and the
+most reliable tools don't come from hoarding information behind paywalls, they come from a community
+that shares openly. If you want to contribute, join the discord and reach out to the team directly.
+
 ## Links
 
-**Every signal function, every indicator and every document here exists because someone chose to
-share what they know.** Bugs and ideas:
 [GitHub Issues](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues).
 
 Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem —
 [**join us on Discord**](https://discord.gg/Yycbw6P93B).
+
+The [Mangrove](https://mangrove.io) app - try today for free, no subscription or payment required.
 
 **If you find this useful, please star the repo** — it helps others discover it and keeps the project
 growing.
