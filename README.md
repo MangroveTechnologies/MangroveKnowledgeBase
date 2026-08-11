@@ -56,7 +56,6 @@ its edges. [Interface guide below](#the-viewer).*
 - [Repository structure](#repository-structure)
 - [Development](#development)
 - [License](#license)
-- [Contributing](#contributing)
 - [Links](#links)
 
 ---
@@ -367,26 +366,11 @@ Releases published before this change remain under the MIT license they shipped 
 
 ---
 
-## Contributing
-
-Mangrove is named after the mangrove tree — an ecosystem where everything is interconnected,
-resilient, and thriving. We think trading knowledge works the same way: the best strategies and the
-most reliable tools don't come from hoarding information behind paywalls, they come from a community
-that shares openly. **Every signal function, every indicator, and every document here exists because
-someone chose to share what they know.**
-
-Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). The best ones add a signal or
-indicator you actually use, improve the accuracy of an existing implementation, or fix something the
-graph gets wrong. Whether you're a quant who can improve an RSI calculation, a trader who spots a
-missing candlestick pattern, or a student adding to the knowledge base — it makes the whole thing
-stronger. Bugs and suggestions:
-[GitHub Issues](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues).
-
-Every signal carries its docstring contract — formula, requires, params with ranges, typed outputs.
-The graph is built from those, so a docstring that lies is a graph that lies; the build fails loudly
-on a half-authored one rather than emitting it.
-
 ## Links
+
+**Every signal function, every indicator and every document here exists because someone chose to
+share what they know.** Bugs and ideas:
+[GitHub Issues](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues).
 
 Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem —
 [**join us on Discord**](https://discord.gg/Yycbw6P93B).
