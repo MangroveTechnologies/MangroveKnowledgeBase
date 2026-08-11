@@ -4,6 +4,70 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [2.0.0] - Unreleased
+
+**A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
+carries a class describing what its output tells you about its input, and every modelled signal
+carries a formula stating the predicate it computes -- 303 nodes, 1049 edges, in
+`ontology/signal-indicator-ontology.json`.
+
+Major, because files moved and things were renamed. **No registered signal name changed meaning,
+and every old name still evaluates**, so stored strategies are unaffected; the breaks are in import
+paths, and all of them are shimmed.
+
+### The rule
+
+Indicators are measurements, never verdicts; signals are verdicts. Applying it changed five
+indicators:
+
+- `Divergence` emitted four booleans -- it concluded rather than measured. Replaced by `SwingDelta`,
+  which emits the two changes a divergence is drawn from; the four sign comparisons moved into the
+  signals.
+- `TTMSqueeze` emitted `squeeze_on` / `squeeze_fired` beside a real momentum. Replaced by
+  `SqueezeDepth`, which emits how far inside the Keltner Channel the Bollinger Bands sit -- positive
+  IS the squeeze, and the magnitude the boolean discarded comes back.
+- `MultiTFTrend` emitted a ternary -1/0/+1. Replaced by `MultiTFSlope`, which emits the normalised
+  higher-timeframe slope. `slope_threshold` moved to the signals with the verdict.
+- `ChandelierExit` and `VolatilityStop` were excluded from the ontology as "stateful policy rules"
+  and should not have been -- both are stateless measurements whose names stated a use. Now
+  `ChandelierLevels` and `VolatilityEnvelope`, both class `volatility`.
+
+Every split was proven equivalent before landing: reconstructing the old outputs from the new
+measurements reproduces them bar-for-bar on a 1,294-bar BTC fixture, and the rewritten signals
+disagree with the old implementations on zero expanding-window evaluations.
+
+### Signal files are named for their class
+
+`volume.py` is gone -- there is no `volume` indicator class, and its 33 signals split four ways by
+the class of the indicator each reads. `patterns.py` is `pattern.py`. `trend.py` went from 88
+signals to 7. Files now: `averaging` 55, `momentum` 56, `oscillator` 30, `volatility` 29,
+`pattern` 40, `flow` 10, `trend` 7, `onchain` 10, `defi_pro` 10.
+
+### Nothing breaks
+
+- Retired signal names resolve through a registry alias, evaluate identically, and warn. They are
+  excluded from `names()` and the catalogue so no signal is counted twice.
+- `mangrove_kb.signals.volume` and `.patterns` survive as shim modules.
+- Signals that moved between modules that both still exist resolve through a PEP 562 `__getattr__`,
+  so `from mangrove_kb.signals.trend import vortex_bullish` still works.
+- `SuperTrend`, `PSAR` and `ATRTrailingStop` are deprecated and out of `__all__`, but importable.
+
+### Fixed
+
+- Every `stockcharts.com/doku.php` reference URL in the indicator docstrings was dead (30 of them);
+  ChartSchool moved. All replaced with fetched, title-verified links.
+- `sma_crossover` guarded on `len < window_slow` when a crossing needs the prior bar too, so the
+  lifted warmup understated by one.
+- `RuleRegistry` gained `names()`, `has()`, `alias()` and `resolve()`.
+- Five `defi_pro` signals can never fire with the data their provider actually returns, and the
+  on-chain window arithmetic counts observations rather than bars -- documented in
+  [#109](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109), not yet fixed.
+
+### Known gaps
+
+216 of 247 signals are modelled. The 20 `onchain` / `defi_pro` signals read provider feeds rather
+than indicator outputs and have no class; 11 read a verdict and never will. All 31 still evaluate.
+
 ## [1.0.0] - Unreleased
 
 Comprehensive expansion to 99 indicators and 223 signals. This release adds 29 standard
@@ -81,7 +145,7 @@ indicator is benchmarked on the same fixture and tier-classified
 - **DarkCloudCover `require_gap` parameter**: Same as PiercingLine. When `False`, relaxes from "open above previous high" to "open above previous close".
 - **TwoBarReversal `close_proximity` parameter**: New float parameter (default `0.25`, range `0.1-0.5`). Controls how close the close must be to the high/low for reversal detection. Previously hardcoded at `0.25`.
 - **Indicator audit framework** at `scripts/audit/` -- reproducible accuracy verification for all 70 indicators and 136 signals against Bukosabino `ta` reference library.
-- **Audit reports** at `audit_results/` -- indicator, signal, pattern, and gap analysis reports.
+- **Audit reports** generated into `audit_results/` by `scripts/audit/run_all.py` (not committed).
 
 ### Documentation
 - Updated KB document 07-chart-patterns.md with notes on `require_gap` and `close_proximity` parameters

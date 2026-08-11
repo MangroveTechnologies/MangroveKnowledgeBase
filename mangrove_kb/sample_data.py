@@ -2,8 +2,12 @@
 
 Provides a deterministic, dependency-free helper so every quickstart snippet
 runs out of the box -- no CSV file, no download, no network call. The generated
-DataFrame uses the same **capitalized** ``Open/High/Low/Close/Volume`` columns
-that the signals and indicators in this package expect.
+DataFrame uses the canonical **lowercase** ``open/high/low/close/volume`` columns
+that the signals and indicators in this package expect, so the sample data agrees
+with what the knowledge graph publishes for every node.
+
+Capitalized frames are still accepted -- signals normalize OHLCV column case at
+the registry boundary -- but lowercase is what this package produces and states.
 
 Example:
     >>> from mangrove_kb import sample_ohlcv, RuleRegistry
@@ -44,9 +48,9 @@ def sample_ohlcv(
 
     Returns:
         pd.DataFrame: ``rows`` rows indexed by a daily ``DatetimeIndex`` named
-        ``Timestamp``, with float columns ``Open``, ``High``, ``Low``,
-        ``Close``, ``Volume`` -- the capitalized OHLCV schema the signals and
-        indicators expect.
+        ``Timestamp``, with float columns ``open``, ``high``, ``low``,
+        ``close``, ``volume`` -- the canonical lowercase OHLCV schema the
+        signals and indicators expect.
 
     Raises:
         ValueError: If ``rows`` < 2, ``start_price`` <= 0, ``volatility`` < 0, or
@@ -88,11 +92,11 @@ def sample_ohlcv(
     index = pd.date_range("2024-01-01", periods=rows, freq="D", name="Timestamp")
     return pd.DataFrame(
         {
-            "Open": open_,
-            "High": high,
-            "Low": low,
-            "Close": close,
-            "Volume": volume,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": volume,
         },
         index=index,
     )

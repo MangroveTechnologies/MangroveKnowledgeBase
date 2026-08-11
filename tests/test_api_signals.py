@@ -12,17 +12,22 @@ class TestSignalEndpoints:
         resp = client.get("/api/signals")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["total"] == 243
+        assert data["total"] == 249
 
     def test_list_signals_filter_category(self):
-        resp = client.get("/api/signals?category=Momentum")
-        assert resp.status_code == 200
-        assert resp.json()["total"] == 42
+        """Files are named for the ontology class they hold. momentum.py and volume.py each held
+        several, and volume.py is gone -- there is no `volume` indicator class."""
+        for category, total in (("Momentum", 56), ("Oscillator", 30), ("Averaging", 55),
+                                ("Flow", 10), ("Pattern", 40), ("Volatility", 31),
+                                ("Trend", 7)):
+            resp = client.get(f"/api/signals?category={category}")
+            assert resp.status_code == 200
+            assert resp.json()["total"] == total, category
 
     def test_list_signals_filter_type(self):
         resp = client.get("/api/signals?signal_type=TRIGGER")
         assert resp.status_code == 200
-        assert resp.json()["total"] == 117
+        assert resp.json()["total"] == 119
 
     def test_get_signal(self):
         resp = client.get("/api/signals/rsi_oversold")
@@ -40,7 +45,8 @@ class TestIndicatorEndpoints:
     def test_list_indicators(self):
         resp = client.get("/api/indicators")
         assert resp.status_code == 200
-        assert resp.json()["total"] == 99
+        # 99 - 27 retired pattern indicators + CandleGeometry + CandleRelation + CandleRaw.
+        assert resp.json()["total"] == 71
 
     def test_get_indicator(self):
         resp = client.get("/api/indicators/RSI")

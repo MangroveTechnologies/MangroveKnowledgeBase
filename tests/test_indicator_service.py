@@ -11,7 +11,8 @@ class TestIndicatorServiceMetadata:
 
     def test_list_indicators_returns_all(self):
         indicators = self.service.list_indicators()
-        assert len(indicators) == 99
+        # 99 - 27 retired pattern indicators + CandleGeometry + CandleRelation + CandleRaw.
+        assert len(indicators) == 71
 
     def test_list_indicators_filter_by_category(self):
         momentum = self.service.list_indicators(category="Momentum")

@@ -65,7 +65,7 @@ from datetime import datetime
 
 from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.docstring_parser import parse_all_signals
-from mangrove_kb.signals import momentum, trend, volume, volatility, patterns
+from mangrove_kb.signals import momentum, trend, volume, volatility, pattern, oscillator, averaging
 
 # Parse all signals
 SIGNAL_MODULES = [momentum, trend, volume, volatility, patterns]
@@ -172,7 +172,7 @@ def plot_filter_signal(name, df, fire_indices, category):
     plt.show()"""))
 
     # Summary scan
-    cells.append(md_cell("## Summary Scan\n\nEvaluate all 223 signals and collect fire counts."))
+    cells.append(md_cell("## Summary Scan\n\nEvaluate every registered signal and collect fire counts."))
     cells.append(code_cell("""results = {}
 errors = {}
 

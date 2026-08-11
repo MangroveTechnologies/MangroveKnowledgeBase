@@ -8,15 +8,30 @@ class TestSignalServiceMetadata:
 
     def test_list_signals_returns_all(self):
         signals = self.service.list_signals()
-        assert len(signals) == 243
+        assert len(signals) == 249
 
     def test_list_signals_filter_by_category(self):
-        momentum = self.service.list_signals(category="Momentum")
-        assert len(momentum) == 42
+        """Categories follow the file layout, and the files follow the ontology class.
+
+        Two files held several classes at once and were split. momentum.py was 42: the bounded
+        oscillators are `oscillator` and the KAMA crossings are `averaging`. volume.py was 33 and is
+        gone entirely -- there is no `volume` indicator class, so its signals went four ways by the
+        class of the indicator each reads, and `flow` (the cumulative lines: OBV, ADI, VPT, NVI)
+        appeared as a file for the first time. trend.py was 88 and is down to the 24 whose class
+        cannot be settled: all seven read SuperTrend's `direction` or PSAR's flip flags, which are
+        verdicts rather than measurements, so there is nothing for them to inherit a class from."""
+        assert len(self.service.list_signals(category="Momentum")) == 56
+        assert len(self.service.list_signals(category="Oscillator")) == 30
+        assert len(self.service.list_signals(category="Averaging")) == 55
+        assert len(self.service.list_signals(category="Flow")) == 10
+        assert len(self.service.list_signals(category="Pattern")) == 40
+        assert len(self.service.list_signals(category="Volatility")) == 31
+        # trend.py is not a class -- what is left there is what cannot be classified yet
+        assert len(self.service.list_signals(category="Trend")) == 7
 
     def test_list_signals_filter_by_type(self):
         triggers = self.service.list_signals(signal_type="TRIGGER")
-        assert len(triggers) == 117
+        assert len(triggers) == 119
 
     def test_get_signal_exists(self):
         signal = self.service.get_signal("rsi_oversold")

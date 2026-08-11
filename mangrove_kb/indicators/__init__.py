@@ -33,12 +33,13 @@ from .momentum_indicators import (
     PVO,
     MOM,
     BOP,
-    APO,
     CMO,
 )
 
-# Volatility indicators
-from .volatility_indicators import (
+# Volatility indicators. ChandelierExit is the deprecated spelling of ChandelierLevels:
+# importable so old code keeps working, absent from __all__ so it is not a second entry in
+# the indicator catalogue.
+from .volatility_indicators import (  # noqa: F401
     ATR,
     BollingerBands,
     KeltnerChannel,
@@ -48,8 +49,12 @@ from .volatility_indicators import (
     NATR,
     ATRTrailingStop,
     STARCBands,
+    VolatilityEnvelope,
     VolatilityStop,
+    SqueezeDepth,
     TTMSqueeze,
+    ChandelierLevels,
+    ChandelierExit,
 )
 
 # Trend indicators
@@ -67,11 +72,11 @@ from .trend_indicators import (
     T3,
     MAMA,
     HeikinAshi,
-    ChandelierExit,
     WilliamsAlligator,
     SuperTrend,
-    MARibbon,
+    MultiTFSlope,
     MultiTFTrend,
+    SwingDelta,
     Divergence,
     MACD,
     Aroon,
@@ -101,6 +106,7 @@ from .volume_indicators import (
     VWMA,
     ADOSC,
     KVO,
+    KlingerVolumeOscillator,
 )
 
 # Return indicators
@@ -112,36 +118,15 @@ from .return_indicators import (
 
 # Pattern indicators
 from .pattern_indicators import (
-    Doji,
-    LongLeggedDoji,
-    DragonflyDoji,
-    GravestoneDoji,
-    Hammer,
-    HangingMan,
-    InvertedHammer,
-    ShootingStar,
-    Marubozu,
-    SpinningTop,
-    Engulfing,
-    Harami,
-    PiercingLine,
-    DarkCloudCover,
-    TweezerTops,
-    TweezerBottoms,
-    MorningStar,
-    EveningStar,
-    ThreeWhiteSoldiers,
-    ThreeBlackCrows,
-    ThreeInsideUp,
-    ThreeInsideDown,
-    InsideBar,
-    OutsideBar,
-    PinBar,
-    TwoBarReversal,
-    NarrowRange,
+    CandleGeometry,
+    CandleRaw,
+    CandleRelation,
 )
 
 __all__ = [
+    "CandleGeometry",
+    "CandleRaw",
+    "CandleRelation",
     # Interface
     "IndicatorInterface",
     # Utilities
@@ -161,7 +146,6 @@ __all__ = [
     "PVO",
     "MOM",
     "BOP",
-    "APO",
     "CMO",
     # Volatility indicators
     "ATR",
@@ -171,10 +155,9 @@ __all__ = [
     "UlcerIndex",
     "TrueRange",
     "NATR",
-    "ATRTrailingStop",
     "STARCBands",
-    "VolatilityStop",
-    "TTMSqueeze",
+    "VolatilityEnvelope",
+    "SqueezeDepth",
     # Trend indicators
     "SMA",
     "EMA",
@@ -189,12 +172,10 @@ __all__ = [
     "T3",
     "MAMA",
     "HeikinAshi",
-    "ChandelierExit",
+    "ChandelierLevels",
     "WilliamsAlligator",
-    "SuperTrend",
-    "MARibbon",
-    "MultiTFTrend",
-    "Divergence",
+    "MultiTFSlope",
+    "SwingDelta",
     "MACD",
     "Aroon",
     "TRIX",
@@ -205,7 +186,6 @@ __all__ = [
     "CCI",
     "ADX",
     "Vortex",
-    "PSAR",
     "STC",
     # Volume indicators
     "ADI",
@@ -220,36 +200,10 @@ __all__ = [
     "VWMA",
     "ADOSC",
     "KVO",
+    "KlingerVolumeOscillator",
     # Return indicators
     "DailyReturn",
     "DailyLogReturn",
     "CumulativeReturn",
     # Pattern indicators
-    "Doji",
-    "LongLeggedDoji",
-    "DragonflyDoji",
-    "GravestoneDoji",
-    "Hammer",
-    "HangingMan",
-    "InvertedHammer",
-    "ShootingStar",
-    "Marubozu",
-    "SpinningTop",
-    "Engulfing",
-    "Harami",
-    "PiercingLine",
-    "DarkCloudCover",
-    "TweezerTops",
-    "TweezerBottoms",
-    "MorningStar",
-    "EveningStar",
-    "ThreeWhiteSoldiers",
-    "ThreeBlackCrows",
-    "ThreeInsideUp",
-    "ThreeInsideDown",
-    "InsideBar",
-    "OutsideBar",
-    "PinBar",
-    "TwoBarReversal",
-    "NarrowRange",
 ]

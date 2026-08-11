@@ -113,6 +113,14 @@ def token_unlock_cliff_ahead(
 @RuleRegistry.register("funding_negative_regime")
 def funding_negative_regime(df: pd.DataFrame, window: int = 14) -> bool:
     """
+    CANNOT FIRE with the data available today. See
+    https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109 --
+    DeFiLlama returns this column as a CURRENT SNAPSHOT, not a series, so the fetcher
+    populates the latest bar only and `_clean_series` sees exactly one observation.
+    This signal needs 14, so it returns False on every bar, in backtest and live alike.
+    The provider does return usable aggregates (fundingRate7dAverage, apyMean30d,
+    change_7d); reshaping around those is the fix.
+
     Check for a persistently negative funding regime (shorts pay longs).
 
     Type: FILTER
@@ -135,6 +143,14 @@ def funding_negative_regime(df: pd.DataFrame, window: int = 14) -> bool:
 @RuleRegistry.register("funding_flip_positive")
 def funding_flip_positive(df: pd.DataFrame) -> bool:
     """
+    CANNOT FIRE with the data available today. See
+    https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109 --
+    DeFiLlama returns this column as a CURRENT SNAPSHOT, not a series, so the fetcher
+    populates the latest bar only and `_clean_series` sees exactly one observation.
+    This signal needs 2, so it returns False on every bar, in backtest and live alike.
+    The provider does return usable aggregates (fundingRate7dAverage, apyMean30d,
+    change_7d); reshaping around those is the fix.
+
     Detect funding crossing from non-positive to positive on the latest bar.
 
     Type: TRIGGER
@@ -218,6 +234,14 @@ def etf_inflow_spike(df: pd.DataFrame, window: int = 20, z_threshold: float = 2.
 @RuleRegistry.register("treasury_growing")
 def treasury_growing(df: pd.DataFrame, window: int = 14) -> bool:
     """
+    CANNOT FIRE with the data available today. See
+    https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109 --
+    DeFiLlama returns this column as a CURRENT SNAPSHOT, not a series, so the fetcher
+    populates the latest bar only and `_clean_series` sees exactly one observation.
+    This signal needs 14, so it returns False on every bar, in backtest and live alike.
+    The provider does return usable aggregates (fundingRate7dAverage, apyMean30d,
+    change_7d); reshaping around those is the fix.
+
     Check whether the protocol treasury is growing over the window.
 
     Type: FILTER
@@ -240,6 +264,14 @@ def treasury_growing(df: pd.DataFrame, window: int = 14) -> bool:
 @RuleRegistry.register("treasury_accumulation_trigger")
 def treasury_accumulation_trigger(df: pd.DataFrame, window: int = 20) -> bool:
     """
+    CANNOT FIRE with the data available today. See
+    https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109 --
+    DeFiLlama returns this column as a CURRENT SNAPSHOT, not a series, so the fetcher
+    populates the latest bar only and `_clean_series` sees exactly one observation.
+    This signal needs 20, so it returns False on every bar, in backtest and live alike.
+    The provider does return usable aggregates (fundingRate7dAverage, apyMean30d,
+    change_7d); reshaping around those is the fix.
+
     Detect treasury value crossing above its moving average.
 
     Type: TRIGGER
@@ -295,6 +327,14 @@ def lending_spread_low(df: pd.DataFrame, threshold: float = 0.02) -> bool:
 @RuleRegistry.register("lending_spread_widening")
 def lending_spread_widening(df: pd.DataFrame, window: int = 20) -> bool:
     """
+    CANNOT FIRE with the data available today. See
+    https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109 --
+    DeFiLlama returns this column as a CURRENT SNAPSHOT, not a series, so the fetcher
+    populates the latest bar only and `_clean_series` sees exactly one observation.
+    This signal needs 20, so it returns False on every bar, in backtest and live alike.
+    The provider does return usable aggregates (fundingRate7dAverage, apyMean30d,
+    change_7d); reshaping around those is the fix.
+
     Detect the borrow-supply spread crossing above its moving average.
 
     Type: TRIGGER

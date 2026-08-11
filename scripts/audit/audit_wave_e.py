@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Audit Wave E indicators (trend) against pandas-ta / behavioral tests.
 
-Wave E indicators: HeikinAshi, ChandelierExit, WilliamsAlligator, SuperTrend.
+Wave E indicators: HeikinAshi, ChandelierLevels, WilliamsAlligator, SuperTrend.
 
 Notes:
 - HeikinAshi, SuperTrend: numerical match against pandas-ta (bit-exact).
@@ -9,7 +9,7 @@ Notes:
   definition (pandas-ta uses close instead of median price and skips the
   forward offset). Behavioral audit: post-warmup non-NaN, meaningful number
   of bullish and bearish alignments.
-- ChandelierExit: not in pandas-ta. Behavioral audit: long_stop below
+- ChandelierLevels: not in pandas-ta. Behavioral audit: long_stop below
   rolling_highest_high, short_stop above rolling_lowest_low, both > 0.
 
 Signal verification: every signal runs bar-by-bar via sliding window and is
@@ -36,7 +36,7 @@ from audit.compare import (
 )
 from mangrove_kb.indicators import (
     HeikinAshi,
-    ChandelierExit,
+    ChandelierLevels,
     WilliamsAlligator,
     SuperTrend,
 )
@@ -96,8 +96,8 @@ def run_audit():
 def _audit_chandelier(high, low, close) -> AuditResult:
     """Behavioral: long_stop < rolling_high, short_stop > rolling_low."""
     params = {'window': 22, 'multiplier': 3.0}
-    out = ChandelierExit.compute({'high': high, 'low': low, 'close': close}, params)
-    ls, ss = out['long_stop'], out['short_stop']
+    out = ChandelierLevels.compute({'high': high, 'low': low, 'close': close}, params)
+    ls, ss = out['high_offset'], out['low_offset']
 
     rolling_high = high.rolling(22, min_periods=22).max()
     rolling_low = low.rolling(22, min_periods=22).min()
@@ -110,7 +110,7 @@ def _audit_chandelier(high, low, close) -> AuditResult:
 
     pass_fail = long_ok and short_ok and positive
     result = AuditResult(
-        indicator_name='ChandelierExit',
+        indicator_name='ChandelierLevels',
         category='Trend',
         reference_library='behavioral',
         tolerance_tier='BEHAVIORAL',
@@ -118,7 +118,7 @@ def _audit_chandelier(high, low, close) -> AuditResult:
         pass_fail=pass_fail,
         notes=f'long<rolling_high={long_ok}, short>rolling_low={short_ok}, positive={positive}, valid={int(valid.sum())}',
     )
-    for key, series in [('long_stop', ls), ('short_stop', ss)]:
+    for key, series in [('high_offset', ls), ('low_offset', ss)]:
         result.outputs[key] = OutputResult(
             output_key=key,
             max_abs_error=0.0,
@@ -180,14 +180,14 @@ def run_signal_audit():
     results.append(verify_signal('heikin_ashi_bullish', {}, df, truth_bull))
     results.append(verify_signal('heikin_ashi_bearish', {}, df, truth_bear))
 
-    # --- ChandelierExit signals
+    # --- ChandelierLevels signals
     ce_params = {'window': 22, 'multiplier': 3.0}
-    ce = ChandelierExit.compute({'high': high, 'low': low, 'close': close}, ce_params)
+    ce = ChandelierLevels.compute({'high': high, 'low': low, 'close': close}, ce_params)
     # Close below long_stop: stop hit if in long
-    truth_long_hit = (close < ce['long_stop']).fillna(False).to_numpy()
-    truth_short_hit = (close > ce['short_stop']).fillna(False).to_numpy()
-    results.append(verify_signal('chandelier_long_stop_hit', ce_params, df, truth_long_hit))
-    results.append(verify_signal('chandelier_short_stop_hit', ce_params, df, truth_short_hit))
+    truth_long_hit = (close < ce['high_offset']).fillna(False).to_numpy()
+    truth_short_hit = (close > ce['low_offset']).fillna(False).to_numpy()
+    results.append(verify_signal('cl_below_high_offset', ce_params, df, truth_long_hit))
+    results.append(verify_signal('cl_above_low_offset', ce_params, df, truth_short_hit))
 
     # --- WilliamsAlligator signals: three regime filters + one awakening trigger
     alg_params = {'jaw': 13, 'teeth': 8, 'lips': 5, 'jaw_offset': 8, 'teeth_offset': 5, 'lips_offset': 3}
@@ -227,7 +227,7 @@ def run_benchmark():
 
     return [
         bench_indicator('HeikinAshi', lambda: HeikinAshi.compute({'open': open_, 'high': high, 'low': low, 'close': close}, {}), bars, runs=20),
-        bench_indicator('ChandelierExit(22,3)', lambda: ChandelierExit.compute({'high': high, 'low': low, 'close': close}, {'window': 22, 'multiplier': 3.0}), bars),
+        bench_indicator('ChandelierLevels(22,3)', lambda: ChandelierLevels.compute({'high': high, 'low': low, 'close': close}, {'window': 22, 'multiplier': 3.0}), bars),
         bench_indicator('WilliamsAlligator', lambda: WilliamsAlligator.compute({'high': high, 'low': low}, {'jaw': 13, 'teeth': 8, 'lips': 5, 'jaw_offset': 8, 'teeth_offset': 5, 'lips_offset': 3}), bars),
         bench_indicator('SuperTrend(10,3)', lambda: SuperTrend.compute({'high': high, 'low': low, 'close': close}, {'window': 10, 'multiplier': 3.0}), bars, runs=20),
     ]

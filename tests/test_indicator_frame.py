@@ -16,9 +16,8 @@ from mangrove_kb.indicators.indicator_interface import IndicatorInterface
 
 # The 14 no-param indicators the audit harness flagged.
 NO_PARAM_INDICATORS = [
-    "ADI", "BOP", "CumulativeReturn", "DailyLogReturn", "DailyReturn",
-    "Engulfing", "Harami", "HeikinAshi", "InsideBar", "OBV", "OutsideBar",
-    "ThreeInsideDown", "ThreeInsideUp", "TrueRange",
+    "ADI", "BOP", "CandleGeometry", "CandleRelation", "CumulativeReturn",
+    "DailyLogReturn", "DailyReturn", "HeikinAshi", "OBV", "TrueRange",
 ]
 
 

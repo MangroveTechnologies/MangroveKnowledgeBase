@@ -17,6 +17,7 @@ Usage:
     pytest tests/test_signal_return_types.py -v
 """
 
+import inspect
 import json
 
 import numpy as np
@@ -76,6 +77,22 @@ def _native_type(value) -> bool:
     return isinstance(value, (bool, pd.Series))
 
 
+# Plausible values for the parameters that have no default, so that every signal can actually be
+# called. Without this the registry sweep below has to skip them, which silently left four
+# crossover signals covered by nothing at all.
+_REQUIRED_DEFAULTS = {
+    "window": 14, "window_fast": 10, "window_slow": 30, "window_signal": 9,
+    "threshold": 50.0, "multiplier": 3.0,
+}
+
+
+def _required_kwargs(fn) -> dict:
+    """Bind every parameter of `fn` that has no default, skipping the leading DataFrame arg."""
+    params = list(inspect.signature(fn).parameters.values())[1:]
+    return {p.name: _REQUIRED_DEFAULTS.get(p.name, 14)
+            for p in params if p.default is inspect.Parameter.empty}
+
+
 class TestToNativeHelper:
     def test_numpy_bool_becomes_native_bool(self):
         coerced = _to_native(np.bool_(True))
@@ -112,17 +129,32 @@ class TestEverySignalContract:
 
     def test_no_numpy_leakage_across_registry(self, df):
         offenders = []
+        checked = 0
         for name, fn in RuleRegistry._registry.items():
-            try:
-                value = fn(df)
-            except TypeError:
-                # Signals with required positional args (e.g. window_fast)
-                # can't be called with df alone; their return path is covered
-                # by the parametrized/evaluate tests instead.
-                continue
+            # Every signal is called, including those with required parameters. This used to
+            # `except TypeError: continue`, which skipped them -- and a blanket catch would also
+            # have swallowed a genuine TypeError raised inside a signal on valid data.
+            value = fn(df, **_required_kwargs(fn))
+            checked += 1
             if isinstance(value, np.generic) or not _native_type(value):
                 offenders.append((name, type(value).__name__))
         assert not offenders, f"signals leaking non-native return types: {offenders}"
+        # Guards the contract's reach: if a signal ever stops being callable, that is a failure
+        # rather than a silent gap in coverage.
+        assert checked == len(RuleRegistry._registry)
+
+    def test_every_signal_returns_a_plain_bool(self, df):
+        """The stated contract is `-> bool`, so nothing may return a Series or a numpy scalar."""
+        wrong = {name: type(fn(df, **_required_kwargs(fn))).__name__
+                 for name, fn in RuleRegistry._registry.items()
+                 if type(fn(df, **_required_kwargs(fn))) is not bool}
+        assert not wrong, f"signals not returning a native bool: {wrong}"
+
+    def test_declared_return_annotation_is_bool(self):
+        """A signal whose annotation drifts from `bool` is the first sign of the contract slipping."""
+        wrong = {name: ann for name, fn in RuleRegistry._registry.items()
+                 if (ann := inspect.signature(fn).return_annotation) not in (bool, "bool")}
+        assert not wrong, f"signals not annotated `-> bool`: {wrong}"
 
 
 class TestEvaluatePath:

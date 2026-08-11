@@ -11,7 +11,7 @@ from ..models import (
     SearchResponse, TagListResponse, GlossaryResponse, GlossaryEntry
 )
 from ..services import SearchEngine, CrossReferenceEngine, DocumentLoader
-from ..services.signal_service import SignalService
+from ..services.signal_service import SignalService, SIGNAL_CATEGORIES
 from ..services.indicator_service import IndicatorService
 from ..config import settings
 
@@ -322,7 +322,8 @@ def get_backlinks(
 
 @router.get("/signals")
 def list_signals(
-    category: Optional[str] = Query(None, description="Filter by category (Momentum, Trend, Volume, Volatility, Patterns)"),
+    category: Optional[str] = Query(
+        None, description=f"Filter by category ({', '.join(SIGNAL_CATEGORIES)})"),
     signal_type: Optional[str] = Query(None, description="Filter by type (TRIGGER or FILTER)"),
     signal_service: SignalService = Depends(get_signal_service)
 ):

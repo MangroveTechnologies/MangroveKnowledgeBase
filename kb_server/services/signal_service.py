@@ -8,19 +8,30 @@ import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
 from mangrove_kb.docstring_parser import parse_all_signals
-from mangrove_kb.signals import momentum, trend, volume, volatility, patterns, onchain, defi_pro
+from mangrove_kb.signals import (momentum, trend, volatility, pattern, oscillator,
+                                 averaging, flow, onchain, defi_pro)
 
+# Files reorganised onto the ontology class are named for that class; the rest keep their old
+# use-case names until they are reorganised too.
 _MODULE_CATEGORY = {
+    "oscillator": "Oscillator",
     "momentum": "Momentum",
-    "trend": "Trend",
-    "volume": "Volume",
+    "averaging": "Averaging",
     "volatility": "Volatility",
-    "patterns": "Patterns",
+    "flow": "Flow",
+    "pattern": "Pattern",
+    "trend": "Trend",
     "onchain": "On-Chain",
     "defi_pro": "DeFi Pro",
 }
 
-_SIGNAL_MODULES = [momentum, trend, volume, volatility, patterns, onchain, defi_pro]
+_SIGNAL_MODULES = [momentum, trend, volatility, pattern, oscillator, averaging, flow,
+                   onchain, defi_pro]
+
+# The API and MCP tool descriptions read this rather than repeating the list. They said
+# "Momentum, Trend, Volume, Volatility, Patterns" long after `Volume` stopped existing and
+# `Patterns` was never a value -- a caller filtering on either got an empty list and no hint why.
+SIGNAL_CATEGORIES = tuple(_MODULE_CATEGORY[m.__name__.rsplit(".", 1)[-1]] for m in _SIGNAL_MODULES)
 
 
 class SignalService:

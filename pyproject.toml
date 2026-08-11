@@ -7,16 +7,16 @@ name = "mangrove-kb"
 dynamic = ["version"]
 description = "Open-source trading signals and technical indicators library"
 readme = "PKG_README.md"
-license = {text = "MIT"}
+license = {text = "PolyForm-Noncommercial-1.0.0"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Mangrove Technologies", email = "team@mangrovetechnologies.ai"},
+    {name = "Mangrove Technologies", email = "support@mangrove.ai"},
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Financial and Insurance Industry",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -27,11 +27,29 @@ classifiers = [
 dependencies = [
     "numpy>=1.24.0",
     "pandas>=2.0.0",
+    # `SwingDelta` and the deprecated `Divergence` find swing points with
+    # `scipy.signal.argrelextrema`. Both catch the ImportError and return empty -- SwingDelta as NaN
+    # ("could not compute"), Divergence as all-False ("no divergence", a claim it has not earned).
+    # It was optional-and-undeclared, which meant `pip install mangrove-kb` shipped a ratified
+    # indicator that four signals read and that silently produced nothing.
+    "scipy>=1.11",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
+    # The audits compare our implementations against bukosabino `ta`. It used to be imported from a
+    # hardcoded checkout path, which pinned them to one machine; 0.11.0 is the version that checkout
+    # was, and it is the public PyPI release.
+    "ta>=0.11.0",
+    # The wave audits compare against pandas-ta as a second reference. It was never declared, so it
+    # worked only on machines that happened to have it -- which is how the audits could pass locally
+    # and fail on a clean install. Requires Python >= 3.12.
+    "pandas_ta>=0.4.71b0; python_version >= '3.12'",
+    # `tests/test_wheel_contents.py` imports setup.py to read the bundle list. Virtualenvs stopped
+    # shipping setuptools in 3.12, so that test passed on a machine with it and would have failed on
+    # a clean CI runner -- the build backend installs it in an isolated env, not this one.
+    "setuptools>=68",
     "pytest-cov>=4.0",
     "black>=23.0",
     "flake8>=6.0",
@@ -43,6 +61,18 @@ Repository = "https://github.com/MangroveTechnologies/MangroveKnowledgeBase"
 
 [tool.setuptools.packages.find]
 include = ["mangrove_kb*"]
+
+# Non-Python files INSIDE the package. Without this setuptools ships only `*.py`, and the viewer
+# dies on a wheel install -- `python -m mangrove_kb.viz` raised FileNotFoundError on its own logo
+# while every test passed, because the tests run from the source tree where the files are present.
+# The graph and the skills are bundled separately by the build_py hook in setup.py, because those
+# are copied in from OUTSIDE the package directory; these live inside it and only need declaring.
+[tool.setuptools.package-data]
+mangrove_kb = [
+    "viz/assets/*.svg",      # the Mangrove wordmark, light and dark
+    "viz/vendor/*.js",       # vendored 3d-force-graph -- the 3D view is dead without it
+    "viz/*.sql",             # store schema
+]
 
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
