@@ -141,3 +141,29 @@ def test_nothing_still_claims_the_repo_is_mit():
         if re.search(r"\bMIT[- ](?:licen[cs]ed|License)\b", path.read_text()):
             offenders.append(str(rel))
     assert not offenders, f"these still describe the repo as MIT: {offenders}"
+
+
+@pytest.mark.parametrize("doc", ["README.md", "PKG_README.md"])
+def test_every_image_exists(doc):
+    """A broken image renders as a broken icon on the page a reader lands on first.
+
+    `test_every_linked_path_exists` only sees markdown `](path)` links. The README's screenshots are
+    HTML `<img src=...>` -- in a `<p align="center">` block, because markdown has no way to centre or
+    float one -- so they were invisible to it.
+    """
+    text = (REPO / doc).read_text()
+    srcs = set(re.findall(r'<img\s[^>]*src="(?!https?:)([^"]+)"', text))
+    missing = sorted(s for s in srcs if not (REPO / s).exists())
+    assert not missing, f"{doc} shows images that do not exist: {missing}"
+
+
+def test_the_readme_shows_the_viewer():
+    """The graph is the reason this package is interesting, and it is a visual thing.
+
+    A reader deciding whether to `pip install` looks at the pictures. If the hero ever goes missing
+    the README still reads fine, which is why this is asserted rather than left to review.
+    """
+    text = (REPO / "README.md").read_text()
+    assert "assets/graph-viewer.png" in text, "the README must show the viewer"
+    for shot in ("viewer-facets", "viewer-search", "viewer-inspector", "viewer-3d"):
+        assert f"assets/{shot}.png" in text, f"the interface guide is missing {shot}"

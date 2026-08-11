@@ -77,10 +77,12 @@ def counts():
 #: (file, regex capturing ONE number, which count it must equal). The regex must be specific enough
 #: that it cannot drift onto a different sentence.
 CLAIMS = [
-    ("README.md",                      r"-- (\d+) nodes and [\d,]+ edges",  "nodes"),
-    ("README.md",                      r"-- [\d,]+ nodes and (\d+) edges",  "edges"),
-    ("README.md",                      r"\((\d+) nodes, [\d,]+ edges\)",    "nodes"),
-    ("README.md",                      r"\([\d,]+ nodes, (\d+) edges\)",    "edges"),
+    ("README.md",                      r"(\d+) nodes and [\d,]+ edges",     "nodes"),
+    ("README.md",                      r"[\d,]+ nodes and (\d+) edges",     "edges"),
+    # The shields.io badge states the size too, and is the first thing a reader sees. It was
+    # unguarded prose in an <img> URL, which is exactly where a stale number hides longest.
+    ("README.md",                      r"graph-(\d+)%20nodes",               "nodes"),
+    ("README.md",                      r"nodes%20%C2%B7%20(\d+)%20edges",    "edges"),
     ("CHANGELOG.md",                   r"-- (\d+) nodes, [\d,]+ edges, in", "nodes"),
     ("CHANGELOG.md",                   r"-- [\d,]+ nodes, (\d+) edges, in", "edges"),
     ("skills/knowledge-graph/SKILL.md", r"\*\*(\d+) nodes, [\d,]+ edges\*\*", "nodes"),
@@ -104,8 +106,10 @@ CLAIMS = [
     ("README.md",      r"functions\*\* \((\d+) TRIGGER",              "triggers"),
     ("README.md",      r"TRIGGER, (\d+) FILTER",                       "filters"),
     ("README.md",      r"\*\*(\d+) technical indicator classes\*\*", "indicator_classes"),
-    ("README.md",      r"Of (\d+) registered signals",                 "registered_signals"),
-    ("README.md",      r"registered signals, \*\*(\d+) are modelled",  "signals"),
+    ("README.md",      r"Of \*\*(\d+) registered signals\*\*",         "registered_signals"),
+    ("README.md",      r"\*\*(\d+) are modelled\*\*",                    "signals"),
+    ("README.md",      r"(\d+) of the [\d,]+ indicator\s*\n?classes",   "indicators"),
+    ("README.md",      r"[\d,]+ of the (\d+) indicator\s*\n?classes",   "indicator_classes"),
     ("PKG_README.md",  r"\*\*(\d+) trading signals\*\*",             "registered_signals"),
     ("PKG_README.md",  r"\*\*(\d+) technical indicators\*\*",        "indicator_classes"),
     # The PyPI front page stated 755 edges after the graph reached 1049, and nothing caught it:
