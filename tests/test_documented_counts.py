@@ -15,7 +15,6 @@ a table rather than a repo-wide regex:
   falsify the record. Only the ``[Unreleased]`` section describes the present.
 * ``audit_results/gap_analysis.md`` carries a ``Generated: <date>`` stamp -- it is a dated report.
 * ``docs/research/*`` states "graph at time of survey" for the same reason.
-* ``SESSION-SUMMARY.md`` is a record of a session, not a description of now.
 
 A generator was considered instead and rejected: these numbers sit inside prose sentences, so
 generating them needs either templating markers in every sentence (unreadable in source) or regex
@@ -93,8 +92,6 @@ CLAIMS = [
     ("mangrove_kb/graph.py",           r"\((\d+) of [\d,]+ nodes carry both\)", "signals"),
     ("mangrove_kb/graph.py",           r"\([\d,]+ of (\d+) nodes carry both\)", "nodes"),
     ("mangrove_kb/graph.py",           r"All (\d+) signals resolve this way", "signals"),
-    ("kb-next-steps.md",               r"(\d+) signals, [\d,]+ indicators",  "signals"),
-    ("kb-next-steps.md",               r"[\d,]+ signals, (\d+) indicators",  "indicators"),
     ("skills/knowledge-graph/GUIDE.md", r"nodes, edges  (\d+) [\d,]+",   "nodes"),
     ("skills/knowledge-graph/GUIDE.md", r"nodes, edges  [\d,]+ (\d+)",   "edges"),
     ("skills/knowledge-graph/GUIDE.md", r's\["edges"\]\s+# (\d+), [\d,]+', "nodes"),
@@ -120,7 +117,7 @@ CLAIMS = [
 
 #: Files whose numbers are historical and MUST NOT be "corrected". Listed so the exclusion is a
 #: decision on the record rather than an omission someone later mistakes for an oversight.
-HISTORICAL = ("audit_results/gap_analysis.md", "SESSION-SUMMARY.md",
+HISTORICAL = ("audit_results/gap_analysis.md",
               "docs/research/graph-query-api-and-mcp-surface.md")
 
 

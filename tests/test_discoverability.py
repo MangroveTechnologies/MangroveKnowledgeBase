@@ -129,8 +129,8 @@ def test_the_licence_is_stated_consistently_everywhere():
 
 
 def test_nothing_still_claims_the_repo_is_mit():
-    """Except SESSION-SUMMARY.md, which records what was true on the day it was written."""
-    dated = {"SESSION-SUMMARY.md", "CHANGELOG.md", "LICENSE"}
+    """Except the dated records: a changelog entry and the licence itself say when."""
+    dated = {"CHANGELOG.md", "LICENSE"}
     offenders = []
     for path in REPO.rglob("*"):
         if not path.is_file() or path.suffix not in {".md", ".toml", ".py", ".json"}:
@@ -167,3 +167,35 @@ def test_the_readme_shows_the_viewer():
     assert "assets/graph-viewer.png" in text, "the README must show the viewer"
     for shot in ("viewer-facets", "viewer-search", "viewer-inspector", "viewer-3d"):
         assert f"assets/{shot}.png" in text, f"the interface guide is missing {shot}"
+
+
+def test_the_readme_keeps_the_community_links():
+    """Discord, downloads, the ecosystem line and the star ask.
+
+    A README rewrite is a rewrite of the growth surface too, and these are easy to lose because they
+    are not *about* the software -- exactly what happened: a restructure dropped all four without
+    anyone asking for it, and it was caught by eye, not by a test.
+    """
+    text = (REPO / "README.md").read_text()
+    for token, what in (("discord.gg/xUcn4R6zJR", "the Discord invite"),
+                        ("pepy.tech/projects/mangrove-kb", "the downloads badge"),
+                        ("please star the repo", "the star ask"),
+                        ("github.com/MangroveTechnologies)", "the ecosystem link")):
+        assert token in text, f"the README lost {what}"
+
+
+def test_no_session_or_handoff_docs_are_committed():
+    """This repo keeps no summaries, handoffs or next-steps docs.
+
+    They are written to describe a moment and then read as if they describe now. The one that was
+    here opened with the words "Not committed. Working note only." -- and was committed.
+    """
+    banned = []
+    for path in REPO.rglob("*.md"):
+        rel = path.relative_to(REPO)
+        if ".git" in rel.parts or "build" in rel.parts or "node_modules" in rel.parts:
+            continue
+        name = rel.name.lower()
+        if any(w in name for w in ("session-summary", "handoff", "next-steps", "status")):
+            banned.append(str(rel))
+    assert not banned, f"summary/handoff docs must not be committed: {banned}"

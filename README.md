@@ -11,6 +11,11 @@
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
 
+<p align="center">
+  <a href="https://discord.gg/xUcn4R6zJR"><img src="https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white&style=for-the-badge" alt="Discord"></a>
+  <a href="https://pepy.tech/projects/mangrove-kb"><img src="https://static.pepy.tech/badge/mangrove-kb" alt="PyPI Downloads"></a>
+</p>
+
 **249 trading signal functions** (119 TRIGGER, 130 FILTER) and **80 technical indicator classes**,
 every one with a machine-readable docstring — formula, inputs, parameters with ranges and defaults,
 typed outputs with units, and warmup.
@@ -303,9 +308,17 @@ Releases published before this change remain under the MIT license they shipped 
 
 ## Contributing
 
+Mangrove is named after the mangrove tree — an ecosystem where everything is interconnected,
+resilient, and thriving. We think trading knowledge works the same way: the best strategies and the
+most reliable tools don't come from hoarding information behind paywalls, they come from a community
+that shares openly. **Every signal function, every indicator, and every document here exists because
+someone chose to share what they know.**
+
 Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). The best ones add a signal or
 indicator you actually use, improve the accuracy of an existing implementation, or fix something the
-graph gets wrong. Bugs and suggestions:
+graph gets wrong. Whether you're a quant who can improve an RSI calculation, a trader who spots a
+missing candlestick pattern, or a student adding to the knowledge base — it makes the whole thing
+stronger. Bugs and suggestions:
 [GitHub Issues](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues).
 
 Every signal carries its docstring contract — formula, requires, params with ranges, typed outputs.
@@ -314,4 +327,10 @@ on a half-authored one rather than emitting it.
 
 ## Links
 
-- [PyPI](https://pypi.org/project/mangrove-kb/) · [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) · [Mangrove](https://mangrove.ai)
+Part of the [Mangrove](https://github.com/MangroveTechnologies) ecosystem. Questions, ideas, or want
+to contribute? [**Join us on Discord**](https://discord.gg/xUcn4R6zJR).
+
+**If you find this useful, please star the repo** — it helps others discover it and keeps the project
+growing.
+
+- [PyPI](https://pypi.org/project/mangrove-kb/) · [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) · [Docs](https://mangrove.io/docs) · [Mangrove](https://mangrove.ai)
