@@ -199,3 +199,61 @@ def test_no_session_or_handoff_docs_are_committed():
         if any(w in name for w in ("session-summary", "handoff", "next-steps", "status")):
             banned.append(str(rel))
     assert not banned, f"summary/handoff docs must not be committed: {banned}"
+
+
+def _github_slug(text: str) -> str:
+    """GitHub's heading anchor: lowercase, drop punctuation, spaces to hyphens.
+
+    `&` and `—` are dropped rather than replaced, so "Skill & graph tools" becomes
+    `skill--graph-tools` -- two hyphens, from the two spaces the ampersand left behind. Guessing
+    that rule is exactly how a table of contents ends up with links that scroll nowhere.
+    """
+    return re.sub(r"[^\w\- ]", "", text.strip().lower()).replace(" ", "-")
+
+
+def _headings(text: str) -> list[tuple[int, str]]:
+    """`##`/`###` headings, ignoring anything inside a fenced code block."""
+    out, fence = [], False
+    for line in text.splitlines():
+        if line.startswith("```"):
+            fence = not fence
+        elif not fence:
+            m = re.match(r"^(#{2,3}) (.+)$", line)
+            if m:
+                out.append((len(m.group(1)), m.group(2).strip()))
+    return out
+
+
+def test_the_readme_has_a_table_of_contents_that_links_every_section():
+    """A TOC is only worth having if its links land. Anchors are derived, never hand-typed."""
+    text = (REPO / "README.md").read_text()
+    assert "## Contents" in text, "the README has no table of contents"
+
+    heads = _headings(text)
+    valid = {_github_slug(t) for _, t in heads}
+
+    # EVERY in-page anchor, not just the list items. The hero caption links `#the-viewer` too, and
+    # scoping this to the table of contents left that one unguarded -- found by breaking it and
+    # watching the test stay green.
+    all_anchors = set(re.findall(r"\]\(#([^)]+)\)", text))
+    dangling = sorted(all_anchors - valid)
+    assert not dangling, f"in-page links that match no heading: {dangling}"
+
+    linked = set(re.findall(r"^\s*- \[[^\]]+\]\(#([^)]+)\)", text, re.M))
+
+    top = {t for lvl, t in heads if lvl == 2 and t != "Contents"}
+    missing = sorted(t for t in top if _github_slug(t) not in linked)
+    assert not missing, f"sections missing from the table of contents: {missing}"
+
+
+def test_the_skill_and_tools_have_their_own_section():
+    """The query surface and the two agent documents are the point of the package, and they were
+    a single sentence inside Install."""
+    text = (REPO / "README.md").read_text()
+    assert "## Skill & graph tools" in text
+    section = text.split("## Skill & graph tools", 1)[1].split("\n## ", 1)[0]
+    for call in ("stats()", "schema()", "find(", "get(id)", "outputs(", "neighbors(",
+                 "subgraph(", "path(a, b)", "all_paths(a, b)"):
+        assert call in section, f"the tools section does not mention {call}"
+    for doc in ("SKILL.md", "GUIDE.md"):
+        assert doc in section, f"the tools section does not link {doc}"

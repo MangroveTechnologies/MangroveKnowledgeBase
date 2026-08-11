@@ -34,8 +34,32 @@ about the code as it is.
 *The bundled viewer (`python -m mangrove_kb.viz`): click any node to read what it computes and walk
 its edges. [Interface guide below](#the-viewer).*
 
----
+## Contents
 
+- [Install](#install)
+- [Quick start](#quick-start)
+  - [1 · Ask the graph before you read the source](#1--ask-the-graph-before-you-read-the-source)
+  - [2 · Work out what a change breaks](#2--work-out-what-a-change-breaks)
+  - [3 · Ask about the values, not the nodes](#3--ask-about-the-values-not-the-nodes)
+  - [4 · Explain an answer](#4--explain-an-answer)
+  - [5 · Run what you found](#5--run-what-you-found)
+  - [6 · View it in a browser](#6--view-it-in-a-browser)
+- [Skill & graph tools](#skill--graph-tools)
+  - [The tools](#the-tools)
+- [The model in 30 seconds](#the-model-in-30-seconds)
+- [The viewer](#the-viewer)
+  - [The rail — two-level filters](#the-rail--two-level-filters)
+  - [Search — ranked, and it tells you why](#search--ranked-and-it-tells-you-why)
+  - [The inspector — what a node actually carries](#the-inspector--what-a-node-actually-carries)
+  - [2D, 3D, and collapse](#2d-3d-and-collapse)
+- [What is in the graph, and what is not](#what-is-in-the-graph-and-what-is-not)
+- [Repository structure](#repository-structure)
+- [Development](#development)
+- [License](#license)
+- [Contributing](#contributing)
+- [Links](#links)
+
+---
 ## Install
 
 ```bash
@@ -44,10 +68,6 @@ pip install mangrove-kb
 
 Python 3.10+; `numpy` and `pandas` are the only runtime dependencies. The graph, the agent skill and
 the viewer all ship **inside the wheel** — there is nothing else to fetch.
-
-For agents: [`skills/knowledge-graph/SKILL.md`](skills/knowledge-graph/SKILL.md) is the reference for
-*which call*, and [`GUIDE.md`](skills/knowledge-graph/GUIDE.md) beside it walks thirteen whole tasks
-end to end with real output and the trap in each.
 
 ---
 
@@ -116,6 +136,47 @@ python -m mangrove_kb.viz > graph.html
 ```
 
 One self-contained file — no CDN, no build step, no network.
+
+---
+
+## Skill & graph tools
+
+Two documents ship **inside the wheel**, so an agent that installs the package has them without
+fetching anything:
+
+| | what it is |
+|---|---|
+| [`SKILL.md`](skills/knowledge-graph/SKILL.md) | the reference for **which call** — the two axes, the rules of use, and a question→call table |
+| [`GUIDE.md`](skills/knowledge-graph/GUIDE.md) | the reference for **what a whole job looks like** — thirteen tasks end to end, with real output and the trap in each |
+
+Both are executable documentation: every example in them is re-run by the test suite against the
+committed graph, so an example that drifts fails the build rather than misleading a reader.
+
+### The tools
+
+`mangrove_kb.graph.KnowledgeGraph` is the whole query surface — eight calls:
+
+| question | call |
+|---|---|
+| what is in here at all? | `stats()` — **always first**; returns every value the other calls accept as a filter |
+| what shapes can I even ask for? | `schema()` — the 12 `(subject, relation, object)` triples that actually occur |
+| the user gave me a name, not an id | `resolve("rsi_oversold")`, or `get()`, which resolves too |
+| is there already a signal for X? | `find("keyword")` — ranked by *where* it matched |
+| everything of a class, or in a role, or both | `find(kind=…, role=…)` |
+| what needs volume? what is retired? | `find(requires=…)`, `find(status=…)` |
+| what does this compute — formula, params, outputs? | `get(id)` |
+| which values are bounded / in these units? | `outputs(bounded=True, units=…)` |
+| what produces an output called X? | `outputs("X")` |
+| what reads this indicator? what does this read? | `neighbors(id, relation="uses", direction="in"\|"out")` |
+| the neighbourhood around something | `subgraph(id, radius=1)` |
+| how are these two related? | `path(a, b)` — one shortest route |
+| every way they connect, and why | `all_paths(a, b)` — all routes, shortest first |
+| now actually run what I found | `RuleRegistry.evaluate({"name": node["name"], …}, df)` |
+
+**Every bounded return states its own truncation.** A `Result` carries `total`, `truncated` and a
+`note` — a short list is never mistakable for a complete one, and `limit=None` gets everything.
+Filters that take a vocabulary raise and name the legal values rather than returning an empty result
+you would read as *"there are none"*.
 
 ---
 
