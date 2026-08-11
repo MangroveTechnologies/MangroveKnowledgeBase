@@ -8,10 +8,11 @@ pip install mangrove-kb
 
 ## What You Get
 
-- **223 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
-- **99 technical indicators** -- stateless `compute()` API returning named Series
+- **249 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
+- **80 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
+- **A knowledge graph of the library itself** -- 303 nodes, 1049 edges, queryable, shipped in the package
 
 Dependencies: numpy, pandas. That's it.
 
@@ -26,12 +27,12 @@ from mangrove_kb import sample_ohlcv
 df = sample_ohlcv()  # self-contained sample data; or pd.read_csv("your_ohlcv_data.csv")
 
 # RSI
-result = RSI.compute(data={"close": df["Close"]}, params={"window": 14})
+result = RSI.compute(data={"close": df["close"]}, params={"window": 14})
 rsi = result["rsi"]  # pd.Series
 
 # MACD
 result = MACD.compute(
-    data={"close": df["Close"]},
+    data={"close": df["close"]},
     params={"window_fast": 12, "window_slow": 26, "window_sign": 9},
 )
 macd_line = result["macd"]
@@ -40,7 +41,7 @@ histogram = result["histogram"]
 
 # Bollinger Bands
 result = BollingerBands.compute(
-    data={"close": df["Close"]},
+    data={"close": df["close"]},
     params={"window": 20, "window_dev": 2},
 )
 upper, middle, lower = result["hband"], result["mavg"], result["lband"]
@@ -119,7 +120,7 @@ metadata = parse_all_signals([momentum, trend, volume, volatility, patterns])
 # Example: inspect rsi_oversold
 sig = metadata["rsi_oversold"]
 print(sig["type"])        # "FILTER"
-print(sig["requires"])    # ["Close"]
+print(sig["requires"])    # ["close"]
 print(sig["params"])      # {"window": {"type": "int", "min": 2, "max": 100, "default": 14}, ...}
 ```
 
@@ -132,29 +133,66 @@ from mangrove_kb.indicators import Hammer, BullishEngulfing, MorningStar, NR7
 
 # Hammer detection (returns 1 where detected, 0 otherwise)
 result = Hammer.compute(
-    data={"open": df["Open"], "high": df["High"], "low": df["Low"], "close": df["Close"]},
+    data={"open": df["open"], "high": df["high"], "low": df["low"], "close": df["close"]},
     params={"wick_ratio": 2.0, "upper_wick_max": 0.1},
 )
 hammers = result["hammer"]  # pd.Series of 0/1
 
 # NR7 (Narrowest Range of 7 bars)
 result = NR7.compute(
-    data={"high": df["High"], "low": df["Low"]},
+    data={"high": df["high"], "low": df["low"]},
     params={"window": 7},
 )
 nr7_bars = result["nr7"]
 ```
 
+## Ask the library about itself
+
+`mangrove-kb` ships a knowledge graph of its own contents -- what each indicator computes, what it
+consumes and produces, which signals read which of its outputs, and what part each signal plays in a
+strategy. It is generated from the source, so it is exact: no ranking model, no text extraction.
+
+```python
+from mangrove_kb.graph import KnowledgeGraph
+
+kg = KnowledgeGraph.load()          # no download, no config -- it is in the package
+kg.stats()                          # counts + the full vocabulary every filter accepts
+
+kg.find("divergence")                                # is there already a signal for this?
+kg.find(kind="momentum", role="trigger")             # by what it is AND how it is used
+kg.find(requires="volume", status="deprecated")      # by what it needs and whether it is current
+kg.get("procedure:indicator-rsi")["outputs"]         # typed outputs, with units and range
+kg.outputs(bounded=True, kind="oscillator")          # every value you could put on one axis
+kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # what would break
+kg.path("procedure:signal-adosc-bearish", "concept:momentum")   # why is it classed so
+```
+
+**Read these two before using it** -- they are installed alongside the package at
+`mangrove_kb/skills/knowledge-graph/`, and readable here:
+
+- **[SKILL.md](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/skills/knowledge-graph/SKILL.md)** -- which call answers which question, and
+  the rules of use (results are capped and say so; roles are never types)
+- **[GUIDE.md](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/skills/knowledge-graph/GUIDE.md)** -- thirteen worked tasks end to end, with real
+  output and the trap in each
+
+If you are an agent, load `SKILL.md` -- it is written for you.
+
 ## Data Format
 
-All functions expect a pandas DataFrame with capitalized OHLCV columns:
+All functions expect a pandas DataFrame with lowercase OHLCV columns:
 
 ```
-Timestamp  Open      High      Low       Close     Volume
+Timestamp  open      high      low       close     volume
 2024-01-01 42000.0   42500.0   41800.0   42300.0   15000.0
 ```
 
-Required columns depend on the signal/indicator (check `Requires:` in docstrings or metadata).
+Capitalized columns are accepted too -- signals normalize OHLCV column case at the
+registry boundary -- but lowercase is the canonical form, the one `sample_ohlcv()`
+produces and the one the knowledge graph publishes for every node.
+
+Required columns depend on the signal/indicator: ask the graph
+(`kg.get(id)["inputs"]`, or `kg.find(requires="volume")`), or read `Requires:` in the
+docstring.
 
 ## Part of the Mangrove Ecosystem
 
@@ -171,4 +209,8 @@ This package is part of [MangroveKnowledgeBase](https://github.com/MangroveTechn
 
 ## License
 
-[MIT](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/LICENSE) -- Use it freely. Cite it proudly. Contribute back when you can.
+Free for noncommercial use under the [PolyForm Noncommercial License 1.0.0](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/LICENSE) -- personal study, hobby projects, research, teaching, and use by charitable, educational, public-research and government organizations.
+
+**Commercial use requires a paid license.** Using mangrove-kb in a product or service you sell, or internally in a for-profit business, needs one -- contact **support@mangrove.ai**.
+
+Releases published before this change remain under the MIT license they shipped with.

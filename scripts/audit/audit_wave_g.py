@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Audit Wave G signal patterns (MARibbon, TTMSqueeze, Divergence, MultiTFTrend).
+"""Audit Wave G signal patterns (MA Ribbon, TTMSqueeze, Divergence, MultiTFTrend).
 
 These are composite indicators with no single pandas-ta counterpart. Audit
 strategy is behavioral + bar-by-bar signal verification against ground
 truth built from the verified indicator outputs.
 
 Notes:
-- MARibbon: behavioral: bullish + bearish + tangled are mutually exclusive
+- MA Ribbon: behavioral: bullish + bearish + tangled are mutually exclusive
   and cover all post-warmup bars. Signals verified bar-by-bar.
 - TTMSqueeze: behavioral: squeeze_on obeys the BB-inside-KC definition;
   squeeze_fired is strictly {was_on} & {~is_on}. Signal verification.
@@ -33,7 +33,7 @@ from audit.compare import (
     OutputResult,
 )
 from mangrove_kb.indicators import (
-    MARibbon, MultiTFTrend, Divergence, TTMSqueeze, RSI,
+    SMA, MultiTFTrend, Divergence, TTMSqueeze, RSI,
 )
 
 
@@ -46,18 +46,39 @@ def _load_btc_with_datetime_index():
     return df2
 
 
+def _ribbon_flags(close, windows):
+    """Independent ground truth for the MA-ribbon alignment, built from SMA alone.
+
+    Bullish is strict fastest-above-slowest -- the SMAs read shortest window to longest are strictly
+    decreasing. Bearish is the strict opposite. Tangled is neither. Bars where any SMA is still in
+    warmup are none of the three.
+    """
+    mas = np.column_stack([
+        SMA.compute({'close': close}, {'window': w})['sma'].to_numpy(dtype=float) for w in windows
+    ])
+    diffs = np.diff(mas, axis=1)
+    defined = ~np.any(np.isnan(diffs), axis=1)
+    bull = np.all(diffs < 0, axis=1) & defined
+    bear = np.all(diffs > 0, axis=1) & defined
+    tangled = ~bull & ~bear & defined
+    idx = close.index
+    return pd.Series(bull, index=idx), pd.Series(bear, index=idx), pd.Series(tangled, index=idx)
+
+
 def run_audit():
     df = _load_btc_with_datetime_index()
     high, low, close = df['high'], df['low'], df['close']
 
     results = []
 
-    # MARibbon: regime flags are mutually exclusive; sum == 1 on every
-    # post-warmup bar.
-    ribbon = MARibbon.compute({'close': close}, {'windows': [5, 8, 13, 21, 34, 55, 89, 144]})
-    bull = ribbon['ribbon_bullish']
-    bear = ribbon['ribbon_bearish']
-    tangled = ribbon['ribbon_tangled']
+    # MA Ribbon: regime flags are mutually exclusive; sum == 1 on every post-warmup bar.
+    #
+    # Reconstructed from SMA here rather than read back off an indicator. The `MARibbon` class was
+    # removed -- all three of its outputs were boolean, so it was a signal, not an indicator -- and
+    # the alignment test now lives in the three `ma_ribbon_*` signals. An independent reconstruction
+    # is the stronger audit regardless: reading the implementation's own output back and asserting
+    # it agrees with itself proves nothing.
+    bull, bear, tangled = _ribbon_flags(close, [5, 8, 13, 21, 34, 55, 89, 144])
     sum_flags = bull.astype(int) + bear.astype(int) + tangled.astype(int)
     warmup = 200
     post_warmup = sum_flags.iloc[warmup:]
@@ -65,7 +86,7 @@ def run_audit():
     bull_fires = int(bull.sum())
     bear_fires = int(bear.sum())
     result = AuditResult(
-        indicator_name='MARibbon',
+        indicator_name='MA Ribbon (signals)',
         category='Trend',
         reference_library='behavioral',
         tolerance_tier='BEHAVIORAL',
@@ -150,12 +171,12 @@ def run_signal_audit():
 
     results = []
 
-    # --- MARibbon signals ---
+    # --- MA Ribbon signals ---
     ribbon_params = {'windows': (5, 8, 13, 21, 34, 55, 89, 144)}
-    ribbon = MARibbon.compute({'close': close}, {'windows': list(ribbon_params['windows'])})
-    results.append(verify_signal('ma_ribbon_bullish', ribbon_params, df, ribbon['ribbon_bullish'].to_numpy(dtype=bool)))
-    results.append(verify_signal('ma_ribbon_bearish', ribbon_params, df, ribbon['ribbon_bearish'].to_numpy(dtype=bool)))
-    results.append(verify_signal('ma_ribbon_tangled', ribbon_params, df, ribbon['ribbon_tangled'].to_numpy(dtype=bool)))
+    r_bull, r_bear, r_tangled = _ribbon_flags(close, list(ribbon_params['windows']))
+    results.append(verify_signal('ma_ribbon_bullish', ribbon_params, df, r_bull.to_numpy(dtype=bool)))
+    results.append(verify_signal('ma_ribbon_bearish', ribbon_params, df, r_bear.to_numpy(dtype=bool)))
+    results.append(verify_signal('ma_ribbon_tangled', ribbon_params, df, r_tangled.to_numpy(dtype=bool)))
 
     # --- TTMSqueeze signals ---
     ttm_params = dict(bb_window=20, bb_std=2.0, kc_window=20, kc_atr_mult=1.5, mom_window=12)
@@ -194,8 +215,6 @@ def run_benchmark():
     rsi = RSI.compute({'close': close}, {'window': 14})['rsi']
 
     return [
-        bench_indicator('MARibbon(8 fib)',
-                        lambda: MARibbon.compute({'close': close}, {'windows': [5, 8, 13, 21, 34, 55, 89, 144]}), bars),
         bench_indicator('TTMSqueeze',
                         lambda: TTMSqueeze.compute({'high': high, 'low': low, 'close': close},
                                                     {'bb_window': 20, 'bb_std': 2.0, 'kc_window': 20, 'kc_atr_mult': 1.5, 'mom_window': 12}), bars),

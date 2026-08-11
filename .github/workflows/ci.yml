@@ -31,3 +31,28 @@ jobs:
 
       - name: Run tests
         run: pytest tests/ -v
+
+  # The audits are the other half of the guarantee, and until now nothing ran them: they were
+  # hand-run scripts, so in practice they ran when someone remembered. They check our indicator
+  # implementations against a reference library, and the runner also executes the ontology build --
+  # which is where nine abort-invariants live that only fire when it actually builds.
+  #
+  # One Python, not the matrix: it is the same code being audited three times otherwise, and this
+  # takes ~2 minutes. `--quick` leaves out the symbolic formula verifier, which runs in minutes and
+  # is named in the run's own summary rather than silently dropped.
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run every audit and the ontology build
+        run: python scripts/audit/run_all.py --quick

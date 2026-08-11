@@ -239,7 +239,8 @@ def create_mcp_server(
         """List available trading signals with optional filtering.
 
         Args:
-            category: Filter by category (Momentum, Trend, Volume, Volatility, Patterns).
+            category: Filter by category (Oscillator, Momentum, Averaging,
+                Volatility, Pattern, Trend, Flow, On-Chain, DeFi Pro).
             signal_type: Filter by type (TRIGGER or FILTER).
 
         Returns:

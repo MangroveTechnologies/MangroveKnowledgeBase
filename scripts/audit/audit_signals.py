@@ -1,4 +1,4 @@
-"""Signal audit: smoke test all 223 signals, crossover accuracy, FILTER code review.
+"""Signal audit: smoke test every registered signal, crossover accuracy, FILTER code review.
 
 Run:
     cd MangroveKnowledgeBase
@@ -166,7 +166,9 @@ def _crossover_accuracy(
 
 def test_rsi_crossovers(df: pd.DataFrame) -> list[dict]:
     """Test RSI cross_up and cross_down against ground truth."""
-    from mangrove_kb.signals.momentum import rsi_cross_up, rsi_cross_down
+    # RSI signals are `oscillator`: bounded output where absolute thresholds mean
+    # something. They moved out of momentum.py when the files were named for the class.
+    from mangrove_kb.signals.oscillator import rsi_cross_up, rsi_cross_down
 
     rsi_result = RSI.compute(data={"close": df["Close"]}, params={"window": 14})
     rsi_series = rsi_result["rsi"]

@@ -1,0 +1,934 @@
+#!/usr/bin/env python3
+"""Verify every authored `formula` in the ontology graph against the signal it describes.
+
+    PYTHONPATH=. python3 scripts/audit/verify_signal_formulas.py            # every class
+    PYTHONPATH=. python3 scripts/audit/verify_signal_formulas.py volatility # one source module
+
+A signal node's `formula` claims what the signal computes. This transcribes each claim back into
+code and replays it against the registered signal bar-for-bar, so a formula that drifts from the
+implementation fails here rather than misleading a reader of the graph.
+
+WHY THIS FILE EXISTS. The first three authoring passes each got their own throwaway script, and each
+one repeated a fresh mistake -- wrong detector call shapes, parameters the signal does not expose,
+warmup offsets, degenerate fixtures. This is the one harness. A new class adds a SPEC entry; it does
+not add a script.
+
+TWO RULES IT ENFORCES, both learned the hard way:
+
+  1. The REAL fixture first. `load_btc_daily()` is 1,294 bars of actual BTC daily data, and every
+     formula is checked against it. Synthetic series are a supplement for setups the real trace does
+     not contain -- never a substitute, and the report always says which was used.
+  2. A signal that never fires verifies nothing. If it is False on every bar, so is the formula, and
+     they agree for a reason unrelated to correctness. Anything that does not fire on the real
+     fixture is re-run against a constructed series built to force it, and reported separately.
+
+A signal that fires on NEITHER is a finding, not a gap in the test. Two causes, opposite responses:
+the setup does not occur in this market (fine -- `natr_low_volatility` needs NATR below 1.0 and
+BTC's daily range is 1.72-6.67), or the signal CANNOT fire in this market (a defect --
+`piercing_line_trigger` defaulted to requiring a gap, and a 24/7 market never gaps).
+"""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import numpy as np
+import pandas as pd
+
+import mangrove_kb
+
+if "site-packages" in mangrove_kb.__file__:  # pragma: no cover - guardrail
+    raise SystemExit(
+        f"ABORT: mangrove_kb resolved to {mangrove_kb.__file__}\n"
+        "Run with PYTHONPATH=<repo root>. Python puts the SCRIPT's directory on sys.path[0], not "
+        "the working directory, so this imports the installed copy otherwise -- a different, older "
+        "API that silently verifies the wrong code."
+    )
+
+import mangrove_kb.signals  # noqa: E402,F401  -- registers every signal
+import mangrove_kb.signals.pattern as P  # noqa: E402
+import mangrove_kb.signals.volatility as VOL  # noqa: E402
+from audit import load_btc_daily  # noqa: E402
+from mangrove_kb.registry import RuleRegistry  # noqa: E402
+
+
+# =============================================================================
+# Fixtures
+# =============================================================================
+
+import json as _json  # noqa: E402
+
+_NODES = {a["title"]: a for a in _json.loads(
+    (Path(__file__).resolve().parents[2] / "ontology" / "signal-indicator-ontology.json").read_text()
+)["atoms"]}
+
+
+def real_fixture() -> pd.DataFrame:
+    """The 1,294-bar BTC daily trace. The primary evidence for every formula.
+
+    Indexed by its own timestamps. The loader parses them and then resets to a RangeIndex, which
+    silently disqualifies every time-aware signal: `multi_tf_trend_bullish` resamples to a higher
+    timeframe and returns False outright unless the index is a DatetimeIndex, so it could never fire
+    on the real trace and would have been verified against synthetic bars instead. Signals address
+    bars positionally, so carrying the real dates changes nothing else.
+    """
+    df = load_btc_daily()
+    out = df[["Open", "High", "Low", "Close", "Volume"]].copy()
+    out.index = pd.DatetimeIndex(df["timestamp"])
+    return out
+
+
+def synthetic_fixture(n: int = 600, seed: int = 71) -> pd.DataFrame:
+    """A constructed series for setups the real trace does not contain.
+
+    Drift alternates four times so oscillators traverse both extremes, volatility contracts so
+    band-width thresholds are crossed, and a sustained drawdown lets drawdown-depth measures reach
+    their high-risk levels. `open` carries its own noise rather than being the previous close: an
+    open exactly equal to the prior close makes every strict `<` comparison against it unfirable.
+    """
+    idx = pd.date_range("2024-01-01", periods=n, freq="h")
+    rs = np.random.RandomState(seed)
+    q = n // 4
+    drift = np.concatenate([np.full(q, 0.35), np.full(q, -0.9),
+                            np.full(q, 0.5), np.full(n - 3 * q, -0.2)])
+    vol = np.concatenate([np.full(q, 2.2), np.linspace(2.2, 0.15, q),
+                          np.full(q, 0.15), np.full(n - 3 * q, 1.0)])
+    c = pd.Series(100 + np.cumsum(rs.normal(0, 1, n) * vol + drift), index=idx)
+    o = c.shift(1).bfill() + rs.normal(0, 0.4, n)
+    hi = np.maximum(o, c) + np.abs(rs.normal(0, 1, n) * vol)
+    lo = np.minimum(o, c) - np.abs(rs.normal(0, 1, n) * vol)
+    return pd.DataFrame({"Open": o, "High": hi, "Low": lo, "Close": c,
+                         "Volume": pd.Series(rs.randint(1000, 9000, n).astype(float), index=idx)},
+                        index=idx)
+
+
+def gapless_fixture(n: int = 400, seed: int = 17) -> pd.DataFrame:
+    """A 24/7 market: the open never escapes the prior bar's range, so no bar ever gaps.
+
+    Near the prior close, not equal to it -- an identical open cannot satisfy a strict inequality
+    against it either, which makes the fixture degenerate rather than merely gapless.
+    """
+    idx = pd.date_range("2024-01-01", periods=n, freq="h")
+    rs = np.random.RandomState(seed)
+    c = pd.Series(100 + rs.normal(0, 1.5, n).cumsum(), index=idx)
+    o = c.shift(1).bfill() + rs.normal(0, 0.25, n)
+    hi = np.maximum(o, c) + np.abs(rs.normal(0, 0.6, n))
+    lo = np.minimum(o, c) - np.abs(rs.normal(0, 0.6, n))
+    df = pd.DataFrame({"Open": o, "High": hi, "Low": lo, "Close": c, "Volume": 1000.0}, index=idx)
+    df["Open"] = df["Open"].clip(lower=df["Low"].shift(1), upper=df["High"].shift(1)).fillna(df["Open"])
+    return df
+
+
+# =============================================================================
+# Predicate builders -- the shapes that recur across every class
+# =============================================================================
+
+def defined(*vals) -> bool:
+    return all(not pd.isna(v) for v in vals)
+
+
+def above(series, thr):
+    return lambda t: defined(series.iloc[t]) and series.iloc[t] > thr
+
+
+def below(series, thr):
+    return lambda t: defined(series.iloc[t]) and series.iloc[t] < thr
+
+
+def at_least(series, thr):
+    return lambda t: defined(series.iloc[t]) and series.iloc[t] >= thr
+
+
+def at_most(series, thr):
+    return lambda t: defined(series.iloc[t]) and series.iloc[t] <= thr
+
+
+def crosses_up(series, thr=0.0):
+    return lambda t: (defined(series.iloc[t - 1], series.iloc[t])
+                      and series.iloc[t - 1] <= thr < series.iloc[t])
+
+
+def crosses_down(series, thr=0.0):
+    return lambda t: (defined(series.iloc[t - 1], series.iloc[t])
+                      and series.iloc[t - 1] >= thr > series.iloc[t])
+
+
+def crosses_above(series, band):
+    """`series` crosses above `band`, both moving. Distinct from a fixed threshold."""
+    return lambda t: (defined(series.iloc[t - 1], series.iloc[t], band.iloc[t - 1], band.iloc[t])
+                      and series.iloc[t - 1] <= band.iloc[t - 1] and series.iloc[t] > band.iloc[t])
+
+
+def crosses_below(series, band):
+    return lambda t: (defined(series.iloc[t - 1], series.iloc[t], band.iloc[t - 1], band.iloc[t])
+                      and series.iloc[t - 1] >= band.iloc[t - 1] and series.iloc[t] < band.iloc[t])
+
+
+def not_below(series, band):
+    """`series >= band`, both moving. Distinct from `outside_above`, which is strict.
+
+    The volatility-envelope signals test `>=` and `<=`, and a strict builder disagrees on any bar
+    where close lands exactly on the band. Rare, but it is the difference between transcribing the
+    predicate and approximating it.
+    """
+    return lambda t: defined(series.iloc[t], band.iloc[t]) and series.iloc[t] >= band.iloc[t]
+
+
+def not_above(series, band):
+    return lambda t: defined(series.iloc[t], band.iloc[t]) and series.iloc[t] <= band.iloc[t]
+
+
+def outside_above(series, band):
+    """A STATE: true for every bar `series` sits above `band`, not only the crossing bar."""
+    return lambda t: defined(series.iloc[t], band.iloc[t]) and series.iloc[t] > band.iloc[t]
+
+
+def outside_below(series, band):
+    return lambda t: defined(series.iloc[t], band.iloc[t]) and series.iloc[t] < band.iloc[t]
+
+
+def equals(series, value):
+    """A detector emitting -1 / 0 / +1, where the sign carries the direction."""
+    return lambda t: bool(series.iloc[t] == value)
+
+
+def nonzero(series):
+    return lambda t: bool(series.iloc[t] != 0)
+
+
+def fired_within(series_list, window):
+    """Any of `series_list` non-zero on any bar in [t-window+1 .. t]."""
+    return lambda t: any(bool((s.iloc[max(0, t - window + 1):t + 1] != 0).any())
+                         for s in series_list)
+
+
+def detector(fn, O, H, L, C, **kw):
+    """Call a private pattern detector.
+
+    The call shape IS uniform now. The three-inside detectors used to take (open, close) only,
+    being pure body comparisons -- but that made them the only detectors reading raw series rather
+    than an indicator, and so the only pattern signals with no indicator behind them in the graph.
+    They take the whole bar and read it back out of CandleRaw, like the rest.
+    """
+    return fn(O, H, L, C, **kw)
+
+
+# =============================================================================
+# Result reporting
+# =============================================================================
+
+class Result:
+    __slots__ = ("name", "module", "real_fires", "real_mismatch",
+                 "alt_fires", "alt_mismatch", "alt_kind", "error")
+
+    def __init__(self, name, module):
+        self.name, self.module = name, module
+        self.real_fires = self.real_mismatch = 0
+        self.alt_fires = self.alt_mismatch = None
+        self.alt_kind = self.error = None
+
+    @property
+    def verified(self):
+        if self.error:
+            return False
+        if self.real_mismatch or (self.alt_mismatch or 0):
+            return False
+        return self.real_fires > 0 or (self.alt_fires or 0) > 0
+
+    @property
+    def status(self):
+        if self.error:
+            return "ERROR"
+        if self.real_mismatch or (self.alt_mismatch or 0):
+            return "MISMATCH"
+        if self.real_fires:
+            return "ok (real)"
+        if self.alt_fires:
+            return f"ok ({self.alt_kind})"
+        return "NEVER FIRES"
+
+
+def replay(name, params, predicate, df, start):
+    """Compare the signal against the predicate over `df`. Returns (fires, mismatches)."""
+    fires = mismatches = 0
+    for t in range(start, len(df)):
+        got = bool(RuleRegistry.evaluate({"name": name, "params": params}, df.iloc[:t + 1]))
+        try:
+            want = bool(predicate(t))
+        except Exception:
+            want = False
+        fires += got
+        mismatches += got != want
+    return fires, mismatches
+
+
+def graph_warmup(name, params, floor=70):
+    """The signal's own warmup, from its node, evaluated against the params under test.
+
+    A signal will not answer before its guard is satisfied, and comparing against it earlier reports
+    the guard as a formula mismatch. `nvi_bullish` needs 255 bars; a fixed start of 70 called it
+    wrong on 185 of them. `warmup_bars` already records this, so read it rather than guess.
+    """
+    node = _NODES.get(name) or {}
+    expr = (node.get("props") or {}).get("warmup_bars")
+    if not expr:
+        return floor
+    try:
+        return max(floor, int(eval(expr, {"__builtins__": {}, "max": max, "min": min}, dict(params))) + 1)
+    except Exception:
+        return floor
+
+
+def run(spec_builder, label, start=70):
+    """Run one class's spec against the real fixture, falling back for anything that never fires."""
+    real = real_fixture()
+    spec = spec_builder(real)
+    results = []
+    for name, (params, predicate) in spec.items():
+        r = Result(name, label)
+        try:
+            r.real_fires, r.real_mismatch = replay(
+                name, params, predicate, real, graph_warmup(name, params, start))
+        except Exception as exc:  # a signal that raises is a defect, not a skip
+            r.error = f"{type(exc).__name__}: {exc}"
+            results.append(r)
+            continue
+        if r.real_fires == 0 and not r.real_mismatch:
+            for kind, builder in (("synthetic", synthetic_fixture), ("gapless", gapless_fixture)):
+                alt = builder()
+                alt_spec = spec_builder(alt)
+                if name not in alt_spec:
+                    continue
+                f, m = replay(name, alt_spec[name][0], alt_spec[name][1], alt, min(start, len(alt) // 4))
+                if f or m:
+                    r.alt_fires, r.alt_mismatch, r.alt_kind = f, m, kind
+                    break
+        results.append(r)
+    return results
+
+
+def report(results):
+    bad = [r for r in results if not r.verified]
+    for r in sorted(results, key=lambda x: (x.status != "ok (real)", x.name)):
+        detail = f"real={r.real_fires:4d}"
+        if r.alt_fires is not None:
+            detail += f"  {r.alt_kind}={r.alt_fires}"
+        if r.error:
+            detail = r.error
+        print(f"  {r.status:14} {r.name:34} {detail}")
+    n = len(results)
+    print(f"\n{n - len(bad)} / {n} verified"
+          + (f"   PROBLEMS: {[r.name for r in bad]}" if bad else ""))
+    return 1 if bad else 0
+
+
+# =============================================================================
+# SPECS -- one entry per authored signal: name -> (params, predicate)
+#
+# Each builder takes the fixture and returns the spec, so the same definitions run against the real
+# trace and any constructed one. A new class appends a builder here and a line in CLASSES; nothing
+# else changes.
+# =============================================================================
+
+def spec_volatility(df):
+    from mangrove_kb.indicators import (ATR, NATR, BollingerBands, ChandelierLevels,
+                                        DonchianChannel, KeltnerChannel, SqueezeDepth, STARCBands,
+                                        UlcerIndex, VolatilityEnvelope)
+    H, L, C = df["High"], df["Low"], df["Close"]
+    atr = ATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["atr"]
+    natr = NATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["natr"]
+    ui = UlcerIndex.compute({"close": C}, {"window": 14})["ulcer_index"]
+    bb = BollingerBands.compute({"close": C}, {"window": 20, "window_dev": 2})
+    dc = DonchianChannel.compute({"high": H, "low": L, "close": C},
+                                 {"window": 20, "include_current_bar": False})
+    kc = KeltnerChannel.compute({"high": H, "low": L, "close": C},
+                                {"window": 20, "window_atr": 10, "original_version": False,
+                                 "multiplier": 2.0})
+    st = STARCBands.compute({"high": H, "low": L, "close": C},
+                            {"window": 20, "window_atr": 14, "multiplier": 2.0})
+    bbp = {"window": 20, "window_dev": 2}
+    kcp = {"window": 20, "window_atr": 10, "multiplier": 2.0}
+    stp = {"window": 20, "window_atr": 14, "multiplier": 2.0}
+    # Chandelier Levels: offsets from OPPOSITE extremes, so NOT a band pair -- both predicates are
+    # true together on 15 of these 1,294 bars, which a band invariant would forbid.
+    clp = {"window": 22, "multiplier": 3.0}
+    cl = ChandelierLevels.compute({"high": H, "low": L, "close": C}, dict(clp))
+    # VolatilityEnvelope IS a true band pair (symmetric about the previous close), unlike the
+    # Chandelier offsets above -- hband >= lband on every bar.
+    vep = {"window": 20, "multiplier": 2.0}
+    ve = VolatilityEnvelope.compute({"close": C}, dict(vep))
+    # TTM Squeeze: the release is squeeze_depth crossing down through zero, and direction comes
+    # from Carter's momentum on the same bar. Both were booleans inside the old indicator.
+    sqp = {"bb_window": 20, "bb_std": 2.0, "kc_window": 20, "kc_atr_mult": 1.5, "mom_window": 12}
+    sq = SqueezeDepth.compute({"high": H, "low": L, "close": C}, dict(sqp))
+    depth, ttm_mom = sq["squeeze_depth"], sq["momentum"]
+
+    def fired(momentum_positive):
+        def f(t):
+            if t < 1 or not defined(depth.iloc[t - 1], depth.iloc[t], ttm_mom.iloc[t]):
+                return False
+            return (depth.iloc[t - 1] > 0 and depth.iloc[t] <= 0
+                    and (ttm_mom.iloc[t] > 0) == momentum_positive)
+        return f
+
+    return {
+        "ttm_squeeze_active": (dict(sqp), above(depth, 0)),
+        "ttm_squeeze_fired_bullish": (dict(sqp), fired(True)),
+        "ttm_squeeze_fired_bearish": (dict(sqp), fired(False)),
+        "ve_above_upper": (vep, not_below(C, ve["vstop_hband"])),
+        "ve_below_lower": (vep, not_above(C, ve["vstop_lband"])),
+        "cl_below_high_offset": (clp, outside_below(C, cl["high_offset"])),
+        "cl_above_low_offset": (clp, outside_above(C, cl["low_offset"])),
+        # The event form of the two above. Same pair of builders the Bollinger and Keltner
+        # crossings use, so a state/crossing mix-up here would show as a disagreement there too.
+        "cl_high_offset_break": (clp, crosses_below(C, cl["high_offset"])),
+        "cl_low_offset_break": (clp, crosses_above(C, cl["low_offset"])),
+        "bb_upper_breakout": (bbp, crosses_above(C, bb["hband"])),
+        "bb_lower_breakout": (bbp, crosses_below(C, bb["lband"])),
+        "bb_above_upper": (bbp, outside_above(C, bb["hband"])),
+        "bb_below_lower": (bbp, outside_below(C, bb["lband"])),
+        "bb_squeeze": ({**bbp, "threshold": 5.0}, crosses_down(bb["wband"], 5.0)),
+        # ATR read as a percent of price, so the threshold is comparable across instruments
+        "atr_high_volatility": ({"window": 14, "threshold_pct": 2.0},
+                                lambda t: defined(atr.iloc[t]) and C.iloc[t] != 0
+                                          and (atr.iloc[t] / C.iloc[t]) * 100 > 2.0),
+        "natr_high_volatility": ({"window": 14, "threshold": 3.0}, above(natr, 3.0)),
+        "natr_low_volatility": ({"window": 14, "threshold": 1.0}, below(natr, 1.0)),
+        "ulcer_high_risk": ({"window": 14, "threshold": 10.0}, above(ui, 10.0)),
+        "ulcer_low_risk": ({"window": 14, "threshold": 5.0}, below(ui, 5.0)),
+        "dc_upper_breakout": ({"window": 20}, crosses_above(C, dc["hband"])),
+        "dc_lower_breakout": ({"window": 20}, crosses_below(C, dc["lband"])),
+        "kc_upper_breakout": ({**kcp, "original_version": False}, crosses_above(C, kc["hband"])),
+        "kc_lower_breakout": ({**kcp, "original_version": False}, crosses_below(C, kc["lband"])),
+        "kc_above_upper": (kcp, outside_above(C, kc["hband"])),
+        "kc_below_lower": (kcp, outside_below(C, kc["lband"])),
+        # named "breakout" but a STATE -- see the node's formula
+        "starc_upper_breakout": (stp, outside_above(C, st["starc_hband"])),
+        "starc_lower_breakout": (stp, outside_below(C, st["starc_lband"])),
+    }
+
+
+def spec_momentum(df):
+    from mangrove_kb.indicators import (BOP, CMO, KAMA, MACD, MOM, PPO, PVO, ROC, RSI, TSI,
+                                        AwesomeOscillator, StochasticOscillator, StochRSI,
+                                        UltimateOscillator, WilliamsR)
+    O, H, L, C, V = df["Open"], df["High"], df["Low"], df["Close"], df["Volume"]
+    ao = AwesomeOscillator.compute({"high": H, "low": L}, {"window1": 5, "window2": 34})["ao"]
+    bop = BOP.compute({"open": O, "high": H, "low": L, "close": C}, {})["bop"]
+    cmo = CMO.compute({"close": C}, {"window": 14})["cmo"]
+    kama = KAMA.compute({"close": C}, {"window": 10, "pow1": 2, "pow2": 30})["kama"]
+    macd = MACD.compute({"close": C}, {"window_fast": 12, "window_slow": 26, "window_sign": 9})["macd"]
+    mom = MOM.compute({"close": C}, {"window": 10})["mom"]
+    ppo = PPO.compute({"close": C}, {"window_slow": 26, "window_fast": 12, "window_sign": 9})
+    pvo = PVO.compute({"volume": V}, {"window_slow": 26, "window_fast": 12, "window_sign": 9})
+    roc = ROC.compute({"close": C}, {"window": 12})["roc"]
+    rsi = RSI.compute({"close": C}, {"window": 14})["rsi"]
+    stoch = StochasticOscillator.compute({"high": H, "low": L, "close": C},
+                                         {"window": 14, "smooth_window": 3})["stoch_k"]
+    srsi = StochRSI.compute({"close": C}, {"window": 14, "smooth1": 3, "smooth2": 3})["stochrsi"]
+    tsi = TSI.compute({"close": C}, {"window_slow": 25, "window_fast": 13})["tsi"]
+    uo = UltimateOscillator.compute({"high": H, "low": L, "close": C},
+                                    {"window1": 7, "window2": 14, "window3": 28,
+                                     "weight1": 4.0, "weight2": 2.0, "weight3": 1.0})["ultimate_oscillator"]
+    wr = WilliamsR.compute({"high": H, "low": L, "close": C}, {"window": 14})["wr"]
+    aop = {"window_fast": 5, "window_slow": 34}
+    mp = {"window_fast": 12, "window_slow": 26}
+    sp = {"window_slow": 26, "window_fast": 12, "window_sign": 9}
+    return {
+        "ao_bullish": ({**aop, "threshold": 0.0}, above(ao, 0.0)),
+        "ao_bearish": ({**aop, "threshold": 0.0}, below(ao, 0.0)),
+        "ao_zero_cross": ({**aop, "direction": "bullish"}, crosses_up(ao)),
+        "bop_bullish": ({}, above(bop, 0.0)), "bop_bearish": ({}, below(bop, 0.0)),
+        "bop_cross_up": ({}, crosses_up(bop)), "bop_cross_down": ({}, crosses_down(bop)),
+        "cmo_overbought": ({"window": 14, "threshold": 50.0}, at_least(cmo, 50.0)),
+        "cmo_oversold": ({"window": 14, "threshold": -50.0}, at_most(cmo, -50.0)),
+        "cmo_cross_up": ({"window": 14, "threshold": -50.0}, crosses_up(cmo, -50.0)),
+        "cmo_cross_down": ({"window": 14, "threshold": 50.0}, crosses_down(cmo, 50.0)),
+        "kama_cross_up": ({"window": 10, "pow1": 2, "pow2": 30}, crosses_above(C, kama)),
+        "kama_cross_down": ({"window": 10, "pow1": 2, "pow2": 30}, crosses_below(C, kama)),
+        "macd_line_positive": (mp, above(macd, 0.0)),
+        "macd_line_negative": (mp, below(macd, 0.0)),
+        "macd_line_cross_up": (mp, crosses_up(macd)),
+        "macd_line_cross_down": (mp, crosses_down(macd)),
+        "mom_bullish": ({"window": 10}, above(mom, 0.0)),
+        "mom_bearish": ({"window": 10}, below(mom, 0.0)),
+        "mom_cross_up": ({"window": 10}, crosses_up(mom)),
+        "mom_cross_down": ({"window": 10}, crosses_down(mom)),
+        "ppo_bullish_cross": (sp, crosses_above(ppo["ppo"], ppo["ppo_signal"])),
+        "ppo_bearish_cross": (sp, crosses_below(ppo["ppo"], ppo["ppo_signal"])),
+        # PVO is computed from VOLUME despite sharing PPO's shape exactly
+        "pvo_bullish_cross": (sp, crosses_above(pvo["pvo"], pvo["pvo_signal"])),
+        "pvo_bearish_cross": (sp, crosses_below(pvo["pvo"], pvo["pvo_signal"])),
+        "roc_positive": ({"window": 12, "threshold": 0.0}, above(roc, 0.0)),
+        "roc_negative": ({"window": 12, "threshold": 0.0}, below(roc, 0.0)),
+        "roc_momentum_shift": ({"window": 12, "direction": "bullish"}, crosses_up(roc)),
+        "rsi_overbought": ({"window": 14, "threshold": 70.0}, above(rsi, 70.0)),
+        "rsi_oversold": ({"window": 14, "threshold": 30.0}, below(rsi, 30.0)),
+        "rsi_cross_up": ({"window": 14, "threshold": 30.0}, crosses_up(rsi, 30.0)),
+        "rsi_cross_down": ({"window": 14, "threshold": 70.0}, crosses_down(rsi, 70.0)),
+        "stoch_overbought": ({"window": 14, "smooth_window": 3, "threshold": 80.0}, above(stoch, 80.0)),
+        "stoch_oversold": ({"window": 14, "smooth_window": 3, "threshold": 20.0}, below(stoch, 20.0)),
+        # StochRSI is on the 0..1 scale: the conventional 80/20 levels are 0.80/0.20 here
+        "stochrsi_overbought": ({"window": 14, "smooth1": 3, "smooth2": 3, "threshold": 0.8}, above(srsi, 0.8)),
+        "stochrsi_oversold": ({"window": 14, "smooth1": 3, "smooth2": 3, "threshold": 0.2}, below(srsi, 0.2)),
+        "tsi_bullish": ({"window_slow": 25, "window_fast": 13, "threshold": 0.0}, above(tsi, 0.0)),
+        "tsi_bearish": ({"window_slow": 25, "window_fast": 13, "threshold": 0.0}, below(tsi, 0.0)),
+        "uo_overbought": ({"window_short": 7, "window_medium": 14, "window_long": 28, "threshold": 70.0}, above(uo, 70.0)),
+        "uo_oversold": ({"window_short": 7, "window_medium": 14, "window_long": 28, "threshold": 30.0}, below(uo, 30.0)),
+        # Williams %R is NEGATIVE: overbought is the band nearest zero
+        "williams_r_overbought": ({"window": 14, "threshold": -20.0}, above(wr, -20.0)),
+        "williams_r_oversold": ({"window": 14, "threshold": -80.0}, below(wr, -80.0)),
+    }
+
+
+def spec_pattern(df):
+    O, H, L, C = df["Open"], df["High"], df["Low"], df["Close"]
+
+    def d(fn, **kw):
+        return detector(fn, O, H, L, C, **kw)
+
+    bull = [d(P._hammer, wick_ratio=2.0, upper_wick_max=0.1),
+            d(P._inverted_hammer, wick_ratio=2.0, lower_wick_max=0.1),
+            d(P._engulfing).clip(lower=0), d(P._harami).clip(lower=0),
+            d(P._piercing_line, min_penetration=0.5, require_gap=False),
+            d(P._dragonfly_doji, body_threshold=0.1, upper_wick_max=0.1),
+            d(P._tweezer_bottoms, tolerance=0.01),
+            d(P._pin_bar, wick_ratio=2.0, body_position=0.33).clip(lower=0),
+            d(P._morning_star, body_threshold=0.3),
+            d(P._three_white_soldiers, min_body_ratio=0.5), d(P._three_inside_up)]
+    bear = [d(P._hanging_man, wick_ratio=2.0, upper_wick_max=0.1),
+            d(P._shooting_star, wick_ratio=2.0, lower_wick_max=0.1),
+            d(P._engulfing).clip(upper=0).abs(), d(P._harami).clip(upper=0).abs(),
+            d(P._dark_cloud_cover, min_penetration=0.5, require_gap=False).abs(),
+            d(P._gravestone_doji, body_threshold=0.1, lower_wick_max=0.1),
+            d(P._tweezer_tops, tolerance=0.01).abs(),
+            d(P._pin_bar, wick_ratio=2.0, body_position=0.33).clip(upper=0).abs(),
+            d(P._evening_star, body_threshold=0.3).abs(),
+            d(P._three_black_crows, min_body_ratio=0.5).abs(), d(P._three_inside_down).abs()]
+    W = 5
+    return {
+        "doji_trigger": ({"body_threshold": 0.1}, nonzero(d(P._doji, body_threshold=0.1))),
+        "dragonfly_doji_trigger": ({"body_threshold": 0.1, "upper_wick_max": 0.1},
+                                   nonzero(d(P._dragonfly_doji, body_threshold=0.1, upper_wick_max=0.1))),
+        "gravestone_doji_trigger": ({"body_threshold": 0.1, "lower_wick_max": 0.1},
+                                    nonzero(d(P._gravestone_doji, body_threshold=0.1, lower_wick_max=0.1))),
+        "long_legged_doji_trigger": ({"body_threshold": 0.1, "wick_threshold": 0.25},
+                                     nonzero(d(P._long_legged_doji, body_threshold=0.1, wick_threshold=0.25))),
+        "spinning_top_trigger": ({"body_max": 0.3, "wick_min": 0.2},
+                                 nonzero(d(P._spinning_top, body_max=0.3, wick_min=0.2))),
+        "marubozu_bullish_trigger": ({"wick_tolerance": 0.05}, equals(d(P._marubozu, wick_tolerance=0.05), 1)),
+        "marubozu_bearish_trigger": ({"wick_tolerance": 0.05}, equals(d(P._marubozu, wick_tolerance=0.05), -1)),
+        "hammer_trigger": ({"wick_ratio": 2.0, "upper_wick_max": 0.1},
+                           nonzero(d(P._hammer, wick_ratio=2.0, upper_wick_max=0.1))),
+        "inverted_hammer_trigger": ({"wick_ratio": 2.0, "lower_wick_max": 0.1},
+                                    nonzero(d(P._inverted_hammer, wick_ratio=2.0, lower_wick_max=0.1))),
+        # identical arithmetic to hammer / inverted_hammer -- deprecated, kept for external callers
+        "hanging_man_trigger": ({"wick_ratio": 2.0, "upper_wick_max": 0.1},
+                                nonzero(d(P._hanging_man, wick_ratio=2.0, upper_wick_max=0.1))),
+        "shooting_star_trigger": ({"wick_ratio": 2.0, "lower_wick_max": 0.1},
+                                  nonzero(d(P._shooting_star, wick_ratio=2.0, lower_wick_max=0.1))),
+        "bullish_pin_bar_trigger": ({"wick_ratio": 2.0, "body_position": 0.33},
+                                    equals(d(P._pin_bar, wick_ratio=2.0, body_position=0.33), 1)),
+        "bearish_pin_bar_trigger": ({"wick_ratio": 2.0, "body_position": 0.33},
+                                    equals(d(P._pin_bar, wick_ratio=2.0, body_position=0.33), -1)),
+        "bullish_engulfing_trigger": ({}, equals(d(P._engulfing), 1)),
+        "bearish_engulfing_trigger": ({}, equals(d(P._engulfing), -1)),
+        "bullish_harami_trigger": ({}, equals(d(P._harami), 1)),
+        "bearish_harami_trigger": ({}, equals(d(P._harami), -1)),
+        "inside_bar_trigger": ({}, nonzero(d(P._inside_bar))),
+        "outside_bar_trigger": ({}, nonzero(d(P._outside_bar))),
+        "nr7_trigger": ({"window": 7}, nonzero(d(P._narrow_range, window=7))),
+        # require_gap defaults to False: a 24/7 market never opens beyond the prior extreme
+        "piercing_line_trigger": ({"min_penetration": 0.5, "require_gap": False},
+                                  nonzero(d(P._piercing_line, min_penetration=0.5, require_gap=False))),
+        "dark_cloud_cover_trigger": ({"min_penetration": 0.5, "require_gap": False},
+                                     equals(d(P._dark_cloud_cover, min_penetration=0.5, require_gap=False), -1)),
+        "tweezer_bottoms_trigger": ({"tolerance": 0.01}, nonzero(d(P._tweezer_bottoms, tolerance=0.01))),
+        "tweezer_tops_trigger": ({"tolerance": 0.01}, equals(d(P._tweezer_tops, tolerance=0.01), -1)),
+        "two_bar_reversal_bullish_trigger": ({"close_proximity": 0.25},
+                                             equals(d(P._two_bar_reversal, close_proximity=0.25), 1)),
+        "two_bar_reversal_bearish_trigger": ({"close_proximity": 0.25},
+                                             equals(d(P._two_bar_reversal, close_proximity=0.25), -1)),
+        "morning_star_trigger": ({"body_threshold": 0.3}, nonzero(d(P._morning_star, body_threshold=0.3))),
+        "evening_star_trigger": ({"body_threshold": 0.3}, equals(d(P._evening_star, body_threshold=0.3), -1)),
+        "three_white_soldiers_trigger": ({"min_body_ratio": 0.5},
+                                         nonzero(d(P._three_white_soldiers, min_body_ratio=0.5))),
+        "three_black_crows_trigger": ({"min_body_ratio": 0.5},
+                                      equals(d(P._three_black_crows, min_body_ratio=0.5), -1)),
+        "three_inside_up_trigger": ({}, nonzero(d(P._three_inside_up))),
+        "three_inside_down_trigger": ({}, equals(d(P._three_inside_down), -1)),
+        "bullish_pattern_recent": ({"window": W}, fired_within(bull, W)),
+        "bearish_pattern_recent": ({"window": W}, fired_within(bear, W)),
+        "reversal_pattern_bullish": ({"window": W}, fired_within([bull[0], bull[1], bull[2], bull[4], bull[5], bull[8]], W)),
+        "reversal_pattern_bearish": ({"window": W}, fired_within([bear[0], bear[1], bear[2], bear[4], bear[5], bear[8]], W)),
+        "continuation_pattern_bullish": ({"window": W}, fired_within(
+            [d(P._three_white_soldiers, min_body_ratio=0.5), d(P._three_inside_up)], W)),
+        "continuation_pattern_bearish": ({"window": W}, fired_within(
+            [d(P._three_black_crows, min_body_ratio=0.5).abs(), d(P._three_inside_down).abs()], W)),
+        "indecision_pattern_recent": ({"window": W}, fired_within(
+            [d(P._doji, body_threshold=0.1), d(P._spinning_top, body_max=0.3, wick_min=0.2),
+             d(P._inside_bar), d(P._narrow_range, window=7)], W)),
+        "strong_body_recent": ({"window": W}, fired_within([d(P._marubozu, wick_tolerance=0.05).abs()], W)),
+    }
+
+
+def rose_over(series, window):
+    """A running total higher than it was `window` bars ago -- the only way to read a cumulative
+    line whose absolute level is an artefact of where the data begins.
+
+    The comparison bar is `t - window + 1`, not `t - window`. The signal reads `iloc[-window]` on a
+    frame of length t+1, which is index t+1-window; using t-window looks right and is one bar early.
+    """
+    return lambda t: (t >= window and defined(series.iloc[t], series.iloc[t - window + 1])
+                      and series.iloc[t] > series.iloc[t - window + 1])
+
+
+def fell_over(series, window):
+    return lambda t: (t >= window and defined(series.iloc[t], series.iloc[t - window + 1])
+                      and series.iloc[t] < series.iloc[t - window + 1])
+
+
+def spec_flow_and_volume_derived(df):
+    from mangrove_kb.indicators import (ADI, ADOSC, CMF, KVO, MFI, NVI, OBV, VPT, VWAP, VWMA,
+                                        CumulativeReturn, DailyReturn, EaseOfMovement, ForceIndex)
+    H, L, C, V = df["High"], df["Low"], df["Close"], df["Volume"]
+    hlcv = {"high": H, "low": L, "close": C, "volume": V}
+    adi = ADI.compute(hlcv, {})["adi"]
+    adosc = ADOSC.compute(hlcv, {"fast": 3, "slow": 10})["adosc"]
+    cmf = CMF.compute(hlcv, {"window": 20})["cmf"]
+    cr = CumulativeReturn.compute({"close": C}, {})["cumulative_return"]
+    dr = DailyReturn.compute({"close": C}, {})["daily_return"]
+    eom = EaseOfMovement.compute({"high": H, "low": L, "volume": V}, {"window": 14})["eom"]
+    fi = ForceIndex.compute({"close": C, "volume": V}, {"window": 13})["fi"]
+    mfi = MFI.compute(hlcv, {"window": 14})["mfi"]
+    nvi = NVI.compute({"close": C, "volume": V}, {"window": 255})
+    obv = OBV.compute({"close": C, "volume": V}, {})["obv"]
+    vpt = VPT.compute({"close": C, "volume": V}, {"smoothing_factor": None})["vpt"]
+    vwap = VWAP.compute(hlcv, {"window": 14})["vwap"]
+    vwma20 = VWMA.compute({"close": C, "volume": V}, {"window": 20})["vwma"]
+    vwma_f = VWMA.compute({"close": C, "volume": V}, {"window": 10})["vwma"]
+    vwma_s = VWMA.compute({"close": C, "volume": V}, {"window": 30})["vwma"]
+    kvo = KVO.compute(hlcv, {"fast": 34, "slow": 55, "signal_window": 13})
+    ap = {"fast": 3, "slow": 10}
+    kp = {"fast": 34, "slow": 55, "signal_window": 13}
+    return {
+        # cumulative flow lines: read by DIRECTION over a window, never by level -- the level is an
+        # artefact of where the series begins
+        "adi_bullish": ({"window": 20}, rose_over(adi, 20)),
+        "adi_bearish": ({"window": 20}, fell_over(adi, 20)),
+        "obv_bullish": ({"window": 20}, rose_over(obv, 20)),
+        "obv_bearish": ({"window": 20}, fell_over(obv, 20)),
+        "vpt_bullish": ({"window": 20}, rose_over(vpt, 20)),
+        "vpt_bearish": ({"window": 20}, fell_over(vpt, 20)),
+        "adosc_bullish": (ap, above(adosc, 0.0)),
+        "adosc_bearish": (ap, below(adosc, 0.0)),
+        "adosc_cross_up": (ap, crosses_up(adosc)),
+        "adosc_cross_down": (ap, crosses_down(adosc)),
+        "cmf_bullish": ({"window": 20, "threshold": 0.0}, above(cmf, 0.0)),
+        "cmf_bearish": ({"window": 20, "threshold": 0.0}, below(cmf, 0.0)),
+        "eom_bullish": ({"window": 14, "threshold": 0.0}, above(eom, 0.0)),
+        "eom_bearish": ({"window": 14, "threshold": 0.0}, below(eom, 0.0)),
+        "force_bullish": ({"window": 13, "threshold": 0.0}, above(fi, 0.0)),
+        "force_bearish": ({"window": 13, "threshold": 0.0}, below(fi, 0.0)),
+        "daily_return_positive": ({"threshold": 0.0}, above(dr, 0.0)),
+        "daily_return_negative": ({"threshold": 0.0}, below(dr, 0.0)),
+        "cumulative_return_positive": ({"threshold": 0.0}, above(cr, 0.0)),
+        "cumulative_return_target": ({"target": 10.0}, at_least(cr, 10.0)),
+        "mfi_overbought": ({"window": 14, "threshold": 80.0}, above(mfi, 80.0)),
+        "mfi_oversold": ({"window": 14, "threshold": 20.0}, below(mfi, 20.0)),
+        # NVI's level is an arbitrary seed constant, so every documented reading is positional
+        # against its own EMA
+        "nvi_bullish": ({"window": 255}, outside_above(nvi["nvi"], nvi["nvi_ema"])),
+        "nvi_bearish": ({"window": 255}, outside_below(nvi["nvi"], nvi["nvi_ema"])),
+        "vwap_above": ({"window": 14}, outside_above(C, vwap)),
+        "vwap_below": ({"window": 14}, outside_below(C, vwap)),
+        "is_above_vwma": ({"window": 20}, outside_above(C, vwma20)),
+        "vwma_cross_up": ({"window_fast": 10, "window_slow": 30}, crosses_above(vwma_f, vwma_s)),
+        "vwma_cross_down": ({"window_fast": 10, "window_slow": 30}, crosses_below(vwma_f, vwma_s)),
+        # the SIMPLIFIED KVO; KlingerVolumeOscillator is the original and no signal reads it
+        "kvo_bullish": (kp, outside_above(kvo["kvo"], kvo["kvo_signal"])),
+        "kvo_bearish": (kp, outside_below(kvo["kvo"], kvo["kvo_signal"])),
+        "kvo_bullish_cross": (kp, crosses_above(kvo["kvo"], kvo["kvo_signal"])),
+        "kvo_bearish_cross": (kp, crosses_below(kvo["kvo"], kvo["kvo_signal"])),
+    }
+
+
+# Keyed by the signal's source module, which is now the ontology CLASS -- `momentum` here covers
+# only the 18 rate-of-change signals; the bounded oscillators moved to `oscillator` and the KAMA
+# crossings to `averaging`. spec_momentum still returns all three because they are verified the same
+# way; the split that matters is in the files, not here.
+
+def spec_trend(df):
+    """The 64 signals still living in trend.py, whose classes are averaging, momentum, oscillator.
+
+    `trend` is not one of the seven ontology classes -- the file is a use-case grouping that predates
+    the class axis, and these 64 split three ways by the class of the indicator each one reads. They
+    are verified together here because verification does not care which file they live in; the split
+    that matters is on disk.
+
+    The 22 not here are held out of the graph, so they have no formula to check: nine are built on
+    indicators that emit a verdict rather than a measurement (SuperTrend, PSAR) and fifteen read an
+    indicator still in the `unclassed` class.
+    """
+    from mangrove_kb.indicators import (
+        ADX, ALMA, Aroon, CCI, DEMA, DPO, EMA, EPMA, HMA, HeikinAshi, Ichimoku, KST, MACD, MAMA,
+        MassIndex, MultiTFTrend, RSI, SMA, SMMA, STC, SwingDelta, T3, TEMA, TRIMA, TRIX, Vortex,
+        WMA, WilliamsAlligator,
+    )
+    C = df["Close"]
+    HLC = {"high": df["High"], "low": df["Low"], "close": df["Close"]}
+    spec = {}
+
+    # --- averaging: two averages of one kind at different windows, and price against one average
+    def ma(cls, key, w, **kw):
+        return cls.compute(data={"close": C}, params={"window": w, **kw})[key]
+
+    MAS = [
+        # (signal stem, class, output key, fast, slow, extra params, is_above window)
+        ("sma",   SMA,   "sma",   None, None, {}, None),
+        ("ema",   EMA,   "ema",   9, 21, {}, None),
+        ("wma",   WMA,   "wma",   9, 21, {}, None),
+        ("dema",  DEMA,  "dema",  9, 21, {}, 21),
+        ("tema",  TEMA,  "tema",  9, 21, {}, 21),
+        ("trima", TRIMA, "trima", 10, 30, {}, 20),
+        ("smma",  SMMA,  "smma",  14, 50, {}, 14),
+        ("hma",   HMA,   "hma",   9, 25, {}, 16),
+        ("alma",  ALMA,  "alma",  9, 21, {"offset": 0.85, "sigma": 6.0}, None),
+        ("t3",    T3,    "t3",    5, 10, {"volume_factor": 0.7}, None),
+    ]
+    for stem, cls, key, f, s, extra, above_w in MAS:
+        if f is not None:
+            fast, slow = ma(cls, key, f, **extra), ma(cls, key, s, **extra)
+            p = {"window_fast": f, "window_slow": s, **extra}
+            spec[f"{stem}_cross_up"] = (p, crosses_above(fast, slow))
+            spec[f"{stem}_cross_down"] = (p, crosses_below(fast, slow))
+        if above_w is not None:
+            spec[f"is_above_{stem}"] = ({"window": above_w}, outside_above(C, ma(cls, key, above_w)))
+
+    # SMA's windows have no defaults -- the signal requires them, so the spec supplies them.
+    sf, ss = ma(SMA, "sma", 9), ma(SMA, "sma", 21)
+    spec["sma_cross_up"] = ({"window_fast": 9, "window_slow": 21}, crosses_above(sf, ss))
+    spec["sma_cross_down"] = ({"window_fast": 9, "window_slow": 21}, crosses_below(sf, ss))
+    spec["sma_crossover"] = ({"window_fast": 9, "window_slow": 21, "direction": "bullish"},
+                             crosses_above(sf, ss))
+    spec["is_above_sma"] = ({"window": 20}, outside_above(C, ma(SMA, "sma", 20)))
+    # ALMA and T3 take extra shape parameters, so their `is_above` cannot come from the loop above.
+    spec["is_above_alma"] = ({"window": 21, "offset": 0.85, "sigma": 6.0},
+                             outside_above(C, ma(ALMA, "alma", 21, offset=0.85, sigma=6.0)))
+    spec["is_above_t3"] = ({"window": 10, "volume_factor": 0.7},
+                           outside_above(C, ma(T3, "t3", 10, volume_factor=0.7)))
+    ef, es = ma(EMA, "ema", 9), ma(EMA, "ema", 21)
+    spec["ema_crossover"] = ({"window_fast": 9, "window_slow": 21, "direction": "bearish"},
+                             crosses_below(ef, es))
+    spec["price_above_ema"] = ({"window": 20}, outside_above(C, ma(EMA, "ema", 20)))
+
+    # MAMA against FAMA: two outputs of one computation, not two windows.
+    mm = MAMA.compute(data={"high": df["High"], "low": df["Low"]},
+                      params={"fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": 64})
+    mama, fama = mm["mama"], mm["fama"]
+    spec["mama_cross_up"] = ({"fast_limit": 0.5, "slow_limit": 0.05}, crosses_above(mama, fama))
+    spec["mama_cross_down"] = ({"fast_limit": 0.5, "slow_limit": 0.05}, crosses_below(mama, fama))
+    spec["is_above_mama"] = ({"fast_limit": 0.5, "slow_limit": 0.05, "warmup_bars": 64},
+                             outside_above(C, mama))
+
+    # Alligator: three displaced smoothed averages, checked as an ordering.
+    ap = {"jaw": 13, "teeth": 8, "lips": 5, "jaw_offset": 8, "teeth_offset": 5, "lips_offset": 3}
+    al = WilliamsAlligator.compute(data={"high": df["High"], "low": df["Low"]}, params=ap)
+    jaw, teeth, lips = al["jaw"], al["teeth"], al["lips"]
+
+    def gator(kind):
+        def f(t):
+            j, e, l = jaw.iloc[t], teeth.iloc[t], lips.iloc[t]
+            if not defined(j, e, l):
+                return False
+            bull, bear = l > e > j, l < e < j
+            return {"bullish": bull, "bearish": bear, "sleeping": not (bull or bear)}[kind]
+        return f
+    for kind in ("bullish", "bearish", "sleeping"):
+        spec[f"alligator_{kind}"] = (dict(ap), gator(kind))
+
+    # Ribbon: SMAs at strictly increasing windows, all gaps the same sign.
+    RW = [10, 20, 30, 40, 50]
+    ribbon = [ma(SMA, "sma", w) for w in RW]
+
+    def ribbon_is(kind):
+        def f(t):
+            vals = [s.iloc[t] for s in ribbon]
+            if not defined(*vals):
+                return False
+            d = [b - a for a, b in zip(vals, vals[1:])]
+            bull, bear = all(x < 0 for x in d), all(x > 0 for x in d)
+            return {"bullish": bull, "bearish": bear, "tangled": not (bull or bear)}[kind]
+        return f
+    for kind in ("bullish", "bearish", "tangled"):
+        spec[f"ma_ribbon_{kind}"] = ({"windows": RW}, ribbon_is(kind))
+
+    # --- momentum
+    adx = ADX.compute(data=HLC, params={"window": 14})
+    spec["adx_strong_trend"] = ({"window": 14, "threshold": 25.0}, above(adx["adx"], 25.0))
+    spec["adx_bullish_di"] = ({"window": 14}, outside_above(adx["adx_pos"], adx["adx_neg"]))
+
+    ar = Aroon.compute(data={"high": df["High"], "low": df["Low"]}, params={"window": 25})
+    up, dn = ar["aroon_up"], ar["aroon_down"]
+    spec["aroon_up_trend"] = ({"window": 25, "threshold": 70.0}, above(up, 70.0))
+    spec["aroon_down_trend"] = ({"window": 25, "threshold": 70.0}, above(dn, 70.0))
+    spec["aroon_crossover"] = ({"window": 25, "direction": "bullish"}, crosses_above(up, dn))
+
+    dpo = DPO.compute(data={"close": C}, params={"window": 20})["dpo"]
+    spec["dpo_positive"] = ({"window": 20}, above(dpo, 0))
+    spec["dpo_negative"] = ({"window": 20}, below(dpo, 0))
+
+    kp = {"roc1": 10, "roc2": 15, "roc3": 20, "roc4": 30, "window_sma1": 10, "window_sma2": 10,
+          "window_sma3": 10, "window_sma4": 15, "nsig": 9}
+    k = KST.compute(data={"close": C}, params={"roc1": 10, "roc2": 15, "roc3": 20, "roc4": 30,
+                                               "window1": 10, "window2": 10, "window3": 10,
+                                               "window4": 15, "nsig": 9})
+    spec["kst_bullish_cross"] = (dict(kp), crosses_above(k["kst"], k["kst_signal"]))
+    spec["kst_bearish_cross"] = (dict(kp), crosses_below(k["kst"], k["kst_signal"]))
+
+    mp = {"window_fast": 12, "window_slow": 26, "window_sign": 9}
+    m = MACD.compute(data={"close": C}, params=dict(mp))
+    spec["macd_bullish_cross"] = (dict(mp), crosses_above(m["macd"], m["signal"]))
+    spec["macd_bearish_cross"] = (dict(mp), crosses_below(m["macd"], m["signal"]))
+    spec["macd_positive"] = (dict(mp), above(m["histogram"], 0))
+
+    msp = {"window_fast": 9, "window_slow": 25}
+    mi = MassIndex.compute(data={"high": df["High"], "low": df["Low"]}, params=dict(msp))["mass_index"]
+
+    def bulge(t):
+        window = mi.iloc[max(0, t - 9):t + 1]
+        return bool((window > 27.0).any()) and defined(mi.iloc[t]) and mi.iloc[t] < 26.5
+    spec["mass_reversal_signal"] = ({**msp, "threshold_high": 27.0, "threshold_low": 26.5}, bulge)
+
+    tx = TRIX.compute(data={"close": C}, params={"window": 15, "window_sign": 9})["trix"]
+    spec["trix_bullish"] = ({"window": 15, "threshold": 0.0}, above(tx, 0.0))
+    spec["trix_bearish"] = ({"window": 15, "threshold": 0.0}, below(tx, 0.0))
+
+    vx = Vortex.compute(data=HLC, params={"window": 14})
+    vp, vn = vx["vortex_pos"], vx["vortex_neg"]
+    spec["vortex_bullish"] = ({"window": 14}, outside_above(vp, vn))
+    spec["vortex_bearish"] = ({"window": 14}, outside_above(vn, vp))
+    spec["vortex_crossover"] = ({"window": 14, "direction": "bearish"}, crosses_below(vp, vn))
+
+    # MultiTFTrend resamples, so it needs a DatetimeIndex -- which every fixture here now has.
+    #
+    # And it is the one indicator whose reference series CANNOT be precomputed on the full frame.
+    # Resampling groups day t into a higher-timeframe bar; on the full frame that bar is complete
+    # because it also contains days AFTER t, so the precomputed value at t is contaminated by the
+    # future. The signal sees a partial current period and gets a different slope. Precomputing
+    # disagreed on exactly one bar out of 1,224 -- rare enough to look like a formula error and
+    # be "fixed" in the wrong place, which is why this note is longer than the code.
+    #
+    # Every other indicator here is path-independent, so precomputing is safe for them.
+    mt = {"higher_tf": "W", "window": 10, "slope_threshold": 0.0}
+
+    def tf_trend(value):
+        def f(t):
+            upto = MultiTFTrend.compute(data={"close": C.iloc[:t + 1]}, params=dict(mt))
+            v = upto["higher_tf_trend"].iloc[-1]
+            return bool(v == value)
+        return f
+    spec["multi_tf_trend_bullish"] = (dict(mt), tf_trend(1))
+    spec["multi_tf_trend_bearish"] = (dict(mt), tf_trend(-1))
+
+    # --- newly unblocked: EPMA and Ichimoku became `averaging`, HeikinAshi likewise, and the four
+    # divergence signals now read SwingDelta's measurements instead of Divergence's booleans.
+    spec["is_above_epma"] = ({"window": 20}, outside_above(C, ma(EPMA, "epma", 20)))
+    ef2, es2 = ma(EPMA, "epma", 10), ma(EPMA, "epma", 30)
+    spec["epma_cross_up"] = ({"window_fast": 10, "window_slow": 30}, crosses_above(ef2, es2))
+    spec["epma_cross_down"] = ({"window_fast": 10, "window_slow": 30}, crosses_below(ef2, es2))
+
+    ip = {"window_tenkan": 9, "window_kijun": 26, "window_senkou": 52}
+    ich = Ichimoku.compute({"high": df["High"], "low": df["Low"]},
+                           {"window1": 9, "window2": 26, "window3": 52, "visual": False})
+    sa, sb, conv, base = ich["span_a"], ich["span_b"], ich["conversion_line"], ich["base_line"]
+
+    def cloud(above):
+        def f(t):
+            a, b, c = sa.iloc[t], sb.iloc[t], C.iloc[t]
+            if not defined(a, b, c):
+                return False
+            return c > max(a, b) if above else c < min(a, b)
+        return f
+    spec["ichimoku_bullish"] = (dict(ip), cloud(True))
+    spec["ichimoku_bearish"] = (dict(ip), cloud(False))
+    spec["ichimoku_tk_cross"] = ({**ip, "direction": "bullish"}, crosses_above(conv, base))
+
+    ha = HeikinAshi.compute({"open": df["Open"], "high": df["High"], "low": df["Low"],
+                             "close": df["Close"]}, {})
+    spec["heikin_ashi_bullish"] = ({}, outside_above(ha["ha_close"], ha["ha_open"]))
+    spec["heikin_ashi_bearish"] = ({}, outside_below(ha["ha_close"], ha["ha_open"]))
+
+    dp = {"rsi_window": 14, "swing_window": 5, "min_swing_distance": 10}
+    rsi14 = RSI.compute({"close": C}, {"window": 14})["rsi"]
+    sd = SwingDelta.compute({"price": C, "indicator": rsi14},
+                            {"swing_window": 5, "min_swing_distance": 10})
+
+    def diverge(side, price_up, ind_up):
+        pd_, id_ = sd[f"{side}_price_delta"], sd[f"{side}_indicator_delta"]
+        def f(t):
+            a, b = pd_.iloc[t], id_.iloc[t]
+            return defined(a, b) and (a > 0) == price_up and (b > 0) == ind_up
+        return f
+    spec["rsi_bullish_divergence"] = (dict(dp), diverge("low", False, True))
+    spec["rsi_hidden_bullish_divergence"] = (dict(dp), diverge("low", True, False))
+    spec["rsi_bearish_divergence"] = (dict(dp), diverge("high", True, False))
+    spec["rsi_hidden_bearish_divergence"] = (dict(dp), diverge("high", False, True))
+
+    # --- oscillator
+    cci = CCI.compute(data=HLC, params={"window": 20, "constant": 0.015})["cci"]
+    spec["cci_overbought"] = ({"window": 20, "constant": 0.015, "threshold": 100.0}, above(cci, 100.0))
+    spec["cci_oversold"] = ({"window": 20, "constant": 0.015, "threshold": -100.0}, below(cci, -100.0))
+
+    sp = {"window_slow": 50, "window_fast": 23, "cycle": 10, "smooth1": 3, "smooth2": 3}
+    stc = STC.compute(data={"close": C}, params=dict(sp))["stc"]
+    spec["stc_overbought"] = ({**sp, "threshold": 75.0}, above(stc, 75.0))
+    spec["stc_oversold"] = ({**sp, "threshold": 25.0}, below(stc, 25.0))
+
+    return spec
+
+
+CLASSES = {
+    "volatility": spec_volatility,
+    "momentum": spec_momentum,
+    "pattern": spec_pattern,
+    # volume.py is gone: there is no `volume` indicator class, so its 33 signals split
+    # four ways by the class of the indicator each reads. They are still verified
+    # together, since the verification does not care which file they live in.
+    "flow": spec_flow_and_volume_derived,
+    "trend": spec_trend,
+}
+
+
+def main(argv):
+    wanted = argv[1:] or list(CLASSES)
+    unknown = [w for w in wanted if w not in CLASSES]
+    if unknown:
+        print(f"unknown: {unknown}. known: {sorted(CLASSES)}", file=sys.stderr)
+        return 2
+
+    # Everything authored must be covered. A signal with a formula and no spec entry is unverified,
+    # which is the state this harness exists to make impossible.
+    import json
+    graph = json.loads((Path(__file__).resolve().parents[2]
+                        / "ontology" / "signal-indicator-ontology.json").read_text())
+    authored = {a["title"] for a in graph["atoms"]
+                if a["id"].startswith("procedure:signal-") and a["props"].get("formula")}
+    covered = set()
+    for k in CLASSES:
+        covered |= set(CLASSES[k](real_fixture()))
+    if wanted == list(CLASSES) and (gap := sorted(authored - covered)):
+        print(f"ABORT: {len(gap)} signals have an authored formula but no spec here: {gap}",
+              file=sys.stderr)
+        return 2
+
+    rc = 0
+    for name in wanted:
+        print(f"=== {name} ===")
+        rc |= report(run(CLASSES[name], name))
+        print()
+    return rc
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

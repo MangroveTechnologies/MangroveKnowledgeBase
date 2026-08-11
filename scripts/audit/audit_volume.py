@@ -52,17 +52,31 @@ def run_audit():
     results.append(compare_indicator(
         indicator_name="OBV",
         category="Volume",
-        our_fn=lambda: OBV.compute(
-            {'close': close, 'volume': volume}, {}
-        ),
+        # Compare the BAR-TO-BAR CHANGE, not the level. OBV is a running accumulation whose
+        # starting point is arbitrary -- `ta` seeds it at volume[0], we seed at 0 -- so the two
+        # series differ by a constant equal to the first bar's volume (measured: offset
+        # -144210.16219 on every one of 1,294 bars, spread 2.97e-09). The level carries no meaning
+        # on its own; the direction does, which is exactly why the ontology puts OBV in the `flow`
+        # class: "running accumulation whose level is arbitrary but whose direction carries
+        # meaning". Differencing removes the seed and tests the thing that means something --
+        # measured max |diff of diffs| = 4.66e-10.
+        our_fn=lambda: {
+            'obv': OBV.compute({'close': close, 'volume': volume}, {})['obv'].diff()
+        },
         ref_fn=lambda: {
             'obv': ta.volume.OnBalanceVolumeIndicator(
                 close=close, volume=volume, fillna=False,
-            ).on_balance_volume()
+            ).on_balance_volume().diff()
         },
         output_keys=['obv'],
         tolerance=tol,
         tolerance_tier=tier,
+        # Relative: the compared values are volumes (~1e5) and a cumulative sum of 1,294 such terms
+        # cannot be bit-identical to one summed in a different order. The residual is 4.66e-10
+        # absolute, about 5e-15 relative.
+        relative=True,
+        notes="Compared as bar-to-bar change: the accumulation's origin is arbitrary and the two "
+              "libraries seed it differently (ta at volume[0], we at 0).",
     ))
 
     # --- CMF ---

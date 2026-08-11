@@ -4,7 +4,7 @@ Tests for the sample_ohlcv() mock-data helper.
 Reproduces the reported bug: the quickstart snippets referenced a file
 (`ohlcv.csv`) that is not shipped, so they failed on a clean install with
 FileNotFoundError. sample_ohlcv() gives every snippet self-contained data that
-runs out of the box, with the capitalized OHLCV columns the signals expect.
+runs out of the box, with the canonical lowercase OHLCV columns the signals expect.
 
 Usage:
     pytest tests/test_sample_data.py -v
@@ -17,9 +17,9 @@ from mangrove_kb import RuleRegistry, sample_ohlcv
 
 
 class TestShape:
-    EXPECTED_COLUMNS = ["Open", "High", "Low", "Close", "Volume"]
+    EXPECTED_COLUMNS = ["open", "high", "low", "close", "volume"]
 
-    def test_default_columns_are_capitalized_ohlcv(self):
+    def test_default_columns_are_canonical_lowercase_ohlcv(self):
         df = sample_ohlcv()
         assert list(df.columns) == self.EXPECTED_COLUMNS
 
@@ -43,20 +43,20 @@ class TestShape:
 class TestCandleInvariants:
     def test_high_is_the_max_low_is_the_min(self):
         df = sample_ohlcv(rows=500)
-        body_high = df[["Open", "Close"]].max(axis=1)
-        body_low = df[["Open", "Close"]].min(axis=1)
-        assert (df["High"] >= body_high - 1e-9).all()
-        assert (df["Low"] <= body_low + 1e-9).all()
-        assert (df["High"] >= df["Low"]).all()
+        body_high = df[["open", "close"]].max(axis=1)
+        body_low = df[["open", "close"]].min(axis=1)
+        assert (df["high"] >= body_high - 1e-9).all()
+        assert (df["low"] <= body_low + 1e-9).all()
+        assert (df["high"] >= df["low"]).all()
 
     def test_prices_and_volume_are_positive(self):
         df = sample_ohlcv(rows=500)
-        assert (df[["Open", "High", "Low", "Close"]] > 0).all().all()
-        assert (df["Volume"] > 0).all()
+        assert (df[["open", "high", "low", "close"]] > 0).all().all()
+        assert (df["volume"] > 0).all()
 
     def test_first_bar_opens_at_start_price(self):
         df = sample_ohlcv(start_price=250.0)
-        assert df["Open"].iloc[0] == pytest.approx(250.0)
+        assert df["open"].iloc[0] == pytest.approx(250.0)
 
 
 class TestDeterminism:
@@ -64,17 +64,17 @@ class TestDeterminism:
         pd.testing.assert_frame_equal(sample_ohlcv(seed=7), sample_ohlcv(seed=7))
 
     def test_different_seed_different_data(self):
-        assert not sample_ohlcv(seed=1)["Close"].equals(sample_ohlcv(seed=2)["Close"])
+        assert not sample_ohlcv(seed=1)["close"].equals(sample_ohlcv(seed=2)["close"])
 
 
 class TestTrend:
     def test_down_trend_ends_lower(self):
         df = sample_ohlcv(rows=400, trend="down", seed=0)
-        assert df["Close"].iloc[-1] < df["Close"].iloc[0]
+        assert df["close"].iloc[-1] < df["close"].iloc[0]
 
     def test_up_trend_ends_higher(self):
         df = sample_ohlcv(rows=400, trend="up", seed=0)
-        assert df["Close"].iloc[-1] > df["Close"].iloc[0]
+        assert df["close"].iloc[-1] > df["close"].iloc[0]
 
 
 class TestValidation:

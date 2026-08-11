@@ -91,7 +91,7 @@ Today, MangroveAI consumes the KB via direct HTTP calls to the FastAPI kb_server
 - 96 signal functions with structured docstring metadata
 - 40+ indicator classes with defined inputs/params/outputs
 - Data is read-only at runtime (changes only via reindex after editing markdown files)
-- All content is public (MIT-licensed repository)
+- All content is public (source-available; noncommercial license)
 
 ---
 
@@ -912,7 +912,7 @@ All of this is read-only after initialization. Multiple concurrent tool calls ar
 
 ### 4.2 Authentication Model
 
-The MangroveKnowledgeBase is an MIT-licensed, public repository. All content -- documents, signals, indicators, glossary -- is intended to be openly accessible. This is fundamentally different from MangroveMarkets, where authentication is required because agents interact with financial instruments.
+The MangroveKnowledgeBase is a public, source-available repository (noncommercial license; commercial use is paid). All content -- documents, signals, indicators, glossary -- is intended to be openly accessible. This is fundamentally different from MangroveMarkets, where authentication is required because agents interact with financial instruments.
 
 **Recommended tiered approach:**
 
@@ -962,7 +962,7 @@ Rate limiting protects the server from abuse and ensures fair access for all cli
 
 | Data | Classification | Notes |
 |------|---------------|-------|
-| KB document content | Public | MIT-licensed markdown files |
+| KB document content | Public | source-available markdown files |
 | Glossary terms and definitions | Public | Part of the KB |
 | Signal names, types, descriptions | Public | Published in the open-source package |
 | Signal parameter ranges and defaults | Public | Embedded in docstrings, published code |

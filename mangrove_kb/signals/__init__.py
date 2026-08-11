@@ -4,22 +4,36 @@ Signals are boolean-returning functions that evaluate market conditions
 using technical indicators. Each signal is registered with the RuleRegistry
 and can be evaluated by name.
 
+Files are named for the ontology CLASS of the signals they hold -- the class of the indicator each
+signal reads -- so a signal's location agrees with its position in the graph. Files not yet
+reorganised keep their old use-case names.
+
 Signal Categories:
-    - momentum: RSI, Stochastic, Williams %R, TSI, KAMA, ROC, etc.
+    - oscillator: RSI, Stochastic, StochRSI, Williams %R, CMO, TSI, BOP, Ultimate Oscillator, CMF, MFI
+    - momentum: MACD line, ROC, MOM, PPO, PVO, Awesome Oscillator, ADOSC, Force Index,
+      Ease of Movement, KVO, daily returns
+    - averaging: KAMA crossings, VWAP, VWMA
+    - flow: OBV, ADI, VPT, NVI, CumulativeReturn -- running accumulations read by direction
+    - pattern: Doji, Hammer, Engulfing, MorningStar, InsideBar, NR7, etc.
     - trend: SMA, EMA, MACD, ADX, Aroon, Ichimoku, PSAR, etc.
-    - volume: OBV, CMF, MFI, VWAP, ADI, Force Index, etc.
     - volatility: Bollinger Bands, ATR, Keltner Channel, Donchian, etc.
-    - patterns: Doji, Hammer, Engulfing, MorningStar, InsideBar, NR7, etc.
     - onchain: smart-money flows, exchange flows, whale activity, holder concentration
     - defi_pro: token-unlock pressure, perp funding regime, ETF-flow momentum,
       treasury accumulation, lending-rate spread (DeFiLlama Pro)
+
+Deprecated paths: `volume` (split four ways) and `patterns` (now `pattern`) survive as shim modules
+that re-export from the new homes and warn on import. They are deliberately NOT imported below --
+importing the package must not emit a DeprecationWarning -- so they load only when something asks
+for the old path by name. Registered signal names never changed, so no strategy is affected.
 """
 
 # Import all signal modules to trigger registration with RuleRegistry
 from mangrove_kb.signals import momentum
 from mangrove_kb.signals import trend
-from mangrove_kb.signals import volume
+from mangrove_kb.signals import flow
 from mangrove_kb.signals import volatility
-from mangrove_kb.signals import patterns
+from mangrove_kb.signals import pattern
+from mangrove_kb.signals import oscillator
+from mangrove_kb.signals import averaging
 from mangrove_kb.signals import onchain
 from mangrove_kb.signals import defi_pro
