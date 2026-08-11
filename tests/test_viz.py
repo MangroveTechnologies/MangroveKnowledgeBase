@@ -244,3 +244,15 @@ def test_only_exceptional_status_is_ringed_and_selection_grows_outward(page):
     assert sel in page, "selection must be a green ring on its OWN path, outside the fill"
     assert "if(n===sel||n===hov){ctx.lineWidth=2;ctx.strokeStyle=cssv('--ink');ctx.stroke();}" \
         not in page, "the old selection stroke reused the fill path and ate the node's area"
+
+
+def test_the_focused_node_labels_itself_louder(page):
+    """Bigger and bold for the selected node, on the same `foc` the ring uses.
+
+    The x-offset moves with the font: the ring's outer edge is r+4.0 and the label started at r+3,
+    so a 14px label would have been printed across the ring it accompanies.
+    """
+    assert "ctx.font=foc?'bold 14px sans-serif':'11px sans-serif';" in page
+    assert "n.x+r+(foc?6:3)" in page, "the label must clear the ring it sits beside"
+    assert "ctx.font='11px sans-serif';\n      ctx.fillText" not in page, \
+        "the unconditional label font is still in place; selection would look identical"

@@ -1002,6 +1002,16 @@ def main() -> int:
         ("if(n===sel||n===hov){ctx.lineWidth=2;ctx.strokeStyle=cssv('--ink');ctx.stroke();}",
          "if(n===sel||n===hov){ctx.lineWidth=3.6;ctx.strokeStyle=cssv('--ok');"
          "ctx.beginPath();ctx.arc(n.x,n.y,r+2.2,0,6.2832);ctx.stroke();}"),
+        # The focused node's own label, bigger and bold. `foc` is already `sel||hov` on that line --
+        # the same condition the ring uses -- so the two states cannot drift apart.
+        #
+        # The x-offset moves with it: the ring's outer edge is now r+4.0 and the label started at
+        # r+3, so at 14px it would have been printed across the ring it is meant to accompany.
+        ("if(showLbl){ctx.fillStyle=cssv('--ink');ctx.font='11px sans-serif';\n"
+         "      ctx.fillText((n.name||n.id).slice(0,26),n.x+r+3,n.y+4);}});",
+         "if(showLbl){ctx.fillStyle=cssv('--ink');"
+         "ctx.font=foc?'bold 14px sans-serif':'11px sans-serif';\n"
+         "      ctx.fillText((n.name||n.id).slice(0,26),n.x+r+(foc?6:3),n.y+4);}});"),
     ):
         if page.count(old) != 1:
             sys.exit(f"expected exactly one {old!r} in the viewer script, found {page.count(old)}; "
