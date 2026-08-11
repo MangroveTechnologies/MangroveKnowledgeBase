@@ -56,6 +56,7 @@ its edges. [Interface guide below](#the-viewer).*
 - [Repository structure](#repository-structure)
 - [Development](#development)
 - [License](#license)
+- [Contributing](#contributing)
 - [Links](#links)
 
 ---
