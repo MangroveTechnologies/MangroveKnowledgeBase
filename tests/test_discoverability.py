@@ -257,3 +257,42 @@ def test_the_skill_and_tools_have_their_own_section():
         assert call in section, f"the tools section does not mention {call}"
     for doc in ("SKILL.md", "GUIDE.md"):
         assert doc in section, f"the tools section does not link {doc}"
+
+
+def test_no_committed_file_carries_a_local_absolute_path():
+    """This is a public repository. A developer's home directory is not documentation.
+
+    `scripts/audit/gap_analysis.py` defaulted a reference-library path to
+    `/home/<user>/mangrove/MangroveResearch/...`, which leaked a username and a local layout and was
+    wrong for every other machine anyway. Environment variables, or nothing.
+    """
+    import subprocess
+    files = subprocess.run(["git", "ls-files"], cwd=REPO, capture_output=True, text=True,
+                           check=True).stdout.split()
+    offenders = []
+    for rel in files:
+        path = REPO / rel
+        if not path.is_file() or path.suffix in {".png", ".svg", ".db", ".csv", ".ipynb"}:
+            continue
+        try:
+            text = path.read_text()
+        except UnicodeDecodeError:
+            continue
+        for pattern in (r"/home/[a-z]", r"/Users/[a-z]"):
+            if re.search(pattern, text):
+                offenders.append(rel)
+                break
+    assert not offenders, f"committed files carry a local absolute path: {sorted(set(offenders))}"
+
+
+def test_no_agent_definitions_are_committed():
+    """Agent specs and repo memory live in the private workspace. CLAUDE.md used to point at
+    `.claude/agents/product-owner.md`, which is not in this repo -- a dead pointer in the file an
+    agent reads first. The authoring skills stay; they document the values this repo carries."""
+    import subprocess
+    committed = subprocess.run(["git", "ls-files", ".claude"], cwd=REPO,
+                               capture_output=True, text=True, check=True).stdout.split()
+    stray = [f for f in committed if not f.startswith(".claude/skills/")]
+    assert not stray, f"only authoring skills belong under .claude here: {stray}"
+    assert "agents/product-owner.md" not in (REPO / "CLAUDE.md").read_text(), \
+        "CLAUDE.md points at an agent spec this repo does not contain"

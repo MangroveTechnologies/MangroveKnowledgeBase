@@ -112,6 +112,17 @@ CLAIMS = [
     # the guard covered its signal and indicator counts but not the graph size.
     ("PKG_README.md",  r"-- (\d+) nodes, [\d,]+ edges, queryable",     "nodes"),
     ("PKG_README.md",  r"-- [\d,]+ nodes, (\d+) edges, queryable",     "edges"),
+    # CLAUDE.md is what an agent reads before touching this repo, and it had drifted furthest:
+    # "102 tests", "233 signal functions", "99 indicator classes", and a curl example still using
+    # capitalised OHLCV after lowercase became canonical. Nothing was watching it.
+    ("CLAUDE.md",      r"(\d+) signal functions",                     "registered_signals"),
+    ("CLAUDE.md",      r"(\d+) indicator classes",                    "indicator_classes"),
+    ("CLAUDE.md",      r"(\d+) registered \(",                        "registered_signals"),
+    ("CLAUDE.md",      r"registered \((\d+) TRIGGER",                 "triggers"),
+    ("CLAUDE.md",      r"TRIGGER, (\d+) FILTER",                      "filters"),
+    ("CLAUDE.md",      r"(\d+) are modelled in the graph",            "signals"),
+    ("CLAUDE.md",      r"(\d+) nodes\n?and [\d,]+ edges",             "nodes"),
+    ("CLAUDE.md",      r"[\d,]+ nodes\n?and (\d+) edges",             "edges"),
 ]
 
 #: Files whose numbers are historical and MUST NOT be "corrected". Listed so the exclusion is a

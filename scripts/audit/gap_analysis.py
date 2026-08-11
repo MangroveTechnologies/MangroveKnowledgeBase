@@ -144,12 +144,15 @@ def get_talib_functions() -> dict[str, list[tuple[str, str]]]:
     """
     # TA-Lib's Python stubs are not on PyPI as a file we can read, so this needs a checkout.
     # Overridable, and absent on any machine that is not this one -- including CI.
-    pyi_path = Path(os.environ.get(
-        "TALIB_PYI", "/home/darrahts/mangrove/MangroveResearch/ta-lib-python-master/talib/_ta_lib.pyi"))
-    if not pyi_path.is_file():
-        print(f"SKIP: TA-Lib stubs not found at {pyi_path}. Set TALIB_PYI to a checkout of\n"
-              f"      ta-lib-python to include TA-Lib in the gap analysis.", file=sys.stderr)
+    # No default path. This is a public repository, and the previous default was one developer's
+    # home directory -- which leaked a username and a local layout, and was wrong for everyone else
+    # anyway. Point TALIB_PYI at a ta-lib-python checkout to include TA-Lib in the comparison.
+    stub = os.environ.get("TALIB_PYI")
+    if not stub or not Path(stub).is_file():
+        print("SKIP: TA-Lib stubs not available. Set TALIB_PYI to `talib/_ta_lib.pyi` in a\n"
+              "      ta-lib-python checkout to include TA-Lib in the gap analysis.", file=sys.stderr)
         raise SkipAudit()
+    pyi_path = Path(stub)
 
     # Extract all uppercase function names (actual indicators, not stream_ variants)
     func_names = []
