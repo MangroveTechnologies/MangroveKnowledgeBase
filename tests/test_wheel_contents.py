@@ -98,3 +98,41 @@ def test_every_bundled_source_exists():
     assert expected in destinations, (
         f"graph.py loads {expected} from inside the package, but setup.py does not put it there; "
         f"it copies {sorted(destinations)}")
+
+
+#: Files inside the package that are not `.py`. setuptools ships only Python modules unless they are
+#: declared, and the failure is invisible from a source checkout: every test passes, and the viewer
+#: dies on `pip install` with `FileNotFoundError` on its own logo.
+NON_PY_PACKAGE_DATA = (
+    "mangrove_kb/viz/assets/Mangrove-Horiz-FullColor.svg",
+    "mangrove_kb/viz/assets/Mangrove-Horiz-FullColor-WhiteType.svg",
+    "mangrove_kb/viz/vendor/3d-force-graph.min.js",
+    "mangrove_kb/viz/schema.sql",
+)
+
+
+def test_the_viewers_own_files_are_in_the_wheel(wheel):
+    """The 3D view is dead without the vendored library, and the page will not render without the
+    wordmark. Both were absent for the first four builds of this package."""
+    names = set(wheel.namelist())
+    missing = [f for f in NON_PY_PACKAGE_DATA if f not in names]
+    assert not missing, (f"the wheel ships no {missing}.\n"
+                         f"  Declare them in [tool.setuptools.package-data]; setuptools includes "
+                         f"only *.py otherwise, and nothing running from the source tree notices.")
+
+
+def test_the_viewer_runs_from_the_wheel_alone(wheel, tmp_path):
+    """The consumer's check, not ours: install the built artifact into a clean venv OUTSIDE the
+    repo and run the documented command. Reading the file list proves the bytes are present; only
+    running it proves they are the ones the code reaches for."""
+    venv = tmp_path / "venv"
+    subprocess.run([sys.executable, "-m", "venv", str(venv)], check=True, capture_output=True)
+    py = venv / "bin" / "python"
+    # `wheel` is an open ZipFile; the artifact's path is on it.
+    subprocess.run([str(py), "-m", "pip", "-q", "install", "--no-cache-dir", wheel.filename],
+                   check=True, capture_output=True, timeout=900)
+    proc = subprocess.run([str(py), "-m", "mangrove_kb.viz"], capture_output=True, text=True,
+                          cwd=str(tmp_path), timeout=900)
+    assert proc.returncode == 0, f"the viewer does not run from a wheel install:\n{proc.stderr[-1500:]}"
+    assert "data:image/svg" in proc.stdout, "the wordmark did not embed -- the SVG is missing"
+    assert len(proc.stdout) > 1_000_000, "the page is too small to contain the vendored 3D library"

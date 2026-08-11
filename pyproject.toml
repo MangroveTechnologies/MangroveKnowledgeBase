@@ -62,6 +62,18 @@ Repository = "https://github.com/MangroveTechnologies/MangroveKnowledgeBase"
 [tool.setuptools.packages.find]
 include = ["mangrove_kb*"]
 
+# Non-Python files INSIDE the package. Without this setuptools ships only `*.py`, and the viewer
+# dies on a wheel install -- `python -m mangrove_kb.viz` raised FileNotFoundError on its own logo
+# while every test passed, because the tests run from the source tree where the files are present.
+# The graph and the skills are bundled separately by the build_py hook in setup.py, because those
+# are copied in from OUTSIDE the package directory; these live inside it and only need declaring.
+[tool.setuptools.package-data]
+mangrove_kb = [
+    "viz/assets/*.svg",      # the Mangrove wordmark, light and dark
+    "viz/vendor/*.js",       # vendored 3d-force-graph -- the 3D view is dead without it
+    "viz/*.sql",             # store schema
+]
+
 [tool.setuptools_scm]
 version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
