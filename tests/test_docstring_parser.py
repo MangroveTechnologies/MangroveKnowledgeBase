@@ -1,9 +1,17 @@
 """
 Validation tests for the docstring parser.
 
-Loads the original signals_metadata.json, imports the signal modules whose signals that JSON
-covers, parses their docstrings using the parser, and compares the parsed output to the JSON for
-every signal.
+Imports every signal module in the package, parses their docstrings with the parser, and checks
+what comes out.
+
+This file used to compare the parsed result against `signals_metadata.json` in the MangroveAI
+repository. Those 17 tests were dead: the path was a hard-coded absolute one under a Dropbox
+directory that no longer exists, so they skipped themselves on every run -- with the reason
+"(CI environment)", which is why nobody looked. Pointed at the file's real location they fail, and
+correctly: the snapshot has 96 signals against this package's 249, and expects `Requires: Close`
+where lowercase is now canonical. They asserted agreement with a frozen copy of a different repo
+that this one deliberately moved past, so they are gone rather than repaired. What remains tests
+the parser against the docstrings in THIS package, which is the thing worth guarding.
 
 The module list is not hand-maintained: the reorganisation onto ontology classes moved signals
 between files twice, and a hard-coded list silently drops whichever ones moved out. Every module in
@@ -17,8 +25,6 @@ Usage:
     pytest tests/test_docstring_parser.py -v
 """
 
-import json
-import os
 
 import pytest
 
@@ -35,23 +41,12 @@ from mangrove_kb.docstring_parser import (  # noqa: E402
 
 # Social signals are private (not in mangrove_kb). Skip them in tests.
 # The JSON has 127 signals (122 enabled + 5 social). We validate the 122 public ones.
-SOCIAL_SIGNALS = {
-    "x_user_post_trigger",
-    "x_topic_mention_trigger",
-    "x_social_sentiment_trigger",
-    "x_user_influence_filter",
-    "x_topic_sentiment_filter",
-}
 
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
-METADATA_JSON_PATH = (
-    "/home/darrahts/development/Dropbox/alpha-delta/mangrove/"
-    "MangroveAI/src/MangroveAI/domains/signals/signals_metadata.json"
-)
 
 ALL_SIGNAL_MODULES = [
     m for m in vars(mangrove_kb.signals).values()
@@ -63,16 +58,6 @@ ALL_SIGNAL_MODULES = [
     # would depend on whether some other test imported the old path first.
     and not getattr(m, "__deprecated__", False)
 ]
-
-
-@pytest.fixture(scope="session")
-def json_metadata() -> dict:
-    """Load the original signals_metadata.json, excluding social signals."""
-    if not os.path.exists(METADATA_JSON_PATH):
-        pytest.skip(f"signals_metadata.json not found at {METADATA_JSON_PATH} (CI environment)")
-    with open(METADATA_JSON_PATH, "r") as f:
-        all_meta = json.load(f)
-    return {k: v for k, v in all_meta.items() if k not in SOCIAL_SIGNALS}
 
 
 @pytest.fixture(scope="session")
@@ -102,307 +87,15 @@ _KNOWN_DESCRIPTION_DIFFS = {
 # Test: all JSON signals are parsed
 # ---------------------------------------------------------------------------
 
-class TestParserCoverage:
-    """Verify that every signal in the JSON is parsed from docstrings."""
-
-    def test_all_json_signals_are_parsed(self, json_metadata, parsed_metadata):
-        """Every signal in signals_metadata.json should be found by the parser."""
-        json_names = set(json_metadata.keys())
-        parsed_names = set(parsed_metadata.keys())
-
-        missing = json_names - parsed_names
-        assert not missing, (
-            f"Signals in JSON but not parsed from docstrings: {sorted(missing)}"
-        )
-
-    def test_no_extra_signals_parsed(self, json_metadata, parsed_metadata):
-        """The parser should not find signals that are not in the JSON."""
-        json_names = set(json_metadata.keys())
-        parsed_names = set(parsed_metadata.keys())
-
-        extra = parsed_names - json_names
-        assert not extra, (
-            f"Signals parsed from docstrings but not in JSON: {sorted(extra)}"
-        )
-
-    def test_signal_count_matches(self, json_metadata, parsed_metadata):
-        """Total number of signals should match."""
-        assert len(parsed_metadata) == len(json_metadata), (
-            f"Parsed {len(parsed_metadata)} signals, "
-            f"JSON has {len(json_metadata)}"
-        )
-
 
 # ---------------------------------------------------------------------------
 # Test: signal-level fields
 # ---------------------------------------------------------------------------
 
-class TestSignalFields:
-    """Validate type, requires, and description for each signal."""
-
-    def test_type_matches(self, json_metadata, parsed_metadata):
-        """Signal type (TRIGGER/FILTER) should match for every signal."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            expected = json_metadata[name]["type"]
-            actual = parsed_metadata[name]["type"]
-            if expected != actual:
-                mismatches.append(
-                    f"  {name}: expected type={expected!r}, got {actual!r}"
-                )
-        assert not mismatches, (
-            "Signal type mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_requires_matches(self, json_metadata, parsed_metadata):
-        """Required columns should match for every signal."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            expected = sorted(json_metadata[name].get("requires", []))
-            actual = sorted(parsed_metadata[name].get("requires", []))
-            if expected != actual:
-                mismatches.append(
-                    f"  {name}: expected requires={expected}, got {actual}"
-                )
-        assert not mismatches, (
-            "Requires mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_rule_name_matches(self, json_metadata, parsed_metadata):
-        """Rule name should match the JSON key for every signal."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            expected = json_metadata[name]["rule_name"]
-            actual = parsed_metadata[name]["rule_name"]
-            if expected != actual:
-                mismatches.append(
-                    f"  {name}: expected rule_name={expected!r}, got {actual!r}"
-                )
-        assert not mismatches, (
-            "Rule name mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_disabled_flag_matches(self, json_metadata, parsed_metadata):
-        """Disabled flag should match for every signal."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            expected_disabled = json_metadata[name].get("disabled", False)
-            actual_disabled = parsed_metadata[name].get("disabled", False)
-            if expected_disabled != actual_disabled:
-                mismatches.append(
-                    f"  {name}: expected disabled={expected_disabled}, "
-                    f"got {actual_disabled}"
-                )
-        assert not mismatches, (
-            "Disabled flag mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_disabled_reason_matches(self, json_metadata, parsed_metadata):
-        """Disabled reason should match for disabled signals."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            expected = json_metadata[name].get("disabled_reason", "")
-            actual = parsed_metadata[name].get("disabled_reason", "")
-            if expected != actual:
-                mismatches.append(
-                    f"  {name}: expected disabled_reason={expected!r}, "
-                    f"got {actual!r}"
-                )
-        assert not mismatches, (
-            "Disabled reason mismatches:\n" + "\n".join(mismatches)
-        )
-
 
 # ---------------------------------------------------------------------------
 # Test: parameter-level fields
 # ---------------------------------------------------------------------------
-
-class TestParamFields:
-    """Validate parameter names, types, ranges, and defaults."""
-
-    def test_param_names_match(self, json_metadata, parsed_metadata):
-        """Parameter names should match for every signal."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            expected_params = set(json_metadata[name].get("params", {}).keys())
-            actual_params = set(parsed_metadata[name].get("params", {}).keys())
-            if expected_params != actual_params:
-                missing = expected_params - actual_params
-                extra = actual_params - expected_params
-                msg = f"  {name}:"
-                if missing:
-                    msg += f" missing={sorted(missing)}"
-                if extra:
-                    msg += f" extra={sorted(extra)}"
-                mismatches.append(msg)
-        assert not mismatches, (
-            "Param name mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_param_types_match(self, json_metadata, parsed_metadata):
-        """Parameter types should match for every parameter."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            for pname, pmeta in json_metadata[name].get("params", {}).items():
-                if pname not in parsed_metadata[name].get("params", {}):
-                    continue
-                expected = pmeta["type"]
-                actual = parsed_metadata[name]["params"][pname]["type"]
-                if expected != actual:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected type={expected!r}, "
-                        f"got {actual!r}"
-                    )
-        assert not mismatches, (
-            "Param type mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_param_optional_matches(self, json_metadata, parsed_metadata):
-        """Parameter optional flag should match for every parameter."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            for pname, pmeta in json_metadata[name].get("params", {}).items():
-                if pname not in parsed_metadata[name].get("params", {}):
-                    continue
-                expected = pmeta.get("optional", False)
-                actual = parsed_metadata[name]["params"][pname].get(
-                    "optional", False
-                )
-                if expected != actual:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected optional={expected}, "
-                        f"got {actual}"
-                    )
-        assert not mismatches, (
-            "Param optional mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_param_defaults_match(self, json_metadata, parsed_metadata):
-        """Parameter defaults should match for every parameter that has one."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            for pname, pmeta in json_metadata[name].get("params", {}).items():
-                if pname not in parsed_metadata[name].get("params", {}):
-                    continue
-                if "default" not in pmeta:
-                    continue
-                expected = pmeta["default"]
-                actual_pmeta = parsed_metadata[name]["params"][pname]
-                if "default" not in actual_pmeta:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected default={expected!r}, "
-                        f"but parsed has no default"
-                    )
-                    continue
-                actual = actual_pmeta["default"]
-
-                # Compare with type-aware tolerance for floats
-                if isinstance(expected, float) and isinstance(actual, float):
-                    if abs(expected - actual) > 1e-6:
-                        mismatches.append(
-                            f"  {name}.{pname}: expected default={expected}, "
-                            f"got {actual}"
-                        )
-                elif expected != actual:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected default={expected!r}, "
-                        f"got {actual!r}"
-                    )
-        assert not mismatches, (
-            "Param default mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_param_min_matches(self, json_metadata, parsed_metadata):
-        """Parameter min values should match for every parameter that has one."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            for pname, pmeta in json_metadata[name].get("params", {}).items():
-                if pname not in parsed_metadata[name].get("params", {}):
-                    continue
-                if "min" not in pmeta:
-                    continue
-                expected = pmeta["min"]
-                actual_pmeta = parsed_metadata[name]["params"][pname]
-                if "min" not in actual_pmeta:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected min={expected}, "
-                        f"but parsed has no min"
-                    )
-                    continue
-                actual = actual_pmeta["min"]
-
-                # Compare with type-aware tolerance
-                if isinstance(expected, float) and isinstance(actual, float):
-                    if abs(expected - actual) > 1e-6:
-                        mismatches.append(
-                            f"  {name}.{pname}: expected min={expected}, "
-                            f"got {actual}"
-                        )
-                elif expected != actual:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected min={expected!r}, "
-                        f"got {actual!r}"
-                    )
-        assert not mismatches, (
-            "Param min mismatches:\n" + "\n".join(mismatches)
-        )
-
-    def test_param_max_matches(self, json_metadata, parsed_metadata):
-        """Parameter max values should match for every parameter that has one."""
-        mismatches = []
-        for name in json_metadata:
-            if name not in parsed_metadata:
-                continue
-            for pname, pmeta in json_metadata[name].get("params", {}).items():
-                if pname not in parsed_metadata[name].get("params", {}):
-                    continue
-                if "max" not in pmeta:
-                    continue
-                expected = pmeta["max"]
-                actual_pmeta = parsed_metadata[name]["params"][pname]
-                if "max" not in actual_pmeta:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected max={expected}, "
-                        f"but parsed has no max"
-                    )
-                    continue
-                actual = actual_pmeta["max"]
-
-                # Compare with type-aware tolerance
-                if isinstance(expected, float) and isinstance(actual, float):
-                    if abs(expected - actual) > 1e-6:
-                        mismatches.append(
-                            f"  {name}.{pname}: expected max={expected}, "
-                            f"got {actual}"
-                        )
-                elif expected != actual:
-                    mismatches.append(
-                        f"  {name}.{pname}: expected max={expected!r}, "
-                        f"got {actual!r}"
-                    )
-        assert not mismatches, (
-            "Param max mismatches:\n" + "\n".join(mismatches)
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -445,10 +138,6 @@ class TestIndividualParsing:
         assert window_fast["optional"] is False
         assert "default" not in window_fast
 
-    @pytest.mark.skip(reason="Social signals are private, not in mangrove_kb")
-    def test_parse_disabled_signal(self):
-        """Verify parsing of a disabled social signal."""
-        pass
 
     def test_parse_str_param_no_range(self):
         """Verify parsing of a str param without Range."""
@@ -485,10 +174,6 @@ class TestIndividualParsing:
         assert threshold["max"] == 0
         assert threshold["default"] == -20.0
 
-    @pytest.mark.skip(reason="Social signals are private, not in mangrove_kb")
-    def test_parse_requires_none(self):
-        """Verify that Requires: None produces an empty list."""
-        pass
 
     def test_parse_requires_multiple(self):
         """Verify parsing of multiple required columns."""
@@ -562,181 +247,3 @@ class TestParseAllSignals:
 # Test: comprehensive field-by-field comparison report
 # ---------------------------------------------------------------------------
 
-class TestComprehensiveComparison:
-    """Generate a detailed comparison report between parsed and JSON metadata."""
-
-    def test_full_comparison(self, json_metadata, parsed_metadata):
-        """Compare every field of every signal and report all mismatches.
-
-        This is the master comparison test. It checks:
-        - type
-        - requires
-        - disabled / disabled_reason
-        - param names
-        - param type, min, max, optional, default for each param
-        """
-        all_mismatches = []
-
-        for name in sorted(json_metadata.keys()):
-            if name not in parsed_metadata:
-                all_mismatches.append(f"MISSING: {name} not in parsed output")
-                continue
-
-            jmeta = json_metadata[name]
-            pmeta = parsed_metadata[name]
-
-            # Type
-            if jmeta.get("type") != pmeta.get("type"):
-                all_mismatches.append(
-                    f"{name}: type mismatch: "
-                    f"json={jmeta.get('type')!r} vs "
-                    f"parsed={pmeta.get('type')!r}"
-                )
-
-            # Requires
-            if sorted(jmeta.get("requires", [])) != sorted(
-                pmeta.get("requires", [])
-            ):
-                all_mismatches.append(
-                    f"{name}: requires mismatch: "
-                    f"json={sorted(jmeta.get('requires', []))} vs "
-                    f"parsed={sorted(pmeta.get('requires', []))}"
-                )
-
-            # Disabled
-            j_disabled = jmeta.get("disabled", False)
-            p_disabled = pmeta.get("disabled", False)
-            if j_disabled != p_disabled:
-                all_mismatches.append(
-                    f"{name}: disabled mismatch: "
-                    f"json={j_disabled} vs parsed={p_disabled}"
-                )
-
-            # Disabled reason
-            j_reason = jmeta.get("disabled_reason", "")
-            p_reason = pmeta.get("disabled_reason", "")
-            if j_disabled and j_reason != p_reason:
-                all_mismatches.append(
-                    f"{name}: disabled_reason mismatch: "
-                    f"json={j_reason!r} vs parsed={p_reason!r}"
-                )
-
-            # Params
-            j_params = jmeta.get("params", {})
-            p_params = pmeta.get("params", {})
-
-            j_pnames = set(j_params.keys())
-            p_pnames = set(p_params.keys())
-
-            if j_pnames != p_pnames:
-                missing = j_pnames - p_pnames
-                extra = p_pnames - j_pnames
-                if missing:
-                    all_mismatches.append(
-                        f"{name}: missing params: {sorted(missing)}"
-                    )
-                if extra:
-                    all_mismatches.append(
-                        f"{name}: extra params: {sorted(extra)}"
-                    )
-
-            # Compare each common param
-            for pname in sorted(j_pnames & p_pnames):
-                jp = j_params[pname]
-                pp = p_params[pname]
-
-                # Type
-                if jp.get("type") != pp.get("type"):
-                    all_mismatches.append(
-                        f"{name}.{pname}: type mismatch: "
-                        f"json={jp.get('type')!r} vs "
-                        f"parsed={pp.get('type')!r}"
-                    )
-
-                # Optional
-                if jp.get("optional", False) != pp.get("optional", False):
-                    all_mismatches.append(
-                        f"{name}.{pname}: optional mismatch: "
-                        f"json={jp.get('optional', False)} vs "
-                        f"parsed={pp.get('optional', False)}"
-                    )
-
-                # Min
-                if "min" in jp:
-                    if "min" not in pp:
-                        all_mismatches.append(
-                            f"{name}.{pname}: min missing in parsed "
-                            f"(json has {jp['min']})"
-                        )
-                    else:
-                        j_min = jp["min"]
-                        p_min = pp["min"]
-                        if isinstance(j_min, float) and isinstance(
-                            p_min, float
-                        ):
-                            if abs(j_min - p_min) > 1e-6:
-                                all_mismatches.append(
-                                    f"{name}.{pname}: min mismatch: "
-                                    f"json={j_min} vs parsed={p_min}"
-                                )
-                        elif j_min != p_min:
-                            all_mismatches.append(
-                                f"{name}.{pname}: min mismatch: "
-                                f"json={j_min!r} vs parsed={p_min!r}"
-                            )
-
-                # Max
-                if "max" in jp:
-                    if "max" not in pp:
-                        all_mismatches.append(
-                            f"{name}.{pname}: max missing in parsed "
-                            f"(json has {jp['max']})"
-                        )
-                    else:
-                        j_max = jp["max"]
-                        p_max = pp["max"]
-                        if isinstance(j_max, float) and isinstance(
-                            p_max, float
-                        ):
-                            if abs(j_max - p_max) > 1e-6:
-                                all_mismatches.append(
-                                    f"{name}.{pname}: max mismatch: "
-                                    f"json={j_max} vs parsed={p_max}"
-                                )
-                        elif j_max != p_max:
-                            all_mismatches.append(
-                                f"{name}.{pname}: max mismatch: "
-                                f"json={j_max!r} vs parsed={p_max!r}"
-                            )
-
-                # Default
-                if "default" in jp:
-                    if "default" not in pp:
-                        all_mismatches.append(
-                            f"{name}.{pname}: default missing in parsed "
-                            f"(json has {jp['default']!r})"
-                        )
-                    else:
-                        j_def = jp["default"]
-                        p_def = pp["default"]
-                        if isinstance(j_def, float) and isinstance(
-                            p_def, float
-                        ):
-                            if abs(j_def - p_def) > 1e-6:
-                                all_mismatches.append(
-                                    f"{name}.{pname}: default mismatch: "
-                                    f"json={j_def} vs parsed={p_def}"
-                                )
-                        elif j_def != p_def:
-                            all_mismatches.append(
-                                f"{name}.{pname}: default mismatch: "
-                                f"json={j_def!r} vs parsed={p_def!r}"
-                            )
-
-        # Final assertion
-        if all_mismatches:
-            report = "\n".join(f"  [{i+1}] {m}" for i, m in enumerate(all_mismatches))
-            pytest.fail(
-                f"\n{len(all_mismatches)} mismatch(es) found between "
-                f"parsed docstrings and signals_metadata.json:\n{report}"
-            )
