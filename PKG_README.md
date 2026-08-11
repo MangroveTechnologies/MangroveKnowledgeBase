@@ -204,7 +204,6 @@ This package is part of [MangroveKnowledgeBase](https://github.com/MangroveTechn
 
 - [GitHub](https://github.com/MangroveTechnologies/MangroveKnowledgeBase) -- star it, fork it, contribute
 - [Documentation](https://mangrove.io/docs)
-- [Contributing Guide](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/CONTRIBUTING.md)
 - [Mangrove](https://mangrove.ai)
 
 ## License
