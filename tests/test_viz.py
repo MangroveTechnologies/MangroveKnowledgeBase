@@ -239,7 +239,7 @@ def test_only_exceptional_status_is_ringed_and_selection_grows_outward(page):
     assert "if(sc){ctx.lineWidth=1.2;" in page, "the status ring should be thin"
     assert "if(sc){ctx.lineWidth=2;" not in page
 
-    sel = ("if(n===sel||n===hov){ctx.lineWidth=2.4;ctx.strokeStyle=cssv('--ok');"
+    sel = ("if(n===sel||n===hov){ctx.lineWidth=3.6;ctx.strokeStyle=cssv('--ok');"
            "ctx.beginPath();ctx.arc(n.x,n.y,r+2.2,0,6.2832);ctx.stroke();}")
     assert sel in page, "selection must be a green ring on its OWN path, outside the fill"
     assert "if(n===sel||n===hov){ctx.lineWidth=2;ctx.strokeStyle=cssv('--ink');ctx.stroke();}" \

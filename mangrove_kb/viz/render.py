@@ -997,9 +997,10 @@ def main() -> int:
         # Selection is drawn OUTSIDE the node, not on its edge. A stroke is centred on its path, so
         # stroking the fill circle at width 2 spent half that width covering the node -- the marker
         # shrank what it was marking. At r+2.2 the whole ring sits clear of the fill, so a selected
-        # node is the same size as an unselected one with a halo added.
+        # node is the same size as an unselected one with a halo added. At width 3.6 the band runs
+        # r+0.4 to r+4.0 -- more prominent, and its inner edge still clears the fill.
         ("if(n===sel||n===hov){ctx.lineWidth=2;ctx.strokeStyle=cssv('--ink');ctx.stroke();}",
-         "if(n===sel||n===hov){ctx.lineWidth=2.4;ctx.strokeStyle=cssv('--ok');"
+         "if(n===sel||n===hov){ctx.lineWidth=3.6;ctx.strokeStyle=cssv('--ok');"
          "ctx.beginPath();ctx.arc(n.x,n.y,r+2.2,0,6.2832);ctx.stroke();}"),
     ):
         if page.count(old) != 1:
