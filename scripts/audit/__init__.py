@@ -6,6 +6,8 @@ from pathlib import Path
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 RESULTS_DIR = Path(__file__).parent.parent.parent / "audit_results"
+#: Generated output, gitignored -- so it may not exist on a fresh clone.
+RESULTS_DIR.mkdir(exist_ok=True)
 KB_ROOT = Path(__file__).parent.parent.parent
 
 

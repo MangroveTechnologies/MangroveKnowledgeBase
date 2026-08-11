@@ -27,6 +27,12 @@ classifiers = [
 dependencies = [
     "numpy>=1.24.0",
     "pandas>=2.0.0",
+    # `SwingDelta` and the deprecated `Divergence` find swing points with
+    # `scipy.signal.argrelextrema`. Both catch the ImportError and return empty -- SwingDelta as NaN
+    # ("could not compute"), Divergence as all-False ("no divergence", a claim it has not earned).
+    # It was optional-and-undeclared, which meant `pip install mangrove-kb` shipped a ratified
+    # indicator that four signals read and that silently produced nothing.
+    "scipy>=1.11",
 ]
 
 [project.optional-dependencies]
@@ -40,10 +46,6 @@ dev = [
     # worked only on machines that happened to have it -- which is how the audits could pass locally
     # and fail on a clean install. Requires Python >= 3.12.
     "pandas_ta>=0.4.71b0; python_version >= '3.12'",
-    # `Divergence` uses scipy.signal.argrelextrema and, without it, catches the ImportError and
-    # returns all-zeros -- indistinguishable from "no divergences found". Undeclared, so a clean
-    # install audited an indicator that had quietly stopped working. See the note in the audit job.
-    "scipy>=1.11",
     # `tests/test_wheel_contents.py` imports setup.py to read the bundle list. Virtualenvs stopped
     # shipping setuptools in 3.12, so that test passed on a machine with it and would have failed on
     # a clean CI runner -- the build backend installs it in an isolated env, not this one.

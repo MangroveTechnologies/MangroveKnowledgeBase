@@ -145,7 +145,7 @@ indicator is benchmarked on the same fixture and tier-classified
 - **DarkCloudCover `require_gap` parameter**: Same as PiercingLine. When `False`, relaxes from "open above previous high" to "open above previous close".
 - **TwoBarReversal `close_proximity` parameter**: New float parameter (default `0.25`, range `0.1-0.5`). Controls how close the close must be to the high/low for reversal detection. Previously hardcoded at `0.25`.
 - **Indicator audit framework** at `scripts/audit/` -- reproducible accuracy verification for all 70 indicators and 136 signals against Bukosabino `ta` reference library.
-- **Audit reports** at `audit_results/` -- indicator, signal, pattern, and gap analysis reports.
+- **Audit reports** generated into `audit_results/` by `scripts/audit/run_all.py` (not committed).
 
 ### Documentation
 - Updated KB document 07-chart-patterns.md with notes on `require_gap` and `close_proximity` parameters

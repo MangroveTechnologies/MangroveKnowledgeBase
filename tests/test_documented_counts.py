@@ -13,7 +13,6 @@ a table rather than a repo-wide regex:
 
 * ``CHANGELOG.md`` entries under a *released* version were true when written. Rewriting them would
   falsify the record. Only the ``[Unreleased]`` section describes the present.
-* ``audit_results/gap_analysis.md`` carries a ``Generated: <date>`` stamp -- it is a dated report.
 * ``docs/research/*`` states "graph at time of survey" for the same reason.
 
 A generator was considered instead and rejected: these numbers sit inside prose sentences, so
@@ -117,8 +116,7 @@ CLAIMS = [
 
 #: Files whose numbers are historical and MUST NOT be "corrected". Listed so the exclusion is a
 #: decision on the record rather than an omission someone later mistakes for an oversight.
-HISTORICAL = ("audit_results/gap_analysis.md",
-              "docs/research/graph-query-api-and-mcp-surface.md")
+HISTORICAL = ("docs/research/graph-query-api-and-mcp-surface.md",)
 
 
 @pytest.mark.parametrize("relpath,pattern,key", CLAIMS,
