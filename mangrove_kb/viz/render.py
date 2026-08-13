@@ -663,6 +663,189 @@ title="show this node">${esc(id)}</span>`;
 </script>
 """
 
+# The inspector's property block, made readable.
+#
+# The viewer renders any object property with `JSON.stringify`, so `inputs`, `params` and `outputs`
+# arrive as raw JSON -- BollingerBands' `outputs` alone is a ~1,400-character wall of braces. Worse,
+# `JSON.stringify` is LOSSY here: the page holds `range: [0, Infinity]` as real JS numbers and
+# stringify writes `null` for a non-finite one, so 161 unbounded endpoints render identically to the
+# 0 that were never authored. `SKILL.md` makes that distinction load-bearing -- "unbounded is
+# `[-inf, inf]`, not `null`" -- and the panel was destroying it at the last step.
+#
+# The property space is not arbitrary JSON. Measured across all 303 nodes: three dict-of-dict keys
+# with FIXED inner shapes (`inputs` {type, description} x625, `params` {type, default, min, max,
+# description} x581, `outputs` {type, units, range, canonical_name, description} x355), four plain
+# strings, and two that are a list on 64 nodes and a string on 7. Three known shapes is what makes
+# tables possible instead of a pretty-printer.
+#
+# `window.KVPROPS`/`window.KVEDGE` are read at the two `kv()` CALL SITES (patched in `main()`), not
+# by redefining `kv` -- an overlay cannot rebind a `const`, and the call sites are guarded so the
+# panel falls back to the viewer's own dump if this script ever fails to load. Everything is a pure
+# string function over `n.props`: no DOM, no viewer bindings, so `tests/test_viz.py` runs it in node
+# against the real graph rather than asserting that the source text is present.
+#
+# Nothing is hidden. Any key these formatters do not know about still reaches the panel through the
+# generic fallback at the bottom of the details block -- the invariant the original `kv` existed for.
+PROPERTY_PANEL = r"""
+<style>
+  #inspect table.kbt{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12px}
+  #inspect table.kbt td{vertical-align:top;padding:1px 0 5px}
+  #inspect table.kbt td.kbn{font:600 11.5px ui-monospace,monospace;width:34%;padding-right:8px;
+                            overflow-wrap:anywhere}
+  #inspect table.kbt td.kbv{overflow-wrap:anywhere}
+  #inspect .kbm{font:10.5px ui-monospace,monospace;color:var(--muted);letter-spacing:.02em}
+  #inspect .kbd{color:var(--muted);font-size:11.5px;line-height:1.45}
+  #inspect ul.kbl{margin:2px 0 0;padding-left:16px;font-size:12px;line-height:1.5}
+  #inspect pre.kbp{margin:2px 0 0;padding:6px 8px;background:rgba(128,128,128,.12);border-radius:4px;
+                   font:11px ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+  #inspect details.kbx{margin-top:14px;border-top:1px solid var(--line,rgba(128,128,128,.3));
+                       padding-top:8px}
+  #inspect details.kbx summary{font:10.5px ui-monospace,monospace;text-transform:uppercase;
+                               letter-spacing:.06em;color:var(--muted);cursor:pointer}
+  #inspect details.kbx[open] summary{margin-bottom:6px}
+</style>
+<script>
+(function(){
+  // Self-contained on purpose: its own escaper, no reads of the viewer's scope. That is what lets
+  // the test harness eval this block in node with nothing but `window` stubbed.
+  const E = s => (s==null?'':(''+s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const sec = (label, body) => body ? `<div class="lbl">${E(label)}</div><div class="val">${body}</div>` : '';
+
+  // 2.0 not 2, 0.5 not 0.5000000000000001, and never "Infinity" -- callers handle non-finite.
+  const NUM = v => typeof v === 'number' ? (Number.isInteger(v) ? String(v)
+                    : String(parseFloat(v.toPrecision(6)))) : E(v);
+
+  // The whole point of this file. `null` means NOT AUTHORED; a non-finite bound means UNBOUNDED.
+  // They are different facts about an endpoint and the panel used to print both as `null`.
+  const RANGE = (r, type) => {
+    if(!Array.isArray(r) || r.length !== 2) return '';
+    const [lo, hi] = r;
+    if(type === 'bool' && lo === 0 && hi === 1) return 'true/false';   // 218 of 355 outputs
+    const nlo = lo == null, nhi = hi == null;
+    if(nlo && nhi) return '<span class="kbm">not authored</span>';
+    // Number.isFinite is false for null too, so test null first (above) -- order matters.
+    const ulo = !Number.isFinite(lo), uhi = !Number.isFinite(hi);
+    if(ulo && uhi) return 'unbounded';
+    if(ulo) return '≤ ' + NUM(hi);
+    if(uhi) return '≥ ' + NUM(lo);
+    return NUM(lo) + ' … ' + NUM(hi);
+  };
+
+  // min/max on a param are two independent optional bounds, NOT a range pair: 142 params author a
+  // min and no max. `null` there means unconstrained-because-unstated, so it is simply omitted.
+  const BOUNDS = (mn, mx) => mn == null && mx == null ? ''
+    : mn == null ? '≤ ' + NUM(mx)
+    : mx == null ? '≥ ' + NUM(mn)
+    : NUM(mn) + ' … ' + NUM(mx);
+
+  // name in the left column; the meta line and the description stacked in the right. Holds up at
+  // the 330px default width, where five real columns would wrap into porridge.
+  const TABLE = (dict, row) => {
+    const ks = Object.keys(dict || {});
+    if(!ks.length) return '';
+    return '<table class="kbt">' + ks.map(k => {
+      const s = dict[k] || {}, meta = row(s).filter(Boolean).join(' · ');
+      return `<tr><td class="kbn">${E(k)}</td><td class="kbv">`
+        + (meta ? `<span class="kbm">${meta}</span>` : '')
+        + (s.description ? `<div class="kbd">${E(s.description)}</div>` : '')
+        + '</td></tr>';
+    }).join('') + '</table>';
+  };
+
+  // 64 nodes carry these as a list and 7 as a paragraph. Same field, so it renders the same way.
+  const BULLETS = v => Array.isArray(v)
+    ? '<ul class="kbl">' + v.map(x => `<li>${E(x)}</li>`).join('') + '</ul>'
+    : (v ? `<div class="kbd">${E(v)}</div>` : '');
+
+  const CODE = v => v ? `<pre class="kbp">${E(v)}</pre>` : '';
+
+  const LINK = u => {
+    if(!u) return '';
+    let host = u; try{ host = new URL(u).hostname.replace(/^www\./,''); }catch(_){}
+    return `<a href="${E(u)}" target="_blank" rel="noopener" title="${E(u)}">${E(host)} →</a>`;
+  };
+
+  // Everything the panel already showed higher up, or that is provenance rather than an answer.
+  const KNOWN = ['inputs','params','outputs','formula','usage_example','warmup_bars',
+                 'source_module','reference','abbreviation','interpretation','applications'];
+
+  window.KVPROPS = function(n){
+    const p = (n && n.props) || {};
+    let h = '';
+    h += sec('inputs',  TABLE(p.inputs,  s => [s.type]));
+    h += sec('parameters', TABLE(p.params, s => [s.type,
+              s.default == null ? '' : 'default ' + NUM(s.default), BOUNDS(s.min, s.max)]));
+    // An EXPRESSION over the params above ("window - 1"), not a number -- 75 nodes say exactly that.
+    if(p.warmup_bars) h += `<div class="kbm" style="margin-top:4px">warm-up <code>`
+      + `${E(p.warmup_bars)}</code> bars — an expression in these parameters</div>`;
+    h += sec('outputs', TABLE(p.outputs, s => [s.type,
+              s.units && s.units !== 'boolean' ? s.units : '', RANGE(s.range, s.type)]));
+    h += sec('interpretation', BULLETS(p.interpretation));
+    h += sec('applications',   BULLETS(p.applications));
+    h += sec('formula',        CODE(p.formula));
+    h += sec('reference',      LINK(p.reference));
+
+    // Provenance and the long-tail: real, occasionally wanted, never the answer to "what is this".
+    let x = '';
+    if(p.source_module) x += `<div class="kbm">module <code>${E(p.source_module)}</code></div>`;
+    if(p.abbreviation)  x += `<div class="kbm">abbreviated <b>${E(p.abbreviation)}</b></div>`;
+    // Confidence is null on every node in this graph, so it is printed only if one ever carries it.
+    if(n && n.epistemic) x += `<div class="kbm">epistemic <b>${E(n.epistemic)}</b>`
+      + (n.conf == null ? '' : ' · confidence ' + NUM(n.conf)) + '</div>';
+    // 246 of 355 outputs say "none"; printing those is noise, and the 109 real ones are the ones a
+    // reader is looking for when they ask what the literature calls this line.
+    const cn = Object.entries(p.outputs || {})
+      .filter(([, s]) => s && s.canonical_name && s.canonical_name !== 'none')
+      .map(([k, s]) => `${E(k)} → ${E(s.canonical_name)}`);
+    if(cn.length) x += `<div class="kbm">known as ${cn.join(' · ')}</div>`;
+    if(p.usage_example) x += '<div class="kbm" style="margin-top:6px">usage</div>'
+      + CODE(p.usage_example);
+    // Anything this file has never heard of, verbatim. The panel hides nothing.
+    for(const [k, v] of Object.entries(p)){
+      if(KNOWN.includes(k) || v == null) continue;
+      x += `<div class="kbm"><b>${E(k)}</b>: `
+        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+    }
+    // A disclosure triangle over a single line hides one word behind a click. The 14 concept nodes
+    // carry no props at all, so for them the "extras" ARE the panel -- show them flat.
+    if(x) h += h ? `<details class="kbx"><summary>provenance &amp; extras</summary>${x}</details>`
+                 : sec('epistemic status', x);
+    return h;
+  };
+
+  // `uses` carries WHICH outputs of the indicator flow into the signal. As raw JSON that read
+  // `{"adi":{"type":"series"}}`; the type is the same on all 233 and says nothing.
+  window.KVEDGE = function(e){
+    const p = (e && e.props) || {};
+    let h = '';
+    if(p.why) h += sec('why', `<span class="kbd">${E(p.why)}</span>`);
+    const io = Object.keys(p.inputs || {});
+    if(io.length) h += sec('inputs used', io.map(k => `<code>${E(k)}</code>`).join(' '));
+    let rest = '';
+    for(const [k, v] of Object.entries(p)){
+      if(['because','state','note','why','inputs'].includes(k) || v == null) continue;
+      rest += `<div class="kbm"><b>${E(k)}</b>: `
+        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+    }
+    return h + (rest ? sec('other properties', rest) : '');
+  };
+
+  // The viewer prints `epistemic · confidence` near the top, where confidence is null on every node
+  // in this graph -- it rendered as the words "observed ·" with nothing after them. It now sits in
+  // the details block above, so drop the original rather than show it twice.
+  if(typeof showNode === 'function'){
+    const _showNode = showNode;
+    showNode = function(n){
+      _showNode(n);
+      const l = [...inspect.querySelectorAll('.lbl')]
+        .find(x => x.textContent === 'epistemic · confidence');
+      if(l){ const v = l.nextElementSibling; l.remove(); if(v) v.remove(); }
+    };
+  }
+})();
+</script>
+"""
+
 # Collapse across a chosen set of relation types, driven from the node panel.
 #
 # The viewer's own collapse asks "what is reachable ONLY through this node", so it can never fold a
@@ -1018,8 +1201,24 @@ def main() -> int:
                      f"upstream viz.py changed and the sub-kind colours would silently not apply")
         page = page.replace(old, new)
 
+    # The two `kv()` call sites hand off to the readable formatters in PROPERTY_PANEL. Guarded, so a
+    # page that somehow loses the overlay degrades to the viewer's own dump rather than an empty
+    # block -- and asserted, so an upstream rename fails the build instead of silently reverting the
+    # panel to raw JSON, which looks like nothing changed.
+    for old, new in (
+        ("+kv('properties',n.props)",
+         "+(window.KVPROPS?window.KVPROPS(n):kv('properties',n.props))"),
+        ("+kv('other properties',pr,['because','state','note']);",
+         "+(window.KVEDGE?window.KVEDGE(e):kv('other properties',pr,['because','state','note']));"),
+    ):
+        if page.count(old) != 1:
+            sys.exit(f"expected exactly one {old!r} in the viewer script, found {page.count(old)}; "
+                     f"upstream viz.py changed and the inspector would fall back to raw JSON")
+        page = page.replace(old, new)
+
     overlay = (BRAND_STYLE
                + INSPECTOR_LINKS
+               + PROPERTY_PANEL
                + COLLAPSE_PANEL.replace("__ROOT__", json.dumps(ROOT_ID))
                + BACK_BUTTON
                + THEME_SCRIPT

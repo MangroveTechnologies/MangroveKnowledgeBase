@@ -256,3 +256,152 @@ def test_the_focused_node_labels_itself_louder(page):
     assert "n.x+r+(foc?6:3)" in page, "the label must clear the ring it sits beside"
     assert "ctx.font='11px sans-serif';\n      ctx.fillText" not in page, \
         "the unconditional label font is still in place; selection would look identical"
+
+
+# --- the inspector's property block ---------------------------------------------------------------
+
+def _run_in_node(page: str, driver: str, tmp_path: Path):
+    """Execute the panel's formatters exactly as the browser would, over the page's own DATA.
+
+    The overlay is deliberately pure -- no DOM, no reads of the viewer's scope -- so it can be
+    eval'd here. That matters more than it sounds: the bug this block fixes was `JSON.stringify`
+    turning `Infinity` into `null`, and an assertion that the SOURCE TEXT is present would have
+    passed against the broken version. The only way to know is to run it on the real payload.
+    """
+    import json
+    import shutil
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("node is not installed; the panel's formatters cannot be executed")
+    (tmp_path / "graph.html").write_text(page)
+    (tmp_path / "d.mjs").write_text("""
+import {readFileSync} from 'fs';
+const page = readFileSync(process.argv[2],'utf8');
+// The DATA payload is a JS literal, not JSON -- `Infinity` is a real number here, exactly as the
+// browser sees it. Parsing it as JSON would destroy the very distinction under test.
+globalThis.window = {};
+const DATA = eval('(' + page.match(/const DATA = (\\{[\\s\\S]*?\\});\\s*\\n/)[1] + ')');
+const at = page.indexOf('window.KVPROPS =');
+const js = page.slice(page.lastIndexOf('<script>', at) + 8, page.indexOf('</script>', at));
+eval(js);
+const nodeById = id => DATA.nodes.find(n => n.id === id);
+const edgesOf = t => DATA.edges.filter(e => e.type === t);
+""" + driver)
+    proc = subprocess.run([node, str(tmp_path / "d.mjs"), str(tmp_path / "graph.html")],
+                          capture_output=True, text=True, timeout=120)
+    assert proc.returncode == 0, proc.stderr[-2000:]
+    return json.loads(proc.stdout)
+
+
+def test_the_panel_never_prints_raw_json(page, tmp_path):
+    """`JSON.stringify` on `inputs`/`params`/`outputs` was a 1,400-character wall of braces.
+
+    Every node is rendered, so a shape this file has not seen fails here rather than in someone's
+    browser -- and the assertion is on the OUTPUT, not on the source of the formatter.
+    """
+    out = _run_in_node(page, """
+const bad = [], braces = [];
+for(const n of DATA.nodes){
+  let h; try{ h = window.KVPROPS(n); }catch(e){ bad.push([n.id, e.message]); continue; }
+  if(/\\{&quot;|\\{"/.test(h)) braces.push(n.id);          // a stringified object reached the panel
+}
+console.log(JSON.stringify({threw: bad, braces, count: DATA.nodes.length}));
+""", tmp_path)
+    assert out["threw"] == [], f"the formatter threw on {out['threw']}"
+    assert out["braces"] == [], f"raw JSON still reaches the panel for {out['braces']}"
+    assert out["count"] == 303
+
+
+def test_unbounded_and_unauthored_are_different_things(page, tmp_path):
+    """The bug that started this. `JSON.stringify([0, Infinity])` is `[0,null]`.
+
+    SKILL.md makes the distinction load-bearing -- "unbounded is `[-inf, inf]`, not `null`" -- and
+    161 endpoints in this graph are non-finite, so the panel was reporting "not authored" for all
+    of them. The synthetic cases cover the endpoints the real graph has no example of.
+    """
+    out = _run_in_node(page, """
+const R = spec => window.KVPROPS({props:{outputs:{o:{...spec, description:'d'}}}});
+const cases = {
+  '0..100':     R({type:'series', units:'x', range:[0,100]}),
+  'lower':      R({type:'series', units:'x', range:[0,Infinity]}),
+  'upper':      R({type:'series', units:'x', range:[-Infinity,100]}),
+  'unbounded':  R({type:'series', units:'x', range:[-Infinity,Infinity]}),
+  'bool':       R({type:'bool',   units:'boolean', range:[0,1]}),
+  'unauthored': R({type:'series', units:'x', range:[null,null]}),
+};
+const real = {
+  pband: window.KVPROPS(nodeById('procedure:indicator-bollingerbands')),
+  fired: window.KVPROPS(nodeById('procedure:signal-rsi-cross-up')),
+};
+console.log(JSON.stringify({cases, real}));
+""", tmp_path)
+    c = out["cases"]
+    assert "0 … 100" in c["0..100"]
+    assert "≥ 0" in c["lower"], "a finite floor with an infinite ceiling reads as a floor"
+    assert "≤ 100" in c["upper"]
+    assert "unbounded" in c["unbounded"]
+    assert "true/false" in c["bool"], "a 0/1 bool is not a numeric interval"
+    assert "not authored" in c["unauthored"], "an unstated range must not read as unbounded"
+    assert "not authored" not in c["unbounded"] and "unbounded" not in c["unauthored"]
+
+    # And on the real nodes: BollingerBands' pband is the ratio that is explicitly NOT clamped.
+    assert "unbounded" in out["real"]["pband"] and "≥ 0" in out["real"]["pband"]
+    assert "true/false" in out["real"]["fired"]
+
+
+def test_the_panel_shows_what_a_reader_asked_for_and_folds_the_rest(page, tmp_path):
+    """Description, then inputs/params/outputs, then formula. Provenance behind a disclosure.
+
+    `source_module` and `usage_example` are provenance -- SKILL.md's words are "not the answer" --
+    and they used to lead the block because the dump was in insertion order.
+    """
+    out = _run_in_node(page, """
+const bb = window.KVPROPS(nodeById('procedure:indicator-bollingerbands'));
+const concept = window.KVPROPS(nodeById('concept:momentum'));
+const pos = s => bb.indexOf(s);
+console.log(JSON.stringify({bb, concept, order: {
+  inputs: pos('>inputs<'), params: pos('>parameters<'), outputs: pos('>outputs<'),
+  formula: pos('>formula<'), details: pos('<details')}}));
+""", tmp_path)
+    o = out["order"]
+    assert -1 < o["inputs"] < o["params"] < o["outputs"] < o["formula"] < o["details"]
+    bb = out["bb"]
+    assert "volatility_indicators" in bb and bb.index("<details") < bb.index("volatility_indicators"), \
+        "source_module is provenance; it belongs inside the fold"
+    assert "BandWidth" in bb, "a canonical name that is not 'none' is the one thing worth printing"
+    assert bb.count("none") == 0, "246 of 355 outputs say canonical_name 'none' -- that is noise"
+    assert "warm-up <code>window - 1</code>" in bb, \
+        "warmup_bars is an EXPRESSION in these params, not a bar count"
+    assert "abbreviation" not in bb.lower() or "BB" in bb
+    # 224 nodes have a null abbreviation and 56 a null reference. A label with nothing after it is
+    # worse than no label.
+    assert "null" not in bb
+    # The 14 concept nodes carry no props at all: a disclosure triangle over one word is theatre.
+    assert "<details" not in out["concept"] and "observed" in out["concept"]
+
+
+def test_an_edge_says_which_outputs_it_uses(page, tmp_path):
+    """`uses` carries the indicator outputs that flow into the signal -- 233 edges do.
+
+    It rendered as `{"adi":{"type":"series"}}`, where the type is identical on all 233 and the
+    names are the whole point.
+    """
+    out = _run_in_node(page, """
+const e = edgesOf('uses').find(e => Object.keys(e.props.inputs || {}).length > 1)
+       || edgesOf('uses')[0];
+console.log(JSON.stringify({html: window.KVEDGE(e), names: Object.keys(e.props.inputs)}));
+""", tmp_path)
+    for name in out["names"]:
+        assert f"<code>{name}</code>" in out["html"], f"the edge does not name {name}"
+    assert '{"' not in out["html"] and "{&quot;" not in out["html"]
+
+
+def test_the_panel_falls_back_rather_than_going_blank(page):
+    """Both call sites are guarded, so a page that loses the overlay degrades to the old dump.
+
+    The count is pinned for the same reason the colour patches are: an upstream rename would revert
+    the inspector to raw JSON, which looks like nothing changed rather than like a failure.
+    """
+    assert page.count("window.KVPROPS?window.KVPROPS(n):kv('properties',n.props)") == 1
+    assert page.count("window.KVEDGE?window.KVEDGE(e):kv('other properties'") == 1
+    assert "+kv('properties',n.props)" not in page, "the unguarded call site is still in place"
