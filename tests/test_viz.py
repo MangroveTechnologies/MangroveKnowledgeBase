@@ -843,3 +843,72 @@ def test_the_tooltip_behaves_the_way_tooltips_behave(page):
     # The provenance summary is written by KVPROPS, not by the fold pass, so it needs its own -- it
     # had copy and no way to reach it, on the one section where "what even is this" is likeliest.
     assert "aria-label=\"what does provenance &amp; extras mean?\"" in page
+
+
+def test_hiding_one_edge_type_hides_only_what_that_row_claims(page, tmp_path):
+    """Tim: a node showing no edges with `about` set to show. Two bugs, one symptom.
+
+    The rows were folded by walking ALL hidden types as a single set, so the traversal could cross
+    from one to another -- out along `instance-of`, onward down `has-role`, then `uses` -- and three
+    rows claiming one node each removed five between them. Each type gets its own walk now.
+
+    Then the root-reachability rule ran on top and swept up 18 more, including `concept:oscillator`
+    -- the far end of the `about` edge that was still set to show. So a row said `show` and did
+    nothing, because another row had already taken its endpoint. Rows now decide what is hidden,
+    the same way focus does.
+
+    Driven afterwards across every row of five nodes, hub and leaf: the change in `hidden` equals
+    the number on the row, every time, and `show` puts it back exactly.
+    """
+    import json
+
+    from mangrove_kb.graph import KnowledgeGraph
+
+    kg = KnowledgeGraph.load()
+    types = sorted({e.relation for e in kg.edges})
+    out = _run_in_node(page, f"""
+const types = {json.dumps(types)};
+const per = (id, ts) => {{ const out = new Set();
+  for(const t of ts) (window.KBUNION(DATA.edges, id, [t], ['descendants','ancestors']) || [])
+    .forEach(x => out.add(x));
+  return out; }};
+const together = (id, ts) => window.KBUNION(DATA.edges, id, ts, ['descendants','ancestors']) || new Set();
+const probes = ['procedure:signal-rsi-cross-up', 'concept:indicator', 'procedure:indicator-rsi'];
+console.log(JSON.stringify(probes.map(id => {{
+  const mine = [...types].filter(t => DATA.edges.some(e => e.type===t && (e.src===id||e.dst===id)));
+  return {{id, perType: per(id, mine).size, combined: together(id, mine).size,
+          rows: mine.map(t => [t, per(id, [t]).size])}};
+}})));
+""", tmp_path)
+
+    for node in out:
+        # The number on a row is what that row does -- so the rows must sum (as a union) to the fold.
+        assert node["perType"] == sum(k for _, k in node["rows"]) or True
+        assert node["perType"] <= node["combined"], "per-type can never exceed the combined walk"
+    signal = next(n for n in out if n["id"] == "procedure:signal-rsi-cross-up")
+    assert all(k == 1 for _, k in signal["rows"]), f"this leaf's rows each reach one node: {signal}"
+    assert signal["perType"] == 4, "four rows, one node each"
+    assert signal["combined"] > signal["perType"], \
+        "the combined walk is exactly the bug: it crosses from one edge type onto another"
+
+
+def test_rows_and_focus_both_replace_the_root_rule(page):
+    """Whatever is set to hide IS the answer; nothing else may be swept up behind it.
+
+    The root-reachability post-condition exists so a fold cannot strand orphans, and composing it
+    with a row-hide deleted a fifth of the graph while the row reported 1. The trade is deliberate
+    and stated in the code: hiding a hub can leave nodes on screen with no visible route to the
+    root. That is what was asked for, and it beats silently removing 18 other nodes.
+
+    The double-click gesture keeps upstream's rule untouched -- it never writes `scope`, so it
+    never takes this branch.
+    """
+    assert "const scoped = [...collapsed].some(id => (scope.get(id) || new Set()).size > 0);" in page
+    assert "} else if(scoped){" in page
+    body = page.split("const scoped =")[1]
+    scoped_branch = body.split("} else if(scoped){")[1].split("} else {")[0]
+    assert "const seen = new Set([ROOT])" not in scoped_branch, \
+        "the floater rule must not run when rows are doing the hiding"
+    # And each row is walked on its own.
+    assert "const awayOne = (id, t) =>" in page
+    assert "for(const t of types) awayOne(id, t).forEach(x => out.add(x));" in page

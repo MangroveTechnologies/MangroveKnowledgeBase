@@ -1298,8 +1298,17 @@ ACTION_PANEL = """
   // Everything hidden along one edge type is everything that way FROM this node, in whichever
   // direction(s) the type is incident here -- both lineages, so a row works on a leaf too, where
   // every edge points outward and the old panel could only say "nothing hangs off this node".
-  const away = (id, types) =>
-    window.KBUNION(L, id, types, ['descendants', 'ancestors']) || new Set();
+  // ONE ROW AT A TIME. Walking the hidden types as a single set lets the traversal cross from one
+  // to another -- out along `instance-of`, then onward down `has-role`, then `uses` -- so three
+  // rows claiming one node each removed five between them. A row's count has to be what that row
+  // does, so each type gets its own walk and the results are unioned.
+  const awayOne = (id, t) =>
+    window.KBUNION(L, id, [t], ['descendants', 'ancestors']) || new Set();
+  const away = (id, types) => {
+    const out = new Set();
+    for(const t of types) awayOne(id, t).forEach(x => out.add(x));
+    return out;
+  };
   // What the walk may cross: everything except the types this node has set to hide. Tim's rule.
   const live = id => { const off = scope.get(id) || new Set();
                        return new Set(ALL_TYPES.filter(t => !off.has(t))); };
@@ -1317,6 +1326,17 @@ ACTION_PANEL = """
     });
     const keep = focus.id == null ? null
                  : window.KBUNION(L, focus.id, live(focus.id), focus.modes);
+    // Is any row set to `hide`? Then those rows decide what is hidden, and the root-reachability
+    // rule below is skipped -- for the same reason focus skips it, and it took Tim reporting a
+    // node with no edges to see it. Hiding one signal's `uses` claimed 1 node and removed 21: the
+    // three endpoints the rows named, plus 18 the floater rule swept up behind them, INCLUDING the
+    // far end of the `about` edge that was still set to show. So a row's count lied, and a row set
+    // to show did nothing, because a different row had already taken its endpoint away.
+    //
+    // The trade is deliberate: hiding a hub can now leave nodes on screen with no visible route to
+    // the root. That is what the user asked for, and it is honest -- the alternative silently
+    // deletes a fifth of the graph and reports 1.
+    const scoped = [...collapsed].some(id => (scope.get(id) || new Set()).size > 0);
     if(keep){
       // Focus REPLACES the root-reachability post-condition below. Composing them would hide the
       // whole graph, because the root is normally outside the focused set.
@@ -1324,6 +1344,8 @@ ACTION_PANEL = """
       N.forEach(n => { if(!keep.has(n.id)) h.add(n.id); });
       collapsed.forEach(id => { if(keep.has(id)) h.delete(id); });
       h.delete(focus.id);
+    } else if(scoped){
+      collapsed.forEach(id => h.delete(id));     // the rows are the whole answer
     } else {
       if(idx[ROOT] != null){                     // upstream's rule, and the floater post-condition
         const seen = new Set([ROOT]), q = [ROOT];
