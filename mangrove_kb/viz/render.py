@@ -979,25 +979,68 @@ PROPERTY_PANEL = r"""
 </script>
 """
 
-# Collapse across a chosen set of relation types, driven from the node panel.
+# The set maths behind `show only`, kept in its own block with no reference to the viewer's scope.
 #
-# The viewer's own collapse asks "what is reachable ONLY through this node", so it can never fold a
-# CROSS-CUTTING AXIS: every signal has two containment parents (`instance-of` Signal and `has-role`
-# its role), so collapsing `trigger` strands nobody, hideCount is 0, and the dead-toggle guard
-# reverts it. Correct for what it computes, useless for "hide the signals in this role".
+# It takes its edges as an argument rather than reading `L`, which is the whole point: the test
+# harness evaluates this script in node and runs it over the page's own DATA payload, then compares
+# every answer against the same traversal written independently in Python. A count on a button that
+# disagrees with what happens after the click is worse than no count at all.
+FOCUS_SETS = """
+<script>
+// Nodes to KEEP around `id`, excluding the anchor itself. `null` means no focus at all -- which is
+// not the same as an empty set, and the difference decides whether the canvas shows everything or
+// nothing. Direction is the graph's own: a signal is `instance-of` its class, so classes are UP.
+window.KBSETS = function(edges, id, types, mode){
+  if(mode === 'all') return null;
+  const T = types instanceof Set ? types : new Set(types);
+  const inBy = {}, outBy = {};
+  for(const e of edges){
+    if(!T.has(e.type)) continue;
+    (inBy[e.dst] = inBy[e.dst] || []).push(e.src);      // child --rel--> parent
+    (outBy[e.src] = outBy[e.src] || []).push(e.dst);
+  }
+  const walk = adj => {
+    const out = new Set(), seen = new Set([id]), q = [id];
+    while(q.length){
+      const u = q.shift();
+      for(const v of (adj[u] || [])){
+        if(seen.has(v)) continue;
+        seen.add(v); out.add(v); q.push(v);
+      }
+    }
+    return out;
+  };
+  if(mode === 'neighbors') return new Set([...(inBy[id] || []), ...(outBy[id] || [])]);
+  if(mode === 'descendants') return walk(inBy);
+  if(mode === 'ancestors') return walk(outBy);
+  if(mode === 'lineage'){ const a = walk(inBy); walk(outBy).forEach(x => a.add(x)); return a; }
+  return null;
+};
+</script>
+"""
+
+# The Action section: how much of the graph is in view, and along which edges.
 #
-# This asks a different question -- "what hangs off this node ALONG THESE RELATIONS" -- walking
-# incoming edges of the chosen types, transitively, and ignoring whether those nodes have another
-# parent. Jarvis's floater-free guarantee is kept as a POST-CONDITION rather than the definition:
-# after the type-scoped set is hidden, anything that can no longer reach the root is hidden too.
+# Two controls, coarse first. `show only` picks how much graph is in view around this node --
+# everything, its immediate neighbors, its descendants, its ancestors, or both lineages. `show or
+# hide` prunes edge types within that. ONE RULE ties them together, and it is Tim's: the lineage
+# walk traverses exactly the edge types currently set to show, so a row set to `hide` drops that
+# branch AND drops that axis from the walk. The counts beside every option are computed from the
+# live type set, so the numbers always describe what the button would actually do.
 #
-# Written against the viewer's own bindings: `hidden` is `let` so it is reassigned, `collapsed` and
-# `hideCount` are `const` so they are mutated in place, and `recomputeHidden`/`toggleCollapse` are
-# function declarations whose call sites (2D dblclick, 3D dblclick) resolve by name at call time.
-# The vendored file is not touched.
-COLLAPSE_PANEL = """
+# The set maths is exposed as `window.KBSETS(edges, id, types, mode)` -- pure, taking its edges as
+# an argument rather than reading the viewer's `L` -- so `tests/test_viz.py` executes it in node
+# against the real graph instead of asserting that the source text looks right.
+#
+# The floater rule is the hazard here. `recomputeHidden` normally ends by hiding anything that
+# cannot reach the root, which is what keeps a fold from leaving orphans adrift. Under focus the
+# root is usually OUT of view, so that rule would hide the entire graph -- a blank canvas with no
+# error. Focus therefore REPLACES that post-condition rather than composing with it, and there is a
+# test that fails on a blank canvas.
+ACTION_PANEL = """
 <style>
-  #inspect .xintro{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2);margin-bottom:8px}
+  #inspect .xintro{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2);margin:0 0 7px}
+  #inspect .xintro+.xintro{margin-top:16px}
   #inspect .xrow{display:flex;align-items:center;gap:9px;padding:6px 0}
   #inspect .xrow+.xrow{border-top:1px solid var(--kb-rule)}
   #inspect .xname{font:600 12.5px var(--kb-mono);color:var(--ink);overflow-wrap:anywhere}
@@ -1014,70 +1057,95 @@ COLLAPSE_PANEL = """
   #inspect .xsw button.on{background:var(--act);color:#0a0a0a}
   #inspect .xsw button.on.xhide{background:var(--dev-highlight);color:#0a0a0a}
   #inspect .xnone{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2)}
+  /* The scope rows are a radio, not toggles: these views are mutually exclusive and `everything`
+     is the way back. The whole row is the control -- a 5-option segmented strip wraps into
+     porridge at the 330px default width, and the counts have nowhere to live. */
+  #inspect button.xfrow{display:flex;align-items:center;gap:9px;width:100%;padding:6px 8px;
+                        border:0;border-left:2px solid transparent;background:transparent;
+                        cursor:pointer;text-align:left;font:inherit}
+  #inspect button.xfrow+button.xfrow{border-top:1px solid var(--kb-rule)}
+  #inspect button.xfrow:hover:not(:disabled){background:var(--kb-band)}
+  #inspect button.xfrow.on{background:var(--kb-band);border-left-color:var(--act)}
+  #inspect button.xfrow:disabled{cursor:default;opacity:.45}
+  #inspect button.xfrow .xdot{width:9px;height:9px;flex:none;border-radius:50%;
+                              border:1px solid var(--kb-edge)}
+  #inspect button.xfrow.on .xdot{background:var(--act);border-color:var(--act)}
+  /* Focus is a change to the whole canvas, so its indicator lives ON the canvas -- the panel can
+     be scrolled away or showing a different node entirely. Without this a reduced graph has no
+     visible cause and no way back. */
+  #xfocus{position:absolute;left:12px;top:12px;z-index:6;display:none;align-items:center;gap:9px;
+          padding:6px 10px;border:1px solid var(--kb-edge,var(--line));border-radius:var(--radius);
+          background:var(--panel);color:var(--ink);font:12px var(--kb-sans,system-ui);
+          box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  #xfocus.on{display:flex}
+  #xfocus b{font:600 12px ui-monospace,monospace}
+  #xfocus .xfx{border:0;background:transparent;color:var(--act);cursor:pointer;font:600 12px inherit;
+               padding:0 2px}
+  #xfocus .xfx:hover{text-decoration:underline}
 </style>
 <script>
 (function(){
   const ROOT = __ROOT__;
-  const scope = new Map();                       // node id -> Set of relation types to fold along
+  const scope = new Map();                       // node id -> Set of relation types set to `hide`
+  let focus = {id:null, mode:'all'};             // never persisted: a page that opens showing 8 of
+                                                 // 303 with no explanation is a bug report
 
-  const inBy = {};                               // dst -> incoming edges (child --rel--> parent)
-  L.forEach(e => { (inBy[e.dst] = inBy[e.dst] || []).push(e); });
-
-  // relation types incident to a node; `inn` is what a collapse could fold along
-  function typesFor(id){
+  // relation types incident to a node, and which way they point from it
+  function incident(id){
     const m = new Map();
-    L.forEach(e => {
-      const k = e.type;
-      if(e.dst === id || e.src === id){
-        const v = m.get(k) || {inn:0, out:0};
-        (e.dst === id ? v.inn++ : v.out++); m.set(k, v);
-      }
-    });
+    for(const e of L){
+      if(e.dst !== id && e.src !== id) continue;
+      const v = m.get(e.type) || {inn:0, out:0};
+      (e.dst === id ? v.inn++ : v.out++); m.set(e.type, v);
+    }
     return m;
   }
-  const foldable = id => [...typesFor(id)].filter(([, c]) => c.inn > 0).map(([t]) => t);
-  const defaults = id => new Set(foldable(id));
-
-  // everything that reaches `id` by incoming edges of `types`, transitively
-  function descendants(id, types){
-    const out = new Set(), seen = new Set([id]), q = [id];
-    while(q.length){
-      const u = q.shift();
-      (inBy[u] || []).forEach(e => {
-        if(!types.has(e.type) || seen.has(e.src)) return;
-        seen.add(e.src); out.add(e.src); q.push(e.src);
-      });
-    }
-    return out;
-  }
+  const ALL_TYPES = [...new Set(L.map(e => e.type))];
+  // Everything hidden along one edge type is everything that way FROM this node, in whichever
+  // direction(s) the type is incident here -- both lineages, so a row works on a leaf too, where
+  // every edge points outward and the old panel could only say "nothing hangs off this node".
+  const away = (id, types) => window.KBSETS(L, id, types, 'lineage') || new Set();
+  // What the walk may cross: everything except the types this node has set to hide. Tim's rule.
+  const live = id => { const off = scope.get(id) || new Set();
+                       return new Set(ALL_TYPES.filter(t => !off.has(t))); };
 
   // Two ways in, and they must not be confused:
   //   * double-click keeps UPSTREAM's rule exactly -- containment-reachability, folding only what is
   //     reachable SOLELY through the node. `Indicator` folds 75; `RSI`, `trigger` and `filter` fold
   //     nothing, because their children have a second parent. Unchanged behaviour, deliberately.
-  //   * the panel folds along the TICKED relation types, which is the only way to fold a
+  //   * the panel hides along the chosen relation types, which is the only way to fold a
   //     cross-cutting axis. A node folded that way has an entry in `scope`.
   recomputeHidden = function(){
     const h = new Set();
     collapsed.forEach(id => {                    // panel folds: type-scoped
-      const t = scope.get(id); if(t) descendants(id, t).forEach(x => h.add(x));
+      const t = scope.get(id); if(t && t.size) away(id, t).forEach(x => h.add(x));
     });
-    if(idx[ROOT] != null){                       // upstream's rule, and the floater post-condition
-      const seen = new Set([ROOT]), q = [ROOT];
-      while(q.length){
-        const u = q.shift();
-        if(collapsed.has(u)) continue;           // never traverse THROUGH a collapsed node
-        (cadj[u] || []).forEach(v => { if(h.has(v) || seen.has(v)) return; seen.add(v); q.push(v); });
+    const keep = focus.id == null ? null : window.KBSETS(L, focus.id, live(focus.id), focus.mode);
+    if(keep){
+      // Focus REPLACES the root-reachability post-condition below. Composing them would hide the
+      // whole graph, because the root is normally outside the focused set.
+      keep.add(focus.id);
+      N.forEach(n => { if(!keep.has(n.id)) h.add(n.id); });
+      collapsed.forEach(id => { if(keep.has(id)) h.delete(id); });
+      h.delete(focus.id);
+    } else {
+      if(idx[ROOT] != null){                     // upstream's rule, and the floater post-condition
+        const seen = new Set([ROOT]), q = [ROOT];
+        while(q.length){
+          const u = q.shift();
+          if(collapsed.has(u)) continue;         // never traverse THROUGH a collapsed node
+          (cadj[u] || []).forEach(v => { if(h.has(v) || seen.has(v)) return; seen.add(v); q.push(v); });
+        }
+        N.forEach(n => { if(!seen.has(n.id)) h.add(n.id); });
       }
-      N.forEach(n => { if(!seen.has(n.id)) h.add(n.id); });
+      collapsed.forEach(id => h.delete(id));     // a collapsed node is never hidden by its own fold
     }
-    collapsed.forEach(id => h.delete(id));       // a collapsed node is never hidden by its own fold
     for(const k in hideCount) delete hideCount[k];
     collapsed.forEach(id => {                    // attribute the folded region to its node (badge)
       const t = scope.get(id);
-      if(t){                                     // panel fold: count along the types that folded it.
+      if(t && t.size){                           // panel fold: count along the types that folded it.
         let k = 0;                               // `cadj` is containment-only and cannot see a fold
-        descendants(id, t).forEach(x => { if(h.has(x)) k++; });   // along `uses`, so it must not be
+        away(id, t).forEach(x => { if(h.has(x)) k++; });          // along `uses`, so it must not be
         hideCount[id] = k;                       // used here -- it would report 0 and the dead-toggle
         return;                                  // guard would revert every associative fold.
       }
@@ -1089,6 +1157,7 @@ COLLAPSE_PANEL = """
       hideCount[id] = k;
     });
     hidden = h;
+    paintFocusChip();
   };
 
   function apply(id, types){
@@ -1123,7 +1192,7 @@ COLLAPSE_PANEL = """
   function setHidden(id, types){
     if(types.size){
       collapsed.add(id); apply(id, types);
-      if((hideCount[id] || 0) === 0){                  // folds nothing: revert rather than lie
+      if((hideCount[id] || 0) === 0 && focus.id == null){   // folds nothing: revert rather than lie
         collapsed.delete(id); scope.delete(id); recomputeHidden(); wake(0.5);
         if(mode === '3d') refresh3d();
       }
@@ -1134,22 +1203,96 @@ COLLAPSE_PANEL = """
     if(sel && sel.id === id) showNode(N[idx[id]]);
   }
 
+  // --- focus ------------------------------------------------------------------------------------
+  const MODES = [['all', 'everything'], ['neighbors', 'neighbors'],
+                 ['descendants', 'descendants'], ['ancestors', 'ancestors'],
+                 ['lineage', 'ancestors + descendants']];
+
+  // Hiding 290 of 303 nodes leaves the 13 survivors wherever the layout had already scattered
+  // them -- which, at the zoom you were at, is usually off screen. The first build of this showed
+  // a correct focus as an EMPTY CANVAS: the data was right and the view was pointed at nothing.
+  // So focus re-frames. Twice: once now, and once after the layout has had a moment to pull the
+  // survivors together, because the positions the first fit measured are already moving.
+  function frameVisible(){
+    const vis = N.filter(n => !hidden.has(n.id));
+    if(!vis.length) return;
+    const xs = vis.map(n => n.x), ys = vis.map(n => n.y);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs);
+    const y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const w = stage.clientWidth, h = stage.clientHeight, pad = 160;
+    const z = Math.max(0.3, Math.min(3, Math.min(w / Math.max(1, x1 - x0 + pad),
+                                                 h / Math.max(1, y1 - y0 + pad))));
+    view.z = z;
+    view.x = -((x0 + x1) / 2) * z;
+    view.y = -((y0 + y1) / 2) * z;
+  }
+
+  function setFocus(id, m){
+    focus = (m === 'all') ? {id:null, mode:'all'} : {id, mode:m};
+    recomputeHidden();
+    frameVisible();
+    wake(0.6);
+    // The survivors are still being pulled together by the simulation, so one fit is a snapshot of
+    // positions that are already stale. Three, spread over the settle, and the last one lands.
+    [400, 1000, 1900].forEach(ms => setTimeout(() => { frameVisible(); wake(0.05); }, ms));
+    if(mode === '3d'){ refresh3d(); if(fg3d && fg3d.zoomToFit) fg3d.zoomToFit(600, 60); }
+    if(sel && sel.id) showNode(N[idx[sel.id]]);
+  }
+
+  const chip = document.createElement('div');
+  chip.id = 'xfocus';
+  (document.getElementById('stage') || document.body).append(chip);
+  function paintFocusChip(){
+    if(focus.id == null){ chip.className = ''; chip.innerHTML = ''; return; }
+    const label = (MODES.find(m => m[0] === focus.mode) || [, focus.mode])[1];
+    chip.className = 'on';
+    chip.innerHTML = `showing ${N.length - hidden.size} of ${N.length} · ${esc(label)} of `
+      + `<b>${esc(focus.id)}</b>`
+      + '<button class="xfx" title="show the whole graph (esc)">show everything</button>';
+  }
+  chip.addEventListener('click', ev => { if(ev.target.closest('.xfx')) setFocus(null, 'all'); });
+  addEventListener('keydown', ev => {
+    if(ev.key === 'Escape' && focus.id != null){ setFocus(null, 'all'); }
+  });
+
   const _showNode = showNode;
   showNode = function(n){
     _showNode(n);
-    const types = foldable(n.id);
+    const types = [...incident(n.id).keys()];
     const hid = scope.get(n.id) || new Set();
+    const T = live(n.id);
     const lbl = document.createElement('div');
     lbl.className = 'lbl';
     lbl.textContent = 'action';
     const val = document.createElement('div');
     val.className = 'val';
+
+    // How much graph. Counts are what would REMAIN, anchor included, over the live types -- so an
+    // option that would leave you looking at a single dot is greyed with its count still showing,
+    // rather than clicking through to an empty canvas and wondering what broke.
+    let html = '<div class="xintro">show only</div>';
+    for(const [m, label] of MODES){
+      const set = window.KBSETS(L, n.id, T, m);
+      const k = m === 'all' ? N.length : set.size + 1;
+      // Lit against THIS node's state: a focus anchored elsewhere leaves this node reading
+      // `everything`, which is true of it -- nothing is being hidden on its account.
+      const active = (focus.id === n.id) ? (focus.mode === m) : (m === 'all');
+      html += `<button class="xfrow${active ? ' on' : ''}" data-m="${m}" data-id="${esc(n.id)}"`
+        + `${(m !== 'all' && k <= 1) ? ' disabled' : ''}>`
+        + `<span class="xname">${esc(label)}</span><span class="xn">${k}</span>`
+        + '<span class="xdot"></span></button>';
+    }
+
+    // Which edges. One row per relation type incident to this node, in either direction: a signal
+    // is a leaf in containment, so an incoming-only list left 249 of 303 nodes with a control that
+    // could not do anything.
     if(!types.length){
-      val.innerHTML = '<div class="xnone">nothing hangs off this node</div>';
+      html += '<div class="xintro">show or hide nodes along the following edges</div>'
+            + '<div class="xnone">this node has no edges</div>';
     } else {
-      val.innerHTML = '<div class="xintro">show or hide nodes along the following edges</div>'
+      html += '<div class="xintro">show or hide nodes along the following edges</div>'
         + types.map(t => {
-            const k = descendants(n.id, new Set([t])).size;
+            const k = away(n.id, new Set([t])).size;
             const off = hid.has(t);
             return `<div class="xrow"><span class="xname">${esc(t)}</span>`
               + `<span class="xn">${k}</span>`
@@ -1158,6 +1301,8 @@ COLLAPSE_PANEL = """
               + `<button class="xhide${off ? ' on' : ''}">hide</button></span></div>`;
           }).join('');
     }
+    val.innerHTML = html;
+
     // Below the node's name, not above its title: the first thing you read should be what the node
     // IS. Falls back to the top of the panel only if the name section is somehow absent.
     const name = [...inspect.querySelectorAll(':scope > details')]
@@ -1168,6 +1313,8 @@ COLLAPSE_PANEL = """
   };
 
   inspect.addEventListener('click', ev => {
+    const f = ev.target.closest('.xfrow');
+    if(f && !f.disabled){ setFocus(f.dataset.id, f.dataset.m); return; }
     const b = ev.target.closest('.xsw button'); if(!b) return;
     const sw = b.parentElement, id = sw.dataset.id, t = sw.dataset.t;
     const hid = new Set(scope.get(id) || []);
@@ -1392,7 +1539,8 @@ def main() -> int:
     overlay = (BRAND_STYLE
                + INSPECTOR_LINKS
                + PROPERTY_PANEL
-               + COLLAPSE_PANEL.replace("__ROOT__", json.dumps(ROOT_ID))
+               + FOCUS_SETS
+               + ACTION_PANEL.replace("__ROOT__", json.dumps(ROOT_ID))
                + BACK_BUTTON
                + THEME_SCRIPT
                + DECLUTTER

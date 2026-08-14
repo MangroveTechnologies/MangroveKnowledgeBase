@@ -281,9 +281,13 @@ const page = readFileSync(process.argv[2],'utf8');
 // browser sees it. Parsing it as JSON would destroy the very distinction under test.
 globalThis.window = {};
 const DATA = eval('(' + page.match(/const DATA = (\\{[\\s\\S]*?\\});\\s*\\n/)[1] + ')');
-const at = page.indexOf('window.KVPROPS =');
-const js = page.slice(page.lastIndexOf('<script>', at) + 8, page.indexOf('</script>', at));
-eval(js);
+// Both self-contained blocks: the property formatters and the focus set maths. Each is written
+// with no reference to the viewer's scope precisely so that it can be executed here.
+for(const marker of ['window.KVPROPS =', 'window.KBSETS =']){
+  const at = page.indexOf(marker);
+  if(at < 0) throw new Error('no block defines ' + marker);
+  eval(page.slice(page.lastIndexOf('<script>', at) + 8, page.indexOf('</script>', at)));
+}
 const nodeById = id => DATA.nodes.find(n => n.id === id);
 const edgesOf = t => DATA.edges.filter(e => e.type === t);
 """ + driver)
@@ -592,3 +596,139 @@ def test_no_visible_text_says_collapse(page):
     panel = page.split("const ROOT =")[1].split("</script>")[0]
     for phrase in ("collapse across", ">Collapse<", ">Expand<", "'Collapse'", "'Expand'"):
         assert phrase not in panel, f"the action panel still writes {phrase!r}"
+
+
+# --- focus: how much of the graph is in view ------------------------------------------------------
+
+def _reach(edges, start, forward):
+    """Transitive closure from `start`, following edges in one direction. The reference answer."""
+    adj = {}
+    for e in edges:
+        u, v = (e.src, e.dst) if forward else (e.dst, e.src)
+        adj.setdefault(u, []).append(v)
+    seen, out, q = {start}, set(), [start]
+    while q:
+        for v in adj.get(q.pop(), ()):
+            if v not in seen:
+                seen.add(v)
+                out.add(v)
+                q.append(v)
+    return out
+
+
+def test_focus_sets_are_what_they_claim(page, tmp_path):
+    """Computed twice -- once by the page, once here -- and compared on the real graph.
+
+    `ancestors` follows edges outward (a signal is `instance-of` its class, so the class is up),
+    `descendants` follows them inward, `neighbors` is radius 1 in both. A count that disagrees with
+    what appears after the click is worse than no count, because the whole point of putting the
+    numbers on the buttons is to say what will happen BEFORE you commit to it.
+    """
+    import json
+
+    from mangrove_kb.graph import KnowledgeGraph
+
+    kg = KnowledgeGraph.load()
+    types = sorted({e.relation for e in kg.edges})
+    probes = ["procedure:indicator-rsi", "procedure:signal-rsi-cross-up", "concept:indicator",
+              "object:mangrove-knowledge-space"]
+    out = _run_in_node(page, f"""
+const probes = {json.dumps(probes)}, types = {json.dumps(types)};
+const res = {{}};
+for(const id of probes) res[id] = Object.fromEntries(
+  ['neighbors','descendants','ancestors','lineage']
+    .map(m => [m, [...window.KBSETS(DATA.edges, id, types, m)].sort()]));
+res.__all = window.KBSETS(DATA.edges, probes[0], types, 'all');
+console.log(JSON.stringify(res));
+""", tmp_path)
+
+    assert out["__all"] is None, "'everything' must mean no focus at all, not an empty set"
+    for node in probes:
+        desc = _reach(kg.edges, node, forward=False)
+        anc = _reach(kg.edges, node, forward=True)
+        nbr = {e.dst for e in kg.edges if e.src == node} | {e.src for e in kg.edges if e.dst == node}
+        got = out[node]
+        assert set(got["descendants"]) == desc, f"descendants of {node}"
+        assert set(got["ancestors"]) == anc, f"ancestors of {node}"
+        assert set(got["neighbors"]) == nbr, f"neighbors of {node}"
+        assert set(got["lineage"]) == desc | anc, f"lineage of {node}"
+        # The anchor is never in its own set; the panel adds it back when it counts what remains.
+        assert node not in got["lineage"]
+
+
+def test_focus_traverses_only_the_edge_types_left_showing(page, tmp_path):
+    """One rule: the walk crosses exactly the types set to show, so `hide` drops a branch AND drops
+    that axis from the lineage. RSI is used by eight signals; hiding `uses` must take exactly those
+    eight out of its descendants and change nothing else.
+    """
+    import json
+
+    from mangrove_kb.graph import KnowledgeGraph
+
+    kg = KnowledgeGraph.load()
+    all_t = sorted({e.relation for e in kg.edges})
+    out = _run_in_node(page, f"""
+const A = {json.dumps(all_t)}, B = A.filter(t => t !== 'uses'), id = 'procedure:indicator-rsi';
+console.log(JSON.stringify({{
+  all: [...window.KBSETS(DATA.edges, id, A, 'descendants')].sort(),
+  less: [...window.KBSETS(DATA.edges, id, B, 'descendants')].sort()}}));
+""", tmp_path)
+    users = {e.src for e in kg.edges if e.dst == "procedure:indicator-rsi" and e.relation == "uses"}
+    assert users, "the fixture assumes RSI is used by something"
+    assert set(out["all"]) - set(out["less"]) == users, \
+        "hiding an edge type must remove exactly what that type reached"
+
+
+def test_focus_replaces_the_root_rule_rather_than_composing_with_it(page):
+    """The blank-canvas hazard, and the reason this one is asserted on structure.
+
+    `recomputeHidden` normally ends by hiding whatever cannot reach the root -- the rule that stops
+    a fold leaving orphans adrift. Under focus the root is usually OUT of view, so running both
+    would hide every node and produce an empty canvas with no error anywhere. The focus branch must
+    therefore REPLACE it, which is what the else here is for.
+
+    Driven as well as asserted: lineage of RSI leaves 13 of 303 nodes visible in 2D and the same 13
+    in 3D, not 0.
+    """
+    body = page.split("const keep = focus.id == null")[1]
+    focus_branch, root_branch = body.split("} else {", 1)
+    assert "keep.add(focus.id);" in focus_branch
+    assert "cannot reach the root" not in focus_branch
+    assert "const seen = new Set([ROOT])" in root_branch, \
+        "the floater rule must live in the else branch, not run under focus too"
+    assert "const seen = new Set([ROOT])" not in focus_branch
+
+
+def test_focus_is_visible_on_the_canvas_and_never_persisted(page):
+    """A reduced graph with no visible cause is the failure mode of every focus feature.
+
+    The chip says how much is in view, of what, around which node, and carries the way out. It
+    lives on the stage rather than in the panel because the panel scrolls, can show a different
+    node, and is where you are NOT looking when you wonder why the graph got small.
+    """
+    assert "chip.id = 'xfocus';" in page and "#xfocus.on{display:flex}" in page
+    assert "showing ${N.length - hidden.size} of ${N.length}" in page, "the chip must state both counts"
+    assert "show the whole graph (esc)" in page and "ev.key === 'Escape'" in page
+    # Section fold state is remembered; focus deliberately is not.
+    assert "mangrove-kb-panel-sections" in page
+    focus_block = page.split("let focus = {id:null")[1].split("</script>")[0]
+    assert "localStorage" not in focus_block, \
+        "a page that opens showing 8 of 303 nodes with no explanation is a bug report"
+
+
+def test_focus_re_frames_the_view(page):
+    """A correct focus pointed at empty space looks exactly like a broken one.
+
+    The first build hid 290 of 303 nodes and left the camera where it was, so the survivors sat off
+    screen and the canvas came up blank -- the data right, the view aimed at nothing. Focus fits
+    the visible set, and fits it again as the simulation pulls the survivors together, because the
+    positions the first fit measured are already moving when it measures them.
+
+    Measured in a browser afterwards: lineage of RSI is 13 visible and 13 on screen; ancestors of
+    rsi_cross_up, 10 and 9. Descendants of concept:indicator is 290 nodes and does not fit at the
+    viewer's 0.3 minimum zoom -- that is the graph being big, and is what panning is for.
+    """
+    assert "function frameVisible()" in page
+    assert page.count("frameVisible();") >= 2, "one fit is a snapshot of positions already moving"
+    assert "[400, 1000, 1900].forEach" in page, "the refits must span the settle"
+    assert "fg3d.zoomToFit" in page, "3D must re-frame too, or the toggle lands on empty space"
