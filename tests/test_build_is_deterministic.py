@@ -47,7 +47,7 @@ def _code_derived(graph):
     `test_doc_derived_atoms.py` fails if the merge is skipped, which is the failure this test
     would otherwise be mistaken for.
     """
-    doc = {a["id"] for a in graph["atoms"] if "source_chapter" in (a.get("props") or {})}
+    doc = set(graph["meta"].get("doc_atom_ids", ()))
     return ({a["id"]: a for a in graph["atoms"] if a["id"] not in doc},
             [r for r in graph["relations"] if r["from_id"] not in doc and r["to_id"] not in doc])
 

@@ -102,7 +102,7 @@ SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
     ("summary",),
     ("formula", "reference", "interpretation", "applications",
      "inputs", "params", "outputs",           # slot NAMES and their descriptions
-     "explanation"),                          # the doc-derived body (see `source_chapter`)
+     "explanation"),                          # the doc-derived body (see `reference_chapter`)
 )
 
 #: Where the graph is looked for, in order. An explicit path always wins; ``MANGROVE_KB_ONTOLOGY``

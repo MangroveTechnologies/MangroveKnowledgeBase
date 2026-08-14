@@ -59,8 +59,8 @@ def test_doc_nodes_record_the_chapter_they_came_from(kg):
         if page["chapter"] is None:          # anchors carry no chapter; they are code-derived
             continue
         node = kg.get(nid)
-        assert node.get("source_chapter") == page["chapter"], \
-            f"{nid} should record chapter {page['chapter']}, got {node.get('source_chapter')!r}"
+        assert node.get("reference_chapter") == page["chapter"], \
+            f"{nid} should record chapter {page['chapter']}, got {node.get('reference_chapter')!r}"
 
 
 def test_doc_nodes_are_searchable_by_their_body(kg):

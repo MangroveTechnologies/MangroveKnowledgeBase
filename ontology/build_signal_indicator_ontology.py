@@ -1034,6 +1034,14 @@ atom(ROOT, ROOT_TITLE, "Object",
      "computation can measure, the role axis, and everything classified under them. Strategy "
      "attaches directly; markets and the rest of the knowledge base land here too.")
 
+# Which knowledge-base chapter documents each of these. The chapter is not where the node came
+# from -- the code is -- so this is a REFERENCE, not provenance: it points a reader at the prose
+# that explains the thing. Doc-derived nodes carry the same key from their page frontmatter, so one
+# question ("which chapter covers this?") has one answer across both halves of the graph.
+CH_INDICATORS = "06-indicators"
+CH_PATTERNS = "07-chart-patterns"
+CH_STRATEGY = "04-strategy-design-modeling"
+
 # entity types
 #
 # The primitive follows one test, from the primitive definitions themselves: a Concept is a CATEGORY
@@ -1050,11 +1058,14 @@ atom(ROOT, ROOT_TITLE, "Object",
 # An id may say what a thing IS; it must never say what a thing BELONGS TO. `concept:strategy` broke
 # the first half and `concept:indicator-class-momentum` broke the second -- see the class axis below.
 atom("concept:indicator", "Indicator", "Concept",
-     "A computation over one or more input series producing one or more numeric output series.")
+     "A computation over one or more input series producing one or more numeric output series.",
+     reference_chapter=CH_INDICATORS)
 atom("concept:signal", "Signal", "Concept",
-     "A boolean predicate over indicator output, evaluated per bar. Composed of (indicator, predicate, params).")
+     "A boolean predicate over indicator output, evaluated per bar. Composed of (indicator, predicate, params).",
+     reference_chapter=CH_INDICATORS)
 atom("schema:strategy", "Strategy", "Schema",
-     "A structured template composing signals into entry/exit rules plus configuration.")
+     "A structured template composing signals into entry/exit rules plus configuration.",
+     reference_chapter=CH_STRATEGY)
 # Indicator and Signal sit UNDER technical analysis, not beside it. An indicator reads a market from
 # its own price and volume history, which is what technical analysis IS -- making it a sibling of the
 # domain said it was something else. `part-of`, not `kind-of`, because these are the two LAYERS the
@@ -1082,13 +1093,15 @@ rel("Signal", "part-of", "Strategy", "component composed into strategies",
 # signal and none at an indicator, so role is a facet of Signal rather than a peer of it. `kind-of`
 # would be wrong -- a role is not a kind of signal, it is an axis along which signals are placed.
 atom("property:role", "Role", "Property",
-     "The position a signal occupies within a strategy. Contextual, not intrinsic.")
+     "The position a signal occupies within a strategy. Contextual, not intrinsic.",
+     reference_chapter=CH_INDICATORS)
 rel("Role", "part-of", "Signal", "axis along which signals are placed", "property:role", "concept:signal")
 # `arm` was declared here and never used: zero signals carried it, and SKILL.md documents the role
 # vocabulary as trigger and filter. A value nothing takes is not a vocabulary, it is a claim the
 # graph cannot support -- `stats()` offered it as a legal filter that always returns nothing.
 for r in ("trigger", "filter"):
-    atom(f"property:role-{r}", r, "Property", f"Signal role: {r}.")
+    atom(f"property:role-{r}", r, "Property", f"Signal role: {r}.",
+         reference_chapter=CH_INDICATORS)
     rel(r, "kind-of", "Role", "role value", f"property:role-{r}", "property:role")
 
 # class axis + members
@@ -1105,11 +1118,15 @@ for r in ("trigger", "filter"):
 atom(TA_ID, "technical analysis", "Concept",
      "Reading a market from its own price and volume history. The characters a computation can "
      "measure -- momentum, volatility, flow and the rest -- divide this space; the indicators that "
-     "measure them and the signals that read them both attach to those divisions.")
+     "measure them and the signals that read them both attach to those divisions.",
+     reference_chapter=CH_INDICATORS)
 rel("technical analysis", "part-of", ROOT_TITLE,
     "the domain this knowledge space covers", TA_ID, ROOT)
 for cls, desc in CLASSES_DEF.items():
-    atom(f"concept:{cls}", cls, "Concept", desc)
+    # `pattern` is candlestick geometry, documented in 7.1 -- chapter 06 has no candlestick
+    # section. Every other character class is one of 06's indicator categories.
+    atom(f"concept:{cls}", cls, "Concept", desc,
+         reference_chapter=CH_PATTERNS if cls == "pattern" else CH_INDICATORS)
     rel(cls, "kind-of", "technical analysis", "character measured", f"concept:{cls}", TA_ID)
 for ind, cls in sorted(assigned.items()):
     lifted = _lift(CLASSES[ind])

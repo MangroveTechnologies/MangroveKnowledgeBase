@@ -15,7 +15,7 @@ Three things it adds that ``wiki-to-graph`` does not carry into our shape:
   format stores ``{target, type, via, weight}`` with no such field. The convention is the text after
   ``--`` on the link's own line, and it is *required* -- an edge without one fails the build rather
   than entering the graph unexplained.
-* **``source_chapter``.** Which knowledge-base chapter a node was authored from, taken from the
+* **``reference_chapter``.** Which knowledge-base chapter a node was authored from, taken from the
   page's ``chapter:`` frontmatter. A property rather than an edge, so the subject axis stays clean
   and provenance does not double the edge count.
 * **``explanation``.** The page body, which is the node's actual content -- ``graph.SEARCH_TIERS``
@@ -127,7 +127,7 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
             raise MergeError(f"{page['file']}: no Summary section -- every new node needs one")
         props = {}
         if page["chapter"]:
-            props["source_chapter"] = page["chapter"]
+            props["reference_chapter"] = page["chapter"]
         # The body is the node's content, not decoration: for a doc-derived node it plays the part
         # formula/params/outputs play for a computation, and `graph.SEARCH_TIERS` reads it in the
         # same tier. Dropping it would leave `find("head and shoulders")` empty on the very page
@@ -167,7 +167,11 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
 
     merged = {"atoms": onto["atoms"] + new_atoms,
               "relations": onto["relations"] + new_rels,
+              # The ids, not just the count: the determinism test needs to separate the two halves
+              # exactly, and `reference_chapter` cannot do it -- code-derived nodes carry that key
+              # too, because it says which chapter DOCUMENTS a node, not where the node came from.
               "meta": {**onto["meta"], "doc_atoms": len(new_atoms),
+                       "doc_atom_ids": sorted(a["id"] for a in new_atoms),
                        "doc_relations": len(new_rels), "doc_anchors": sorted(anchors)}}
     return merged, {"new_atoms": new_atoms, "new_relations": new_rels, "anchors": anchors}
 
@@ -205,7 +209,7 @@ def main() -> int:
     print(f"anchors (untouched) : {len(added['anchors'])}  {', '.join(added['anchors'])}")
     print(f"new atoms           : {len(added['new_atoms'])}")
     for a in added["new_atoms"]:
-        print(f"   {a['id']:34} {a['kind']:9} chapter={a['props'].get('source_chapter')}")
+        print(f"   {a['id']:34} {a['kind']:9} chapter={a['props'].get('reference_chapter')}")
     print(f"new relations       : {len(added['new_relations'])}")
     for r in added["new_relations"]:
         print(f"   {r['from_id']:34} --{r['rel']}--> {r['to_id']}   ({r['why']})")
