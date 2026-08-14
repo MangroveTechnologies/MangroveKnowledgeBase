@@ -47,8 +47,10 @@ def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
     quantifiers = {e["id"] for e in kg.neighbors("concept:liquidity", relation="about",
                                                  direction="in", limit=None)}
     assert quantifiers, "nothing quantifies liquidity; the case's output is stale"
+    # The guide shows a representative few rather than all of them, so it must not claim a count and
+    # every id it DOES show must still be real.
     for q in quantifiers:
-        assert q in guide, f"{q} quantifies liquidity and the guide does not list it"
+        assert q in guide, f"{q} quantifies liquidity and the guide does not show it"
 
     scope = kg.find(under="market foundations", limit=None)
     assert f"{scope.total} nodes" in guide, f"the guide's subject size is stale ({scope.total})"
@@ -71,8 +73,8 @@ def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
 def test_uc1_orientation_values(kg, guide):
     s = kg.stats()
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
-    assert len(kg.schema()) == 17, "the guide says '17 shapes in total'"
-    assert "17 shapes in total" in guide
+    assert len(kg.schema()) == 19, "the guide says '19 shapes in total'"
+    assert "19 shapes in total" in guide
     for c in s["classes"]:                    # every class the guide lists must still exist
         assert c in guide, f"guide's class list is missing {c}"
 

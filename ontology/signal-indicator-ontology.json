@@ -17568,10 +17568,10 @@
    }
   },
   {
-   "id": "procedure:effective-spread",
+   "id": "property:effective-spread",
    "title": "effective spread",
-   "kind": "Procedure",
-   "summary": "Computes effective spread (measures actual execution cost).",
+   "kind": "Property",
+   "summary": "The quantity effective spread (measures actual execution cost).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17603,10 +17603,10 @@
    }
   },
   {
-   "id": "procedure:price-impact",
+   "id": "property:price-impact",
    "title": "price impact (kyle lambda)",
-   "kind": "Procedure",
-   "summary": "Computes price impact (kyle lambda).",
+   "kind": "Property",
+   "summary": "The quantity price impact (kyle lambda).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17638,10 +17638,10 @@
    }
   },
   {
-   "id": "procedure:quoted-spread",
+   "id": "property:quoted-spread",
    "title": "quoted spread",
-   "kind": "Procedure",
-   "summary": "Computes quoted spread.",
+   "kind": "Property",
+   "summary": "The quantity quoted spread.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17957,10 +17957,10 @@
    }
   },
   {
-   "id": "procedure:simple-slippage",
+   "id": "property:simple-slippage",
    "title": "simple slippage",
-   "kind": "Procedure",
-   "summary": "Computes simple slippage.",
+   "kind": "Property",
+   "summary": "The quantity simple slippage.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18054,10 +18054,10 @@
    }
   },
   {
-   "id": "procedure:square-root-market-impact-rule",
+   "id": "fact:square-root-market-impact-rule",
    "title": "square root market impact rule (empirical)",
-   "kind": "Procedure",
-   "summary": "Computes square root market impact rule (empirical).",
+   "kind": "Fact",
+   "summary": "The identity square root market impact rule (empirical).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18093,10 +18093,10 @@
    }
   },
   {
-   "id": "procedure:participation-rate",
+   "id": "property:participation-rate",
    "title": "participation rate",
-   "kind": "Procedure",
-   "summary": "Computes participation rate.",
+   "kind": "Property",
+   "summary": "The quantity participation rate.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18184,10 +18184,10 @@
    }
   },
   {
-   "id": "procedure:historical-volatility",
+   "id": "property:historical-volatility",
    "title": "historical volatility (standard deviation of returns)",
-   "kind": "Procedure",
-   "summary": "Computes historical volatility (standard deviation of returns).",
+   "kind": "Property",
+   "summary": "The quantity historical volatility (standard deviation of returns).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18262,10 +18262,10 @@
    }
   },
   {
-   "id": "procedure:volatility-ratio",
+   "id": "property:volatility-ratio",
    "title": "volatility ratio (regime detection)",
-   "kind": "Procedure",
-   "summary": "Computes volatility ratio (regime detection).",
+   "kind": "Property",
+   "summary": "The quantity volatility ratio (regime detection).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18472,10 +18472,10 @@
    }
   },
   {
-   "id": "procedure:relative-spread",
+   "id": "property:relative-spread",
    "title": "relative spread (percentage)",
-   "kind": "Procedure",
-   "summary": "Computes relative spread (percentage).",
+   "kind": "Property",
+   "summary": "The quantity relative spread (percentage).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18507,10 +18507,10 @@
    }
   },
   {
-   "id": "procedure:realized-spread",
+   "id": "property:realized-spread",
    "title": "realized spread (market maker profit after price movement)",
-   "kind": "Procedure",
-   "summary": "Computes realized spread (market maker profit after price movement).",
+   "kind": "Property",
+   "summary": "The quantity realized spread (market maker profit after price movement).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18605,10 +18605,10 @@
    }
   },
   {
-   "id": "procedure:information-share",
+   "id": "property:information-share",
    "title": "information share (hasbrouck)",
-   "kind": "Procedure",
-   "summary": "Computes information share (hasbrouck).",
+   "kind": "Property",
+   "summary": "The quantity information share (hasbrouck).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18640,10 +18640,10 @@
    }
   },
   {
-   "id": "procedure:component-share",
+   "id": "property:component-share",
    "title": "component share",
-   "kind": "Procedure",
-   "summary": "Computes component share.",
+   "kind": "Property",
+   "summary": "The quantity component share.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18675,10 +18675,10 @@
    }
   },
   {
-   "id": "procedure:price-efficiency-ratio",
+   "id": "property:price-efficiency-ratio",
    "title": "price efficiency ratio",
-   "kind": "Procedure",
-   "summary": "Computes price efficiency ratio.",
+   "kind": "Property",
+   "summary": "The quantity price efficiency ratio.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -28790,7 +28790,7 @@
    "rel": "about",
    "to": "market microstructure",
    "why": "quantifies market microstructure",
-   "from_id": "procedure:effective-spread",
+   "from_id": "property:effective-spread",
    "to_id": "concept:market-microstructure"
   },
   {
@@ -28798,7 +28798,7 @@
    "rel": "about",
    "to": "market microstructure",
    "why": "quantifies market microstructure",
-   "from_id": "procedure:price-impact",
+   "from_id": "property:price-impact",
    "to_id": "concept:market-microstructure"
   },
   {
@@ -28806,7 +28806,7 @@
    "rel": "about",
    "to": "market microstructure",
    "why": "quantifies market microstructure",
-   "from_id": "procedure:quoted-spread",
+   "from_id": "property:quoted-spread",
    "to_id": "concept:market-microstructure"
   },
   {
@@ -28958,7 +28958,7 @@
    "rel": "about",
    "to": "slippage",
    "why": "quantifies slippage",
-   "from_id": "procedure:simple-slippage",
+   "from_id": "property:simple-slippage",
    "to_id": "concept:slippage"
   },
   {
@@ -28974,7 +28974,7 @@
    "rel": "about",
    "to": "market impact",
    "why": "quantifies market impact",
-   "from_id": "procedure:square-root-market-impact-rule",
+   "from_id": "fact:square-root-market-impact-rule",
    "to_id": "concept:market-impact"
   },
   {
@@ -28982,7 +28982,7 @@
    "rel": "about",
    "to": "liquidity",
    "why": "quantifies liquidity",
-   "from_id": "procedure:participation-rate",
+   "from_id": "property:participation-rate",
    "to_id": "concept:liquidity"
   },
   {
@@ -29030,7 +29030,7 @@
    "rel": "about",
    "to": "volatility",
    "why": "quantifies volatility",
-   "from_id": "procedure:historical-volatility",
+   "from_id": "property:historical-volatility",
    "to_id": "concept:volatility"
   },
   {
@@ -29054,7 +29054,7 @@
    "rel": "about",
    "to": "volatility",
    "why": "quantifies volatility",
-   "from_id": "procedure:volatility-ratio",
+   "from_id": "property:volatility-ratio",
    "to_id": "concept:volatility"
   },
   {
@@ -29158,7 +29158,7 @@
    "rel": "about",
    "to": "bid-ask spread dynamics",
    "why": "quantifies bid-ask spread dynamics",
-   "from_id": "procedure:quoted-spread",
+   "from_id": "property:quoted-spread",
    "to_id": "concept:bid-ask-spread"
   },
   {
@@ -29166,7 +29166,7 @@
    "rel": "about",
    "to": "bid-ask spread dynamics",
    "why": "quantifies bid-ask spread dynamics",
-   "from_id": "procedure:relative-spread",
+   "from_id": "property:relative-spread",
    "to_id": "concept:bid-ask-spread"
   },
   {
@@ -29174,7 +29174,7 @@
    "rel": "about",
    "to": "bid-ask spread dynamics",
    "why": "quantifies bid-ask spread dynamics",
-   "from_id": "procedure:effective-spread",
+   "from_id": "property:effective-spread",
    "to_id": "concept:bid-ask-spread"
   },
   {
@@ -29182,7 +29182,7 @@
    "rel": "about",
    "to": "bid-ask spread dynamics",
    "why": "quantifies bid-ask spread dynamics",
-   "from_id": "procedure:realized-spread",
+   "from_id": "property:realized-spread",
    "to_id": "concept:bid-ask-spread"
   },
   {
@@ -29222,7 +29222,7 @@
    "rel": "about",
    "to": "price discovery mechanisms",
    "why": "quantifies price discovery mechanisms",
-   "from_id": "procedure:information-share",
+   "from_id": "property:information-share",
    "to_id": "concept:price-discovery"
   },
   {
@@ -29230,7 +29230,7 @@
    "rel": "about",
    "to": "price discovery mechanisms",
    "why": "quantifies price discovery mechanisms",
-   "from_id": "procedure:component-share",
+   "from_id": "property:component-share",
    "to_id": "concept:price-discovery"
   },
   {
@@ -29238,7 +29238,7 @@
    "rel": "about",
    "to": "price discovery mechanisms",
    "why": "quantifies price discovery mechanisms",
-   "from_id": "procedure:price-efficiency-ratio",
+   "from_id": "property:price-efficiency-ratio",
    "to_id": "concept:price-discovery"
   },
   {
@@ -29609,26 +29609,26 @@
    "concept:trading-venue",
    "concept:trailing-stop",
    "fact:market-foundations-core-principles",
+   "fact:square-root-market-impact-rule",
    "judgment:market-foundations-best-practices",
    "procedure:almgren-chriss-market-impact-model",
-   "procedure:component-share",
-   "procedure:effective-spread",
    "procedure:garch-model",
-   "procedure:historical-volatility",
    "procedure:implementation-shortfall",
-   "procedure:information-share",
-   "procedure:participation-rate",
-   "procedure:price-efficiency-ratio",
-   "procedure:price-impact",
-   "procedure:quoted-spread",
-   "procedure:realized-spread",
-   "procedure:relative-spread",
-   "procedure:simple-slippage",
    "procedure:sniper-liquidity-seeking",
-   "procedure:square-root-market-impact-rule",
    "procedure:twap",
-   "procedure:volatility-ratio",
-   "procedure:vwap"
+   "procedure:vwap",
+   "property:component-share",
+   "property:effective-spread",
+   "property:historical-volatility",
+   "property:information-share",
+   "property:participation-rate",
+   "property:price-efficiency-ratio",
+   "property:price-impact",
+   "property:quoted-spread",
+   "property:realized-spread",
+   "property:relative-spread",
+   "property:simple-slippage",
+   "property:volatility-ratio"
   ],
   "derived_relations": [
    [
@@ -30012,6 +30012,11 @@
     "concept:market-foundations"
    ],
    [
+    "fact:square-root-market-impact-rule",
+    "about",
+    "concept:market-impact"
+   ],
+   [
     "judgment:market-foundations-best-practices",
     "part-of",
     "concept:market-foundations"
@@ -30022,27 +30027,7 @@
     "concept:market-impact"
    ],
    [
-    "procedure:component-share",
-    "about",
-    "concept:price-discovery"
-   ],
-   [
-    "procedure:effective-spread",
-    "about",
-    "concept:bid-ask-spread"
-   ],
-   [
-    "procedure:effective-spread",
-    "about",
-    "concept:market-microstructure"
-   ],
-   [
     "procedure:garch-model",
-    "about",
-    "concept:volatility"
-   ],
-   [
-    "procedure:historical-volatility",
     "about",
     "concept:volatility"
    ],
@@ -30057,69 +30042,14 @@
     "concept:volatility"
    ],
    [
-    "procedure:information-share",
-    "about",
-    "concept:price-discovery"
-   ],
-   [
-    "procedure:participation-rate",
-    "about",
-    "concept:liquidity"
-   ],
-   [
-    "procedure:price-efficiency-ratio",
-    "about",
-    "concept:price-discovery"
-   ],
-   [
-    "procedure:price-impact",
-    "about",
-    "concept:market-microstructure"
-   ],
-   [
-    "procedure:quoted-spread",
-    "about",
-    "concept:bid-ask-spread"
-   ],
-   [
-    "procedure:quoted-spread",
-    "about",
-    "concept:market-microstructure"
-   ],
-   [
-    "procedure:realized-spread",
-    "about",
-    "concept:bid-ask-spread"
-   ],
-   [
-    "procedure:relative-spread",
-    "about",
-    "concept:bid-ask-spread"
-   ],
-   [
-    "procedure:simple-slippage",
-    "about",
-    "concept:slippage"
-   ],
-   [
     "procedure:sniper-liquidity-seeking",
     "instance-of",
     "concept:execution-model"
    ],
    [
-    "procedure:square-root-market-impact-rule",
-    "about",
-    "concept:market-impact"
-   ],
-   [
     "procedure:twap",
     "instance-of",
     "concept:execution-model"
-   ],
-   [
-    "procedure:volatility-ratio",
-    "about",
-    "concept:volatility"
    ],
    [
     "procedure:vwap",
@@ -30135,6 +30065,76 @@
     "procedure:vwap",
     "uses",
     "procedure:indicator-vwap"
+   ],
+   [
+    "property:component-share",
+    "about",
+    "concept:price-discovery"
+   ],
+   [
+    "property:effective-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "property:effective-spread",
+    "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "property:historical-volatility",
+    "about",
+    "concept:volatility"
+   ],
+   [
+    "property:information-share",
+    "about",
+    "concept:price-discovery"
+   ],
+   [
+    "property:participation-rate",
+    "about",
+    "concept:liquidity"
+   ],
+   [
+    "property:price-efficiency-ratio",
+    "about",
+    "concept:price-discovery"
+   ],
+   [
+    "property:price-impact",
+    "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "property:quoted-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "property:quoted-spread",
+    "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "property:realized-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "property:relative-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "property:simple-slippage",
+    "about",
+    "concept:slippage"
+   ],
+   [
+    "property:volatility-ratio",
+    "about",
+    "concept:volatility"
    ]
   ],
   "doc_relations": 6,

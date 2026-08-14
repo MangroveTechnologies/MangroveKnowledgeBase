@@ -52,7 +52,48 @@ BLOCK_LABEL = re.compile(r"^\*\*(.+?)\*\*\s*[::]?\s*$")
 #:
 #: A chapter absent from here raises rather than building with nothing.
 CHAPTERS: dict[str, dict] = {
+    "instruments-market-mechanics": {
+        # Four of the eight sections list real kinds. 2.1 names four spot markets, 2.3 the option
+        # types, 2.5 the crypto venue models and 2.7 the settlement regimes. The other four are
+        # arithmetic: 2.2 walks a contract spec and a funding payment, 2.4 works three leverage
+        # sums, 2.6 four FX calculations, and 2.8 lists three named contracts with their
+        # multipliers -- instances of a spec rather than kinds of one.
+        # Read one at a time. Black-Scholes is a model you run. Three state identities that hold --
+        # break one and there is an arbitrage, which is not what "run this" means. The Greeks names
+        # five sensitivities rather than one calculation. Everything else is a quantity a contract,
+        # a position or a pool has.
+        "formula_primitive": {
+            "Black-Scholes Call Price": "Procedure",
+            "Put-Call Parity": "Fact",
+            "Cost of Carry Relationship": "Fact",
+            "Constant Product AMM (Uniswap V2)": "Fact",
+            "The Greeks": "Concept",
+        },
+        # Same quantity stated twice under different headings: 2.2's Contract Value computes the
+        # notional of 2.8, and 2.6's position P&L is 2.8's P&L calculation. One node each.
+        "rename": {"Price Impact (AMM)": "property:amm-price-impact",
+                   "Contract Value": "property:notional-value",
+                   "P&L Calculation": "property:position-profit-loss",
+                   "Concentrated Liquidity (V3)": "property:concentrated-liquidity-efficiency"},
+        "taxonomy": {"Spot Markets", "Options", "Crypto-Specific Mechanics", "Settlement & Clearing"},
+        # Same label, different thing. Chapter 1's price impact is Kyle lambda -- how far an order
+        # book moves per unit of order flow. This is the constant-product curve, which is a property
+        # of an AMM's arithmetic and not of anyone's order flow. They would have folded into one
+        # node on the strength of a shared name, which is the opposite of what folding is for.
+        "wired": {},
+    },
     "market-foundations": {
+        # Read one at a time. Two are models you RUN, one is an empirical regularity, and the other
+        # twelve are quantities something has -- a spread a book has, a rate an execution has.
+        "formula_primitive": {
+            "Almgren-Chriss Market Impact Model": "Procedure",
+            "GARCH(1,1) Model (Volatility Forecasting)": "Procedure",
+            "Square Root Market Impact Rule (Empirical)": "Fact",
+            # ATR is a quantity a bar has AND a function the library exposes. It is declared a
+            # Procedure so it keeps the id that folds onto `procedure:indicator-atr` -- where a
+            # thing is callable, the callable node is the one that should exist.
+            "Average True Range (ATR)": "Procedure",
+        },
         "taxonomy": {"Order Types", "Market Participants", "Volatility, Regimes & Regime Shifts",
                      "Trading Venues & Execution Models", "Price Discovery Mechanisms"},
         # `### <heading>` blocks that are a table of things rather than prose. Declared, because a
@@ -194,7 +235,7 @@ DEFINITION = {
         "order flow, transaction costs and information asymmetries specific to a market's design.",
 }
 
-#: Typed I/O for the chapter's computations, in the shape the 71 code-derived indicators use. The
+#: Typed I/O for a chapter's stated formulas, in the shape the 71 code-derived indicators use. The
 #: formula is in the text; what it consumes and emits is not, and without it nothing can connect
 #: `quoted spread` to the bid and ask it reads. `range` uses None for an open end -- Infinity does
 #: not survive a JSON round trip in every consumer, and null means "unbounded" throughout.
@@ -222,28 +263,28 @@ JUDGMENT_SUMMARY = (
     "than a rule -- departing from one is often right, but it should be a decision with a reason.")
 
 PRICE = {"type": "series", "units": "price"}
-PROCEDURE_IO = {
-    "procedure:quoted-spread": (
+FORMULA_IO = {
+    "property:quoted-spread": (
         {"bid": "highest price a buyer will pay", "ask": "lowest price a seller will accept"},
         {"quoted_spread": {**PRICE, "range": [0, None], "canonical_name": "Quoted Spread"}}),
-    "procedure:relative-spread": (
+    "property:relative-spread": (
         {"bid": "highest price a buyer will pay", "ask": "lowest price a seller will accept"},
         {"relative_spread": {"type": "series", "units": "percent", "range": [0, None],
                              "canonical_name": "Relative Spread"}}),
-    "procedure:effective-spread": (
+    "property:effective-spread": (
         {"trade_price": "price actually paid or received", "midpoint": "(bid + ask) / 2 at the time"},
         {"effective_spread": {**PRICE, "range": [0, None], "canonical_name": "Effective Spread"}}),
-    "procedure:realized-spread": (
+    "property:realized-spread": (
         {"trade_price": "price actually paid or received",
          "midpoint_after": "midpoint a fixed interval after the trade",
          "direction": "+1 buyer-initiated, -1 seller-initiated"},
         {"realized_spread": {**PRICE, "range": [None, None],
                              "canonical_name": "Realized Spread"}}),
-    "procedure:simple-slippage": (
+    "property:simple-slippage": (
         {"execution_price": "average price actually filled", "expected_price": "price expected"},
         {"slippage": {**PRICE, "range": [None, None], "canonical_name": "Slippage"},
          "slippage_pct": {"type": "series", "units": "percent", "range": [None, None]}}),
-    "procedure:price-impact": (
+    "property:price-impact": (
         {"order_flow": "signed order flow over the interval",
          "lam": "market price sensitivity to order flow (Kyle lambda)"},
         {"delta_p": {**PRICE, "range": [None, None], "canonical_name": "Price Impact"}}),
@@ -253,16 +294,16 @@ PROCEDURE_IO = {
          "gamma": "permanent-impact coefficient"},
         {"temporary_impact": {**PRICE, "range": [0, None]},
          "permanent_impact": {**PRICE, "range": [0, None]}}),
-    "procedure:square-root-market-impact-rule": (
+    "fact:square-root-market-impact-rule": (
         {"order_size": "shares or contracts to execute", "adv": "average daily volume",
          "sigma": "daily volatility"},
         {"impact": {**PRICE, "range": [0, None], "canonical_name": "Square-Root Impact"}}),
-    "procedure:participation-rate": (
+    "property:participation-rate": (
         {"order_size": "shares or contracts to execute", "adv": "average daily volume",
          "duration_days": "execution horizon in days"},
         {"participation_rate": {"type": "series", "units": "fraction", "range": [0, 1],
                                 "canonical_name": "Participation Rate"}}),
-    "procedure:historical-volatility": (
+    "property:historical-volatility": (
         {"returns": "periodic returns series", "periods": "periods per year for annualisation"},
         {"sigma": {"type": "series", "units": "fraction", "range": [0, None],
                    "canonical_name": "Historical Volatility"}}),
@@ -271,21 +312,21 @@ PROCEDURE_IO = {
          "alpha": "reaction to recent shocks", "beta": "persistence of volatility"},
         {"sigma2": {"type": "series", "units": "variance", "range": [0, None],
                     "canonical_name": "Conditional Variance"}}),
-    "procedure:volatility-ratio": (
+    "property:volatility-ratio": (
         {"short_vol": "short-window volatility", "long_vol": "long-window volatility"},
         {"vol_ratio": {"type": "series", "units": "ratio", "range": [0, None],
                        "canonical_name": "Volatility Ratio"}}),
-    "procedure:information-share": (
+    "property:information-share": (
         {"variance_contribution": "variance of this market's contribution to the efficient price",
          "variance_total": "variance of the total efficient price"},
         {"information_share": {"type": "series", "units": "fraction", "range": [0, 1],
                                "canonical_name": "Information Share"}}),
-    "procedure:component-share": (
+    "property:component-share": (
         {"permanent_impact_market": "permanent price impact from this market",
          "permanent_impact_total": "total permanent price impact"},
         {"component_share": {"type": "series", "units": "fraction", "range": [0, 1],
                              "canonical_name": "Component Share"}}),
-    "procedure:price-efficiency-ratio": (
+    "property:price-efficiency-ratio": (
         {"var_long": "return variance over the long horizon",
          "var_short": "return variance over the short horizon", "n": "horizon ratio"},
         {"efficiency": {"type": "series", "units": "ratio", "range": [0, None],
@@ -302,12 +343,16 @@ SCAFFOLD = ("Definition", "Core Principles", "Common Use Cases", "Examples",
 #: `bid-ask-spread` and `price-discovery`. Kept out of the middle of a name -- "over-the-counter"
 #: must not become "over-counter" -- so only leading and trailing words are removed.
 EDGE_STOPWORDS = {"the", "a", "an", "of", "and", "or", "in", "to", "for",
-                  "dynamics", "mechanisms"}
+                  "dynamics", "mechanisms", "basics"}
 
 #: A category node is singular: one `market maker`, not `market makers`. The chapter titles its
 #: sections and example blocks in the plural because they head a list.
 IRREGULAR = {"mechanics": "mechanics", "analysis": "analysis", "series": "series",
-             "venues": "venue", "networks": "network"}
+             "venues": "venue", "networks": "network",
+             # Not plurals. "Basis" and "Greeks" are the terms themselves, and a futures contract
+             # is "futures" -- a `future` is a different word. Stripping the s invented three terms
+             # nobody uses: `basi`, `greek`, `future`.
+             "basis": "basis", "greeks": "greeks", "futures": "futures"}
 
 
 #: Trailing words that name the FORM of a thing rather than the thing: "Almgren-Chriss Market
@@ -477,7 +522,7 @@ def build(path: Path, chapter: str, parent: str,
         """Create or MERGE. A term defined twice in one chapter (price discovery in 1.1 and 1.8) is
         one node: the longer definition wins and the props union, rather than a second node or a
         build error. Deconfliction of the two wordings is a review step, not a parse-time decision."""
-        nid = f"{kind.lower()}:{slug(title)}"
+        nid = decl.get("rename", {}).get(title) or f"{kind.lower()}:{slug(title)}"
         target = MERGE_INTO.get(nid, nid)
         if target in existing:
             # Already in the graph: FULL OUTER MERGE. The existing node keeps its identity and its
@@ -617,10 +662,15 @@ def build(path: Path, chapter: str, parent: str,
             formula = code_of(body)
             if not formula:
                 continue
-            # `_generated` marks a summary this builder wrote rather than read. It is a filler
-            # until the node is reviewed, and must never be recorded as a "chapter variant" of a
-            # real authored summary -- that is noise presented as a conflict.
-            pid = atom("Procedure", label, f"Computes {label.lower()}.",
+            # A formula says nothing about what a thing IS. `Basis = Futures - Spot` defines a
+            # QUANTITY a contract has; `Put-Call Parity` states an identity that holds; only
+            # Black-Scholes and GARCH are things you RUN. Reading every formula as a Procedure gave
+            # chapter 2 thirty-two of them and the graph zero Properties, because this path could
+            # not emit one. Property is the default and the exceptions are declared per chapter.
+            prim = decl.get("formula_primitive", {}).get(label, "Property")
+            verb = {"Property": "The quantity", "Fact": "The identity",
+                    "Procedure": "Computes", "Concept": "The family"}[prim]
+            pid = atom(prim, label, f"{verb} {label.lower()}.",
                        formula=formula, _generated=True, _section=num)
             quantified = subject_for(label, subjects)
             rel(pid, "about", quantified, f"quantifies {name_of(quantified)}")
@@ -696,8 +746,8 @@ def build(path: Path, chapter: str, parent: str,
             if a["summary"] and a["summary"] not in (a["props"].get("examples") or []):
                 a["props"].setdefault("examples", []).insert(0, a["summary"])
             a["summary"] = DEFINITION[nid]
-        if nid in PROCEDURE_IO:
-            ins, outs = PROCEDURE_IO[nid]
+        if nid in FORMULA_IO:
+            ins, outs = FORMULA_IO[nid]
             a["props"]["inputs"] = {k: {"type": "series", "description": v} for k, v in ins.items()}
             a["props"]["outputs"] = outs
 

@@ -155,13 +155,13 @@ def test_a_chapter_with_no_declarations_refuses_to_build():
     from pathlib import Path
 
     repo = Path(__file__).resolve().parent.parent
-    src = repo / "knowledge-base" / "02-instruments-market-mechanics.md"
+    src = repo / "knowledge-base" / "03-core-trading-concepts.md"
     if not src.is_file():
         import pytest
         pytest.skip("chapter 02 source not in this checkout")
     r = subprocess.run(
         [sys.executable, str(repo / "ontology" / "chapter_to_atoms.py"), str(src),
-         "--chapter-id", "instruments-market-mechanics", "--parent", "concept:market-mechanics",
+         "--chapter-id", "core-trading-concepts", "--parent", "concept:price-action",
          "--ontology", str(repo / "ontology" / "signal-indicator-ontology.json"), "--table"],
         capture_output=True, text=True, timeout=120)
     assert r.returncode != 0, "an undeclared chapter built anyway"
@@ -175,9 +175,9 @@ def test_a_section_with_several_subjects_attaches_each_thing_to_its_own(kg):
     of VOLATILITY rather than of market regime -- a taxonomy error, not just an imprecise edge.
     """
     expected = {
-        "procedure:simple-slippage": "concept:slippage",
+        "property:simple-slippage": "concept:slippage",
         "procedure:almgren-chriss-market-impact-model": "concept:market-impact",
-        "procedure:square-root-market-impact-rule": "concept:market-impact",
+        "fact:square-root-market-impact-rule": "concept:market-impact",
         "concept:low-volatility-regime": "concept:market-regime",
         "concept:high-volatility-regime": "concept:market-regime",
     }
@@ -196,3 +196,35 @@ def test_a_near_duplicate_across_the_two_halves_is_related_not_left_adjacent(kg)
     linked = {e["id"] for e in kg.neighbors("procedure:vwap", direction="out", limit=None)}
     assert "procedure:indicator-vwap" in linked, \
         "the execution algorithm and the indicator of the same name must be joined"
+
+
+def test_a_stated_formula_is_not_automatically_a_procedure(kg):
+    """What a formula DEFINES decides the primitive, not the section it sits in.
+
+    Reading every `### Mathematical Rules/Formulas` entry as a Procedure gave chapter 2 thirty-two
+    of them and the whole graph three Properties -- because that path could not emit one. A formula
+    can define a quantity (Property), state an identity (Fact), name a family (Concept), or specify
+    a method (Procedure), and only the last is something you run.
+    """
+    expect = {
+        "property:quoted-spread": "Property",        # a number a book has
+        "property:basis": "Property",                # futures minus spot
+        "property:margin-ratio": "Property",
+        "fact:put-call-parity": "Fact",              # holds, or there is an arbitrage
+        "fact:cost-of-carry-relationship": "Fact",
+        "procedure:black-scholes-call-price": "Procedure",   # a model you run
+        "procedure:garch-model": "Procedure",
+        "concept:greeks": "Concept",                 # five sensitivities, not one calculation
+    }
+    for nid, primitive in expect.items():
+        if nid not in kg.nodes:
+            continue                                  # its chapter is not merged yet
+        assert kg.get(nid)["primitive"] == primitive, \
+            f"{nid} should be {primitive}, is {kg.get(nid)['primitive']}"
+
+
+def test_the_graph_actually_holds_quantities(kg):
+    """The count is the tell: three Properties in the whole graph meant the parser could not make
+    one, not that the knowledge base states no quantities."""
+    quantities = [i for i in kg.nodes if i.startswith("property:") and "role" not in i]
+    assert len(quantities) >= 10, f"only {len(quantities)} quantities; the default has regressed"

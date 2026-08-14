@@ -68,7 +68,7 @@ def test_containment_is_derived_from_edges_not_from_a_property(kg):
 
 def test_a_path_explains_itself_at_every_hop(kg):
     """Every edge records why it holds; a route that drops it explains nothing."""
-    hops = kg.path("procedure:quoted-spread", "object:mangrove-knowledge-space")
+    hops = kg.path("property:quoted-spread", "object:mangrove-knowledge-space")
     assert hops and len(hops) > 2
     for step in hops[1:]:
         via = step["via"]
@@ -77,7 +77,7 @@ def test_a_path_explains_itself_at_every_hop(kg):
 
 
 def test_all_paths_carries_the_same_reasons(kg):
-    routes = kg.all_paths("procedure:quoted-spread", SUBJECT, limit=None).items
+    routes = kg.all_paths("property:quoted-spread", SUBJECT, limit=None).items
     assert routes, "expected at least one route"
     for route in routes:
         for step in route[1:]:

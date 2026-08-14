@@ -584,6 +584,7 @@ KIND_COLOR = {
     "domain":                _shade(PRIMITIVE_COLOR["Concept"], 0.35),
     "role value":            PRIMITIVE_COLOR["Property"],
     "role axis":             _shade(PRIMITIVE_COLOR["Property"], -0.35),
+    "quantity":              _shade(PRIMITIVE_COLOR["Property"], 0.4),
     "root:knowledge-graph":  PRIMITIVE_COLOR["Object"],
     "schema":                PRIMITIVE_COLOR["Schema"],
     "fact":                  PRIMITIVE_COLOR["Fact"],
@@ -1694,6 +1695,9 @@ KIND_BY_PREFIX = {
     "concept:": "entity type",
     "property:role-": "role value",
     "property:role": "role axis",
+    # A measurable quantity a thing has -- a spread, a basis, a margin ratio. Distinct from the role
+    # axis, which is the only other Property in the graph and is not a quantity at all.
+    "property:": "quantity",
     "procedure:indicator-": "indicator",
     "procedure:signal-": "signal",
     # A computation the knowledge base states but the library does not implement -- a formula with

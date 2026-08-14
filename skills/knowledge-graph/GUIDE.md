@@ -46,7 +46,7 @@ Do not start by listing files. Start with the graph's own summary:
 ```python
 s = kg.stats()
 s["nodes"], s["edges"]          # 365, 1150
-s["primitives"]                 # {'Procedure': 304, 'Concept': 44, 'Property': 3, ...}
+s["primitives"]                 # {'Procedure': 295, 'Concept': 50, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 274, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
@@ -55,8 +55,8 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 
 ```
 nodes, edges  365 1150
-primitives    {'Procedure': 304, 'Concept': 44, 'Property': 3, 'Object': 1, 'Schema': 1,
-               'Fact': 1, 'Judgment': 1}
+primitives    {'Procedure': 295, 'Concept': 50, 'Property': 15, 'Object': 1,
+               'Schema': 1, 'Fact': 2, 'Judgment': 1}
 relations     {'instance-of': 364, 'uses': 234, 'about': 274, 'has-role': 218,
                'kind-of': 32, 'part-of': 26, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
@@ -66,7 +66,7 @@ roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 17 shapes in total]
+               ... 19 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
@@ -638,16 +638,21 @@ summary       The ease with which an asset can be bought or sold without signifi
               and minimal price impact.
 applications  Estimating realistic execution costs for strategy backtesting
               Determining optimal order sizing based on available liquidity
-neighbors     about    procedure:simple-slippage
-              about    procedure:participation-rate
-              about    procedure:square-root-market-impact-rule
-              about    procedure:almgren-chriss-market-impact-model
-              part-of  concept:market-foundations
+neighbors  in   about    property:participation-rate
+           out  about    fact:market-foundations-core-principles
+           out  about    judgment:market-foundations-best-practices
+           out  part-of  concept:market-foundations
 ```
 
-Four computations quantify it and none of them is in the library — they are **formulas**, stated by
-the knowledge base with typed inputs and outputs and no code behind them. `get()` gives you the
-formula; there is no `RuleRegistry` name to run.
+Direction carries meaning. **Incoming** `about` is what quantifies liquidity — participation rate,
+a number an execution has. **Outgoing** `about` is what is known about it: the principles that hold
+and the practices that follow, each statement on its edge.
+
+Note the primitive. `property:` is a **quantity** something has, the way `atr` is a number a bar
+has; `procedure:` is a method you run. Neither has code behind it here — `get()` gives you the
+formula and there is no `RuleRegistry` name to call. Reading every stated formula as a Procedure is
+the easy mistake, and it hides the other two: `Put-Call Parity` is a `Fact`, an identity that holds,
+and breaking it is an arbitrage rather than a failed function call.
 
 Widen by subject rather than by node when the question is broader. `find(under=…)` walks containment
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
