@@ -698,8 +698,18 @@ PROPERTY_PANEL = r"""
        ink 50% panel   the section labels themselves
      The mix is against --panel rather than `transparent` so the result is a real opaque colour in
      both themes instead of depending on what happens to be painted underneath. */
-  #inspect{--kb-2:color-mix(in oklab,var(--ink) 68%,var(--panel));
-           --kb-3:color-mix(in oklab,var(--ink) 64%,var(--panel));
+  /* WHAT FONT THIS ACTUALLY RENDERS IN. `Geist` and `Geist Mono` are named in the brand style but
+     no @font-face ever loads them and this page may not fetch one -- it is a single self-contained
+     file with no network. Measured in the browser: a string set in "Geist Mono" is pixel-identical
+     to the same string set in "NoSuchFont12345", i.e. both fall through to the generic. So the
+     brand font is aspirational here, and the only typography that is real is the size, the weight,
+     the colour, and WHICH GENERIC -- sans or mono. Those are what this block sets.
+     Mono is for identifiers -- names you would type: `window_dev`, `mavg`, `int`, `[0, inf]`.
+     Sans is for prose -- headings, descriptions, bullets. The panel used mono, small and grey, for
+     both, which is why it read as one undifferentiated block of code. */
+  #inspect{--kb-sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+           --kb-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+           --kb-2:color-mix(in oklab,var(--ink) 78%,var(--panel));
            --kb-rule:color-mix(in oklab,var(--line) 75%,var(--panel));
            /* The brand accent is a mid teal: 6.5:1 on the dark panel and 2.66:1 on the light one,
               measured. It is the token the eye lands on first, so on light it is darkened until it
@@ -709,45 +719,43 @@ PROPERTY_PANEL = r"""
            --kb-ty:#12667f}
   @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) #inspect{--kb-ty:var(--act)} }
   :root[data-theme="dark"] #inspect{--kb-ty:var(--act)}
-  /* The viewer's own labels and values, scaled with the rest. Every block in the panel uses these,
-     so the header, the description and the edge list move together rather than my three tables
-     drifting into a different typeface from everything above them. */
-  #inspect h2{font-size:14px;line-height:1.35;margin-bottom:8px}
-  #inspect .lbl{font:600 11px "Geist Mono",ui-monospace,monospace;letter-spacing:.1em;
-                color:var(--kb-3);margin:17px 0 5px}
-  #inspect .val{font-size:13px;line-height:1.55;color:var(--ink)}
+  /* Headings were 10.5px uppercase mono in a grey mixed halfway to the background -- grey on black,
+     smaller than the text under them, and in the same typeface. A heading's whole job is to be the
+     thing you find when you are scanning, so: sans, 13px, bold, FULL --ink, sentence case, and a
+     rule under it so the section has a visible top edge. */
+  #inspect h2{font:600 14px var(--kb-mono);line-height:1.35;margin-bottom:9px;color:var(--ink)}
+  #inspect .lbl{font:700 13px var(--kb-sans);letter-spacing:0;text-transform:capitalize;
+                color:var(--ink);margin:20px 0 7px;padding-bottom:5px;
+                border-bottom:1px solid var(--kb-rule)}
+  #inspect .val{font:13px/1.6 var(--kb-sans);color:var(--ink)}
   #inspect .val.acc{color:var(--kb-2)}
   #inspect table.kbt{border-collapse:collapse;width:100%;table-layout:fixed}
-  #inspect table.kbt td{vertical-align:top;padding:6px 0;
-                        border-bottom:1px solid var(--kb-rule)}
-  #inspect table.kbt tr:last-child td{border-bottom:0;padding-bottom:2px}
-  #inspect table.kbt td.kbn{font:600 12.5px "Geist Mono",ui-monospace,monospace;color:var(--ink);
+  #inspect table.kbt td{vertical-align:top;padding:7px 0}
+  #inspect table.kbt tr+tr td{border-top:1px solid var(--kb-rule)}
+  #inspect table.kbt td.kbn{font:600 13px var(--kb-mono);color:var(--ink);
                             width:38%;padding-right:10px;overflow-wrap:anywhere}
   #inspect table.kbt td.kbv{overflow-wrap:anywhere}
   /* The type is the first thing you want off an entry -- series, int, bool -- so it is the one
      token in the meta line that carries a colour of its own. */
-  #inspect .kbty{color:var(--kb-ty);font-weight:600}
-  #inspect .kbm{font:11.5px "Geist Mono",ui-monospace,monospace;color:var(--kb-2);
-                letter-spacing:.01em;line-height:1.5}
-  #inspect .kbd{color:var(--ink);font-size:12.5px;line-height:1.55;margin-top:3px}
+  #inspect .kbty{color:var(--kb-ty);font-weight:700}
+  #inspect .kbm{font:12px var(--kb-mono);color:var(--kb-2);line-height:1.5}
+  #inspect .kbd{font:13px/1.6 var(--kb-sans);color:var(--ink);margin-top:4px}
   /* It belongs to the parameter table above it, not to the last row in it -- without the gap it
      read as a third line of window_dev's description. */
-  #inspect .kbw{margin-top:9px}
-  #inspect ul.kbl{margin:3px 0 0;padding-left:17px;font-size:12.5px;line-height:1.6;color:var(--ink)}
-  #inspect ul.kbl li{margin:3px 0}
-  #inspect pre.kbp{margin:3px 0 0;padding:8px 10px;background:var(--chip);border:1px solid var(--line);
-                   border-radius:6px;color:var(--ink);
-                   font:11.5px/1.55 "Geist Mono",ui-monospace,monospace;
+  #inspect .kbw{margin-top:10px}
+  #inspect ul.kbl{margin:4px 0 0;padding-left:18px;font:13px/1.65 var(--kb-sans);color:var(--ink)}
+  #inspect ul.kbl li{margin:4px 0}
+  #inspect pre.kbp{margin:4px 0 0;padding:9px 11px;background:var(--chip);border:1px solid var(--line);
+                   border-radius:6px;color:var(--ink);font:12px/1.6 var(--kb-mono);
                    white-space:pre-wrap;overflow-wrap:anywhere}
-  #inspect details.kbx{margin-top:18px;border-top:1px solid var(--line);padding-top:10px}
-  #inspect details.kbx summary{font:600 11px "Geist Mono",ui-monospace,monospace;
-                               letter-spacing:.1em;color:var(--kb-3);cursor:pointer;
+  #inspect details.kbx{margin-top:20px;border-top:1px solid var(--line);padding-top:11px}
+  #inspect details.kbx summary{font:700 12.5px var(--kb-sans);color:var(--kb-2);cursor:pointer;
                                list-style:none}
   #inspect details.kbx summary:hover{color:var(--act)}
-  #inspect details.kbx summary::before{content:"▸ ";font-size:9px}
-  #inspect details.kbx[open] summary::before{content:"▾ "}
-  #inspect details.kbx[open] summary{margin-bottom:8px}
-  #inspect details.kbx .kbm{margin:4px 0}
+  #inspect details.kbx summary::before{content:"\25b8 ";font-size:10px}
+  #inspect details.kbx[open] summary::before{content:"\25be "}
+  #inspect details.kbx[open] summary{margin-bottom:9px}
+  #inspect details.kbx .kbm{margin:5px 0}
 </style>
 <script>
 (function(){

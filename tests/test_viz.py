@@ -427,4 +427,14 @@ def test_the_panel_is_legible_in_both_themes(page):
     assert ':root:not([data-theme="light"]) #inspect{--kb-ty:var(--act)}' in page, \
         "an explicit light choice on a dark OS must keep the readable colour"
     # The description IS the answer to "what is this". It was rendered in --muted, like provenance.
-    assert "#inspect .kbd{color:var(--ink)" in page, "descriptions must be full-contrast body text"
+    assert "#inspect .kbd{font:13px/1.6 var(--kb-sans);color:var(--ink)" in page, \
+        "descriptions must be full-contrast body text in the prose face, not small grey mono"
+    # A heading in a grey mixed halfway to the background, smaller than the text beneath it and in
+    # the same typeface, is not a heading. Full ink, sans, bold, and bigger than the body it heads.
+    assert "#inspect .lbl{font:700 13px var(--kb-sans)" in page and "color:var(--ink);margin:20px" in page
+    # Mono is for identifiers, sans is for prose. Naming a font that does not load is not a choice:
+    # "Geist Mono" measures pixel-identical to "NoSuchFont12345" on this page -- there is no
+    # @font-face and the page may not fetch one -- so what is real is the size, weight, colour and
+    # which generic. The panel must not go back to naming a font it does not have.
+    assert '"Geist Mono"' not in page.split("#inspect{--kb-sans")[1].split("</style>")[0], \
+        "the panel must not declare a font that never loads"
