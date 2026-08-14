@@ -583,8 +583,8 @@ def test_the_action_section_says_what_the_graph_is_doing(page):
     # It folds through the same machinery as every other section rather than a second copy of it.
     assert "window.KBFOLD = foldSections;" in page and "if(window.KBFOLD) window.KBFOLD();" in page
     # Exactly one of the two words is lit, and which one is read from the state, not from the click.
-    assert 'class="xshow${off ? \'\' : \' on\'}">show</button>' in page
-    assert 'class="xhide${off ? \' on\' : \'\'}">hide</button>' in page
+    assert 'class="xshow${off ? \'\' : \' on\'}" aria-pressed="${!off}">show</button>' in page
+    assert 'class="xhide${off ? \' on\' : \'\'}" aria-pressed="${off}">hide</button>' in page
     # White on this teal measures 2.6:1; the lit chip carries dark ink in both themes.
     assert "#inspect .xsw button.on{background:var(--act);color:#0a0a0a}" in page
 
@@ -741,7 +741,8 @@ def test_focus_re_frames_the_view(page):
     """
     assert "function frameVisible()" in page
     assert page.count("frameVisible();") >= 2, "one fit is a snapshot of positions already moving"
-    assert "[400, 1000, 1900].forEach" in page, "the refits must span the settle"
+    assert "refits = [400, 1000, 1900].map(ms =>" in page, \
+        "the refits must span the settle, and be cancellable"
     assert "fg3d.zoomToFit" in page, "3D must re-frame too, or the toggle lands on empty space"
 
 
@@ -882,8 +883,12 @@ console.log(JSON.stringify(probes.map(id => {{
 """, tmp_path)
 
     for node in out:
-        # The number on a row is what that row does -- so the rows must sum (as a union) to the fold.
-        assert node["perType"] == sum(k for _, k in node["rows"]) or True
+        # The number on a row is what that row does, so the fold -- the union of the per-row sets --
+        # can never come out bigger than those numbers added up. A walk that crosses between edge
+        # types breaks exactly this: it reaches nodes no single row claims.
+        rows_total = sum(k for _, k in node["rows"])
+        assert node["perType"] <= rows_total, \
+            f"{node['id']}: rows claim {rows_total} between them, the fold takes {node['perType']}"
         assert node["perType"] <= node["combined"], "per-type can never exceed the combined walk"
     signal = next(n for n in out if n["id"] == "procedure:signal-rsi-cross-up")
     assert all(k == 1 for _, k in signal["rows"]), f"this leaf's rows each reach one node: {signal}"
@@ -912,3 +917,79 @@ def test_rows_and_focus_both_replace_the_root_rule(page):
     # And each row is walked on its own.
     assert "const awayOne = (id, t) =>" in page
     assert "for(const t of types) awayOne(id, t).forEach(x => out.add(x));" in page
+
+
+def test_clearing_focus_gives_back_the_view_you_had(page):
+    """Focus re-frames because it must; clearing must NOT, because that is a different question.
+
+    Measured before the fix: pan and zoom to (200,-140,z1.8), focus, press Escape, and you land at
+    (428,-342,z0.30) -- a whole-graph fit, nowhere you chose. Now both exits, Escape and the
+    `everything` row, put back exactly what was there.
+    """
+    assert "let preFocus = null;" in page
+    assert "if(wanted && focus.id == null) preFocus = {x: view.x, y: view.y, z: view.z};" in page
+    assert "view.x = preFocus.x; view.y = preFocus.y; view.z = preFocus.z;" in page
+    # And the clear path must not fall through into the re-frame below it.
+    assert "return;" in page.split("if(!wanted && preFocus){")[1].split("frameVisible();")[0], \
+        "clearing must return before the re-frame, or it fits the whole graph anyway"
+
+
+def test_pending_refits_are_cancelled(page):
+    """Three quick clicks used to leave nine fits queued, and the ones belonging to a scope you had
+    already changed kept moving the camera for seconds -- measured drifting from (176,351,z0.30) to
+    (-14,36,z0.54) 2.5s after the last click. Every entry to setFocus cancels what is outstanding.
+    """
+    assert "let refits = [];" in page
+    assert page.count("refits.forEach(clearTimeout);") == 2, \
+        "cancel on both paths: changing the focus, and clearing it"
+    assert "refits = [400, 1000, 1900].map(ms =>" in page
+
+
+def test_provenance_remembers_its_fold_like_every_other_section(page):
+    """It was the one section that forgot, because KVPROPS writes it rather than the fold pass.
+
+    Same store and same key as the others, opposite default: shut unless you have opened it.
+    """
+    assert "const prov = inspect.querySelector(':scope > details.kbx');" in page
+    assert "prov.open = state[key] === true;" in page, "closed by default, remembered once opened"
+    assert page.count("writeFold(st);") == 2, "both the sections and the provenance block persist"
+
+
+def test_controls_announce_their_own_state(page):
+    """"neighbors 11" tells a screen-reader user nothing about whether it is on.
+
+    aria-pressed, not role=radio: the scopes COMBINE, and radios are mutually exclusive by
+    definition. Verified in a browser that the attribute tracks the lit class on every control,
+    before and after toggling: zero disagreement.
+    """
+    assert 'aria-pressed="${picked.length ? \'false\' : \'true\'}"' in page, "the everything row"
+    assert 'aria-pressed="${on}"' in page, "each scope row"
+    assert 'aria-pressed="${!off}">show</button>' in page and 'aria-pressed="${off}">hide</button>' in page
+    assert 'role="group" aria-labelledby="xsonly"' in page, "the scopes are a named group"
+    assert 'role="group" aria-label="${attr(t)} edges"' in page, "each show/hide pair is named"
+    assert "#inspect .xsr{position:absolute" in page, "the bare count needs a unit read aloud"
+
+
+def test_framing_does_not_spread_one_argument_per_node(page):
+    """`Math.min(...xs)` passes one argument per visible node: fine at 303, RangeError in the tens
+    of thousands (checked in the same browser -- 200k throws, the loop does not). This viewer ships
+    for other people's graphs, and a crash at scale is a poor way to find that out.
+    """
+    import re as _re
+    code = _re.sub(r"//.*", "", page)              # the comment EXPLAINING this names the old call
+    assert "Math.min(...xs)" not in code and "Math.max(...xs)" not in code
+    assert "for(const n of N){" in page and "if(n.x < x0) x0 = n.x;" in page
+    assert "if(!seen) return;" in page, "an empty visible set must still bail out"
+
+
+def test_attribute_values_are_escaped_for_attributes(page):
+    """The viewer's `esc` handles text nodes -- it leaves `\"` alone -- and these go into attributes.
+
+    No tooltip carries a double quote today, which is exactly why this was worth fixing before one
+    does. Verified in a browser with a definition containing both `"` and `<`: the row stays intact
+    (3 buttons) and the text round-trips verbatim.
+    """
+    panel = page.split("const attr = v => esc(v).replace")[1].split("</script>")[0]
+    assert 'data-tip="${esc(' not in panel, "a tooltip is an attribute value"
+    assert 'data-id="${esc(' not in panel and 'data-t="${esc(' not in panel
+    assert 'data-tip="${attr(tip)}"' in panel

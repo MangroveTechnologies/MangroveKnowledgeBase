@@ -974,6 +974,18 @@ PROPERTY_PANEL = r"""
       d.append(s, v);
       d.addEventListener('toggle', () => { const st = readFold(); st[key] = d.open; writeFold(st); });
     }
+    // The provenance block is written by KVPROPS as its own <details>, so the loop above never sees
+    // it -- and it was the one section that forgot its state the moment you clicked another node,
+    // while every other section remembered. Same store, same key, opposite default: it stays shut
+    // unless you have opened it, because it is the section nobody opens to answer "what is this".
+    const prov = inspect.querySelector(':scope > details.kbx');
+    if(prov){
+      const key = 'provenance & extras';
+      prov.open = state[key] === true;
+      prov.addEventListener('toggle', () => {
+        const st = readFold(); st[key] = prov.open; writeFold(st);
+      });
+    }
   }
 
   // The viewer prints `epistemic · confidence` near the top, where confidence is null on every node
@@ -1215,16 +1227,20 @@ window.KBUNION = function(edges, id, types, modes){
 
 # The Action section: how much of the graph is in view, and along which edges.
 #
-# Two controls, coarse first. `show only` picks how much graph is in view around this node --
-# everything, its immediate neighbors, its descendants, its ancestors, or both lineages. `show or
-# hide` prunes edge types within that. ONE RULE ties them together, and it is Tim's: the lineage
-# walk traverses exactly the edge types currently set to show, so a row set to `hide` drops that
-# branch AND drops that axis from the walk. The counts beside every option are computed from the
-# live type set, so the numbers always describe what the button would actually do.
+# Two controls, coarse first. `show only` picks how much graph is in view around this node:
+# neighbors, descendants, ancestors -- combinable, so all seven combinations come out of three
+# rows, and selecting none is `everything`. `show or hide` prunes edge types within that. ONE RULE
+# ties them together, and it is Tim's: the walk traverses exactly the edge types currently set to
+# show, so a row set to `hide` drops that branch AND drops that axis from the walk. Each row hides
+# only what its own count claims -- one walk per type, never a combined one, and whatever is set to
+# hide IS the answer (the root-reachability rule is skipped, as it is under focus). Every count is
+# recomputed from the live type set, so the numbers always describe what the button will do.
 #
-# The set maths is exposed as `window.KBSETS(edges, id, types, mode)` -- pure, taking its edges as
-# an argument rather than reading the viewer's `L` -- so `tests/test_viz.py` executes it in node
-# against the real graph instead of asserting that the source text looks right.
+# The set maths is exposed as `window.KBSETS` (one scope) and `window.KBUNION` (a combination) --
+# pure, taking their edges as an argument rather than reading the viewer's `L` -- so
+# `tests/test_viz.py` executes them in node against the real graph and compares every answer with
+# the same traversal written independently in Python, instead of asserting that the source looks
+# right.
 #
 # The floater rule is the hazard here. `recomputeHidden` normally ends by hiding anything that
 # cannot reach the root, which is what keeps a fold from leaving orphans adrift. Under focus the
@@ -1251,6 +1267,9 @@ ACTION_PANEL = """
   #inspect .xsw button.on{background:var(--act);color:#0a0a0a}
   #inspect .xsw button.on.xhide{background:var(--dev-highlight);color:#0a0a0a}
   #inspect .xnone{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2)}
+  /* Read aloud, never drawn: "neighbors 11" alone does not say 11 of what. */
+  #inspect .xsr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+                white-space:nowrap}
   /* The scope rows are a radio, not toggles: these views are mutually exclusive and `everything`
      is the way back. The whole row is the control -- a 5-option segmented strip wraps into
      porridge at the 330px default width, and the counts have nowhere to live. */
@@ -1280,6 +1299,8 @@ ACTION_PANEL = """
 <script>
 (function(){
   const ROOT = __ROOT__;
+  // Attribute-safe: the viewer's `esc` handles text nodes, not `attr="..."` values.
+  const attr = v => esc(v).replace(/"/g, '&quot;');
   const scope = new Map();                       // node id -> Set of relation types set to `hide`
   let focus = {id:null, mode:'all'};             // never persisted: a page that opens showing 8 of
                                                  // 303 with no explanation is a bug report
@@ -1431,14 +1452,23 @@ ACTION_PANEL = """
   // Hiding 290 of 303 nodes leaves the 13 survivors wherever the layout had already scattered
   // them -- which, at the zoom you were at, is usually off screen. The first build of this showed
   // a correct focus as an EMPTY CANVAS: the data was right and the view was pointed at nothing.
-  // So focus re-frames. Twice: once now, and once after the layout has had a moment to pull the
-  // survivors together, because the positions the first fit measured are already moving.
+  // So focus re-frames: once immediately, then three more times across the settle, because the
+  // positions the first fit measured are already moving while it measures them. Clearing focus
+  // does NOT re-frame -- it hands back the view you had before, which is a different question.
   function frameVisible(){
-    const vis = N.filter(n => !hidden.has(n.id));
-    if(!vis.length) return;
-    const xs = vis.map(n => n.x), ys = vis.map(n => n.y);
-    const x0 = Math.min(...xs), x1 = Math.max(...xs);
-    const y0 = Math.min(...ys), y1 = Math.max(...ys);
+    // One pass, no spread: `Math.min(...xs)` passes one ARGUMENT per visible node, which is fine
+    // for this graph's 303 and throws RangeError somewhere in the tens of thousands. This viewer
+    // is shipped for other people's graphs, and a crash at scale is a poor way to find that out.
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, seen = 0;
+    for(const n of N){
+      if(hidden.has(n.id)) continue;
+      seen++;
+      if(n.x < x0) x0 = n.x;
+      if(n.x > x1) x1 = n.x;
+      if(n.y < y0) y0 = n.y;
+      if(n.y > y1) y1 = n.y;
+    }
+    if(!seen) return;
     const w = stage.clientWidth, h = stage.clientHeight, pad = 160;
     const z = Math.max(0.3, Math.min(3, Math.min(w / Math.max(1, x1 - x0 + pad),
                                                  h / Math.max(1, y1 - y0 + pad))));
@@ -1447,14 +1477,39 @@ ACTION_PANEL = """
     view.y = -((y0 + y1) / 2) * z;
   }
 
+  // Where the camera was before focus took it somewhere else. Focusing re-frames -- it has to, or
+  // the survivors sit off screen -- but CLEARING should hand back the view you had, not fit the
+  // whole graph and drop you somewhere you never chose. You pan, you focus, you come back: you
+  // should be where you left.
+  let preFocus = null;
+  let refits = [];                               // pending re-fit timers, cancelled on every change
+
   function setFocus(id, modes){
-    focus = (!modes || !modes.length) ? {id:null, modes:[]} : {id, modes};
+    const wanted = (!modes || !modes.length) ? null : {id, modes};
+    if(wanted && focus.id == null) preFocus = {x: view.x, y: view.y, z: view.z};
+    focus = wanted || {id:null, modes:[]};
     recomputeHidden();
+    refits.forEach(clearTimeout);
+    refits = [];
+    if(!wanted && preFocus){
+      view.x = preFocus.x; view.y = preFocus.y; view.z = preFocus.z;
+      preFocus = null;
+      wake(0.3);
+      if(sel && sel.id) showNode(N[idx[sel.id]]);
+      return;
+    }
     frameVisible();
     wake(0.6);
     // The survivors are still being pulled together by the simulation, so one fit is a snapshot of
     // positions that are already stale. Three, spread over the settle, and the last one lands.
-    [400, 1000, 1900].forEach(ms => setTimeout(() => { frameVisible(); wake(0.05); }, ms));
+    //
+    // Cancelled on the way in: without this, three quick clicks leave nine fits queued, and the
+    // ones belonging to a scope you have already changed keep re-framing the camera for seconds
+    // afterwards. Measured drifting from (176,351,z0.30) to (-14,36,z0.54) 2.5s after the last
+    // click -- a view that moves on its own long after you stopped touching it.
+    refits.forEach(clearTimeout);
+    refits = [400, 1000, 1900].map(ms =>
+      setTimeout(() => { frameVisible(); wake(0.05); }, ms));
     if(mode === '3d'){ refresh3d(); if(fg3d && fg3d.zoomToFit) fg3d.zoomToFit(600, 60); }
     if(sel && sel.id) showNode(N[idx[sel.id]]);
   }
@@ -1495,17 +1550,24 @@ ACTION_PANEL = """
     // anchor, and a scope that would add nothing is greyed with its count still showing rather
     // than clicking through to a canvas that did not change.
     const picked = (focus.id === n.id) ? focus.modes : [];
-    let html = '<div class="xintro">show only</div>'
-      + `<button class="xfrow${picked.length ? '' : ' on'}" data-m="" data-id="${esc(n.id)}">`
+    // State is on the element, not only in a CSS class: a screen reader reading "neighbors 11"
+    // otherwise has no way to know whether it is on. aria-pressed, not role=radio -- these
+    // combine, and radios are mutually exclusive by definition.
+    let html = '<div class="xintro" id="xsonly">show only</div>'
+      + '<div role="group" aria-labelledby="xsonly">'
+      + `<button class="xfrow${picked.length ? '' : ' on'}" data-m="" data-id="${attr(n.id)}" `
+      + `aria-pressed="${picked.length ? 'false' : 'true'}">`
       + `<span class="xname">everything</span><span class="xn">${N.length}</span>`
       + '<span class="xdot"></span></button>';
     for(const [m, label] of MODES){
       const k = window.KBSETS(L, n.id, T, m).size + 1;
-      html += `<button class="xfrow${picked.includes(m) ? ' on' : ''}" data-m="${m}" `
-        + `data-id="${esc(n.id)}"${k <= 1 ? ' disabled' : ''}>`
+      const on = picked.includes(m);
+      html += `<button class="xfrow${on ? ' on' : ''}" data-m="${m}" `
+        + `data-id="${attr(n.id)}" aria-pressed="${on}"${k <= 1 ? ' disabled' : ''}>`
         + `<span class="xname">${esc(label)}</span><span class="xn">${k}</span>`
-        + '<span class="xdot"></span></button>';
+        + `<span class="xdot"></span><span class="xsr"> nodes</span></button>`;
     }
+    html += '</div>';
 
     // Which edges. One row per relation type incident to this node, in either direction: a signal
     // is a leaf in containment, so an incoming-only list left 249 of 303 nodes with a control that
@@ -1519,13 +1581,18 @@ ACTION_PANEL = """
             const k = away(n.id, new Set([t])).size;
             const off = hid.has(t);
             const tip = (window.KBRELTIPS || {})[t];
+            // `esc` escapes & and < but NOT quotes, and these go into ATTRIBUTES. No copy carries a
+            // double quote today, which is exactly why this is worth fixing now rather than when
+            // someone writes the first definition with a quoted term in it and the row falls apart.
             return `<div class="xrow"><span class="xname">${esc(t)}</span>`
-              + (tip ? `<button type="button" class="xtip" data-tip="${esc(tip)}" `
-                       + `aria-label="what does ${esc(t)} mean?">?</button>` : '')
+              + (tip ? `<button type="button" class="xtip" data-tip="${attr(tip)}" `
+                       + `aria-label="what does ${attr(t)} mean?">?</button>` : '')
               + `<span class="xn">${k}</span>`
-              + `<span class="xsw" data-t="${esc(t)}" data-id="${esc(n.id)}">`
-              + `<button class="xshow${off ? '' : ' on'}">show</button>`
-              + `<button class="xhide${off ? ' on' : ''}">hide</button></span></div>`;
+              + `<span class="xsw" role="group" aria-label="${attr(t)} edges" `
+              + `data-t="${attr(t)}" data-id="${attr(n.id)}">`
+              + `<button class="xshow${off ? '' : ' on'}" aria-pressed="${!off}">show</button>`
+              + `<button class="xhide${off ? ' on' : ''}" aria-pressed="${off}">hide</button>`
+              + '</span></div>';
           }).join('');
     }
     val.innerHTML = html;
