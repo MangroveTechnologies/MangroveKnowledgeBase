@@ -55,6 +55,17 @@ CHAPTERS: dict[str, dict] = {
     "market-foundations": {
         "taxonomy": {"Order Types", "Market Participants", "Volatility, Regimes & Regime Shifts",
                      "Trading Venues & Execution Models", "Price Discovery Mechanisms"},
+        # `### <heading>` blocks that are a table of things rather than prose. Declared, because a
+        # table is as often a summary of nodes that already exist (the Order Type Summary Table
+        # restates the six order types) as it is a source of new ones.
+        "tables": {"Execution Algorithm Selection Guide":
+                   ("concept:execution-model", "instance-of")},
+        # Edges nothing in the text states, authored here. The chapter's VWAP is an execution
+        # SCHEDULE -- trade in proportion to volume -- and the library's VWAP is the price series it
+        # targets. Different things with the same name, so neither folds into the other; the edge is
+        # what stops them sitting side by side looking like a duplicate.
+        "edges": [("procedure:vwap", "uses", "procedure:indicator-vwap",
+                   "executes against the price series this computes")],
         "wired": {
             "Use iceberg orders for large positions": "concept:iceberg-order",
             # Wired to the iceberg order rather than to `order-type`, where the sentence points:
@@ -68,7 +79,11 @@ CHAPTERS: dict[str, dict] = {
 #: Blocks inside a taxonomy section that are still NOT kinds: "Regime Shift Triggers" lists causes
 #: of a shift and "Information Events" lists occasions for discovery. Both read like members and
 #: are not, which no rule about the text can tell apart from the ones that are.
-NOT_A_KIND = {"Regime Shift Triggers", "Information Events"}
+NOT_A_KIND = {"Regime Shift Triggers", "Information Events",
+              # The execution-algorithm table lists Iceberg beside TWAP and VWAP. It is the same
+              # thing as the order type of that name, which is already a node; a second one under a
+              # different primitive would be a duplicate wearing a different hat.
+              "Iceberg"}
 
 #: Chapter term -> the node in the graph that IS that thing under a different id. A collision the
 #: slug cannot see: the chapter calls it "Average True Range", the library registers the class as
@@ -229,6 +244,24 @@ IRREGULAR = {"mechanics": "mechanics", "analysis": "analysis", "series": "series
              "venues": "venue", "networks": "network"}
 
 
+#: Trailing words that name the FORM of a thing rather than the thing: "Almgren-Chriss Market
+#: Impact Model" is about market impact, "Volatility Ratio" about volatility. Stripped from the end
+#: of a label before matching it to a subject.
+FORM_WORDS = {"model", "rule", "ratio", "guide", "example", "formula", "method", "empirical"}
+
+
+def head_noun(label: str) -> str:
+    """The last meaningful word of a label -- what it is actually about.
+
+    `Simple Slippage` -> slippage. `Square Root Market Impact Rule` -> impact. English puts the head
+    of a noun phrase last, so the final word after the form words are dropped names the subject.
+    """
+    parts = [p for p in slug(re.sub(r"\(.*?\)", " ", label)).split("-") if p]
+    while parts and parts[-1] in FORM_WORDS:
+        parts.pop()
+    return parts[-1] if parts else ""
+
+
 def singular(word: str) -> str:
     if word in IRREGULAR:
         return IRREGULAR[word]
@@ -328,6 +361,20 @@ def split_block(body: list[str]) -> tuple[str, str]:
     return " ".join(define), " ".join(show)
 
 
+def table_rows(lines: list[str]) -> list[tuple[str, str]]:
+    """`| name | ... |` rows as (name, the rest joined). Header and rule rows are skipped."""
+    out = []
+    for line in lines:
+        s = line.strip()
+        if not s.startswith("|") or set(s) <= set("|- :"):
+            continue
+        cells = [c.strip() for c in s.strip("|").split("|")]
+        if len(cells) < 2 or cells[0].lower() in ("algorithm", "order type", "name", "term"):
+            continue
+        out.append((cells[0], ". ".join(c for c in cells[1:] if c)))
+    return out
+
+
 def code_of(lines: list[str]) -> str:
     inside, out = False, []
     for line in lines:
@@ -396,6 +443,24 @@ def build(path: Path, chapter: str, parent: str,
         cur["props"].setdefault("merged_from", []).append(props.get("_section", ""))
         return nid
 
+    def subject_for(label: str, subjects: list[str]) -> str:
+        """Which of a section's subjects a label belongs to.
+
+        A section often defines several things -- §1.4 defines liquidity, slippage and market impact
+        -- and every formula and every taxonomy member used to attach to whichever came first. So
+        `simple slippage` was declared to be about LIQUIDITY, and `low volatility regime` was made a
+        kind of VOLATILITY rather than of market regime. Match on the label's head noun, and fall
+        back to the first subject only when nothing matches, which is the single-subject case anyway.
+        """
+        if len(subjects) == 1:
+            return subjects[0]
+        head = head_noun(label)
+        if head:
+            for sid in subjects:
+                if head in sid.split(":", 1)[1].split("-"):
+                    return sid
+        return subjects[0]
+
     def name_of(nid: str) -> str:
         """The display name, for an id anywhere: authored in this chapter, folded into the existing
         graph, or the chapter's parent. Reading it out of `atoms` alone breaks the moment a term
@@ -453,7 +518,8 @@ def build(path: Path, chapter: str, parent: str,
                     continue
                 kid = atom("Concept", label, definition,
                            examples=[illustration] if illustration else None, _section=num)
-                rel(kid, "kind-of", subjects[0], f"a kind of {name_of(subjects[0])}")
+                parent_sub = subject_for(label, subjects)
+                rel(kid, "kind-of", parent_sub, f"a kind of {name_of(parent_sub)}")
         else:
             # Not a taxonomy: the Examples are worked illustrations of the section's own subjects
             # ("Slippage Example", "Tight Spread"). They are not nodes, but they are not rubbish
@@ -474,6 +540,13 @@ def build(path: Path, chapter: str, parent: str,
                     extra.setdefault(target, {}).setdefault("examples", []).append(
                         f"{label}: {text}")
 
+        for heading, (target, relation) in decl.get("tables", {}).items():
+            for name, rest in table_rows(blocks.get(heading, [])):
+                if name in NOT_A_KIND:
+                    continue
+                nid = atom("Procedure", name, rest, _generated=True, _section=num)
+                rel(nid, relation, target, f"listed under {heading.lower()}")
+
         for label, body in labelled_blocks(blocks.get("Mathematical Rules/Formulas", [])):
             formula = code_of(body)
             if not formula:
@@ -483,7 +556,8 @@ def build(path: Path, chapter: str, parent: str,
             # real authored summary -- that is noise presented as a conflict.
             pid = atom("Procedure", label, f"Computes {label.lower()}.",
                        formula=formula, _generated=True, _section=num)
-            rel(pid, "about", subjects[0], f"quantifies {name_of(subjects[0])}")
+            quantified = subject_for(label, subjects)
+            rel(pid, "about", quantified, f"quantifies {name_of(quantified)}")
 
     # Named for the SUBJECT, not the chapter file: `01-market-foundations-core-principles` carried
     # a sort key and a file extension into an identifier. The title is just "core principles" --
@@ -524,6 +598,12 @@ def build(path: Path, chapter: str, parent: str,
                          "from_id": target, "to_id": list_id})
 
         return kept
+
+    for src, relation, dst, why in decl.get("edges", []):
+        for end in (src, dst):
+            if end not in atoms and end not in existing:
+                raise ValueError(f"authored edge endpoint {end!r} is not a node")
+        rel(src, relation, dst, why)
 
     unused = {k for k in decl["wired"] if not any(k in l for l in principles + practices)}
     if unused:

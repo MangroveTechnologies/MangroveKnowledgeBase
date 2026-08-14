@@ -166,3 +166,33 @@ def test_a_chapter_with_no_declarations_refuses_to_build():
         capture_output=True, text=True, timeout=120)
     assert r.returncode != 0, "an undeclared chapter built anyway"
     assert "no declarations for chapter" in r.stderr + r.stdout
+
+
+def test_a_section_with_several_subjects_attaches_each_thing_to_its_own(kg):
+    """§1.4 defines liquidity, slippage and market impact. Everything used to attach to the first.
+
+    `simple slippage` was declared to be about LIQUIDITY and `low volatility regime` was made a kind
+    of VOLATILITY rather than of market regime -- a taxonomy error, not just an imprecise edge.
+    """
+    expected = {
+        "procedure:simple-slippage": "concept:slippage",
+        "procedure:almgren-chriss-market-impact-model": "concept:market-impact",
+        "procedure:square-root-market-impact-rule": "concept:market-impact",
+        "concept:low-volatility-regime": "concept:market-regime",
+        "concept:high-volatility-regime": "concept:market-regime",
+    }
+    for nid, want in expected.items():
+        got = {e["id"] for e in kg.neighbors(nid, direction="out", limit=None)
+               if e["relation"] in ("about", "kind-of")}
+        assert want in got, f"{nid} should attach to {want}, got {got or 'nothing'}"
+
+
+def test_a_near_duplicate_across_the_two_halves_is_related_not_left_adjacent(kg):
+    """The chapter's VWAP is an execution schedule; the library's is the price series it targets.
+
+    Same name, different things, so neither folds into the other -- but sitting side by side
+    unconnected is what makes a graph look like it has duplicates.
+    """
+    linked = {e["id"] for e in kg.neighbors("procedure:vwap", direction="out", limit=None)}
+    assert "procedure:indicator-vwap" in linked, \
+        "the execution algorithm and the indicator of the same name must be joined"

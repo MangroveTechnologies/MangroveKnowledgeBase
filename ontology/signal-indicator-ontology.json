@@ -18395,6 +18395,58 @@
    }
   },
   {
+   "id": "procedure:twap",
+   "title": "twap",
+   "kind": "Procedure",
+   "summary": "Steady execution over time. Splits order evenly across time",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "procedure:vwap",
+   "title": "vwap",
+   "kind": "Procedure",
+   "summary": "Matching market volume profile. Executes proportional to volume",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "procedure:implementation-shortfall",
+   "title": "implementation shortfall",
+   "kind": "Procedure",
+   "summary": "Minimizing total cost. Balances impact vs. timing risk",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "procedure:sniper-liquidity-seeking",
+   "title": "sniper/liquidity seeking",
+   "kind": "Procedure",
+   "summary": "Capturing hidden liquidity. Pings dark pools",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ]
+   }
+  },
+  {
    "id": "concept:bid-ask-spread",
    "title": "bid-ask spread dynamics",
    "kind": "Concept",
@@ -28963,26 +29015,26 @@
   {
    "from": "simple slippage",
    "rel": "about",
-   "to": "liquidity",
-   "why": "quantifies liquidity",
+   "to": "slippage",
+   "why": "quantifies slippage",
    "from_id": "procedure:simple-slippage",
-   "to_id": "concept:liquidity"
+   "to_id": "concept:slippage"
   },
   {
    "from": "almgren-chriss market impact model",
    "rel": "about",
-   "to": "liquidity",
-   "why": "quantifies liquidity",
+   "to": "market impact",
+   "why": "quantifies market impact",
    "from_id": "procedure:almgren-chriss-market-impact-model",
-   "to_id": "concept:liquidity"
+   "to_id": "concept:market-impact"
   },
   {
    "from": "square root market impact rule (empirical)",
    "rel": "about",
-   "to": "liquidity",
-   "why": "quantifies liquidity",
+   "to": "market impact",
+   "why": "quantifies market impact",
    "from_id": "procedure:square-root-market-impact-rule",
-   "to_id": "concept:liquidity"
+   "to_id": "concept:market-impact"
   },
   {
    "from": "participation rate",
@@ -29019,18 +29071,18 @@
   {
    "from": "low volatility regime",
    "rel": "kind-of",
-   "to": "volatility",
-   "why": "a kind of volatility",
+   "to": "market regimes",
+   "why": "a kind of market regimes",
    "from_id": "concept:low-volatility-regime",
-   "to_id": "concept:volatility"
+   "to_id": "concept:market-regime"
   },
   {
    "from": "high volatility regime",
    "rel": "kind-of",
-   "to": "volatility",
-   "why": "a kind of volatility",
+   "to": "market regimes",
+   "why": "a kind of market regimes",
    "from_id": "concept:high-volatility-regime",
-   "to_id": "concept:volatility"
+   "to_id": "concept:market-regime"
   },
   {
    "from": "historical volatility (standard deviation of returns)",
@@ -29119,6 +29171,38 @@
    "why": "a kind of trading venues",
    "from_id": "concept:internalization",
    "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "twap",
+   "rel": "instance-of",
+   "to": "execution models",
+   "why": "listed under execution algorithm selection guide",
+   "from_id": "procedure:twap",
+   "to_id": "concept:execution-model"
+  },
+  {
+   "from": "vwap",
+   "rel": "instance-of",
+   "to": "execution models",
+   "why": "listed under execution algorithm selection guide",
+   "from_id": "procedure:vwap",
+   "to_id": "concept:execution-model"
+  },
+  {
+   "from": "implementation shortfall",
+   "rel": "instance-of",
+   "to": "execution models",
+   "why": "listed under execution algorithm selection guide",
+   "from_id": "procedure:implementation-shortfall",
+   "to_id": "concept:execution-model"
+  },
+  {
+   "from": "sniper/liquidity seeking",
+   "rel": "instance-of",
+   "to": "execution models",
+   "why": "listed under execution algorithm selection guide",
+   "from_id": "procedure:sniper-liquidity-seeking",
+   "to_id": "concept:execution-model"
   },
   {
    "from": "bid-ask spread dynamics",
@@ -29215,6 +29299,14 @@
    "why": "quantifies price discovery mechanisms",
    "from_id": "procedure:price-efficiency-ratio",
    "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "vwap",
+   "rel": "uses",
+   "to": "VWAP",
+   "why": "executes against the price series this computes",
+   "from_id": "procedure:vwap",
+   "to_id": "procedure:indicator-vwap"
   },
   {
    "from": "iceberg order",
@@ -29326,6 +29418,7 @@
    "procedure:effective-spread",
    "procedure:garch-model",
    "procedure:historical-volatility",
+   "procedure:implementation-shortfall",
    "procedure:information-share",
    "procedure:participation-rate",
    "procedure:price-efficiency-ratio",
@@ -29334,8 +29427,11 @@
    "procedure:realized-spread",
    "procedure:relative-spread",
    "procedure:simple-slippage",
+   "procedure:sniper-liquidity-seeking",
    "procedure:square-root-market-impact-rule",
-   "procedure:volatility-ratio"
+   "procedure:twap",
+   "procedure:volatility-ratio",
+   "procedure:vwap"
   ],
   "derived_relations": [
    [
@@ -29396,7 +29492,7 @@
    [
     "concept:high-volatility-regime",
     "kind-of",
-    "concept:volatility"
+    "concept:market-regime"
    ],
    [
     "concept:iceberg-order",
@@ -29441,7 +29537,7 @@
    [
     "concept:low-volatility-regime",
     "kind-of",
-    "concept:volatility"
+    "concept:market-regime"
    ],
    [
     "concept:market-foundations",
@@ -29571,7 +29667,7 @@
    [
     "procedure:almgren-chriss-market-impact-model",
     "about",
-    "concept:liquidity"
+    "concept:market-impact"
    ],
    [
     "procedure:component-share",
@@ -29597,6 +29693,11 @@
     "procedure:historical-volatility",
     "about",
     "concept:volatility"
+   ],
+   [
+    "procedure:implementation-shortfall",
+    "instance-of",
+    "concept:execution-model"
    ],
    [
     "procedure:indicator-atr",
@@ -29646,17 +29747,37 @@
    [
     "procedure:simple-slippage",
     "about",
-    "concept:liquidity"
+    "concept:slippage"
+   ],
+   [
+    "procedure:sniper-liquidity-seeking",
+    "instance-of",
+    "concept:execution-model"
    ],
    [
     "procedure:square-root-market-impact-rule",
     "about",
-    "concept:liquidity"
+    "concept:market-impact"
+   ],
+   [
+    "procedure:twap",
+    "instance-of",
+    "concept:execution-model"
    ],
    [
     "procedure:volatility-ratio",
     "about",
     "concept:volatility"
+   ],
+   [
+    "procedure:vwap",
+    "instance-of",
+    "concept:execution-model"
+   ],
+   [
+    "procedure:vwap",
+    "uses",
+    "procedure:indicator-vwap"
    ]
   ],
   "doc_relations": 6,
@@ -29664,8 +29785,8 @@
    "concept:technical-analysis",
    "object:mangrove-knowledge-space"
   ],
-  "chapter_market-foundations_atoms": 52,
-  "chapter_market-foundations_relations": 58,
+  "chapter_market-foundations_atoms": 56,
+  "chapter_market-foundations_relations": 63,
   "chapter_market-foundations_folded": [
    "concept:volatility",
    "procedure:indicator-atr"

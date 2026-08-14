@@ -45,19 +45,19 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 361, 1113
+s["nodes"], s["edges"]          # 365, 1118
 s["primitives"]                 # {'Procedure': 304, 'Concept': 44, 'Property': 3, ...}
-s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 242, ...}
+s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 242, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  361 1113
+nodes, edges  365 1118
 primitives    {'Procedure': 304, 'Concept': 44, 'Property': 3, 'Object': 1, 'Schema': 1,
                'Fact': 1, 'Judgment': 1}
-relations     {'instance-of': 360, 'uses': 233, 'about': 242, 'has-role': 218,
+relations     {'instance-of': 364, 'uses': 234, 'about': 242, 'has-role': 218,
                'kind-of': 32, 'part-of': 26, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:oscillator', 'concept:pattern',
@@ -76,7 +76,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (301 of 361) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (299 of 365) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -294,7 +294,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 361 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 365 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -653,7 +653,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 91 nodes
+kg.find(under="market foundations", limit=None)                 # 95 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```
