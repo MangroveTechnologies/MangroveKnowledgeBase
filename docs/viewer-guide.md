@@ -34,6 +34,8 @@ mention it.
 
 ## Reading a node
 
+<img src="../assets/viewer-inspector.png" alt="The panel for BollingerBands: folded sections, then Inputs, Parameters and Outputs as tables" width="330" align="right">
+
 Click a node. The panel fills with what the library records about it, in sections you can fold. Your
 choices stick: fold **Edges** once and it stays folded on every node after it.
 
@@ -44,7 +46,14 @@ choices stick: fold **Edges** once and it stays folded on every node after it.
 - **Edges** — every link, grouped incoming and outgoing
 - **Provenance & extras** — module, a call you can copy, how the entry was recorded
 
-Every heading carries a **?** that says what that section holds. So does every edge type.
+Every heading carries a **?** that says what that section holds. So does every edge type — point at
+it, tab to it, or tap it:
+
+<br clear="right">
+
+<p align="center">
+  <img src="../assets/viewer-tooltip.png" alt="The ? beside the uses row, with its explanation shown to the left of the panel" width="90%">
+</p>
 
 ### Ranges say more than they look like
 
@@ -87,6 +96,10 @@ the `uses` edge beside it is the reason.
 
 303 nodes at once is a picture, not an answer. The **Action** section on any node cuts it down.
 
+<p align="center">
+  <img src="../assets/viewer-action.png" alt="Action with neighbors and ancestors both selected, and a bar over the map reading showing 13 of 303" width="100%">
+</p>
+
 **show only** — pick any combination:
 
 | | Keeps |
@@ -123,12 +136,16 @@ thing that connected them is the thing you hid.
 
 ## The rail
 
+<img src="../assets/viewer-facets.png" alt="The rail: Procedure splits into signal and indicator, Concept into class, entity type and domain" width="240" align="right">
+
 Nodes group by primitive, edges by relation category, and each opens into the derived kind beneath
 it — `signal` and `indicator` inside `Procedure`, `about` and `has-role` inside `descriptive`.
 
 Sub-kinds are shades of their parent's hue rather than new colours, so a darker teal is always a
 subset of the teal above it. Parent and child are AND-ed: untick `Procedure` and every procedure
 goes, with the children greyed to show why.
+
+<br clear="right">
 
 ## Rings and themes
 
