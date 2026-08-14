@@ -635,14 +635,19 @@ def test_focus_sets_are_what_they_claim(page, tmp_path):
     out = _run_in_node(page, f"""
 const probes = {json.dumps(probes)}, types = {json.dumps(types)};
 const res = {{}};
-for(const id of probes) res[id] = Object.fromEntries(
-  ['neighbors','descendants','ancestors','lineage']
+for(const id of probes){{
+  res[id] = Object.fromEntries(['neighbors','descendants','ancestors']
     .map(m => [m, [...window.KBSETS(DATA.edges, id, types, m)].sort()]));
-res.__all = window.KBSETS(DATA.edges, probes[0], types, 'all');
+  // the combination the panel builds when two scopes are lit at once
+  res[id].both = [...window.KBUNION(DATA.edges, id, types,
+                                    ['descendants','ancestors'])].sort();
+}}
+res.__none = window.KBUNION(DATA.edges, probes[0], types, []);
 console.log(JSON.stringify(res));
 """, tmp_path)
 
-    assert out["__all"] is None, "'everything' must mean no focus at all, not an empty set"
+    assert out["__none"] is None, \
+        "'everything' is an EMPTY SELECTION, and must mean no focus at all rather than an empty view"
     for node in probes:
         desc = _reach(kg.edges, node, forward=False)
         anc = _reach(kg.edges, node, forward=True)
@@ -651,9 +656,9 @@ console.log(JSON.stringify(res));
         assert set(got["descendants"]) == desc, f"descendants of {node}"
         assert set(got["ancestors"]) == anc, f"ancestors of {node}"
         assert set(got["neighbors"]) == nbr, f"neighbors of {node}"
-        assert set(got["lineage"]) == desc | anc, f"lineage of {node}"
+        assert set(got["both"]) == desc | anc, f"descendants + ancestors of {node}"
         # The anchor is never in its own set; the panel adds it back when it counts what remains.
-        assert node not in got["lineage"]
+        assert node not in got["both"]
 
 
 def test_focus_traverses_only_the_edge_types_left_showing(page, tmp_path):
@@ -732,3 +737,49 @@ def test_focus_re_frames_the_view(page):
     assert page.count("frameVisible();") >= 2, "one fit is a snapshot of positions already moving"
     assert "[400, 1000, 1900].forEach" in page, "the refits must span the settle"
     assert "fg3d.zoomToFit" in page, "3D must re-frame too, or the toggle lands on empty space"
+
+
+def test_scopes_combine_rather_than_replace_each_other(page, tmp_path):
+    """neighbors + ancestors is a SELECTION, not a fourth kind of thing.
+
+    The first cut of this had a fifth row, "ancestors + descendants", which is the only combination
+    anyone had thought to hard-code -- and no way to ask for the one Tim actually wanted. Three
+    scopes that combine cover all seven combinations with three controls, and `everything` becomes
+    what it always was: the empty selection.
+
+    Driven in a browser as well: neighbors 11, + ancestors 13, + descendants 13, then dropping
+    neighbors leaves 13, and `everything` restores 303 with the chip gone.
+    """
+    import json
+
+    from mangrove_kb.graph import KnowledgeGraph
+
+    kg = KnowledgeGraph.load()
+    types = sorted({e.relation for e in kg.edges})
+    out = _run_in_node(page, f"""
+const id = 'procedure:indicator-rsi', types = {json.dumps(types)};
+const one = m => window.KBSETS(DATA.edges, id, types, m);
+const many = ms => window.KBUNION(DATA.edges, id, types, ms);
+console.log(JSON.stringify({{
+  n: [...one('neighbors')].sort(),
+  a: [...one('ancestors')].sort(),
+  na: [...many(['neighbors','ancestors'])].sort(),
+  all3: [...many(['neighbors','descendants','ancestors'])].sort(),
+  d: [...one('descendants')].sort(),
+  none: many([]),
+  // order must not matter: a selection is a set, not a sequence
+  an: [...many(['ancestors','neighbors'])].sort()}}));
+""", tmp_path)
+    assert set(out["na"]) == set(out["n"]) | set(out["a"]), "a combination is the union of its parts"
+    assert out["na"] == out["an"], "the result must not depend on which row was clicked first"
+    assert set(out["all3"]) == set(out["n"]) | set(out["a"]) | set(out["d"])
+    assert out["none"] is None
+    assert set(out["na"]) != set(out["n"]), "the fixture must have a combination worth testing"
+
+    # No hard-coded combination survives in the UI: three rows, and `everything` as the clear.
+    modes = re.search(r"const MODES = \[(.*?)\];", page, re.S).group(1)
+    assert "lineage" not in modes and "+" not in modes, \
+        f"a combination is a selection, not a row: {modes}"
+    assert "data-m=\"\"" in page, "`everything` is the empty selection"
+    assert "cur.includes(m) ? cur.filter(x => x !== m) : cur.concat(m)" in page, \
+        "the rows must toggle, not replace"

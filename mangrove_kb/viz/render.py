@@ -987,9 +987,10 @@ PROPERTY_PANEL = r"""
 # disagrees with what happens after the click is worse than no count at all.
 FOCUS_SETS = """
 <script>
-// Nodes to KEEP around `id`, excluding the anchor itself. `null` means no focus at all -- which is
-// not the same as an empty set, and the difference decides whether the canvas shows everything or
-// nothing. Direction is the graph's own: a signal is `instance-of` its class, so classes are UP.
+// Nodes to KEEP around `id`, excluding the anchor itself, for ONE primitive scope. `null` means no
+// focus at all -- which is not the same as an empty set, and the difference decides whether the
+// canvas shows everything or nothing. Direction is the graph's own: a signal is `instance-of` its
+// class, so classes are UP. Combinations are unions of these, see KBUNION below.
 window.KBSETS = function(edges, id, types, mode){
   if(mode === 'all') return null;
   const T = types instanceof Set ? types : new Set(types);
@@ -1013,8 +1014,20 @@ window.KBSETS = function(edges, id, types, mode){
   if(mode === 'neighbors') return new Set([...(inBy[id] || []), ...(outBy[id] || [])]);
   if(mode === 'descendants') return walk(inBy);
   if(mode === 'ancestors') return walk(outBy);
-  if(mode === 'lineage'){ const a = walk(inBy); walk(outBy).forEach(x => a.add(x)); return a; }
   return null;
+};
+
+// The union of any combination -- neighbors + ancestors, all three, whatever is lit. There is no
+// separate "ancestors + descendants" mode because a combination is not a fourth kind of thing; an
+// empty selection is `everything`, which is no focus at all rather than an empty view.
+window.KBUNION = function(edges, id, types, modes){
+  if(!modes || !modes.length) return null;
+  const out = new Set();
+  for(const m of modes){
+    const s = window.KBSETS(edges, id, types, m);
+    if(s) s.forEach(x => out.add(x));
+  }
+  return out;
 };
 </script>
 """
@@ -1104,7 +1117,8 @@ ACTION_PANEL = """
   // Everything hidden along one edge type is everything that way FROM this node, in whichever
   // direction(s) the type is incident here -- both lineages, so a row works on a leaf too, where
   // every edge points outward and the old panel could only say "nothing hangs off this node".
-  const away = (id, types) => window.KBSETS(L, id, types, 'lineage') || new Set();
+  const away = (id, types) =>
+    window.KBUNION(L, id, types, ['descendants', 'ancestors']) || new Set();
   // What the walk may cross: everything except the types this node has set to hide. Tim's rule.
   const live = id => { const off = scope.get(id) || new Set();
                        return new Set(ALL_TYPES.filter(t => !off.has(t))); };
@@ -1120,7 +1134,8 @@ ACTION_PANEL = """
     collapsed.forEach(id => {                    // panel folds: type-scoped
       const t = scope.get(id); if(t && t.size) away(id, t).forEach(x => h.add(x));
     });
-    const keep = focus.id == null ? null : window.KBSETS(L, focus.id, live(focus.id), focus.mode);
+    const keep = focus.id == null ? null
+                 : window.KBUNION(L, focus.id, live(focus.id), focus.modes);
     if(keep){
       // Focus REPLACES the root-reachability post-condition below. Composing them would hide the
       // whole graph, because the root is normally outside the focused set.
@@ -1204,9 +1219,11 @@ ACTION_PANEL = """
   }
 
   // --- focus ------------------------------------------------------------------------------------
-  const MODES = [['all', 'everything'], ['neighbors', 'neighbors'],
-                 ['descendants', 'descendants'], ['ancestors', 'ancestors'],
-                 ['lineage', 'ancestors + descendants']];
+  // Three scopes that COMBINE -- neighbors + ancestors is a selection, not a fourth kind of thing,
+  // which is why the old "ancestors + descendants" row is gone. `everything` is the ABSENCE of a
+  // selection rather than a fourth choice, so it is the reset and it cannot be combined with them.
+  const MODES = [['neighbors', 'neighbors'], ['descendants', 'descendants'],
+                 ['ancestors', 'ancestors']];
 
   // Hiding 290 of 303 nodes leaves the 13 survivors wherever the layout had already scattered
   // them -- which, at the zoom you were at, is usually off screen. The first build of this showed
@@ -1227,8 +1244,8 @@ ACTION_PANEL = """
     view.y = -((y0 + y1) / 2) * z;
   }
 
-  function setFocus(id, m){
-    focus = (m === 'all') ? {id:null, mode:'all'} : {id, mode:m};
+  function setFocus(id, modes){
+    focus = (!modes || !modes.length) ? {id:null, modes:[]} : {id, modes};
     recomputeHidden();
     frameVisible();
     wake(0.6);
@@ -1244,15 +1261,17 @@ ACTION_PANEL = """
   (document.getElementById('stage') || document.body).append(chip);
   function paintFocusChip(){
     if(focus.id == null){ chip.className = ''; chip.innerHTML = ''; return; }
-    const label = (MODES.find(m => m[0] === focus.mode) || [, focus.mode])[1];
+    // Named in the order the rows are listed, so the chip reads the way the panel looks rather
+    // than in whatever order they happened to be clicked.
+    const label = MODES.filter(m => focus.modes.includes(m[0])).map(m => m[1]).join(' + ');
     chip.className = 'on';
     chip.innerHTML = `showing ${N.length - hidden.size} of ${N.length} · ${esc(label)} of `
       + `<b>${esc(focus.id)}</b>`
       + '<button class="xfx" title="show the whole graph (esc)">show everything</button>';
   }
-  chip.addEventListener('click', ev => { if(ev.target.closest('.xfx')) setFocus(null, 'all'); });
+  chip.addEventListener('click', ev => { if(ev.target.closest('.xfx')) setFocus(null, []); });
   addEventListener('keydown', ev => {
-    if(ev.key === 'Escape' && focus.id != null){ setFocus(null, 'all'); }
+    if(ev.key === 'Escape' && focus.id != null){ setFocus(null, []); }
   });
 
   const _showNode = showNode;
@@ -1267,18 +1286,20 @@ ACTION_PANEL = """
     const val = document.createElement('div');
     val.className = 'val';
 
-    // How much graph. Counts are what would REMAIN, anchor included, over the live types -- so an
-    // option that would leave you looking at a single dot is greyed with its count still showing,
-    // rather than clicking through to an empty canvas and wondering what broke.
-    let html = '<div class="xintro">show only</div>';
+    // How much graph. The scopes COMBINE, so each row carries its own size -- what `neighbors`
+    // means is 11 nodes whether or not `ancestors` is also lit, and the chip on the canvas states
+    // the union, which is the only number that changes as you add scopes. Counts include the
+    // anchor, and a scope that would add nothing is greyed with its count still showing rather
+    // than clicking through to a canvas that did not change.
+    const picked = (focus.id === n.id) ? focus.modes : [];
+    let html = '<div class="xintro">show only</div>'
+      + `<button class="xfrow${picked.length ? '' : ' on'}" data-m="" data-id="${esc(n.id)}">`
+      + `<span class="xname">everything</span><span class="xn">${N.length}</span>`
+      + '<span class="xdot"></span></button>';
     for(const [m, label] of MODES){
-      const set = window.KBSETS(L, n.id, T, m);
-      const k = m === 'all' ? N.length : set.size + 1;
-      // Lit against THIS node's state: a focus anchored elsewhere leaves this node reading
-      // `everything`, which is true of it -- nothing is being hidden on its account.
-      const active = (focus.id === n.id) ? (focus.mode === m) : (m === 'all');
-      html += `<button class="xfrow${active ? ' on' : ''}" data-m="${m}" data-id="${esc(n.id)}"`
-        + `${(m !== 'all' && k <= 1) ? ' disabled' : ''}>`
+      const k = window.KBSETS(L, n.id, T, m).size + 1;
+      html += `<button class="xfrow${picked.includes(m) ? ' on' : ''}" data-m="${m}" `
+        + `data-id="${esc(n.id)}"${k <= 1 ? ' disabled' : ''}>`
         + `<span class="xname">${esc(label)}</span><span class="xn">${k}</span>`
         + '<span class="xdot"></span></button>';
     }
@@ -1314,7 +1335,13 @@ ACTION_PANEL = """
 
   inspect.addEventListener('click', ev => {
     const f = ev.target.closest('.xfrow');
-    if(f && !f.disabled){ setFocus(f.dataset.id, f.dataset.m); return; }
+    if(f && !f.disabled){
+      const id = f.dataset.id, m = f.dataset.m;
+      // `everything` is the empty selection, so it clears rather than toggling alongside them.
+      const cur = (focus.id === id) ? focus.modes : [];
+      setFocus(id, !m ? [] : cur.includes(m) ? cur.filter(x => x !== m) : cur.concat(m));
+      return;
+    }
     const b = ev.target.closest('.xsw button'); if(!b) return;
     const sw = b.parentElement, id = sw.dataset.id, t = sw.dataset.t;
     const hid = new Set(scope.get(id) || []);
