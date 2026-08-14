@@ -1029,41 +1029,30 @@ TIP_COPY = """
 // load-bearing definitions, not decoration, and inventing a second wording for them is how a
 // glossary starts disagreeing with the thing it describes.
 window.KBTIPS = {
-  'name': 'What this computation is called in the library.',
-  'action': 'Changes the GRAPH, not this node: how much of it stays in view around this node, '
-    + 'and which edges count. Ancestors are UP -- its class, its role, what it uses; descendants '
-    + 'are what hangs off it.',
-  'description': 'What this computation does, in one sentence, from its docstring.',
-  'subtype': 'Which character class it belongs to: averaging, momentum, oscillator, volatility, '
-    + 'flow or pattern.',
-  'inputs': 'The price series it reads. Each one is a column you supply.',
-  'parameters': 'What you set when you call it: the type, the default, and the range it accepts.',
-  'warm-up': 'How many bars it needs before its first valid value.',
-  'outputs': 'What it returns, with units and the range each value can take. `unbounded` and '
-    + '`not authored` are different facts: one is a stated infinity, the other is a gap.',
-  'interpretation': 'What the values mean when you read them.',
-  'applications': 'What the literature uses it for.',
-  'formula': 'How it is computed, as stated in the source.',
+  'name': 'What it is called in code.',
+  'action': 'Show less of the graph: how much of it around this node, and along which edges.',
+  'description': 'What it does, in one sentence.',
+  'subtype': 'The family it belongs to -- momentum, volatility, pattern, and so on.',
+  'inputs': 'The price columns it reads.',
+  'parameters': 'What you set when you call it, with defaults and limits.',
+  'warm-up': 'Bars it needs before the first valid value.',
+  'outputs': 'What it returns, with units and the range each value can take.',
+  'interpretation': 'How to read the values.',
+  'applications': 'What it is used for.',
+  'formula': 'How it is calculated.',
   'reference': 'Where the definition comes from.',
-  'provenance & extras': 'Where this came from and how it is recorded -- module, epistemic '
-    + 'status, canonical names, a call you can copy. Never the answer to "what is this".',
-  'edges': 'Every relationship this node has, incoming and outgoing, and what is on the far end.',
+  'provenance & extras': 'Where it lives in the code, and how to call it.',
+  'edges': 'How this connects to everything else.',
 };
-// From SKILL.md, which is where these claims are defined.
+// What each relation asserts. SKILL.md's distinctions, said in one line.
 window.KBRELTIPS = {
-  'instance-of': 'A member of that class. An indicator MEASURES its class -- ADOSC measures rate '
-    + 'of change, so it is an instance of momentum.',
-  'about': 'Concerned with that class without measuring it. A signal emits a boolean, so it is '
-    + 'ABOUT momentum rather than an instance of it -- and the `uses` edge is the reason.',
-  'kind-of': 'A subclass of the other. Transitive: what holds of the parent holds here.',
-  'part-of': 'A component of the other. Transitive.',
-  'has-role': 'The part it plays in a strategy -- trigger or filter. A role is not a type: it is '
-    + 'never inherited and never appears as a class.',
-  // Double-quoted deliberately: this constant is a non-raw Python string, so an escaped
-  // apostrophe inside it arrives here unescaped and ends the JS string early.
-  'uses': "It reads the other computation, and carries which of that one's outputs flow in.",
-  'supersedes': 'Replaces the other, which is deprecated -- it still runs, it just has a '
-    + 'canonical replacement.',
+  'instance-of': 'It measures that class -- RSI measures momentum. Indicators only.',
+  'about': 'Concerned with that class without measuring it. This is how signals carry a class.',
+  'kind-of': 'A subtype of the other.',
+  'part-of': 'A component of the other.',
+  'has-role': 'The part it plays in a strategy: trigger or filter.',
+  'uses': "It reads that computation's output.",
+  'supersedes': 'It replaces the other, which is deprecated.',
 };
 </script>
 """
