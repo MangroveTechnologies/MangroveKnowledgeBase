@@ -688,21 +688,66 @@ title="show this node">${esc(id)}</span>`;
 # generic fallback at the bottom of the details block -- the invariant the original `kv` existed for.
 PROPERTY_PANEL = r"""
 <style>
-  #inspect table.kbt{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12px}
-  #inspect table.kbt td{vertical-align:top;padding:1px 0 5px}
-  #inspect table.kbt td.kbn{font:600 11.5px ui-monospace,monospace;width:34%;padding-right:8px;
-                            overflow-wrap:anywhere}
+  /* The panel had one type size (10.5-12px) and one colour (--muted) for everything, so a
+     description -- the answer to "what is this" -- was rendered exactly like the provenance beside
+     it, in grey, at the size of a footnote. In dark mode --muted is #a1a1a1 on #171717, which is
+     where it became genuinely hard to read.
+     Three levels now, and they mean something:
+       ink            what you came to read: descriptions, bullets, entry names
+       ink 68% panel   supporting detail: type, default, range, units
+       ink 50% panel   the section labels themselves
+     The mix is against --panel rather than `transparent` so the result is a real opaque colour in
+     both themes instead of depending on what happens to be painted underneath. */
+  #inspect{--kb-2:color-mix(in oklab,var(--ink) 68%,var(--panel));
+           --kb-3:color-mix(in oklab,var(--ink) 64%,var(--panel));
+           --kb-rule:color-mix(in oklab,var(--line) 75%,var(--panel));
+           /* The brand accent is a mid teal: 6.5:1 on the dark panel and 2.66:1 on the light one,
+              measured. It is the token the eye lands on first, so on light it is darkened until it
+              clears 4.5:1 rather than left as decoration you cannot read. Three states, like every
+              other colour here -- the default is LIGHT, so a page with no `data-theme` and no OS
+              preference gets the readable one. */
+           --kb-ty:#12667f}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) #inspect{--kb-ty:var(--act)} }
+  :root[data-theme="dark"] #inspect{--kb-ty:var(--act)}
+  /* The viewer's own labels and values, scaled with the rest. Every block in the panel uses these,
+     so the header, the description and the edge list move together rather than my three tables
+     drifting into a different typeface from everything above them. */
+  #inspect h2{font-size:14px;line-height:1.35;margin-bottom:8px}
+  #inspect .lbl{font:600 11px "Geist Mono",ui-monospace,monospace;letter-spacing:.1em;
+                color:var(--kb-3);margin:17px 0 5px}
+  #inspect .val{font-size:13px;line-height:1.55;color:var(--ink)}
+  #inspect .val.acc{color:var(--kb-2)}
+  #inspect table.kbt{border-collapse:collapse;width:100%;table-layout:fixed}
+  #inspect table.kbt td{vertical-align:top;padding:6px 0;
+                        border-bottom:1px solid var(--kb-rule)}
+  #inspect table.kbt tr:last-child td{border-bottom:0;padding-bottom:2px}
+  #inspect table.kbt td.kbn{font:600 12.5px "Geist Mono",ui-monospace,monospace;color:var(--ink);
+                            width:38%;padding-right:10px;overflow-wrap:anywhere}
   #inspect table.kbt td.kbv{overflow-wrap:anywhere}
-  #inspect .kbm{font:10.5px ui-monospace,monospace;color:var(--muted);letter-spacing:.02em}
-  #inspect .kbd{color:var(--muted);font-size:11.5px;line-height:1.45}
-  #inspect ul.kbl{margin:2px 0 0;padding-left:16px;font-size:12px;line-height:1.5}
-  #inspect pre.kbp{margin:2px 0 0;padding:6px 8px;background:rgba(128,128,128,.12);border-radius:4px;
-                   font:11px ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
-  #inspect details.kbx{margin-top:14px;border-top:1px solid var(--line,rgba(128,128,128,.3));
-                       padding-top:8px}
-  #inspect details.kbx summary{font:10.5px ui-monospace,monospace;text-transform:uppercase;
-                               letter-spacing:.06em;color:var(--muted);cursor:pointer}
-  #inspect details.kbx[open] summary{margin-bottom:6px}
+  /* The type is the first thing you want off an entry -- series, int, bool -- so it is the one
+     token in the meta line that carries a colour of its own. */
+  #inspect .kbty{color:var(--kb-ty);font-weight:600}
+  #inspect .kbm{font:11.5px "Geist Mono",ui-monospace,monospace;color:var(--kb-2);
+                letter-spacing:.01em;line-height:1.5}
+  #inspect .kbd{color:var(--ink);font-size:12.5px;line-height:1.55;margin-top:3px}
+  /* It belongs to the parameter table above it, not to the last row in it -- without the gap it
+     read as a third line of window_dev's description. */
+  #inspect .kbw{margin-top:9px}
+  #inspect ul.kbl{margin:3px 0 0;padding-left:17px;font-size:12.5px;line-height:1.6;color:var(--ink)}
+  #inspect ul.kbl li{margin:3px 0}
+  #inspect pre.kbp{margin:3px 0 0;padding:8px 10px;background:var(--chip);border:1px solid var(--line);
+                   border-radius:6px;color:var(--ink);
+                   font:11.5px/1.55 "Geist Mono",ui-monospace,monospace;
+                   white-space:pre-wrap;overflow-wrap:anywhere}
+  #inspect details.kbx{margin-top:18px;border-top:1px solid var(--line);padding-top:10px}
+  #inspect details.kbx summary{font:600 11px "Geist Mono",ui-monospace,monospace;
+                               letter-spacing:.1em;color:var(--kb-3);cursor:pointer;
+                               list-style:none}
+  #inspect details.kbx summary:hover{color:var(--act)}
+  #inspect details.kbx summary::before{content:"▸ ";font-size:9px}
+  #inspect details.kbx[open] summary::before{content:"▾ "}
+  #inspect details.kbx[open] summary{margin-bottom:8px}
+  #inspect details.kbx .kbm{margin:4px 0}
 </style>
 <script>
 (function(){
@@ -744,7 +789,13 @@ PROPERTY_PANEL = r"""
     const ks = Object.keys(dict || {});
     if(!ks.length) return '';
     return '<table class="kbt">' + ks.map(k => {
-      const s = dict[k] || {}, meta = row(s).filter(Boolean).join(' · ');
+      const s = dict[k] || {}, parts = row(s).filter(Boolean);
+      // The first token is always the type. It gets the accent so the eye lands on "series" /
+      // "int" / "bool" first; the rest of the line is supporting detail.
+      const meta = parts.length
+        ? `<span class="kbty">${E(parts[0])}</span>`
+          + (parts.length > 1 ? ' · ' + parts.slice(1).join(' · ') : '')
+        : '';
       return `<tr><td class="kbn">${E(k)}</td><td class="kbv">`
         + (meta ? `<span class="kbm">${meta}</span>` : '')
         + (s.description ? `<div class="kbd">${E(s.description)}</div>` : '')
@@ -776,10 +827,10 @@ PROPERTY_PANEL = r"""
     h += sec('parameters', TABLE(p.params, s => [s.type,
               s.default == null ? '' : 'default ' + NUM(s.default), BOUNDS(s.min, s.max)]));
     // An EXPRESSION over the params above ("window - 1"), not a number -- 75 nodes say exactly that.
-    if(p.warmup_bars) h += `<div class="kbm" style="margin-top:4px">warm-up <code>`
-      + `${E(p.warmup_bars)}</code> bars — an expression in these parameters</div>`;
+    if(p.warmup_bars) h += `<div class="kbm kbw">warm-up <code>${E(p.warmup_bars)}</code>`
+      + ` bars — an expression in these parameters</div>`;
     h += sec('outputs', TABLE(p.outputs, s => [s.type,
-              s.units && s.units !== 'boolean' ? s.units : '', RANGE(s.range, s.type)]));
+              s.units && s.units !== 'boolean' ? E(s.units) : '', RANGE(s.range, s.type)]));
     h += sec('interpretation', BULLETS(p.interpretation));
     h += sec('applications',   BULLETS(p.applications));
     h += sec('formula',        CODE(p.formula));

@@ -405,3 +405,26 @@ def test_the_panel_falls_back_rather_than_going_blank(page):
     assert page.count("window.KVPROPS?window.KVPROPS(n):kv('properties',n.props)") == 1
     assert page.count("window.KVEDGE?window.KVEDGE(e):kv('other properties'") == 1
     assert "+kv('properties',n.props)" not in page, "the unguarded call site is still in place"
+
+
+def test_the_panel_is_legible_in_both_themes(page):
+    """The accent is a mid teal: measured 6.47:1 on the dark panel and 2.66:1 on the light one.
+
+    It is the token the eye lands on first -- the type of every input, param and output -- so it
+    cannot be the one you have to squint at. Light gets a darkened value (measured 6.22:1) and dark
+    keeps the brand accent, declared across all three theme states like every other colour here:
+    an explicit choice in either direction, and the OS preference when there is none.
+
+    Contrast itself is measured out of a real browser rather than asserted here; this pins the
+    three declarations, because losing the `[data-theme="dark"]` one leaves the toggle working in
+    one direction only and that is invisible until someone uses it.
+    """
+    assert "--kb-ty:#12667f" in page, "the light-mode type colour is missing"
+    assert page.count("#inspect{--kb-ty:var(--act)}") == 2, \
+        "both dark states -- the OS preference and the explicit choice -- restore the brand accent"
+    assert '[data-theme="dark"] #inspect{--kb-ty:var(--act)}' in page, \
+        "an explicit dark choice would fall back to the light-mode colour"
+    assert ':root:not([data-theme="light"]) #inspect{--kb-ty:var(--act)}' in page, \
+        "an explicit light choice on a dark OS must keep the readable colour"
+    # The description IS the answer to "what is this". It was rendered in --muted, like provenance.
+    assert "#inspect .kbd{color:var(--ink)" in page, "descriptions must be full-contrast body text"
