@@ -1,6 +1,6 @@
 # Agent guide: using the knowledge graph
 
-Thirteen tasks an agent actually gets asked to do with this library, and how to do each one with
+Fifteen tasks an agent actually gets asked to do with this library, and how to do each one with
 `mangrove_kb.graph`. Every call here was executed against the committed graph; the outputs are real.
 
 The skill (`SKILL.md`, beside this file) is the reference for *which call*. This is the
@@ -566,6 +566,93 @@ both dimensionless on [0, 100]  ->  one panel is fine
 
 **Trap:** `usage_example` writes `params={'window': value}` — `value` is a placeholder, not a
 default. The real defaults are in `kg.get(id)["params"]`, with `min` and `max` beside them.
+
+---
+
+## 14. Pull what the knowledge base says about a subject
+
+**Task:** "What do we actually know about liquidity?"
+
+The graph holds two kinds of thing and one call spans both. Start with the node, then widen:
+
+```python
+kg.get("concept:liquidity")
+kg.find(under="concept:liquidity", limit=None)          # everything beneath it, any primitive
+kg.neighbors("concept:liquidity", limit=None)           # what quantifies it, what it is part of
+```
+
+```
+summary       The ease with which an asset can be bought or sold without significantly
+              affecting its price. High liquidity implies tight spreads, deep order books,
+              and minimal price impact.
+applications  Estimating realistic execution costs for strategy backtesting
+              Determining optimal order sizing based on available liquidity
+neighbors     about    procedure:simple-slippage
+              about    procedure:participation-rate
+              about    procedure:square-root-market-impact-rule
+              about    procedure:almgren-chriss-market-impact-model
+              part-of  concept:market-foundations
+```
+
+Four computations quantify it and none of them is in the library — they are **formulas**, stated by
+the knowledge base with typed inputs and outputs and no code behind them. `get()` gives you the
+formula; there is no `RuleRegistry` name to run.
+
+Widen by subject rather than by node when the question is broader. `find(under=…)` walks containment
+— `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
+
+```python
+kg.find(under="market foundations", limit=None)                 # 91 nodes
+kg.find(under="market foundations", primitive="Procedure")      # just its computations
+kg.find("spread", under="market foundations")                   # scoped text search
+```
+
+**Trap:** do not reach for `reference_chapter`. It is provenance on nodes that predate a chapter
+node, not the retrieval mechanism — the edges are, and they are what `under=` walks.
+
+---
+
+## 15. Find the reasoning behind a piece of advice
+
+**Task:** "Why should I break a large order into child orders?"
+
+Each subject carries two nodes beside its concepts: a `Fact` holding what is true of it, and a
+`Judgment` holding what to do about it. They are separate primitives because they answer to
+different standards — a Fact is settled by measurement, a Judgment by argument.
+
+```python
+kg.get("judgment:market-foundations-best-practices")["practices"]
+kg.get("fact:market-foundations-core-principles")["principles"]
+```
+
+```
+practice   1.4 Break large orders into smaller child orders to reduce footprint
+principle  1.4 Impact is Non-Linear: market impact grows faster than linearly with order size
+principle  1.4 Urgency-Cost Tradeoff: faster execution incurs higher market impact; slower
+               execution risks adverse price movement
+```
+
+The advice and the reason are one section apart, and the principle is the *why*. Both are indexed,
+so a plain search reaches them: `find("dark pool")` returns `concept:dark-pool` and
+`concept:trading-venue`, and then the Fact and the Judgment that discuss it.
+
+**Where the book and the code disagree.** When a chapter defines something the library already
+implements, the node folds and the two statements are kept side by side rather than one overwriting
+the other:
+
+```python
+kg.get("procedure:indicator-atr")["chapter_variants"]
+# {'formula': 'TR = max(High - Low, |High - Previous Close|, |Low - Previous Close|)\n
+#              ATR = EMA(TR, n periods)'}
+```
+
+The node's own `formula` is the implementation's; `chapter_variants` is the chapter's wording of the
+same computation, unreconciled. A key in there means nobody has decided yet — not that either is
+wrong.
+
+**Trap:** a Judgment is not a fact and must not be reported as one. It is argued from practice and
+is context-dependent — "use limit orders" is advice to a liquidity taker and meaningless to a market
+maker. Quote it as guidance, with the principle behind it.
 
 ---
 

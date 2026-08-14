@@ -99,9 +99,14 @@ Procedures, the Fact and the Judgment together. Intersect it with anything -- `p
 `role=`, a text query.
 
 Two sub-kinds are worth knowing apart. A `procedure:indicator-*` is callable; a bare `procedure:*`
-is a **formula** the knowledge base states and nothing implements. And `concept:chart-pattern` has
-no members on purpose -- multi-bar formations need swing points no computation here produces -- so
-an empty result from it is the answer, not a bug.
+is a **formula** the knowledge base states and nothing implements.
+
+The same split shows up between a node's content and its members. `concept:chart-pattern` answers
+*what is a chart pattern* in full -- `find("head and shoulders")` returns it, and it names the
+formations and what completes them. What it has no members: nothing implements them, because a
+multi-bar formation needs swing points no computation here produces. Read the node for the
+knowledge; `find(kind="chart-pattern")` is empty because there is no code, not because there is
+nothing to know.
 
 ## Which call
 
@@ -199,73 +204,20 @@ indicators.
 
 ## Worked examples
 
-**"Is there already something that does X?"**
+Each of these is a whole job -- the calls, the output, and the trap -- in
+[`GUIDE.md`](GUIDE.md). They are not restated here; this file is the reference for *which call*.
 
-```python
-kg.find("divergence")                       # every authored field, ranked by where it hit
-kg.find(kind="volatility", role="trigger")  # by what it is and how it is used
-```
+| you want to | GUIDE |
+|---|---|
+| orient yourself in the library | §1 |
+| check something does not already exist | §2 |
+| work out what a change breaks | §3 |
+| compose a strategy from both axes | §4 |
+| find what a signal needs to run | §5 |
+| decide whether two outputs are comparable | §6 |
+| explain why something is classified as it is | §8 |
+| ask about values rather than nodes | §9 |
+| run what you found against real data | §12–13 |
+| pull what the knowledge base says about a subject | §14 |
+| find the reasoning behind a piece of advice | §15 |
 
-**"What breaks if I change RSI's output?"**
-
-```python
-readers = kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in", limit=None)
-[r["id"] for r in readers]        # every signal that reads it — and `inputs` says which output
-```
-
-**"What does this signal actually need to run?"**
-
-```python
-sig = kg.get("procedure:signal-rsi-oversold")
-sig["params"]                         # {'window': {...}, 'threshold': {...}} — its knobs, with ranges
-sig["warmup_bars"]                    # 'window' — an EXPRESSION in those params, evaluate it yourself
-kg.neighbors(sig["id"], relation="uses", direction="out")          # the indicators beneath it
-```
-
-**"Take what I found and run it."**
-
-```python
-from mangrove_kb import RuleRegistry, sample_ohlcv
-from mangrove_kb.signals import momentum            # import the class module to register it
-
-node = kg.get("procedure:signal-adosc-cross-down")
-RuleRegistry.evaluate({"name": node["name"], "params": {"fast": 3, "slow": 10}}, sample_ohlcv())
-```
-
-A node's `name` **is** the registered signal name — that is the join between the graph and the code,
-and it is what makes this a map of a runnable library rather than an encyclopedia.
-
-**"How is this signal connected to that class?"**
-
-```python
-kg.path("procedure:signal-adosc-bearish", "concept:momentum")
-# the claim: one hop, --about--> momentum
-
-kg.path("procedure:signal-adosc-bearish", "concept:momentum",
-        relations=["uses", "instance-of"])
-# the reason: --uses--> ADOSC --instance-of--> momentum
-```
-
-`path` returns the **shortest** route, so it takes the `about` shortcut unless you constrain it.
-`all_paths` gives you both at once, shortest first, and is the better default when you do not already
-know the shape of the answer:
-
-```python
-kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum")
-# 2 paths: the `about` claim, then the `uses` -> `instance-of` reason
-```
-
-It excludes routes through a shared parent by default — `X --instance-of--> Signal <--instance-of-- Y`
-says "both are signals" and, with that hub at degree 218, those detours outnumber the real answers
-9,638 to 2 at `max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer.
-
-**"What can I plot on one panel, and what can I run without a volume feed?"**
-
-```python
-kg.outputs(bounded=True, kind="oscillator", limit=None)   # 48 outputs, each with units and range
-kg.outputs("histogram")                                   # who produces one — MACD, and only MACD
-
-ids = lambda r: {x["id"] for x in r}                      # rows are dicts; key on the id
-ids(kg.find(role="trigger", limit=None)) - ids(kg.find(requires="volume", role="trigger", limit=None))
-kg.find(status="deprecated", limit=None)                  # 2 — exclude these from anything new
-```

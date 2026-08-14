@@ -31,9 +31,36 @@ def guide():
     return GUIDE.read_text()
 
 
-def test_guide_exists_and_covers_thirteen_use_cases(guide):
+def test_guide_exists_and_covers_every_use_case(guide):
     headings = re.findall(r"^## (\d+)\. ", guide, re.M)
-    assert headings == [str(i) for i in range(1, 14)], f"expected use cases 1-13, found {headings}"
+    assert headings == [str(i) for i in range(1, 16)], f"expected use cases 1-15, found {headings}"
+
+
+def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
+    """The guide covered signals, indicators and strategies only, while half the graph is now the
+    knowledge base. An agent reading it would not learn that the market layer exists."""
+    assert "## 14." in guide and "## 15." in guide
+
+    # Every value the two new cases quote, checked against the graph rather than trusted.
+    liq = kg.get("concept:liquidity")
+    assert liq["summary"][:60] in guide
+    quantifiers = {e["id"] for e in kg.neighbors("concept:liquidity", relation="about",
+                                                 direction="in", limit=None)}
+    assert quantifiers, "nothing quantifies liquidity; the case's output is stale"
+    for q in quantifiers:
+        assert q in guide, f"{q} quantifies liquidity and the guide does not list it"
+
+    scope = kg.find(under="market foundations", limit=None)
+    assert f"{scope.total} nodes" in guide, f"the guide's subject size is stale ({scope.total})"
+
+    practice = next(p for p in kg.get("judgment:market-foundations-best-practices")["practices"]
+                    if "child orders" in p)
+    assert practice.split(" ", 1)[1] in guide
+    principle = next(p for p in kg.get("fact:market-foundations-core-principles")["principles"]
+                     if "Non-Linear" in p)
+    assert principle.split(":", 1)[0].split(" ", 1)[1] in guide
+
+    assert "chapter_variants" in guide and kg.get("procedure:indicator-atr")["chapter_variants"]
 
 
 def test_uc1_orientation_values(kg, guide):
