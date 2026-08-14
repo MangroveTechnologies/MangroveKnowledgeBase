@@ -18730,39 +18730,7 @@
      "Information Asymmetry: The unequal distribution of information among market participants, where some traders possess superior information about asset values",
      "Transaction Costs: Total costs of trading including explicit costs (commissions, fees) and implicit costs (spread, market impact, timing costs)",
      "Market Efficiency: The degree to which prices reflect all available information, influenced by the speed and accuracy of price discovery",
-     "Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price",
-     "Conditional Execution: Stop orders become active only when a trigger price is reached",
-     "Execution Certainty: Different order types offer varying degrees of fill certainty",
-     "Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage)",
-     "Information Hierarchy: Some participants have superior information or analytical capabilities",
-     "Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade",
-     "Time Horizon Diversity: Participants operate on different time scales from microseconds to years",
-     "Adversarial Dynamics: Informed traders seek to profit from uninformed traders",
-     "Liquidity is Dynamic: Liquidity varies by time of day, market conditions, and asset characteristics",
-     "Impact is Non-Linear: Market impact grows faster than linearly with order size",
-     "Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)",
-     "Urgency-Cost Tradeoff: Faster execution incurs higher market impact; slower execution risks adverse price movement",
-     "Liquidity Illusion: Displayed liquidity often disappears when tested",
-     "Volatility Clustering: High volatility tends to follow high volatility; low volatility tends to follow low volatility",
-     "Mean Reversion of Volatility: While returns are not predictable, volatility tends to revert to long-term averages",
-     "Regime Persistence: Markets tend to remain in a regime until a significant catalyst triggers a shift",
-     "Asymmetric Volatility: Volatility increases more on down moves than up moves (leverage effect)",
-     "Correlation Breakdown: Asset correlations change dramatically across regimes",
-     "Fragmentation: Modern markets are fragmented across multiple venues, requiring smart order routing",
-     "Transparency Spectrum: Venues range from fully transparent (lit exchanges) to opaque (dark pools)",
-     "Best Execution Obligation: Brokers must seek the best available price across venues",
-     "Latency Competition: Execution speed varies significantly across venues",
-     "Regulatory Frameworks: Different venues operate under different regulatory requirements",
-     "Spread as Compensation: Market makers earn the spread as compensation for providing liquidity and bearing inventory risk",
-     "Information Asymmetry Cost: Spreads widen when market makers fear trading against informed participants",
-     "Inventory Risk: Spreads reflect the risk of holding inventory that may decline in value",
-     "Competition Effect: More market makers competing leads to tighter spreads",
-     "Volatility Relationship: Spreads typically widen during high volatility",
-     "Information Aggregation: Prices aggregate dispersed information held by many participants",
-     "Continuous Process: Price discovery occurs continuously as new information arrives",
-     "Order Flow Information: The sequence and size of orders reveals information",
-     "Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously",
-     "Speed of Incorporation: The efficiency of price discovery depends on market structure"
+     "Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)"
     ]
    }
   },
@@ -18778,55 +18746,28 @@
      "market-foundations"
     ],
     "practices": [
-     "Monitor order book depth continuously to assess real-time liquidity conditions",
-     "Use limit orders to control execution prices when liquidity permits",
      "Be aware of the potential impact of large orders on market prices and plan execution accordingly",
      "Study the specific microstructure characteristics of each market traded (e.g., tick sizes, trading hours, circuit breakers)",
      "Account for all transaction costs when calculating expected strategy returns",
-     "Use market orders sparingly and only when immediate execution is critical",
-     "Place limit orders at realistic prices based on current market conditions",
-     "Set stop-losses based on technical levels or volatility, not arbitrary percentages",
-     "Understand that stop orders become market orders and may fill at worse prices in fast markets",
-     "Consider using stop-limit orders in volatile markets to maintain price control",
-     "Understand your position in the market participant hierarchy",
-     "Recognize that market makers adjust spreads based on perceived information content of orders",
-     "Monitor institutional activity through volume patterns, dark pool prints, and 13F filings",
-     "Be aware that HFT can front-run large orders if execution is predictable",
      "Trade when your counterparty is likely to be uninformed (e.g., index rebalancing flows)",
      "Avoid trading patterns that reveal your strategy to sophisticated participants",
-     "Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal)",
-     "Use volume-weighted average price (VWAP) orders for large positions",
      "Break large orders into smaller child orders to reduce footprint",
      "Avoid trading during illiquid periods (market open, lunch hour, holidays)",
-     "Build slippage assumptions into backtest and live performance expectations",
      "Monitor real-time market depth before executing larger orders",
-     "Consider using dark pools for large orders to minimize information leakage",
-     "Monitor volatility indicators (VIX, ATR, realized vs. implied vol) continuously",
-     "Reduce position sizes and leverage during high volatility regimes",
      "Use regime detection filters to enable/disable specific strategies",
      "Adapt trading strategies to current market conditions rather than forcing one approach",
      "Backtest strategies across multiple regimes to understand performance variation",
      "Have predefined plans for regime transitions rather than reacting emotionally",
-     "Consider that regime shifts often occur faster than regime detection algorithms can identify",
-     "Use smart order routers (SOR) to access multiple venues simultaneously",
      "Select venues based on order characteristics (size, urgency, information sensitivity)",
      "Monitor execution quality metrics across venues",
      "Understand fee structures (maker-taker rebates can influence routing)",
-     "Use dark pools strategically for large orders, but verify execution quality",
-     "Be aware of venue-specific order types and matching rules",
-     "Consider total cost of execution including fees, spread, and market impact",
-     "Always check the current spread before trading",
-     "Use limit orders to avoid paying the full spread",
-     "Trade during high liquidity periods for tighter spreads",
      "Factor spread costs into strategy profitability calculations",
      "Monitor spread changes as an indicator of market conditions",
-     "Avoid trading when spreads are abnormally wide unless necessary",
      "Monitor lead-lag relationships between related markets",
      "Use pre-market and after-hours trading for early information",
      "Understand the price discovery role of derivatives markets",
      "Be cautious trading immediately after major information releases",
-     "Recognize that the first price after news is often not the right price",
-     "Study auction dynamics for opening and closing trades"
+     "Recognize that the first price after news is often not the right price"
     ]
    }
   }
@@ -29309,6 +29250,22 @@
    "to_id": "procedure:indicator-vwap"
   },
   {
+   "from": "order types",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price \u00b7 Execution Certainty: Different order types offer varying degrees of fill certainty",
+   "from_id": "concept:order-type",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "stop order (stop-loss)",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Conditional Execution: Stop orders become active only when a trigger price is reached",
+   "from_id": "concept:stop-order",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
    "from": "iceberg order",
    "rel": "about",
    "to": "core principles",
@@ -29317,11 +29274,251 @@
    "to_id": "fact:market-foundations-core-principles"
   },
   {
+   "from": "market participants",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage) \u00b7 Information Hierarchy: Some participants have superior information or analytical capabilities \u00b7 Time Horizon Diversity: Participants operate on different time scales from microseconds to years \u00b7 Adversarial Dynamics: Informed traders seek to profit from uninformed traders",
+   "from_id": "concept:market-participant",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "market makers",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade \u00b7 Spread as Compensation: Market makers earn the spread as compensation for providing liquidity and bearing inventory risk",
+   "from_id": "concept:market-maker",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "liquidity",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Liquidity is Dynamic: Liquidity varies by time of day, market conditions, and asset characteristics \u00b7 Liquidity Illusion: Displayed liquidity often disappears when tested",
+   "from_id": "concept:liquidity",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "market impact",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Impact is Non-Linear: Market impact grows faster than linearly with order size \u00b7 Urgency-Cost Tradeoff: Faster execution incurs higher market impact; slower execution risks adverse price movement",
+   "from_id": "concept:market-impact",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "volatility",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volatility Clustering: High volatility tends to follow high volatility; low volatility tends to follow low volatility \u00b7 Mean Reversion of Volatility: While returns are not predictable, volatility tends to revert to long-term averages \u00b7 Asymmetric Volatility: Volatility increases more on down moves than up moves (leverage effect)",
+   "from_id": "concept:volatility",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Regime Persistence: Markets tend to remain in a regime until a significant catalyst triggers a shift \u00b7 Correlation Breakdown: Asset correlations change dramatically across regimes",
+   "from_id": "concept:market-regime",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "trading venues",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Fragmentation: Modern markets are fragmented across multiple venues, requiring smart order routing \u00b7 Transparency Spectrum: Venues range from fully transparent (lit exchanges) to opaque (dark pools) \u00b7 Latency Competition: Execution speed varies significantly across venues \u00b7 Regulatory Frameworks: Different venues operate under different regulatory requirements",
+   "from_id": "concept:trading-venue",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "execution models",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Best Execution Obligation: Brokers must seek the best available price across venues",
+   "from_id": "concept:execution-model",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "bid-ask spread dynamics",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Information Asymmetry Cost: Spreads widen when market makers fear trading against informed participants \u00b7 Inventory Risk: Spreads reflect the risk of holding inventory that may decline in value \u00b7 Competition Effect: More market makers competing leads to tighter spreads \u00b7 Volatility Relationship: Spreads typically widen during high volatility",
+   "from_id": "concept:bid-ask-spread",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "price discovery mechanisms",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Information Aggregation: Prices aggregate dispersed information held by many participants \u00b7 Continuous Process: Price discovery occurs continuously as new information arrives \u00b7 Order Flow Information: The sequence and size of orders reveals information \u00b7 Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously \u00b7 Speed of Incorporation: The efficiency of price discovery depends on market structure",
+   "from_id": "concept:price-discovery",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
+   "from": "liquidity",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor order book depth continuously to assess real-time liquidity conditions \u00b7 Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal) \u00b7 Trade during high liquidity periods for tighter spreads",
+   "from_id": "concept:liquidity",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "limit order",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use limit orders to control execution prices when liquidity permits \u00b7 Place limit orders at realistic prices based on current market conditions \u00b7 Use limit orders to avoid paying the full spread",
+   "from_id": "concept:limit-order",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "market order",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use market orders sparingly and only when immediate execution is critical \u00b7 Understand that stop orders become market orders and may fill at worse prices in fast markets",
+   "from_id": "concept:market-order",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "stop order (stop-loss)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Set stop-losses based on technical levels or volatility, not arbitrary percentages",
+   "from_id": "concept:stop-order",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "stop-limit order",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider using stop-limit orders in volatile markets to maintain price control",
+   "from_id": "concept:stop-limit-order",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
    "from": "iceberg order",
    "rel": "about",
    "to": "best practices",
    "why": "Use iceberg orders for large positions to reduce information leakage",
    "from_id": "concept:iceberg-order",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "market participants",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand your position in the market participant hierarchy",
+   "from_id": "concept:market-participant",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "market makers",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Recognize that market makers adjust spreads based on perceived information content of orders",
+   "from_id": "concept:market-maker",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "institutional investors",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor institutional activity through volume patterns, dark pool prints, and 13F filings",
+   "from_id": "concept:institutional-investor",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "high-frequency traders (hft)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Be aware that HFT can front-run large orders if execution is predictable",
+   "from_id": "concept:high-frequency-trader",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "vwap",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use volume-weighted average price (VWAP) orders for large positions",
+   "from_id": "procedure:vwap",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "slippage",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Build slippage assumptions into backtest and live performance expectations",
+   "from_id": "concept:slippage",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "dark pools",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider using dark pools for large orders to minimize information leakage \u00b7 Use dark pools strategically for large orders, but verify execution quality",
+   "from_id": "concept:dark-pool",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "volatility",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor volatility indicators (VIX, ATR, realized vs. implied vol) continuously",
+   "from_id": "concept:volatility",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "high volatility regime",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Reduce position sizes and leverage during high volatility regimes",
+   "from_id": "concept:high-volatility-regime",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "regime shifts",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider that regime shifts often occur faster than regime detection algorithms can identify",
+   "from_id": "concept:regime-shift",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "trading venues",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use smart order routers (SOR) to access multiple venues simultaneously",
+   "from_id": "concept:trading-venue",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "order types",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Be aware of venue-specific order types and matching rules",
+   "from_id": "concept:order-type",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "market impact",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider total cost of execution including fees, spread, and market impact",
+   "from_id": "concept:market-impact",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "bid-ask spread dynamics",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Always check the current spread before trading \u00b7 Avoid trading when spreads are abnormally wide unless necessary",
+   "from_id": "concept:bid-ask-spread",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "auction-based discovery",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Study auction dynamics for opening and closing trades",
+   "from_id": "concept:auction-based-discovery",
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
@@ -29441,8 +29638,23 @@
    ],
    [
     "concept:auction-based-discovery",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:auction-based-discovery",
     "kind-of",
     "concept:price-discovery"
+   ],
+   [
+    "concept:bid-ask-spread",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:bid-ask-spread",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:bid-ask-spread",
@@ -29466,6 +29678,11 @@
    ],
    [
     "concept:dark-pool",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:dark-pool",
     "kind-of",
     "concept:trading-venue"
    ],
@@ -29473,6 +29690,11 @@
     "concept:electronic-communication-network",
     "kind-of",
     "concept:trading-venue"
+   ],
+   [
+    "concept:execution-model",
+    "about",
+    "fact:market-foundations-core-principles"
    ],
    [
     "concept:execution-model",
@@ -29486,8 +29708,18 @@
    ],
    [
     "concept:high-frequency-trader",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:high-frequency-trader",
     "kind-of",
     "concept:market-participant"
+   ],
+   [
+    "concept:high-volatility-regime",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:high-volatility-regime",
@@ -29511,6 +29743,11 @@
    ],
    [
     "concept:institutional-investor",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:institutional-investor",
     "kind-of",
     "concept:market-participant"
    ],
@@ -29521,8 +29758,23 @@
    ],
    [
     "concept:limit-order",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:limit-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:liquidity",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:liquidity",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:liquidity",
@@ -29546,8 +29798,28 @@
    ],
    [
     "concept:market-impact",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:market-impact",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:market-impact",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:market-maker",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:market-maker",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:market-maker",
@@ -29566,8 +29838,23 @@
    ],
    [
     "concept:market-order",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:market-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:market-participant",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:market-participant",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:market-participant",
@@ -29576,8 +29863,23 @@
    ],
    [
     "concept:market-regime",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:market-regime",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:order-type",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:order-type",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:order-type",
@@ -29596,6 +29898,11 @@
    ],
    [
     "concept:price-discovery",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:price-discovery",
     "part-of",
     "concept:market-foundations"
    ],
@@ -29608,6 +29915,11 @@
     "concept:quantitative-analysis",
     "part-of",
     "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:regime-shift",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:regime-shift",
@@ -29626,8 +29938,18 @@
    ],
    [
     "concept:slippage",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:slippage",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:stop-limit-order",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:stop-limit-order",
@@ -29636,8 +29958,28 @@
    ],
    [
     "concept:stop-order",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:stop-order",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:stop-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:trading-venue",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:trading-venue",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:trading-venue",
@@ -29648,6 +29990,16 @@
     "concept:trailing-stop",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:volatility",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:volatility",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:volatility",
@@ -29771,6 +30123,11 @@
    ],
    [
     "procedure:vwap",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "procedure:vwap",
     "instance-of",
     "concept:execution-model"
    ],
@@ -29786,7 +30143,7 @@
    "object:mangrove-knowledge-space"
   ],
   "chapter_market-foundations_atoms": 56,
-  "chapter_market-foundations_relations": 63,
+  "chapter_market-foundations_relations": 95,
   "chapter_market-foundations_folded": [
    "concept:volatility",
    "procedure:indicator-atr"

@@ -45,19 +45,19 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 365, 1118
+s["nodes"], s["edges"]          # 365, 1150
 s["primitives"]                 # {'Procedure': 304, 'Concept': 44, 'Property': 3, ...}
-s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 242, ...}
+s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 274, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  365 1118
+nodes, edges  365 1150
 primitives    {'Procedure': 304, 'Concept': 44, 'Property': 3, 'Object': 1, 'Schema': 1,
                'Fact': 1, 'Judgment': 1}
-relations     {'instance-of': 364, 'uses': 234, 'about': 242, 'has-role': 218,
+relations     {'instance-of': 364, 'uses': 234, 'about': 274, 'has-role': 218,
                'kind-of': 32, 'part-of': 26, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:oscillator', 'concept:pattern',
@@ -66,7 +66,7 @@ roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 16 shapes in total]
+               ... 17 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
@@ -667,27 +667,35 @@ node, not the retrieval mechanism — the edges are, and they are what `under=` 
 
 ## 15. Find the reasoning behind a piece of advice
 
-**Task:** "Why should I break a large order into child orders?"
+**Task:** "Why does executing a large order slowly cost less?"
 
 Each subject carries two nodes beside its concepts: a `Fact` holding what is true of it, and a
 `Judgment` holding what to do about it. They are separate primitives because they answer to
 different standards — a Fact is settled by measurement, a Judgment by argument.
 
+**Ask the concept, not the lists.** A statement that concerns a node hangs off that node, and the
+edge carries the statement itself:
+
 ```python
-kg.get("judgment:market-foundations-best-practices")["practices"]
-kg.get("fact:market-foundations-core-principles")["principles"]
+kg.neighbors("concept:market-impact", relation="about", direction="out")
 ```
 
 ```
-practice   1.4 Break large orders into smaller child orders to reduce footprint
-principle  1.4 Impact is Non-Linear: market impact grows faster than linearly with order size
-principle  1.4 Urgency-Cost Tradeoff: faster execution incurs higher market impact; slower
-               execution risks adverse price movement
+fact:…-core-principles      Impact is Non-Linear: market impact grows faster than linearly with
+                            order size · Urgency-Cost Tradeoff: faster execution incurs higher
+                            market impact; slower execution risks adverse price movement
+judgment:…-best-practices   Consider total cost of execution including fees, spread, and market
+                            impact
 ```
 
-The advice and the reason are one section apart, and the principle is the *why*. Both are indexed,
-so a plain search reaches them: `find("dark pool")` returns `concept:dark-pool` and
-`concept:trading-venue`, and then the Fact and the Judgment that discuss it.
+Two hops from the node to the reason, and the reason is on the edge rather than buried in a
+thirty-line property. `concept:dark-pool` answers the same way, and so does every concept the
+chapter says anything about.
+
+**A statement lives in exactly one place.** Until it concerns a node it sits in the list; once it
+does, it moves onto the edge. So what remains in `["principles"]` and `["practices"]` is precisely
+what has not been connected yet — a backlog, not an index. Read the lists to see what is missing;
+read the edges to see what is known.
 
 **Where the book and the code disagree.** When a chapter defines something the library already
 implements, the node folds and the two statements are kept side by side rather than one overwriting

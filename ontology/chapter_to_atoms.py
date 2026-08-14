@@ -67,11 +67,77 @@ CHAPTERS: dict[str, dict] = {
         "edges": [("procedure:vwap", "uses", "procedure:indicator-vwap",
                    "executes against the price series this computes")],
         "wired": {
+            # --- order types -------------------------------------------------------------------
+            "Use market orders sparingly": "concept:market-order",
+            "Understand that stop orders become market orders": "concept:market-order",
+            "Place limit orders at realistic prices": "concept:limit-order",
+            "Use limit orders to control execution prices": "concept:limit-order",
+            "Use limit orders to avoid paying the full spread": "concept:limit-order",
+            "Conditional Execution: Stop orders become active": "concept:stop-order",
+            "Set stop-losses based on technical levels": "concept:stop-order",
+            "Consider using stop-limit orders": "concept:stop-limit-order",
             "Use iceberg orders for large positions": "concept:iceberg-order",
             # Wired to the iceberg order rather than to `order-type`, where the sentence points:
             # the node's own definition invokes information leakage, so this is the principle that
             # accounts for what that node does.
             "Information Leakage: Some order types reveal": "concept:iceberg-order",
+            "Immediacy vs. Price Control": "concept:order-type",
+            "Execution Certainty: Different order types": "concept:order-type",
+            "Be aware of venue-specific order types": "concept:order-type",
+            # --- participants ------------------------------------------------------------------
+            "Understand your position in the market participant": "concept:market-participant",
+            "Heterogeneous Motivations": "concept:market-participant",
+            "Information Hierarchy": "concept:market-participant",
+            "Time Horizon Diversity": "concept:market-participant",
+            "Adversarial Dynamics": "concept:market-participant",
+            "Recognize that market makers adjust spreads": "concept:market-maker",
+            "Liquidity Ecosystem: Market makers": "concept:market-maker",
+            "Spread as Compensation": "concept:market-maker",
+            "Monitor institutional activity": "concept:institutional-investor",
+            "Be aware that HFT can front-run": "concept:high-frequency-trader",
+            # --- liquidity, slippage, impact ---------------------------------------------------
+            "Monitor order book depth continuously": "concept:liquidity",
+            "Trade during high liquidity periods": "concept:liquidity",
+            "Evaluate liquidity before sizing positions": "concept:liquidity",
+            "Liquidity is Dynamic": "concept:liquidity",
+            "Liquidity Illusion": "concept:liquidity",
+            "Build slippage assumptions into backtest": "concept:slippage",
+            "Impact is Non-Linear": "concept:market-impact",
+            "Urgency-Cost Tradeoff": "concept:market-impact",
+            "Consider total cost of execution": "concept:market-impact",
+            "Use volume-weighted average price (VWAP) orders": "procedure:vwap",
+            # --- volatility and regimes --------------------------------------------------------
+            "Volatility Clustering": "concept:volatility",
+            "Mean Reversion of Volatility": "concept:volatility",
+            "Asymmetric Volatility": "concept:volatility",
+            "Monitor volatility indicators": "concept:volatility",
+            "Regime Persistence": "concept:market-regime",
+            "Correlation Breakdown": "concept:market-regime",
+            "Reduce position sizes and leverage during high volatility": "concept:high-volatility-regime",
+            "Consider that regime shifts often occur faster": "concept:regime-shift",
+            # --- venues and execution ----------------------------------------------------------
+            "Fragmentation: Modern markets are fragmented": "concept:trading-venue",
+            "Transparency Spectrum": "concept:trading-venue",
+            "Latency Competition": "concept:trading-venue",
+            "Regulatory Frameworks": "concept:trading-venue",
+            "Use smart order routers": "concept:trading-venue",
+            "Best Execution Obligation": "concept:execution-model",
+            "Consider using dark pools for large orders": "concept:dark-pool",
+            "Use dark pools strategically": "concept:dark-pool",
+            # --- spread ------------------------------------------------------------------------
+            "Always check the current spread": "concept:bid-ask-spread",
+            "Avoid trading when spreads are abnormally wide": "concept:bid-ask-spread",
+            "Information Asymmetry Cost": "concept:bid-ask-spread",
+            "Inventory Risk: Spreads reflect": "concept:bid-ask-spread",
+            "Competition Effect": "concept:bid-ask-spread",
+            "Volatility Relationship: Spreads typically widen": "concept:bid-ask-spread",
+            # --- price discovery ---------------------------------------------------------------
+            "Information Aggregation": "concept:price-discovery",
+            "Continuous Process": "concept:price-discovery",
+            "Order Flow Information": "concept:price-discovery",
+            "Multiple Venues": "concept:price-discovery",
+            "Speed of Incorporation": "concept:price-discovery",
+            "Study auction dynamics": "concept:auction-based-discovery",
         },
     },
 }
@@ -593,9 +659,13 @@ def build(path: Path, chapter: str, parent: str,
             # concept points at the principles and practices that govern it, not the reverse. It
             # also keeps the two list nodes from accumulating 87 outgoing edges apiece while every
             # concept sits there with none.
-            rels.append({"from": name_of(target), "rel": "about", "to": atoms[list_id]["title"],
-                         "why": line,
-                         "from_id": target, "to_id": list_id})
+            prior = next((r for r in rels if r["from_id"] == target and r["rel"] == "about"
+                          and r["to_id"] == list_id), None)
+            if prior:
+                prior["why"] += " · " + line
+            else:
+                rels.append({"from": name_of(target), "rel": "about", "to": atoms[list_id]["title"],
+                             "why": line, "from_id": target, "to_id": list_id})
 
         return kept
 
