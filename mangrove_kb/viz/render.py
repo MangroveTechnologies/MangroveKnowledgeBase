@@ -970,6 +970,10 @@ PROPERTY_PANEL = r"""
       foldSections();
     };
     showEdge = function(e){ _showEdge(e); foldSections(); };
+    // The action panel is inserted by a LATER wrapper, i.e. after this one has already folded
+    // everything into <details>. It hands its own label/value pair back through here so there is
+    // one definition of what a section is, rather than two that drift.
+    window.KBFOLD = foldSections;
   }
 })();
 </script>
@@ -993,16 +997,23 @@ PROPERTY_PANEL = r"""
 # The vendored file is not touched.
 COLLAPSE_PANEL = """
 <style>
-  #inspect .xcol{margin-top:4px}
-  #inspect .xcol label{display:flex;align-items:center;gap:6px;font:11px ui-monospace,monospace;
-                       padding:1px 0;cursor:pointer}
-  #inspect .xcol label input{margin:0;cursor:pointer}
-  #inspect .xcol .n{color:var(--act);margin-left:auto}
-  #inspect .xcol button{margin-top:6px;font:11px ui-monospace,monospace;padding:3px 10px;
-                        cursor:pointer;border:1px solid currentColor;border-radius:3px;
-                        background:transparent;color:inherit}
-  #inspect .xcol button:hover{color:var(--act)}
-  #inspect .xcol .mut{font:11px ui-monospace,monospace}
+  #inspect .xintro{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2);margin-bottom:8px}
+  #inspect .xrow{display:flex;align-items:center;gap:9px;padding:6px 0}
+  #inspect .xrow+.xrow{border-top:1px solid var(--kb-rule)}
+  #inspect .xname{font:600 12.5px var(--kb-mono);color:var(--ink);overflow-wrap:anywhere}
+  #inspect .xn{font:11.5px var(--kb-mono);color:var(--kb-2);margin-left:auto;flex:none}
+  /* Two words, one lit. A checkbox says "ticked/unticked" and leaves you to work out which way
+     round that is; show|hide says what the graph is doing right now, in the words themselves. */
+  #inspect .xsw{display:inline-flex;flex:none;border:1px solid var(--kb-edge);border-radius:5px;
+                overflow:hidden}
+  #inspect .xsw button{font:600 11px var(--kb-sans);padding:3px 9px;border:0;cursor:pointer;
+                       background:transparent;color:var(--kb-2);letter-spacing:.01em}
+  #inspect .xsw button+button{border-left:1px solid var(--kb-edge)}
+  #inspect .xsw button:hover{color:var(--ink)}
+  /* Dark ink on the lit chip in both themes: white on this teal measures 2.6:1. */
+  #inspect .xsw button.on{background:var(--act);color:#0a0a0a}
+  #inspect .xsw button.on.xhide{background:var(--dev-highlight);color:#0a0a0a}
+  #inspect .xnone{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2)}
 </style>
 <script>
 (function(){
@@ -1102,37 +1113,66 @@ COLLAPSE_PANEL = """
     if(sel && sel.id === id) showNode(N[idx[id]]);           // reflect the new button state
   };
 
+  // Per-edge-type show/hide, applied on the click rather than staged behind a button. The old
+  // panel was tick-some-boxes-then-press-Collapse: two steps, and the boxes described a plan
+  // rather than the state of the graph, so a node you had already folded came back with every box
+  // ticked and a button that said Expand. Here each row says what that edge type is doing NOW.
+  //
+  // `scope` holds the types currently HIDDEN for a node, so "everything shown" is the empty set
+  // and the node is in `collapsed` exactly when that set is non-empty.
+  function setHidden(id, types){
+    if(types.size){
+      collapsed.add(id); apply(id, types);
+      if((hideCount[id] || 0) === 0){                  // folds nothing: revert rather than lie
+        collapsed.delete(id); scope.delete(id); recomputeHidden(); wake(0.5);
+        if(mode === '3d') refresh3d();
+      }
+    } else {
+      collapsed.delete(id); scope.delete(id); recomputeHidden(); wake(0.5);
+      if(mode === '3d') refresh3d();
+    }
+    if(sel && sel.id === id) showNode(N[idx[id]]);
+  }
+
   const _showNode = showNode;
   showNode = function(n){
     _showNode(n);
     const types = foldable(n.id);
-    const on = scope.get(n.id) || defaults(n.id);
-    const div = document.createElement('div');
-    div.className = 'xcol';
+    const hid = scope.get(n.id) || new Set();
+    const lbl = document.createElement('div');
+    lbl.className = 'lbl';
+    lbl.textContent = 'action';
+    const val = document.createElement('div');
+    val.className = 'val';
     if(!types.length){
-      div.innerHTML = '<div class="lbl">collapse</div>'
-        + '<div class="val mut">nothing hangs off this node</div>';
+      val.innerHTML = '<div class="xnone">nothing hangs off this node</div>';
     } else {
-      div.innerHTML = '<div class="lbl">collapse across</div><div class="val">'
+      val.innerHTML = '<div class="xintro">show or hide nodes along the following edges</div>'
         + types.map(t => {
             const k = descendants(n.id, new Set([t])).size;
-            return `<label><input type="checkbox" class="xct" data-t="${esc(t)}"`
-                 + `${on.has(t) ? ' checked' : ''}>${esc(t)}<span class="n">${k}</span></label>`;
-          }).join('')
-        + `<button class="xcb" data-id="${esc(n.id)}">`
-        + `${collapsed.has(n.id) ? 'Expand' : 'Collapse'}</button></div>`;
+            const off = hid.has(t);
+            return `<div class="xrow"><span class="xname">${esc(t)}</span>`
+              + `<span class="xn">${k}</span>`
+              + `<span class="xsw" data-t="${esc(t)}" data-id="${esc(n.id)}">`
+              + `<button class="xshow${off ? '' : ' on'}">show</button>`
+              + `<button class="xhide${off ? ' on' : ''}">hide</button></span></div>`;
+          }).join('');
     }
-    inspect.insertBefore(div, inspect.firstChild);   // top of the panel, not buried under the edges
+    // Below the node's name, not above its title: the first thing you read should be what the node
+    // IS. Falls back to the top of the panel only if the name section is somehow absent.
+    const name = [...inspect.querySelectorAll(':scope > details')]
+      .find(d => d.querySelector('summary').textContent.trim().toLowerCase() === 'name');
+    if(name) name.after(lbl, val); else inspect.insertBefore(val, inspect.firstChild),
+                                        inspect.insertBefore(lbl, inspect.firstChild);
+    if(window.KBFOLD) window.KBFOLD();            // same section machinery as everything else
   };
 
   inspect.addEventListener('click', ev => {
-    const b = ev.target.closest('.xcb'); if(!b) return;
-    const id = b.dataset.id;
-    const picked = new Set([...inspect.querySelectorAll('.xct')]
-      .filter(c => c.checked).map(c => c.dataset.t));
-    if(collapsed.has(id)) toggleCollapse(id);                 // expand
-    else if(picked.size) toggleCollapse(id, picked);          // collapse across the ticked types
-    if(sel && sel.id === id) showNode(N[idx[id]]);
+    const b = ev.target.closest('.xsw button'); if(!b) return;
+    const sw = b.parentElement, id = sw.dataset.id, t = sw.dataset.t;
+    const hid = new Set(scope.get(id) || []);
+    if(b.classList.contains('xhide')) hid.add(t); else hid.delete(t);
+    setHidden(id, hid);
   });
 
   recomputeHidden();
@@ -1335,6 +1375,10 @@ def main() -> int:
     # block -- and asserted, so an upstream rename fails the build instead of silently reverting the
     # panel to raw JSON, which looks like nothing changed.
     for old, new in (
+        # One vocabulary. The panel says show/hide, so the hint bar cannot say collapse/expand for
+        # the gesture that does the same thing -- it is the only user-visible use of the word left.
+        ("double-click a node to collapse/expand",
+         "double-click a node to hide or show what hangs off it"),
         ("+kv('properties',n.props)",
          "+(window.KVPROPS?window.KVPROPS(n):kv('properties',n.props))"),
         ("+kv('other properties',pr,['because','state','note']);",

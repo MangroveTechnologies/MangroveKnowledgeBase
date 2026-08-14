@@ -552,3 +552,43 @@ console.log(JSON.stringify(names));
     # warm-up is a sentence about the parameters when there are any, and its own section when
     # there are not -- saying "an expression in these parameters" beside no parameters is a lie.
     assert out.get("warm-up") == 25, f"expected the 25 parameterless nodes to head it: {out}"
+
+
+def test_the_action_section_says_what_the_graph_is_doing(page):
+    """Two words, one lit, applied on the click -- not tick-boxes staged behind a Collapse button.
+
+    The old panel described a PLAN: you ticked relation types and pressed Collapse. A node you had
+    already folded came back with every box ticked and a button reading Expand, so the control
+    never told you the current state of anything. Each row now says what that edge type is doing
+    right now, and changing it takes effect immediately.
+
+    Driven in a browser as well as asserted here: clicking `hide` on concept:indicator's
+    `instance-of` row took `hidden` from 0 to 71 nodes, and `show` put it back to 0.
+    """
+    assert "show or hide nodes along the following edges" in page
+    assert "lbl.textContent = 'action';" in page, "the section must be called action"
+    # Below the node's name: the first thing you read should be what the node IS.
+    assert ".find(d => d.querySelector('summary').textContent.trim().toLowerCase() === 'name')" in page
+    assert "if(name) name.after(lbl, val);" in page
+    # It folds through the same machinery as every other section rather than a second copy of it.
+    assert "window.KBFOLD = foldSections;" in page and "if(window.KBFOLD) window.KBFOLD();" in page
+    # Exactly one of the two words is lit, and which one is read from the state, not from the click.
+    assert 'class="xshow${off ? \'\' : \' on\'}">show</button>' in page
+    assert 'class="xhide${off ? \' on\' : \'\'}">hide</button>' in page
+    # White on this teal measures 2.6:1; the lit chip carries dark ink in both themes.
+    assert "#inspect .xsw button.on{background:var(--act);color:#0a0a0a}" in page
+
+
+def test_no_visible_text_says_collapse(page):
+    """One vocabulary. The panel says show/hide, so the gesture that does the same thing cannot be
+    described as collapse/expand in the hint bar -- that was the last user-visible use of the word.
+
+    Only rendered text counts: the viewer's own `collapsed` set and `toggleCollapse` function are
+    identifiers inside <script>, which nobody reads, and renaming vendored internals is churn.
+    """
+    assert "double-click a node to hide or show what hangs off it" in page
+    assert "double-click a node to collapse/expand" not in page
+    # The panel's own markup -- the strings it writes into the DOM -- must not use the word either.
+    panel = page.split("const ROOT =")[1].split("</script>")[0]
+    for phrase in ("collapse across", ">Collapse<", ">Expand<", "'Collapse'", "'Expand'"):
+        assert phrase not in panel, f"the action panel still writes {phrase!r}"
