@@ -189,15 +189,22 @@ def test_no_session_or_handoff_docs_are_committed():
 
     They are written to describe a moment and then read as if they describe now. The one that was
     here opened with the words "Not committed. Working note only." -- and was committed.
+
+    Asks git what is TRACKED rather than globbing the filesystem. An uncommitted working note in
+    someone's checkout is fine -- that is the whole point of keeping them out of the repo -- and
+    globbing failed the build for one, which is the opposite of what this guards.
     """
-    banned = []
-    for path in REPO.rglob("*.md"):
-        rel = path.relative_to(REPO)
-        if ".git" in rel.parts or "build" in rel.parts or "node_modules" in rel.parts:
-            continue
-        name = rel.name.lower()
-        if any(w in name for w in ("session-summary", "handoff", "next-steps", "status")):
-            banned.append(str(rel))
+    import subprocess
+    try:
+        proc = subprocess.run(["git", "ls-files", "*.md", "**/*.md"], cwd=REPO,
+                              capture_output=True, text=True)
+    except FileNotFoundError:  # no git binary
+        pytest.skip("git unavailable -- nothing to ask about what is tracked")
+    if proc.returncode != 0:  # an unpacked sdist, not a checkout
+        pytest.skip("not a git checkout")
+    banned = [f for f in proc.stdout.split()
+              if any(w in Path(f).name.lower()
+                     for w in ("session-summary", "handoff", "next-steps", "status"))]
     assert not banned, f"summary/handoff docs must not be committed: {banned}"
 
 

@@ -60,3 +60,23 @@ appmap.log
 # the audits themselves superseded, and they read as current. Re-generate with
 # `python scripts/audit/run_all.py`.
 audit_results/
+
+# Working notes: status docs, session summaries, handoffs, next-steps, and anything stamped with a
+# date. They describe a moment and are then read as describing now -- STATUS.md, SESSION-SUMMARY.md,
+# kb-next-steps.md and findings/session-summary-2026-02-22.md were all committed and all stale, and
+# one of them opened with the words "Not committed. Working note only."
+#
+# Scoped to .md so nothing shadows real code (kb_server has a status route).
+# `tests/test_discoverability.py` fails the build if one is committed anyway -- belt and braces,
+# because .gitignore does nothing for a file already tracked or added with `-f`.
+[Ss][Tt][Aa][Tt][Uu][Ss].md
+*[-_][Ss][Tt][Aa][Tt][Uu][Ss].md
+*[Ss][Ee][Ss][Ss][Ii][Oo][Nn][-_][Ss][Uu][Mm][Mm][Aa][Rr][Yy]*.md
+*[Hh][Aa][Nn][Dd][Oo][Ff][Ff]*.md
+*[Nn][Ee][Xx][Tt][-_][Ss][Tt][Ee][Pp][Ss]*.md
+*[Ss][Cc][Rr][Aa][Tt][Cc][Hh][Pp][Aa][Dd]*.md
+*[Ww][Ii][Pp].md
+
+# Anything date-stamped: notes-2026-08-10.md, summary_2026_08_10.md, report-20260810.md
+*[-_][0-9][0-9][0-9][0-9][-_][0-9][0-9][-_][0-9][0-9].md
+*[-_][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].md
