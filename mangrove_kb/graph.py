@@ -454,6 +454,36 @@ class KnowledgeGraph:
                     q.append(e.src)
         return out
 
+    def under(self, ref: str) -> set[str]:
+        """Everything beneath this node, whatever primitive it is -- the containment question.
+
+        :meth:`descendants` answers *what is a kind of this*, over the rigid backbone. That is the
+        wrong question for "give me everything from market foundations": an order type is not a
+        KIND of market foundations, it is PART of it, and `part-of` is not on the backbone -- so the
+        walk stopped at the first composition edge and returned almost nothing.
+
+        This follows every transitive structural relation (`part-of` alongside `kind-of`, both
+        declared transitive in :data:`RELATIONS`) plus `instance-of` for the leaf members, and then
+        the same one-hop `about` projection :meth:`in_class` uses, so a computation concerned with
+        something in scope comes along with it.
+
+        The point is that it is primitive-blind. A Fact, a Concept, an indicator and a chapter
+        formula are all reached by this one call, because the graph already records which chapter
+        each belongs to -- as edges. Nothing needs a `reference_chapter` filter to be found.
+        """
+        nid = self.resolve(ref)
+        down = {r for r, spec in RELATIONS.items() if spec.get("transitive")} | {"instance-of"}
+        seen = {nid}
+        q = deque([nid])
+        while q:
+            cur = q.popleft()
+            for e in self._in.get(cur, []):
+                if e.relation in down and e.src not in seen:
+                    seen.add(e.src)
+                    q.append(e.src)
+        via_about = {e.src for e in self.edges if e.relation == "about" and e.dst in seen}
+        return (seen | via_about) - {nid}
+
     def bearers(self, role: str) -> list[str]:
         """Nodes that bear this role. **One hop, never transitive** -- roles are not inherited."""
         rid = self.resolve(role)
@@ -493,7 +523,8 @@ class KnowledgeGraph:
 
     def find(self, query: str = "", *, kind: str | None = None, role: str | None = None,
              primitive: str | None = None, status: str | None = None,
-             requires: str | None = None, limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
+             requires: str | None = None, under: str | None = None,
+             limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
         """Search by text, and/or filter by class, role, status and required input.
 
         ``kind`` and ``role`` are separate parameters on purpose, and they intersect. ``kind`` is
@@ -505,6 +536,14 @@ class KnowledgeGraph:
             kg.find(kind="momentum", role="trigger")   # momentum-class signals used as triggers
             kg.find(kind="oscillator")                 # everything in the oscillator class
             kg.find(role="filter")                     # signals playing the filter part
+
+        ``under`` scopes to everything beneath a node by containment -- and it is primitive-blind,
+        so one call reaches the Concepts, the Facts, the advice and the formulas of a subject
+        alike::
+
+            kg.find(under="market foundations")            # the whole subject, every kind of node
+            kg.find(under="market foundations", primitive="Procedure")   # just its computations
+            kg.find("spread", under="market foundations")  # text search, scoped to the subject
 
         ``status`` and ``requires`` are flat node predicates with small enumerable vocabularies --
         both are listed by :meth:`stats`, so neither can be guessed wrong::
@@ -519,8 +558,11 @@ class KnowledgeGraph:
         from being invisible.
         """
         pool: set[str] | None = None
+        if under is not None:
+            pool = self.under(under)
         if kind is not None:
-            pool = self.in_class(kind)
+            got = self.in_class(kind)
+            pool = got if pool is None else (pool & got)
         if role is not None:
             rid = self.resolve(role)
             borne = set(self.bearers(rid))
@@ -708,6 +750,10 @@ class KnowledgeGraph:
         edge orientation. Returns ``None`` when nothing connects them within ``max_depth`` -- which
         is a real answer about this graph, not a failure.
 
+        Each hop carries the edge's own ``why``. Every relation in this graph records why it holds
+        -- the merge refuses an edge without one -- and a route that named the relations but dropped
+        the reasons was the one call whose whole job is explanation discarding the explanation.
+
         **Shortest is rarely the explanatory route.** It returns ONE path and says nothing about the
         others, so adding an edge silently changes the answer -- which is exactly what happened when
         signals gained a direct ``about`` edge to their class and this method stopped showing the
@@ -745,7 +791,7 @@ class KnowledgeGraph:
             parent, e = prev[cur]
             chain.append({"node": self.nodes[cur].brief(),
                           "via": {"relation": e.relation, "category": e.category,
-                                  "from": e.src, "to": e.dst}})
+                                  "why": e.why, "from": e.src, "to": e.dst}})
             cur = parent
         chain.append({"node": self.nodes[a].brief()})
         return list(reversed(chain))
@@ -820,7 +866,7 @@ class KnowledgeGraph:
                     return
                 step = {"node": self.nodes[other].brief(),
                         "via": {"relation": e.relation, "category": e.category,
-                                "from": e.src, "to": e.dst}}
+                                "why": e.why, "from": e.src, "to": e.dst}}
                 if other == b:
                     found.append(acc + [step])
                     continue          # a simple path ends at the target; do not walk through it

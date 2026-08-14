@@ -84,6 +84,25 @@ kg.find(kind="oscillator")                   # everything in the oscillator clas
 kg.find(role="filter")                       # signals playing the filter part
 ```
 
+## Two halves, one retrieval surface
+
+The graph holds two kinds of thing and they are queried identically.
+
+**Read off the code** -- 71 indicators and 218 signals, exact, with typed inputs and outputs.
+**Read off the knowledge base** -- the concepts a market is made of (orders, participants, venues,
+liquidity, spread), the formulas the chapters state, and two nodes per subject holding what is
+true of it (`Fact`) and what to do about it (`Judgment`).
+
+`find(under=…)` is the call that spans them: it walks containment (`part-of` alongside `kind-of`
+and `instance-of`) and is primitive-blind, so `find(under="market foundations")` returns Concepts,
+Procedures, the Fact and the Judgment together. Intersect it with anything -- `primitive="Fact"`,
+`role=`, a text query.
+
+Two sub-kinds are worth knowing apart. A `procedure:indicator-*` is callable; a bare `procedure:*`
+is a **formula** the knowledge base states and nothing implements. And `concept:chart-pattern` has
+no members on purpose -- multi-bar formations need swing points no computation here produces -- so
+an empty result from it is the answer, not a bug.
+
 ## Which call
 
 | question | call |
@@ -101,6 +120,7 @@ kg.find(role="filter")                       # signals playing the filter part
 | what does this signal depend on? | `neighbors(id, relation="uses", direction="out")` |
 | what breaks if I change this? | `neighbors(id, direction="in")`, then widen with `subgraph` |
 | the neighbourhood around something | `subgraph(id, radius=1)` |
+| everything belonging to a subject, whatever kind | `find(under="market foundations")` |
 | how are these two related? | `path(a, b)` — one shortest route |
 | every way these two connect, and why | `all_paths(a, b)` — all routes, shortest first |
 | now actually run what I found | `RuleRegistry.evaluate({"name": node["name"], ...}, df)` |
@@ -126,8 +146,12 @@ kg.get("procedure:indicator-rsi")["outputs"]
 #          'canonical_name': 'Relative Strength Index', 'description': ...}}
 ```
 
-Every node carries `formula`, `inputs`, `params`, `outputs`, `warmup_bars`, `reference`,
-`usage_example`. Outputs carry `units` and `range`, which is what makes *"can I compare these two
+Every **signal and indicator** node carries `formula`, `inputs`, `params`, `outputs`,
+`warmup_bars`, `reference`, `usage_example` -- they are lifted from the code. Doc-derived nodes
+carry what their chapter states instead: a summary, an `explanation`, `applications`, `examples`,
+and for a chapter formula a `formula` with typed `inputs` and `outputs` but no `warmup_bars` or
+`usage_example`, because there is no implementation behind it. Read `get()` rather than assuming a
+field is there. Outputs carry `units` and `range`, which is what makes *"can I compare these two
 directly"* a question with an exact answer — reach for `outputs()` when you want it across the whole
 library rather than for one node.
 
