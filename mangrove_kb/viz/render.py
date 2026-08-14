@@ -1028,31 +1028,60 @@ TIP_COPY = """
 // One sentence each, in the panel's own vocabulary. The relation copy is SKILL.md's -- these are
 // load-bearing definitions, not decoration, and inventing a second wording for them is how a
 // glossary starts disagreeing with the thing it describes.
+// WHAT A TOOLTIP HAS TO DO, from the research recorded in docs/research/tooltip-microcopy.md:
+// say what the thing IS and what you would USE IT FOR, and never restate the label. NN/g is blunt
+// about the failure mode -- "tooltips with obvious or redundant text are not beneficial to users"
+// -- and the first pass here failed exactly that way: `formula` said "How it is calculated", which
+// is the word `formula` with more letters. Microsoft's InfoTip rules (the `?`-icon pattern this
+// panel uses) ask for complete sentences in plain language; NN/g's microcontent rules ask for the
+// load-bearing words first, because this is read in a glance or not at all.
 window.KBTIPS = {
-  'name': 'What it is called in code.',
-  'action': 'Show less of the graph: how much of it around this node, and along which edges.',
-  'description': 'What it does, in one sentence.',
-  'subtype': 'The family it belongs to -- momentum, volatility, pattern, and so on.',
-  'inputs': 'The price columns it reads.',
-  'parameters': 'What you set when you call it, with defaults and limits.',
-  'warm-up': 'Bars it needs before the first valid value.',
-  'outputs': 'What it returns, with units and the range each value can take.',
-  'interpretation': 'How to read the values.',
-  'applications': 'What it is used for.',
-  'formula': 'How it is calculated.',
-  'reference': 'Where the definition comes from.',
-  'provenance & extras': 'Where it lives in the code, and how to call it.',
-  'edges': 'How this connects to everything else.',
+  'name': 'The name this computation goes by in code -- what you import, or pass to the registry '
+    + 'when you call it.',
+  'action': 'Controls how much of the graph you see around this node. Use it to isolate one '
+    + 'computation -- just what it touches, everything it is built from, everything built on it -- '
+    + 'or to drop edge types you do not care about. Each option says how many nodes it leaves.',
+  'description': 'What this computation does, in one sentence. Read it first to decide whether '
+    + 'this is the one you want.',
+  'subtype': 'The family this belongs to: averaging, momentum, oscillator, volatility, flow or '
+    + 'pattern. Use it to find siblings that do a similar job.',
+  'inputs': 'The price series this reads, and what each one is for. You supply them as columns -- '
+    + 'close, high, volume.',
+  'parameters': 'The settings you pass when you call it, with the default and the range each '
+    + 'accepts. Tune these to your timeframe and instrument.',
+  'warm-up': 'How many bars this needs before its first valid value. Feed it fewer and the leading '
+    + 'rows come back empty.',
+  'outputs': 'What this returns, with units and the range each value can take. Check it before you '
+    + 'plot a series, threshold it, or compare two of them.',
+  'interpretation': 'What the values mean in practice -- what a high reading, a low one, or a '
+    + 'crossing is telling you about the market.',
+  'applications': 'What this is good for in a strategy, and the conditions it suits.',
+  'formula': 'The calculation itself, as stated in the source. Use it to check the implementation '
+    + 'against the definition you already know.',
+  'reference': 'The published description this implementation follows, for when you want the '
+    + 'original rather than ours.',
+  'provenance & extras': 'Where this lives in the code, a call you can copy, and how the entry '
+    + 'itself was recorded.',
+  'edges': 'Every relationship this node has, incoming and outgoing. Click one to jump to the node '
+    + 'on the other end.',
 };
-// What each relation asserts. SKILL.md's distinctions, said in one line.
+// What each relation ASSERTS, and what you would follow it for. These are SKILL.md's distinctions:
+// `about` versus `instance-of` is a claim the graph makes, and a second wording of it here would
+// start disagreeing with the thing it describes.
 window.KBRELTIPS = {
-  'instance-of': 'It measures that class -- RSI measures momentum. Indicators only.',
-  'about': 'Concerned with that class without measuring it. This is how signals carry a class.',
-  'kind-of': 'A subtype of the other.',
-  'part-of': 'A component of the other.',
-  'has-role': 'The part it plays in a strategy: trigger or filter.',
-  'uses': "It reads that computation's output.",
-  'supersedes': 'It replaces the other, which is deprecated.',
+  'instance-of': 'Says this indicator measures that class -- RSI measures momentum. Follow it to '
+    + 'find every indicator of a given kind.',
+  'about': 'Says this signal is concerned with that class without measuring it. It is how a '
+    + 'boolean signal carries a class, and it comes from the indicator the signal reads.',
+  'kind-of': 'Says this is a subtype of that. Anything true of the parent is true here, so it '
+    + 'carries down.',
+  'part-of': 'Says this is a component of that -- how the graph groups pieces into a whole.',
+  'has-role': 'The part this plays in a strategy: trigger or filter. A role is not a type -- the '
+    + 'same computation can play a different part in another strategy.',
+  'uses': "Says this reads the other computation, and names which of its outputs flow in. Follow "
+    + "it to see what a signal is built from.",
+  'supersedes': 'Says this replaces the other, which is deprecated. The old one still runs; this '
+    + 'is the canonical version.',
 };
 </script>
 """
