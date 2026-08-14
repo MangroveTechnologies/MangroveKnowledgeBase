@@ -531,6 +531,7 @@ BRAND = {
     "ember":      "#ff4713",
     "deep_teal":  "#2b7f99",     # shade of teal
     "sun":        "#ffc266",     # tint of orange
+    "bark":       "#8c570d",     # shade of orange
 }
 
 #: The viewer ships a general-purpose categorical palette -- #4e79a7, #59a14f, #e15759 -- which is
@@ -543,6 +544,11 @@ PRIMITIVE_COLOR = {
     "Property":  BRAND["sky"],
     "Object":    BRAND["ember"],
     "Schema":    BRAND["deep_teal"],
+    # Knowledge ABOUT the concepts rather than more concepts, so both take the concept hue: a Fact
+    # states what is true of one, a Judgment what to do about it. A fifth and sixth hue would have
+    # said they are unrelated to what they describe, which is the opposite of how they are read.
+    "Fact":      BRAND["sun"],
+    "Judgment":  BRAND["bark"],
 }
 
 CATEGORY_COLOR = {
@@ -572,6 +578,7 @@ def _shade(hex_color: str, amount: float) -> str:
 KIND_COLOR = {
     "signal":                PRIMITIVE_COLOR["Procedure"],
     "indicator":             _shade(PRIMITIVE_COLOR["Procedure"], -0.35),
+    "formula":               _shade(PRIMITIVE_COLOR["Procedure"], 0.4),
     "class":                 PRIMITIVE_COLOR["Concept"],
     "entity type":           _shade(PRIMITIVE_COLOR["Concept"], -0.35),
     "domain":                _shade(PRIMITIVE_COLOR["Concept"], 0.35),
@@ -579,6 +586,8 @@ KIND_COLOR = {
     "role axis":             _shade(PRIMITIVE_COLOR["Property"], -0.35),
     "root:knowledge-graph":  PRIMITIVE_COLOR["Object"],
     "schema":                PRIMITIVE_COLOR["Schema"],
+    "fact":                  PRIMITIVE_COLOR["Fact"],
+    "judgment":              PRIMITIVE_COLOR["Judgment"],
 }
 
 #: Relation -> colour, each a shade of its category. Deliberately NOT dash: `viz.py` already spends
@@ -833,6 +842,17 @@ PROPERTY_PANEL = r"""
   };
 
   // 64 nodes carry these as a list and 7 as a paragraph. Same field, so it renders the same way.
+  // Any value at all, rendered as rows rather than serialised. Recurses, so a property this file
+  // has never seen -- `chapter_variants`, whatever comes next -- reads as nested labels instead of
+  // arriving as `{"a":{"b":1}}`.
+  const DEEP = v => {
+    if(v == null) return '';
+    if(Array.isArray(v)) return v.map(x => `<div>${DEEP(x)}</div>`).join('');
+    if(typeof v === 'object') return Object.entries(v)
+      .map(([k, x]) => `<div style="margin-left:8px"><b>${E(k)}</b>: ${DEEP(x)}</div>`).join('');
+    return E(String(v));
+  };
+
   const BULLETS = v => Array.isArray(v)
     ? '<ul class="kbl">' + v.map(x => `<li>${E(x)}</li>`).join('') + '</ul>'
     : (v ? `<div class="kbd">${E(v)}</div>` : '');
@@ -892,11 +912,12 @@ PROPERTY_PANEL = r"""
     if(cn.length) x += `<div class="kbm">known as ${cn.join(' · ')}</div>`;
     if(p.usage_example) x += '<div class="kbm" style="margin-top:6px">usage</div>'
       + CODE(p.usage_example);
-    // Anything this file has never heard of, verbatim. The panel hides nothing.
+    // Anything this file has never heard of, verbatim. The panel hides nothing -- and `verbatim`
+    // means readable: `JSON.stringify` on a nested value put `{"formula":"TR = max(..."}` in front
+    // of a reader, which is the wall of braces this panel exists to have removed.
     for(const [k, v] of Object.entries(p)){
       if(KNOWN.includes(k) || v == null) continue;
-      x += `<div class="kbm"><b>${E(k)}</b>: `
-        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+      x += `<div class="kbm"><b>${E(k)}</b>: ${DEEP(v)}</div>`;
     }
     // ONE name for this section on every node. It used to render flat, as "epistemic status", when
     // the node had nothing else -- a special case I invented to avoid a disclosure over a single
@@ -923,8 +944,7 @@ PROPERTY_PANEL = r"""
     let rest = '';
     for(const [k, v] of Object.entries(p)){
       if(['because','state','note','why','inputs'].includes(k) || v == null) continue;
-      rest += `<div class="kbm"><b>${E(k)}</b>: `
-        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+      rest += `<div class="kbm"><b>${E(k)}</b>: ${DEEP(v)}</div>`;
     }
     return h + (rest ? sec('other properties', rest) : '');
   };
@@ -1676,7 +1696,13 @@ KIND_BY_PREFIX = {
     "property:role": "role axis",
     "procedure:indicator-": "indicator",
     "procedure:signal-": "signal",
+    # A computation the knowledge base states but the library does not implement -- a formula with
+    # typed inputs and outputs and no code behind it. Distinct from `indicator` on purpose: the
+    # difference between "you can call this" and "this is written down" is the whole point.
+    "procedure:": "formula",
     "schema:": "schema",
+    "fact:": "fact",
+    "judgment:": "judgment",
     "object:": "root:knowledge-graph",
 }
 

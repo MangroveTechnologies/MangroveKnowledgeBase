@@ -21,19 +21,20 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 309, 1055
-s["primitives"]                 # {'Procedure': 289, 'Concept': 9, 'Property': 3, ...}
-s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 222, ...}
-s["classes"]                    # the six character classes -- what find(kind=) is for
+s["nodes"], s["edges"]          # 361, 1111
+s["primitives"]                 # {'Procedure': 304, 'Concept': 44, 'Property': 3, ...}
+s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 240, ...}
+s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  309 1055
-primitives    {'Procedure': 289, 'Concept': 9, 'Property': 3, 'Object': 1, 'Schema': 1}
-relations     {'instance-of': 360, 'uses': 233, 'about': 222, 'has-role': 218,
-               'kind-of': 8, 'part-of': 6, 'supersedes': 2}
+nodes, edges  361 1111
+primitives    {'Procedure': 304, 'Concept': 44, 'Property': 3, 'Object': 1, 'Schema': 1,
+               'Fact': 1, 'Judgment': 1}
+relations     {'instance-of': 360, 'uses': 233, 'about': 240, 'has-role': 218,
+               'kind-of': 31, 'part-of': 27, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:oscillator', 'concept:pattern',
                'concept:volatility']
@@ -41,7 +42,7 @@ roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 12 shapes in total]
+               ... 14 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
@@ -51,7 +52,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (296 of 309) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (301 of 361) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -257,7 +258,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 309 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 361 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 ---
@@ -354,7 +355,7 @@ kg.outputs("histogram", limit=None)
 #   'macd minus signal. Crosses zero exactly when macd crosses it'
 ```
 
-The other filters are `units=` (`kg.stats()["units"]` enumerates them; `percent` matches 26) and
+The other filters are `units=` (`kg.stats()["units"]` enumerates them; `percent` matches 28) and
 `bounded=False` for the unbounded tail.
 
 **Trap:** `units=` is an exact match against a deliberately heterogeneous vocabulary — a unit is a
@@ -381,12 +382,13 @@ deprecated        2    procedure:signal-hanging-man-trigger
                        procedure:signal-shooting-star-trigger
 ```
 
-Both vocabularies are enumerable — `stats()["input_columns"]` is `close, high, indicator, low, open,
-price, volume`, and `stats()["statuses"]` is `deprecated, ratified`. Use case 7 checks deprecation on
+Both vocabularies are enumerable — `stats()["input_columns"]` runs from the implemented
+indicators' columns (`close, high, low, open, volume`) to the terms the chapter formulas declare
+(`bid`, `ask`, `adv`, `order_size`, …), and `stats()["statuses"]` is `draft, deprecated, ratified`. Use case 7 checks deprecation on
 a node you already suspect; this is the sweep that finds the ones you did not.
 
 **Trap:** a guessed value raises rather than returning an empty result. `find(requires="vwap")` is a
-`GraphError` naming the seven real columns, not a quiet zero you would read as "nothing needs it".
+`GraphError` naming the real columns, not a quiet zero you would read as "nothing needs it".
 
 ---
 

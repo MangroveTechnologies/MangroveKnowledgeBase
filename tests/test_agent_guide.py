@@ -39,8 +39,8 @@ def test_guide_exists_and_covers_thirteen_use_cases(guide):
 def test_uc1_orientation_values(kg, guide):
     s = kg.stats()
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
-    assert len(kg.schema()) == 12, "the guide says '12 shapes in total'"
-    assert "12 shapes in total" in guide
+    assert len(kg.schema()) == 14, "the guide says '14 shapes in total'"
+    assert "14 shapes in total" in guide
     for c in s["classes"]:                    # every class the guide lists must still exist
         assert c in guide, f"guide's class list is missing {c}"
 
@@ -148,7 +148,7 @@ def test_uc9_output_index(kg, guide):
     assert hist[0]["description"].startswith("macd minus signal. Crosses zero exactly when macd")
     assert hist[0]["description"][:60] in guide
 
-    assert kg.outputs(units="percent", limit=None).total == 26 and "percent` matches 26" in guide
+    assert kg.outputs(units="percent", limit=None).total == 28 and "percent` matches 28" in guide
     # The guide's trap rests on SwingDelta's unit being DEFERRED -- it is whatever the companion
     # indicator carries. If that ever became a concrete unit the trap would be misinformation.
     assert {r["id"] for r in kg.outputs(units="indicator units", limit=None)} == \
@@ -164,10 +164,15 @@ def test_uc10_status_and_requires(kg, guide):
     vol = kg.find(requires="volume", role="trigger", limit=None)
     assert vol.total == 8 and "volume triggers   8" in guide
 
-    assert kg.stats()["input_columns"] == ["close", "high", "indicator", "low", "open",
-                                           "price", "volume"]
-    assert kg.stats()["statuses"] == ["deprecated", "ratified"]
-    assert "close, high, indicator, low, open," in guide and "deprecated, ratified" in guide
+    # The implemented indicators' columns are the ones a caller reaches for, and they must stay
+    # enumerable. The list is no longer closed at seven -- every chapter formula declares its own
+    # terms (`bid`, `ask`, `adv`) -- so this asserts the OHLCV core is intact rather than pinning a
+    # literal that grows with each chapter and says nothing when it changes.
+    cols = kg.stats()["input_columns"]
+    assert {"close", "high", "low", "open", "volume"} <= set(cols)
+    assert cols == sorted(cols), "the column vocabulary must be ordered to be readable"
+    assert kg.stats()["statuses"] == ["deprecated", "draft", "ratified"]
+    assert "close, high, low, open, volume" in guide and "draft, deprecated, ratified" in guide
 
 
 def test_every_documented_example_actually_runs():

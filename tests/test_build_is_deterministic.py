@@ -42,21 +42,40 @@ def _code_derived(graph):
     """The committed record is the code build plus the wiki merge. This strips the second half.
 
     Determinism is a claim about the builder: given the tree, it reproduces what it wrote. The
-    doc-derived nodes are not its output and it has never heard of them, so including them here
-    would assert the builder produces something it does not. They have their own guard --
-    `test_doc_derived_atoms.py` fails if the merge is skipped, which is the failure this test
-    would otherwise be mistaken for.
+    doc-derived nodes -- the hand-authored wiki and every parsed chapter -- are not its output and
+    it has never heard of them, so including them here would assert the builder produces something
+    it does not. They have their own guard -- `test_doc_derived_atoms.py` fails if the merge is
+    skipped, which is the failure this test would otherwise be mistaken for.
     """
-    doc = set(graph["meta"].get("doc_atom_ids", ()))
+    doc = set(graph["meta"].get("derived_atom_ids", ()))
+    # Edges are subtracted by identity, not by endpoint: a doc source can draw an edge BETWEEN two
+    # code-derived nodes (ATR --about--> volatility), which no endpoint filter would catch.
+    added = {tuple(x) for x in graph["meta"].get("derived_relations", ())}
     return ({a["id"]: a for a in graph["atoms"] if a["id"] not in doc},
-            [r for r in graph["relations"] if r["from_id"] not in doc and r["to_id"] not in doc])
+            [r for r in graph["relations"]
+             if r["from_id"] not in doc and r["to_id"] not in doc
+             and (r["from_id"], r["rel"], r["to_id"]) not in added])
 
 
 def test_atoms_are_reproduced_exactly(rebuilt, committed):
     got = {a["id"]: a for a in rebuilt["atoms"]}
     want, _ = _code_derived(committed)
     assert set(got) == set(want), "the node SET changed"
-    differing = [i for i in want if got[i] != want[i]]
+    # A folded atom is the builder's, plus props a doc source added to it. Equality would report
+    # every fold as a determinism break; a subset check still catches the builder changing or
+    # losing anything of its own, which is what this guards.
+    folded = set(committed["meta"].get("folded_atom_ids", ()))
+    for i in folded & set(want):
+        for k, v in got[i]["props"].items():
+            held = want[i]["props"].get(k, ...)
+            # A list-valued prop may be EXTENDED by a fold -- `reference_chapter` gains the
+            # chapter that also documents the node -- but never reordered or stripped.
+            ok = held == v or (isinstance(v, list) and isinstance(held, list)
+                               and held[:len(v)] == v)
+            assert ok, f"{i}.{k}: the fold changed a value the builder wrote, it did not only add"
+        assert {k: v for k, v in got[i].items() if k != "props"} == \
+               {k: v for k, v in want[i].items() if k != "props"}, f"{i}: a builder field changed"
+    differing = [i for i in want if i not in folded and got[i] != want[i]]
     assert not differing, (
         f"{len(differing)} atoms differ, e.g. {differing[:3]}\n"
         + "\n".join(f"  {i}: {json.dumps(got[i])[:200]}" for i in differing[:2]))

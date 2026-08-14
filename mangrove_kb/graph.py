@@ -6,7 +6,7 @@ part each signal plays in a strategy. It is generated from the source, so it is 
 extracted -- there is no text-mining noise to rank around.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (218 of 309 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (218 of 361 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -102,7 +102,11 @@ SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
     ("summary",),
     ("formula", "reference", "interpretation", "applications",
      "inputs", "params", "outputs",           # slot NAMES and their descriptions
-     "explanation"),                          # the doc-derived body (see `reference_chapter`)
+     "explanation",                           # the doc-derived body (see `reference_chapter`)
+     # A chapter node's content IS these lists -- 39 principles, 50 practices, the worked examples.
+     # Leaving them out made `find("mean reversion")` miss the node that states it, which is the
+     # exact false negative SEARCH_TIERS was widened to prevent.
+     "principles", "practices", "examples"),
 )
 
 #: Where the graph is looked for, in order. An explicit path always wins; ``MANGROVE_KB_ONTOLOGY``
@@ -358,7 +362,7 @@ class KnowledgeGraph:
 
         This deliberately does **not** return every node the backbone points at. That set also holds
         ``concept:indicator`` (71 results), ``concept:signal`` (218), ``concept:technical-analysis``
-        (296 of 309 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
+        (301 of 361 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
         class vocabulary invites a filter that looks like a query and returns almost everything.
         They remain legal ``kind=`` arguments, and :meth:`find` documents them; they are just not
         classes.
@@ -561,7 +565,7 @@ class KnowledgeGraph:
         The other operations answer questions about a node's place in the graph. This one answers
         questions about the values themselves -- *what produces an output called* ``histogram``,
         *which computations emit a percentage*, *which are bounded and therefore comparable on one
-        axis*. Those were previously reachable only by fetching all 309 nodes and looping, which is
+        axis*. Those were previously reachable only by fetching all 361 nodes and looping, which is
         why they were not being asked.
 
         A row is an **output**, not a node: an indicator with three outputs contributes three rows,

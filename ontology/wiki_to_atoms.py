@@ -127,7 +127,7 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
             raise MergeError(f"{page['file']}: no Summary section -- every new node needs one")
         props = {}
         if page["chapter"]:
-            props["reference_chapter"] = page["chapter"]
+            props["reference_chapter"] = [page["chapter"]]
         # The body is the node's content, not decoration: for a doc-derived node it plays the part
         # formula/params/outputs play for a computation, and `graph.SEARCH_TIERS` reads it in the
         # same tier. Dropping it would leave `find("head and shoulders")` empty on the very page
@@ -172,6 +172,15 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
               # too, because it says which chapter DOCUMENTS a node, not where the node came from.
               "meta": {**onto["meta"], "doc_atoms": len(new_atoms),
                        "doc_atom_ids": sorted(a["id"] for a in new_atoms),
+                       # Every atom the code builder did not produce, from EVERY derived source.
+                       # The determinism test splits the record on this one key, so a second
+                       # source that forgot to append would look like a builder regression.
+                       "derived_atom_ids": sorted(
+                           set(onto["meta"].get("derived_atom_ids", ()))
+                           | {a["id"] for a in new_atoms}),
+                       "derived_relations": sorted(
+                           {tuple(x) for x in onto["meta"].get("derived_relations", ())}
+                           | {(r["from_id"], r["rel"], r["to_id"]) for r in new_rels}),
                        "doc_relations": len(new_rels), "doc_anchors": sorted(anchors)}}
     return merged, {"new_atoms": new_atoms, "new_relations": new_rels, "anchors": anchors}
 

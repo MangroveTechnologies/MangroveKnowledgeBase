@@ -17,7 +17,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -28,7 +30,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -39,7 +43,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "04-strategy-design-modeling"
+    "reference_chapter": [
+     "04-strategy-design-modeling"
+    ]
    }
   },
   {
@@ -50,7 +56,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -61,7 +69,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -72,7 +82,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -83,7 +95,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -94,7 +108,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -105,7 +121,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -116,18 +134,30 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
    "id": "concept:volatility",
    "title": "volatility",
    "kind": "Concept",
-   "summary": "Measures observed dispersion -- distance, width, or range.",
+   "summary": "Dispersion of returns -- how far price moves from its own average, conventionally standard deviation or variance. As a character a computation measures, it is observed distance, width, or range.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators",
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Adjusting position sizes based on current volatility regime",
+     "Switching strategy parameters or entire strategies based on detected regime",
+     "Setting dynamic stop-losses using volatility-adjusted levels",
+     "Forecasting future volatility for options pricing and risk management",
+     "Identifying regime shifts for tactical allocation changes"
+    ]
    }
   },
   {
@@ -138,7 +168,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "06-indicators"
+    "reference_chapter": [
+     "06-indicators"
+    ]
    }
   },
   {
@@ -149,7 +181,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "07-chart-patterns"
+    "reference_chapter": [
+     "07-chart-patterns"
+    ]
    }
   },
   {
@@ -501,6 +535,12 @@
       "canonical_name": "Average True Range",
       "description": "Wilder-smoothed mean of the true range. Seeded with the arithmetic mean of the first `window` true-range values, then smoothed by ewm(alpha=1/window) -- Wilder's original recurrence, not an ordinary EMA. In the instrument's own price units, so NOT comparable across instruments or price levels; use NATR for that. WARMUP CAVEAT: bars 0..window-2 are filled with literal 0.0 rather than NaN, so a zero here means 'not yet computed' and is indistinguishable from genuine zero volatility -- mask the first window-1 bars before consuming this series"
      }
+    },
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "chapter_variants": {
+     "formula": "TR = max(High - Low, |High - Previous Close|, |Low - Previous Close|)\nATR = EMA(TR, n periods)"
     }
    }
   },
@@ -4476,7 +4516,7 @@
      "Positive TRIX: Bullish momentum",
      "Negative TRIX: Bearish momentum",
      "Zero line crossovers signal trend changes",
-     "Very smooth—filters out most noise"
+     "Very smooth\u2014filters out most noise"
     ],
     "applications": [
      "Trend-following momentum with heavy noise suppression, for instruments where MACD whipsaws",
@@ -17428,7 +17468,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "07-chart-patterns",
+    "reference_chapter": [
+     "07-chart-patterns"
+    ],
     "explanation": "Multi-bar formations: head and shoulders, double tops and bottoms, triangles, wedges, flags and pennants, cup and handle, and the necklines and completion criteria that define them. Also pattern reliability and failure modes, and the context a formation requires to mean anything. Sibling of the existing pattern class, not a parent of it and not the same thing. That class holds candlestick geometry -- shapes computable from one bar or a small fixed number of them, which is why 41 signals implement it. A chart pattern needs a swing structure of unknown length, and no computation in the library produces swing points, so this class carries no procedures. It is the first class in the graph that is knowledge without an implementation."
    }
   },
@@ -17440,7 +17482,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "01-market-foundations",
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
     "explanation": "Market microstructure, order types, participant classes, liquidity and its price -- slippage and market impact -- volatility regimes and the shifts between them, trading venues and their execution models, bid-ask spread dynamics, and price discovery. This is the layer every computation in the graph silently assumes. An indicator consumes a price series; this subject area is where that series comes from."
    }
   },
@@ -17452,7 +17496,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "02-instruments-market-mechanics",
+    "reference_chapter": [
+     "02-instruments-market-mechanics"
+    ],
     "explanation": "Spot markets, futures and perpetual swaps, options, margin and leverage and the liquidation engines that enforce them, crypto-specific mechanics, FX basics, settlement and clearing, and contract specifications. Distinct from market foundations: that subject area covers how a price forms, this one covers what is actually being traded and under whose rules."
    }
   },
@@ -17464,7 +17510,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "03-core-trading-concepts",
+    "reference_chapter": [
+     "03-core-trading-concepts"
+    ],
     "explanation": "Price action theory, market structure, trend versus range and compression versus expansion, liquidity theory, volume and order flow, support and resistance, supply and demand zones, multi-timeframe analysis, confluence, fair value gaps, and volume profile. Deliberately kept beside technical analysis rather than beneath it. Technical analysis is organised in this graph by what a computation *measures*, and its six subclasses are exactly those characters; price action names conclusions drawn from price geometry rather than a character a computation measures, so placing it there would misuse that axis."
    }
   },
@@ -17476,7 +17524,9 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "08-quantitative-analysis",
+    "reference_chapter": [
+     "08-quantitative-analysis"
+    ],
     "explanation": "Seasonality and time-of-day effects, volatility clustering, mean reversion, breakout behaviour, autocorrelation and momentum persistence, machine-learned patterns, cross-sectional versus time-series effects, and carry. Where technical analysis classifies a computation by what it measures, this subject area is about the properties of the series being measured -- the evidence that a given class of computation has anything to find."
    }
   },
@@ -17488,8 +17538,1246 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_chapter": "05-risk-management",
+    "reference_chapter": [
+     "05-risk-management"
+    ],
     "explanation": "Risk dimensions in strategy design, trading rules and protocols, position sizing, drawdown controls, stop-loss and take-profit engineering, portfolio risk, capital efficiency, risk-reward ratios, risk of ruin, and scenario analysis. Signals decide whether to act; this subject area decides at what size and under what limits, and it constrains a strategy independently of which signals it composes."
+   }
+  },
+  {
+   "id": "concept:market-microstructure",
+   "title": "market microstructure",
+   "kind": "Concept",
+   "summary": "The mechanics by which orders become trades and trades become prices: the matching rules, order flow, transaction costs and information asymmetries specific to a market's design.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Designing execution algorithms that minimize transaction costs by understanding order book dynamics",
+     "Analyzing the impact of large trades on market prices before execution",
+     "Identifying informed trading activity through order flow analysis",
+     "Optimizing order placement and timing based on microstructure patterns",
+     "Detecting market manipulation or unusual trading patterns"
+    ],
+    "examples": [
+     "Market microstructure is the study of the processes and mechanisms through which securities are traded, including the dynamics of order flow, price formation, transaction costs, and the behavior of market participants. It examines how the specific trading rules, protocols, and institutional arrangements of a market affect trading outcomes."
+    ]
+   }
+  },
+  {
+   "id": "procedure:effective-spread",
+   "title": "effective spread",
+   "kind": "Procedure",
+   "summary": "Computes effective spread (measures actual execution cost).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Effective Spread = 2 * |Trade Price - Midpoint Price|",
+    "inputs": {
+     "trade_price": {
+      "type": "series",
+      "description": "price actually paid or received"
+     },
+     "midpoint": {
+      "type": "series",
+      "description": "(bid + ask) / 2 at the time"
+     }
+    },
+    "outputs": {
+     "effective_spread": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Effective Spread"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:price-impact",
+   "title": "price impact (kyle lambda)",
+   "kind": "Procedure",
+   "summary": "Computes price impact (kyle lambda).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Delta_P = lambda * Order_Flow",
+    "inputs": {
+     "order_flow": {
+      "type": "series",
+      "description": "signed order flow over the interval"
+     },
+     "lam": {
+      "type": "series",
+      "description": "market price sensitivity to order flow (Kyle lambda)"
+     }
+    },
+    "outputs": {
+     "delta_p": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "Price Impact"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:quoted-spread",
+   "title": "quoted spread",
+   "kind": "Procedure",
+   "summary": "Computes quoted spread.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Quoted Spread = Ask Price - Bid Price\nRelative Spread = (Ask - Bid) / Midpoint * 100%",
+    "inputs": {
+     "bid": {
+      "type": "series",
+      "description": "highest price a buyer will pay"
+     },
+     "ask": {
+      "type": "series",
+      "description": "lowest price a seller will accept"
+     }
+    },
+    "outputs": {
+     "quoted_spread": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Quoted Spread"
+     }
+    }
+   }
+  },
+  {
+   "id": "concept:order-type",
+   "title": "order types",
+   "kind": "Concept",
+   "summary": "Order types are specific instructions traders use to communicate with the market about how they want their trades to be executed. Each order type defines the conditions under which a trade should occur, including price constraints, timing, and execution preferences.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Immediate execution when speed is critical (news events, closing positions urgently)",
+     "Entering or exiting positions at desired prices, providing liquidity",
+     "Protecting positions from adverse moves, triggering entries on breakouts",
+     "Combining stop triggers with price limits to avoid poor fills",
+     "Locking in profits while allowing positions to run"
+    ]
+   }
+  },
+  {
+   "id": "concept:market-order",
+   "title": "market order",
+   "kind": "Concept",
+   "summary": "An instruction to trade immediately at the best price currently available. Execution is certain, the price is not.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Buy 100 shares at the best available price",
+     "Result: Immediate fill at current ask price(s), guaranteed execution, uncertain price"
+    ]
+   }
+  },
+  {
+   "id": "concept:limit-order",
+   "title": "limit order",
+   "kind": "Concept",
+   "summary": "An instruction to trade only at a stated price or better. The price is certain, execution is not; the order rests in the book supplying liquidity until it fills or is cancelled.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Buy 100 shares at $50 or better",
+     "Result: Only fills at $50 or below, may not execute if price never reaches $50"
+    ]
+   }
+  },
+  {
+   "id": "concept:stop-order",
+   "title": "stop order (stop-loss)",
+   "kind": "Concept",
+   "summary": "A resting instruction that becomes a market order once price reaches a trigger level. The trigger is certain, the fill price is not.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Sell 100 shares if price drops to $45",
+     "Result: Becomes a market order when price touches $45, then executes at best available"
+    ]
+   }
+  },
+  {
+   "id": "concept:stop-limit-order",
+   "title": "stop-limit order",
+   "kind": "Concept",
+   "summary": "A stop order that becomes a limit order rather than a market order when triggered, bounding the fill price at the risk of not filling at all in a fast market.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Sell 100 shares if price drops to $45, but not below $44",
+     "Result: Triggers at $45, but only fills at $44 or better (may not fill in fast markets)"
+    ]
+   }
+  },
+  {
+   "id": "concept:trailing-stop",
+   "title": "trailing stop",
+   "kind": "Concept",
+   "summary": "A stop whose trigger follows price at a fixed distance in the favourable direction only, locking in gain while leaving the position room to run.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Sell if price drops $2 from its highest point since order placed",
+     "Result: Stop level adjusts upward as price rises, locks in gains"
+    ]
+   }
+  },
+  {
+   "id": "concept:iceberg-order",
+   "title": "iceberg order",
+   "kind": "Concept",
+   "summary": "A large order that displays only part of its size at a time, refreshing as each slice fills, to reduce the information leakage and impact of showing full size.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Buy 10,000 shares but only display 500 at a time",
+     "Result: Hides true order size to minimize market impact"
+    ]
+   }
+  },
+  {
+   "id": "concept:market-participant",
+   "title": "market participants",
+   "kind": "Concept",
+   "summary": "Market participants are individuals, institutions, or entities engaged in the buying and selling of financial instruments within a market. Each participant type has distinct motivations, time horizons, information sets, and trading behaviors that collectively shape market dynamics.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Identifying which participant types are active to anticipate market behavior",
+     "Understanding the \"food chain\" of market participants to avoid being exploited",
+     "Analyzing institutional order flow for directional signals",
+     "Recognizing market maker behavior patterns around key levels"
+    ]
+   }
+  },
+  {
+   "id": "concept:retail-trader",
+   "title": "retail traders",
+   "kind": "Concept",
+   "summary": "Individual investors trading for personal accounts Typically smaller position sizes, longer holding periods Often use technical analysis, may exhibit behavioral biases Tend to be net liquidity takers",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:institutional-investor",
+   "title": "institutional investors",
+   "kind": "Concept",
+   "summary": "Mutual funds, pension funds, insurance companies, endowments Large position sizes requiring careful execution over time Focus on fundamental analysis, longer time horizons Create significant market impact when repositioning",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:market-maker",
+   "title": "market makers",
+   "kind": "Concept",
+   "summary": "Provide continuous two-sided quotes (bid and ask) Profit from the bid-ask spread while managing inventory risk Obligated to provide liquidity in exchange markets Use sophisticated algorithms to manage quotes and hedge exposure",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:high-frequency-trader",
+   "title": "high-frequency traders (hft)",
+   "kind": "Concept",
+   "summary": "Use ultra-low latency technology for speed advantage Strategies include market making, arbitrage, latency arbitrage Hold positions for milliseconds to seconds Provide significant liquidity but can withdraw in stress",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:arbitrageur",
+   "title": "arbitrageurs",
+   "kind": "Concept",
+   "summary": "Exploit price discrepancies between related instruments ETF-underlying arbitrage, cross-exchange arbitrage, statistical arbitrage Force prices toward efficiency Generally market-neutral with hedged positions",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:hedge-fund",
+   "title": "hedge funds",
+   "kind": "Concept",
+   "summary": "Pursue diverse strategies: long/short equity, macro, quantitative Aggressive risk-taking with leverage Shorter time horizons than traditional asset managers Can be liquidity providers or aggressive liquidity takers",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:proprietary-trading-firm",
+   "title": "proprietary trading firms",
+   "kind": "Concept",
+   "summary": "Trade firm capital using systematic or discretionary strategies Often specialize in specific markets or strategies May operate HFT or longer-term systematic strategies No external investor constraints",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:liquidity",
+   "title": "liquidity",
+   "kind": "Concept",
+   "summary": "The ease with which an asset can be bought or sold without significantly affecting its price. High liquidity implies tight spreads, deep order books, and minimal price impact.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Estimating realistic execution costs for strategy backtesting",
+     "Determining optimal order sizing based on available liquidity",
+     "Choosing execution algorithms (TWAP, VWAP, Implementation Shortfall)",
+     "Identifying low-liquidity periods to avoid or exploit",
+     "Stress-testing strategies for liquidity withdrawal scenarios"
+    ]
+   }
+  },
+  {
+   "id": "concept:slippage",
+   "title": "slippage",
+   "kind": "Concept",
+   "summary": "The difference between the expected price of a trade and the actual executed price, typically caused by market movement or insufficient liquidity.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Slippage Example: Expected buy price: $100.00 (midpoint) Market order for 1,000 shares Actual average fill: $100.15 Slippage: $0.15 per share ($150 total)"
+    ]
+   }
+  },
+  {
+   "id": "concept:market-impact",
+   "title": "market impact",
+   "kind": "Concept",
+   "summary": "The effect that a trader's own order has on the market price of an asset, caused by consuming available liquidity.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "examples": [
+     "Market Impact Example: Order: Buy 50,000 shares of a stock with 100,000 average daily volume Pre-trade price: $50.00 Execution over 2 hours raises price to $50.80 during buying Price settles to $50.50 after completion Temporary impact: $0.30 (reversed) Permanent impact: $0.50 (persisted)"
+    ]
+   }
+  },
+  {
+   "id": "procedure:simple-slippage",
+   "title": "simple slippage",
+   "kind": "Procedure",
+   "summary": "Computes simple slippage.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Slippage = Actual Execution Price - Expected Price\nSlippage % = Slippage / Expected Price * 100%",
+    "inputs": {
+     "execution_price": {
+      "type": "series",
+      "description": "average price actually filled"
+     },
+     "expected_price": {
+      "type": "series",
+      "description": "price expected"
+     }
+    },
+    "outputs": {
+     "slippage": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "Slippage"
+     },
+     "slippage_pct": {
+      "type": "series",
+      "units": "percent",
+      "range": [
+       null,
+       null
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:almgren-chriss-market-impact-model",
+   "title": "almgren-chriss market impact model",
+   "kind": "Procedure",
+   "summary": "Computes almgren-chriss market impact model.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Total Cost = Temporary Impact + Permanent Impact + Volatility Risk\n\nTemporary Impact = eta * sigma * (X/V)^(3/5)\nPermanent Impact = gamma * (X/V)",
+    "inputs": {
+     "order_size": {
+      "type": "series",
+      "description": "shares or contracts to execute"
+     },
+     "adv": {
+      "type": "series",
+      "description": "average daily volume"
+     },
+     "sigma": {
+      "type": "series",
+      "description": "daily volatility"
+     },
+     "eta": {
+      "type": "series",
+      "description": "temporary-impact coefficient"
+     },
+     "gamma": {
+      "type": "series",
+      "description": "permanent-impact coefficient"
+     }
+    },
+    "outputs": {
+     "temporary_impact": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       null
+      ]
+     },
+     "permanent_impact": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       null
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:square-root-market-impact-rule",
+   "title": "square root market impact rule (empirical)",
+   "kind": "Procedure",
+   "summary": "Computes square root market impact rule (empirical).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Impact = constant * sigma * sqrt(X / V)",
+    "inputs": {
+     "order_size": {
+      "type": "series",
+      "description": "shares or contracts to execute"
+     },
+     "adv": {
+      "type": "series",
+      "description": "average daily volume"
+     },
+     "sigma": {
+      "type": "series",
+      "description": "daily volatility"
+     }
+    },
+    "outputs": {
+     "impact": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Square-Root Impact"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:participation-rate",
+   "title": "participation rate",
+   "kind": "Procedure",
+   "summary": "Computes participation rate.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Participation Rate = Order Size / (ADV * Trading Duration in Days)",
+    "inputs": {
+     "order_size": {
+      "type": "series",
+      "description": "shares or contracts to execute"
+     },
+     "adv": {
+      "type": "series",
+      "description": "average daily volume"
+     },
+     "duration_days": {
+      "type": "series",
+      "description": "execution horizon in days"
+     }
+    },
+    "outputs": {
+     "participation_rate": {
+      "type": "series",
+      "units": "fraction",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "Participation Rate"
+     }
+    }
+   }
+  },
+  {
+   "id": "concept:market-regime",
+   "title": "market regimes",
+   "kind": "Concept",
+   "summary": "Distinct periods characterized by specific volatility patterns, trend behaviors, or correlation structures.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:regime-shift",
+   "title": "regime shifts",
+   "kind": "Concept",
+   "summary": "Transitions between different market regimes, often triggered by changes in fundamental conditions, sentiment, or structural factors.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:low-volatility-regime",
+   "title": "low volatility regime",
+   "kind": "Concept",
+   "summary": "VIX below 15 Tight trading ranges, mean-reverting price action Low correlations between assets Carry strategies and short volatility strategies perform well Trend-following strategies underperform",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:high-volatility-regime",
+   "title": "high volatility regime",
+   "kind": "Concept",
+   "summary": "VIX above 25-30 Large daily moves, trend persistence Elevated correlations (risk-on/risk-off behavior) Momentum and trend-following strategies perform well Mean reversion strategies suffer",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "procedure:historical-volatility",
+   "title": "historical volatility (standard deviation of returns)",
+   "kind": "Procedure",
+   "summary": "Computes historical volatility (standard deviation of returns).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "sigma = sqrt(1/(n-1) * sum((r_i - r_bar)^2))\n\nAnnualized Vol = Daily Vol * sqrt(252)",
+    "inputs": {
+     "returns": {
+      "type": "series",
+      "description": "periodic returns series"
+     },
+     "periods": {
+      "type": "series",
+      "description": "periods per year for annualisation"
+     }
+    },
+    "outputs": {
+     "sigma": {
+      "type": "series",
+      "units": "fraction",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Historical Volatility"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:garch-model",
+   "title": "garch(1,1) model (volatility forecasting)",
+   "kind": "Procedure",
+   "summary": "Computes garch(1,1) model (volatility forecasting).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "sigma_t^2 = omega + alpha * epsilon_(t-1)^2 + beta * sigma_(t-1)^2",
+    "inputs": {
+     "returns": {
+      "type": "series",
+      "description": "periodic returns series"
+     },
+     "omega": {
+      "type": "series",
+      "description": "long-run variance weight"
+     },
+     "alpha": {
+      "type": "series",
+      "description": "reaction to recent shocks"
+     },
+     "beta": {
+      "type": "series",
+      "description": "persistence of volatility"
+     }
+    },
+    "outputs": {
+     "sigma2": {
+      "type": "series",
+      "units": "variance",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Conditional Variance"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:volatility-ratio",
+   "title": "volatility ratio (regime detection)",
+   "kind": "Procedure",
+   "summary": "Computes volatility ratio (regime detection).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Vol Ratio = Short-term Vol / Long-term Vol",
+    "inputs": {
+     "short_vol": {
+      "type": "series",
+      "description": "short-window volatility"
+     },
+     "long_vol": {
+      "type": "series",
+      "description": "long-window volatility"
+     }
+    },
+    "outputs": {
+     "vol_ratio": {
+      "type": "series",
+      "units": "ratio",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Volatility Ratio"
+     }
+    }
+   }
+  },
+  {
+   "id": "concept:trading-venue",
+   "title": "trading venues",
+   "kind": "Concept",
+   "summary": "Platforms or marketplaces where financial instruments are bought and sold, including exchanges, alternative trading systems, and over-the-counter markets.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Routing orders to venues with best price and liquidity",
+     "Using dark pools for large orders to minimize information leakage",
+     "Accessing specific participant pools (retail, institutional)",
+     "Arbitraging price differences across venues",
+     "Selecting venues based on fee structures (maker-taker, payment for order flow)"
+    ]
+   }
+  },
+  {
+   "id": "concept:execution-model",
+   "title": "execution models",
+   "kind": "Concept",
+   "summary": "Methods and protocols by which trades are matched and executed, varying by transparency, speed, and participant access.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:lit-exchange",
+   "title": "lit exchanges (nyse, nasdaq, lse)",
+   "kind": "Concept",
+   "summary": "Full pre-trade transparency (visible order book) Price-time priority for order matching Regulatory oversight and surveillance Best for price discovery and transparent execution",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:dark-pool",
+   "title": "dark pools",
+   "kind": "Concept",
+   "summary": "No pre-trade transparency (orders hidden until execution) Match large orders without market impact May offer midpoint pricing Used by institutional investors for block trades",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:electronic-communication-network",
+   "title": "electronic communication networks (ecns)",
+   "kind": "Concept",
+   "summary": "Automated matching of buy and sell orders Often offer extended trading hours Direct access without intermediaries Variable fee structures",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:over-the-counter-market",
+   "title": "over-the-counter (otc) markets",
+   "kind": "Concept",
+   "summary": "Direct dealer-to-dealer or dealer-to-client trading Common for bonds, derivatives, FX Customizable contract terms Less standardization, more counterparty risk",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:internalization",
+   "title": "internalization",
+   "kind": "Concept",
+   "summary": "Broker fills customer order from own inventory No exchange fees, potentially faster execution Potential conflicts of interest Subject to best execution requirements",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:bid-ask-spread",
+   "title": "bid-ask spread dynamics",
+   "kind": "Concept",
+   "summary": "The bid-ask spread is the difference between the highest price a buyer is willing to pay (bid) and the lowest price a seller is willing to accept (ask). It represents the cost of immediacy and compensates liquidity providers for their services and risks.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Measuring transaction costs and market efficiency",
+     "Identifying periods of market stress or uncertainty",
+     "Comparing liquidity across different assets",
+     "Evaluating execution quality",
+     "Detecting unusual market conditions"
+    ],
+    "examples": [
+     "Tight Spread (Liquid Market): Asset: SPY ETF Bid: $450.00 Ask: $450.01 Spread: $0.01 (0.002%) Indication: Highly liquid, low transaction cost",
+     "Wide Spread (Illiquid Market): Asset: Small-cap stock Bid: $12.50 Ask: $12.80 Spread: $0.30 (2.4%) Indication: Illiquid, high transaction cost",
+     "Spread Widening Event: Normal spread: $0.02 Pre-earnings announcement: $0.08 Post-earnings (uncertainty resolved): $0.02 Interpretation: Market makers charged premium for uncertainty"
+    ]
+   }
+  },
+  {
+   "id": "procedure:relative-spread",
+   "title": "relative spread (percentage)",
+   "kind": "Procedure",
+   "summary": "Computes relative spread (percentage).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Relative Spread = (Ask - Bid) / Midpoint * 100%\nMidpoint = (Bid + Ask) / 2",
+    "inputs": {
+     "bid": {
+      "type": "series",
+      "description": "highest price a buyer will pay"
+     },
+     "ask": {
+      "type": "series",
+      "description": "lowest price a seller will accept"
+     }
+    },
+    "outputs": {
+     "relative_spread": {
+      "type": "series",
+      "units": "percent",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Relative Spread"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:realized-spread",
+   "title": "realized spread (market maker profit after price movement)",
+   "kind": "Procedure",
+   "summary": "Computes realized spread (market maker profit after price movement).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Realized Spread = 2 * D * (Trade Price - Midpoint after t)",
+    "inputs": {
+     "trade_price": {
+      "type": "series",
+      "description": "price actually paid or received"
+     },
+     "midpoint_after": {
+      "type": "series",
+      "description": "midpoint a fixed interval after the trade"
+     },
+     "direction": {
+      "type": "series",
+      "description": "+1 buyer-initiated, -1 seller-initiated"
+     }
+    },
+    "outputs": {
+     "realized_spread": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       null,
+       null
+      ],
+      "canonical_name": "Realized Spread"
+     }
+    }
+   }
+  },
+  {
+   "id": "concept:price-discovery",
+   "title": "price discovery mechanisms",
+   "kind": "Concept",
+   "summary": "Price discovery is the process by which market prices are determined through the interaction of buyers and sellers. It encompasses the mechanisms through which information is incorporated into prices, reflecting the collective assessment of an asset's value.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "applications": [
+     "Identifying which market or venue leads price discovery",
+     "Understanding how information flows into prices",
+     "Timing trades around information events",
+     "Designing strategies that exploit slow price discovery",
+     "Evaluating market efficiency"
+    ]
+   }
+  },
+  {
+   "id": "concept:auction-based-discovery",
+   "title": "auction-based discovery",
+   "kind": "Concept",
+   "summary": "Opening/closing auctions aggregate orders to set a single clearing price Reduces volatility by batching orders Used for price-setting in many equity markets",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:continuous-trading-discovery",
+   "title": "continuous trading discovery",
+   "kind": "Concept",
+   "summary": "Prices update tick-by-tick as orders match Provides real-time price information Can be noisy in thin markets",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "concept:cross-market-discovery",
+   "title": "cross-market discovery",
+   "kind": "Concept",
+   "summary": "Futures often lead spot price discovery Options markets embed volatility expectations ADRs and local shares influence each other ETFs and underlying baskets arbitrage to equilibrium",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ]
+   }
+  },
+  {
+   "id": "procedure:information-share",
+   "title": "information share (hasbrouck)",
+   "kind": "Procedure",
+   "summary": "Computes information share (hasbrouck).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Information Share = Var(market_i contribution to efficient price) / Var(total efficient price)",
+    "inputs": {
+     "variance_contribution": {
+      "type": "series",
+      "description": "variance of this market's contribution to the efficient price"
+     },
+     "variance_total": {
+      "type": "series",
+      "description": "variance of the total efficient price"
+     }
+    },
+    "outputs": {
+     "information_share": {
+      "type": "series",
+      "units": "fraction",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "Information Share"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:component-share",
+   "title": "component share",
+   "kind": "Procedure",
+   "summary": "Computes component share.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Component Share = Var(permanent price impact from market_i) / Var(total permanent price impact)",
+    "inputs": {
+     "permanent_impact_market": {
+      "type": "series",
+      "description": "permanent price impact from this market"
+     },
+     "permanent_impact_total": {
+      "type": "series",
+      "description": "total permanent price impact"
+     }
+    },
+    "outputs": {
+     "component_share": {
+      "type": "series",
+      "units": "fraction",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "Component Share"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:price-efficiency-ratio",
+   "title": "price efficiency ratio",
+   "kind": "Procedure",
+   "summary": "Computes price efficiency ratio.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "formula": "Efficiency = Variance(Returns over long horizon) / (n * Variance(Returns over short horizon))",
+    "inputs": {
+     "var_long": {
+      "type": "series",
+      "description": "return variance over the long horizon"
+     },
+     "var_short": {
+      "type": "series",
+      "description": "return variance over the short horizon"
+     },
+     "n": {
+      "type": "series",
+      "description": "horizon ratio"
+     }
+    },
+    "outputs": {
+     "efficiency": {
+      "type": "series",
+      "units": "ratio",
+      "range": [
+       0,
+       null
+      ],
+      "canonical_name": "Price Efficiency Ratio"
+     }
+    }
+   }
+  },
+  {
+   "id": "fact:01-market-foundations-core-principles",
+   "title": "01 market foundations core principles",
+   "kind": "Fact",
+   "summary": "How the market behaves, as stated across 01-market-foundations: 39 principles.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "principles": [
+     "1.1 Price Discovery: The process by which market prices are determined through the interaction of supply and demand, facilitated by the continuous matching of buy and sell orders",
+     "1.1 Order Flow: The sequence and volume of buy and sell orders entering the market, which drives short-term price movements",
+     "1.1 Information Asymmetry: The unequal distribution of information among market participants, where some traders possess superior information about asset values",
+     "1.1 Transaction Costs: Total costs of trading including explicit costs (commissions, fees) and implicit costs (spread, market impact, timing costs)",
+     "1.1 Market Efficiency: The degree to which prices reflect all available information, influenced by the speed and accuracy of price discovery",
+     "1.2 Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price",
+     "1.2 Conditional Execution: Stop orders become active only when a trigger price is reached",
+     "1.2 Execution Certainty: Different order types offer varying degrees of fill certainty",
+     "1.2 Information Leakage: Some order types reveal trading intentions more than others",
+     "1.3 Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage)",
+     "1.3 Information Hierarchy: Some participants have superior information or analytical capabilities",
+     "1.3 Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade",
+     "1.3 Time Horizon Diversity: Participants operate on different time scales from microseconds to years",
+     "1.3 Adversarial Dynamics: Informed traders seek to profit from uninformed traders",
+     "1.4 Liquidity is Dynamic: Liquidity varies by time of day, market conditions, and asset characteristics",
+     "1.4 Impact is Non-Linear: Market impact grows faster than linearly with order size",
+     "1.4 Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)",
+     "1.4 Urgency-Cost Tradeoff: Faster execution incurs higher market impact; slower execution risks adverse price movement",
+     "1.4 Liquidity Illusion: Displayed liquidity often disappears when tested",
+     "1.5 Volatility Clustering: High volatility tends to follow high volatility; low volatility tends to follow low volatility",
+     "1.5 Mean Reversion of Volatility: While returns are not predictable, volatility tends to revert to long-term averages",
+     "1.5 Regime Persistence: Markets tend to remain in a regime until a significant catalyst triggers a shift",
+     "1.5 Asymmetric Volatility: Volatility increases more on down moves than up moves (leverage effect)",
+     "1.5 Correlation Breakdown: Asset correlations change dramatically across regimes",
+     "1.6 Fragmentation: Modern markets are fragmented across multiple venues, requiring smart order routing",
+     "1.6 Transparency Spectrum: Venues range from fully transparent (lit exchanges) to opaque (dark pools)",
+     "1.6 Best Execution Obligation: Brokers must seek the best available price across venues",
+     "1.6 Latency Competition: Execution speed varies significantly across venues",
+     "1.6 Regulatory Frameworks: Different venues operate under different regulatory requirements",
+     "1.7 Spread as Compensation: Market makers earn the spread as compensation for providing liquidity and bearing inventory risk",
+     "1.7 Information Asymmetry Cost: Spreads widen when market makers fear trading against informed participants",
+     "1.7 Inventory Risk: Spreads reflect the risk of holding inventory that may decline in value",
+     "1.7 Competition Effect: More market makers competing leads to tighter spreads",
+     "1.7 Volatility Relationship: Spreads typically widen during high volatility",
+     "1.8 Information Aggregation: Prices aggregate dispersed information held by many participants",
+     "1.8 Continuous Process: Price discovery occurs continuously as new information arrives",
+     "1.8 Order Flow Information: The sequence and size of orders reveals information",
+     "1.8 Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously",
+     "1.8 Speed of Incorporation: The efficiency of price discovery depends on market structure"
+    ]
+   }
+  },
+  {
+   "id": "judgment:01-market-foundations-best-practices",
+   "title": "01 market foundations best practices",
+   "kind": "Judgment",
+   "summary": "What to do about it, as advised across 01-market-foundations: 50 practices.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "01-market-foundations"
+    ],
+    "practices": [
+     "1.1 Monitor order book depth continuously to assess real-time liquidity conditions",
+     "1.1 Use limit orders to control execution prices when liquidity permits",
+     "1.1 Be aware of the potential impact of large orders on market prices and plan execution accordingly",
+     "1.1 Study the specific microstructure characteristics of each market traded (e.g., tick sizes, trading hours, circuit breakers)",
+     "1.1 Account for all transaction costs when calculating expected strategy returns",
+     "1.2 Use market orders sparingly and only when immediate execution is critical",
+     "1.2 Place limit orders at realistic prices based on current market conditions",
+     "1.2 Set stop-losses based on technical levels or volatility, not arbitrary percentages",
+     "1.2 Understand that stop orders become market orders and may fill at worse prices in fast markets",
+     "1.2 Consider using stop-limit orders in volatile markets to maintain price control",
+     "1.2 Use iceberg orders for large positions to reduce information leakage",
+     "1.3 Understand your position in the market participant hierarchy",
+     "1.3 Recognize that market makers adjust spreads based on perceived information content of orders",
+     "1.3 Monitor institutional activity through volume patterns, dark pool prints, and 13F filings",
+     "1.3 Be aware that HFT can front-run large orders if execution is predictable",
+     "1.3 Trade when your counterparty is likely to be uninformed (e.g., index rebalancing flows)",
+     "1.3 Avoid trading patterns that reveal your strategy to sophisticated participants",
+     "1.4 Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal)",
+     "1.4 Use volume-weighted average price (VWAP) orders for large positions",
+     "1.4 Break large orders into smaller child orders to reduce footprint",
+     "1.4 Avoid trading during illiquid periods (market open, lunch hour, holidays)",
+     "1.4 Build slippage assumptions into backtest and live performance expectations",
+     "1.4 Monitor real-time market depth before executing larger orders",
+     "1.4 Consider using dark pools for large orders to minimize information leakage",
+     "1.5 Monitor volatility indicators (VIX, ATR, realized vs. implied vol) continuously",
+     "1.5 Reduce position sizes and leverage during high volatility regimes",
+     "1.5 Use regime detection filters to enable/disable specific strategies",
+     "1.5 Adapt trading strategies to current market conditions rather than forcing one approach",
+     "1.5 Backtest strategies across multiple regimes to understand performance variation",
+     "1.5 Have predefined plans for regime transitions rather than reacting emotionally",
+     "1.5 Consider that regime shifts often occur faster than regime detection algorithms can identify",
+     "1.6 Use smart order routers (SOR) to access multiple venues simultaneously",
+     "1.6 Select venues based on order characteristics (size, urgency, information sensitivity)",
+     "1.6 Monitor execution quality metrics across venues",
+     "1.6 Understand fee structures (maker-taker rebates can influence routing)",
+     "1.6 Use dark pools strategically for large orders, but verify execution quality",
+     "1.6 Be aware of venue-specific order types and matching rules",
+     "1.6 Consider total cost of execution including fees, spread, and market impact",
+     "1.7 Always check the current spread before trading",
+     "1.7 Use limit orders to avoid paying the full spread",
+     "1.7 Trade during high liquidity periods for tighter spreads",
+     "1.7 Factor spread costs into strategy profitability calculations",
+     "1.7 Monitor spread changes as an indicator of market conditions",
+     "1.7 Avoid trading when spreads are abnormally wide unless necessary",
+     "1.8 Monitor lead-lag relationships between related markets",
+     "1.8 Use pre-market and after-hours trading for early information",
+     "1.8 Understand the price discovery role of derivatives markets",
+     "1.8 Be cautious trading immediately after major information releases",
+     "1.8 Recognize that the first price after news is often not the right price",
+     "1.8 Study auction dynamics for opening and closing trades"
+    ]
    }
   }
  ],
@@ -27497,6 +28785,454 @@
    "why": "subject area of the knowledge space",
    "from_id": "concept:risk-management",
    "to_id": "object:mangrove-knowledge-space"
+  },
+  {
+   "from": "market microstructure",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.1",
+   "from_id": "concept:market-microstructure",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "effective spread",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "quantifies market microstructure",
+   "from_id": "procedure:effective-spread",
+   "to_id": "concept:market-microstructure"
+  },
+  {
+   "from": "price impact (kyle lambda)",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "quantifies market microstructure",
+   "from_id": "procedure:price-impact",
+   "to_id": "concept:market-microstructure"
+  },
+  {
+   "from": "quoted spread",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "quantifies market microstructure",
+   "from_id": "procedure:quoted-spread",
+   "to_id": "concept:market-microstructure"
+  },
+  {
+   "from": "order types",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.2",
+   "from_id": "concept:order-type",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "market order",
+   "rel": "kind-of",
+   "to": "order types",
+   "why": "a kind of order types",
+   "from_id": "concept:market-order",
+   "to_id": "concept:order-type"
+  },
+  {
+   "from": "limit order",
+   "rel": "kind-of",
+   "to": "order types",
+   "why": "a kind of order types",
+   "from_id": "concept:limit-order",
+   "to_id": "concept:order-type"
+  },
+  {
+   "from": "stop order (stop-loss)",
+   "rel": "kind-of",
+   "to": "order types",
+   "why": "a kind of order types",
+   "from_id": "concept:stop-order",
+   "to_id": "concept:order-type"
+  },
+  {
+   "from": "stop-limit order",
+   "rel": "kind-of",
+   "to": "order types",
+   "why": "a kind of order types",
+   "from_id": "concept:stop-limit-order",
+   "to_id": "concept:order-type"
+  },
+  {
+   "from": "trailing stop",
+   "rel": "kind-of",
+   "to": "order types",
+   "why": "a kind of order types",
+   "from_id": "concept:trailing-stop",
+   "to_id": "concept:order-type"
+  },
+  {
+   "from": "iceberg order",
+   "rel": "kind-of",
+   "to": "order types",
+   "why": "a kind of order types",
+   "from_id": "concept:iceberg-order",
+   "to_id": "concept:order-type"
+  },
+  {
+   "from": "market participants",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.3",
+   "from_id": "concept:market-participant",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "retail traders",
+   "rel": "kind-of",
+   "to": "market participants",
+   "why": "a kind of market participants",
+   "from_id": "concept:retail-trader",
+   "to_id": "concept:market-participant"
+  },
+  {
+   "from": "institutional investors",
+   "rel": "kind-of",
+   "to": "market participants",
+   "why": "a kind of market participants",
+   "from_id": "concept:institutional-investor",
+   "to_id": "concept:market-participant"
+  },
+  {
+   "from": "market makers",
+   "rel": "kind-of",
+   "to": "market participants",
+   "why": "a kind of market participants",
+   "from_id": "concept:market-maker",
+   "to_id": "concept:market-participant"
+  },
+  {
+   "from": "high-frequency traders (hft)",
+   "rel": "kind-of",
+   "to": "market participants",
+   "why": "a kind of market participants",
+   "from_id": "concept:high-frequency-trader",
+   "to_id": "concept:market-participant"
+  },
+  {
+   "from": "arbitrageurs",
+   "rel": "kind-of",
+   "to": "market participants",
+   "why": "a kind of market participants",
+   "from_id": "concept:arbitrageur",
+   "to_id": "concept:market-participant"
+  },
+  {
+   "from": "hedge funds",
+   "rel": "kind-of",
+   "to": "market participants",
+   "why": "a kind of market participants",
+   "from_id": "concept:hedge-fund",
+   "to_id": "concept:market-participant"
+  },
+  {
+   "from": "proprietary trading firms",
+   "rel": "kind-of",
+   "to": "market participants",
+   "why": "a kind of market participants",
+   "from_id": "concept:proprietary-trading-firm",
+   "to_id": "concept:market-participant"
+  },
+  {
+   "from": "liquidity",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.4",
+   "from_id": "concept:liquidity",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "slippage",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.4",
+   "from_id": "concept:slippage",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "market impact",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.4",
+   "from_id": "concept:market-impact",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "simple slippage",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "quantifies liquidity",
+   "from_id": "procedure:simple-slippage",
+   "to_id": "concept:liquidity"
+  },
+  {
+   "from": "almgren-chriss market impact model",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "quantifies liquidity",
+   "from_id": "procedure:almgren-chriss-market-impact-model",
+   "to_id": "concept:liquidity"
+  },
+  {
+   "from": "square root market impact rule (empirical)",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "quantifies liquidity",
+   "from_id": "procedure:square-root-market-impact-rule",
+   "to_id": "concept:liquidity"
+  },
+  {
+   "from": "participation rate",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "quantifies liquidity",
+   "from_id": "procedure:participation-rate",
+   "to_id": "concept:liquidity"
+  },
+  {
+   "from": "volatility",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.5",
+   "from_id": "concept:volatility",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "market regimes",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.5",
+   "from_id": "concept:market-regime",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "regime shifts",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.5",
+   "from_id": "concept:regime-shift",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "low volatility regime",
+   "rel": "kind-of",
+   "to": "volatility",
+   "why": "a kind of volatility",
+   "from_id": "concept:low-volatility-regime",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "high volatility regime",
+   "rel": "kind-of",
+   "to": "volatility",
+   "why": "a kind of volatility",
+   "from_id": "concept:high-volatility-regime",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "historical volatility (standard deviation of returns)",
+   "rel": "about",
+   "to": "volatility",
+   "why": "quantifies volatility",
+   "from_id": "procedure:historical-volatility",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "garch(1,1) model (volatility forecasting)",
+   "rel": "about",
+   "to": "volatility",
+   "why": "quantifies volatility",
+   "from_id": "procedure:garch-model",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "ATR",
+   "rel": "about",
+   "to": "volatility",
+   "why": "quantifies volatility",
+   "from_id": "procedure:indicator-atr",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "volatility ratio (regime detection)",
+   "rel": "about",
+   "to": "volatility",
+   "why": "quantifies volatility",
+   "from_id": "procedure:volatility-ratio",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "trading venues",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.6",
+   "from_id": "concept:trading-venue",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "execution models",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.6",
+   "from_id": "concept:execution-model",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "lit exchanges (nyse, nasdaq, lse)",
+   "rel": "kind-of",
+   "to": "trading venues",
+   "why": "a kind of trading venues",
+   "from_id": "concept:lit-exchange",
+   "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "dark pools",
+   "rel": "kind-of",
+   "to": "trading venues",
+   "why": "a kind of trading venues",
+   "from_id": "concept:dark-pool",
+   "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "electronic communication networks (ecns)",
+   "rel": "kind-of",
+   "to": "trading venues",
+   "why": "a kind of trading venues",
+   "from_id": "concept:electronic-communication-network",
+   "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "over-the-counter (otc) markets",
+   "rel": "kind-of",
+   "to": "trading venues",
+   "why": "a kind of trading venues",
+   "from_id": "concept:over-the-counter-market",
+   "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "internalization",
+   "rel": "kind-of",
+   "to": "trading venues",
+   "why": "a kind of trading venues",
+   "from_id": "concept:internalization",
+   "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "bid-ask spread dynamics",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.7",
+   "from_id": "concept:bid-ask-spread",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "quoted spread",
+   "rel": "about",
+   "to": "bid-ask spread dynamics",
+   "why": "quantifies bid-ask spread dynamics",
+   "from_id": "procedure:quoted-spread",
+   "to_id": "concept:bid-ask-spread"
+  },
+  {
+   "from": "relative spread (percentage)",
+   "rel": "about",
+   "to": "bid-ask spread dynamics",
+   "why": "quantifies bid-ask spread dynamics",
+   "from_id": "procedure:relative-spread",
+   "to_id": "concept:bid-ask-spread"
+  },
+  {
+   "from": "effective spread",
+   "rel": "about",
+   "to": "bid-ask spread dynamics",
+   "why": "quantifies bid-ask spread dynamics",
+   "from_id": "procedure:effective-spread",
+   "to_id": "concept:bid-ask-spread"
+  },
+  {
+   "from": "realized spread (market maker profit after price movement)",
+   "rel": "about",
+   "to": "bid-ask spread dynamics",
+   "why": "quantifies bid-ask spread dynamics",
+   "from_id": "procedure:realized-spread",
+   "to_id": "concept:bid-ask-spread"
+  },
+  {
+   "from": "price discovery mechanisms",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined in 01-market-foundations \u00a71.8",
+   "from_id": "concept:price-discovery",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "auction-based discovery",
+   "rel": "kind-of",
+   "to": "price discovery mechanisms",
+   "why": "a kind of price discovery mechanisms",
+   "from_id": "concept:auction-based-discovery",
+   "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "continuous trading discovery",
+   "rel": "kind-of",
+   "to": "price discovery mechanisms",
+   "why": "a kind of price discovery mechanisms",
+   "from_id": "concept:continuous-trading-discovery",
+   "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "cross-market discovery",
+   "rel": "kind-of",
+   "to": "price discovery mechanisms",
+   "why": "a kind of price discovery mechanisms",
+   "from_id": "concept:cross-market-discovery",
+   "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "information share (hasbrouck)",
+   "rel": "about",
+   "to": "price discovery mechanisms",
+   "why": "quantifies price discovery mechanisms",
+   "from_id": "procedure:information-share",
+   "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "component share",
+   "rel": "about",
+   "to": "price discovery mechanisms",
+   "why": "quantifies price discovery mechanisms",
+   "from_id": "procedure:component-share",
+   "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "price efficiency ratio",
+   "rel": "about",
+   "to": "price discovery mechanisms",
+   "why": "quantifies price discovery mechanisms",
+   "from_id": "procedure:price-efficiency-ratio",
+   "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "01 market foundations core principles",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "stated across 01-market-foundations",
+   "from_id": "fact:01-market-foundations-core-principles",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "01 market foundations best practices",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "stated across 01-market-foundations",
+   "from_id": "judgment:01-market-foundations-best-practices",
+   "to_id": "concept:market-foundations"
   }
  ],
  "meta": {
@@ -27527,10 +29263,392 @@
    "concept:quantitative-analysis",
    "concept:risk-management"
   ],
+  "derived_atom_ids": [
+   "concept:arbitrageur",
+   "concept:auction-based-discovery",
+   "concept:bid-ask-spread",
+   "concept:chart-pattern",
+   "concept:continuous-trading-discovery",
+   "concept:cross-market-discovery",
+   "concept:dark-pool",
+   "concept:electronic-communication-network",
+   "concept:execution-model",
+   "concept:hedge-fund",
+   "concept:high-frequency-trader",
+   "concept:high-volatility-regime",
+   "concept:iceberg-order",
+   "concept:institutional-investor",
+   "concept:internalization",
+   "concept:limit-order",
+   "concept:liquidity",
+   "concept:lit-exchange",
+   "concept:low-volatility-regime",
+   "concept:market-foundations",
+   "concept:market-impact",
+   "concept:market-maker",
+   "concept:market-mechanics",
+   "concept:market-microstructure",
+   "concept:market-order",
+   "concept:market-participant",
+   "concept:market-regime",
+   "concept:order-type",
+   "concept:over-the-counter-market",
+   "concept:price-action",
+   "concept:price-discovery",
+   "concept:proprietary-trading-firm",
+   "concept:quantitative-analysis",
+   "concept:regime-shift",
+   "concept:retail-trader",
+   "concept:risk-management",
+   "concept:slippage",
+   "concept:stop-limit-order",
+   "concept:stop-order",
+   "concept:trading-venue",
+   "concept:trailing-stop",
+   "fact:01-market-foundations-core-principles",
+   "judgment:01-market-foundations-best-practices",
+   "procedure:almgren-chriss-market-impact-model",
+   "procedure:component-share",
+   "procedure:effective-spread",
+   "procedure:garch-model",
+   "procedure:historical-volatility",
+   "procedure:information-share",
+   "procedure:participation-rate",
+   "procedure:price-efficiency-ratio",
+   "procedure:price-impact",
+   "procedure:quoted-spread",
+   "procedure:realized-spread",
+   "procedure:relative-spread",
+   "procedure:simple-slippage",
+   "procedure:square-root-market-impact-rule",
+   "procedure:volatility-ratio"
+  ],
+  "derived_relations": [
+   [
+    "concept:arbitrageur",
+    "kind-of",
+    "concept:market-participant"
+   ],
+   [
+    "concept:auction-based-discovery",
+    "kind-of",
+    "concept:price-discovery"
+   ],
+   [
+    "concept:bid-ask-spread",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:chart-pattern",
+    "kind-of",
+    "concept:technical-analysis"
+   ],
+   [
+    "concept:continuous-trading-discovery",
+    "kind-of",
+    "concept:price-discovery"
+   ],
+   [
+    "concept:cross-market-discovery",
+    "kind-of",
+    "concept:price-discovery"
+   ],
+   [
+    "concept:dark-pool",
+    "kind-of",
+    "concept:trading-venue"
+   ],
+   [
+    "concept:electronic-communication-network",
+    "kind-of",
+    "concept:trading-venue"
+   ],
+   [
+    "concept:execution-model",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:hedge-fund",
+    "kind-of",
+    "concept:market-participant"
+   ],
+   [
+    "concept:high-frequency-trader",
+    "kind-of",
+    "concept:market-participant"
+   ],
+   [
+    "concept:high-volatility-regime",
+    "kind-of",
+    "concept:volatility"
+   ],
+   [
+    "concept:iceberg-order",
+    "kind-of",
+    "concept:order-type"
+   ],
+   [
+    "concept:institutional-investor",
+    "kind-of",
+    "concept:market-participant"
+   ],
+   [
+    "concept:internalization",
+    "kind-of",
+    "concept:trading-venue"
+   ],
+   [
+    "concept:limit-order",
+    "kind-of",
+    "concept:order-type"
+   ],
+   [
+    "concept:liquidity",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:lit-exchange",
+    "kind-of",
+    "concept:trading-venue"
+   ],
+   [
+    "concept:low-volatility-regime",
+    "kind-of",
+    "concept:volatility"
+   ],
+   [
+    "concept:market-foundations",
+    "part-of",
+    "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:market-impact",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:market-maker",
+    "kind-of",
+    "concept:market-participant"
+   ],
+   [
+    "concept:market-mechanics",
+    "part-of",
+    "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:market-microstructure",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:market-order",
+    "kind-of",
+    "concept:order-type"
+   ],
+   [
+    "concept:market-participant",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:market-regime",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:order-type",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:over-the-counter-market",
+    "kind-of",
+    "concept:trading-venue"
+   ],
+   [
+    "concept:price-action",
+    "part-of",
+    "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:price-discovery",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:proprietary-trading-firm",
+    "kind-of",
+    "concept:market-participant"
+   ],
+   [
+    "concept:quantitative-analysis",
+    "part-of",
+    "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:regime-shift",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:retail-trader",
+    "kind-of",
+    "concept:market-participant"
+   ],
+   [
+    "concept:risk-management",
+    "part-of",
+    "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:slippage",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:stop-limit-order",
+    "kind-of",
+    "concept:order-type"
+   ],
+   [
+    "concept:stop-order",
+    "kind-of",
+    "concept:order-type"
+   ],
+   [
+    "concept:trading-venue",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:trailing-stop",
+    "kind-of",
+    "concept:order-type"
+   ],
+   [
+    "concept:volatility",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "fact:01-market-foundations-core-principles",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "judgment:01-market-foundations-best-practices",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "procedure:almgren-chriss-market-impact-model",
+    "about",
+    "concept:liquidity"
+   ],
+   [
+    "procedure:component-share",
+    "about",
+    "concept:price-discovery"
+   ],
+   [
+    "procedure:effective-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "procedure:effective-spread",
+    "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "procedure:garch-model",
+    "about",
+    "concept:volatility"
+   ],
+   [
+    "procedure:historical-volatility",
+    "about",
+    "concept:volatility"
+   ],
+   [
+    "procedure:indicator-atr",
+    "about",
+    "concept:volatility"
+   ],
+   [
+    "procedure:information-share",
+    "about",
+    "concept:price-discovery"
+   ],
+   [
+    "procedure:participation-rate",
+    "about",
+    "concept:liquidity"
+   ],
+   [
+    "procedure:price-efficiency-ratio",
+    "about",
+    "concept:price-discovery"
+   ],
+   [
+    "procedure:price-impact",
+    "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "procedure:quoted-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "procedure:quoted-spread",
+    "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "procedure:realized-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "procedure:relative-spread",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
+    "procedure:simple-slippage",
+    "about",
+    "concept:liquidity"
+   ],
+   [
+    "procedure:square-root-market-impact-rule",
+    "about",
+    "concept:liquidity"
+   ],
+   [
+    "procedure:volatility-ratio",
+    "about",
+    "concept:volatility"
+   ]
+  ],
   "doc_relations": 6,
   "doc_anchors": [
    "concept:technical-analysis",
    "object:mangrove-knowledge-space"
+  ],
+  "chapter_01-market-foundations_atoms": 52,
+  "chapter_01-market-foundations_relations": 56,
+  "chapter_01-market-foundations_folded": [
+   "concept:volatility",
+   "procedure:indicator-atr"
+  ],
+  "folded_atom_ids": [
+   "concept:volatility",
+   "procedure:indicator-atr"
   ]
  }
 }
