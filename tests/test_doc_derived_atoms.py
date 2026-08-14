@@ -126,3 +126,43 @@ def test_a_wired_concept_is_reachable_from_its_statement(kg):
         "a concept points AT the principles and practices that govern it, so both should be "
         f"outgoing from iceberg-order; got {kinds}")
     assert all(e["why"].strip() for e in out), "every wired edge carries the statement it moved"
+
+
+def test_the_graph_carries_no_document_numbering(kg):
+    """A chapter or section number says where a thing sits in a file, not what it is.
+
+    `01-market-foundations`, `§1.1` and a `1.4 ` prefix on every practice are all artifacts of the
+    document. They also broke things: keying the taxonomy declarations on section numbers made every
+    one of them silently inert on any other chapter.
+    """
+    import re
+    numbered = re.compile(r"^\d+[-.]|\s§?\d+\.\d+\b")
+    for nid in kg.nodes:
+        node = kg.get(nid)
+        for chapter in node.get("reference_chapter") or []:
+            assert not numbered.match(chapter), f"{nid}: reference_chapter {chapter!r} is numbered"
+        for field in ("principles", "practices"):
+            for line in node.get(field) or []:
+                assert not numbered.match(line), f"{nid}.{field}: {line[:60]!r} is numbered"
+    for edge in kg.edges:
+        assert not numbered.search(edge.why), f"{edge.src} -> {edge.dst}: why is numbered ({edge.why!r})"
+
+
+def test_a_chapter_with_no_declarations_refuses_to_build():
+    """Building one without them emitted a graph with no taxonomy and said nothing about it."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parent.parent
+    src = repo / "knowledge-base" / "02-instruments-market-mechanics.md"
+    if not src.is_file():
+        import pytest
+        pytest.skip("chapter 02 source not in this checkout")
+    r = subprocess.run(
+        [sys.executable, str(repo / "ontology" / "chapter_to_atoms.py"), str(src),
+         "--chapter-id", "instruments-market-mechanics", "--parent", "concept:market-mechanics",
+         "--ontology", str(repo / "ontology" / "signal-indicator-ontology.json"), "--table"],
+        capture_output=True, text=True, timeout=120)
+    assert r.returncode != 0, "an undeclared chapter built anyway"
+    assert "no declarations for chapter" in r.stderr + r.stdout

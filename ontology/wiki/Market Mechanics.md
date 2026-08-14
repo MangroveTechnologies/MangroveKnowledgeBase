@@ -1,6 +1,6 @@
 ---
 kind: concept
-chapter: 02-instruments-market-mechanics
+chapter: instruments-market-mechanics
 ---
 
 # market mechanics

@@ -1044,9 +1044,9 @@ atom(ROOT, ROOT_TITLE, "Object",
 # from -- the code is -- so this is a REFERENCE, not provenance: it points a reader at the prose
 # that explains the thing. Doc-derived nodes carry the same key from their page frontmatter, so one
 # question ("which chapter covers this?") has one answer across both halves of the graph.
-CH_INDICATORS = "06-indicators"
-CH_PATTERNS = "07-chart-patterns"
-CH_STRATEGY = "04-strategy-design-modeling"
+CH_INDICATORS = "indicators"
+CH_PATTERNS = "chart-patterns"
+CH_STRATEGY = "strategy-design-modeling"
 
 # entity types
 #

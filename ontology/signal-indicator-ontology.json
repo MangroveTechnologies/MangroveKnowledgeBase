@@ -18,7 +18,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -31,7 +31,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -44,7 +44,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "04-strategy-design-modeling"
+     "strategy-design-modeling"
     ]
    }
   },
@@ -57,7 +57,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -70,7 +70,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -83,7 +83,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -96,7 +96,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -109,7 +109,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -122,7 +122,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -135,7 +135,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -148,8 +148,8 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators",
-     "01-market-foundations"
+     "indicators",
+     "market-foundations"
     ],
     "applications": [
      "Adjusting position sizes based on current volatility regime",
@@ -169,7 +169,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "06-indicators"
+     "indicators"
     ]
    }
   },
@@ -182,7 +182,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "07-chart-patterns"
+     "chart-patterns"
     ]
    }
   },
@@ -537,7 +537,7 @@
      }
     },
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "chapter_variants": {
      "formula": "TR = max(High - Low, |High - Previous Close|, |Low - Previous Close|)\nATR = EMA(TR, n periods)"
@@ -17469,7 +17469,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "07-chart-patterns"
+     "chart-patterns"
     ],
     "explanation": "Multi-bar formations: head and shoulders, double tops and bottoms, triangles, wedges, flags and pennants, cup and handle, and the necklines and completion criteria that define them. Also pattern reliability and failure modes, and the context a formation requires to mean anything. Sibling of the existing pattern class, not a parent of it and not the same thing. That class holds candlestick geometry -- shapes computable from one bar or a small fixed number of them, which is why 41 signals implement it. A chart pattern needs a swing structure of unknown length, and no computation in the library produces swing points, so this class carries no procedures. It is the first class in the graph that is knowledge without an implementation."
    }
@@ -17483,7 +17483,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "explanation": "Market microstructure, order types, participant classes, liquidity and its price -- slippage and market impact -- volatility regimes and the shifts between them, trading venues and their execution models, bid-ask spread dynamics, and price discovery. This is the layer every computation in the graph silently assumes. An indicator consumes a price series; this subject area is where that series comes from."
    }
@@ -17497,7 +17497,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "02-instruments-market-mechanics"
+     "instruments-market-mechanics"
     ],
     "explanation": "Spot markets, futures and perpetual swaps, options, margin and leverage and the liquidation engines that enforce them, crypto-specific mechanics, FX basics, settlement and clearing, and contract specifications. Distinct from market foundations: that subject area covers how a price forms, this one covers what is actually being traded and under whose rules."
    }
@@ -17511,7 +17511,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "03-core-trading-concepts"
+     "core-trading-concepts"
     ],
     "explanation": "Price action theory, market structure, trend versus range and compression versus expansion, liquidity theory, volume and order flow, support and resistance, supply and demand zones, multi-timeframe analysis, confluence, fair value gaps, and volume profile. Deliberately kept beside technical analysis rather than beneath it. Technical analysis is organised in this graph by what a computation *measures*, and its six subclasses are exactly those characters; price action names conclusions drawn from price geometry rather than a character a computation measures, so placing it there would misuse that axis."
    }
@@ -17525,7 +17525,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "08-quantitative-analysis"
+     "quantitative-analysis"
     ],
     "explanation": "Seasonality and time-of-day effects, volatility clustering, mean reversion, breakout behaviour, autocorrelation and momentum persistence, machine-learned patterns, cross-sectional versus time-series effects, and carry. Where technical analysis classifies a computation by what it measures, this subject area is about the properties of the series being measured -- the evidence that a given class of computation has anything to find."
    }
@@ -17539,7 +17539,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "05-risk-management"
+     "risk-management"
     ],
     "explanation": "Risk dimensions in strategy design, trading rules and protocols, position sizing, drawdown controls, stop-loss and take-profit engineering, portfolio risk, capital efficiency, risk-reward ratios, risk of ruin, and scenario analysis. Signals decide whether to act; this subject area decides at what size and under what limits, and it constrains a strategy independently of which signals it composes."
    }
@@ -17553,7 +17553,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "applications": [
      "Designing execution algorithms that minimize transaction costs by understanding order book dynamics",
@@ -17576,7 +17576,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Effective Spread = 2 * |Trade Price - Midpoint Price|",
     "inputs": {
@@ -17611,7 +17611,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Delta_P = lambda * Order_Flow",
     "inputs": {
@@ -17646,7 +17646,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Quoted Spread = Ask Price - Bid Price\nRelative Spread = (Ask - Bid) / Midpoint * 100%",
     "inputs": {
@@ -17681,7 +17681,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "applications": [
      "Immediate execution when speed is critical (news events, closing positions urgently)",
@@ -17701,7 +17701,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Buy 100 shares at the best available price",
@@ -17718,7 +17718,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Buy 100 shares at $50 or better",
@@ -17735,7 +17735,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Sell 100 shares if price drops to $45",
@@ -17752,7 +17752,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Sell 100 shares if price drops to $45, but not below $44",
@@ -17769,7 +17769,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Sell if price drops $2 from its highest point since order placed",
@@ -17786,7 +17786,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Buy 10,000 shares but only display 500 at a time",
@@ -17803,7 +17803,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "applications": [
      "Identifying which participant types are active to anticipate market behavior",
@@ -17822,7 +17822,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -17835,7 +17835,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -17848,7 +17848,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -17861,7 +17861,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -17874,7 +17874,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -17887,7 +17887,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -17900,7 +17900,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -17913,7 +17913,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "applications": [
      "Estimating realistic execution costs for strategy backtesting",
@@ -17933,7 +17933,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Slippage Example: Expected buy price: $100.00 (midpoint) Market order for 1,000 shares Actual average fill: $100.15 Slippage: $0.15 per share ($150 total)"
@@ -17949,7 +17949,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "examples": [
      "Market Impact Example: Order: Buy 50,000 shares of a stock with 100,000 average daily volume Pre-trade price: $50.00 Execution over 2 hours raises price to $50.80 during buying Price settles to $50.50 after completion Temporary impact: $0.30 (reversed) Permanent impact: $0.50 (persisted)"
@@ -17965,7 +17965,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Slippage = Actual Execution Price - Expected Price\nSlippage % = Slippage / Expected Price * 100%",
     "inputs": {
@@ -18008,7 +18008,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Total Cost = Temporary Impact + Permanent Impact + Volatility Risk\n\nTemporary Impact = eta * sigma * (X/V)^(3/5)\nPermanent Impact = gamma * (X/V)",
     "inputs": {
@@ -18062,7 +18062,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Impact = constant * sigma * sqrt(X / V)",
     "inputs": {
@@ -18101,7 +18101,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Participation Rate = Order Size / (ADV * Trading Duration in Days)",
     "inputs": {
@@ -18140,7 +18140,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18153,7 +18153,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18166,7 +18166,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18179,7 +18179,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18192,7 +18192,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "sigma = sqrt(1/(n-1) * sum((r_i - r_bar)^2))\n\nAnnualized Vol = Daily Vol * sqrt(252)",
     "inputs": {
@@ -18227,7 +18227,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "sigma_t^2 = omega + alpha * epsilon_(t-1)^2 + beta * sigma_(t-1)^2",
     "inputs": {
@@ -18270,7 +18270,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Vol Ratio = Short-term Vol / Long-term Vol",
     "inputs": {
@@ -18305,7 +18305,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "applications": [
      "Routing orders to venues with best price and liquidity",
@@ -18325,7 +18325,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18338,7 +18338,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18351,7 +18351,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18364,7 +18364,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18377,7 +18377,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18390,7 +18390,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18403,7 +18403,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "applications": [
      "Measuring transaction costs and market efficiency",
@@ -18428,7 +18428,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Relative Spread = (Ask - Bid) / Midpoint * 100%\nMidpoint = (Bid + Ask) / 2",
     "inputs": {
@@ -18463,7 +18463,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Realized Spread = 2 * D * (Trade Price - Midpoint after t)",
     "inputs": {
@@ -18502,7 +18502,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "applications": [
      "Identifying which market or venue leads price discovery",
@@ -18522,7 +18522,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18535,7 +18535,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18548,7 +18548,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ]
    }
   },
@@ -18561,7 +18561,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Information Share = Var(market_i contribution to efficient price) / Var(total efficient price)",
     "inputs": {
@@ -18596,7 +18596,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Component Share = Var(permanent price impact from market_i) / Var(total permanent price impact)",
     "inputs": {
@@ -18631,7 +18631,7 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "formula": "Efficiency = Variance(Returns over long horizon) / (n * Variance(Returns over short horizon))",
     "inputs": {
@@ -18670,47 +18670,47 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "principles": [
-     "1.1 Price Discovery: The process by which market prices are determined through the interaction of supply and demand, facilitated by the continuous matching of buy and sell orders",
-     "1.1 Order Flow: The sequence and volume of buy and sell orders entering the market, which drives short-term price movements",
-     "1.1 Information Asymmetry: The unequal distribution of information among market participants, where some traders possess superior information about asset values",
-     "1.1 Transaction Costs: Total costs of trading including explicit costs (commissions, fees) and implicit costs (spread, market impact, timing costs)",
-     "1.1 Market Efficiency: The degree to which prices reflect all available information, influenced by the speed and accuracy of price discovery",
-     "1.2 Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price",
-     "1.2 Conditional Execution: Stop orders become active only when a trigger price is reached",
-     "1.2 Execution Certainty: Different order types offer varying degrees of fill certainty",
-     "1.3 Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage)",
-     "1.3 Information Hierarchy: Some participants have superior information or analytical capabilities",
-     "1.3 Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade",
-     "1.3 Time Horizon Diversity: Participants operate on different time scales from microseconds to years",
-     "1.3 Adversarial Dynamics: Informed traders seek to profit from uninformed traders",
-     "1.4 Liquidity is Dynamic: Liquidity varies by time of day, market conditions, and asset characteristics",
-     "1.4 Impact is Non-Linear: Market impact grows faster than linearly with order size",
-     "1.4 Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)",
-     "1.4 Urgency-Cost Tradeoff: Faster execution incurs higher market impact; slower execution risks adverse price movement",
-     "1.4 Liquidity Illusion: Displayed liquidity often disappears when tested",
-     "1.5 Volatility Clustering: High volatility tends to follow high volatility; low volatility tends to follow low volatility",
-     "1.5 Mean Reversion of Volatility: While returns are not predictable, volatility tends to revert to long-term averages",
-     "1.5 Regime Persistence: Markets tend to remain in a regime until a significant catalyst triggers a shift",
-     "1.5 Asymmetric Volatility: Volatility increases more on down moves than up moves (leverage effect)",
-     "1.5 Correlation Breakdown: Asset correlations change dramatically across regimes",
-     "1.6 Fragmentation: Modern markets are fragmented across multiple venues, requiring smart order routing",
-     "1.6 Transparency Spectrum: Venues range from fully transparent (lit exchanges) to opaque (dark pools)",
-     "1.6 Best Execution Obligation: Brokers must seek the best available price across venues",
-     "1.6 Latency Competition: Execution speed varies significantly across venues",
-     "1.6 Regulatory Frameworks: Different venues operate under different regulatory requirements",
-     "1.7 Spread as Compensation: Market makers earn the spread as compensation for providing liquidity and bearing inventory risk",
-     "1.7 Information Asymmetry Cost: Spreads widen when market makers fear trading against informed participants",
-     "1.7 Inventory Risk: Spreads reflect the risk of holding inventory that may decline in value",
-     "1.7 Competition Effect: More market makers competing leads to tighter spreads",
-     "1.7 Volatility Relationship: Spreads typically widen during high volatility",
-     "1.8 Information Aggregation: Prices aggregate dispersed information held by many participants",
-     "1.8 Continuous Process: Price discovery occurs continuously as new information arrives",
-     "1.8 Order Flow Information: The sequence and size of orders reveals information",
-     "1.8 Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously",
-     "1.8 Speed of Incorporation: The efficiency of price discovery depends on market structure"
+     "Price Discovery: The process by which market prices are determined through the interaction of supply and demand, facilitated by the continuous matching of buy and sell orders",
+     "Order Flow: The sequence and volume of buy and sell orders entering the market, which drives short-term price movements",
+     "Information Asymmetry: The unequal distribution of information among market participants, where some traders possess superior information about asset values",
+     "Transaction Costs: Total costs of trading including explicit costs (commissions, fees) and implicit costs (spread, market impact, timing costs)",
+     "Market Efficiency: The degree to which prices reflect all available information, influenced by the speed and accuracy of price discovery",
+     "Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price",
+     "Conditional Execution: Stop orders become active only when a trigger price is reached",
+     "Execution Certainty: Different order types offer varying degrees of fill certainty",
+     "Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage)",
+     "Information Hierarchy: Some participants have superior information or analytical capabilities",
+     "Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade",
+     "Time Horizon Diversity: Participants operate on different time scales from microseconds to years",
+     "Adversarial Dynamics: Informed traders seek to profit from uninformed traders",
+     "Liquidity is Dynamic: Liquidity varies by time of day, market conditions, and asset characteristics",
+     "Impact is Non-Linear: Market impact grows faster than linearly with order size",
+     "Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)",
+     "Urgency-Cost Tradeoff: Faster execution incurs higher market impact; slower execution risks adverse price movement",
+     "Liquidity Illusion: Displayed liquidity often disappears when tested",
+     "Volatility Clustering: High volatility tends to follow high volatility; low volatility tends to follow low volatility",
+     "Mean Reversion of Volatility: While returns are not predictable, volatility tends to revert to long-term averages",
+     "Regime Persistence: Markets tend to remain in a regime until a significant catalyst triggers a shift",
+     "Asymmetric Volatility: Volatility increases more on down moves than up moves (leverage effect)",
+     "Correlation Breakdown: Asset correlations change dramatically across regimes",
+     "Fragmentation: Modern markets are fragmented across multiple venues, requiring smart order routing",
+     "Transparency Spectrum: Venues range from fully transparent (lit exchanges) to opaque (dark pools)",
+     "Best Execution Obligation: Brokers must seek the best available price across venues",
+     "Latency Competition: Execution speed varies significantly across venues",
+     "Regulatory Frameworks: Different venues operate under different regulatory requirements",
+     "Spread as Compensation: Market makers earn the spread as compensation for providing liquidity and bearing inventory risk",
+     "Information Asymmetry Cost: Spreads widen when market makers fear trading against informed participants",
+     "Inventory Risk: Spreads reflect the risk of holding inventory that may decline in value",
+     "Competition Effect: More market makers competing leads to tighter spreads",
+     "Volatility Relationship: Spreads typically widen during high volatility",
+     "Information Aggregation: Prices aggregate dispersed information held by many participants",
+     "Continuous Process: Price discovery occurs continuously as new information arrives",
+     "Order Flow Information: The sequence and size of orders reveals information",
+     "Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously",
+     "Speed of Incorporation: The efficiency of price discovery depends on market structure"
     ]
    }
   },
@@ -18723,58 +18723,58 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "01-market-foundations"
+     "market-foundations"
     ],
     "practices": [
-     "1.1 Monitor order book depth continuously to assess real-time liquidity conditions",
-     "1.1 Use limit orders to control execution prices when liquidity permits",
-     "1.1 Be aware of the potential impact of large orders on market prices and plan execution accordingly",
-     "1.1 Study the specific microstructure characteristics of each market traded (e.g., tick sizes, trading hours, circuit breakers)",
-     "1.1 Account for all transaction costs when calculating expected strategy returns",
-     "1.2 Use market orders sparingly and only when immediate execution is critical",
-     "1.2 Place limit orders at realistic prices based on current market conditions",
-     "1.2 Set stop-losses based on technical levels or volatility, not arbitrary percentages",
-     "1.2 Understand that stop orders become market orders and may fill at worse prices in fast markets",
-     "1.2 Consider using stop-limit orders in volatile markets to maintain price control",
-     "1.3 Understand your position in the market participant hierarchy",
-     "1.3 Recognize that market makers adjust spreads based on perceived information content of orders",
-     "1.3 Monitor institutional activity through volume patterns, dark pool prints, and 13F filings",
-     "1.3 Be aware that HFT can front-run large orders if execution is predictable",
-     "1.3 Trade when your counterparty is likely to be uninformed (e.g., index rebalancing flows)",
-     "1.3 Avoid trading patterns that reveal your strategy to sophisticated participants",
-     "1.4 Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal)",
-     "1.4 Use volume-weighted average price (VWAP) orders for large positions",
-     "1.4 Break large orders into smaller child orders to reduce footprint",
-     "1.4 Avoid trading during illiquid periods (market open, lunch hour, holidays)",
-     "1.4 Build slippage assumptions into backtest and live performance expectations",
-     "1.4 Monitor real-time market depth before executing larger orders",
-     "1.4 Consider using dark pools for large orders to minimize information leakage",
-     "1.5 Monitor volatility indicators (VIX, ATR, realized vs. implied vol) continuously",
-     "1.5 Reduce position sizes and leverage during high volatility regimes",
-     "1.5 Use regime detection filters to enable/disable specific strategies",
-     "1.5 Adapt trading strategies to current market conditions rather than forcing one approach",
-     "1.5 Backtest strategies across multiple regimes to understand performance variation",
-     "1.5 Have predefined plans for regime transitions rather than reacting emotionally",
-     "1.5 Consider that regime shifts often occur faster than regime detection algorithms can identify",
-     "1.6 Use smart order routers (SOR) to access multiple venues simultaneously",
-     "1.6 Select venues based on order characteristics (size, urgency, information sensitivity)",
-     "1.6 Monitor execution quality metrics across venues",
-     "1.6 Understand fee structures (maker-taker rebates can influence routing)",
-     "1.6 Use dark pools strategically for large orders, but verify execution quality",
-     "1.6 Be aware of venue-specific order types and matching rules",
-     "1.6 Consider total cost of execution including fees, spread, and market impact",
-     "1.7 Always check the current spread before trading",
-     "1.7 Use limit orders to avoid paying the full spread",
-     "1.7 Trade during high liquidity periods for tighter spreads",
-     "1.7 Factor spread costs into strategy profitability calculations",
-     "1.7 Monitor spread changes as an indicator of market conditions",
-     "1.7 Avoid trading when spreads are abnormally wide unless necessary",
-     "1.8 Monitor lead-lag relationships between related markets",
-     "1.8 Use pre-market and after-hours trading for early information",
-     "1.8 Understand the price discovery role of derivatives markets",
-     "1.8 Be cautious trading immediately after major information releases",
-     "1.8 Recognize that the first price after news is often not the right price",
-     "1.8 Study auction dynamics for opening and closing trades"
+     "Monitor order book depth continuously to assess real-time liquidity conditions",
+     "Use limit orders to control execution prices when liquidity permits",
+     "Be aware of the potential impact of large orders on market prices and plan execution accordingly",
+     "Study the specific microstructure characteristics of each market traded (e.g., tick sizes, trading hours, circuit breakers)",
+     "Account for all transaction costs when calculating expected strategy returns",
+     "Use market orders sparingly and only when immediate execution is critical",
+     "Place limit orders at realistic prices based on current market conditions",
+     "Set stop-losses based on technical levels or volatility, not arbitrary percentages",
+     "Understand that stop orders become market orders and may fill at worse prices in fast markets",
+     "Consider using stop-limit orders in volatile markets to maintain price control",
+     "Understand your position in the market participant hierarchy",
+     "Recognize that market makers adjust spreads based on perceived information content of orders",
+     "Monitor institutional activity through volume patterns, dark pool prints, and 13F filings",
+     "Be aware that HFT can front-run large orders if execution is predictable",
+     "Trade when your counterparty is likely to be uninformed (e.g., index rebalancing flows)",
+     "Avoid trading patterns that reveal your strategy to sophisticated participants",
+     "Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal)",
+     "Use volume-weighted average price (VWAP) orders for large positions",
+     "Break large orders into smaller child orders to reduce footprint",
+     "Avoid trading during illiquid periods (market open, lunch hour, holidays)",
+     "Build slippage assumptions into backtest and live performance expectations",
+     "Monitor real-time market depth before executing larger orders",
+     "Consider using dark pools for large orders to minimize information leakage",
+     "Monitor volatility indicators (VIX, ATR, realized vs. implied vol) continuously",
+     "Reduce position sizes and leverage during high volatility regimes",
+     "Use regime detection filters to enable/disable specific strategies",
+     "Adapt trading strategies to current market conditions rather than forcing one approach",
+     "Backtest strategies across multiple regimes to understand performance variation",
+     "Have predefined plans for regime transitions rather than reacting emotionally",
+     "Consider that regime shifts often occur faster than regime detection algorithms can identify",
+     "Use smart order routers (SOR) to access multiple venues simultaneously",
+     "Select venues based on order characteristics (size, urgency, information sensitivity)",
+     "Monitor execution quality metrics across venues",
+     "Understand fee structures (maker-taker rebates can influence routing)",
+     "Use dark pools strategically for large orders, but verify execution quality",
+     "Be aware of venue-specific order types and matching rules",
+     "Consider total cost of execution including fees, spread, and market impact",
+     "Always check the current spread before trading",
+     "Use limit orders to avoid paying the full spread",
+     "Trade during high liquidity periods for tighter spreads",
+     "Factor spread costs into strategy profitability calculations",
+     "Monitor spread changes as an indicator of market conditions",
+     "Avoid trading when spreads are abnormally wide unless necessary",
+     "Monitor lead-lag relationships between related markets",
+     "Use pre-market and after-hours trading for early information",
+     "Understand the price discovery role of derivatives markets",
+     "Be cautious trading immediately after major information releases",
+     "Recognize that the first price after news is often not the right price",
+     "Study auction dynamics for opening and closing trades"
     ]
    }
   }
@@ -28788,7 +28788,7 @@
    "from": "market microstructure",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.1",
+   "why": "defined under market microstructure",
    "from_id": "concept:market-microstructure",
    "to_id": "concept:market-foundations"
   },
@@ -28820,7 +28820,7 @@
    "from": "order types",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.2",
+   "why": "defined under order types",
    "from_id": "concept:order-type",
    "to_id": "concept:market-foundations"
   },
@@ -28876,7 +28876,7 @@
    "from": "market participants",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.3",
+   "why": "defined under market participants",
    "from_id": "concept:market-participant",
    "to_id": "concept:market-foundations"
   },
@@ -28940,7 +28940,7 @@
    "from": "liquidity",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.4",
+   "why": "defined under liquidity, slippage & market impact",
    "from_id": "concept:liquidity",
    "to_id": "concept:market-foundations"
   },
@@ -28948,7 +28948,7 @@
    "from": "slippage",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.4",
+   "why": "defined under liquidity, slippage & market impact",
    "from_id": "concept:slippage",
    "to_id": "concept:market-foundations"
   },
@@ -28956,7 +28956,7 @@
    "from": "market impact",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.4",
+   "why": "defined under liquidity, slippage & market impact",
    "from_id": "concept:market-impact",
    "to_id": "concept:market-foundations"
   },
@@ -28996,7 +28996,7 @@
    "from": "volatility",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.5",
+   "why": "defined under volatility, regimes & regime shifts",
    "from_id": "concept:volatility",
    "to_id": "concept:market-foundations"
   },
@@ -29004,7 +29004,7 @@
    "from": "market regimes",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.5",
+   "why": "defined under volatility, regimes & regime shifts",
    "from_id": "concept:market-regime",
    "to_id": "concept:market-foundations"
   },
@@ -29012,7 +29012,7 @@
    "from": "regime shifts",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.5",
+   "why": "defined under volatility, regimes & regime shifts",
    "from_id": "concept:regime-shift",
    "to_id": "concept:market-foundations"
   },
@@ -29068,7 +29068,7 @@
    "from": "trading venues",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.6",
+   "why": "defined under trading venues & execution models",
    "from_id": "concept:trading-venue",
    "to_id": "concept:market-foundations"
   },
@@ -29076,7 +29076,7 @@
    "from": "execution models",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.6",
+   "why": "defined under trading venues & execution models",
    "from_id": "concept:execution-model",
    "to_id": "concept:market-foundations"
   },
@@ -29124,7 +29124,7 @@
    "from": "bid-ask spread dynamics",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.7",
+   "why": "defined under bid-ask spread dynamics",
    "from_id": "concept:bid-ask-spread",
    "to_id": "concept:market-foundations"
   },
@@ -29164,7 +29164,7 @@
    "from": "price discovery mechanisms",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "defined in 01-market-foundations \u00a71.8",
+   "why": "defined under price discovery mechanisms",
    "from_id": "concept:price-discovery",
    "to_id": "concept:market-foundations"
   },
@@ -29236,7 +29236,7 @@
    "from": "core principles",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "stated across 01-market-foundations",
+   "why": "stated across market-foundations",
    "from_id": "fact:market-foundations-core-principles",
    "to_id": "concept:market-foundations"
   },
@@ -29244,7 +29244,7 @@
    "from": "best practices",
    "rel": "part-of",
    "to": "market foundations",
-   "why": "stated across 01-market-foundations",
+   "why": "stated across market-foundations",
    "from_id": "judgment:market-foundations-best-practices",
    "to_id": "concept:market-foundations"
   }
@@ -29664,9 +29664,9 @@
    "concept:technical-analysis",
    "object:mangrove-knowledge-space"
   ],
-  "chapter_01-market-foundations_atoms": 52,
-  "chapter_01-market-foundations_relations": 58,
-  "chapter_01-market-foundations_folded": [
+  "chapter_market-foundations_atoms": 52,
+  "chapter_market-foundations_relations": 58,
+  "chapter_market-foundations_folded": [
    "concept:volatility",
    "procedure:indicator-atr"
   ],

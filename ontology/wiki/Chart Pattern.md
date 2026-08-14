@@ -1,6 +1,6 @@
 ---
 kind: concept
-chapter: 07-chart-patterns
+chapter: chart-patterns
 ---
 
 # chart pattern

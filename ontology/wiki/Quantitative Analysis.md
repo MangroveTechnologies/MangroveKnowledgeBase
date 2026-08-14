@@ -1,6 +1,6 @@
 ---
 kind: concept
-chapter: 08-quantitative-analysis
+chapter: quantitative-analysis
 ---
 
 # quantitative analysis

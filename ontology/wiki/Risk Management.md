@@ -1,6 +1,6 @@
 ---
 kind: concept
-chapter: 05-risk-management
+chapter: risk-management
 ---
 
 # risk management

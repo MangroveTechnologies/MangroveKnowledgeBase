@@ -1,6 +1,6 @@
 ---
 kind: concept
-chapter: 03-core-trading-concepts
+chapter: core-trading-concepts
 ---
 
 # price action

@@ -9,7 +9,7 @@ than transcribed by hand. Every chapter section carries the same six headings:
     ### Definition                    -> the Concept(s) the section is about
     ### Core Principles               -> claims about them          (one Fact node per chapter)
     ### Common Use Cases              -> `applications` on the section concept
-    ### Examples                      -> a taxonomy, or an illustration (see EXAMPLE_IS_TAXONOMY)
+    ### Examples                      -> a taxonomy, or an illustration (see CHAPTERS)
     ### Best Practices for Traders    -> what to do about them      (one Judgment node per chapter)
     ### Mathematical Rules/Formulas   -> Procedure nodes
 
@@ -35,12 +35,35 @@ BULLET = re.compile(r"^\s*-\s+\*\*(.+?)\*\*\s*[::]\s*(.+?)\s*$")
 PLAIN_BULLET = re.compile(r"^\s*-\s+(.+?)\s*$")
 BLOCK_LABEL = re.compile(r"^\*\*(.+?)\*\*\s*[::]?\s*$")
 
-#: An `### Examples` sub-block is a taxonomy (its members become Concepts) when it names a KIND of
-#: thing, and an illustration (no nodes) when it walks through numbers. Decided per section rather
-#: than by a text heuristic: 1.4's "Slippage Example" and 1.7's "Tight Spread" are arithmetic, while
-#: 1.3's "Market Makers" and 1.6's "Dark Pools" are the section's actual taxonomy. A guess either way
-#: is wrong roughly half the time, so it is declared.
-EXAMPLE_IS_TAXONOMY = {"1.2", "1.3", "1.5", "1.6", "1.8"}
+#: Per-chapter declarations: the two things that cannot be read off the text.
+#:
+#: `taxonomy` -- an `### Examples` block is either the section's real taxonomy, whose members become
+#: Concepts, or a worked illustration, which becomes none. "Market Makers" is a kind of participant;
+#: "Slippage Example" is arithmetic. Nothing in the markup separates them.
+#:
+#: `wired` -- a stated line and the node it concerns. The line MOVES: out of the principles or
+#: practices list and onto an `about` edge from that node, as the edge's `why`. Never in both, so
+#: the copies cannot drift; what remains in a list is exactly what is not yet connected.
+#:
+#: Keyed by SECTION TITLE, never by section number. A number says where a thing sits in a file, not
+#: what it is -- and keying on it made every declaration silently inert on any other chapter, since
+#: chapter 2's sections are 2.x and none of chapter 1's numbers matched. The result was a clean
+#: build with no taxonomies at all, which is invisible unless you already know what is missing.
+#:
+#: A chapter absent from here raises rather than building with nothing.
+CHAPTERS: dict[str, dict] = {
+    "market-foundations": {
+        "taxonomy": {"Order Types", "Market Participants", "Volatility, Regimes & Regime Shifts",
+                     "Trading Venues & Execution Models", "Price Discovery Mechanisms"},
+        "wired": {
+            "Use iceberg orders for large positions": "concept:iceberg-order",
+            # Wired to the iceberg order rather than to `order-type`, where the sentence points:
+            # the node's own definition invokes information leakage, so this is the principle that
+            # accounts for what that node does.
+            "Information Leakage: Some order types reveal": "concept:iceberg-order",
+        },
+    },
+}
 
 #: Blocks inside a taxonomy section that are still NOT kinds: "Regime Shift Triggers" lists causes
 #: of a shift and "Information Events" lists occasions for discovery. Both read like members and
@@ -116,16 +139,6 @@ FACT_SUMMARY = (
 JUDGMENT_SUMMARY = (
     "Things we follow because someone has already paid to learn them. Each is a default rather "
     "than a rule -- departing from one is often right, but it should be a decision with a reason.")
-
-WIRED = {
-    "Use iceberg orders for large positions": "concept:iceberg-order",
-    # Wired to the iceberg order, not to `order-type` where the sentence points. The node's own
-    # definition invokes information leakage -- it displays part of its size "to reduce the
-    # information leakage of showing full size" -- so this is the principle that explains what that
-    # node does. The claim is phrased across order types; it earns its edge at the node whose
-    # behaviour it accounts for.
-    "Information Leakage: Some order types reveal": "concept:iceberg-order",
-}
 
 PRICE = {"type": "series", "units": "price"}
 PROCEDURE_IO = {
@@ -334,6 +347,12 @@ def build(path: Path, chapter: str, parent: str,
     than a silent mutation, because a caller merging into the record must be able to see every
     change this makes to the code-derived half before applying it.
     """
+    if chapter not in CHAPTERS:
+        raise ValueError(
+            f"no declarations for chapter {chapter!r}. Add an entry to CHAPTERS naming which of its "
+            "`### Examples` sections are taxonomies -- building without it emits a graph with no "
+            "taxonomy at all, and nothing about the output says so.")
+    decl = CHAPTERS[chapter]
     sections = parse(path)
     existing = existing or {}
     atoms: dict[str, dict] = {}
@@ -408,7 +427,9 @@ def build(path: Path, chapter: str, parent: str,
         else:
             subjects = [atom("Concept", sec["title"], prose, applications=uses, _section=num)]
         for s in subjects:
-            rel(s, "part-of", parent, f"defined in {chapter} §{num}")
+            # The section's NAME, not its number. `§1.1` records a position in a file; the graph
+            # holds what a thing is and where it is defined, and "market microstructure" says that.
+            rel(s, "part-of", parent, f"defined under {sec['title'].lower()}")
         if defined and uses:
             # The section's subject may have folded into a node already in the graph, in which case
             # its use cases are an enrichment rather than a property of something new. Dropping them
@@ -419,11 +440,11 @@ def build(path: Path, chapter: str, parent: str,
                 extra.setdefault(subjects[0], {}).setdefault("applications", uses)
 
         for name, text in bullets(blocks.get("Core Principles", [])):
-            principles.append(f"{num} {name}: {text}" if name else f"{num} {text}")
+            principles.append(f"{name}: {text}" if name else text)
         for _, text in bullets(blocks.get("Best Practices for Traders", [])):
-            practices.append(f"{num} {text}")
+            practices.append(text)
 
-        if num in EXAMPLE_IS_TAXONOMY:
+        if sec["title"] in decl["taxonomy"]:
             for label, body in labelled_blocks(blocks.get("Examples", [])):
                 if label in NOT_A_KIND:
                     continue
@@ -485,29 +506,28 @@ def build(path: Path, chapter: str, parent: str,
                   "props": {"reference_chapter": [chapter], "practices": practices}}
     def wire(list_id: str, lines: list[str]) -> list[str]:
         """Move every wired line out of the list and onto an `about` edge carrying it as the why."""
-        kept, used = [], set()
+        kept = []
         for line in lines:
-            target = next((v for k, v in WIRED.items() if k in line), None)
+            target = next((v for k, v in decl["wired"].items() if k in line), None)
             if target is None:
                 kept.append(line)
                 continue
             if target not in atoms and target not in existing:
-                raise ValueError(f"WIRED points at {target!r}, which is not a node")
+                raise ValueError(f"`wired` points at {target!r}, which is not a node")
             # FROM the node, TO the list it draws on. A reader arrives at a concept and asks what
             # is known about it, and outgoing edges are the answer to that question -- so the
             # concept points at the principles and practices that govern it, not the reverse. It
             # also keeps the two list nodes from accumulating 87 outgoing edges apiece while every
             # concept sits there with none.
             rels.append({"from": name_of(target), "rel": "about", "to": atoms[list_id]["title"],
-                         "why": line.split(" ", 1)[1].strip(),
+                         "why": line,
                          "from_id": target, "to_id": list_id})
-            used.add(next(k for k in WIRED if k in line))
+
         return kept
 
-    unused = set(WIRED) - {k for k in WIRED
-                           if any(k in l for l in principles + practices)}
+    unused = {k for k in decl["wired"] if not any(k in l for l in principles + practices)}
     if unused:
-        raise ValueError(f"WIRED keys match no line -- the source was reworded: {sorted(unused)}")
+        raise ValueError(f"`wired` keys match no line in {chapter} -- reworded? {sorted(unused)}")
     atoms[fid]["props"]["principles"] = wire(fid, principles)
     atoms[jid]["props"]["practices"] = wire(jid, practices)
     atoms[fid]["summary"] = FACT_SUMMARY

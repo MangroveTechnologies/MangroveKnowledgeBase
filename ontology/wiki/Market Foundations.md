@@ -1,6 +1,6 @@
 ---
 kind: concept
-chapter: 01-market-foundations
+chapter: market-foundations
 ---
 
 # market foundations
