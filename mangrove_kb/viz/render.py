@@ -853,11 +853,23 @@ PROPERTY_PANEL = r"""
     const p = (n && n.props) || {};
     let h = '';
     h += sec('inputs',  TABLE(p.inputs,  s => [s.type]));
-    h += sec('parameters', TABLE(p.params, s => [s.type,
-              s.default == null ? '' : 'default ' + NUM(s.default), BOUNDS(s.min, s.max)]));
-    // An EXPRESSION over the params above ("window - 1"), not a number -- 75 nodes say exactly that.
-    if(p.warmup_bars) h += `<div class="kbm kbw">warm-up <code>${E(p.warmup_bars)}</code>`
-      + ` bars — an expression in these parameters</div>`;
+
+    // Warm-up belongs INSIDE the section it talks about. Emitted between sections it was a
+    // top-level orphan on all 289 nodes that carry it -- the one thing in the panel that no
+    // heading owned and no fold could hide, which is exactly how it showed up when everything
+    // around it was folded away. On a node with no parameters the value is a constant, so the
+    // sentence that calls it an expression in them would be a lie: it gets its own section and
+    // says only what is true.
+    const params = TABLE(p.params, s => [s.type,
+              s.default == null ? '' : 'default ' + NUM(s.default), BOUNDS(s.min, s.max)]);
+    const warm = p.warmup_bars ? E(p.warmup_bars) : '';
+    if(params){
+      const note = warm ? `<div class="kbm kbw">warm-up <code>${warm}</code> bars`
+                          + ' — an expression in these parameters</div>' : '';
+      h += sec('parameters', params + note);
+    } else if(warm){
+      h += sec('warm-up', `<span class="kbm"><code>${warm}</code> bars</span>`);
+    }
     h += sec('outputs', TABLE(p.outputs, s => [s.type,
               s.units && s.units !== 'boolean' ? E(s.units) : '', RANGE(s.range, s.type)]));
     h += sec('interpretation', BULLETS(p.interpretation));
@@ -886,10 +898,11 @@ PROPERTY_PANEL = r"""
       x += `<div class="kbm"><b>${E(k)}</b>: `
         + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
     }
-    // A disclosure triangle over a single line hides one word behind a click. The 14 concept nodes
-    // carry no props at all, so for them the "extras" ARE the panel -- show them flat.
-    if(x) h += h ? `<details class="kbx"><summary>provenance &amp; extras</summary>${x}</details>`
-                 : sec('epistemic status', x);
+    // ONE name for this section on every node. It used to render flat, as "epistemic status", when
+    // the node had nothing else -- a special case I invented to avoid a disclosure over a single
+    // line, and the only thing it achieved was that 14 nodes disagreed with the other 289 about
+    // what the section is called and where the same fact lives.
+    if(x) h += `<details class="kbx"><summary>provenance &amp; extras</summary>${x}</details>`;
     return h;
   };
 

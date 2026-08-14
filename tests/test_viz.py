@@ -376,8 +376,11 @@ console.log(JSON.stringify({bb, concept, order: {
     # 224 nodes have a null abbreviation and 56 a null reference. A label with nothing after it is
     # worse than no label.
     assert "null" not in bb
-    # The 14 concept nodes carry no props at all: a disclosure triangle over one word is theatre.
-    assert "<details" not in out["concept"] and "observed" in out["concept"]
+    # The 14 concept nodes carry no props of their own, but the section they DO get is the same
+    # section, under the same name, as on the other 289. It used to render flat and be called
+    # something else, so the panel taught you its shape from one node and lied about the next.
+    assert '<summary>provenance &amp; extras</summary>' in out["concept"]
+    assert "observed" in out["concept"]
 
 
 def test_an_edge_says_which_outputs_it_uses(page, tmp_path):
@@ -486,3 +489,66 @@ def test_a_section_boundary_is_visible_in_both_themes(page):
     assert "#inspect details.kbs{margin:0;border-top:1px solid var(--kb-edge)}" in page
     assert "border-top:1px solid var(--line)}" not in page.split("PROPERTY_PANEL")[-1], \
         "a boundary drawn in --line is invisible on the dark panel"
+
+
+def test_nothing_in_the_panel_escapes_a_section(page, tmp_path):
+    """Everything the panel prints belongs to a heading that can fold it.
+
+    The warm-up line did not: emitted between sections, it was a top-level orphan on all 289 nodes
+    that carry one -- no heading owned it and no fold could hide it, which is how it turned up
+    alone on screen with every section around it folded away.
+
+    Scanned by walking the string with a depth counter rather than by eye, because the failure is
+    invisible until a node happens to be missing the section above the stray.
+    """
+    out = _run_in_node(page, """
+// depth-0 openings of the HTML KVPROPS returns: label, value, and the provenance <details>
+const tops = html => { const out=[]; let d=0;
+  for(const m of html.matchAll(/<(\\/?)([a-z0-9]+)([^>]*)>/gi)){
+    const close = m[1] === '/', tag = m[2].toLowerCase(), attrs = m[3];
+    if(['br','hr','img','input'].includes(tag) || /\\/$/.test(attrs)) continue;
+    if(close){ d--; continue; }
+    if(d === 0) out.push(tag + (/class="([^"]*)"/.exec(attrs)?.[1] ? '.' + /class="([^"]*)"/.exec(attrs)[1] : ''));
+    d++;
+  }
+  return out; };
+const bad = {};
+for(const n of DATA.nodes){
+  for(const t of tops(window.KVPROPS(n))){
+    if(t === 'div.lbl' || t === 'div.val' || t === 'details.kbx') continue;
+    (bad[t] = bad[t] || []).push(n.id);
+  }
+}
+console.log(JSON.stringify(Object.entries(bad).map(([k,v]) => [k, v.length, v[0]])));
+""", tmp_path)
+    assert out == [], f"these render outside any section: {out}"
+
+
+def test_one_node_shape_for_the_same_facts(page, tmp_path):
+    """The same fact must live in the same place on every node, under the same name.
+
+    `epistemic` rendered flat as its own section called "epistemic status" on the 14 nodes that
+    carry no other properties, and inside "provenance & extras" on the other 289 -- a special case
+    invented to avoid a disclosure over a single line, whose only effect was that a reader learned
+    the panel's shape from one node and was wrong about the next.
+
+    Sections still come and go with the DATA -- 232 nodes author no interpretation, 70 no
+    reference, 39 no parameters -- and an empty section is worse than an absent one. What must not
+    vary is where a fact lives WHEN IT EXISTS.
+    """
+    out = _run_in_node(page, """
+const names = {};
+for(const n of DATA.nodes){
+  const h = window.KVPROPS(n);
+  for(const m of h.matchAll(/<div class="lbl">([^<]*)<\\/div>/g)) (names[m[1]] = names[m[1]] || 0), names[m[1]]++;
+  for(const m of h.matchAll(/<summary>([^<]*)<\\/summary>/g)) (names[m[1]] = names[m[1]] || 0), names[m[1]]++;
+}
+console.log(JSON.stringify(names));
+""", tmp_path)
+    assert "epistemic status" not in out, \
+        "epistemic must live in provenance on every node, not as its own section on some"
+    assert out.get("provenance &amp; extras") == 303, \
+        f"every node carries an epistemic status, so every node has the section: {out}"
+    # warm-up is a sentence about the parameters when there are any, and its own section when
+    # there are not -- saying "an expression in these parameters" beside no parameters is a lie.
+    assert out.get("warm-up") == 25, f"expected the 25 parameterless nodes to head it: {out}"
