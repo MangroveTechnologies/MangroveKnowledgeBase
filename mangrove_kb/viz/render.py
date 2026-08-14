@@ -1037,16 +1037,9 @@ PROPERTY_PANEL = r"""
 # that every section the panel renders and every relation the graph carries can explain itself.
 TIP_COPY = """
 <script>
-// One sentence each, in the panel's own vocabulary. The relation copy is SKILL.md's -- these are
-// load-bearing definitions, not decoration, and inventing a second wording for them is how a
-// glossary starts disagreeing with the thing it describes.
-// WHAT A TOOLTIP HAS TO DO, from the research recorded in docs/research/tooltip-microcopy.md:
-// say what the thing IS and what you would USE IT FOR, and never restate the label. NN/g is blunt
-// about the failure mode -- "tooltips with obvious or redundant text are not beneficial to users"
-// -- and the first pass here failed exactly that way: `formula` said "How it is calculated", which
-// is the word `formula` with more letters. Microsoft's InfoTip rules (the `?`-icon pattern this
-// panel uses) ask for complete sentences in plain language; NN/g's microcontent rules ask for the
-// load-bearing words first, because this is read in a glance or not at all.
+// Each says what the thing is and what it is for, and never restates its label. Relation copy is
+// SKILL.md's wording: those are load-bearing definitions, and a second wording of them here would
+// drift from the thing it describes.
 window.KBTIPS = {
   'name': 'The name this computation goes by in code -- what you import, or pass to the registry '
     + 'when you call it.',
