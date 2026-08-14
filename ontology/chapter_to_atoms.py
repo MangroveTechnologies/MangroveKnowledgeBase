@@ -99,6 +99,29 @@ DEFINITION = {
 #: chapter's phrasing as a conflict reports work that is finished as work outstanding.
 RECONCILED = {"concept:volatility"}
 
+#: A stated line, and the node it concerns. A principle or a practice lives in its list until it
+#: earns an edge; then it MOVES -- out of the list, onto the edge as that edge's `why`. It is never
+#: in both places, so the two copies cannot drift apart, and what remains in a list is exactly what
+#: has not been wired yet. An empty list means the chapter is fully connected.
+#:
+#: Keyed by a distinctive fragment of the line rather than the whole sentence: the match must fail
+#: loudly if the source is reworded, and it does -- an unmatched key raises rather than quietly
+#: drawing no edge.
+#: What these two nodes ARE, said without reference to anything the reader cannot see. The first
+#: drafts described the file they came from -- "as advised across 01-market-foundations" -- which
+#: tells a reader nothing about why the node is worth opening.
+FACT_SUMMARY = (
+    "Things that are true of this market whether or not anyone acts on them. A strategy does not "
+    "get to disagree with one: it either accounts for it or pays for it.")
+JUDGMENT_SUMMARY = (
+    "Things we follow because someone has already paid to learn them. Each is a default rather "
+    "than a rule -- departing from one is often right, but it should be a decision with a reason.")
+
+WIRED = {
+    "Use iceberg orders for large positions": "concept:iceberg-order",
+    "Information Leakage: Some order types reveal": "concept:order-type",
+}
+
 PRICE = {"type": "series", "units": "price"}
 PROCEDURE_IO = {
     "procedure:quoted-spread": (
@@ -455,6 +478,34 @@ def build(path: Path, chapter: str, parent: str,
                   # between this node and the Fact beside it.
                   "epistemic": "inferred", "status": "draft",
                   "props": {"reference_chapter": [chapter], "practices": practices}}
+    def wire(list_id: str, lines: list[str]) -> list[str]:
+        """Move every wired line out of the list and onto an `about` edge carrying it as the why."""
+        kept, used = [], set()
+        for line in lines:
+            target = next((v for k, v in WIRED.items() if k in line), None)
+            if target is None:
+                kept.append(line)
+                continue
+            if target not in atoms and target not in existing:
+                raise ValueError(f"WIRED points at {target!r}, which is not a node")
+            # `about` -- the subject the statement concerns. It is what a signal takes to the
+            # character it reads, and a statement stands in the same relation to the thing it is
+            # about: concerned with, never an assertion of what it IS.
+            rels.append({"from": atoms[list_id]["title"], "rel": "about", "to": name_of(target),
+                         "why": line.split(" ", 1)[1].strip(),
+                         "from_id": list_id, "to_id": target})
+            used.add(next(k for k in WIRED if k in line))
+        return kept
+
+    unused = set(WIRED) - {k for k in WIRED
+                           if any(k in l for l in principles + practices)}
+    if unused:
+        raise ValueError(f"WIRED keys match no line -- the source was reworded: {sorted(unused)}")
+    atoms[fid]["props"]["principles"] = wire(fid, principles)
+    atoms[jid]["props"]["practices"] = wire(jid, practices)
+    atoms[fid]["summary"] = FACT_SUMMARY
+    atoms[jid]["summary"] = JUDGMENT_SUMMARY
+
     for i in (fid, jid):
         rels.append({"from": atoms[i]["title"], "rel": "part-of", "to": parent.split(":", 1)[1].replace("-", " "),
                      "why": f"stated across {chapter}", "from_id": i, "to_id": parent})

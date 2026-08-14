@@ -18665,7 +18665,7 @@
    "id": "fact:market-foundations-core-principles",
    "title": "core principles",
    "kind": "Fact",
-   "summary": "How the market behaves: 39 principles stated across market foundations.",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18681,7 +18681,6 @@
      "1.2 Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price",
      "1.2 Conditional Execution: Stop orders become active only when a trigger price is reached",
      "1.2 Execution Certainty: Different order types offer varying degrees of fill certainty",
-     "1.2 Information Leakage: Some order types reveal trading intentions more than others",
      "1.3 Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage)",
      "1.3 Information Hierarchy: Some participants have superior information or analytical capabilities",
      "1.3 Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade",
@@ -18719,7 +18718,7 @@
    "id": "judgment:market-foundations-best-practices",
    "title": "best practices",
    "kind": "Judgment",
-   "summary": "What to do about it: 50 practices advised across market foundations.",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
    "epistemic": "inferred",
    "status": "draft",
    "props": {
@@ -18737,7 +18736,6 @@
      "1.2 Set stop-losses based on technical levels or volatility, not arbitrary percentages",
      "1.2 Understand that stop orders become market orders and may fill at worse prices in fast markets",
      "1.2 Consider using stop-limit orders in volatile markets to maintain price control",
-     "1.2 Use iceberg orders for large positions to reduce information leakage",
      "1.3 Understand your position in the market participant hierarchy",
      "1.3 Recognize that market makers adjust spreads based on perceived information content of orders",
      "1.3 Monitor institutional activity through volume patterns, dark pool prints, and 13F filings",
@@ -29220,6 +29218,22 @@
   },
   {
    "from": "core principles",
+   "rel": "about",
+   "to": "order types",
+   "why": "Information Leakage: Some order types reveal trading intentions more than others",
+   "from_id": "fact:market-foundations-core-principles",
+   "to_id": "concept:order-type"
+  },
+  {
+   "from": "best practices",
+   "rel": "about",
+   "to": "iceberg order",
+   "why": "Use iceberg orders for large positions to reduce information leakage",
+   "from_id": "judgment:market-foundations-best-practices",
+   "to_id": "concept:iceberg-order"
+  },
+  {
+   "from": "core principles",
    "rel": "part-of",
    "to": "market foundations",
    "why": "stated across 01-market-foundations",
@@ -29536,8 +29550,18 @@
    ],
    [
     "fact:market-foundations-core-principles",
+    "about",
+    "concept:order-type"
+   ],
+   [
+    "fact:market-foundations-core-principles",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "judgment:market-foundations-best-practices",
+    "about",
+    "concept:iceberg-order"
    ],
    [
     "judgment:market-foundations-best-practices",
@@ -29641,7 +29665,7 @@
    "object:mangrove-knowledge-space"
   ],
   "chapter_01-market-foundations_atoms": 52,
-  "chapter_01-market-foundations_relations": 56,
+  "chapter_01-market-foundations_relations": 58,
   "chapter_01-market-foundations_folded": [
    "concept:volatility",
    "procedure:indicator-atr"

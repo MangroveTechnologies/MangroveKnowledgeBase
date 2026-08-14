@@ -45,20 +45,20 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 361, 1111
+s["nodes"], s["edges"]          # 361, 1113
 s["primitives"]                 # {'Procedure': 304, 'Concept': 44, 'Property': 3, ...}
-s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 240, ...}
+s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 242, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  361 1111
+nodes, edges  361 1113
 primitives    {'Procedure': 304, 'Concept': 44, 'Property': 3, 'Object': 1, 'Schema': 1,
                'Fact': 1, 'Judgment': 1}
-relations     {'instance-of': 360, 'uses': 233, 'about': 240, 'has-role': 218,
-               'kind-of': 31, 'part-of': 27, 'supersedes': 2}
+relations     {'instance-of': 360, 'uses': 233, 'about': 242, 'has-role': 218,
+               'kind-of': 32, 'part-of': 26, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:oscillator', 'concept:pattern',
                'concept:volatility']
@@ -66,7 +66,7 @@ roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 14 shapes in total]
+               ... 16 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask

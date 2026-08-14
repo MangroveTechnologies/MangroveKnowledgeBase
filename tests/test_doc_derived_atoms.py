@@ -97,3 +97,30 @@ def test_the_record_is_the_merged_graph_not_the_code_build_alone():
     assert record["meta"].get("doc_atoms") == authored, (
         "meta.doc_atoms is missing or stale -- the record was written by the code builder without "
         f"the wiki merge (expected {authored})")
+
+
+def test_a_wired_statement_lives_on_the_edge_and_not_in_the_list(kg):
+    """A principle or practice MOVES when it earns an edge; it is never in both places.
+
+    The list is the backlog: what remains in it is exactly what has not been connected yet, so an
+    empty list means the chapter is fully wired. A line left behind after its edge was drawn would
+    make that number meaningless and give the same sentence two copies to drift apart.
+    """
+    lists = {"fact:market-foundations-core-principles": "principles",
+             "judgment:market-foundations-best-practices": "practices"}
+    for nid, field in lists.items():
+        held = kg.get(nid)[field]
+        for edge in kg.neighbors(nid, relation="about", direction="out", limit=None):
+            reason = edge["why"].strip()
+            assert reason, f"{nid} -> {edge['id']} carries no statement"
+            assert not any(reason in line for line in held), (
+                f"{nid}: the statement wired to {edge['id']} is still in `{field}` -- it must move, "
+                "not be copied")
+
+
+def test_a_wired_concept_is_reachable_from_its_statement(kg):
+    """The point of moving it: the concept stops being a leaf and the advice is one hop away."""
+    inbound = kg.neighbors("concept:iceberg-order", direction="in", relation="about", limit=None)
+    assert any(e["id"].startswith("judgment:") for e in inbound), \
+        "iceberg-order should be reachable from the practice that names it"
+    assert all(e["why"].strip() for e in inbound)
