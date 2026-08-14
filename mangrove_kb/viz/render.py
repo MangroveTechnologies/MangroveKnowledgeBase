@@ -663,98 +663,721 @@ title="show this node">${esc(id)}</span>`;
 </script>
 """
 
-# Collapse across a chosen set of relation types, driven from the node panel.
+# The inspector's property block, made readable.
 #
-# The viewer's own collapse asks "what is reachable ONLY through this node", so it can never fold a
-# CROSS-CUTTING AXIS: every signal has two containment parents (`instance-of` Signal and `has-role`
-# its role), so collapsing `trigger` strands nobody, hideCount is 0, and the dead-toggle guard
-# reverts it. Correct for what it computes, useless for "hide the signals in this role".
+# The viewer renders any object property with `JSON.stringify`, so `inputs`, `params` and `outputs`
+# arrive as raw JSON -- BollingerBands' `outputs` alone is a ~1,400-character wall of braces. Worse,
+# `JSON.stringify` is LOSSY here: the page holds `range: [0, Infinity]` as real JS numbers and
+# stringify writes `null` for a non-finite one, so 161 unbounded endpoints render identically to the
+# 0 that were never authored. `SKILL.md` makes that distinction load-bearing -- "unbounded is
+# `[-inf, inf]`, not `null`" -- and the panel was destroying it at the last step.
 #
-# This asks a different question -- "what hangs off this node ALONG THESE RELATIONS" -- walking
-# incoming edges of the chosen types, transitively, and ignoring whether those nodes have another
-# parent. Jarvis's floater-free guarantee is kept as a POST-CONDITION rather than the definition:
-# after the type-scoped set is hidden, anything that can no longer reach the root is hidden too.
+# The property space is not arbitrary JSON. Measured across all 303 nodes: three dict-of-dict keys
+# with FIXED inner shapes (`inputs` {type, description} x625, `params` {type, default, min, max,
+# description} x581, `outputs` {type, units, range, canonical_name, description} x355), four plain
+# strings, and two that are a list on 64 nodes and a string on 7. Three known shapes is what makes
+# tables possible instead of a pretty-printer.
 #
-# Written against the viewer's own bindings: `hidden` is `let` so it is reassigned, `collapsed` and
-# `hideCount` are `const` so they are mutated in place, and `recomputeHidden`/`toggleCollapse` are
-# function declarations whose call sites (2D dblclick, 3D dblclick) resolve by name at call time.
-# The vendored file is not touched.
-COLLAPSE_PANEL = """
+# `window.KVPROPS`/`window.KVEDGE` are read at the two `kv()` CALL SITES (patched in `main()`), not
+# by redefining `kv` -- an overlay cannot rebind a `const`, and the call sites are guarded so the
+# panel falls back to the viewer's own dump if this script ever fails to load. Everything is a pure
+# string function over `n.props`: no DOM, no viewer bindings, so `tests/test_viz.py` runs it in node
+# against the real graph rather than asserting that the source text is present.
+#
+# Nothing is hidden. Any key these formatters do not know about still reaches the panel through the
+# generic fallback at the bottom of the details block -- the invariant the original `kv` existed for.
+PROPERTY_PANEL = r"""
 <style>
-  #inspect .xcol{margin-top:4px}
-  #inspect .xcol label{display:flex;align-items:center;gap:6px;font:11px ui-monospace,monospace;
-                       padding:1px 0;cursor:pointer}
-  #inspect .xcol label input{margin:0;cursor:pointer}
-  #inspect .xcol .n{color:var(--act);margin-left:auto}
-  #inspect .xcol button{margin-top:6px;font:11px ui-monospace,monospace;padding:3px 10px;
-                        cursor:pointer;border:1px solid currentColor;border-radius:3px;
-                        background:transparent;color:inherit}
-  #inspect .xcol button:hover{color:var(--act)}
-  #inspect .xcol .mut{font:11px ui-monospace,monospace}
+  /* The panel had one type size (10.5-12px) and one colour (--muted) for everything, so a
+     description -- the answer to "what is this" -- read exactly like the provenance beside it.
+     Now the size says what OUTRANKS what: a section heading (14.5px) is bigger than an entry name
+     inside it (12.5px) is bigger than nothing. Colour is mixed against --panel rather than
+     `transparent`, so every value is a real opaque colour in both themes instead of depending on
+     whatever happens to be painted underneath. */
+  /* WHAT FONT THIS ACTUALLY RENDERS IN. `Geist` and `Geist Mono` are named in the brand style but
+     no @font-face ever loads them and this page may not fetch one -- it is a single self-contained
+     file with no network. Measured in the browser: a string set in "Geist Mono" is pixel-identical
+     to the same string set in "NoSuchFont12345", i.e. both fall through to the generic. So the
+     brand font is aspirational here, and the only typography that is real is the size, the weight,
+     the colour, and WHICH GENERIC -- sans or mono. Those are what this block sets.
+     Mono is for identifiers -- names you would type: `window_dev`, `mavg`, `int`, `[0, inf]`.
+     Sans is for prose -- headings, descriptions, bullets. The panel used mono, small and grey, for
+     both, which is why it read as one undifferentiated block of code. */
+  #inspect{--kb-sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+           --kb-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+           --kb-2:color-mix(in oklab,var(--ink) 78%,var(--panel));
+           /* --line is #262626 on a #171717 panel in dark mode: a 1.15:1 rule, which is to say no
+              rule at all. Section boundaries are mixed toward --ink instead so they are visible in
+              BOTH themes, and each heading gets a filled band as well -- a line you have to look
+              for is not a boundary. */
+           --kb-rule:color-mix(in oklab,var(--ink) 22%,var(--panel));
+           --kb-edge:color-mix(in oklab,var(--ink) 42%,var(--panel));
+           --kb-band:color-mix(in oklab,var(--ink) 14%,var(--panel));
+           /* The brand accent is a mid teal: 6.5:1 on the dark panel and 2.66:1 on the light one,
+              measured. It is the token the eye lands on first, so on light it is darkened until it
+              clears 4.5:1 rather than left as decoration you cannot read. Three states, like every
+              other colour here -- the default is LIGHT, so a page with no `data-theme` and no OS
+              preference gets the readable one. */
+           --kb-ty:#12667f}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) #inspect{--kb-ty:var(--act)} }
+  :root[data-theme="dark"] #inspect{--kb-ty:var(--act)}
+  /* Headings were 10.5px uppercase mono in a grey mixed halfway to the background -- grey on black,
+     smaller than the text under them, and in the same typeface. A heading's whole job is to be the
+     thing you find when you are scanning. Now: sans, 14.5px, bold, FULL --ink, sentence case, on a
+     banded row with a hard edge above it -- and it is the control that folds its own section.
+     Every section folds, including the viewer's own (Description, Edges), because the transform
+     runs over label/value pairs rather than over my three tables. The open/closed state is
+     remembered per section name, so folding Edges once folds it for every node after it. */
+  #inspect h2{font:600 14px var(--kb-mono);line-height:1.35;margin-bottom:9px;color:var(--ink)}
+  #inspect details.kbs{margin:0;border-top:1px solid var(--kb-edge)}
+  #inspect details.kbs:first-of-type{border-top:0}
+  #inspect .lbl{font:700 14.5px var(--kb-sans);letter-spacing:0;text-transform:capitalize;
+                color:var(--ink);margin:16px 0 6px}
+  /* The band and the pointer belong to the ones that actually FOLD. The collapse-across panel also
+     emits a `.lbl`, and dressing a non-control as a control is worse than leaving it plain. */
+  #inspect summary.lbl{margin:0;padding:9px 9px 9px 8px;background:var(--kb-band);cursor:pointer;
+                       list-style:none;display:flex;align-items:center;gap:7px;user-select:none}
+  #inspect .lbl::-webkit-details-marker{display:none}
+  #inspect summary.lbl::before{content:"\25be";font-size:11px;color:var(--kb-2);width:9px;
+                               flex:none;transition:transform .12s ease}
+  #inspect details.kbs:not([open])>summary.lbl::before{transform:rotate(-90deg)}
+  #inspect .lbl:hover{color:var(--act)}
+  #inspect details.kbs>.val{padding:10px 2px 16px}
+  #inspect .val{font:13px/1.6 var(--kb-sans);color:var(--ink)}
+  #inspect .val.acc{color:var(--kb-2)}
+  #inspect table.kbt{border-collapse:collapse;width:100%;table-layout:fixed}
+  #inspect table.kbt td{vertical-align:top;padding:7px 0}
+  #inspect table.kbt tr+tr td{border-top:1px solid var(--kb-rule)}
+  #inspect table.kbt td.kbn{font:600 12.5px var(--kb-mono);color:var(--ink);
+                            width:38%;padding-right:10px;overflow-wrap:anywhere}
+  #inspect table.kbt td.kbv{overflow-wrap:anywhere}
+  /* The type is the first thing you want off an entry -- series, int, bool -- so it is the one
+     token in the meta line that carries a colour of its own. */
+  #inspect .kbty{color:var(--kb-ty);font-weight:700}
+  #inspect .kbm{font:12px var(--kb-mono);color:var(--kb-2);line-height:1.5}
+  #inspect .kbd{font:12.5px/1.55 var(--kb-sans);color:var(--ink);margin-top:4px}
+  /* It belongs to the parameter table above it, not to the last row in it -- without the gap it
+     read as a third line of window_dev's description. */
+  #inspect .kbw{margin-top:10px}
+  #inspect ul.kbl{margin:4px 0 0;padding-left:18px;font:12.5px/1.6 var(--kb-sans);color:var(--ink)}
+  #inspect ul.kbl li{margin:4px 0}
+  #inspect pre.kbp{margin:4px 0 0;padding:9px 11px;background:var(--chip);border:1px solid var(--line);
+                   border-radius:6px;color:var(--ink);font:12px/1.6 var(--kb-mono);
+                   white-space:pre-wrap;overflow-wrap:anywhere}
+  /* Provenance folds like every other section, and closed by default -- it is the one section
+     nobody opens to answer "what is this". */
+  #inspect details.kbx{margin:0;border-top:1px solid var(--kb-edge)}
+  #inspect details.kbx>summary{font:700 13px var(--kb-sans);color:var(--kb-2);cursor:pointer;
+                               list-style:none;padding:9px 8px;background:var(--kb-band);
+                               display:flex;align-items:center;gap:7px}
+  #inspect details.kbx>summary+*{margin-top:9px}
+  #inspect details.kbx>summary:hover{color:var(--act)}
+  #inspect details.kbx>summary::before{content:"\25be";font-size:11px;width:9px;flex:none;
+                                       transition:transform .12s ease}
+  #inspect details.kbx:not([open])>summary::before{transform:rotate(-90deg)}
+  #inspect details.kbx .kbm{margin:5px 0;padding:0 2px}
+  #inspect details.kbx pre.kbp{margin-left:2px;margin-right:2px}
+</style>
+<script>
+(function(){
+  // Self-contained on purpose: its own escaper, no reads of the viewer's scope. That is what lets
+  // the test harness eval this block in node with nothing but `window` stubbed.
+  const E = s => (s==null?'':(''+s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const sec = (label, body) => body ? `<div class="lbl">${E(label)}</div><div class="val">${body}</div>` : '';
+
+  // 2.0 not 2, 0.5 not 0.5000000000000001, and never "Infinity" -- callers handle non-finite.
+  const NUM = v => typeof v === 'number' ? (Number.isInteger(v) ? String(v)
+                    : String(parseFloat(v.toPrecision(6)))) : E(v);
+
+  // The whole point of this file. `null` means NOT AUTHORED; a non-finite bound means UNBOUNDED.
+  // They are different facts about an endpoint and the panel used to print both as `null`.
+  const RANGE = (r, type) => {
+    if(!Array.isArray(r) || r.length !== 2) return '';
+    const [lo, hi] = r;
+    if(type === 'bool' && lo === 0 && hi === 1) return 'true/false';   // 218 of 355 outputs
+    const nlo = lo == null, nhi = hi == null;
+    if(nlo && nhi) return '<span class="kbm">not authored</span>';
+    // Number.isFinite is false for null too, so test null first (above) -- order matters.
+    const ulo = !Number.isFinite(lo), uhi = !Number.isFinite(hi);
+    if(ulo && uhi) return 'unbounded';
+    if(ulo) return '≤ ' + NUM(hi);
+    if(uhi) return '≥ ' + NUM(lo);
+    return NUM(lo) + ' … ' + NUM(hi);
+  };
+
+  // min/max on a param are two independent optional bounds, NOT a range pair: 142 params author a
+  // min and no max. `null` there means unconstrained-because-unstated, so it is simply omitted.
+  const BOUNDS = (mn, mx) => mn == null && mx == null ? ''
+    : mn == null ? '≤ ' + NUM(mx)
+    : mx == null ? '≥ ' + NUM(mn)
+    : NUM(mn) + ' … ' + NUM(mx);
+
+  // name in the left column; the meta line and the description stacked in the right. Holds up at
+  // the 330px default width, where five real columns would wrap into porridge.
+  const TABLE = (dict, row) => {
+    const ks = Object.keys(dict || {});
+    if(!ks.length) return '';
+    return '<table class="kbt">' + ks.map(k => {
+      const s = dict[k] || {}, parts = row(s).filter(Boolean);
+      // The first token is always the type. It gets the accent so the eye lands on "series" /
+      // "int" / "bool" first; the rest of the line is supporting detail.
+      const meta = parts.length
+        ? `<span class="kbty">${E(parts[0])}</span>`
+          + (parts.length > 1 ? ' · ' + parts.slice(1).join(' · ') : '')
+        : '';
+      return `<tr><td class="kbn">${E(k)}</td><td class="kbv">`
+        + (meta ? `<span class="kbm">${meta}</span>` : '')
+        + (s.description ? `<div class="kbd">${E(s.description)}</div>` : '')
+        + '</td></tr>';
+    }).join('') + '</table>';
+  };
+
+  // 64 nodes carry these as a list and 7 as a paragraph. Same field, so it renders the same way.
+  const BULLETS = v => Array.isArray(v)
+    ? '<ul class="kbl">' + v.map(x => `<li>${E(x)}</li>`).join('') + '</ul>'
+    : (v ? `<div class="kbd">${E(v)}</div>` : '');
+
+  const CODE = v => v ? `<pre class="kbp">${E(v)}</pre>` : '';
+
+  const LINK = u => {
+    if(!u) return '';
+    let host = u; try{ host = new URL(u).hostname.replace(/^www\./,''); }catch(_){}
+    return `<a href="${E(u)}" target="_blank" rel="noopener" title="${E(u)}">${E(host)} →</a>`;
+  };
+
+  // Everything the panel already showed higher up, or that is provenance rather than an answer.
+  const KNOWN = ['inputs','params','outputs','formula','usage_example','warmup_bars',
+                 'source_module','reference','abbreviation','interpretation','applications'];
+
+  window.KVPROPS = function(n){
+    const p = (n && n.props) || {};
+    let h = '';
+    h += sec('inputs',  TABLE(p.inputs,  s => [s.type]));
+
+    // Warm-up belongs INSIDE the section it talks about. Emitted between sections it was a
+    // top-level orphan on all 289 nodes that carry it -- the one thing in the panel that no
+    // heading owned and no fold could hide, which is exactly how it showed up when everything
+    // around it was folded away. On a node with no parameters the value is a constant, so the
+    // sentence that calls it an expression in them would be a lie: it gets its own section and
+    // says only what is true.
+    const params = TABLE(p.params, s => [s.type,
+              s.default == null ? '' : 'default ' + NUM(s.default), BOUNDS(s.min, s.max)]);
+    const warm = p.warmup_bars ? E(p.warmup_bars) : '';
+    if(params){
+      const note = warm ? `<div class="kbm kbw">warm-up <code>${warm}</code> bars`
+                          + ' — an expression in these parameters</div>' : '';
+      h += sec('parameters', params + note);
+    } else if(warm){
+      h += sec('warm-up', `<span class="kbm"><code>${warm}</code> bars</span>`);
+    }
+    h += sec('outputs', TABLE(p.outputs, s => [s.type,
+              s.units && s.units !== 'boolean' ? E(s.units) : '', RANGE(s.range, s.type)]));
+    h += sec('interpretation', BULLETS(p.interpretation));
+    h += sec('applications',   BULLETS(p.applications));
+    h += sec('formula',        CODE(p.formula));
+    h += sec('reference',      LINK(p.reference));
+
+    // Provenance and the long-tail: real, occasionally wanted, never the answer to "what is this".
+    let x = '';
+    if(p.source_module) x += `<div class="kbm">module <code>${E(p.source_module)}</code></div>`;
+    if(p.abbreviation)  x += `<div class="kbm">abbreviated <b>${E(p.abbreviation)}</b></div>`;
+    // Confidence is null on every node in this graph, so it is printed only if one ever carries it.
+    if(n && n.epistemic) x += `<div class="kbm">epistemic <b>${E(n.epistemic)}</b>`
+      + (n.conf == null ? '' : ' · confidence ' + NUM(n.conf)) + '</div>';
+    // 246 of 355 outputs say "none"; printing those is noise, and the 109 real ones are the ones a
+    // reader is looking for when they ask what the literature calls this line.
+    const cn = Object.entries(p.outputs || {})
+      .filter(([, s]) => s && s.canonical_name && s.canonical_name !== 'none')
+      .map(([k, s]) => `${E(k)} → ${E(s.canonical_name)}`);
+    if(cn.length) x += `<div class="kbm">known as ${cn.join(' · ')}</div>`;
+    if(p.usage_example) x += '<div class="kbm" style="margin-top:6px">usage</div>'
+      + CODE(p.usage_example);
+    // Anything this file has never heard of, verbatim. The panel hides nothing.
+    for(const [k, v] of Object.entries(p)){
+      if(KNOWN.includes(k) || v == null) continue;
+      x += `<div class="kbm"><b>${E(k)}</b>: `
+        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+    }
+    // ONE name for this section on every node. It used to render flat, as "epistemic status", when
+    // the node had nothing else -- a special case I invented to avoid a disclosure over a single
+    // line, and the only thing it achieved was that 14 nodes disagreed with the other 289 about
+    // what the section is called and where the same fact lives.
+    // This summary is written here rather than by the fold pass, so it needs its own `?` -- it had
+    // copy and no way to reach it, which is the one section where "what even is this" is likeliest.
+    const ptip = (window.KBTIPS || {})['provenance & extras'];
+    if(x) h += '<details class="kbx"><summary>provenance &amp; extras'
+      + (ptip ? `<button type="button" class="xtip" data-tip="${E(ptip)}" `
+                + 'aria-label="what does provenance &amp; extras mean?">?</button>' : '')
+      + `</summary>${x}</details>`;
+    return h;
+  };
+
+  // `uses` carries WHICH outputs of the indicator flow into the signal. As raw JSON that read
+  // `{"adi":{"type":"series"}}`; the type is the same on all 233 and says nothing.
+  window.KVEDGE = function(e){
+    const p = (e && e.props) || {};
+    let h = '';
+    if(p.why) h += sec('why', `<span class="kbd">${E(p.why)}</span>`);
+    const io = Object.keys(p.inputs || {});
+    if(io.length) h += sec('inputs used', io.map(k => `<code>${E(k)}</code>`).join(' '));
+    let rest = '';
+    for(const [k, v] of Object.entries(p)){
+      if(['because','state','note','why','inputs'].includes(k) || v == null) continue;
+      rest += `<div class="kbm"><b>${E(k)}</b>: `
+        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+    }
+    return h + (rest ? sec('other properties', rest) : '');
+  };
+
+  // --- folding -------------------------------------------------------------------------------
+  // Every section becomes a <details>, driven by the label/value pairs the panel already emits --
+  // so the viewer's own blocks (Description, Edges, and the 40-edge lists that pushed everything
+  // else off screen) fold on exactly the same control as mine, without either of us knowing about
+  // the other. The heading keeps its `.lbl` class, so `labelEl(t).nextElementSibling` still finds
+  // the value block for the two overlays that look sections up by name.
+  const FOLD_KEY = 'mangrove-kb-panel-sections';
+  const readFold = () => { try{ return JSON.parse(localStorage.getItem(FOLD_KEY)) || {}; }
+                           catch(e){ return {}; } };
+  const writeFold = s => { try{ localStorage.setItem(FOLD_KEY, JSON.stringify(s)); }catch(e){} };
+
+  function foldSections(){
+    const state = readFold();
+    // Only top-level labels: the ones already inside a <details> have been folded on a previous
+    // pass, and the panel is rebuilt from scratch on every click anyway.
+    for(const l of [...inspect.querySelectorAll(':scope > .lbl')]){
+      const v = l.nextElementSibling;
+      if(!v || !v.classList.contains('val')) continue;
+      const key = l.textContent.trim().toLowerCase();
+      const d = document.createElement('details');
+      d.className = 'kbs';
+      d.open = state[key] !== false;                       // open unless folded before
+      const s = document.createElement('summary');
+      s.className = 'lbl';                                 // keep the class the lookups use
+      s.textContent = l.textContent;
+      // The section's name as DATA. Reading it back off `textContent` breaks the moment anything
+      // else is appended to the heading -- adding the `?` put the Action section back above the
+      // title, because the lookup for "name" was suddenly looking at "name?".
+      s.dataset.k = key;
+      // The help affordance rides on the heading rather than replacing it as the hover target:
+      // the heading folds, the `?` explains, and neither does the other's job by accident.
+      const copy = (window.KBTIPS || {})[key];
+      if(copy){
+        const q = document.createElement('button');
+        q.type = 'button';
+        q.className = 'xtip';
+        q.dataset.tip = copy;
+        q.setAttribute('aria-label', 'what does ' + key + ' mean?');
+        q.textContent = '?';
+        s.append(q);
+      }
+      l.replaceWith(d);
+      d.append(s, v);
+      d.addEventListener('toggle', () => { const st = readFold(); st[key] = d.open; writeFold(st); });
+    }
+    // The provenance block is written by KVPROPS as its own <details>, so the loop above never sees
+    // it -- and it was the one section that forgot its state the moment you clicked another node,
+    // while every other section remembered. Same store, same key, opposite default: it stays shut
+    // unless you have opened it, because it is the section nobody opens to answer "what is this".
+    const prov = inspect.querySelector(':scope > details.kbx');
+    if(prov){
+      const key = 'provenance & extras';
+      prov.open = state[key] === true;
+      prov.addEventListener('toggle', () => {
+        const st = readFold(); st[key] = prov.open; writeFold(st);
+      });
+    }
+  }
+
+  // The viewer prints `epistemic · confidence` near the top, where confidence is null on every node
+  // in this graph -- it rendered as the words "observed ·" with nothing after them. It now sits in
+  // the details block above, so drop the original rather than show it twice.
+  //
+  // This wrapper is registered before the collapse panel's and the back button's, so it runs LAST
+  // (each calls the one it captured) -- the panel is fully built by the time sections are folded.
+  if(typeof showNode === 'function'){
+    const _showNode = showNode, _showEdge = showEdge;
+    showNode = function(n){
+      _showNode(n);
+      const l = [...inspect.querySelectorAll('.lbl')]
+        .find(x => x.textContent === 'epistemic · confidence');
+      if(l){ const v = l.nextElementSibling; l.remove(); if(v) v.remove(); }
+      foldSections();
+    };
+    showEdge = function(e){ _showEdge(e); foldSections(); };
+    // The action panel is inserted by a LATER wrapper, i.e. after this one has already folded
+    // everything into <details>. It hands its own label/value pair back through here so there is
+    // one definition of what a section is, rather than two that drift.
+    window.KBFOLD = foldSections;
+  }
+})();
+</script>
+"""
+
+# Tooltips.
+#
+# The panel names things the reader has no way to look up from inside it: a section called
+# `provenance & extras`, an edge type called `about` that means something precise and unobvious
+# (a signal is ABOUT its class; an indicator is an INSTANCE of it -- SKILL.md's distinction, and
+# the copy here is taken from there rather than invented).
+#
+# How it behaves, and why:
+#   * The trigger is a `?`, not the heading. The heading is already a control -- it folds the
+#     section -- and on touch there is no hover at all, so making the heading the trigger means a
+#     tap to read the tip folds the thing you were reading about. The `?` is tab-focusable, tap-
+#     targetable, and dim until you approach it.
+#   * 450ms in, 120ms out. Instant tooltips flicker as the pointer crosses on its way somewhere
+#     else; a deliberate pause is what asks for one.
+#   * Anchored to the trigger, not the cursor. A bubble that chases the mouse is noise.
+#   * Rendered against the viewport, to the LEFT of the panel and over the canvas. The panel is
+#     `overflow:auto` and 330px wide by default: anything inside it is either clipped at the edge
+#     or covering the very content the heading introduces.
+#   * `role="tooltip"` + `aria-describedby`, shows on keyboard focus, Esc dismisses, one at a time,
+#     and it goes away on scroll, on click and whenever the panel is rebuilt.
+# The tooltip copy, in its own block with no DOM in it, so the tests can read it in node and check
+# that every section the panel renders and every relation the graph carries can explain itself.
+TIP_COPY = """
+<script>
+// Each says what the thing is and what it is for, and never restates its label. Relation copy is
+// SKILL.md's wording: those are load-bearing definitions, and a second wording of them here would
+// drift from the thing it describes.
+window.KBTIPS = {
+  'name': 'The name this computation goes by in code -- what you import, or pass to the registry '
+    + 'when you call it.',
+  'action': 'Controls how much of the graph you see around this node. Use it to isolate one '
+    + 'computation -- just what it touches, everything it is built from, everything built on it -- '
+    + 'or to drop edge types you do not care about. Each option says how many nodes it leaves.',
+  'description': 'What this computation does, in one sentence. Read it first to decide whether '
+    + 'this is the one you want.',
+  'subtype': 'The family this belongs to: averaging, momentum, oscillator, volatility, flow or '
+    + 'pattern. Use it to find siblings that do a similar job.',
+  'inputs': 'The price series this reads, and what each one is for. You supply them as columns -- '
+    + 'close, high, volume.',
+  'parameters': 'The settings you pass when you call it, with the default and the range each '
+    + 'accepts. Tune these to your timeframe and instrument.',
+  'warm-up': 'How many bars this needs before its first valid value. Feed it fewer and the leading '
+    + 'rows come back empty.',
+  'outputs': 'What this returns, with units and the range each value can take. Check it before you '
+    + 'plot a series, threshold it, or compare two of them.',
+  'interpretation': 'What the values mean in practice -- what a high reading, a low one, or a '
+    + 'crossing is telling you about the market.',
+  'applications': 'What this is good for in a strategy, and the conditions it suits.',
+  'formula': 'The calculation itself, as stated in the source. Use it to check the implementation '
+    + 'against the definition you already know.',
+  'reference': 'The published description this implementation follows, for when you want the '
+    + 'original rather than ours.',
+  'provenance & extras': 'Where this lives in the code, a call you can copy, and how the entry '
+    + 'itself was recorded.',
+  'edges': 'Every relationship this node has, incoming and outgoing. Click one to jump to the node '
+    + 'on the other end.',
+};
+// What each relation ASSERTS, and what you would follow it for. These are SKILL.md's distinctions:
+// `about` versus `instance-of` is a claim the graph makes, and a second wording of it here would
+// start disagreeing with the thing it describes.
+window.KBRELTIPS = {
+  'instance-of': 'Says this indicator measures that class -- RSI measures momentum. Follow it to '
+    + 'find every indicator of a given kind.',
+  'about': 'Says this signal is concerned with that class without measuring it. It is how a '
+    + 'boolean signal carries a class, and it comes from the indicator the signal reads.',
+  'kind-of': 'Says this is a subtype of that. Anything true of the parent is true here, so it '
+    + 'carries down.',
+  'part-of': 'Says this is a component of that -- how the graph groups pieces into a whole.',
+  'has-role': 'The part this plays in a strategy: trigger or filter. A role is not a type -- the '
+    + 'same computation can play a different part in another strategy.',
+  'uses': "Says this reads the other computation, and names which of its outputs flow in. Follow "
+    + "it to see what a signal is built from.",
+  'supersedes': 'Says this replaces the other, which is deprecated. The old one still runs; this '
+    + 'is the canonical version.',
+};
+</script>
+"""
+
+TOOLTIPS = """
+<style>
+  #inspect .xtip{margin-left:auto;flex:none;width:16px;height:16px;padding:0;border-radius:50%;
+                 border:1px solid var(--kb-edge);background:transparent;color:var(--kb-2);
+                 font:700 10px var(--kb-sans);line-height:14px;cursor:help;opacity:.5}
+  #inspect .xtip:hover,#inspect .xtip:focus-visible{opacity:1;color:var(--act);border-color:var(--act)}
+  #inspect .xtip:focus-visible{outline:2px solid var(--act);outline-offset:2px}
+  #inspect .xrow .xtip{margin-left:0}
+  #xtip{position:fixed;z-index:20;display:none;max-width:290px;padding:9px 11px;
+        border:1px solid var(--kb-edge,var(--line));border-radius:var(--radius);
+        background:var(--panel);color:var(--ink);font:12.5px/1.5 var(--kb-sans,system-ui);
+        box-shadow:0 4px 16px rgba(0,0,0,.28)}
+  #xtip.on{display:block}
+  #xtip code{font:11.5px var(--kb-mono,ui-monospace);background:var(--chip);padding:0 4px;
+             border-radius:3px}
+</style>
+<script>
+(function(){
+  const tip = document.createElement('div');
+  tip.id = 'xtip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.append(tip);
+
+  let inT = null, outT = null, anchor = null;
+
+  function place(el){
+    tip.textContent = el.dataset.tip;
+    tip.className = 'on';                       // measure only once it is laid out
+    const r = el.getBoundingClientRect(), panel = inspect.getBoundingClientRect();
+    tip.style.right = Math.max(8, innerWidth - panel.left + 10) + 'px';
+    const top = r.top + r.height / 2 - tip.offsetHeight / 2;
+    tip.style.top = Math.max(8, Math.min(innerHeight - tip.offsetHeight - 8, top)) + 'px';
+    el.setAttribute('aria-describedby', 'xtip');
+    anchor = el;
+  }
+  function hide(){
+    clearTimeout(inT); clearTimeout(outT);
+    tip.className = '';
+    if(anchor){ anchor.removeAttribute('aria-describedby'); anchor = null; }
+  }
+  function schedule(el, delay){
+    clearTimeout(inT); clearTimeout(outT);
+    inT = setTimeout(() => place(el), delay);
+  }
+
+  inspect.addEventListener('mouseover', ev => {
+    const el = ev.target.closest('[data-tip]');
+    if(el && el !== anchor) schedule(el, 450);
+  });
+  inspect.addEventListener('mouseout', ev => {
+    if(!ev.target.closest('[data-tip]')) return;
+    clearTimeout(inT);
+    outT = setTimeout(hide, 120);
+  });
+  // Keyboard and touch. A tap on the `?` inside a <summary> would fold the section, so the default
+  // is cancelled here -- the button is a help affordance, not a second fold control.
+  inspect.addEventListener('focusin', ev => {
+    const el = ev.target.closest('[data-tip]');
+    if(el) schedule(el, 0);
+  });
+  inspect.addEventListener('focusout', hide);
+  inspect.addEventListener('click', ev => {
+    const el = ev.target.closest('.xtip');
+    if(!el) return;
+    ev.preventDefault(); ev.stopPropagation();
+    if(anchor === el) hide(); else place(el);
+  }, true);
+  inspect.addEventListener('scroll', hide, true);
+  addEventListener('keydown', ev => { if(ev.key === 'Escape') hide(); });
+  addEventListener('resize', hide);
+})();
+</script>
+"""
+
+# The set maths behind `show only`, kept in its own block with no reference to the viewer's scope.
+#
+# It takes its edges as an argument rather than reading `L`, which is the whole point: the test
+# harness evaluates this script in node and runs it over the page's own DATA payload, then compares
+# every answer against the same traversal written independently in Python. A count on a button that
+# disagrees with what happens after the click is worse than no count at all.
+FOCUS_SETS = """
+<script>
+// Nodes to KEEP around `id`, excluding the anchor itself, for ONE primitive scope. `null` means no
+// focus at all -- which is not the same as an empty set, and the difference decides whether the
+// canvas shows everything or nothing. Direction is the graph's own: a signal is `instance-of` its
+// class, so classes are UP. Combinations are unions of these, see KBUNION below.
+window.KBSETS = function(edges, id, types, mode){
+  if(mode === 'all') return null;
+  const T = types instanceof Set ? types : new Set(types);
+  const inBy = {}, outBy = {};
+  for(const e of edges){
+    if(!T.has(e.type)) continue;
+    (inBy[e.dst] = inBy[e.dst] || []).push(e.src);      // child --rel--> parent
+    (outBy[e.src] = outBy[e.src] || []).push(e.dst);
+  }
+  const walk = adj => {
+    const out = new Set(), seen = new Set([id]), q = [id];
+    while(q.length){
+      const u = q.shift();
+      for(const v of (adj[u] || [])){
+        if(seen.has(v)) continue;
+        seen.add(v); out.add(v); q.push(v);
+      }
+    }
+    return out;
+  };
+  if(mode === 'neighbors') return new Set([...(inBy[id] || []), ...(outBy[id] || [])]);
+  if(mode === 'descendants') return walk(inBy);
+  if(mode === 'ancestors') return walk(outBy);
+  return null;
+};
+
+// The union of any combination -- neighbors + ancestors, all three, whatever is lit. There is no
+// separate "ancestors + descendants" mode because a combination is not a fourth kind of thing; an
+// empty selection is `everything`, which is no focus at all rather than an empty view.
+window.KBUNION = function(edges, id, types, modes){
+  if(!modes || !modes.length) return null;
+  const out = new Set();
+  for(const m of modes){
+    const s = window.KBSETS(edges, id, types, m);
+    if(s) s.forEach(x => out.add(x));
+  }
+  return out;
+};
+</script>
+"""
+
+# The Action section: how much of the graph is in view, and along which edges.
+#
+# Two controls, coarse first. `show only` picks how much graph is in view around this node:
+# neighbors, descendants, ancestors -- combinable, so all seven combinations come out of three
+# rows, and selecting none is `everything`. `show or hide` prunes edge types within that. ONE RULE
+# ties them together, and it is Tim's: the walk traverses exactly the edge types currently set to
+# show, so a row set to `hide` drops that branch AND drops that axis from the walk. Each row hides
+# only what its own count claims -- one walk per type, never a combined one, and whatever is set to
+# hide IS the answer (the root-reachability rule is skipped, as it is under focus). Every count is
+# recomputed from the live type set, so the numbers always describe what the button will do.
+#
+# The set maths is exposed as `window.KBSETS` (one scope) and `window.KBUNION` (a combination) --
+# pure, taking their edges as an argument rather than reading the viewer's `L` -- so
+# `tests/test_viz.py` executes them in node against the real graph and compares every answer with
+# the same traversal written independently in Python, instead of asserting that the source looks
+# right.
+#
+# The floater rule is the hazard here. `recomputeHidden` normally ends by hiding anything that
+# cannot reach the root, which is what keeps a fold from leaving orphans adrift. Under focus the
+# root is usually OUT of view, so that rule would hide the entire graph -- a blank canvas with no
+# error. Focus therefore REPLACES that post-condition rather than composing with it, and there is a
+# test that fails on a blank canvas.
+ACTION_PANEL = """
+<style>
+  #inspect .xintro{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2);margin:0 0 7px}
+  #inspect .xintro+.xintro{margin-top:16px}
+  #inspect .xrow{display:flex;align-items:center;gap:9px;padding:6px 0}
+  #inspect .xrow+.xrow{border-top:1px solid var(--kb-rule)}
+  #inspect .xname{font:600 12.5px var(--kb-mono);color:var(--ink);overflow-wrap:anywhere}
+  #inspect .xn{font:11.5px var(--kb-mono);color:var(--kb-2);margin-left:auto;flex:none}
+  /* Two words, one lit. A checkbox says "ticked/unticked" and leaves you to work out which way
+     round that is; show|hide says what the graph is doing right now, in the words themselves. */
+  #inspect .xsw{display:inline-flex;flex:none;border:1px solid var(--kb-edge);border-radius:5px;
+                overflow:hidden}
+  #inspect .xsw button{font:600 11px var(--kb-sans);padding:3px 9px;border:0;cursor:pointer;
+                       background:transparent;color:var(--kb-2);letter-spacing:.01em}
+  #inspect .xsw button+button{border-left:1px solid var(--kb-edge)}
+  #inspect .xsw button:hover{color:var(--ink)}
+  /* Dark ink on the lit chip in both themes: white on this teal measures 2.6:1. */
+  #inspect .xsw button.on{background:var(--act);color:#0a0a0a}
+  #inspect .xsw button.on.xhide{background:var(--dev-highlight);color:#0a0a0a}
+  #inspect .xnone{font:12.5px/1.55 var(--kb-sans);color:var(--kb-2)}
+  /* Read aloud, never drawn: "neighbors 11" alone does not say 11 of what. */
+  #inspect .xsr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);
+                white-space:nowrap}
+  /* The scope rows are a radio, not toggles: these views are mutually exclusive and `everything`
+     is the way back. The whole row is the control -- a 5-option segmented strip wraps into
+     porridge at the 330px default width, and the counts have nowhere to live. */
+  #inspect button.xfrow{display:flex;align-items:center;gap:9px;width:100%;padding:6px 8px;
+                        border:0;border-left:2px solid transparent;background:transparent;
+                        cursor:pointer;text-align:left;font:inherit}
+  #inspect button.xfrow+button.xfrow{border-top:1px solid var(--kb-rule)}
+  #inspect button.xfrow:hover:not(:disabled){background:var(--kb-band)}
+  #inspect button.xfrow.on{background:var(--kb-band);border-left-color:var(--act)}
+  #inspect button.xfrow:disabled{cursor:default;opacity:.45}
+  #inspect button.xfrow .xdot{width:9px;height:9px;flex:none;border-radius:50%;
+                              border:1px solid var(--kb-edge)}
+  #inspect button.xfrow.on .xdot{background:var(--act);border-color:var(--act)}
+  /* Focus is a change to the whole canvas, so its indicator lives ON the canvas -- the panel can
+     be scrolled away or showing a different node entirely. Without this a reduced graph has no
+     visible cause and no way back. */
+  #xfocus{position:absolute;left:12px;top:12px;z-index:6;display:none;align-items:center;gap:9px;
+          padding:6px 10px;border:1px solid var(--kb-edge,var(--line));border-radius:var(--radius);
+          background:var(--panel);color:var(--ink);font:12px var(--kb-sans,system-ui);
+          box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  #xfocus.on{display:flex}
+  #xfocus b{font:600 12px ui-monospace,monospace}
+  #xfocus .xfx{border:0;background:transparent;color:var(--act);cursor:pointer;font:600 12px inherit;
+               padding:0 2px}
+  #xfocus .xfx:hover{text-decoration:underline}
 </style>
 <script>
 (function(){
   const ROOT = __ROOT__;
-  const scope = new Map();                       // node id -> Set of relation types to fold along
+  // Attribute-safe: the viewer's `esc` handles text nodes, not `attr="..."` values.
+  const attr = v => esc(v).replace(/"/g, '&quot;');
+  const scope = new Map();                       // node id -> Set of relation types set to `hide`
+  let focus = {id:null, mode:'all'};             // never persisted: a page that opens showing 8 of
+                                                 // 303 with no explanation is a bug report
 
-  const inBy = {};                               // dst -> incoming edges (child --rel--> parent)
-  L.forEach(e => { (inBy[e.dst] = inBy[e.dst] || []).push(e); });
-
-  // relation types incident to a node; `inn` is what a collapse could fold along
-  function typesFor(id){
+  // relation types incident to a node, and which way they point from it
+  function incident(id){
     const m = new Map();
-    L.forEach(e => {
-      const k = e.type;
-      if(e.dst === id || e.src === id){
-        const v = m.get(k) || {inn:0, out:0};
-        (e.dst === id ? v.inn++ : v.out++); m.set(k, v);
-      }
-    });
+    for(const e of L){
+      if(e.dst !== id && e.src !== id) continue;
+      const v = m.get(e.type) || {inn:0, out:0};
+      (e.dst === id ? v.inn++ : v.out++); m.set(e.type, v);
+    }
     return m;
   }
-  const foldable = id => [...typesFor(id)].filter(([, c]) => c.inn > 0).map(([t]) => t);
-  const defaults = id => new Set(foldable(id));
-
-  // everything that reaches `id` by incoming edges of `types`, transitively
-  function descendants(id, types){
-    const out = new Set(), seen = new Set([id]), q = [id];
-    while(q.length){
-      const u = q.shift();
-      (inBy[u] || []).forEach(e => {
-        if(!types.has(e.type) || seen.has(e.src)) return;
-        seen.add(e.src); out.add(e.src); q.push(e.src);
-      });
-    }
+  const ALL_TYPES = [...new Set(L.map(e => e.type))];
+  // Everything hidden along one edge type is everything that way FROM this node, in whichever
+  // direction(s) the type is incident here -- both lineages, so a row works on a leaf too, where
+  // every edge points outward and the old panel could only say "nothing hangs off this node".
+  // ONE ROW AT A TIME. Walking the hidden types as a single set lets the traversal cross from one
+  // to another -- out along `instance-of`, then onward down `has-role`, then `uses` -- so three
+  // rows claiming one node each removed five between them. A row's count has to be what that row
+  // does, so each type gets its own walk and the results are unioned.
+  const awayOne = (id, t) =>
+    window.KBUNION(L, id, [t], ['descendants', 'ancestors']) || new Set();
+  const away = (id, types) => {
+    const out = new Set();
+    for(const t of types) awayOne(id, t).forEach(x => out.add(x));
     return out;
-  }
+  };
+  // What the walk may cross: everything except the types this node has set to hide. Tim's rule.
+  const live = id => { const off = scope.get(id) || new Set();
+                       return new Set(ALL_TYPES.filter(t => !off.has(t))); };
 
   // Two ways in, and they must not be confused:
   //   * double-click keeps UPSTREAM's rule exactly -- containment-reachability, folding only what is
   //     reachable SOLELY through the node. `Indicator` folds 75; `RSI`, `trigger` and `filter` fold
   //     nothing, because their children have a second parent. Unchanged behaviour, deliberately.
-  //   * the panel folds along the TICKED relation types, which is the only way to fold a
+  //   * the panel hides along the chosen relation types, which is the only way to fold a
   //     cross-cutting axis. A node folded that way has an entry in `scope`.
   recomputeHidden = function(){
     const h = new Set();
     collapsed.forEach(id => {                    // panel folds: type-scoped
-      const t = scope.get(id); if(t) descendants(id, t).forEach(x => h.add(x));
+      const t = scope.get(id); if(t && t.size) away(id, t).forEach(x => h.add(x));
     });
-    if(idx[ROOT] != null){                       // upstream's rule, and the floater post-condition
-      const seen = new Set([ROOT]), q = [ROOT];
-      while(q.length){
-        const u = q.shift();
-        if(collapsed.has(u)) continue;           // never traverse THROUGH a collapsed node
-        (cadj[u] || []).forEach(v => { if(h.has(v) || seen.has(v)) return; seen.add(v); q.push(v); });
+    const keep = focus.id == null ? null
+                 : window.KBUNION(L, focus.id, live(focus.id), focus.modes);
+    // Is any row set to `hide`? Then those rows decide what is hidden, and the root-reachability
+    // rule below is skipped -- for the same reason focus skips it, and it took Tim reporting a
+    // node with no edges to see it. Hiding one signal's `uses` claimed 1 node and removed 21: the
+    // three endpoints the rows named, plus 18 the floater rule swept up behind them, INCLUDING the
+    // far end of the `about` edge that was still set to show. So a row's count lied, and a row set
+    // to show did nothing, because a different row had already taken its endpoint away.
+    //
+    // The trade is deliberate: hiding a hub can now leave nodes on screen with no visible route to
+    // the root. That is what the user asked for, and it is honest -- the alternative silently
+    // deletes a fifth of the graph and reports 1.
+    const scoped = [...collapsed].some(id => (scope.get(id) || new Set()).size > 0);
+    if(keep){
+      // Focus REPLACES the root-reachability post-condition below. Composing them would hide the
+      // whole graph, because the root is normally outside the focused set.
+      keep.add(focus.id);
+      N.forEach(n => { if(!keep.has(n.id)) h.add(n.id); });
+      collapsed.forEach(id => { if(keep.has(id)) h.delete(id); });
+      h.delete(focus.id);
+    } else if(scoped){
+      collapsed.forEach(id => h.delete(id));     // the rows are the whole answer
+    } else {
+      if(idx[ROOT] != null){                     // upstream's rule, and the floater post-condition
+        const seen = new Set([ROOT]), q = [ROOT];
+        while(q.length){
+          const u = q.shift();
+          if(collapsed.has(u)) continue;         // never traverse THROUGH a collapsed node
+          (cadj[u] || []).forEach(v => { if(h.has(v) || seen.has(v)) return; seen.add(v); q.push(v); });
+        }
+        N.forEach(n => { if(!seen.has(n.id)) h.add(n.id); });
       }
-      N.forEach(n => { if(!seen.has(n.id)) h.add(n.id); });
+      collapsed.forEach(id => h.delete(id));     // a collapsed node is never hidden by its own fold
     }
-    collapsed.forEach(id => h.delete(id));       // a collapsed node is never hidden by its own fold
     for(const k in hideCount) delete hideCount[k];
     collapsed.forEach(id => {                    // attribute the folded region to its node (badge)
       const t = scope.get(id);
-      if(t){                                     // panel fold: count along the types that folded it.
+      if(t && t.size){                           // panel fold: count along the types that folded it.
         let k = 0;                               // `cadj` is containment-only and cannot see a fold
-        descendants(id, t).forEach(x => { if(h.has(x)) k++; });   // along `uses`, so it must not be
+        away(id, t).forEach(x => { if(h.has(x)) k++; });          // along `uses`, so it must not be
         hideCount[id] = k;                       // used here -- it would report 0 and the dead-toggle
         return;                                  // guard would revert every associative fold.
       }
@@ -766,6 +1389,7 @@ COLLAPSE_PANEL = """
       hideCount[id] = k;
     });
     hidden = h;
+    paintFocusChip();
   };
 
   function apply(id, types){
@@ -790,37 +1414,205 @@ COLLAPSE_PANEL = """
     if(sel && sel.id === id) showNode(N[idx[id]]);           // reflect the new button state
   };
 
+  // Per-edge-type show/hide, applied on the click rather than staged behind a button. The old
+  // panel was tick-some-boxes-then-press-Collapse: two steps, and the boxes described a plan
+  // rather than the state of the graph, so a node you had already folded came back with every box
+  // ticked and a button that said Expand. Here each row says what that edge type is doing NOW.
+  //
+  // `scope` holds the types currently HIDDEN for a node, so "everything shown" is the empty set
+  // and the node is in `collapsed` exactly when that set is non-empty.
+  function setHidden(id, types){
+    if(types.size){
+      collapsed.add(id); apply(id, types);
+      if((hideCount[id] || 0) === 0 && focus.id == null){   // folds nothing: revert rather than lie
+        collapsed.delete(id); scope.delete(id); recomputeHidden(); wake(0.5);
+        if(mode === '3d') refresh3d();
+      }
+    } else {
+      collapsed.delete(id); scope.delete(id); recomputeHidden(); wake(0.5);
+      if(mode === '3d') refresh3d();
+    }
+    if(sel && sel.id === id) showNode(N[idx[id]]);
+  }
+
+  // --- focus ------------------------------------------------------------------------------------
+  // Three scopes that COMBINE -- neighbors + ancestors is a selection, not a fourth kind of thing,
+  // which is why the old "ancestors + descendants" row is gone. `everything` is the ABSENCE of a
+  // selection rather than a fourth choice, so it is the reset and it cannot be combined with them.
+  const MODES = [['neighbors', 'neighbors'], ['descendants', 'descendants'],
+                 ['ancestors', 'ancestors']];
+
+  // Hiding 290 of 303 nodes leaves the 13 survivors wherever the layout had already scattered
+  // them -- which, at the zoom you were at, is usually off screen. The first build of this showed
+  // a correct focus as an EMPTY CANVAS: the data was right and the view was pointed at nothing.
+  // So focus re-frames: once immediately, then three more times across the settle, because the
+  // positions the first fit measured are already moving while it measures them. Clearing focus
+  // does NOT re-frame -- it hands back the view you had before, which is a different question.
+  function frameVisible(){
+    // One pass, no spread: `Math.min(...xs)` passes one ARGUMENT per visible node, which is fine
+    // for this graph's 303 and throws RangeError somewhere in the tens of thousands. This viewer
+    // is shipped for other people's graphs, and a crash at scale is a poor way to find that out.
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, seen = 0;
+    for(const n of N){
+      if(hidden.has(n.id)) continue;
+      seen++;
+      if(n.x < x0) x0 = n.x;
+      if(n.x > x1) x1 = n.x;
+      if(n.y < y0) y0 = n.y;
+      if(n.y > y1) y1 = n.y;
+    }
+    if(!seen) return;
+    const w = stage.clientWidth, h = stage.clientHeight, pad = 160;
+    const z = Math.max(0.3, Math.min(3, Math.min(w / Math.max(1, x1 - x0 + pad),
+                                                 h / Math.max(1, y1 - y0 + pad))));
+    view.z = z;
+    view.x = -((x0 + x1) / 2) * z;
+    view.y = -((y0 + y1) / 2) * z;
+  }
+
+  // Where the camera was before focus took it somewhere else. Focusing re-frames -- it has to, or
+  // the survivors sit off screen -- but CLEARING should hand back the view you had, not fit the
+  // whole graph and drop you somewhere you never chose. You pan, you focus, you come back: you
+  // should be where you left.
+  let preFocus = null;
+  let refits = [];                               // pending re-fit timers, cancelled on every change
+
+  function setFocus(id, modes){
+    const wanted = (!modes || !modes.length) ? null : {id, modes};
+    if(wanted && focus.id == null) preFocus = {x: view.x, y: view.y, z: view.z};
+    focus = wanted || {id:null, modes:[]};
+    recomputeHidden();
+    refits.forEach(clearTimeout);
+    refits = [];
+    if(!wanted && preFocus){
+      view.x = preFocus.x; view.y = preFocus.y; view.z = preFocus.z;
+      preFocus = null;
+      wake(0.3);
+      if(sel && sel.id) showNode(N[idx[sel.id]]);
+      return;
+    }
+    frameVisible();
+    wake(0.6);
+    // The survivors are still being pulled together by the simulation, so one fit is a snapshot of
+    // positions that are already stale. Three, spread over the settle, and the last one lands.
+    //
+    // Cancelled on the way in: without this, three quick clicks leave nine fits queued, and the
+    // ones belonging to a scope you have already changed keep re-framing the camera for seconds
+    // afterwards. Measured drifting from (176,351,z0.30) to (-14,36,z0.54) 2.5s after the last
+    // click -- a view that moves on its own long after you stopped touching it.
+    refits.forEach(clearTimeout);
+    refits = [400, 1000, 1900].map(ms =>
+      setTimeout(() => { frameVisible(); wake(0.05); }, ms));
+    if(mode === '3d'){ refresh3d(); if(fg3d && fg3d.zoomToFit) fg3d.zoomToFit(600, 60); }
+    if(sel && sel.id) showNode(N[idx[sel.id]]);
+  }
+
+  const chip = document.createElement('div');
+  chip.id = 'xfocus';
+  (document.getElementById('stage') || document.body).append(chip);
+  function paintFocusChip(){
+    if(focus.id == null){ chip.className = ''; chip.innerHTML = ''; return; }
+    // Named in the order the rows are listed, so the chip reads the way the panel looks rather
+    // than in whatever order they happened to be clicked.
+    const label = MODES.filter(m => focus.modes.includes(m[0])).map(m => m[1]).join(' + ');
+    chip.className = 'on';
+    chip.innerHTML = `showing ${N.length - hidden.size} of ${N.length} · ${esc(label)} of `
+      + `<b>${esc(focus.id)}</b>`
+      + '<button class="xfx" title="show the whole graph (esc)">show everything</button>';
+  }
+  chip.addEventListener('click', ev => { if(ev.target.closest('.xfx')) setFocus(null, []); });
+  addEventListener('keydown', ev => {
+    if(ev.key === 'Escape' && focus.id != null){ setFocus(null, []); }
+  });
+
   const _showNode = showNode;
   showNode = function(n){
     _showNode(n);
-    const types = foldable(n.id);
-    const on = scope.get(n.id) || defaults(n.id);
-    const div = document.createElement('div');
-    div.className = 'xcol';
-    if(!types.length){
-      div.innerHTML = '<div class="lbl">collapse</div>'
-        + '<div class="val mut">nothing hangs off this node</div>';
-    } else {
-      div.innerHTML = '<div class="lbl">collapse across</div><div class="val">'
-        + types.map(t => {
-            const k = descendants(n.id, new Set([t])).size;
-            return `<label><input type="checkbox" class="xct" data-t="${esc(t)}"`
-                 + `${on.has(t) ? ' checked' : ''}>${esc(t)}<span class="n">${k}</span></label>`;
-          }).join('')
-        + `<button class="xcb" data-id="${esc(n.id)}">`
-        + `${collapsed.has(n.id) ? 'Expand' : 'Collapse'}</button></div>`;
+    const types = [...incident(n.id).keys()];
+    const hid = scope.get(n.id) || new Set();
+    const T = live(n.id);
+    const lbl = document.createElement('div');
+    lbl.className = 'lbl';
+    lbl.textContent = 'action';
+    const val = document.createElement('div');
+    val.className = 'val';
+
+    // How much graph. The scopes COMBINE, so each row carries its own size -- what `neighbors`
+    // means is 11 nodes whether or not `ancestors` is also lit, and the chip on the canvas states
+    // the union, which is the only number that changes as you add scopes. Counts include the
+    // anchor, and a scope that would add nothing is greyed with its count still showing rather
+    // than clicking through to a canvas that did not change.
+    const picked = (focus.id === n.id) ? focus.modes : [];
+    // State is on the element, not only in a CSS class: a screen reader reading "neighbors 11"
+    // otherwise has no way to know whether it is on. aria-pressed, not role=radio -- these
+    // combine, and radios are mutually exclusive by definition.
+    let html = '<div class="xintro" id="xsonly">show only</div>'
+      + '<div role="group" aria-labelledby="xsonly">'
+      + `<button class="xfrow${picked.length ? '' : ' on'}" data-m="" data-id="${attr(n.id)}" `
+      + `aria-pressed="${picked.length ? 'false' : 'true'}">`
+      + `<span class="xname">everything</span><span class="xn">${N.length}</span>`
+      + '<span class="xdot"></span></button>';
+    for(const [m, label] of MODES){
+      const k = window.KBSETS(L, n.id, T, m).size + 1;
+      const on = picked.includes(m);
+      html += `<button class="xfrow${on ? ' on' : ''}" data-m="${m}" `
+        + `data-id="${attr(n.id)}" aria-pressed="${on}"${k <= 1 ? ' disabled' : ''}>`
+        + `<span class="xname">${esc(label)}</span><span class="xn">${k}</span>`
+        + `<span class="xdot"></span><span class="xsr"> nodes</span></button>`;
     }
-    inspect.insertBefore(div, inspect.firstChild);   // top of the panel, not buried under the edges
+    html += '</div>';
+
+    // Which edges. One row per relation type incident to this node, in either direction: a signal
+    // is a leaf in containment, so an incoming-only list left 249 of 303 nodes with a control that
+    // could not do anything.
+    if(!types.length){
+      html += '<div class="xintro">show or hide nodes along the following edges</div>'
+            + '<div class="xnone">this node has no edges</div>';
+    } else {
+      html += '<div class="xintro">show or hide nodes along the following edges</div>'
+        + types.map(t => {
+            const k = away(n.id, new Set([t])).size;
+            const off = hid.has(t);
+            const tip = (window.KBRELTIPS || {})[t];
+            // `esc` escapes & and < but NOT quotes, and these go into ATTRIBUTES. No copy carries a
+            // double quote today, which is exactly why this is worth fixing now rather than when
+            // someone writes the first definition with a quoted term in it and the row falls apart.
+            return `<div class="xrow"><span class="xname">${esc(t)}</span>`
+              + (tip ? `<button type="button" class="xtip" data-tip="${attr(tip)}" `
+                       + `aria-label="what does ${attr(t)} mean?">?</button>` : '')
+              + `<span class="xn">${k}</span>`
+              + `<span class="xsw" role="group" aria-label="${attr(t)} edges" `
+              + `data-t="${attr(t)}" data-id="${attr(n.id)}">`
+              + `<button class="xshow${off ? '' : ' on'}" aria-pressed="${!off}">show</button>`
+              + `<button class="xhide${off ? ' on' : ''}" aria-pressed="${off}">hide</button>`
+              + '</span></div>';
+          }).join('');
+    }
+    val.innerHTML = html;
+
+    // Below the node's name, not above its title: the first thing you read should be what the node
+    // IS. Falls back to the top of the panel only if the name section is somehow absent.
+    const name = [...inspect.querySelectorAll(':scope > details')]
+      .find(d => d.querySelector('summary').dataset.k === 'name');
+    if(name) name.after(lbl, val); else inspect.insertBefore(val, inspect.firstChild),
+                                        inspect.insertBefore(lbl, inspect.firstChild);
+    if(window.KBFOLD) window.KBFOLD();            // same section machinery as everything else
   };
 
   inspect.addEventListener('click', ev => {
-    const b = ev.target.closest('.xcb'); if(!b) return;
-    const id = b.dataset.id;
-    const picked = new Set([...inspect.querySelectorAll('.xct')]
-      .filter(c => c.checked).map(c => c.dataset.t));
-    if(collapsed.has(id)) toggleCollapse(id);                 // expand
-    else if(picked.size) toggleCollapse(id, picked);          // collapse across the ticked types
-    if(sel && sel.id === id) showNode(N[idx[id]]);
+    const f = ev.target.closest('.xfrow');
+    if(f && !f.disabled){
+      const id = f.dataset.id, m = f.dataset.m;
+      // `everything` is the empty selection, so it clears rather than toggling alongside them.
+      const cur = (focus.id === id) ? focus.modes : [];
+      setFocus(id, !m ? [] : cur.includes(m) ? cur.filter(x => x !== m) : cur.concat(m));
+      return;
+    }
+    const b = ev.target.closest('.xsw button'); if(!b) return;
+    const sw = b.parentElement, id = sw.dataset.id, t = sw.dataset.t;
+    const hid = new Set(scope.get(id) || []);
+    if(b.classList.contains('xhide')) hid.add(t); else hid.delete(t);
+    setHidden(id, hid);
   });
 
   recomputeHidden();
@@ -1018,9 +1810,32 @@ def main() -> int:
                      f"upstream viz.py changed and the sub-kind colours would silently not apply")
         page = page.replace(old, new)
 
+    # The two `kv()` call sites hand off to the readable formatters in PROPERTY_PANEL. Guarded, so a
+    # page that somehow loses the overlay degrades to the viewer's own dump rather than an empty
+    # block -- and asserted, so an upstream rename fails the build instead of silently reverting the
+    # panel to raw JSON, which looks like nothing changed.
+    for old, new in (
+        # One vocabulary. The panel says show/hide, so the hint bar cannot say collapse/expand for
+        # the gesture that does the same thing -- it is the only user-visible use of the word left.
+        ("double-click a node to collapse/expand",
+         "double-click a node to hide or show what hangs off it"),
+        ("+kv('properties',n.props)",
+         "+(window.KVPROPS?window.KVPROPS(n):kv('properties',n.props))"),
+        ("+kv('other properties',pr,['because','state','note']);",
+         "+(window.KVEDGE?window.KVEDGE(e):kv('other properties',pr,['because','state','note']));"),
+    ):
+        if page.count(old) != 1:
+            sys.exit(f"expected exactly one {old!r} in the viewer script, found {page.count(old)}; "
+                     f"upstream viz.py changed and the inspector would fall back to raw JSON")
+        page = page.replace(old, new)
+
     overlay = (BRAND_STYLE
+               + TIP_COPY
+               + TOOLTIPS
                + INSPECTOR_LINKS
-               + COLLAPSE_PANEL.replace("__ROOT__", json.dumps(ROOT_ID))
+               + PROPERTY_PANEL
+               + FOCUS_SETS
+               + ACTION_PANEL.replace("__ROOT__", json.dumps(ROOT_ID))
                + BACK_BUTTON
                + THEME_SCRIPT
                + DECLUTTER

@@ -32,7 +32,7 @@ about the code as it is.
 ![The knowledge graph viewer, with the rsi_oversold signal selected](assets/graph-viewer.png)
 
 *The bundled viewer (`python -m mangrove_kb.viz`): click any node to read what it computes and walk
-its edges. [Interface guide below](#the-viewer).*
+its edges. [What each part does](#the-viewer).*
 
 ## Contents
 
@@ -48,10 +48,12 @@ its edges. [Interface guide below](#the-viewer).*
   - [The tools](#the-tools)
 - [The model in 30 seconds](#the-model-in-30-seconds)
 - [The viewer](#the-viewer)
+  - [The inspector — what a node actually carries](#the-inspector--what-a-node-actually-carries)
+  - [Following an edge](#following-an-edge)
+  - [The Action panel — trim the graph to the question](#the-action-panel--trim-the-graph-to-the-question)
   - [The rail — two-level filters](#the-rail--two-level-filters)
   - [Search — ranked, and it tells you why](#search--ranked-and-it-tells-you-why)
-  - [The inspector — what a node actually carries](#the-inspector--what-a-node-actually-carries)
-  - [2D, 3D, and collapse](#2d-3d-and-collapse)
+  - [3D](#3d)
 - [What is in the graph, and what is not](#what-is-in-the-graph-and-what-is-not)
 - [Repository structure](#repository-structure)
 - [Development](#development)
@@ -218,12 +220,99 @@ you can plan a traversal against what exists rather than discovering emptiness o
 
 ## The viewer
 
-`python -m mangrove_kb.viz > graph.html` writes one self-contained page: the whole graph in 2D and
-3D, filterable, searchable, with every node's authored detail one click away.
+`python -m mangrove_kb.viz > graph.html` writes one self-contained page — no server, no build step,
+no network — with the whole graph in 2D and 3D, filterable, searchable, and every node's authored
+detail one click away.
+
+| Pane | Where | What it holds |
+| --- | --- | --- |
+| Rail | left | filters, by kind of node and kind of edge |
+| Map | middle | 303 nodes, 1049 edges |
+| Panel | right | everything the library records about whatever you clicked |
+
+### The inspector — what a node actually carries
+
+<img src="assets/viewer-inspector.png" alt="The inspector showing BollingerBands: folded sections, then Inputs, Parameters and Outputs as tables" width="330" align="right">
+
+Click any node or edge to pin its detail. Everything authored is here — description, `formula`,
+`reference`, `usage_example` — and **inputs, parameters and outputs come as tables**, each with its
+type, default, units and range, rather than a wall of JSON.
+
+Sections **fold**, and the choice sticks: fold `Edges` once and it stays folded on the next node.
+`Provenance & extras` holds the module and a call you can copy.
+
+Ranges are read carefully, because three different facts used to render identically:
+
+| Shown | Means |
+| --- | --- |
+| `0 … 100` | bounded both ways |
+| `≥ 0` | floored, no ceiling |
+| `unbounded` | `[-inf, inf]` — stated, not missing |
+| `true/false` | boolean, not a `[0,1]` interval |
+| `not authored` | nobody has written the range down |
+
+**Two traps.** `warmup_bars` is an *expression* in the node's own parameters (`window * 3 - 1`), so
+evaluate it against the parameters you intend to use. And units are heterogeneous by design: a
+percentage, a price and an index number are different things and are labelled differently.
+
+<br clear="right">
+
+Every heading carries a **?** that says what that section holds, and so does every edge type — point
+at it, tab to it, or tap it:
+
+<p align="center">
+  <img src="assets/viewer-tooltip.png" alt="The ? beside the uses row, with its explanation shown to the left of the panel" width="85%">
+</p>
+
+### Following an edge
+
+Every name under `Edges` is a link: click it and the panel moves there, with a **back** button to
+return. Edges are grouped incoming and outgoing, and each type asserts something different:
+
+| Edge | Claim |
+| --- | --- |
+| `instance-of` | this indicator measures that family — RSI measures momentum |
+| `about` | this signal is concerned with that family without measuring it |
+| `uses` | this reads that one, and carries which of its outputs flow in |
+| `has-role` | the part it plays in a strategy: trigger or filter |
+| `part-of` | a component of the other |
+| `kind-of` | a subtype of the other |
+
+`instance-of` and `about` are the pair to keep straight. An indicator produces the quantity, so it is
+an instance of the family; a signal emits a boolean, so it is *about* the family instead — and the
+`uses` edge beside it is the reason.
+
+### The Action panel — trim the graph to the question
+
+<p align="center">
+  <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 13 of 303'" width="100%">
+</p>
+
+303 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
+selected node, and the choices combine — `neighbors` + `ancestors` gives you both:
+
+| | Keeps |
+| --- | --- |
+| everything | no trim |
+| neighbors | one hop, in or out |
+| descendants | everything built on this node |
+| ancestors | everything this node is built from |
+
+The count on each choice says how many nodes you would be left with **before** you click, and a
+choice that would leave a single node is disabled. **show or hide** does the same one edge type at a
+time, and its number is exact: hide `uses` on RSI and the eight signals that read it go, and nothing
+else does.
+
+The two compose — an edge type set to hide is dropped from the lineage walk as well, so the counts
+above change to match. A bar over the map says how much is in view and how to get back; `Esc` clears
+it, and clearing returns the view you had rather than refitting the whole graph.
+
+Hiding a hub can leave a few nodes floating with nothing visibly joining them. That is honest: the
+thing that connected them is the thing you hid.
 
 ### The rail — two-level filters
 
-<img src="assets/viewer-facets.png" alt="The filter rail, showing node primitives and relation categories each split into sub-kinds" width="300" align="right">
+<img src="assets/viewer-facets.png" alt="The filter rail: Procedure splits into signal and indicator, Concept into class, entity type and domain" width="260" align="right">
 
 Nodes group by **ontology primitive**, edges by **relation category**, and each splits into the
 derived kind beneath it — so `signal` and `indicator` are separable inside `Procedure`, and `about`
@@ -237,13 +326,13 @@ say, and the children grey out to show why — so the canvas can never empty for
 visible in the rail.
 
 **Density** spreads or tightens the layout. **Labels** switches between always / never / on hover /
-on zoom — worth reaching for at 303 nodes.
+on zoom — at 303 nodes, off is often clearer than on.
 
 <br clear="right">
 
 ### Search — ranked, and it tells you why
 
-<img src="assets/viewer-search.png" alt="Search results for 'divergence', badged NAME, SUMMARY and DETAIL by which field matched" width="420" align="right">
+<img src="assets/viewer-search.png" alt="Search results for 'divergence', badged NAME and SUMMARY by which field matched" width="420" align="right">
 
 Search reads **every authored field**, not just names — formula, interpretation, applications, and
 the names and descriptions of inputs, params and outputs.
@@ -257,34 +346,21 @@ rather than reimplemented in JS, and a test asserts the two agree on real querie
 
 <br clear="right">
 
-### The inspector — what a node actually carries
-
-<img src="assets/viewer-inspector.png" alt="The inspector panel showing rsi_oversold's description, formula, params and outgoing edges" width="330" align="right">
-
-Click any node or edge to pin its full detail: description, `formula`, `warmup_bars`, `reference`,
-`usage_example`, every input and parameter with type, range and default, and every output with its
-units and range.
-
-Its edges are listed **incoming and outgoing**, and each is a link — follow one and the inspector
-moves there, with a back button to return.
-
-**Traps worth knowing.** `warmup_bars` is an *expression* in the node's own parameters (`window * 3 -
-1`), not a number — evaluate it against the params you intend to use. And units are heterogeneous by
-design: a percentage, a price and an index number are different things and are labelled differently.
-
-<br clear="right">
-
-### 2D, 3D, and collapse
+### 3D
 
 <p align="center">
-  <img src="assets/viewer-3d.png" alt="The same graph in 3D" width="70%">
+  <img src="assets/viewer-3d.png" alt="The same graph in 3D" width="80%">
 </p>
 
-The **3D** view is the same graph, same filters, same inspector — drag to rotate, scroll to zoom,
-right-drag to pan. **Double-click any node in either view to collapse** everything hanging off it,
-which is how you make a hub with 218 signals hanging off it readable. A green ring marks the selected node; a yellow ring
-marks a deprecated one. Nothing else is ringed — 301 of 303 nodes are `ratified`, so marking that
-would be decoration rather than information.
+The same graph, same filters, same inspector — drag to rotate, scroll to zoom, right-drag to pan. In
+either view, **double-click a node to hide or show what hangs off it**, which is how you make a hub
+with 218 signals attached readable.
+
+A **green ring** marks the selected node; a **yellow ring** marks a deprecated one — it still runs,
+it just has a canonical replacement. Nothing else is ringed: 301 of 303 nodes are `ratified`, so
+marking that would be decoration rather than information.
+
+Light, dark and follow-the-system are top right, and the choice is remembered.
 
 ---
 

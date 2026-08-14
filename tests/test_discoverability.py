@@ -303,3 +303,54 @@ def test_no_agent_definitions_are_committed():
     assert not stray, f"only authoring skills belong under .claude here: {stray}"
     assert "agents/product-owner.md" not in (REPO / "CLAUDE.md").read_text(), \
         "CLAUDE.md points at an agent spec this repo does not contain"
+
+
+DOCS_WITH_IMAGES = ("README.md", "PKG_README.md")
+
+
+def test_every_screenshot_is_shown_somewhere_and_every_shown_one_exists():
+    """Both directions, because both have bitten.
+
+    A missing file renders as a broken icon on the page a reader lands on first. An orphan is the
+    quieter one: `viewer-tooltip.png` was committed, weighed 233KB, and appeared nowhere -- the
+    section that would have shown it had been moved out from under it.
+    """
+    shown = set()
+    for doc in DOCS_WITH_IMAGES:
+        text = (REPO / doc).read_text()
+        shown |= {m for m in re.findall(r'src="(?:\.\./)?(assets/[^"]+)"', text)}
+        shown |= {m for m in re.findall(r"\]\((?:\.\./)?(assets/[^)]+)\)", text)}
+    on_disk = {f"assets/{p.name}" for p in (REPO / "assets").glob("*.png")}
+    assert not (shown - on_disk), f"shown but not in the repo: {sorted(shown - on_disk)}"
+    assert not (on_disk - shown), f"in the repo but shown nowhere: {sorted(on_disk - shown)}"
+
+
+def test_no_screenshot_was_flattened_to_a_palette():
+    """256 colours is fine for flat UI and ruins a graph.
+
+    The hero is thousands of thin translucent edges. Quantising it to a palette dithered every one
+    of them, and the result reads as a blur -- shipped that way once, spotted by eye, not by any
+    check. Screenshots stay full colour; `zopflipng` gets the size back losslessly.
+    """
+    from PIL import Image
+
+    flattened = [p.name for p in sorted((REPO / "assets").glob("*.png"))
+                 if Image.open(p).mode == "P"]
+    assert not flattened, f"palette-reduced, which dithers fine lines: {flattened}"
+
+
+def test_no_screenshot_is_a_canyon():
+    """A tall image floated beside a short paragraph leaves a column of nothing next to the text.
+
+    `viewer-facets.png` was 340x1441 -- a ratio of 4.24 -- floated at 300px wide, so it stood 1270px
+    tall next to ten lines of prose. Nobody notices while writing the markdown; everybody notices on
+    the rendered page.
+    """
+    from PIL import Image
+
+    tall = []
+    for path in sorted((REPO / "assets").glob("*.png")):
+        w, h = Image.open(path).size
+        if h / w > 2.0:
+            tall.append(f"{path.name} {w}x{h} (ratio {h / w:.2f})")
+    assert not tall, f"too tall to sit beside text: {tall}"

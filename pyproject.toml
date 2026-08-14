@@ -50,6 +50,11 @@ dev = [
     # shipping setuptools in 3.12, so that test passed on a machine with it and would have failed on
     # a clean CI runner -- the build backend installs it in an isolated env, not this one.
     "setuptools>=68",
+    # `tests/test_discoverability.py` reads the README's screenshots -- their mode and their aspect
+    # ratio, because a palette-flattened PNG dithers the graph's fine lines and a 4:1 image floated
+    # beside a paragraph leaves a column of nothing. Undeclared, it passed here (Anaconda ships it)
+    # and failed on the runner: exactly the shape of the `ta` and `setuptools` notes above.
+    "pillow>=10.0",
     "pytest-cov>=4.0",
     "black>=23.0",
     "flake8>=6.0",
