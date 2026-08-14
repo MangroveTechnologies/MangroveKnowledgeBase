@@ -27,6 +27,20 @@ This file is the reference for **which call**. [`GUIDE.md`](GUIDE.md), beside it
 **what a whole job looks like** — thirteen tasks end to end, with real output and the trap in each,
 from "the user said a name, not an id" through to running what you found.
 
+## Contents
+
+Read the section you need; each one links on to the others that bear on it.
+
+| section | |
+|---|---|
+| [Start here](#start-here) | The four calls that answer most questions, and the order to make them in. |
+| [The two axes](#the-two-axes-the-thing-to-understand) | Why `kind` and `role` are separate parameters, and why conflating them returns the wrong thing. |
+| [Two halves, one retrieval surface](#two-halves-one-retrieval-surface) | The graph holds code-derived computations and knowledge-base concepts; one set of calls reaches both. |
+| [Which call](#which-call) | A question-to-method table — the fastest way in when you know what you are asking. |
+| [The typed detail is the point](#the-typed-detail-is-the-point) | What `get()` returns, which fields exist on which kind of node, and the data carried on edges. |
+| [Rules of use](#rules-of-use) | Caps, truncation, guessed values, and the failure modes that make an answer look complete when it is not. |
+| [Worked examples](#worked-examples) | An index into `GUIDE.md`, where each job is shown end to end. |
+
 ## Start here
 
 ```python
@@ -43,6 +57,8 @@ none".
 `kg.schema()` goes further: the list of `(subject, relation, object)` shapes that **actually occur**,
 so you can plan a traversal against what exists rather than discovering emptiness one query at a
 time.
+
+**See also:** [SKILL · which call](SKILL.md#which-call) · [§1 orient yourself](GUIDE.md#1-orient-yourself-in-a-library-you-have-never-seen)
 
 ## The two axes — the thing to understand
 
@@ -84,6 +100,8 @@ kg.find(kind="oscillator")                   # everything in the oscillator clas
 kg.find(role="filter")                       # signals playing the filter part
 ```
 
+**See also:** [§4 compose from both axes](GUIDE.md#4-compose-a-strategy-from-both-axes) · [§8 why it is classified that way](GUIDE.md#8-explain-why-something-is-classified-the-way-it-is)
+
 ## Two halves, one retrieval surface
 
 The graph holds two kinds of thing and they are queried identically.
@@ -107,6 +125,8 @@ formations and what completes them. What it has no members: nothing implements t
 multi-bar formation needs swing points no computation here produces. Read the node for the
 knowledge; `find(kind="chart-pattern")` is empty because there is no code, not because there is
 nothing to know.
+
+**See also:** [§14 pull what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject) · [§15 the reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice)
 
 ## Which call
 
@@ -141,6 +161,8 @@ the questions `get()` can only answer one node at a time — *which computations
 `histogram`* (which `get()` and `resolve()` cannot answer at all, since `histogram` is nobody's node
 name). It intersects with the type axis: `outputs(bounded=True, kind="oscillator")`.
 
+**See also:** [SKILL · worked examples](SKILL.md#worked-examples) · [SKILL · rules of use](SKILL.md#rules-of-use)
+
 ## The typed detail is the point
 
 `get()` returns what the code actually does, not a description of it:
@@ -173,6 +195,8 @@ kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")
 That is a fact about the connection, not about either end — which matters for signals that read two
 indicators.
 
+**See also:** [§5 what a signal needs](GUIDE.md#5-find-out-what-a-signal-needs-to-run) · [§6 comparability](GUIDE.md#6-decide-whether-two-outputs-are-comparable) · [§9 the value index](GUIDE.md#9-ask-about-the-values-not-the-nodes)
+
 ## Rules of use
 
 - **Results are capped, and say so.** Defaults are small on purpose: `concept:signal` has degree
@@ -201,6 +225,8 @@ indicators.
 - **The graph says what the code does, not whether it is a good idea.** A signal existing, or
   bearing the `trigger` role, says nothing about whether it works on your data. It is a map of the
   library, not a recommendation.
+
+**See also:** [§2 truncation in practice](GUIDE.md#2-check-whether-something-already-exists-before-building-it) · [§10 enumerable vocabularies](GUIDE.md#10-filter-by-what-something-needs-and-whether-it-is-still-current)
 
 ## Worked examples
 

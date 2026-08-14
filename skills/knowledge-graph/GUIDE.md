@@ -13,6 +13,30 @@ kg = KnowledgeGraph.load()
 
 ---
 
+## Contents
+
+Fifteen jobs. Each is self-contained — jump to the one you have, and follow the links at its end
+when the answer needs a second call.
+
+| | job | |
+|---|---|---|
+| 1 | [Orient yourself in a library you have never seen](#1-orient-yourself-in-a-library-you-have-never-seen) | Start from the graph's own summary rather than the file tree. |
+| 2 | [Check whether something already exists](#2-check-whether-something-already-exists-before-building-it) | The duplicate you are about to write is one hop from the indicator it would read. |
+| 3 | [Work out what a change breaks](#3-work-out-what-a-change-breaks) | Who reads this, and which specific output each of them takes. |
+| 4 | [Compose a strategy from both axes](#4-compose-a-strategy-from-both-axes) | Intersect what a thing measures with the part it plays. |
+| 5 | [Find out what a signal needs to run](#5-find-out-what-a-signal-needs-to-run) | Params, warm-up and the indicators beneath it, before you call anything. |
+| 6 | [Decide whether two outputs are comparable](#6-decide-whether-two-outputs-are-comparable) | Bounded does not mean same-scale; units and range say which. |
+| 7 | [Check whether something is deprecated](#7-check-whether-something-is-deprecated-and-what-replaced-it) | And what supersedes it, from the edge rather than a naming convention. |
+| 8 | [Explain why something is classified as it is](#8-explain-why-something-is-classified-the-way-it-is) | The claim and the derivation behind it are different routes through the graph. |
+| 9 | [Ask about the values, not the nodes](#9-ask-about-the-values-not-the-nodes) | The output index answers questions `get()` cannot reach one node at a time. |
+| 10 | [Filter by what something needs, and whether it is current](#10-filter-by-what-something-needs-and-whether-it-is-still-current) | Two enumerable vocabularies that reject a guess instead of returning nothing. |
+| 11 | [Turn what the user said into a node](#11-turn-what-the-user-said-into-a-node) | Resolving a spoken name to an id, and what to do when it does not resolve. |
+| 12 | [Go from the graph to an answer about live data](#12-go-from-the-graph-to-an-answer-about-live-data) | Using the graph to choose what to compute, then computing it. |
+| 13 | [Compute an indicator the graph told you about](#13-compute-an-indicator-the-graph-told-you-about) | The node's `name` is the registered name — that is the join to runnable code. |
+| 14 | [Pull what the knowledge base says about a subject](#14-pull-what-the-knowledge-base-says-about-a-subject) | Everything under a subject, whatever kind of node it is, by walking containment. |
+| 15 | [Find the reasoning behind a piece of advice](#15-find-the-reasoning-behind-a-piece-of-advice) | The Judgment holds what to do, the Fact holds why, and folds hold where the two sources disagree. |
+| — | [What this guide does not tell you](#what-this-guide-does-not-tell-you) | The graph's limits, and the questions it is the wrong tool for. |
+
 ## 1. Orient yourself in a library you have never seen
 
 **Task:** "Have a look at mangrove-kb and tell me what's in it."
@@ -55,6 +79,8 @@ also accepts the short name (`"momentum"`). Both work; the ids are what you get 
 `"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (301 of 361) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
+
+**See also:** [§2 does it exist](GUIDE.md#2-check-whether-something-already-exists-before-building-it) · [SKILL · which call](SKILL.md#which-call) · [§14 the knowledge layer](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
 ---
 
@@ -114,6 +140,8 @@ first one is the sanity check.
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
 shown you 10 of 37.
 
+**See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
+
 ---
 
 ## 3. Work out what a change breaks
@@ -148,6 +176,8 @@ Widen to the neighbourhood when you need the shape rather than the list:
 kg.subgraph("procedure:indicator-rsi", radius=1)
 ```
 
+**See also:** [§12 graph to live data](GUIDE.md#12-go-from-the-graph-to-an-answer-about-live-data) · [SKILL · edges carry data](SKILL.md#the-typed-detail-is-the-point)
+
 ---
 
 ## 4. Compose a strategy from both axes
@@ -180,6 +210,8 @@ distinguishable so you can always ask *why* (use case 8).
 **Trap:** a signal can be about **two** classes. The RSI divergence signals read both an oscillator
 and a momentum indicator, so they appear under both. Do not assume the sets are disjoint.
 
+**See also:** [SKILL · the two axes](SKILL.md#the-two-axes-the-thing-to-understand) · [§8 why it is classified that way](GUIDE.md#8-explain-why-something-is-classified-the-way-it-is) · [§5 what it needs to run](GUIDE.md#5-find-out-what-a-signal-needs-to-run)
+
 ---
 
 ## 5. Find out what a signal needs to run
@@ -207,6 +239,8 @@ So with the default `window=14` it needs 14 bars, and 50 is plenty. With `window
 **Trap:** `warmup_bars` is a formula, not a number — `window * 3 - 1`, and worse. To answer "is 50
 bars enough", substitute the params you intend to use. Comparing the string numerically is
 meaningless.
+
+**See also:** [§13 run it](GUIDE.md#13-compute-an-indicator-the-graph-told-you-about) · [SKILL · the typed detail](SKILL.md#the-typed-detail-is-the-point)
 
 ---
 
@@ -238,6 +272,8 @@ shared scale with anything bounded.
 for unbounded outputs. Test the endpoints for infinity — or let `outputs(bounded=…)` do it, which is
 the next use case.
 
+**See also:** [§9 the value index](GUIDE.md#9-ask-about-the-values-not-the-nodes) · [SKILL · units and range](SKILL.md#the-typed-detail-is-the-point)
+
 ## 7. Check whether something is deprecated, and what replaced it
 
 **Task:** "Should I use `hanging_man_trigger`?"
@@ -260,6 +296,9 @@ report which.
 
 **Trap:** `status` is on the node, not the edge, and only 2 of 361 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
+
+
+**See also:** [§10 filter by status](GUIDE.md#10-filter-by-what-something-needs-and-whether-it-is-still-current) · [§2 before building](GUIDE.md#2-check-whether-something-already-exists-before-building-it)
 
 ---
 
@@ -308,6 +347,8 @@ If you use `path` for an explanation, constrain it — `relations=["uses", "inst
 `concept:signal` at degree 218 those detours outnumber the real answers 9,638 to 2 at
 `max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
 related?" "they both read RSI"*.
+
+**See also:** [SKILL · the two axes](SKILL.md#the-two-axes-the-thing-to-understand) · [§15 reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [§4 compose](GUIDE.md#4-compose-a-strategy-from-both-axes)
 
 ---
 
@@ -364,6 +405,8 @@ index number are labelled differently on purpose. SwingDelta goes further: its d
 `indicator units` because they carry whatever unit the companion indicator it reads has, which is
 not knowable until you supply one. Read `stats()["units"]` and filter on what is there.
 
+**See also:** [§6 comparability](GUIDE.md#6-decide-whether-two-outputs-are-comparable) · [SKILL · the typed detail](SKILL.md#the-typed-detail-is-the-point)
+
 ---
 
 ## 10. Filter by what something needs, and whether it is still current
@@ -389,6 +432,8 @@ a node you already suspect; this is the sweep that finds the ones you did not.
 
 **Trap:** a guessed value raises rather than returning an empty result. `find(requires="vwap")` is a
 `GraphError` naming the real columns, not a quiet zero you would read as "nothing needs it".
+
+**See also:** [§7 deprecation](GUIDE.md#7-check-whether-something-is-deprecated-and-what-replaced-it) · [§5 what it needs](GUIDE.md#5-find-out-what-a-signal-needs-to-run)
 
 ---
 
@@ -455,6 +500,8 @@ lookup("rsi_over")["id"]                    # 'procedure:signal-rsi-overbought' 
 `rsi_oversold` because rank ties break on id alphabetically. If the user named an indicator too,
 filter on it — `kg.find("oversold", kind="oscillator")` — or resolve the indicator first and look at
 what reads it. Do not assume the first hit is the one they meant.
+
+**See also:** [§2 does it exist](GUIDE.md#2-check-whether-something-already-exists-before-building-it) · [SKILL · which call](SKILL.md#which-call)
 
 ---
 
@@ -529,6 +576,8 @@ kg.subgraph(t["id"], radius=1)
 `from mangrove_kb.signals import momentum, volatility` (or whichever class the graph gave you — the
 module is named for it) before evaluating, or you get `Unknown rule name`.
 
+**See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§13 compute it](GUIDE.md#13-compute-an-indicator-the-graph-told-you-about)
+
 ---
 
 ## 13. Compute an indicator the graph told you about
@@ -566,6 +615,8 @@ both dimensionless on [0, 100]  ->  one panel is fine
 
 **Trap:** `usage_example` writes `params={'window': value}` — `value` is a placeholder, not a
 default. The real defaults are in `kg.get(id)["params"]`, with `min` and `max` beside them.
+
+**See also:** [§5 what it needs](GUIDE.md#5-find-out-what-a-signal-needs-to-run) · [§12 graph to live data](GUIDE.md#12-go-from-the-graph-to-an-answer-about-live-data)
 
 ---
 
@@ -610,6 +661,8 @@ kg.find("spread", under="market foundations")                   # scoped text se
 **Trap:** do not reach for `reference_chapter`. It is provenance on nodes that predate a chapter
 node, not the retrieval mechanism — the edges are, and they are what `under=` walks.
 
+**See also:** [SKILL · two halves, one surface](SKILL.md#two-halves-one-retrieval-surface) · [§15 the reasoning](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [§2 does it exist](GUIDE.md#2-check-whether-something-already-exists-before-building-it)
+
 ---
 
 ## 15. Find the reasoning behind a piece of advice
@@ -653,6 +706,8 @@ wrong.
 **Trap:** a Judgment is not a fact and must not be reported as one. It is argued from practice and
 is context-dependent — "use limit orders" is advice to a liquidity taker and meaningless to a market
 maker. Quote it as guidance, with the principle behind it.
+
+**See also:** [§14 the whole subject](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject) · [SKILL · two halves, one surface](SKILL.md#two-halves-one-retrieval-surface) · [§8 classification](GUIDE.md#8-explain-why-something-is-classified-the-way-it-is)
 
 ---
 
