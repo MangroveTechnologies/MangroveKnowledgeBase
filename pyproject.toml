@@ -55,6 +55,14 @@ dev = [
     # beside a paragraph leaves a column of nothing. Undeclared, it passed here (Anaconda ships it)
     # and failed on the runner: exactly the shape of the `ta` and `setuptools` notes above.
     "pillow>=10.0",
+    # The doc-derived half of the graph is compiled by this toolkit -- `ontology/wiki_to_atoms.py`
+    # consumes its build output. Pinned to a COMMIT, not a version, on purpose: `--vocab` is what
+    # lets the wiki carry our own relation vocabulary, and it is merged on `main` but not in the
+    # published 0.2.0. Without the pin the documented rebuild ran only on a machine that happened
+    # to have a checkout -- the same failure as the `ta` and `pillow` notes above, and one nobody
+    # would hit until they tried to regenerate the ontology. Swap for `wiki-to-graph>=0.3.0` once
+    # that release ships.
+    "wiki-to-graph @ git+https://github.com/MangroveTechnologies/wiki-to-graph@dcee8ac2236da730dd5af36d1f80f62b7d24ce7e",
     "pytest-cov>=4.0",
     "black>=23.0",
     "flake8>=6.0",

@@ -18662,10 +18662,10 @@
    }
   },
   {
-   "id": "fact:01-market-foundations-core-principles",
-   "title": "01 market foundations core principles",
+   "id": "fact:market-foundations-core-principles",
+   "title": "core principles",
    "kind": "Fact",
-   "summary": "How the market behaves, as stated across 01-market-foundations: 39 principles.",
+   "summary": "How the market behaves: 39 principles stated across market foundations.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18716,10 +18716,10 @@
    }
   },
   {
-   "id": "judgment:01-market-foundations-best-practices",
-   "title": "01 market foundations best practices",
+   "id": "judgment:market-foundations-best-practices",
+   "title": "best practices",
    "kind": "Judgment",
-   "summary": "What to do about it, as advised across 01-market-foundations: 50 practices.",
+   "summary": "What to do about it: 50 practices advised across market foundations.",
    "epistemic": "inferred",
    "status": "draft",
    "props": {
@@ -29219,19 +29219,19 @@
    "to_id": "concept:price-discovery"
   },
   {
-   "from": "01 market foundations core principles",
+   "from": "core principles",
    "rel": "part-of",
    "to": "market foundations",
    "why": "stated across 01-market-foundations",
-   "from_id": "fact:01-market-foundations-core-principles",
+   "from_id": "fact:market-foundations-core-principles",
    "to_id": "concept:market-foundations"
   },
   {
-   "from": "01 market foundations best practices",
+   "from": "best practices",
    "rel": "part-of",
    "to": "market foundations",
    "why": "stated across 01-market-foundations",
-   "from_id": "judgment:01-market-foundations-best-practices",
+   "from_id": "judgment:market-foundations-best-practices",
    "to_id": "concept:market-foundations"
   }
  ],
@@ -29305,8 +29305,8 @@
    "concept:stop-order",
    "concept:trading-venue",
    "concept:trailing-stop",
-   "fact:01-market-foundations-core-principles",
-   "judgment:01-market-foundations-best-practices",
+   "fact:market-foundations-core-principles",
+   "judgment:market-foundations-best-practices",
    "procedure:almgren-chriss-market-impact-model",
    "procedure:component-share",
    "procedure:effective-spread",
@@ -29535,12 +29535,12 @@
     "concept:market-foundations"
    ],
    [
-    "fact:01-market-foundations-core-principles",
+    "fact:market-foundations-core-principles",
     "part-of",
     "concept:market-foundations"
    ],
    [
-    "judgment:01-market-foundations-best-practices",
+    "judgment:market-foundations-best-practices",
     "part-of",
     "concept:market-foundations"
    ],

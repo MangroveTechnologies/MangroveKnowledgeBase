@@ -436,18 +436,21 @@ def build(path: Path, chapter: str, parent: str,
                        formula=formula, _generated=True, _section=num)
             rel(pid, "about", subjects[0], f"quantifies {name_of(subjects[0])}")
 
-    chap_title = path.stem.replace("-", " ")
-    # Built from the chapter id verbatim -- `slug` would singularise "foundations".
-    fid = f"fact:{chapter}-core-principles"
-    jid = f"judgment:{chapter}-best-practices"
-    atoms[fid] = {"id": fid, "title": f"{chap_title} core principles", "kind": "Fact",
-                  "summary": f"How the market behaves, as stated across {chapter}: "
-                             f"{len(principles)} principles.",
+    # Named for the SUBJECT, not the chapter file: `01-market-foundations-core-principles` carried
+    # a sort key and a file extension into an identifier. The title is just "core principles" --
+    # the node hangs off market foundations, so the edge already says which principles these are.
+    # The id keeps the subject because eight chapters each have a set and they must not collide.
+    subject = parent.split(":", 1)[1]
+    fid = f"fact:{subject}-core-principles"
+    jid = f"judgment:{subject}-best-practices"
+    atoms[fid] = {"id": fid, "title": "core principles", "kind": "Fact",
+                  "summary": f"How the market behaves: {len(principles)} principles stated "
+                             f"across {subject.replace('-', ' ')}.",
                   "epistemic": "observed", "status": "draft",
                   "props": {"reference_chapter": [chapter], "principles": principles}}
-    atoms[jid] = {"id": jid, "title": f"{chap_title} best practices", "kind": "Judgment",
-                  "summary": f"What to do about it, as advised across {chapter}: "
-                             f"{len(practices)} practices.",
+    atoms[jid] = {"id": jid, "title": "best practices", "kind": "Judgment",
+                  "summary": f"What to do about it: {len(practices)} practices advised "
+                             f"across {subject.replace('-', ' ')}.",
                   # Argued from accumulated practice rather than measured, which is the difference
                   # between this node and the Fact beside it.
                   "epistemic": "inferred", "status": "draft",
