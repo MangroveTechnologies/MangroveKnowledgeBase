@@ -177,6 +177,18 @@ kg.path("procedure:signal-adosc-bearish", "concept:momentum")   # why is it clas
 
 If you are an agent, load `SKILL.md` -- it is written for you.
 
+### Or look at it
+
+```bash
+python -m mangrove_kb.viz > graph.html
+```
+
+One self-contained page -- no server, no build step, no network -- with the whole graph in 2D and
+3D. Click a node to read what it computes; trim the view to one node's neighbors, ancestors or
+descendants; follow an edge to the thing on the other end. The
+**[interface guide](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/blob/main/docs/viewer-guide.md)**
+walks through it.
+
 ## Data Format
 
 All functions expect a pandas DataFrame with lowercase OHLCV columns:

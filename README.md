@@ -32,7 +32,7 @@ about the code as it is.
 ![The knowledge graph viewer, with the rsi_oversold signal selected](assets/graph-viewer.png)
 
 *The bundled viewer (`python -m mangrove_kb.viz`): click any node to read what it computes and walk
-its edges. [Interface guide below](#the-viewer).*
+its edges. [Interface guide](docs/viewer-guide.md) · [what each part does](#the-viewer).*
 
 ## Contents
 
@@ -48,10 +48,11 @@ its edges. [Interface guide below](#the-viewer).*
   - [The tools](#the-tools)
 - [The model in 30 seconds](#the-model-in-30-seconds)
 - [The viewer](#the-viewer)
+  - [The inspector — what a node actually carries](#the-inspector--what-a-node-actually-carries)
+  - [The Action panel — trim the graph to the question](#the-action-panel--trim-the-graph-to-the-question)
   - [The rail — two-level filters](#the-rail--two-level-filters)
   - [Search — ranked, and it tells you why](#search--ranked-and-it-tells-you-why)
-  - [The inspector — what a node actually carries](#the-inspector--what-a-node-actually-carries)
-  - [2D, 3D, and collapse](#2d-3d-and-collapse)
+  - [2D and 3D](#2d-and-3d)
 - [What is in the graph, and what is not](#what-is-in-the-graph-and-what-is-not)
 - [Repository structure](#repository-structure)
 - [Development](#development)
@@ -219,11 +220,47 @@ you can plan a traversal against what exists rather than discovering emptiness o
 ## The viewer
 
 `python -m mangrove_kb.viz > graph.html` writes one self-contained page: the whole graph in 2D and
-3D, filterable, searchable, with every node's authored detail one click away.
+3D, filterable, searchable, with every node's authored detail one click away. There is a
+**[plain-language interface guide](docs/viewer-guide.md)** if you would rather read than poke.
+
+### The inspector — what a node actually carries
+
+<img src="assets/viewer-inspector.png" alt="The inspector showing BollingerBands: folded sections, then Inputs, Parameters and Outputs as tables" width="330" align="right">
+
+Click any node or edge to pin its detail. Every field the library authored is here: description,
+`formula`, `warmup_bars`, `reference`, `usage_example`, and **inputs, parameters and outputs as
+tables** — each with its type, default, units and range, rather than a wall of JSON.
+
+Sections **fold**, and the choice sticks: fold `Edges` once and it stays folded on the next node.
+Each heading carries a **?** explaining what it holds, as does each edge type — `about` and
+`instance-of` are different claims, and the panel says so.
+
+Ranges are read carefully. `≥ 0` is floored, `unbounded` is a stated infinity, and `not authored` is
+a gap in the notes — three different facts that `JSON.stringify` used to render identically.
+
+**Traps worth knowing.** `warmup_bars` is an *expression* in the node's own parameters
+(`window * 3 - 1`), not a number. And units are heterogeneous by design: a percentage, a price and
+an index number are different things and are labelled differently.
+
+<br clear="right">
+
+### The Action panel — trim the graph to the question
+
+<p align="center">
+  <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 13 of 303'" width="100%">
+</p>
+
+303 nodes at once is a picture, not an answer. **show only** keeps `neighbors`, `descendants`,
+`ancestors` — or any combination of them — around the selected node, with the resulting node count
+on every choice *before* you click. **show or hide** does the same one edge type at a time.
+
+The two compose: an edge type set to hide is dropped from the lineage walk as well, so the counts
+above change to match. A bar over the map says how much is in view and how to get back; `Esc` clears
+it, and clearing returns the view you had rather than refitting the whole graph.
 
 ### The rail — two-level filters
 
-<img src="assets/viewer-facets.png" alt="The filter rail, showing node primitives and relation categories each split into sub-kinds" width="300" align="right">
+<img src="assets/viewer-facets.png" alt="The filter rail: Procedure splits into signal and indicator, Concept into class, entity type and domain" width="260" align="right">
 
 Nodes group by **ontology primitive**, edges by **relation category**, and each splits into the
 derived kind beneath it — so `signal` and `indicator` are separable inside `Procedure`, and `about`
@@ -257,34 +294,17 @@ rather than reimplemented in JS, and a test asserts the two agree on real querie
 
 <br clear="right">
 
-### The inspector — what a node actually carries
-
-<img src="assets/viewer-inspector.png" alt="The inspector panel showing rsi_oversold's description, formula, params and outgoing edges" width="330" align="right">
-
-Click any node or edge to pin its full detail: description, `formula`, `warmup_bars`, `reference`,
-`usage_example`, every input and parameter with type, range and default, and every output with its
-units and range.
-
-Its edges are listed **incoming and outgoing**, and each is a link — follow one and the inspector
-moves there, with a back button to return.
-
-**Traps worth knowing.** `warmup_bars` is an *expression* in the node's own parameters (`window * 3 -
-1`), not a number — evaluate it against the params you intend to use. And units are heterogeneous by
-design: a percentage, a price and an index number are different things and are labelled differently.
-
-<br clear="right">
-
-### 2D, 3D, and collapse
+### 2D and 3D
 
 <p align="center">
   <img src="assets/viewer-3d.png" alt="The same graph in 3D" width="70%">
 </p>
 
 The **3D** view is the same graph, same filters, same inspector — drag to rotate, scroll to zoom,
-right-drag to pan. **Double-click any node in either view to collapse** everything hanging off it,
-which is how you make a hub with 218 signals hanging off it readable. A green ring marks the selected node; a yellow ring
-marks a deprecated one. Nothing else is ringed — 301 of 303 nodes are `ratified`, so marking that
-would be decoration rather than information.
+right-drag to pan. **Double-click any node in either view to hide or show what hangs off it**, which
+is how you make a hub with 218 signals attached readable. A green ring marks the selected node; a
+yellow ring marks a deprecated one. Nothing else is ringed — 301 of 303 nodes are `ratified`, so
+marking that would be decoration rather than information.
 
 ---
 
