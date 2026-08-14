@@ -902,7 +902,13 @@ PROPERTY_PANEL = r"""
     // the node had nothing else -- a special case I invented to avoid a disclosure over a single
     // line, and the only thing it achieved was that 14 nodes disagreed with the other 289 about
     // what the section is called and where the same fact lives.
-    if(x) h += `<details class="kbx"><summary>provenance &amp; extras</summary>${x}</details>`;
+    // This summary is written here rather than by the fold pass, so it needs its own `?` -- it had
+    // copy and no way to reach it, which is the one section where "what even is this" is likeliest.
+    const ptip = (window.KBTIPS || {})['provenance & extras'];
+    if(x) h += '<details class="kbx"><summary>provenance &amp; extras'
+      + (ptip ? `<button type="button" class="xtip" data-tip="${E(ptip)}" `
+                + 'aria-label="what does provenance &amp; extras mean?">?</button>' : '')
+      + `</summary>${x}</details>`;
     return h;
   };
 
@@ -948,6 +954,22 @@ PROPERTY_PANEL = r"""
       const s = document.createElement('summary');
       s.className = 'lbl';                                 // keep the class the lookups use
       s.textContent = l.textContent;
+      // The section's name as DATA. Reading it back off `textContent` breaks the moment anything
+      // else is appended to the heading -- adding the `?` put the Action section back above the
+      // title, because the lookup for "name" was suddenly looking at "name?".
+      s.dataset.k = key;
+      // The help affordance rides on the heading rather than replacing it as the hover target:
+      // the heading folds, the `?` explains, and neither does the other's job by accident.
+      const copy = (window.KBTIPS || {})[key];
+      if(copy){
+        const q = document.createElement('button');
+        q.type = 'button';
+        q.className = 'xtip';
+        q.dataset.tip = copy;
+        q.setAttribute('aria-label', 'what does ' + key + ' mean?');
+        q.textContent = '?';
+        s.append(q);
+      }
       l.replaceWith(d);
       d.append(s, v);
       d.addEventListener('toggle', () => { const st = readFold(); st[key] = d.open; writeFold(st); });
@@ -975,6 +997,147 @@ PROPERTY_PANEL = r"""
     // one definition of what a section is, rather than two that drift.
     window.KBFOLD = foldSections;
   }
+})();
+</script>
+"""
+
+# Tooltips.
+#
+# The panel names things the reader has no way to look up from inside it: a section called
+# `provenance & extras`, an edge type called `about` that means something precise and unobvious
+# (a signal is ABOUT its class; an indicator is an INSTANCE of it -- SKILL.md's distinction, and
+# the copy here is taken from there rather than invented).
+#
+# How it behaves, and why:
+#   * The trigger is a `?`, not the heading. The heading is already a control -- it folds the
+#     section -- and on touch there is no hover at all, so making the heading the trigger means a
+#     tap to read the tip folds the thing you were reading about. The `?` is tab-focusable, tap-
+#     targetable, and dim until you approach it.
+#   * 450ms in, 120ms out. Instant tooltips flicker as the pointer crosses on its way somewhere
+#     else; a deliberate pause is what asks for one.
+#   * Anchored to the trigger, not the cursor. A bubble that chases the mouse is noise.
+#   * Rendered against the viewport, to the LEFT of the panel and over the canvas. The panel is
+#     `overflow:auto` and 330px wide by default: anything inside it is either clipped at the edge
+#     or covering the very content the heading introduces.
+#   * `role="tooltip"` + `aria-describedby`, shows on keyboard focus, Esc dismisses, one at a time,
+#     and it goes away on scroll, on click and whenever the panel is rebuilt.
+# The tooltip copy, in its own block with no DOM in it, so the tests can read it in node and check
+# that every section the panel renders and every relation the graph carries can explain itself.
+TIP_COPY = """
+<script>
+// One sentence each, in the panel's own vocabulary. The relation copy is SKILL.md's -- these are
+// load-bearing definitions, not decoration, and inventing a second wording for them is how a
+// glossary starts disagreeing with the thing it describes.
+window.KBTIPS = {
+  'name': 'What this computation is called in the library.',
+  'action': 'Changes the GRAPH, not this node: how much of it stays in view around this node, '
+    + 'and which edges count. Ancestors are UP -- its class, its role, what it uses; descendants '
+    + 'are what hangs off it.',
+  'description': 'What this computation does, in one sentence, from its docstring.',
+  'subtype': 'Which character class it belongs to: averaging, momentum, oscillator, volatility, '
+    + 'flow or pattern.',
+  'inputs': 'The price series it reads. Each one is a column you supply.',
+  'parameters': 'What you set when you call it: the type, the default, and the range it accepts.',
+  'warm-up': 'How many bars it needs before its first valid value.',
+  'outputs': 'What it returns, with units and the range each value can take. `unbounded` and '
+    + '`not authored` are different facts: one is a stated infinity, the other is a gap.',
+  'interpretation': 'What the values mean when you read them.',
+  'applications': 'What the literature uses it for.',
+  'formula': 'How it is computed, as stated in the source.',
+  'reference': 'Where the definition comes from.',
+  'provenance & extras': 'Where this came from and how it is recorded -- module, epistemic '
+    + 'status, canonical names, a call you can copy. Never the answer to "what is this".',
+  'edges': 'Every relationship this node has, incoming and outgoing, and what is on the far end.',
+};
+// From SKILL.md, which is where these claims are defined.
+window.KBRELTIPS = {
+  'instance-of': 'A member of that class. An indicator MEASURES its class -- ADOSC measures rate '
+    + 'of change, so it is an instance of momentum.',
+  'about': 'Concerned with that class without measuring it. A signal emits a boolean, so it is '
+    + 'ABOUT momentum rather than an instance of it -- and the `uses` edge is the reason.',
+  'kind-of': 'A subclass of the other. Transitive: what holds of the parent holds here.',
+  'part-of': 'A component of the other. Transitive.',
+  'has-role': 'The part it plays in a strategy -- trigger or filter. A role is not a type: it is '
+    + 'never inherited and never appears as a class.',
+  // Double-quoted deliberately: this constant is a non-raw Python string, so an escaped
+  // apostrophe inside it arrives here unescaped and ends the JS string early.
+  'uses': "It reads the other computation, and carries which of that one's outputs flow in.",
+  'supersedes': 'Replaces the other, which is deprecated -- it still runs, it just has a '
+    + 'canonical replacement.',
+};
+</script>
+"""
+
+TOOLTIPS = """
+<style>
+  #inspect .xtip{margin-left:auto;flex:none;width:16px;height:16px;padding:0;border-radius:50%;
+                 border:1px solid var(--kb-edge);background:transparent;color:var(--kb-2);
+                 font:700 10px var(--kb-sans);line-height:14px;cursor:help;opacity:.5}
+  #inspect .xtip:hover,#inspect .xtip:focus-visible{opacity:1;color:var(--act);border-color:var(--act)}
+  #inspect .xtip:focus-visible{outline:2px solid var(--act);outline-offset:2px}
+  #inspect .xrow .xtip{margin-left:0}
+  #xtip{position:fixed;z-index:20;display:none;max-width:290px;padding:9px 11px;
+        border:1px solid var(--kb-edge,var(--line));border-radius:var(--radius);
+        background:var(--panel);color:var(--ink);font:12.5px/1.5 var(--kb-sans,system-ui);
+        box-shadow:0 4px 16px rgba(0,0,0,.28)}
+  #xtip.on{display:block}
+  #xtip code{font:11.5px var(--kb-mono,ui-monospace);background:var(--chip);padding:0 4px;
+             border-radius:3px}
+</style>
+<script>
+(function(){
+  const tip = document.createElement('div');
+  tip.id = 'xtip';
+  tip.setAttribute('role', 'tooltip');
+  document.body.append(tip);
+
+  let inT = null, outT = null, anchor = null;
+
+  function place(el){
+    tip.textContent = el.dataset.tip;
+    tip.className = 'on';                       // measure only once it is laid out
+    const r = el.getBoundingClientRect(), panel = inspect.getBoundingClientRect();
+    tip.style.right = Math.max(8, innerWidth - panel.left + 10) + 'px';
+    const top = r.top + r.height / 2 - tip.offsetHeight / 2;
+    tip.style.top = Math.max(8, Math.min(innerHeight - tip.offsetHeight - 8, top)) + 'px';
+    el.setAttribute('aria-describedby', 'xtip');
+    anchor = el;
+  }
+  function hide(){
+    clearTimeout(inT); clearTimeout(outT);
+    tip.className = '';
+    if(anchor){ anchor.removeAttribute('aria-describedby'); anchor = null; }
+  }
+  function schedule(el, delay){
+    clearTimeout(inT); clearTimeout(outT);
+    inT = setTimeout(() => place(el), delay);
+  }
+
+  inspect.addEventListener('mouseover', ev => {
+    const el = ev.target.closest('[data-tip]');
+    if(el && el !== anchor) schedule(el, 450);
+  });
+  inspect.addEventListener('mouseout', ev => {
+    if(!ev.target.closest('[data-tip]')) return;
+    clearTimeout(inT);
+    outT = setTimeout(hide, 120);
+  });
+  // Keyboard and touch. A tap on the `?` inside a <summary> would fold the section, so the default
+  // is cancelled here -- the button is a help affordance, not a second fold control.
+  inspect.addEventListener('focusin', ev => {
+    const el = ev.target.closest('[data-tip]');
+    if(el) schedule(el, 0);
+  });
+  inspect.addEventListener('focusout', hide);
+  inspect.addEventListener('click', ev => {
+    const el = ev.target.closest('.xtip');
+    if(!el) return;
+    ev.preventDefault(); ev.stopPropagation();
+    if(anchor === el) hide(); else place(el);
+  }, true);
+  inspect.addEventListener('scroll', hide, true);
+  addEventListener('keydown', ev => { if(ev.key === 'Escape') hide(); });
+  addEventListener('resize', hide);
 })();
 </script>
 """
@@ -1315,7 +1478,10 @@ ACTION_PANEL = """
         + types.map(t => {
             const k = away(n.id, new Set([t])).size;
             const off = hid.has(t);
+            const tip = (window.KBRELTIPS || {})[t];
             return `<div class="xrow"><span class="xname">${esc(t)}</span>`
+              + (tip ? `<button type="button" class="xtip" data-tip="${esc(tip)}" `
+                       + `aria-label="what does ${esc(t)} mean?">?</button>` : '')
               + `<span class="xn">${k}</span>`
               + `<span class="xsw" data-t="${esc(t)}" data-id="${esc(n.id)}">`
               + `<button class="xshow${off ? '' : ' on'}">show</button>`
@@ -1327,7 +1493,7 @@ ACTION_PANEL = """
     // Below the node's name, not above its title: the first thing you read should be what the node
     // IS. Falls back to the top of the panel only if the name section is somehow absent.
     const name = [...inspect.querySelectorAll(':scope > details')]
-      .find(d => d.querySelector('summary').textContent.trim().toLowerCase() === 'name');
+      .find(d => d.querySelector('summary').dataset.k === 'name');
     if(name) name.after(lbl, val); else inspect.insertBefore(val, inspect.firstChild),
                                         inspect.insertBefore(lbl, inspect.firstChild);
     if(window.KBFOLD) window.KBFOLD();            // same section machinery as everything else
@@ -1564,6 +1730,8 @@ def main() -> int:
         page = page.replace(old, new)
 
     overlay = (BRAND_STYLE
+               + TIP_COPY
+               + TOOLTIPS
                + INSPECTOR_LINKS
                + PROPERTY_PANEL
                + FOCUS_SETS

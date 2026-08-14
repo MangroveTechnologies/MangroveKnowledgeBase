@@ -283,7 +283,7 @@ globalThis.window = {};
 const DATA = eval('(' + page.match(/const DATA = (\\{[\\s\\S]*?\\});\\s*\\n/)[1] + ')');
 // Both self-contained blocks: the property formatters and the focus set maths. Each is written
 // with no reference to the viewer's scope precisely so that it can be executed here.
-for(const marker of ['window.KVPROPS =', 'window.KBSETS =']){
+for(const marker of ['window.KVPROPS =', 'window.KBSETS =', 'window.KBTIPS =']){
   const at = page.indexOf(marker);
   if(at < 0) throw new Error('no block defines ' + marker);
   eval(page.slice(page.lastIndexOf('<script>', at) + 8, page.indexOf('</script>', at)));
@@ -571,8 +571,11 @@ def test_the_action_section_says_what_the_graph_is_doing(page):
     """
     assert "show or hide nodes along the following edges" in page
     assert "lbl.textContent = 'action';" in page, "the section must be called action"
-    # Below the node's name: the first thing you read should be what the node IS.
-    assert ".find(d => d.querySelector('summary').textContent.trim().toLowerCase() === 'name')" in page
+    # Below the node's name: the first thing you read should be what the node IS. Looked up by
+    # the section's DATA rather than its rendered text -- appending the `?` affordance to the
+    # heading broke a textContent match and put this section back above the title.
+    assert ".find(d => d.querySelector('summary').dataset.k === 'name')" in page
+    assert "s.dataset.k = key;" in page, "sections must carry their name as data"
     assert "if(name) name.after(lbl, val);" in page
     # It folds through the same machinery as every other section rather than a second copy of it.
     assert "window.KBFOLD = foldSections;" in page and "if(window.KBFOLD) window.KBFOLD();" in page
@@ -783,3 +786,57 @@ console.log(JSON.stringify({{
     assert "data-m=\"\"" in page, "`everything` is the empty selection"
     assert "cur.includes(m) ? cur.filter(x => x !== m) : cur.concat(m)" in page, \
         "the rows must toggle, not replace"
+
+
+def test_every_section_and_relation_can_explain_itself(page, tmp_path):
+    """A panel that names `provenance & extras` and `about` has to be able to say what they mean.
+
+    The relation copy is SKILL.md's, not a second wording invented here: `about` versus
+    `instance-of` is a claim the graph makes -- an indicator MEASURES its class, a signal is
+    concerned with it -- and a glossary that paraphrases it starts disagreeing with it.
+
+    Driven in a browser: 14 affordances on RSI (12 sections, 2 relation rows), nothing at 200ms of
+    hover, shown at 700ms, positioned clear of the panel's left edge, dismissed by Esc, shown by
+    keyboard focus alone, and clicking one does NOT fold the section it sits in.
+    """
+    from mangrove_kb.graph import RELATIONS
+
+    out = _run_in_node(page, """
+console.log(JSON.stringify({tips: Object.keys(window.KBTIPS), rels: Object.keys(window.KBRELTIPS),
+  empty: Object.entries(window.KBTIPS).concat(Object.entries(window.KBRELTIPS))
+           .filter(([, v]) => !v || v.length < 20).map(([k]) => k)}));
+""", tmp_path)
+    assert out["empty"] == [], f"these tooltips say nothing useful: {out['empty']}"
+    # Every section the panel can render, and every relation the graph can carry.
+    for section in ("name", "action", "description", "subtype", "inputs", "parameters", "warm-up",
+                    "outputs", "interpretation", "applications", "formula", "reference",
+                    "provenance & extras", "edges"):
+        assert section in out["tips"], f"the {section} section cannot explain itself"
+    assert set(out["rels"]) == set(RELATIONS), \
+        f"a relation with no definition: {set(RELATIONS) - set(out['rels'])}"
+
+
+def test_the_tooltip_behaves_the_way_tooltips_behave(page):
+    """The conventions, each of which is a decision that would be wrong the other way.
+
+    The trigger is the `?`, not the heading: the heading folds the section, and on touch there is
+    no hover, so a tap to read would fold the thing being read about. The delay stops it flashing
+    as the pointer crosses on its way to the fold. It renders against the VIEWPORT, left of the
+    panel -- the panel is `overflow:auto` and 330px wide, so anything inside it is either clipped
+    or covering the content the heading introduces.
+    """
+    assert 'tip.setAttribute(\'role\', \'tooltip\');' in page
+    assert "el.setAttribute('aria-describedby', 'xtip');" in page
+    assert "schedule(el, 450)" in page, "an instant tooltip flickers on pass-through"
+    assert "outT = setTimeout(hide, 120);" in page
+    assert "inspect.addEventListener('focusin'" in page, "keyboard users get no hover"
+    assert "ev.preventDefault(); ev.stopPropagation();" in page, \
+        "a tap on the ? inside a <summary> would fold the section"
+    assert "if(ev.key === 'Escape') hide();" in page
+    assert "inspect.addEventListener('scroll', hide, true);" in page
+    assert "#xtip{position:fixed" in page, "inside the panel it would be clipped by overflow:auto"
+    assert "innerWidth - panel.left + 10" in page, "it must sit clear of the panel, over the canvas"
+    assert "cursor:help" in page
+    # The provenance summary is written by KVPROPS, not by the fold pass, so it needs its own -- it
+    # had copy and no way to reach it, on the one section where "what even is this" is likeliest.
+    assert "aria-label=\"what does provenance &amp; extras mean?\"" in page
