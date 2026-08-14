@@ -1,0 +1,9 @@
+{
+  "_doc": "Vocabulary for the doc-derived half of the graph. `kinds` are the nine ontology primitives (a page's `kind:` frontmatter becomes the id prefix). `concept_edges` is deliberately the exact set of relations mangrove_kb.graph.RELATIONS knows how to categorise and traverse -- anything the wiki can express is therefore queryable, and a section mapping to a relation outside this set is a build-time mistake rather than a silent degree-0 node.",
+  "kinds": ["object", "property", "concept", "fact", "experience",
+            "procedure", "schema", "context", "judgment", "atom"],
+  "concept_edges": ["instance-of", "kind-of", "part-of", "has-role",
+                    "about", "uses", "supersedes"],
+  "symmetric": [],
+  "hub_edges": ["indexes", "records"]
+}

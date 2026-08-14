@@ -21,7 +21,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 303, 1049
+s["nodes"], s["edges"]          # 309, 1055
 s["primitives"]                 # {'Procedure': 289, 'Concept': 9, 'Property': 3, ...}
 s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 222, ...}
 s["classes"]                    # the six character classes -- what find(kind=) is for
@@ -30,12 +30,13 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  303 1049
+nodes, edges  309 1055
 primitives    {'Procedure': 289, 'Concept': 9, 'Property': 3, 'Object': 1, 'Schema': 1}
 relations     {'instance-of': 360, 'uses': 233, 'about': 222, 'has-role': 218,
                'kind-of': 8, 'part-of': 6, 'supersedes': 2}
-classes       ['concept:averaging', 'concept:flow', 'concept:momentum',
-               'concept:oscillator', 'concept:pattern', 'concept:volatility']
+classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
+               'concept:momentum', 'concept:oscillator', 'concept:pattern',
+               'concept:volatility']
 roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
@@ -50,7 +51,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (295 of 303) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (296 of 309) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -256,7 +257,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 303 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 309 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 ---

@@ -30,11 +30,14 @@ def test_stats_enumerates_every_filter_value(kg):
         assert kg.find(role=role, limit=1) is not None
     for cls in s["classes"]:
         assert kg.find(kind=cls, limit=1) is not None
-    assert len(s["classes"]) == 6, (
-        "classes is the CHARACTER vocabulary -- the six divisions of technical analysis. "
+    assert len(s["classes"]) == 7, (
+        "classes is the CHARACTER vocabulary -- the divisions of technical analysis. "
         "It once returned every backbone target, which swept in concept:indicator (71 "
         "results), concept:signal (218), concept:technical-analysis (295 of 303) and "
-        "property:role (the role values), advertising filters that act as no-ops.")
+        "property:role (the role values), advertising filters that act as no-ops. Six are "
+        "measured by a computation; concept:chart-pattern is knowledge only -- multi-bar "
+        "formations need swing points, which nothing in the library produces -- so it is "
+        "deliberately memberless rather than missing.")
     assert set(s["relations"]) <= set(RELATIONS), "graph uses a relation the library cannot classify"
 
 
@@ -125,7 +128,7 @@ def test_derivation_never_runs_over_roles(kg):
     """
     classes = {n["id"] for n in kg.neighbors("concept:technical-analysis", relation="kind-of",
                                              direction="in", limit=None).items}
-    assert len(classes) == 6, f"expected the six character classes, got {sorted(classes)}"
+    assert len(classes) == 7, f"expected the seven character classes, got {sorted(classes)}"
     for role in kg.roles():
         bearers = set(kg.bearers(role))
         for cls in classes:

@@ -311,9 +311,12 @@ for(const n of DATA.nodes){
 }
 console.log(JSON.stringify({threw: bad, braces, count: DATA.nodes.length}));
 """, tmp_path)
+    from mangrove_kb.graph import KnowledgeGraph
     assert out["threw"] == [], f"the formatter threw on {out['threw']}"
     assert out["braces"] == [], f"raw JSON still reaches the panel for {out['braces']}"
-    assert out["count"] == 303
+    # Every node, counted from the graph rather than a literal: the claim is coverage, and a
+    # literal turns each node added to the ontology into a spurious failure here.
+    assert out["count"] == len(KnowledgeGraph.load().nodes)
 
 
 def test_unbounded_and_unauthored_are_different_things(page, tmp_path):
@@ -554,7 +557,8 @@ console.log(JSON.stringify(names));
 """, tmp_path)
     assert "epistemic status" not in out, \
         "epistemic must live in provenance on every node, not as its own section on some"
-    assert out.get("provenance &amp; extras") == 303, \
+    from mangrove_kb.graph import KnowledgeGraph
+    assert out.get("provenance &amp; extras") == len(KnowledgeGraph.load().nodes), \
         f"every node carries an epistemic status, so every node has the section: {out}"
     # warm-up is a sentence about the parameters when there are any, and its own section when
     # there are not -- saying "an expression in these parameters" beside no parameters is a lie.

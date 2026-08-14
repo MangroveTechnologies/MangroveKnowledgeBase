@@ -1,0 +1,99 @@
+"""The doc-derived half of the graph survives in the committed ontology.
+
+`build_signal_indicator_ontology.py` writes the record from the library's source and knows nothing
+about the wiki, so running it alone and committing silently drops every doc-derived node. Nothing
+else would notice: the code-derived atoms would all still be there and the suite would be green.
+These tests are what notices.
+
+The pipeline is two stages, in this order:
+
+    python3 ontology/build_signal_indicator_ontology.py
+    python3 -m wiki_to_graph build ontology/wiki -o build/wiki-graph.json \\
+            --map ontology/wiki-config/map.json --vocab ontology/wiki-config/vocab.json
+    python3 ontology/wiki_to_atoms.py --wiki ontology/wiki --graph build/wiki-graph.json \\
+            --ontology ontology/signal-indicator-ontology.json --out build/record.json
+"""
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+
+import pytest
+
+from mangrove_kb.graph import RELATIONS, KnowledgeGraph
+
+REPO = Path(__file__).resolve().parent.parent
+WIKI = REPO / "ontology" / "wiki"
+
+
+@pytest.fixture(scope="module")
+def kg() -> KnowledgeGraph:
+    return KnowledgeGraph.load()
+
+
+def wiki_pages() -> dict[str, dict]:
+    """Every page, by the id the adapter derives for it: ``{kind}:{slug(title)}``."""
+    out = {}
+    for path in sorted(WIKI.glob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        kind = (m.group(1) if (m := re.search(r"^kind:\s*(\w+)", text, re.M)) else "concept").lower()
+        title = re.search(r"^# (.+)$", text, re.M).group(1).strip()
+        chapter = m.group(1) if (m := re.search(r"^chapter:\s*(\S+)", text, re.M)) else None
+        slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+        out[f"{kind}:{slug}"] = {"file": path.name, "chapter": chapter, "title": title}
+    return out
+
+
+def test_every_authored_page_reached_the_graph(kg):
+    """A page that builds but never lands is the failure this whole path exists to prevent."""
+    missing = [f"{nid} ({p['file']})" for nid, p in wiki_pages().items() if nid not in kg.nodes]
+    assert not missing, (
+        "the committed ontology is missing doc-derived nodes -- the code builder was almost "
+        f"certainly run without the wiki merge that follows it: {missing}")
+
+
+def test_doc_nodes_record_the_chapter_they_came_from(kg):
+    """Provenance is the whole claim to trustworthiness for a node nobody can re-derive from code."""
+    for nid, page in wiki_pages().items():
+        if page["chapter"] is None:          # anchors carry no chapter; they are code-derived
+            continue
+        node = kg.get(nid)
+        assert node.get("source_chapter") == page["chapter"], \
+            f"{nid} should record chapter {page['chapter']}, got {node.get('source_chapter')!r}"
+
+
+def test_doc_nodes_are_searchable_by_their_body(kg):
+    """`explanation` is in SEARCH_TIERS, so a term named only in the page body is findable.
+
+    Before it was carried, `find("head and shoulders")` returned nothing while the chart-pattern
+    page named the formation in its first line -- a search that answers "do we have anything for
+    X?" with a false no is worse than no search.
+    """
+    hits = [r["id"] for r in kg.find("head and shoulders", limit=5).items]
+    assert "concept:chart-pattern" in hits, hits
+
+
+def test_doc_edges_use_only_relations_the_library_can_classify(kg):
+    """The wiki can express any section name; only these seven mean anything to a consumer."""
+    doc_ids = set(wiki_pages())
+    for edge in kg.edges:
+        if edge.src in doc_ids or edge.dst in doc_ids:
+            assert edge.relation in RELATIONS, f"{edge.src} --{edge.relation}--> {edge.dst}"
+
+
+def test_every_doc_edge_records_why_it_holds(kg):
+    """Our relations carry a rationale; the adapter refuses an edge without one, so none exist."""
+    doc_ids = set(wiki_pages())
+    bare = [f"{e.src} --{e.relation}--> {e.dst}" for e in kg.edges
+            if (e.src in doc_ids or e.dst in doc_ids) and not e.why.strip()]
+    assert not bare, bare
+
+
+def test_the_record_is_the_merged_graph_not_the_code_build_alone():
+    """The committed file must be the second stage's output -- meta says how many doc atoms it holds."""
+    record = json.loads((REPO / "ontology" / "signal-indicator-ontology.json").read_text())
+    authored = sum(1 for p in wiki_pages().values() if p["chapter"])
+    assert record["meta"].get("doc_atoms") == authored, (
+        "meta.doc_atoms is missing or stale -- the record was written by the code builder without "
+        f"the wiki merge (expected {authored})")

@@ -4450,7 +4450,7 @@
      "Positive TRIX: Bullish momentum",
      "Negative TRIX: Bearish momentum",
      "Zero line crossovers signal trend changes",
-     "Very smooth\u2014filters out most noise"
+     "Very smooth—filters out most noise"
     ],
     "applications": [
      "Trend-following momentum with heavy noise suppression, for instruments where MACD whipsaws",
@@ -17393,6 +17393,78 @@
      }
     }
    }
+  },
+  {
+   "id": "concept:chart-pattern",
+   "title": "chart pattern",
+   "kind": "Concept",
+   "summary": "A price formation spanning a variable number of bars, identified from swing highs and lows rather than over a fixed window.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_chapter": "07-chart-patterns",
+    "explanation": "Multi-bar formations: head and shoulders, double tops and bottoms, triangles, wedges, flags and pennants, cup and handle, and the necklines and completion criteria that define them. Also pattern reliability and failure modes, and the context a formation requires to mean anything. Sibling of the existing pattern class, not a parent of it and not the same thing. That class holds candlestick geometry -- shapes computable from one bar or a small fixed number of them, which is why 41 signals implement it. A chart pattern needs a swing structure of unknown length, and no computation in the library produces swing points, so this class carries no procedures. It is the first class in the graph that is knowledge without an implementation."
+   }
+  },
+  {
+   "id": "concept:market-foundations",
+   "title": "market foundations",
+   "kind": "Concept",
+   "summary": "How a market produces a price: who participates, how their orders meet, and what crossing the spread costs.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_chapter": "01-market-foundations",
+    "explanation": "Market microstructure, order types, participant classes, liquidity and its price -- slippage and market impact -- volatility regimes and the shifts between them, trading venues and their execution models, bid-ask spread dynamics, and price discovery. This is the layer every computation in the graph silently assumes. An indicator consumes a price series; this subject area is where that series comes from."
+   }
+  },
+  {
+   "id": "concept:market-mechanics",
+   "title": "market mechanics",
+   "kind": "Concept",
+   "summary": "The instruments themselves and the rules under which a position is opened, financed and settled.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_chapter": "02-instruments-market-mechanics",
+    "explanation": "Spot markets, futures and perpetual swaps, options, margin and leverage and the liquidation engines that enforce them, crypto-specific mechanics, FX basics, settlement and clearing, and contract specifications. Distinct from market foundations: that subject area covers how a price forms, this one covers what is actually being traded and under whose rules."
+   }
+  },
+  {
+   "id": "concept:price-action",
+   "title": "price action",
+   "kind": "Concept",
+   "summary": "Reading a market from the shape of its price alone -- structure, levels and regime -- without computing an indicator over it.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_chapter": "03-core-trading-concepts",
+    "explanation": "Price action theory, market structure, trend versus range and compression versus expansion, liquidity theory, volume and order flow, support and resistance, supply and demand zones, multi-timeframe analysis, confluence, fair value gaps, and volume profile. Deliberately kept beside technical analysis rather than beneath it. Technical analysis is organised in this graph by what a computation *measures*, and its six subclasses are exactly those characters; price action names conclusions drawn from price geometry rather than a character a computation measures, so placing it there would misuse that axis."
+   }
+  },
+  {
+   "id": "concept:quantitative-analysis",
+   "title": "quantitative analysis",
+   "kind": "Concept",
+   "summary": "Statistical structure in returns: what persists, what reverts, and over what horizon.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_chapter": "08-quantitative-analysis",
+    "explanation": "Seasonality and time-of-day effects, volatility clustering, mean reversion, breakout behaviour, autocorrelation and momentum persistence, machine-learned patterns, cross-sectional versus time-series effects, and carry. Where technical analysis classifies a computation by what it measures, this subject area is about the properties of the series being measured -- the evidence that a given class of computation has anything to find."
+   }
+  },
+  {
+   "id": "concept:risk-management",
+   "title": "risk management",
+   "kind": "Concept",
+   "summary": "Bounding loss: how much to put on, when to stop, and what the portfolio can survive.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_chapter": "05-risk-management",
+    "explanation": "Risk dimensions in strategy design, trading rules and protocols, position sizing, drawdown controls, stop-loss and take-profit engineering, portfolio risk, capital efficiency, risk-reward ratios, risk of ruin, and scenario analysis. Signals decide whether to act; this subject area decides at what size and under what limits, and it constrains a strategy independently of which signals it composes."
+   }
   }
  ],
  "relations": [
@@ -27351,6 +27423,54 @@
    "why": "computes the same thing under the canonical name",
    "from_id": "procedure:signal-inverted-hammer-trigger",
    "to_id": "procedure:signal-shooting-star-trigger"
+  },
+  {
+   "from": "chart pattern",
+   "rel": "kind-of",
+   "to": "technical analysis",
+   "why": "a character a computation can read, sibling to the candlestick pattern class",
+   "from_id": "concept:chart-pattern",
+   "to_id": "concept:technical-analysis"
+  },
+  {
+   "from": "market foundations",
+   "rel": "part-of",
+   "to": "Mangrove Knowledge Space",
+   "why": "subject area of the knowledge space",
+   "from_id": "concept:market-foundations",
+   "to_id": "object:mangrove-knowledge-space"
+  },
+  {
+   "from": "market mechanics",
+   "rel": "part-of",
+   "to": "Mangrove Knowledge Space",
+   "why": "subject area of the knowledge space",
+   "from_id": "concept:market-mechanics",
+   "to_id": "object:mangrove-knowledge-space"
+  },
+  {
+   "from": "price action",
+   "rel": "part-of",
+   "to": "Mangrove Knowledge Space",
+   "why": "subject area of the knowledge space",
+   "from_id": "concept:price-action",
+   "to_id": "object:mangrove-knowledge-space"
+  },
+  {
+   "from": "quantitative analysis",
+   "rel": "part-of",
+   "to": "Mangrove Knowledge Space",
+   "why": "subject area of the knowledge space",
+   "from_id": "concept:quantitative-analysis",
+   "to_id": "object:mangrove-knowledge-space"
+  },
+  {
+   "from": "risk management",
+   "rel": "part-of",
+   "to": "Mangrove Knowledge Space",
+   "why": "subject area of the knowledge space",
+   "from_id": "concept:risk-management",
+   "to_id": "object:mangrove-knowledge-space"
   }
  ],
  "meta": {
@@ -27371,6 +27491,12 @@
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],
-  "indicators_missing_description": []
+  "indicators_missing_description": [],
+  "doc_atoms": 6,
+  "doc_relations": 6,
+  "doc_anchors": [
+   "concept:technical-analysis",
+   "object:mangrove-knowledge-space"
+  ]
  }
 }

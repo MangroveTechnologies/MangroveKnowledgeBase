@@ -38,9 +38,23 @@ def committed():
     return json.loads(COMMITTED.read_text())
 
 
+def _code_derived(graph):
+    """The committed record is the code build plus the wiki merge. This strips the second half.
+
+    Determinism is a claim about the builder: given the tree, it reproduces what it wrote. The
+    doc-derived nodes are not its output and it has never heard of them, so including them here
+    would assert the builder produces something it does not. They have their own guard --
+    `test_doc_derived_atoms.py` fails if the merge is skipped, which is the failure this test
+    would otherwise be mistaken for.
+    """
+    doc = {a["id"] for a in graph["atoms"] if "source_chapter" in (a.get("props") or {})}
+    return ({a["id"]: a for a in graph["atoms"] if a["id"] not in doc},
+            [r for r in graph["relations"] if r["from_id"] not in doc and r["to_id"] not in doc])
+
+
 def test_atoms_are_reproduced_exactly(rebuilt, committed):
     got = {a["id"]: a for a in rebuilt["atoms"]}
-    want = {a["id"]: a for a in committed["atoms"]}
+    want, _ = _code_derived(committed)
     assert set(got) == set(want), "the node SET changed"
     differing = [i for i in want if got[i] != want[i]]
     assert not differing, (
@@ -49,7 +63,8 @@ def test_atoms_are_reproduced_exactly(rebuilt, committed):
 
 
 def test_relations_are_reproduced_exactly(rebuilt, committed):
-    assert rebuilt["relations"] == committed["relations"]
+    _, want = _code_derived(committed)
+    assert rebuilt["relations"] == want
 
 
 def test_nothing_is_carried_forward(rebuilt):
