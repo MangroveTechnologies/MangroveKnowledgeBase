@@ -427,14 +427,62 @@ def test_the_panel_is_legible_in_both_themes(page):
     assert ':root:not([data-theme="light"]) #inspect{--kb-ty:var(--act)}' in page, \
         "an explicit light choice on a dark OS must keep the readable colour"
     # The description IS the answer to "what is this". It was rendered in --muted, like provenance.
-    assert "#inspect .kbd{font:13px/1.6 var(--kb-sans);color:var(--ink)" in page, \
+    assert re.search(r"#inspect \.kbd\{font:[\d.]+px/[\d.]+ var\(--kb-sans\);color:var\(--ink\)", page), \
         "descriptions must be full-contrast body text in the prose face, not small grey mono"
-    # A heading in a grey mixed halfway to the background, smaller than the text beneath it and in
-    # the same typeface, is not a heading. Full ink, sans, bold, and bigger than the body it heads.
-    assert "#inspect .lbl{font:700 13px var(--kb-sans)" in page and "color:var(--ink);margin:20px" in page
+
+    # A heading that is SMALLER than the entry names beneath it is not a heading. Sizes are read out
+    # of the stylesheet and compared, rather than pinned as strings, so tuning a value stays legal
+    # and inverting the hierarchy does not.
+    def px(pattern):
+        m = re.search(pattern, page)
+        assert m, f"no rule matched {pattern}"
+        return float(m.group(1))
+
+    heading = px(r"#inspect \.lbl\{font:700 ([\d.]+)px var\(--kb-sans\)")
+    entry = px(r"td\.kbn\{font:600 ([\d.]+)px var\(--kb-mono\)")
+    desc = px(r"#inspect \.kbd\{font:([\d.]+)px")
+    assert heading > entry and heading > desc, \
+        f"section heading {heading}px must outrank entry names {entry}px and prose {desc}px"
     # Mono is for identifiers, sans is for prose. Naming a font that does not load is not a choice:
     # "Geist Mono" measures pixel-identical to "NoSuchFont12345" on this page -- there is no
     # @font-face and the page may not fetch one -- so what is real is the size, weight, colour and
     # which generic. The panel must not go back to naming a font it does not have.
     assert '"Geist Mono"' not in page.split("#inspect{--kb-sans")[1].split("</style>")[0], \
         "the panel must not declare a font that never loads"
+
+
+def test_every_section_folds_and_remembers(page, tmp_path):
+    """A node with 40 edges pushed everything else off the screen and there was no way to fold it.
+
+    The transform runs over the label/value pairs the panel already emits, so the viewer's own
+    sections -- Description, Edges -- fold on the same control as the three tables, without either
+    side knowing about the other. The state is keyed by section name and persisted, so folding
+    Edges once folds it for every node after it rather than only for the one in front of you.
+    """
+    out = _run_in_node(page, """
+console.log(JSON.stringify({
+  hasFold: /function foldSections\\(/.test(page),
+  key: /mangrove-kb-panel-sections/.test(page),
+  // the heading keeps `.lbl`, which is what the two overlays that look sections up by name use
+  keepsClass: /s\\.className = 'lbl'/.test(page),
+  wired: /showEdge = function\\(e\\)\\{ _showEdge\\(e\\); foldSections\\(\\); \\}/.test(page),
+}));
+""", tmp_path)
+    assert out["hasFold"] and out["wired"], "sections are not folded on both node and edge panels"
+    assert out["key"], "the open/closed state is not persisted"
+    assert out["keepsClass"], \
+        "the heading must keep .lbl or labelEl()/block() stop finding sections by name"
+
+
+def test_a_section_boundary_is_visible_in_both_themes(page):
+    """--line is #262626 on a #171717 panel: a 1.15:1 rule, which is to say no rule at all.
+
+    Measured in a browser after the change: the section edge is 3.41:1 dark and 3.31:1 light,
+    against the 3:1 WCAG asks of a non-text boundary. Mixing toward --ink rather than using --line
+    is what makes that true in BOTH themes from one declaration.
+    """
+    assert "--kb-edge:color-mix(in oklab,var(--ink) 42%,var(--panel))" in page
+    assert "--kb-band:color-mix(in oklab,var(--ink) 14%,var(--panel))" in page
+    assert "#inspect details.kbs{margin:0;border-top:1px solid var(--kb-edge)}" in page
+    assert "border-top:1px solid var(--line)}" not in page.split("PROPERTY_PANEL")[-1], \
+        "a boundary drawn in --line is invisible on the dark panel"

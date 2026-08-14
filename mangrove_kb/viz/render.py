@@ -689,15 +689,11 @@ title="show this node">${esc(id)}</span>`;
 PROPERTY_PANEL = r"""
 <style>
   /* The panel had one type size (10.5-12px) and one colour (--muted) for everything, so a
-     description -- the answer to "what is this" -- was rendered exactly like the provenance beside
-     it, in grey, at the size of a footnote. In dark mode --muted is #a1a1a1 on #171717, which is
-     where it became genuinely hard to read.
-     Three levels now, and they mean something:
-       ink            what you came to read: descriptions, bullets, entry names
-       ink 68% panel   supporting detail: type, default, range, units
-       ink 50% panel   the section labels themselves
-     The mix is against --panel rather than `transparent` so the result is a real opaque colour in
-     both themes instead of depending on what happens to be painted underneath. */
+     description -- the answer to "what is this" -- read exactly like the provenance beside it.
+     Now the size says what OUTRANKS what: a section heading (14.5px) is bigger than an entry name
+     inside it (12.5px) is bigger than nothing. Colour is mixed against --panel rather than
+     `transparent`, so every value is a real opaque colour in both themes instead of depending on
+     whatever happens to be painted underneath. */
   /* WHAT FONT THIS ACTUALLY RENDERS IN. `Geist` and `Geist Mono` are named in the brand style but
      no @font-face ever loads them and this page may not fetch one -- it is a single self-contained
      file with no network. Measured in the browser: a string set in "Geist Mono" is pixel-identical
@@ -710,7 +706,13 @@ PROPERTY_PANEL = r"""
   #inspect{--kb-sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
            --kb-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono",monospace;
            --kb-2:color-mix(in oklab,var(--ink) 78%,var(--panel));
-           --kb-rule:color-mix(in oklab,var(--line) 75%,var(--panel));
+           /* --line is #262626 on a #171717 panel in dark mode: a 1.15:1 rule, which is to say no
+              rule at all. Section boundaries are mixed toward --ink instead so they are visible in
+              BOTH themes, and each heading gets a filled band as well -- a line you have to look
+              for is not a boundary. */
+           --kb-rule:color-mix(in oklab,var(--ink) 22%,var(--panel));
+           --kb-edge:color-mix(in oklab,var(--ink) 42%,var(--panel));
+           --kb-band:color-mix(in oklab,var(--ink) 14%,var(--panel));
            /* The brand accent is a mid teal: 6.5:1 on the dark panel and 2.66:1 on the light one,
               measured. It is the token the eye lands on first, so on light it is darkened until it
               clears 4.5:1 rather than left as decoration you cannot read. Three states, like every
@@ -721,41 +723,60 @@ PROPERTY_PANEL = r"""
   :root[data-theme="dark"] #inspect{--kb-ty:var(--act)}
   /* Headings were 10.5px uppercase mono in a grey mixed halfway to the background -- grey on black,
      smaller than the text under them, and in the same typeface. A heading's whole job is to be the
-     thing you find when you are scanning, so: sans, 13px, bold, FULL --ink, sentence case, and a
-     rule under it so the section has a visible top edge. */
+     thing you find when you are scanning. Now: sans, 14.5px, bold, FULL --ink, sentence case, on a
+     banded row with a hard edge above it -- and it is the control that folds its own section.
+     Every section folds, including the viewer's own (Description, Edges), because the transform
+     runs over label/value pairs rather than over my three tables. The open/closed state is
+     remembered per section name, so folding Edges once folds it for every node after it. */
   #inspect h2{font:600 14px var(--kb-mono);line-height:1.35;margin-bottom:9px;color:var(--ink)}
-  #inspect .lbl{font:700 13px var(--kb-sans);letter-spacing:0;text-transform:capitalize;
-                color:var(--ink);margin:20px 0 7px;padding-bottom:5px;
-                border-bottom:1px solid var(--kb-rule)}
+  #inspect details.kbs{margin:0;border-top:1px solid var(--kb-edge)}
+  #inspect details.kbs:first-of-type{border-top:0}
+  #inspect .lbl{font:700 14.5px var(--kb-sans);letter-spacing:0;text-transform:capitalize;
+                color:var(--ink);margin:16px 0 6px}
+  /* The band and the pointer belong to the ones that actually FOLD. The collapse-across panel also
+     emits a `.lbl`, and dressing a non-control as a control is worse than leaving it plain. */
+  #inspect summary.lbl{margin:0;padding:9px 9px 9px 8px;background:var(--kb-band);cursor:pointer;
+                       list-style:none;display:flex;align-items:center;gap:7px;user-select:none}
+  #inspect .lbl::-webkit-details-marker{display:none}
+  #inspect summary.lbl::before{content:"\25be";font-size:11px;color:var(--kb-2);width:9px;
+                               flex:none;transition:transform .12s ease}
+  #inspect details.kbs:not([open])>summary.lbl::before{transform:rotate(-90deg)}
+  #inspect .lbl:hover{color:var(--act)}
+  #inspect details.kbs>.val{padding:10px 2px 16px}
   #inspect .val{font:13px/1.6 var(--kb-sans);color:var(--ink)}
   #inspect .val.acc{color:var(--kb-2)}
   #inspect table.kbt{border-collapse:collapse;width:100%;table-layout:fixed}
   #inspect table.kbt td{vertical-align:top;padding:7px 0}
   #inspect table.kbt tr+tr td{border-top:1px solid var(--kb-rule)}
-  #inspect table.kbt td.kbn{font:600 13px var(--kb-mono);color:var(--ink);
+  #inspect table.kbt td.kbn{font:600 12.5px var(--kb-mono);color:var(--ink);
                             width:38%;padding-right:10px;overflow-wrap:anywhere}
   #inspect table.kbt td.kbv{overflow-wrap:anywhere}
   /* The type is the first thing you want off an entry -- series, int, bool -- so it is the one
      token in the meta line that carries a colour of its own. */
   #inspect .kbty{color:var(--kb-ty);font-weight:700}
   #inspect .kbm{font:12px var(--kb-mono);color:var(--kb-2);line-height:1.5}
-  #inspect .kbd{font:13px/1.6 var(--kb-sans);color:var(--ink);margin-top:4px}
+  #inspect .kbd{font:12.5px/1.55 var(--kb-sans);color:var(--ink);margin-top:4px}
   /* It belongs to the parameter table above it, not to the last row in it -- without the gap it
      read as a third line of window_dev's description. */
   #inspect .kbw{margin-top:10px}
-  #inspect ul.kbl{margin:4px 0 0;padding-left:18px;font:13px/1.65 var(--kb-sans);color:var(--ink)}
+  #inspect ul.kbl{margin:4px 0 0;padding-left:18px;font:12.5px/1.6 var(--kb-sans);color:var(--ink)}
   #inspect ul.kbl li{margin:4px 0}
   #inspect pre.kbp{margin:4px 0 0;padding:9px 11px;background:var(--chip);border:1px solid var(--line);
                    border-radius:6px;color:var(--ink);font:12px/1.6 var(--kb-mono);
                    white-space:pre-wrap;overflow-wrap:anywhere}
-  #inspect details.kbx{margin-top:20px;border-top:1px solid var(--line);padding-top:11px}
-  #inspect details.kbx summary{font:700 12.5px var(--kb-sans);color:var(--kb-2);cursor:pointer;
-                               list-style:none}
-  #inspect details.kbx summary:hover{color:var(--act)}
-  #inspect details.kbx summary::before{content:"\25b8 ";font-size:10px}
-  #inspect details.kbx[open] summary::before{content:"\25be "}
-  #inspect details.kbx[open] summary{margin-bottom:9px}
-  #inspect details.kbx .kbm{margin:5px 0}
+  /* Provenance folds like every other section, and closed by default -- it is the one section
+     nobody opens to answer "what is this". */
+  #inspect details.kbx{margin:0;border-top:1px solid var(--kb-edge)}
+  #inspect details.kbx>summary{font:700 13px var(--kb-sans);color:var(--kb-2);cursor:pointer;
+                               list-style:none;padding:9px 8px;background:var(--kb-band);
+                               display:flex;align-items:center;gap:7px}
+  #inspect details.kbx>summary+*{margin-top:9px}
+  #inspect details.kbx>summary:hover{color:var(--act)}
+  #inspect details.kbx>summary::before{content:"\25be";font-size:11px;width:9px;flex:none;
+                                       transition:transform .12s ease}
+  #inspect details.kbx:not([open])>summary::before{transform:rotate(-90deg)}
+  #inspect details.kbx .kbm{margin:5px 0;padding:0 2px}
+  #inspect details.kbx pre.kbp{margin-left:2px;margin-right:2px}
 </style>
 <script>
 (function(){
@@ -889,17 +910,53 @@ PROPERTY_PANEL = r"""
     return h + (rest ? sec('other properties', rest) : '');
   };
 
+  // --- folding -------------------------------------------------------------------------------
+  // Every section becomes a <details>, driven by the label/value pairs the panel already emits --
+  // so the viewer's own blocks (Description, Edges, and the 40-edge lists that pushed everything
+  // else off screen) fold on exactly the same control as mine, without either of us knowing about
+  // the other. The heading keeps its `.lbl` class, so `labelEl(t).nextElementSibling` still finds
+  // the value block for the two overlays that look sections up by name.
+  const FOLD_KEY = 'mangrove-kb-panel-sections';
+  const readFold = () => { try{ return JSON.parse(localStorage.getItem(FOLD_KEY)) || {}; }
+                           catch(e){ return {}; } };
+  const writeFold = s => { try{ localStorage.setItem(FOLD_KEY, JSON.stringify(s)); }catch(e){} };
+
+  function foldSections(){
+    const state = readFold();
+    // Only top-level labels: the ones already inside a <details> have been folded on a previous
+    // pass, and the panel is rebuilt from scratch on every click anyway.
+    for(const l of [...inspect.querySelectorAll(':scope > .lbl')]){
+      const v = l.nextElementSibling;
+      if(!v || !v.classList.contains('val')) continue;
+      const key = l.textContent.trim().toLowerCase();
+      const d = document.createElement('details');
+      d.className = 'kbs';
+      d.open = state[key] !== false;                       // open unless folded before
+      const s = document.createElement('summary');
+      s.className = 'lbl';                                 // keep the class the lookups use
+      s.textContent = l.textContent;
+      l.replaceWith(d);
+      d.append(s, v);
+      d.addEventListener('toggle', () => { const st = readFold(); st[key] = d.open; writeFold(st); });
+    }
+  }
+
   // The viewer prints `epistemic · confidence` near the top, where confidence is null on every node
   // in this graph -- it rendered as the words "observed ·" with nothing after them. It now sits in
   // the details block above, so drop the original rather than show it twice.
+  //
+  // This wrapper is registered before the collapse panel's and the back button's, so it runs LAST
+  // (each calls the one it captured) -- the panel is fully built by the time sections are folded.
   if(typeof showNode === 'function'){
-    const _showNode = showNode;
+    const _showNode = showNode, _showEdge = showEdge;
     showNode = function(n){
       _showNode(n);
       const l = [...inspect.querySelectorAll('.lbl')]
         .find(x => x.textContent === 'epistemic · confidence');
       if(l){ const v = l.nextElementSibling; l.remove(); if(v) v.remove(); }
+      foldSections();
     };
+    showEdge = function(e){ _showEdge(e); foldSections(); };
   }
 })();
 </script>
