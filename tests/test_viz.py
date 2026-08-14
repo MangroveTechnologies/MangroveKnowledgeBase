@@ -383,7 +383,10 @@ console.log(JSON.stringify({bb, concept, order: {
     # The 14 concept nodes carry no props of their own, but the section they DO get is the same
     # section, under the same name, as on the other 289. It used to render flat and be called
     # something else, so the panel taught you its shape from one node and lied about the next.
-    assert '<summary>provenance &amp; extras</summary>' in out["concept"]
+    # Matched on the summary's opening text, not the whole element: the heading also carries the
+    # `?` affordance now, and pinning the closing tag made this fail for a change it does not care
+    # about.
+    assert '<summary>provenance &amp; extras' in out["concept"]
     assert "observed" in out["concept"]
 
 
@@ -545,7 +548,7 @@ const names = {};
 for(const n of DATA.nodes){
   const h = window.KVPROPS(n);
   for(const m of h.matchAll(/<div class="lbl">([^<]*)<\\/div>/g)) (names[m[1]] = names[m[1]] || 0), names[m[1]]++;
-  for(const m of h.matchAll(/<summary>([^<]*)<\\/summary>/g)) (names[m[1]] = names[m[1]] || 0), names[m[1]]++;
+  for(const m of h.matchAll(/<summary>([^<]*)/g)) (names[m[1]] = names[m[1]] || 0), names[m[1]]++;
 }
 console.log(JSON.stringify(names));
 """, tmp_path)
