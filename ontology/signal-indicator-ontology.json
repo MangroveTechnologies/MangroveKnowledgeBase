@@ -29217,20 +29217,20 @@
    "to_id": "concept:price-discovery"
   },
   {
-   "from": "core principles",
+   "from": "iceberg order",
    "rel": "about",
-   "to": "order types",
+   "to": "core principles",
    "why": "Information Leakage: Some order types reveal trading intentions more than others",
-   "from_id": "fact:market-foundations-core-principles",
-   "to_id": "concept:order-type"
+   "from_id": "concept:iceberg-order",
+   "to_id": "fact:market-foundations-core-principles"
   },
   {
-   "from": "best practices",
+   "from": "iceberg order",
    "rel": "about",
-   "to": "iceberg order",
+   "to": "best practices",
    "why": "Use iceberg orders for large positions to reduce information leakage",
-   "from_id": "judgment:market-foundations-best-practices",
-   "to_id": "concept:iceberg-order"
+   "from_id": "concept:iceberg-order",
+   "to_id": "judgment:market-foundations-best-practices"
   },
   {
    "from": "core principles",
@@ -29400,6 +29400,16 @@
    ],
    [
     "concept:iceberg-order",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:iceberg-order",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:iceberg-order",
     "kind-of",
     "concept:order-type"
    ],
@@ -29550,18 +29560,8 @@
    ],
    [
     "fact:market-foundations-core-principles",
-    "about",
-    "concept:order-type"
-   ],
-   [
-    "fact:market-foundations-core-principles",
     "part-of",
     "concept:market-foundations"
-   ],
-   [
-    "judgment:market-foundations-best-practices",
-    "about",
-    "concept:iceberg-order"
    ],
    [
     "judgment:market-foundations-best-practices",

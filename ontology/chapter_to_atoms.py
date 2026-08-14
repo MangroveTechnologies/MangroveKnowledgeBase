@@ -119,7 +119,12 @@ JUDGMENT_SUMMARY = (
 
 WIRED = {
     "Use iceberg orders for large positions": "concept:iceberg-order",
-    "Information Leakage: Some order types reveal": "concept:order-type",
+    # Wired to the iceberg order, not to `order-type` where the sentence points. The node's own
+    # definition invokes information leakage -- it displays part of its size "to reduce the
+    # information leakage of showing full size" -- so this is the principle that explains what that
+    # node does. The claim is phrased across order types; it earns its edge at the node whose
+    # behaviour it accounts for.
+    "Information Leakage: Some order types reveal": "concept:iceberg-order",
 }
 
 PRICE = {"type": "series", "units": "price"}
@@ -488,12 +493,14 @@ def build(path: Path, chapter: str, parent: str,
                 continue
             if target not in atoms and target not in existing:
                 raise ValueError(f"WIRED points at {target!r}, which is not a node")
-            # `about` -- the subject the statement concerns. It is what a signal takes to the
-            # character it reads, and a statement stands in the same relation to the thing it is
-            # about: concerned with, never an assertion of what it IS.
-            rels.append({"from": atoms[list_id]["title"], "rel": "about", "to": name_of(target),
+            # FROM the node, TO the list it draws on. A reader arrives at a concept and asks what
+            # is known about it, and outgoing edges are the answer to that question -- so the
+            # concept points at the principles and practices that govern it, not the reverse. It
+            # also keeps the two list nodes from accumulating 87 outgoing edges apiece while every
+            # concept sits there with none.
+            rels.append({"from": name_of(target), "rel": "about", "to": atoms[list_id]["title"],
                          "why": line.split(" ", 1)[1].strip(),
-                         "from_id": list_id, "to_id": target})
+                         "from_id": target, "to_id": list_id})
             used.add(next(k for k in WIRED if k in line))
         return kept
 

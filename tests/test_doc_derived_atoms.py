@@ -110,7 +110,7 @@ def test_a_wired_statement_lives_on_the_edge_and_not_in_the_list(kg):
              "judgment:market-foundations-best-practices": "practices"}
     for nid, field in lists.items():
         held = kg.get(nid)[field]
-        for edge in kg.neighbors(nid, relation="about", direction="out", limit=None):
+        for edge in kg.neighbors(nid, relation="about", direction="in", limit=None):
             reason = edge["why"].strip()
             assert reason, f"{nid} -> {edge['id']} carries no statement"
             assert not any(reason in line for line in held), (
@@ -120,7 +120,9 @@ def test_a_wired_statement_lives_on_the_edge_and_not_in_the_list(kg):
 
 def test_a_wired_concept_is_reachable_from_its_statement(kg):
     """The point of moving it: the concept stops being a leaf and the advice is one hop away."""
-    inbound = kg.neighbors("concept:iceberg-order", direction="in", relation="about", limit=None)
-    assert any(e["id"].startswith("judgment:") for e in inbound), \
-        "iceberg-order should be reachable from the practice that names it"
-    assert all(e["why"].strip() for e in inbound)
+    out = kg.neighbors("concept:iceberg-order", direction="out", relation="about", limit=None)
+    kinds = {e["id"].split(":", 1)[0] for e in out}
+    assert {"fact", "judgment"} <= kinds, (
+        "a concept points AT the principles and practices that govern it, so both should be "
+        f"outgoing from iceberg-order; got {kinds}")
+    assert all(e["why"].strip() for e in out), "every wired edge carries the statement it moved"
