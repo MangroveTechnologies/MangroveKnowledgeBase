@@ -305,7 +305,7 @@ def test_no_agent_definitions_are_committed():
         "CLAUDE.md points at an agent spec this repo does not contain"
 
 
-DOCS_WITH_IMAGES = ("README.md", "PKG_README.md", "docs/viewer-guide.md")
+DOCS_WITH_IMAGES = ("README.md", "PKG_README.md")
 
 
 def test_every_screenshot_is_shown_somewhere_and_every_shown_one_exists():
@@ -323,6 +323,20 @@ def test_every_screenshot_is_shown_somewhere_and_every_shown_one_exists():
     on_disk = {f"assets/{p.name}" for p in (REPO / "assets").glob("*.png")}
     assert not (shown - on_disk), f"shown but not in the repo: {sorted(shown - on_disk)}"
     assert not (on_disk - shown), f"in the repo but shown nowhere: {sorted(on_disk - shown)}"
+
+
+def test_no_screenshot_was_flattened_to_a_palette():
+    """256 colours is fine for flat UI and ruins a graph.
+
+    The hero is thousands of thin translucent edges. Quantising it to a palette dithered every one
+    of them, and the result reads as a blur -- shipped that way once, spotted by eye, not by any
+    check. Screenshots stay full colour; `zopflipng` gets the size back losslessly.
+    """
+    from PIL import Image
+
+    flattened = [p.name for p in sorted((REPO / "assets").glob("*.png"))
+                 if Image.open(p).mode == "P"]
+    assert not flattened, f"palette-reduced, which dithers fine lines: {flattened}"
 
 
 def test_no_screenshot_is_a_canyon():
