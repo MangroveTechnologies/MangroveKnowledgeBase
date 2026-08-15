@@ -1031,7 +1031,7 @@ def test_the_pages_own_javascript_ranks_as_find_does(page, tmp_path):
 
     idx = re.search(r"const IDX = (\[.*?\]);\n", page, re.S)
     body = re.search(r"  const STOP_SHARE = 0\.4;\n  function rank\(q\)\{.*?\n  \}\n", page, re.S)
-    helpers = re.search(r"  function terms\(q\)\{.*?function variants\(t\)\{.*?\n  \}\n",
+    helpers = re.search(r"  const FUNCTION = new Set\(.*?function variants\(t\)\{.*?\n  \}\n",
                         page, re.S)
     assert idx and body and helpers, "the page's ranker is not where this test looks for it"
 

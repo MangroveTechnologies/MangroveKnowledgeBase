@@ -6,8 +6,8 @@ populations, hubs of degree 200+ -- is exactly what the API has to cope with.
 """
 import pytest
 
-from mangrove_kb.graph import (BACKBONE, RELATIONS, ROLE_RELATION, SEARCH_TIERS, GraphError,
-                               KnowledgeGraph, NodeNotFound, _flatten, _is_bounded)
+from mangrove_kb.graph import (BACKBONE, FUNCTION_WORDS, RELATIONS, ROLE_RELATION, SEARCH_TIERS,
+                               GraphError, KnowledgeGraph, NodeNotFound, _flatten, _is_bounded)
 
 
 @pytest.fixture(scope="module")
@@ -497,3 +497,16 @@ def test_a_concept_lifted_from_core_principles_reaches_its_subject(kg):
         assert out.get("concept:liquidity") == "about", f"{nid} does not reach its subject"
         assert out.get("concept:price-action") == "part-of", f"{nid} lost its chapter scope"
     assert len(kg.path("concept:liquidity", "concept:liquidity-grab")) == 2
+
+
+def test_function_words_are_dropped_but_a_query_of_them_still_asks(kg):
+    """Frequency cannot catch them: `why` is in 26 nodes of 498 because our own prose says
+    "which is why", so it scored as though it discriminated and ranked two nodes that merely say
+    it above the one that answers the question."""
+    from mangrove_kb.graph import query_terms
+
+    assert query_terms("why do breakouts fail") == ["breakouts", "fail"]
+    assert query_terms("what") == ["what"], "a query of nothing but function words still asks"
+    assert "up" not in FUNCTION_WORDS and "down" not in FUNCTION_WORDS, \
+        "a direction is domain vocabulary here, not a function word"
+    assert kg.find("why do breakouts fail", limit=None).total

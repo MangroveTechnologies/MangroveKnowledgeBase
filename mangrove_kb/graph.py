@@ -120,14 +120,34 @@ _URL = re.compile(r"https?://\S+|www\.\S+")
 MIN_QUERY = 2
 
 
+#: English function words: they carry no meaning in ANY corpus, which is exactly why measuring
+#: frequency in THIS one never catches them -- "why" appears in 26 nodes of 498 because our own
+#: prose says "which is why", and it was scoring as though it discriminated. Ranking a question by
+#: it put two nodes that merely say "why" above the one that answers it.
+#:
+#: Domain words that look like function words are deliberately absent: "up", "down", "over",
+#: "under", "high", "low", "open", "close", "long", "short", "range", "point", "value" and "level"
+#: all mean something specific here, and dropping them would break the queries this exists to serve.
+FUNCTION_WORDS = frozenset("""
+an as at be been being but by can could did do does doing done for from had has have if in into is
+it its may might must no not of on or shall should so some such than that the their them then there
+these they this those through to too was were what when where whether which while who whom why will
+with within would you your our we us me my i am are also been each every any both either neither
+""".split())
+
+
 def query_terms(query: str) -> list[str]:
     """A query as the terms it is made of, so word order stops mattering.
 
     ``"mean reversion"`` and ``"reversion mean"`` are the same question and used to return 11 nodes
     and none, because the query was matched as one literal string. Each term is matched
     independently and a node must carry all of them.
+
+    Function words are dropped -- unless that would leave nothing, so ``find("what")`` still asks
+    what it asked.
     """
-    return [t for t in re.split(r"[^a-z0-9]+", query.lower()) if len(t) >= MIN_QUERY]
+    words = [t for t in re.split(r"[^a-z0-9]+", query.lower()) if len(t) >= MIN_QUERY]
+    return [t for t in words if t not in FUNCTION_WORDS] or words
 
 
 @functools.lru_cache(maxsize=1024)

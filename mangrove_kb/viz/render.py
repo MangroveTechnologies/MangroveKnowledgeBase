@@ -450,7 +450,13 @@ SEARCH_UI = """
 
   // Terms, plural/singular variants and the AND across them -- the same rules as query_terms(),
   // _variants() and rank_of() in graph.py. The page and kg.find() must answer identically.
-  function terms(q){ return q.toLowerCase().split(/[^a-z0-9]+/).filter(t=>t.length>=2); }
+  // Mirrors FUNCTION_WORDS and query_terms() in graph.py; the page must rank as find() does.
+  const FUNCTION = new Set('also am an any are as at be been being both but by can could did do does doing done each either every for from had has have i if in into is it its may me might must my neither no not of on or our shall should so some such than that the their them then there these they this those through to too us was we were what when where whether which while who whom why will with within would you your'.split(' '));
+  function terms(q){
+    const w=q.toLowerCase().split(/[^a-z0-9]+/).filter(t=>t.length>=2);
+    const kept=w.filter(t=>!FUNCTION.has(t));
+    return kept.length?kept:w;
+  }
   function variants(t){
     if(t.length<4) return [t];
     if(t.endsWith('ies')) return [t, t.slice(0,-3)+'y'];
