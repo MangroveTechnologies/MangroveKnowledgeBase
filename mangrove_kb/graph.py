@@ -6,7 +6,7 @@ part each signal plays in a strategy. It is generated from the source, so it is 
 extracted -- there is no text-mining noise to rank around.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (218 of 427 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (218 of 498 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -108,6 +108,23 @@ SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
      # exact false negative SEARCH_TIERS was widened to prevent.
      "principles", "practices", "examples"),
 )
+
+def haystacks(source: dict) -> tuple[str, ...]:
+    """One lowercased string per search tier, for a node's fields.
+
+    The last band is everything the tiers do not name. An allow-list had to grow every time a
+    chapter introduced a prop -- a comparison table, a caution, a heading nobody anticipated -- and
+    until it did, a term stated only there was invisible to the search that answers "do we have
+    anything for X?".
+
+    Defined once because two callers need identical ranking: the query layer, and the viewer's
+    precomputed index. A second copy in the renderer would drift from this one silently.
+    """
+    ranked = {f for tier in SEARCH_TIERS for f in tier}
+    tiers = [" ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS]
+    tiers.append(" ".join(_flatten(v) for k, v in source.items() if k not in ranked).lower())
+    return tuple(tiers)
+
 
 #: Where the graph is looked for, in order. An explicit path always wins; ``MANGROVE_KB_ONTOLOGY``
 #: lets a caller point at a build output; then the copy shipped inside the package; then the
@@ -300,9 +317,8 @@ class KnowledgeGraph:
         # so this is cheaper than re-flattening the nested slot dicts on every search.
         self._haystacks: dict[str, tuple[str, ...]] = {}
         for n in self.nodes.values():
-            source = {"name": n.name, "id": n.id, "summary": n.summary, **n.props}
-            self._haystacks[n.id] = tuple(
-                " ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS)
+            self._haystacks[n.id] = haystacks(
+                {"name": n.name, "id": n.id, "summary": n.summary, **n.props})
 
     # --- loading ---------------------------------------------------------------------------------
 
@@ -362,7 +378,7 @@ class KnowledgeGraph:
 
         This deliberately does **not** return every node the backbone points at. That set also holds
         ``concept:indicator`` (71 results), ``concept:signal`` (218), ``concept:technical-analysis``
-        (299 of 427 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
+        (299 of 498 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
         class vocabulary invites a filter that looks like a query and returns almost everything.
         They remain legal ``kind=`` arguments, and :meth:`find` documents them; they are just not
         classes.
@@ -607,7 +623,7 @@ class KnowledgeGraph:
         The other operations answer questions about a node's place in the graph. This one answers
         questions about the values themselves -- *what produces an output called* ``histogram``,
         *which computations emit a percentage*, *which are bounded and therefore comparable on one
-        axis*. Those were previously reachable only by fetching all 427 nodes and looping, which is
+        axis*. Those were previously reachable only by fetching all 498 nodes and looping, which is
         why they were not being asked.
 
         A row is an **output**, not a node: an indicator with three outputs contributes three rows,

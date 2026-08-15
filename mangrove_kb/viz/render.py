@@ -274,7 +274,7 @@ def search_index() -> list[dict]:
     `tests/test_viz.py` asserts the two agree on real queries, so a change to one that is not
     mirrored in the other fails.
     """
-    from ..graph import SEARCH_TIERS, KnowledgeGraph, _flatten
+    from ..graph import KnowledgeGraph, haystacks
 
     kg = KnowledgeGraph.load()
     rows = []
@@ -284,8 +284,9 @@ def search_index() -> list[dict]:
             "id": node.id,
             "name": node.name,
             "summary": (node.summary or "")[:140],
-            # One lowercased string per tier. Tier order IS rank order.
-            "t": [" ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS],
+            # One lowercased string per tier, built by the query layer itself. Tier order
+            # IS rank order.
+            "t": list(haystacks(source)),
         })
     rows.sort(key=lambda r: r["id"])
     return rows
@@ -434,7 +435,7 @@ SEARCH_UI = """
 <script>
 (function(){
   const IDX = __INDEX__;
-  const WHY = ['name','abbrev','summary','detail'];   // parallel to SEARCH_TIERS
+  const WHY = ['name','abbrev','summary','detail','other'];  // parallel to haystacks()
   const LIMIT = 40;
 
   const bar=document.getElementById('brandbar');

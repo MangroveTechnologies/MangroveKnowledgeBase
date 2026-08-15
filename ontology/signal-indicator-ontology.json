@@ -3391,6 +3391,12 @@
       "canonical_name": "On Balance Volume",
       "description": "running total of volume signed by the direction of the close. UNBOUNDED, and the ABSOLUTE LEVEL CARRIES NO INFORMATION -- StockCharts states plainly that 'the absolute value of OBV is not important' and does not even show its scale, because a cumulative total's level is set by where the data happens to begin. Only the shape and direction are read, and the zero crossing is an artefact of the start date, not a signal. Full volume is committed to one side by close direction alone, so a +0.01% bar and a +8% bar add the same amount. IMPLEMENTATION CAVEAT: Granville's rule is three-way and carries the total forward UNCHANGED when the close is flat; this implementation branches only two ways and adds volume on flat bars, so it drifts upward in instruments where unchanged closes are common"
      }
+    },
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "chapter_variants": {
+     "formula": "If Close > Previous_Close: OBV = Previous_OBV + Volume\nIf Close < Previous_Close: OBV = Previous_OBV - Volume\nIf Close = Previous_Close: OBV = Previous_OBV"
     }
    }
   },
@@ -4966,6 +4972,12 @@
       "canonical_name": "volume weighted average price",
       "description": "Rolling volume-weighted average of typical price over `window` bars. The literature's VWAP is session-anchored -- it accumulates from the session open and resets each session -- but anchoring presupposes a session boundary, which a 24/7 market does not have, so the rolling form is the coherent definition here rather than an approximation of the anchored one. Exactly equal to VWMA computed on typical price. Against a synthetic session-anchored VWAP over five sessions it differs by up to 4.00 price units (3.9% of price), which matters only when reconciling against a session-based instrument or platform, where the institutional execution benchmark is defined by the session it anchors to"
      }
+    },
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "chapter_variants": {
+     "formula": "VWAP = Cumulative(Price * Volume) / Cumulative(Volume)"
     }
    }
   },
@@ -17532,7 +17544,29 @@
     "reference_chapter": [
      "core-trading-concepts"
     ],
-    "explanation": "Price action theory, market structure, trend versus range and compression versus expansion, liquidity theory, volume and order flow, support and resistance, supply and demand zones, multi-timeframe analysis, confluence, fair value gaps, and volume profile. Deliberately kept beside technical analysis rather than beneath it. Technical analysis is organised in this graph by what a computation *measures*, and its six subclasses are exactly those characters; price action names conclusions drawn from price geometry rather than a character a computation measures, so placing it there would misuse that axis."
+    "explanation": "Price action theory, market structure, trend versus range and compression versus expansion, liquidity theory, volume and order flow, support and resistance, supply and demand zones, multi-timeframe analysis, confluence, fair value gaps, and volume profile. Deliberately kept beside technical analysis rather than beneath it. Technical analysis is organised in this graph by what a computation *measures*, and its six subclasses are exactly those characters; price action names conclusions drawn from price geometry rather than a character a computation measures, so placing it there would misuse that axis.",
+    "applications": [
+     "Price Action reveals the story of buyer/seller conflict",
+     "Market Structure defines the trend framework",
+     "Trend/Range Analysis determines strategy selection",
+     "Liquidity Theory explains where price is attracted",
+     "Volume Analysis confirms or questions price moves",
+     "Support/Resistance identifies key decision points",
+     "Supply/Demand locates institutional footprints",
+     "Multi-Timeframe Analysis provides context hierarchy",
+     "Confluence filters for highest probability setups",
+     "Fair Value Gaps identify rebalancing opportunities",
+     "Volume Profile & Auction Theory reveals institutional activity and fair value"
+    ],
+    "examples": [
+     "Bullish Price Action: Higher highs and higher lows forming Strong closes near candle highs (buyer dominance) Rejection wicks at support levels Volume confirmation on up moves",
+     "Bearish Price Action: Lower highs and lower lows forming Strong closes near candle lows (seller dominance) Rejection wicks at resistance levels Volume confirmation on down moves",
+     "Reversal Price Action: Long wick candles (hammer, shooting star) Engulfing patterns at key levels Failure to make new highs/lows Climactic volume at extremes"
+    ],
+    "chapter_variants": {
+     "summary": "Price action is a trading methodology that analyzes pure price movement on charts without relying on lagging indicators. It focuses on reading candles, bars, and price patterns to understand market psychology and predict future price direction based on historical price behavior.",
+     "explanation": "This document covers the fundamental analytical frameworks and concepts used by traders to interpret market behavior, identify opportunities, and make trading decisions."
+    }
    }
   },
   {
@@ -18082,7 +18116,8 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "market-foundations"
+     "market-foundations",
+     "core-trading-concepts"
     ],
     "applications": [
      "Estimating realistic execution costs for strategy backtesting",
@@ -18092,7 +18127,20 @@
      "Stress-testing strategies for liquidity withdrawal scenarios"
     ],
     "source_wording": "The ease with which an asset can be bought or sold without significantly affecting its price. High liquidity implies tight spreads, deep order books, and minimal price impact.",
-    "explanation": "High liquidity shows up as a tight [[Bid-Ask Spread]], a deep book and small [[Market Impact]] -- three symptoms of one condition. It is not constant: it varies by time of day and by regime, and displayed size often disappears when it is tested, so the book overstates what is really available. Everything about execution cost follows from it."
+    "explanation": "High liquidity shows up as a tight [[Bid-Ask Spread]], a deep book and small [[Market Impact]] -- three symptoms of one condition. It is not constant: it varies by time of day and by regime, and displayed size often disappears when it is tested, so the book overstates what is really available. Everything about execution cost follows from it.",
+    "examples": [
+     "Liquidity Sweep Setup: Identify obvious swing high with clustered stops above Wait for price to spike above high (sweeping liquidity) Look for immediate rejection (long wick, engulfing candle) Enter short with stop above the sweep Target opposing liquidity zone"
+    ],
+    "chapter_variants": {
+     "applications": [
+      "Avoiding stop-loss placement at obvious levels",
+      "Anticipating false breakouts at liquidity zones",
+      "Entering trades after liquidity sweeps",
+      "Understanding why breakouts fail",
+      "Identifying where large players likely accumulate/distribute"
+     ],
+     "summary": "Liquidity theory in trading context refers to understanding where resting orders (stop-losses, pending orders) accumulate in the market, and how price tends to seek out these liquidity pools before making significant moves. It explains why markets often \"hunt\" stops before reversing."
+    }
    }
   },
   {
@@ -18316,10 +18364,21 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "market-foundations"
+     "market-foundations",
+     "core-trading-concepts"
     ],
     "source_wording": "Distinct periods characterized by specific volatility patterns, trend behaviors, or correlation structures.",
-    "explanation": "A regime is a persistent state rather than a mood: markets stay in one until a catalyst moves them, which is why a strategy can work for a year and then stop. The chapter names two by their volatility, [[Low Volatility Regime]] and [[High Volatility Regime]], and correlations behave differently in each -- they compress in calm and converge in stress, so diversification fails exactly when it is needed."
+    "explanation": "A regime is a persistent state rather than a mood: markets stay in one until a catalyst moves them, which is why a strategy can work for a year and then stop. The chapter names two by their volatility, [[Low Volatility Regime]] and [[High Volatility Regime]], and correlations behave differently in each -- they compress in calm and converge in stress, so diversification fails exactly when it is needed.",
+    "applications": [
+     "Selecting appropriate trading strategies for current conditions",
+     "Anticipating breakouts from compression phases",
+     "Identifying trend exhaustion",
+     "Setting realistic profit targets based on market state",
+     "Filtering trade signals based on trend alignment"
+    ],
+    "chapter_variants": {
+     "summary": "Markets exist in one of three primary states: trending (directional movement), ranging (sideways consolidation), or transitioning between them. Compression refers to decreasing volatility and range contraction, while expansion refers to increasing volatility and range widening."
+    }
    }
   },
   {
@@ -19938,6 +19997,1320 @@
      "instruments-market-mechanics"
     ],
     "practices": []
+   }
+  },
+  {
+   "id": "judgment:trend-is-your-friend",
+   "title": "the trend is your friend",
+   "kind": "Judgment",
+   "summary": "Trading with the prevailing trend is structurally safer than trading against it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "explanation": "Trends persist longer than expected due to behavioral effects (herding, momentum ignition, institutional flows) Counter-trend trades have asymmetric risk: limited upside, potentially unlimited downside Mean reversion assumes prices will revert - but in strong trends, they often don't",
+    "caution": "Do NOT describe mean reversion as \"lower risk\" or \"safer\" than trend following. Mean reversion has a high win rate but negative skew - losses, when they occur, are disproportionately large. Trend following has a low win rate but positive skew - you profit from letting winners run."
+   }
+  },
+  {
+   "id": "fact:win-rate-is-not-risk",
+   "title": "win rate is not risk",
+   "kind": "Fact",
+   "summary": "A strategy's win rate tells you nothing about its risk profile without understanding skew.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "explanation": "Frequent small wins are psychologically rewarding This masks the tail risk of occasional large losses A single large loss can wipe out months of accumulated gains",
+    "comparison": [
+     "Metric \u00b7 Trend Following \u00b7 Mean Reversion",
+     "Win Rate \u00b7 30-40% (low) \u00b7 60-70% (high)",
+     "Skew \u00b7 Positive (large wins) \u00b7 Negative (large losses)",
+     "Tail Risk \u00b7 Moderate \u00b7 High",
+     "Blow-up Risk \u00b7 Low \u00b7 High"
+    ]
+   }
+  },
+  {
+   "id": "fact:risk-is-multi-dimensional",
+   "title": "risk is multi-dimensional",
+   "kind": "Fact",
+   "summary": "Risk is not one number: per-trade exposure, the skew of the strategy, its fit to the regime, drawdown, tail losses and correlation are each a separate one.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "comparison": [
+     "Dimension \u00b7 Definition \u00b7 Example",
+     "Per-Trade Risk \u00b7 Capital at risk on a single trade \u00b7 Position size, stop loss",
+     "Strategy Skew \u00b7 Distribution shape of outcomes \u00b7 Positive (trend) vs. negative (MR)",
+     "Regime Risk \u00b7 Mismatch between strategy and market \u00b7 Mean reversion in a trending market",
+     "Drawdown Risk \u00b7 Maximum capital decline \u00b7 Max drawdown, recovery time",
+     "Tail Risk \u00b7 Probability and magnitude of extreme losses \u00b7 VaR, Expected Shortfall",
+     "Correlation Risk \u00b7 Positions moving together in crisis \u00b7 \"Diversification\" failing"
+    ],
+    "caution": "Critical: Reducing per-trade risk does NOT reduce strategy-level risk. A mean reversion strategy with tight stops still has negative skew.",
+    "source_wording": "Risk cannot be reduced to a single number. Consider all dimensions:",
+    "explanation": "They are independent, which is the part that gets missed -- tightening a stop lowers the first and leaves the second untouched. A mean reversion strategy with small losses still holds a large one, and positions that look diversified converge exactly when it matters."
+   }
+  },
+  {
+   "id": "fact:regime-determines-archetype-effectiveness",
+   "title": "regime determines archetype effectiveness",
+   "kind": "Fact",
+   "summary": "Which family of strategy works is decided by the regime, not by the strategy.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "comparison": [
+     "Regime \u00b7 Works Well \u00b7 Fails",
+     "Strong Trend \u00b7 Trend following, Momentum \u00b7 Mean reversion",
+     "Range-Bound \u00b7 Mean reversion, Range trading \u00b7 Trend following",
+     "High Volatility \u00b7 Breakouts, Volatility strategies \u00b7 Carry",
+     "Low Volatility \u00b7 Carry, Mean reversion \u00b7 Breakouts"
+    ],
+    "caution": "Identify the regime first, then select the archetype. Never apply a strategy blindly without regime context.",
+    "source_wording": "Strategy archetypes rotate in effectiveness based on market regime.",
+    "explanation": "Trend following and momentum earn in a strong trend and bleed in a range; mean reversion does the reverse. Breakouts need volatility and carry needs quiet. So the regime is read first and the archetype chosen second -- applying one without that read is a bet on the market being in the state the strategy happens to need."
+   }
+  },
+  {
+   "id": "property:candle-body-size",
+   "title": "candle body size",
+   "kind": "Property",
+   "summary": "The anatomy of one bar -- body, upper and lower wick, range, and the body as a share of the range.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Body = |Close - Open|\nUpper Wick = High - max(Open, Close)\nLower Wick = min(Open, Close) - Low\nRange = High - Low\nBody Percentage = Body / Range * 100%",
+    "source_wording": "The quantity candle body size.",
+    "explanation": "It is what the reading of a single candle reduces to: a large body is agreement through the period, a long wick is a price the market visited and rejected."
+   }
+  },
+  {
+   "id": "procedure:swing-point-identification",
+   "title": "swing point identification",
+   "kind": "Procedure",
+   "summary": "Marks a bar as a swing high or low when it exceeds the bars either side of it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Swing High: High[i] > High[i-1] AND High[i] > High[i+1]\nSwing Low: Low[i] < Low[i-1] AND Low[i] < Low[i+1]",
+    "source_wording": "Computes swing point identification.",
+    "explanation": "It is the primitive the rest of the chapter is built on: structure, liquidity pools and zones are all defined in terms of swings, so the lookback chosen here sets what everything downstream calls a trend."
+   }
+  },
+  {
+   "id": "concept:fair-value-gap",
+   "title": "fair value gaps",
+   "kind": "Concept",
+   "summary": "A band of price that one impulsive move passed through without two-sided trade.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "applications": [
+     "Identifying pullback targets within trends",
+     "Finding entry points after impulsive moves",
+     "Setting realistic profit targets",
+     "Understanding where price might hesitate or reverse",
+     "Combining with supply/demand zones for higher confluence"
+    ],
+    "examples": [
+     "FVG as Entry: Uptrend established Impulsive move creates bullish FVG Wait for pullback into FVG Enter long when price touches upper portion of FVG Stop below FVG low Target previous high or higher timeframe resistance"
+    ],
+    "source_wording": "A Fair Value Gap (FVG), also called an imbalance, is a price range where significant price movement occurred with minimal trading on one side (gap between candle bodies). It represents an inefficiency in price delivery that the market often returns to fill or rebalance.",
+    "explanation": "The market treats it as unfinished business and tends to return to it, which makes it a target for a pullback entry and a magnet for price that has run too far. A gap that is filled has done its work; an unfilled one is still pulling."
+   }
+  },
+  {
+   "id": "concept:bullish-fair-value-gap",
+   "title": "bullish fair value gap",
+   "kind": "Concept",
+   "summary": "A three-candle imbalance where the third candle's low stays above the first candle's high, leaving a band price rose through without trading.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Candle 1: Any candle Candle 2: Large bullish candle (impulse) Candle 3: Candle 3's low is above Candle 1's high FVG Zone: From Candle 1's high to Candle 3's low Expectation: Price may pull back into this zone before continuing up",
+    "explanation": "It marks delivery too fast to be two-sided, and the market tends to return and trade the band before continuing up. The band runs from the first high to the third low."
+   }
+  },
+  {
+   "id": "concept:bearish-fair-value-gap",
+   "title": "bearish fair value gap",
+   "kind": "Concept",
+   "summary": "A three-candle imbalance where the third candle's high stays below the first candle's low, leaving a band price fell through without trading.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Candle 1: Any candle Candle 2: Large bearish candle (impulse) Candle 3: Candle 3's high is below Candle 1's low FVG Zone: From Candle 1's low to Candle 3's high Expectation: Price may pull back into this zone before continuing down",
+    "explanation": "The gap is where selling was so one-sided that no two-way trade happened, and price often returns to it before continuing down. The band runs from the first low to the third high."
+   }
+  },
+  {
+   "id": "procedure:bullish-fvg-detection",
+   "title": "bullish fvg detection",
+   "kind": "Procedure",
+   "summary": "Detects a bullish gap: the third candle's low above the first candle's high.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Bullish_FVG = Low[candle_3] > High[candle_1]\nFVG_Top = Low[candle_3]\nFVG_Bottom = High[candle_1]\nFVG_Size = FVG_Top - FVG_Bottom",
+    "source_wording": "Computes bullish fvg detection.",
+    "explanation": "Three candles are enough because the imbalance is defined by the outer two failing to overlap -- the middle candle is the impulse that caused it."
+   }
+  },
+  {
+   "id": "procedure:bearish-fvg-detection",
+   "title": "bearish fvg detection",
+   "kind": "Procedure",
+   "summary": "Detects a bearish gap: the third candle's high below the first candle's low.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Bearish_FVG = High[candle_3] < Low[candle_1]\nFVG_Top = Low[candle_1]\nFVG_Bottom = High[candle_3]\nFVG_Size = FVG_Top - FVG_Bottom",
+    "source_wording": "Computes bearish fvg detection.",
+    "explanation": "The two bounding prices become the zone, and its size is what the significance filter is applied to."
+   }
+  },
+  {
+   "id": "procedure:fvg-validity",
+   "title": "fvg validity (significance filter)",
+   "kind": "Procedure",
+   "summary": "Keeps only gaps larger than half the [[Average True Range]].",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Valid_FVG = FVG_Size > ATR * 0.5",
+    "source_wording": "Computes fvg validity (significance filter).",
+    "explanation": "Every noisy series produces small gaps constantly; without a size filter the chart fills with them and none of them mean anything."
+   }
+  },
+  {
+   "id": "procedure:fvg-fill-status",
+   "title": "fvg fill status",
+   "kind": "Procedure",
+   "summary": "Classifies a gap as unfilled, partially filled or filled by how far price has traded back through it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Filled = Price has traded through entire FVG zone\nPartially_Filled = Price entered zone but didn't fully traverse\nUnfilled = Price hasn't touched zone",
+    "source_wording": "Computes fvg fill status.",
+    "explanation": "The status is what makes a gap tradeable or spent: an unfilled gap is still a target, and a filled one is history."
+   }
+  },
+  {
+   "id": "concept:volume-profile",
+   "title": "volume profile",
+   "kind": "Concept",
+   "summary": "The distribution of traded volume across price rather than across time.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "volume_profile_interpretation": "**Point of Control (POC):** - Represents the \"fairest price\" where most business occurred - Acts as a magnet drawing price back to it - Better suited as trade completion zone than trade initiation zone - Multiple days with similar POC indicate strong fair value acceptance **Value Area:** - Contains ~70% of session volume - VAH and VAL act as support/resistance levels - Opening inside prior VA suggests balanced, rotational day - Opening outside prior VA suggests directional move likely",
+    "auction_market_scenario": "**Opening Inside Previous Value Area:** Expectation: Balanced, two-sided trade Behavior: Price likely to rotate between VAH and VAL Strategy: Mean reversion, fade extremes **Opening Above Previous VAH:** Expectation: Bullish continuation or fade opportunity If value migrates higher: Buyers in control, trend continuation If value stays in prior range: Gap fill likely, sellers absorbing **Opening Below Previous VAL:** Expectation: Bearish continuation or fade opportunity If value migrates lower: Sellers in control, trend continuation If value stays in prior range: Gap fill likely, buyers absorbing",
+    "value_migration_analysis": "def analyze_value_migration(today_va, yesterday_va): \"\"\" Determine if buyers or sellers made progress \"\"\" if today_va['vah'] > yesterday_va['vah'] and today_va['val'] > yesterday_va['val']: return 'BUYERS_PROGRESSING' elif today_va['vah'] < yesterday_va['vah'] and today_va['val'] < yesterday_va['val']: return 'SELLERS_PROGRESSING' elif today_va['vah'] > yesterday_va['vah'] and today_va['val'] < yesterday_va['val']: return 'RANGE_EXPANSION' else: return 'OVERLAPPING_BALANCE'",
+    "using_poc_and_va_for_trading": "**POC as Target:** - Mean reversion trades often target POC - Price tends to revisit POC during balanced sessions - Multiple touches of POC increase its significance **VAH/VAL as Entry Zones:** - Enter long near VAL in uptrend with stop below - Enter short near VAH in downtrend with stop above - Failed breaks of VA boundaries signal reversals **Developing vs. Naked POC:** - Current session POC: May shift as session develops - Prior session POC: Static reference level (naked if untested) - Naked POCs act as magnets and often get tested",
+    "source_wording": "Volume Profile displays trading activity distributed across price levels rather than time, revealing where the most trading occurred. Market Auction Theory views markets as continuous auctions where price seeks fair value through the interaction of buyers and sellers. Together, these concepts identify where institutions trade and where price is likely to react.",
+    "explanation": "It answers a different question from a chart of price over time: not where price went, but where business was actually done. From it come the [[Point of Control]] and the value area, and with them the auction reading of a market -- price advertises, volume accepts or rejects, and value migrates when one side keeps making progress."
+   }
+  },
+  {
+   "id": "concept:point-of-control",
+   "title": "point of control",
+   "kind": "Concept",
+   "summary": "The price with the most volume traded in a session -- where the most business was done.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "POC. Price level with highest traded volume in the session",
+    "explanation": "It is the session's fairest price by the market's own vote, and price returns to it during balanced trade, which makes it a better target than an entry."
+   }
+  },
+  {
+   "id": "concept:value-area-high",
+   "title": "value area high",
+   "kind": "Concept",
+   "summary": "The upper edge of the range holding roughly seventy per cent of a session's volume.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "VAH. Upper boundary of the value area (70% of volume)",
+    "explanation": "It is the boundary between accepted value and price the market has rejected, so a session opening above it is making a directional statement rather than rotating."
+   }
+  },
+  {
+   "id": "concept:value-area-low",
+   "title": "value area low",
+   "kind": "Concept",
+   "summary": "The lower edge of the range holding roughly seventy per cent of a session's volume.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "VAL. Lower boundary of the value area",
+    "explanation": "Together with [[Value Area High]] it bounds where business was done, and both act as levels in the next session for the same reason a [[High Volume Node]] does."
+   }
+  },
+  {
+   "id": "concept:high-volume-node",
+   "title": "high volume node",
+   "kind": "Concept",
+   "summary": "A price level where a lot of volume has traded.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "HVN. Price level with significant volume accumulation",
+    "explanation": "Business done at a price is agreement about value, and price tends to slow there, which is why these act as support and resistance without being drawn from swings."
+   }
+  },
+  {
+   "id": "concept:low-volume-node",
+   "title": "low volume node",
+   "kind": "Concept",
+   "summary": "A price level where little volume has traded.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "LVN. Price level with minimal volume (often acts as magnet)",
+    "explanation": "Little business means little agreement, so price crosses these quickly rather than settling in them -- which makes them poor targets and good places to expect acceleration."
+   }
+  },
+  {
+   "id": "procedure:value-area-calculation",
+   "title": "value area calculation",
+   "kind": "Procedure",
+   "summary": "Grows a range outward from the [[Point of Control]], taking the busier side each step, until it holds seventy per cent of the volume.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "1. Identify POC (highest volume price)\n2. Add volume from one tick above and one tick below POC\n3. Continue adding volume from side with greater volume\n4. Stop when cumulative volume reaches 70% of total\n5. Upper bound = VAH, Lower bound = VAL",
+    "source_wording": "Computes value area calculation.",
+    "explanation": "Building outward from the busiest price is what makes the area an observation about where business was done rather than a standard deviation of a distribution nobody checked was normal."
+   }
+  },
+  {
+   "id": "property:volume-profile-metric",
+   "title": "volume profile metrics",
+   "kind": "Property",
+   "summary": "The width of the value area, in price and as a share of the session range.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Value Area Range = VAH - VAL\nVA Percentage of Range = (VAH - VAL) / (Session High - Session Low) * 100\n\nInterpretation:\n- Tight VA (< 40% of range): Strong directional day\n- Wide VA (> 70% of range): Balanced, rotational day",
+    "source_wording": "The quantity volume profile metrics.",
+    "explanation": "A narrow value area against a wide session says the market spent its time in one place and travelled through the rest -- a directional day. A wide one says it rotated."
+   }
+  },
+  {
+   "id": "concept:market-structure",
+   "title": "market structure",
+   "kind": "Concept",
+   "summary": "The arrangement of swing highs and lows that says whether a market is trending or ranging.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "applications": [
+     "Determining trend direction objectively",
+     "Identifying trend continuation vs. reversal points",
+     "Setting stop-loss levels based on structural invalidation",
+     "Finding high-probability entry points after structural breaks",
+     "Aligning trades with higher timeframe structure"
+    ],
+    "examples": [
+     "Uptrend Structure: Each high exceeds previous high Each low exceeds previous low Long bias maintained until CHoCH HH3\n   /\n HH2   \n /  \\\nHH1  HL3\n/  \\  /\nHL1 HL2",
+     "Break of Structure (BOS) - Bullish: Uptrend established with HH/HL sequence Price pulls back creating new HL Price breaks above most recent HH Confirmation of trend continuation",
+     "Change of Character (CHoCH) - Bearish: Uptrend with HH/HL sequence Price fails to make new HH (creates LH) Price breaks below most recent HL First signal of potential trend reversal"
+    ],
+    "source_wording": "Market structure refers to the arrangement of price highs and lows that define the current state and direction of a market. It provides a framework for understanding whether a market is trending (up or down) or ranging, and identifies key structural shifts that signal potential reversals.",
+    "explanation": "It gives trend a definition that can be checked rather than eyeballed: higher highs with higher lows, or lower lows with lower highs, and neither in a range. Because it is defined by swings it repeats at every timeframe, and it supplies the level at which a position is wrong -- the structural point whose break invalidates the read."
+   }
+  },
+  {
+   "id": "concept:break-of-structure",
+   "title": "break of structure (bos)",
+   "kind": "Concept",
+   "summary": "Price closing beyond the most recent swing point in the direction of the trend.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "explanation": "It is the continuation signal: the sequence of higher highs and higher lows extends rather than fails, which is what distinguishes it from a [[Change of Character]]. It is also where the invalidation level for the position moves to."
+   }
+  },
+  {
+   "id": "concept:change-of-character",
+   "title": "change of character (choch)",
+   "kind": "Concept",
+   "summary": "Price breaking structure against the prevailing trend -- the first break that does not fit the sequence.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Reversal signal where price breaks structure against the prevailing trend",
+    "explanation": "It is a warning rather than a reversal: the trend has stopped extending, which is not yet the same as turning. Treating it as an entry rather than as notice to tighten is the mistake the chapter warns about."
+   }
+  },
+  {
+   "id": "procedure:trend-classification",
+   "title": "trend classification",
+   "kind": "Procedure",
+   "summary": "Classifies the market as up, down or ranging by comparing consecutive swing highs and lows.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Uptrend: Swing_High[n] > Swing_High[n-1] AND Swing_Low[n] > Swing_Low[n-1]\nDowntrend: Swing_High[n] < Swing_High[n-1] AND Swing_Low[n] < Swing_Low[n-1]\nRange: Neither condition met",
+    "source_wording": "Computes trend classification.",
+    "explanation": "It turns \"the trend is up\" into something two people can check and agree on, and it returns a range whenever the two conditions disagree rather than guessing."
+   }
+  },
+  {
+   "id": "procedure:structure-break-detection",
+   "title": "structure break detection",
+   "kind": "Procedure",
+   "summary": "Marks a break of structure when a close passes the previous swing high or low.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "BOS_Bullish: Close > Previous_Swing_High\nBOS_Bearish: Close < Previous_Swing_Low",
+    "source_wording": "Computes structure break detection.",
+    "explanation": "On the close rather than on the wick, which is what separates a structural break from a sweep of the same level."
+   }
+  },
+  {
+   "id": "concept:trending-market",
+   "title": "trending market",
+   "kind": "Concept",
+   "summary": "A market making higher highs and higher lows, or lower lows and lower highs, with pullbacks shallow against the moves that make them.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Clear higher highs/higher lows (uptrend) or lower highs/lower lows (downtrend) Moving averages fanning out and sloping in trend direction Pullbacks are shallow relative to impulse moves ADX above 25 indicating trend strength Best strategy: Trend following, momentum",
+    "explanation": "Moving averages separate and slope, and [[ADX]] holds above twenty-five. This is where trend following and momentum work and where mean reversion is most dangerous, because the reversion it waits for does not come."
+   }
+  },
+  {
+   "id": "concept:ranging-market",
+   "title": "ranging market",
+   "kind": "Concept",
+   "summary": "A market oscillating between a floor and a ceiling, making no directional progress.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Price oscillating between support and resistance Moving averages flat and intertwined Higher highs followed by lower lows (no consistency) ADX below 20 indicating lack of trend Best strategy: Mean reversion, range trading",
+    "explanation": "Moving averages flatten and cross, and [[ADX]] sits below twenty. Mean reversion is what works here and trend following is what bleeds, which is the whole reason to classify the state before choosing the strategy."
+   }
+  },
+  {
+   "id": "concept:compression",
+   "title": "compression",
+   "kind": "Concept",
+   "summary": "A phase of contracting range and falling volatility.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Decreasing range (ATR declining) Bollinger Bands squeezing Triangles, wedges, or rectangles forming Decreasing volume Preparation for breakout",
+    "explanation": "Ranges narrow, bands squeeze and volume dries up while the market waits. It resolves into [[Expansion]], which is why compression is read as a setup rather than as a state to trade inside."
+   }
+  },
+  {
+   "id": "concept:expansion",
+   "title": "expansion",
+   "kind": "Concept",
+   "summary": "A phase of widening range and rising volatility.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Increasing range (ATR rising) Bollinger Bands expanding Strong directional candles Increasing volume Trend initiation or continuation",
+    "explanation": "Directional candles, rising [[Average True Range]] and rising volume: this is where trends begin and resume, and where a strategy fitted to the quiet phase before it stops working."
+   }
+  },
+  {
+   "id": "procedure:adx-trend-strength",
+   "title": "adx trend strength",
+   "kind": "Procedure",
+   "summary": "Classifies the market as trending, ranging or transitional from the level of [[ADX]].",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "ADX > 25: Trending market\nADX < 20: Ranging market\nADX 20-25: Transitional",
+    "source_wording": "Computes adx trend strength.",
+    "explanation": "Above twenty-five is a trend, below twenty is a range, and between them is the state in which most strategies are least reliable. It measures how strong a trend is and says nothing about which way it points."
+   }
+  },
+  {
+   "id": "property:bollinger-band-width",
+   "title": "bollinger band width (compression measure)",
+   "kind": "Property",
+   "summary": "The distance between the bands as a fraction of the middle band.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "BB Width = (Upper Band - Lower Band) / Middle Band",
+    "source_wording": "The quantity bollinger band width (compression measure).",
+    "explanation": "It is the standard measure of a squeeze: low and falling is compression, rising is the expansion that follows it."
+   }
+  },
+  {
+   "id": "property:atr-percentage",
+   "title": "atr percentage",
+   "kind": "Property",
+   "summary": "The [[Average True Range]] as a percentage of price.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "ATR% = ATR / Close * 100",
+    "source_wording": "The quantity atr percentage.",
+    "explanation": "Expressing range against price is what makes two instruments comparable, and its direction is the objective form of [[Compression]] and [[Expansion]]."
+   }
+  },
+  {
+   "id": "property:range-ratio",
+   "title": "range ratio",
+   "kind": "Property",
+   "summary": "The current range against the average range of recent periods.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Range Ratio = Current Range / Average Range (n periods)",
+    "source_wording": "The quantity range ratio.",
+    "explanation": "Below half is compression and above one and a half is expansion, which turns the phase of the volatility cycle into a number rather than an impression."
+   }
+  },
+  {
+   "id": "concept:liquidity-pool",
+   "title": "liquidity pools",
+   "kind": "Concept",
+   "summary": "A cluster of resting orders -- stops and pending entries -- at a level everyone can see.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Clusters of stop-loss orders and pending orders at predictable levels",
+    "explanation": "Price is drawn towards them because that is where size can be filled, which inverts the naive reading of a level: the obvious stop is not protection but a target."
+   }
+  },
+  {
+   "id": "concept:stop-hunt",
+   "title": "stop hunts",
+   "kind": "Concept",
+   "summary": "A move that runs the stops clustered at an obvious level and then turns.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Price moves designed to trigger clustered stops before reversing",
+    "explanation": "It is [[Liquidity Grab]] seen from the side of the trader who was stopped out, and it is the argument for placing stops past the obvious level rather than on it."
+   }
+  },
+  {
+   "id": "concept:liquidity-grab",
+   "title": "liquidity grab",
+   "kind": "Concept",
+   "summary": "A quick move into a pool of resting orders followed immediately by a reversal.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Quick move to liquidity zone followed by reversal",
+    "explanation": "It is how a large order gets filled without paying for the whole move: the stops it triggers supply the other side. Read as a breakout it is a loss; read as a sweep it is the entry."
+   }
+  },
+  {
+   "id": "concept:smart-money-concept",
+   "title": "smart money concept",
+   "kind": "Concept",
+   "summary": "The reading of price as the footprint of participants large enough to need other people's orders to fill their own.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Institutional traders need liquidity to fill large orders",
+    "explanation": "The claim is mechanical rather than conspiratorial: size cannot be filled where there is no liquidity, so it is filled where the stops are. Whether the label is right, the constraint it names is real."
+   }
+  },
+  {
+   "id": "concept:equal-highs-and-lows",
+   "title": "equal highs and lows",
+   "kind": "Concept",
+   "summary": "Two or more touches at the same level, which is where stops collect.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Multiple touches at same price create \"equal highs\" or \"equal lows\" Represent obvious stop-loss locations (retail traders place stops there) High probability of being swept before a real move",
+    "explanation": "The obviousness is what makes them liquidity: every trader who drew the same line put a stop just beyond it. The chapter's advice follows from that -- expect the level to be swept before any real move, and place stops past it rather than at it."
+   }
+  },
+  {
+   "id": "concept:buy-side-liquidity",
+   "title": "buy-side liquidity",
+   "kind": "Concept",
+   "summary": "Resting buy orders above the market -- the stops of short positions and the entry orders of breakout buyers.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Location: Above recent swing highs, above equal highs Contents: Stop-losses from short positions, buy stop orders Action: Price sweeps above, triggers stops, then reverses down",
+    "explanation": "It sits where everyone can see it: above swing highs and above [[Equal Highs and Lows]]. That visibility is the point, because a large seller needs buyers to sell into, and this is where they are."
+   }
+  },
+  {
+   "id": "concept:sell-side-liquidity",
+   "title": "sell-side liquidity",
+   "kind": "Concept",
+   "summary": "Resting sell orders below the market -- the stops of long positions and the entry orders of breakdown sellers.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Location: Below recent swing lows, below equal lows Contents: Stop-losses from long positions, sell stop orders Action: Price sweeps below, triggers stops, then reverses up",
+    "explanation": "It gathers under swing lows and under [[Equal Highs and Lows]], and it is where a large buyer finds the size to buy."
+   }
+  },
+  {
+   "id": "procedure:liquidity-zone-identification",
+   "title": "liquidity zone identification",
+   "kind": "Procedure",
+   "summary": "Places the buy-side and sell-side pools a fraction of an [[Average True Range]] beyond the recent swing high and low.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Buy-Side Liquidity = Swing_High + ATR_Buffer\nSell-Side Liquidity = Swing_Low - ATR_Buffer\n\nWhere ATR_Buffer = ATR * 0.5 to 1.0",
+    "source_wording": "Computes liquidity zone identification.",
+    "explanation": "The buffer is the point: stops sit past the level rather than on it, so the zone that gets swept is above the high rather than at it."
+   }
+  },
+  {
+   "id": "procedure:equal-level-detection",
+   "title": "equal level detection",
+   "kind": "Procedure",
+   "summary": "Finds highs or lows matching within a tolerance -- the levels where stops gather.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Equal Highs: |High[i] - High[j]| < Threshold AND i != j\nEqual Lows: |Low[i] - Low[j]| < Threshold AND i != j",
+    "source_wording": "Computes equal level detection.",
+    "explanation": "The tolerance is what makes it usable: exact equality almost never occurs, and a level a few ticks apart is the same level to everyone looking at it."
+   }
+  },
+  {
+   "id": "concept:volume",
+   "title": "volume",
+   "kind": "Concept",
+   "summary": "How much traded in a period -- the amount of activity behind a price move.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "applications": [
+     "Confirming breakouts and trend moves",
+     "Identifying accumulation and distribution phases",
+     "Spotting divergences between price and volume",
+     "Detecting institutional activity",
+     "Timing entries and exits based on volume patterns"
+    ],
+    "source_wording": "Volume represents the number of shares, contracts, or units traded during a specific period. Order flow analysis studies the sequence and characteristics of executed trades to understand the balance between buying and selling pressure and identify institutional activity.",
+    "explanation": "It is the second dimension of every move: the same distance travelled on twice the volume is a different event, because more participants had to agree to produce it. Comparing effort against result is what separates a move that will hold from one that will not."
+   }
+  },
+  {
+   "id": "concept:volume-confirmation",
+   "title": "volume confirmation",
+   "kind": "Concept",
+   "summary": "The requirement that a breakout come with above-average volume before it is believed.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Breakout above resistance on 2x average volume = Confirmed Breakout above resistance on below-average volume = Suspect, likely to fail",
+    "explanation": "A move on thin volume is a move few people took part in, and those are the breakouts that fail back into the range. Requiring it costs some genuine breakouts and avoids most false ones."
+   }
+  },
+  {
+   "id": "concept:volume-divergence",
+   "title": "volume divergence",
+   "kind": "Concept",
+   "summary": "Price making new extremes while volume does not follow.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Price making higher highs Volume making lower highs Warning: Momentum weakening, potential reversal",
+    "explanation": "Participation is draining out of the move even as it continues, which is a warning rather than a signal: divergences persist far longer than they look like they should."
+   }
+  },
+  {
+   "id": "concept:accumulation-pattern",
+   "title": "accumulation pattern",
+   "kind": "Concept",
+   "summary": "Sideways price with volume weighted towards up days -- the footprint of a buyer working a large order without moving the price.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "examples": [
+     "Indication: Smart money accumulating"
+    ],
+    "source_wording": "Price trading sideways Volume higher on up days than down days On-Balance Volume rising while price flat",
+    "explanation": "The tell is effort without result in one direction only: [[On-Balance Volume]] rises while price stays flat. It is read as a large participant building a position quietly, and it ends when the range breaks upward."
+   }
+  },
+  {
+   "id": "concept:distribution-pattern",
+   "title": "distribution pattern",
+   "kind": "Concept",
+   "summary": "Sideways price with volume weighted towards down days -- a large seller working out of a position near the highs.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "examples": [
+     "Indication: Smart money distributing"
+    ],
+    "source_wording": "Price trading sideways near highs Volume higher on down days than up days On-Balance Volume falling while price flat",
+    "explanation": "It is the mirror of [[Accumulation Pattern]]: [[On-Balance Volume]] falls while price holds up, and the range usually breaks down. Price alone shows nothing, which is the reason to look at volume at all."
+   }
+  },
+  {
+   "id": "concept:climactic-volume",
+   "title": "climactic volume",
+   "kind": "Concept",
+   "summary": "A volume spike several times normal at a price extreme.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Volume spike 3x+ normal levels Often at market extremes (tops/bottoms) Can signal exhaustion and reversal",
+    "explanation": "It reads as exhaustion rather than confirmation: everyone who was going to act has acted, and there is no one left to continue the move. The same magnitude in the middle of a range means nothing of the kind."
+   }
+  },
+  {
+   "id": "property:relative-volume",
+   "title": "relative volume",
+   "kind": "Property",
+   "summary": "Current volume against the average for the same period.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "RVOL = Current_Volume / Average_Volume(n periods)",
+    "source_wording": "The quantity relative volume.",
+    "explanation": "Absolute volume says nothing without its own baseline: above one and a half is real participation, and it is the objective form of the confirmation the chapter demands of a breakout."
+   }
+  },
+  {
+   "id": "property:order-flow-delta",
+   "title": "delta (order flow)",
+   "kind": "Property",
+   "summary": "Buy volume minus sell volume, and its running total.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Delta = Buy_Volume - Sell_Volume\nCumulative Delta = Running sum of Delta",
+    "source_wording": "The quantity delta (order flow).",
+    "explanation": "Volume says how much traded; delta says which side was the aggressor. A rising price on negative cumulative delta is a move being sold into, which is invisible in volume alone."
+   }
+  },
+  {
+   "id": "procedure:volume-profile",
+   "title": "volume profile",
+   "kind": "Procedure",
+   "summary": "Sums traded volume at each price level and takes the busiest as the point of control.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "For each price level:\n  Volume_at_Price[P] = Sum of volume traded at price P\nPoint of Control (POC) = Price with highest Volume_at_Price",
+    "source_wording": "Computes volume profile.",
+    "explanation": "This is the computation behind the profile: bin by price rather than by time, and the shape that results is where the levels come from."
+   }
+  },
+  {
+   "id": "concept:support-and-resistance",
+   "title": "support and resistance",
+   "kind": "Concept",
+   "summary": "Price levels where buying or selling has repeatedly been strong enough to stop a move.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "applications": [
+     "Identifying entry points near support in uptrends",
+     "Identifying exit points near resistance",
+     "Setting stop-loss levels below support or above resistance",
+     "Planning breakout trades above resistance or below support",
+     "Mapping key levels for position management"
+    ],
+    "examples": [
+     "Role Reversal Example: Price approaches resistance at $50 Multiple rejections from $50 (confirmed resistance) Price eventually breaks above $50 Price pulls back to $50 $50 now acts as support (role reversal) Price bounces from $50 and continues higher"
+    ],
+    "source_wording": "Support is a price level where buying pressure is expected to overcome selling pressure, causing a decline to pause or reverse. Resistance is a price level where selling pressure is expected to overcome buying pressure, causing an advance to pause or reverse.",
+    "explanation": "They work because participants remember them and act again at the same price, which is why a broken level reverses role: the buyers defending it become the sellers trapped above it. They are zones rather than lines, and their weight comes from the timeframe they were drawn on and how strongly price reacted before."
+   }
+  },
+  {
+   "id": "concept:horizontal-level",
+   "title": "horizontal level",
+   "kind": "Concept",
+   "summary": "A support or resistance level fixed at a price -- a prior swing, a level tested repeatedly, a round number, a high-volume node.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "examples": [
+     "Previous swing highs/lows Multiple price touches at same level Round numbers ($100, $50, etc.) High-volume nodes from volume profile"
+    ],
+    "explanation": "It holds because enough participants remember the same price, which is also why it stops holding once everyone has traded around it."
+   }
+  },
+  {
+   "id": "concept:dynamic-level",
+   "title": "dynamic level",
+   "kind": "Concept",
+   "summary": "A support or resistance level that moves with price: a moving average, a trend line, VWAP, a band.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Moving averages (20 EMA, 50 SMA, 200 SMA) Trend lines connecting highs or lows Indicator levels (VWAP, Bollinger Bands)",
+    "explanation": "It is the same idea as a horizontal level with a different anchor -- the level is computed from recent price rather than fixed at one -- and it is why the same instrument can respect a rising line it never touched at a fixed price."
+   }
+  },
+  {
+   "id": "property:support-resistance-zone-width",
+   "title": "support/resistance zone width",
+   "kind": "Property",
+   "summary": "How wide to draw a level, scaled to the [[Average True Range]].",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Zone Width = ATR * 0.5 to 1.0\nSupport Zone = Level - Zone_Width to Level + Zone_Width/2\nResistance Zone = Level - Zone_Width/2 to Level + Zone_Width",
+    "source_wording": "The quantity support/resistance zone width.",
+    "explanation": "Drawing a zone rather than a line is what accommodates the wicks that pierce every level; scaling it to volatility is what keeps one instrument's zone from being another's noise."
+   }
+  },
+  {
+   "id": "property:level-strength-score",
+   "title": "level strength score",
+   "kind": "Property",
+   "summary": "How much weight a level carries, from the number of touches, the timeframes it appears on and the volume traded there.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Strength = Number_of_Touches + (Timeframe_Weight * Timeframe_Count) + Volume_Weight",
+    "source_wording": "The quantity level strength score.",
+    "explanation": "It makes explicit what is usually a judgement call, so that two levels can be ranked instead of both being drawn and treated alike."
+   }
+  },
+  {
+   "id": "property:pivot-point",
+   "title": "pivot points (classic)",
+   "kind": "Property",
+   "summary": "A level derived from the previous period's high, low and close, with supports and resistances stepped out from it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Pivot = (High + Low + Close) / 3\nR1 = (2 * Pivot) - Low\nS1 = (2 * Pivot) - High\nR2 = Pivot + (High - Low)\nS2 = Pivot - (High - Low)",
+    "source_wording": "The quantity pivot points (classic).",
+    "explanation": "The value is not in the arithmetic but in how many participants compute the same numbers from the same bar, which is what makes them levels at all."
+   }
+  },
+  {
+   "id": "concept:supply-demand-zone",
+   "title": "supply & demand zones",
+   "kind": "Concept",
+   "summary": "The area a strong impulsive move began from, expected to matter again when price returns.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "applications": [
+     "Identifying high-probability reversal areas",
+     "Finding entries with excellent risk/reward ratios",
+     "Understanding institutional order flow",
+     "Setting precise stop-loss levels",
+     "Planning trades around pending zone tests"
+    ],
+    "examples": [
+     "Zone Quality Factors: Strength of departure: Stronger moves indicate stronger zones Time at zone: Shorter basing periods suggest more urgent imbalance Freshness: First touch of zone is highest probability Trend alignment: Zones in trend direction are more reliable"
+    ],
+    "source_wording": "Supply and demand zones are price areas where significant imbalances between buyers and sellers caused strong price moves. Unlike traditional support/resistance, these zones focus on the origin of moves and expect price to react when returning to these areas.",
+    "explanation": "It is defined by the origin of a move rather than by how often a level has been touched, which is what distinguishes it from [[Support and Resistance]]. Fresh zones are the claim; a zone tested twice has spent whatever imbalance it held."
+   }
+  },
+  {
+   "id": "concept:demand-zone",
+   "title": "demand zone",
+   "kind": "Concept",
+   "summary": "The base a strong rally departed from, taken to hold buying that was never filled.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Price trading sideways or declining (base formation) Strong bullish candle(s) break up from the base The base area becomes a demand zone When price returns to zone, expect buying response Zone extends from base low to base high",
+    "explanation": "The claim is about the origin of the move rather than the number of touches, which is what separates it from [[Support and Resistance]]. It is strongest untested, and it weakens each time price returns to it."
+   }
+  },
+  {
+   "id": "concept:supply-zone",
+   "title": "supply zone",
+   "kind": "Concept",
+   "summary": "The base a strong decline departed from, taken to hold selling that was never filled.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "source_wording": "Price trading sideways or rising (base formation) Strong bearish candle(s) break down from the base The base area becomes a supply zone When price returns to zone, expect selling response Zone extends from base low to base high",
+    "explanation": "The mirror of [[Demand Zone]]: the stronger and faster the move away, the stronger the claim that unfilled orders remain behind it."
+   }
+  },
+  {
+   "id": "procedure:zone-identification",
+   "title": "zone identification",
+   "kind": "Procedure",
+   "summary": "Marks the consolidation before an impulsive move as a zone, valid when the departure exceeds twice the [[Average True Range]].",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Demand Zone:\n  - Base_Low = Lowest low in consolidation before bullish breakout\n  - Base_High = Highest candle body before breakout candle\n  - Valid if: Breakout_Move > 2 * ATR\n\nSupply Zone:\n  - Base_High = Highest high in consolidation before bearish breakdown\n  - Base_Low = Lowest candle body before breakdown candle\n  - Valid if: Breakdown_Move > 2 * ATR",
+    "source_wording": "Computes zone identification.",
+    "explanation": "The size test is what keeps every pause from becoming a zone; the base itself is bounded by the extreme of the consolidation and the last body before the move."
+   }
+  },
+  {
+   "id": "property:zone-freshness",
+   "title": "zone freshness",
+   "kind": "Property",
+   "summary": "How many times price has already traded into a zone.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Touch_Count = Number of times price has entered zone\nFresh = Touch_Count == 0\nTested = Touch_Count >= 1\nExpired = Touch_Count >= 2 (reduce probability weight)",
+    "source_wording": "The quantity zone freshness.",
+    "explanation": "Untouched is the whole claim: the orders presumed to rest there are filled by the first test, so a second visit is weaker and a third is not worth taking."
+   }
+  },
+  {
+   "id": "concept:multi-timeframe-analysis",
+   "title": "multi-timeframe analysis",
+   "kind": "Concept",
+   "summary": "Reading the same market on several timeframes, taking context from the higher and timing from the lower.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "applications": [
+     "Identifying trend direction on higher timeframes",
+     "Finding precision entries on lower timeframes",
+     "Filtering out counter-trend trades",
+     "Setting appropriate stop-loss and target levels",
+     "Understanding where current price sits within larger structure"
+    ],
+    "examples": [
+     "Typical Timeframe Combinations: Position Trading: Monthly / Weekly / Daily Swing Trading: Weekly / Daily / 4-Hour Day Trading: Daily / 4-Hour / 1-Hour or 15-Min Scalping: 1-Hour / 15-Min / 5-Min or 1-Min",
+     "Three-Timeframe Approach: **Higher TF (Trend)**: Determine overall trend direction **Middle TF (Structure)**: Identify key levels and structure **Lower TF (Entry)**: Find precise entry triggers",
+     "Example Application: Daily: Uptrend, price pulling back to 50 EMA 4-Hour: Price at demand zone within daily pullback 1-Hour: Bullish engulfing candle forms at zone Action: Enter long with stop below zone, target daily resistance"
+    ],
+    "source_wording": "Multi-timeframe analysis (MTA) is the practice of analyzing the same market across multiple timeframes to gain a comprehensive view of market structure, trend, and potential trade setups. It aligns lower timeframe entries with higher timeframe context.",
+    "explanation": "The higher timeframe wins where they disagree, because more participants and more capital are expressed in it. Working downward -- trend, then level, then trigger -- is what stops a good entry being taken against the move that matters."
+   }
+  },
+  {
+   "id": "fact:timeframe-ratio",
+   "title": "timeframe ratio",
+   "kind": "Fact",
+   "summary": "Timeframes are worth watching together when each is roughly four to six times the one below it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Recommended ratio between timeframes: 4:1 to 6:1\n\nExample:\n  Daily (1440 min) / 4-Hour (240 min) = 6:1\n  4-Hour (240 min) / 1-Hour (60 min) = 4:1",
+    "source_wording": "The identity timeframe ratio.",
+    "explanation": "Closer than that and the two show the same thing twice; further apart and the lower gives no context for the higher. Daily against four-hour is six to one; four-hour against hourly is four to one."
+   }
+  },
+  {
+   "id": "property:trend-alignment-score",
+   "title": "trend alignment score",
+   "kind": "Property",
+   "summary": "The weighted sum of each timeframe's direction, scored plus one, minus one or zero.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "For each timeframe, assign:\n  +1 if bullish\n  -1 if bearish\n  0 if neutral\n\nScore = Sum of timeframe values weighted by timeframe importance",
+    "source_wording": "The quantity trend alignment score.",
+    "explanation": "It reduces the multi-timeframe read to one number, which is what the chapter's \"two of three must agree\" rule is checking."
+   }
+  },
+  {
+   "id": "concept:confluence",
+   "title": "confluence",
+   "kind": "Concept",
+   "summary": "Several independent methods marking the same price or the same moment.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "applications": [
+     "Identifying high-probability entry points",
+     "Filtering trade setups to only the strongest",
+     "Building conviction for position sizing",
+     "Setting more aggressive targets when confluence is high",
+     "Avoiding trades with single-factor support"
+    ],
+    "examples": [
+     "Confluence Factors: Support/Resistance level Moving average (e.g., 200 SMA) Fibonacci retracement level (e.g., 61.8%) Trend line Supply/Demand zone Round number Pivot point Previous high/low VWAP Volume profile POC",
+     "Strong Confluence Example: Daily 200 SMA at $145 Previous swing high (now support) at $144.50 50% Fibonacci retracement at $145.20 Rising trend line intersects at $144.80 Round number $145 Zone: $144.50 - $145.50 has five independent factors = High confluence"
+    ],
+    "source_wording": "Confluence occurs when multiple independent technical factors align at the same price level or point in time, increasing the probability of a significant price reaction. It represents the intersection of different analytical methods supporting the same trade thesis.",
+    "explanation": "What earns the extra confidence is the independence: a moving average, a prior swing and a retracement level agreeing say more together than any of them repeated. It raises the odds and settles nothing on its own, which is why the chapter pairs it with position sizing rather than with certainty."
+   }
+  },
+  {
+   "id": "property:confluence-score",
+   "title": "confluence score",
+   "kind": "Property",
+   "summary": "The weighted count of independent factors agreeing at one level.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Score = Sum of (Factor_Present * Factor_Weight)\n\nExample weights:\n  Major S/R (HTF): 3\n  Moving Average (200): 2\n  Fibonacci Level: 2\n  Trend Line: 2\n  Supply/Demand Zone: 2\n  Round Number: 1\n  Minor S/R (LTF): 1",
+    "source_wording": "The quantity confluence score.",
+    "explanation": "Weighting is what stops five weak agreements outranking one strong one; the chapter's weights put a higher-timeframe level at three and a round number at one."
+   }
+  },
+  {
+   "id": "property:zone-overlap",
+   "title": "zone overlap",
+   "kind": "Property",
+   "summary": "The intersection of the individual zones a level is made of.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "formula": "Confluence Zone = Intersection of all individual zones\nHigh Confluence if Zone_Width < ATR and Factor_Count >= 3",
+    "source_wording": "The quantity zone overlap.",
+    "explanation": "It is what turns several near-agreements into one tradeable area, and it is only high confluence if the overlap is tighter than an [[Average True Range]] and at least three factors are in it."
+   }
+  },
+  {
+   "id": "fact:price-action-core-principles",
+   "title": "core principles",
+   "kind": "Fact",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "principles": [
+     "Price Discounts Everything: All known information is reflected in price",
+     "Raw Data Superiority: Price itself is the most immediate and unfiltered data source",
+     "Repetitive Patterns: Markets exhibit recurring behavioral patterns due to consistent human psychology",
+     "Context Dependency: Price action signals must be interpreted within broader market context",
+     "Simplicity: Fewer indicators reduce analysis paralysis and conflicting signals",
+     "Inefficient Price Delivery: Gaps represent areas where price moved too quickly",
+     "Rebalancing Tendency: Markets often return to fill FVGs",
+     "Imbalance Detection: Three-candle pattern identifies FVGs",
+     "Magnet Effect: Unfilled FVGs act as magnets for price",
+     "Partial vs. Full Fill: Gaps may be partially filled before price continues",
+     "Price as Advertisement: Price moves to attract participation; volume confirms acceptance",
+     "Value Area: The price range containing approximately 70% of session volume (one standard deviation)",
+     "Point of Control (POC): The price level with the highest traded volume; represents \"fair value\"",
+     "Acceptance vs. Rejection: High volume = acceptance at price; low volume = rejection",
+     "Balance and Imbalance: Markets alternate between balanced (range) and imbalanced (trending) states",
+     "Higher Highs, Higher Lows (HH/HL): Defines an uptrend",
+     "Lower Highs, Lower Lows (LH/LL): Defines a downtrend",
+     "Structure is Fractal: Patterns repeat across all timeframes",
+     "Trend Persistence: Trends tend to continue until clear reversal signals appear",
+     "Mean Reversion in Ranges: Prices oscillate around a central value in ranging markets",
+     "Compression Precedes Expansion: Low volatility periods often precede significant moves",
+     "Volatility Cycles: Markets alternate between compression and expansion phases",
+     "Strategy Adaptation: Different market states require different trading approaches",
+     "Volume Confirms Price: Price moves on high volume are more significant",
+     "Volume Precedes Price: Volume changes often precede price changes",
+     "Climactic Volume: Extreme volume at tops/bottoms signals exhaustion",
+     "Effort vs. Result: Compare volume (effort) to price movement (result)",
+     "Delta: Net difference between buying and selling volume",
+     "Role Reversal: Broken support becomes resistance; broken resistance becomes support",
+     "Strength Through Tests: Levels gain significance with each successful test",
+     "Round Numbers: Psychological levels often act as support/resistance",
+     "Multiple Timeframe Confluence: Levels aligned across timeframes are stronger",
+     "Zones Over Lines: Support/resistance are zones, not exact prices",
+     "Origin of Move: Zones form at the base of strong impulsive moves",
+     "Fresh Zones: Untested zones have highest probability of reaction",
+     "Strength Indication: Stronger the move away from zone, stronger the zone",
+     "Imbalance: Zones represent unfilled orders left by institutional traders",
+     "One-Time Use: Zones weaken or expire after being tested",
+     "Higher Timeframe Dominance: Higher timeframes carry more weight",
+     "Top-Down Approach: Analyze from higher to lower timeframes",
+     "Alignment: Best trades align across multiple timeframes",
+     "Context vs. Timing: Higher TF provides context; lower TF provides entry timing",
+     "Nested Structure: Lower timeframe trends exist within higher timeframe moves",
+     "Multiple Confirmation: More confirming factors increase probability",
+     "Independent Factors: Factors should be derived from different methodologies",
+     "Quality Over Quantity: Focus on significant factors, not minor alignments",
+     "Probabilistic Thinking: Confluence increases odds but doesn't guarantee outcomes",
+     "Hierarchy of Factors: Some factors are more significant than others"
+    ]
+   }
+  },
+  {
+   "id": "judgment:price-action-best-practices",
+   "title": "best practices",
+   "kind": "Judgment",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "core-trading-concepts"
+    ],
+    "practices": [
+     "Study candle anatomy: open, high, low, close, body, wicks",
+     "Always analyze price action in context of market structure",
+     "Look for confluence with key support/resistance levels",
+     "Practice reading charts without any indicators initially",
+     "Use higher timeframes to establish context before lower timeframe entries",
+     "Document recurring patterns and their outcomes",
+     "Focus on FVGs created by strong impulse moves",
+     "Higher timeframe FVGs are more significant",
+     "Combine FVGs with supply/demand zones for higher probability",
+     "Fresh (unfilled) FVGs have higher probability",
+     "Don't expect all FVGs to fill; use as targets, not certainties",
+     "Mark FVGs from significant moves, not minor swings",
+     "Use prior session's VA/POC as key reference levels",
+     "Monitor value migration for trend confirmation",
+     "POC is better as profit target than entry point",
+     "Expect rotational behavior when opening inside value",
+     "Initiative moves break and hold outside value area",
+     "Combine with price action for higher probability setups",
+     "Always identify structure on higher timeframe first",
+     "Mark significant swing points clearly on charts",
+     "Wait for structural breaks rather than anticipating",
+     "Use CHoCH as a warning, not an immediate reversal signal",
+     "Combine structure analysis with key support/resistance levels",
+     "Understand that minor structure breaks within major trends are normal",
+     "Classify market state before selecting strategy",
+     "Do not apply trend-following strategies in ranges",
+     "Watch for compression as setup for breakout trades",
+     "Use ATR and Bollinger Band width for objective measurement",
+     "Expect failed breakouts from ranges (test both sides)",
+     "Reduce position size during uncertain transitional periods",
+     "Place stops beyond obvious liquidity zones, not at them",
+     "Wait for liquidity sweeps before entering counter-trend trades",
+     "Recognize that \"obvious\" support/resistance attracts stop clusters",
+     "Use liquidity grabs as entry signals, not exit triggers",
+     "Understand that breakouts through liquidity often continue",
+     "Differentiate between liquidity grabs (quick reversal) and genuine breakouts",
+     "Always analyze volume alongside price action",
+     "Require volume confirmation for breakout trades",
+     "Watch for volume climaxes at support/resistance",
+     "Use volume profile to identify high-volume nodes (support/resistance)",
+     "Monitor relative volume (current vs. average)",
+     "Study order flow data (tape reading) for additional insight",
+     "Identify major support/resistance from higher timeframes first",
+     "Draw zones rather than single lines (price is not precise)",
+     "Note how strongly price reacted at each level historically",
+     "Expect some penetration of levels (wicks through levels are common)",
+     "Look for confluence of multiple support/resistance factors",
+     "Update levels as market structure evolves",
+     "Mark zones at the origin of impulsive moves",
+     "Focus on the consolidation/base before the move",
+     "Use the extreme of the zone for entries (demand zone low, supply zone high)",
+     "Place stops beyond the zone (demand: below low, supply: above high)",
+     "Expect zones to work once or twice maximum",
+     "Higher timeframe zones take precedence over lower timeframe zones",
+     "Start analysis from higher timeframe and work down",
+     "Never trade against higher timeframe trend without clear invalidation",
+     "Use higher timeframe levels for targets and major stops",
+     "Use lower timeframe patterns for entry triggers",
+     "Ensure at least 2 out of 3 timeframes agree before trading",
+     "Define your timeframes and stick to them consistently",
+     "Map all relevant factors before looking for trades",
+     "Require minimum 3 confirming factors for high-probability setups",
+     "Weight factors by their historical reliability",
+     "Don't force confluence where it doesn't exist",
+     "Note which types of confluence work best in your trading",
+     "Document confluence levels in trade journal"
+    ]
    }
   }
  ],
@@ -32049,6 +33422,1062 @@
    "why": "stated across instruments-market-mechanics",
    "from_id": "judgment:market-mechanics-best-practices",
    "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "the trend is your friend",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "stated under core market wisdom",
+   "from_id": "judgment:trend-is-your-friend",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "win rate is not risk",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "stated under core market wisdom",
+   "from_id": "fact:win-rate-is-not-risk",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "risk is multi-dimensional",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "stated under core market wisdom",
+   "from_id": "fact:risk-is-multi-dimensional",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "regime determines archetype effectiveness",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "stated under core market wisdom",
+   "from_id": "fact:regime-determines-archetype-effectiveness",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "candle body size",
+   "rel": "about",
+   "to": "price action",
+   "why": "quantifies price action",
+   "from_id": "property:candle-body-size",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "swing point identification",
+   "rel": "about",
+   "to": "price action",
+   "why": "quantifies price action",
+   "from_id": "procedure:swing-point-identification",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "fair value gaps",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under fair value gaps",
+   "from_id": "concept:fair-value-gap",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "bullish fair value gap",
+   "rel": "kind-of",
+   "to": "fair value gaps",
+   "why": "a kind of fair value gaps",
+   "from_id": "concept:bullish-fair-value-gap",
+   "to_id": "concept:fair-value-gap"
+  },
+  {
+   "from": "bearish fair value gap",
+   "rel": "kind-of",
+   "to": "fair value gaps",
+   "why": "a kind of fair value gaps",
+   "from_id": "concept:bearish-fair-value-gap",
+   "to_id": "concept:fair-value-gap"
+  },
+  {
+   "from": "bullish fvg detection",
+   "rel": "about",
+   "to": "fair value gaps",
+   "why": "quantifies fair value gaps",
+   "from_id": "procedure:bullish-fvg-detection",
+   "to_id": "concept:fair-value-gap"
+  },
+  {
+   "from": "bearish fvg detection",
+   "rel": "about",
+   "to": "fair value gaps",
+   "why": "quantifies fair value gaps",
+   "from_id": "procedure:bearish-fvg-detection",
+   "to_id": "concept:fair-value-gap"
+  },
+  {
+   "from": "fvg validity (significance filter)",
+   "rel": "about",
+   "to": "fair value gaps",
+   "why": "quantifies fair value gaps",
+   "from_id": "procedure:fvg-validity",
+   "to_id": "concept:fair-value-gap"
+  },
+  {
+   "from": "fvg fill status",
+   "rel": "about",
+   "to": "fair value gaps",
+   "why": "quantifies fair value gaps",
+   "from_id": "procedure:fvg-fill-status",
+   "to_id": "concept:fair-value-gap"
+  },
+  {
+   "from": "volume profile",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under volume profile & market auction theory",
+   "from_id": "concept:volume-profile",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "point of control",
+   "rel": "part-of",
+   "to": "volume profile",
+   "why": "listed under key definitions",
+   "from_id": "concept:point-of-control",
+   "to_id": "concept:volume-profile"
+  },
+  {
+   "from": "value area high",
+   "rel": "part-of",
+   "to": "volume profile",
+   "why": "listed under key definitions",
+   "from_id": "concept:value-area-high",
+   "to_id": "concept:volume-profile"
+  },
+  {
+   "from": "value area low",
+   "rel": "part-of",
+   "to": "volume profile",
+   "why": "listed under key definitions",
+   "from_id": "concept:value-area-low",
+   "to_id": "concept:volume-profile"
+  },
+  {
+   "from": "high volume node",
+   "rel": "part-of",
+   "to": "volume profile",
+   "why": "listed under key definitions",
+   "from_id": "concept:high-volume-node",
+   "to_id": "concept:volume-profile"
+  },
+  {
+   "from": "low volume node",
+   "rel": "part-of",
+   "to": "volume profile",
+   "why": "listed under key definitions",
+   "from_id": "concept:low-volume-node",
+   "to_id": "concept:volume-profile"
+  },
+  {
+   "from": "value area calculation",
+   "rel": "about",
+   "to": "volume profile",
+   "why": "quantifies volume profile",
+   "from_id": "procedure:value-area-calculation",
+   "to_id": "concept:volume-profile"
+  },
+  {
+   "from": "volume profile metrics",
+   "rel": "about",
+   "to": "volume profile",
+   "why": "quantifies volume profile",
+   "from_id": "property:volume-profile-metric",
+   "to_id": "concept:volume-profile"
+  },
+  {
+   "from": "market structure",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under market structure",
+   "from_id": "concept:market-structure",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "break of structure (bos)",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under market structure",
+   "from_id": "concept:break-of-structure",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "change of character (choch)",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under market structure",
+   "from_id": "concept:change-of-character",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "trend classification",
+   "rel": "about",
+   "to": "market structure",
+   "why": "quantifies market structure",
+   "from_id": "procedure:trend-classification",
+   "to_id": "concept:market-structure"
+  },
+  {
+   "from": "structure break detection",
+   "rel": "about",
+   "to": "market structure",
+   "why": "quantifies market structure",
+   "from_id": "procedure:structure-break-detection",
+   "to_id": "concept:market-structure"
+  },
+  {
+   "from": "market regimes",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under trend, range, compression/expansion",
+   "from_id": "concept:market-regime",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "trending market",
+   "rel": "kind-of",
+   "to": "market regimes",
+   "why": "a kind of market regimes",
+   "from_id": "concept:trending-market",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "ranging market",
+   "rel": "kind-of",
+   "to": "market regimes",
+   "why": "a kind of market regimes",
+   "from_id": "concept:ranging-market",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "compression",
+   "rel": "kind-of",
+   "to": "market regimes",
+   "why": "a kind of market regimes",
+   "from_id": "concept:compression",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "expansion",
+   "rel": "kind-of",
+   "to": "market regimes",
+   "why": "a kind of market regimes",
+   "from_id": "concept:expansion",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "adx trend strength",
+   "rel": "about",
+   "to": "market regimes",
+   "why": "quantifies market regimes",
+   "from_id": "procedure:adx-trend-strength",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "bollinger band width (compression measure)",
+   "rel": "about",
+   "to": "market regimes",
+   "why": "quantifies market regimes",
+   "from_id": "property:bollinger-band-width",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "atr percentage",
+   "rel": "about",
+   "to": "market regimes",
+   "why": "quantifies market regimes",
+   "from_id": "property:atr-percentage",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "range ratio",
+   "rel": "about",
+   "to": "market regimes",
+   "why": "quantifies market regimes",
+   "from_id": "property:range-ratio",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "liquidity",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under liquidity theory",
+   "from_id": "concept:liquidity",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "liquidity pools",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under liquidity theory",
+   "from_id": "concept:liquidity-pool",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "stop hunts",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under liquidity theory",
+   "from_id": "concept:stop-hunt",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "liquidity grab",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under liquidity theory",
+   "from_id": "concept:liquidity-grab",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "smart money concept",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under liquidity theory",
+   "from_id": "concept:smart-money-concept",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "equal highs and lows",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under liquidity theory",
+   "from_id": "concept:equal-highs-and-lows",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "buy-side liquidity",
+   "rel": "kind-of",
+   "to": "liquidity",
+   "why": "a kind of liquidity",
+   "from_id": "concept:buy-side-liquidity",
+   "to_id": "concept:liquidity"
+  },
+  {
+   "from": "sell-side liquidity",
+   "rel": "kind-of",
+   "to": "liquidity",
+   "why": "a kind of liquidity",
+   "from_id": "concept:sell-side-liquidity",
+   "to_id": "concept:liquidity"
+  },
+  {
+   "from": "equal highs and lows",
+   "rel": "kind-of",
+   "to": "liquidity",
+   "why": "a kind of liquidity",
+   "from_id": "concept:equal-highs-and-lows",
+   "to_id": "concept:liquidity"
+  },
+  {
+   "from": "liquidity zone identification",
+   "rel": "about",
+   "to": "liquidity pools",
+   "why": "quantifies liquidity pools",
+   "from_id": "procedure:liquidity-zone-identification",
+   "to_id": "concept:liquidity-pool"
+  },
+  {
+   "from": "equal level detection",
+   "rel": "about",
+   "to": "equal highs and lows",
+   "why": "quantifies equal highs and lows",
+   "from_id": "procedure:equal-level-detection",
+   "to_id": "concept:equal-highs-and-lows"
+  },
+  {
+   "from": "volume",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under volume & order flow",
+   "from_id": "concept:volume",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "kind-of",
+   "to": "volume",
+   "why": "a kind of volume",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "volume divergence",
+   "rel": "kind-of",
+   "to": "volume",
+   "why": "a kind of volume",
+   "from_id": "concept:volume-divergence",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "accumulation pattern",
+   "rel": "kind-of",
+   "to": "volume",
+   "why": "a kind of volume",
+   "from_id": "concept:accumulation-pattern",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "distribution pattern",
+   "rel": "kind-of",
+   "to": "volume",
+   "why": "a kind of volume",
+   "from_id": "concept:distribution-pattern",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "climactic volume",
+   "rel": "kind-of",
+   "to": "volume",
+   "why": "a kind of volume",
+   "from_id": "concept:climactic-volume",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "OBV",
+   "rel": "about",
+   "to": "volume",
+   "why": "quantifies volume",
+   "from_id": "procedure:indicator-obv",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "VWAP",
+   "rel": "about",
+   "to": "volume",
+   "why": "quantifies volume",
+   "from_id": "procedure:indicator-vwap",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "relative volume",
+   "rel": "about",
+   "to": "volume",
+   "why": "quantifies volume",
+   "from_id": "property:relative-volume",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "delta (order flow)",
+   "rel": "about",
+   "to": "order flow",
+   "why": "quantifies order flow",
+   "from_id": "property:order-flow-delta",
+   "to_id": "concept:order-flow"
+  },
+  {
+   "from": "volume profile",
+   "rel": "about",
+   "to": "volume",
+   "why": "quantifies volume",
+   "from_id": "procedure:volume-profile",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "support and resistance",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under support & resistance",
+   "from_id": "concept:support-and-resistance",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "horizontal level",
+   "rel": "kind-of",
+   "to": "support and resistance",
+   "why": "a kind of support and resistance",
+   "from_id": "concept:horizontal-level",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "dynamic level",
+   "rel": "kind-of",
+   "to": "support and resistance",
+   "why": "a kind of support and resistance",
+   "from_id": "concept:dynamic-level",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "support/resistance zone width",
+   "rel": "about",
+   "to": "support and resistance",
+   "why": "quantifies support and resistance",
+   "from_id": "property:support-resistance-zone-width",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "level strength score",
+   "rel": "about",
+   "to": "support and resistance",
+   "why": "quantifies support and resistance",
+   "from_id": "property:level-strength-score",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "pivot points (classic)",
+   "rel": "about",
+   "to": "support and resistance",
+   "why": "quantifies support and resistance",
+   "from_id": "property:pivot-point",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "supply & demand zones",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under supply & demand zones",
+   "from_id": "concept:supply-demand-zone",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "demand zone",
+   "rel": "kind-of",
+   "to": "supply & demand zones",
+   "why": "a kind of supply & demand zones",
+   "from_id": "concept:demand-zone",
+   "to_id": "concept:supply-demand-zone"
+  },
+  {
+   "from": "supply zone",
+   "rel": "kind-of",
+   "to": "supply & demand zones",
+   "why": "a kind of supply & demand zones",
+   "from_id": "concept:supply-zone",
+   "to_id": "concept:supply-demand-zone"
+  },
+  {
+   "from": "zone identification",
+   "rel": "about",
+   "to": "supply & demand zones",
+   "why": "quantifies supply & demand zones",
+   "from_id": "procedure:zone-identification",
+   "to_id": "concept:supply-demand-zone"
+  },
+  {
+   "from": "zone freshness",
+   "rel": "about",
+   "to": "supply & demand zones",
+   "why": "quantifies supply & demand zones",
+   "from_id": "property:zone-freshness",
+   "to_id": "concept:supply-demand-zone"
+  },
+  {
+   "from": "multi-timeframe analysis",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under multi-timeframe analysis",
+   "from_id": "concept:multi-timeframe-analysis",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "timeframe ratio",
+   "rel": "about",
+   "to": "multi-timeframe analysis",
+   "why": "quantifies multi-timeframe analysis",
+   "from_id": "fact:timeframe-ratio",
+   "to_id": "concept:multi-timeframe-analysis"
+  },
+  {
+   "from": "trend alignment score",
+   "rel": "about",
+   "to": "multi-timeframe analysis",
+   "why": "quantifies multi-timeframe analysis",
+   "from_id": "property:trend-alignment-score",
+   "to_id": "concept:multi-timeframe-analysis"
+  },
+  {
+   "from": "confluence",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "defined under confluence",
+   "from_id": "concept:confluence",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "confluence score",
+   "rel": "about",
+   "to": "confluence",
+   "why": "quantifies confluence",
+   "from_id": "property:confluence-score",
+   "to_id": "concept:confluence"
+  },
+  {
+   "from": "zone overlap",
+   "rel": "about",
+   "to": "confluence",
+   "why": "quantifies confluence",
+   "from_id": "property:zone-overlap",
+   "to_id": "concept:confluence"
+  },
+  {
+   "from": "atr percentage",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "the range it scales against price",
+   "from_id": "property:atr-percentage",
+   "to_id": "procedure:indicator-atr"
+  },
+  {
+   "from": "bollinger band width (compression measure)",
+   "rel": "uses",
+   "to": "BollingerBands",
+   "why": "the bands whose distance it measures",
+   "from_id": "property:bollinger-band-width",
+   "to_id": "procedure:indicator-bollingerbands"
+  },
+  {
+   "from": "adx trend strength",
+   "rel": "uses",
+   "to": "ADX",
+   "why": "the strength reading it thresholds",
+   "from_id": "procedure:adx-trend-strength",
+   "to_id": "procedure:indicator-adx"
+  },
+  {
+   "from": "liquidity zone identification",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "the buffer it places the pool beyond the swing by",
+   "from_id": "procedure:liquidity-zone-identification",
+   "to_id": "procedure:indicator-atr"
+  },
+  {
+   "from": "fvg validity (significance filter)",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "the size a gap must exceed to be worth marking",
+   "from_id": "procedure:fvg-validity",
+   "to_id": "procedure:indicator-atr"
+  },
+  {
+   "from": "zone identification",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "the departure size that makes a base a zone",
+   "from_id": "procedure:zone-identification",
+   "to_id": "procedure:indicator-atr"
+  },
+  {
+   "from": "support/resistance zone width",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "how wide a level is drawn",
+   "from_id": "property:support-resistance-zone-width",
+   "to_id": "procedure:indicator-atr"
+  },
+  {
+   "from": "trend classification",
+   "rel": "uses",
+   "to": "swing point identification",
+   "why": "the swings it compares",
+   "from_id": "procedure:trend-classification",
+   "to_id": "procedure:swing-point-identification"
+  },
+  {
+   "from": "structure break detection",
+   "rel": "uses",
+   "to": "swing point identification",
+   "why": "the swing a close is tested against",
+   "from_id": "procedure:structure-break-detection",
+   "to_id": "procedure:swing-point-identification"
+  },
+  {
+   "from": "value area calculation",
+   "rel": "uses",
+   "to": "volume profile",
+   "why": "the profile it walks outward from",
+   "from_id": "procedure:value-area-calculation",
+   "to_id": "procedure:volume-profile"
+  },
+  {
+   "from": "swing point identification",
+   "rel": "about",
+   "to": "market structure",
+   "why": "the swings structure is defined over",
+   "from_id": "procedure:swing-point-identification",
+   "to_id": "concept:market-structure"
+  },
+  {
+   "from": "adx trend strength",
+   "rel": "about",
+   "to": "trending market",
+   "why": "above twenty-five is what it calls one",
+   "from_id": "procedure:adx-trend-strength",
+   "to_id": "concept:trending-market"
+  },
+  {
+   "from": "adx trend strength",
+   "rel": "about",
+   "to": "ranging market",
+   "why": "below twenty is what it calls one",
+   "from_id": "procedure:adx-trend-strength",
+   "to_id": "concept:ranging-market"
+  },
+  {
+   "from": "structure break detection",
+   "rel": "about",
+   "to": "break of structure (bos)",
+   "why": "how one is detected",
+   "from_id": "procedure:structure-break-detection",
+   "to_id": "concept:break-of-structure"
+  },
+  {
+   "from": "structure break detection",
+   "rel": "about",
+   "to": "change of character (choch)",
+   "why": "the same test, applied against the prevailing trend",
+   "from_id": "procedure:structure-break-detection",
+   "to_id": "concept:change-of-character"
+  },
+  {
+   "from": "bullish fvg detection",
+   "rel": "about",
+   "to": "bullish fair value gap",
+   "why": "how one is found",
+   "from_id": "procedure:bullish-fvg-detection",
+   "to_id": "concept:bullish-fair-value-gap"
+  },
+  {
+   "from": "bearish fvg detection",
+   "rel": "about",
+   "to": "bearish fair value gap",
+   "why": "how one is found",
+   "from_id": "procedure:bearish-fvg-detection",
+   "to_id": "concept:bearish-fair-value-gap"
+  },
+  {
+   "from": "zone identification",
+   "rel": "about",
+   "to": "demand zone",
+   "why": "the base a rally left, marked",
+   "from_id": "procedure:zone-identification",
+   "to_id": "concept:demand-zone"
+  },
+  {
+   "from": "zone identification",
+   "rel": "about",
+   "to": "supply zone",
+   "why": "the base a decline left, marked",
+   "from_id": "procedure:zone-identification",
+   "to_id": "concept:supply-zone"
+  },
+  {
+   "from": "volume profile",
+   "rel": "about",
+   "to": "point of control",
+   "why": "the level it returns as the busiest",
+   "from_id": "procedure:volume-profile",
+   "to_id": "concept:point-of-control"
+  },
+  {
+   "from": "relative volume",
+   "rel": "about",
+   "to": "volume confirmation",
+   "why": "the objective form of above average",
+   "from_id": "property:relative-volume",
+   "to_id": "concept:volume-confirmation"
+  },
+  {
+   "from": "bollinger band width (compression measure)",
+   "rel": "about",
+   "to": "compression",
+   "why": "low and falling is what one looks like",
+   "from_id": "property:bollinger-band-width",
+   "to_id": "concept:compression"
+  },
+  {
+   "from": "atr percentage",
+   "rel": "about",
+   "to": "expansion",
+   "why": "rising is what one looks like",
+   "from_id": "property:atr-percentage",
+   "to_id": "concept:expansion"
+  },
+  {
+   "from": "pivot points (classic)",
+   "rel": "about",
+   "to": "horizontal level",
+   "why": "levels everyone computes from the same bar, which is what makes them levels",
+   "from_id": "property:pivot-point",
+   "to_id": "concept:horizontal-level"
+  },
+  {
+   "from": "OBV",
+   "rel": "about",
+   "to": "accumulation pattern",
+   "why": "rising while price stays flat is what identifies one",
+   "from_id": "procedure:indicator-obv",
+   "to_id": "concept:accumulation-pattern"
+  },
+  {
+   "from": "OBV",
+   "rel": "about",
+   "to": "distribution pattern",
+   "why": "falling while price holds up is what identifies one",
+   "from_id": "procedure:indicator-obv",
+   "to_id": "concept:distribution-pattern"
+  },
+  {
+   "from": "VWAP",
+   "rel": "about",
+   "to": "dynamic level",
+   "why": "a level that moves with price rather than sitting at one",
+   "from_id": "procedure:indicator-vwap",
+   "to_id": "concept:dynamic-level"
+  },
+  {
+   "from": "high volume node",
+   "rel": "about",
+   "to": "support and resistance",
+   "why": "business done at a price is why it holds",
+   "from_id": "concept:high-volume-node",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "volume",
+   "rel": "about",
+   "to": "order flow",
+   "why": "volume says how much traded; flow says which side was the aggressor",
+   "from_id": "concept:volume",
+   "to_id": "concept:order-flow"
+  },
+  {
+   "from": "liquidity pools",
+   "rel": "about",
+   "to": "stop order (stop-loss)",
+   "why": "the resting orders that make one are mostly stops",
+   "from_id": "concept:liquidity-pool",
+   "to_id": "concept:stop-order"
+  },
+  {
+   "from": "stop hunts",
+   "rel": "about",
+   "to": "liquidity pools",
+   "why": "the pool it runs",
+   "from_id": "concept:stop-hunt",
+   "to_id": "concept:liquidity-pool"
+  },
+  {
+   "from": "liquidity grab",
+   "rel": "about",
+   "to": "liquidity pools",
+   "why": "the same sweep, named for the fill it achieves",
+   "from_id": "concept:liquidity-grab",
+   "to_id": "concept:liquidity-pool"
+  },
+  {
+   "from": "the trend is your friend",
+   "rel": "about",
+   "to": "trending market",
+   "why": "the state it advises trading with",
+   "from_id": "judgment:trend-is-your-friend",
+   "to_id": "concept:trending-market"
+  },
+  {
+   "from": "regime determines archetype effectiveness",
+   "rel": "about",
+   "to": "market regimes",
+   "why": "the regime it says selects the archetype",
+   "from_id": "fact:regime-determines-archetype-effectiveness",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "win rate is not risk",
+   "rel": "about",
+   "to": "risk is multi-dimensional",
+   "why": "skew is one of the dimensions it lists",
+   "from_id": "fact:win-rate-is-not-risk",
+   "to_id": "fact:risk-is-multi-dimensional"
+  },
+  {
+   "from": "candle body size",
+   "rel": "uses",
+   "to": "CandleGeometry",
+   "why": "the same anatomy, already computed",
+   "from_id": "property:candle-body-size",
+   "to_id": "procedure:indicator-candlegeometry"
+  },
+  {
+   "from": "fvg fill status",
+   "rel": "uses",
+   "to": "bullish fvg detection",
+   "why": "the zone whose fill it tracks",
+   "from_id": "procedure:fvg-fill-status",
+   "to_id": "procedure:bullish-fvg-detection"
+  },
+  {
+   "from": "value area high",
+   "rel": "about",
+   "to": "support and resistance",
+   "why": "the edge of value acts as a level in the session after it",
+   "from_id": "concept:value-area-high",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "value area low",
+   "rel": "about",
+   "to": "support and resistance",
+   "why": "the edge of value acts as a level in the session after it",
+   "from_id": "concept:value-area-low",
+   "to_id": "concept:support-and-resistance"
+  },
+  {
+   "from": "low volume node",
+   "rel": "about",
+   "to": "fair value gaps",
+   "why": "both mark price the market passed through rather than traded in",
+   "from_id": "concept:low-volume-node",
+   "to_id": "concept:fair-value-gap"
+  },
+  {
+   "from": "volume profile metrics",
+   "rel": "about",
+   "to": "ranging market",
+   "why": "a value area wide against the session range is a rotational day",
+   "from_id": "property:volume-profile-metric",
+   "to_id": "concept:ranging-market"
+  },
+  {
+   "from": "range ratio",
+   "rel": "about",
+   "to": "compression",
+   "why": "below half the average range is what one measures as",
+   "from_id": "property:range-ratio",
+   "to_id": "concept:compression"
+  },
+  {
+   "from": "smart money concept",
+   "rel": "about",
+   "to": "institutional investors",
+   "why": "the participants whose size is the whole of the argument",
+   "from_id": "concept:smart-money-concept",
+   "to_id": "concept:institutional-investor"
+  },
+  {
+   "from": "buy-side liquidity",
+   "rel": "about",
+   "to": "equal highs and lows",
+   "why": "it gathers above them",
+   "from_id": "concept:buy-side-liquidity",
+   "to_id": "concept:equal-highs-and-lows"
+  },
+  {
+   "from": "sell-side liquidity",
+   "rel": "about",
+   "to": "equal highs and lows",
+   "why": "it gathers below them",
+   "from_id": "concept:sell-side-liquidity",
+   "to_id": "concept:equal-highs-and-lows"
+  },
+  {
+   "from": "equal level detection",
+   "rel": "uses",
+   "to": "swing point identification",
+   "why": "the highs and lows it compares",
+   "from_id": "procedure:equal-level-detection",
+   "to_id": "procedure:swing-point-identification"
+  },
+  {
+   "from": "OBV",
+   "rel": "about",
+   "to": "volume divergence",
+   "why": "it rising while price does not is the classic form of one",
+   "from_id": "procedure:indicator-obv",
+   "to_id": "concept:volume-divergence"
+  },
+  {
+   "from": "relative volume",
+   "rel": "about",
+   "to": "climactic volume",
+   "why": "several times normal is what makes it climactic",
+   "from_id": "property:relative-volume",
+   "to_id": "concept:climactic-volume"
+  },
+  {
+   "from": "delta (order flow)",
+   "rel": "about",
+   "to": "volume",
+   "why": "the same activity with a side attached to it",
+   "from_id": "property:order-flow-delta",
+   "to_id": "concept:volume"
+  },
+  {
+   "from": "level strength score",
+   "rel": "about",
+   "to": "confluence",
+   "why": "counting agreeing factors, applied to a single level",
+   "from_id": "property:level-strength-score",
+   "to_id": "concept:confluence"
+  },
+  {
+   "from": "zone freshness",
+   "rel": "about",
+   "to": "demand zone",
+   "why": "untested is the whole of its claim",
+   "from_id": "property:zone-freshness",
+   "to_id": "concept:demand-zone"
+  },
+  {
+   "from": "zone freshness",
+   "rel": "about",
+   "to": "supply zone",
+   "why": "untested is the whole of its claim",
+   "from_id": "property:zone-freshness",
+   "to_id": "concept:supply-zone"
+  },
+  {
+   "from": "timeframe ratio",
+   "rel": "about",
+   "to": "market structure",
+   "why": "structure repeats at every scale, which is what makes two timeframes say different things about the same market",
+   "from_id": "fact:timeframe-ratio",
+   "to_id": "concept:market-structure"
+  },
+  {
+   "from": "trend alignment score",
+   "rel": "uses",
+   "to": "trend classification",
+   "why": "the direction it scores on each timeframe",
+   "from_id": "property:trend-alignment-score",
+   "to_id": "procedure:trend-classification"
+  },
+  {
+   "from": "confluence score",
+   "rel": "uses",
+   "to": "level strength score",
+   "why": "the weight each factor carries into the sum",
+   "from_id": "property:confluence-score",
+   "to_id": "property:level-strength-score"
+  },
+  {
+   "from": "zone overlap",
+   "rel": "uses",
+   "to": "support/resistance zone width",
+   "why": "the widths it intersects",
+   "from_id": "property:zone-overlap",
+   "to_id": "property:support-resistance-zone-width"
+  },
+  {
+   "from": "core principles",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "stated across core-trading-concepts",
+   "from_id": "fact:price-action-core-principles",
+   "to_id": "concept:price-action"
+  },
+  {
+   "from": "best practices",
+   "rel": "part-of",
+   "to": "price action",
+   "why": "stated across core-trading-concepts",
+   "from_id": "judgment:price-action-best-practices",
+   "to_id": "concept:price-action"
   }
  ],
  "meta": {
@@ -32080,17 +34509,26 @@
    "concept:risk-management"
   ],
   "derived_atom_ids": [
+   "concept:accumulation-pattern",
    "concept:arbitrageur",
    "concept:auction-based-discovery",
    "concept:automated-market-maker",
+   "concept:bearish-fair-value-gap",
    "concept:bid-ask-spread",
+   "concept:break-of-structure",
+   "concept:bullish-fair-value-gap",
+   "concept:buy-side-liquidity",
    "concept:call-option",
    "concept:central-counterparty",
    "concept:centralized-exchange",
+   "concept:change-of-character",
    "concept:chart-pattern",
    "concept:clearing",
+   "concept:climactic-volume",
    "concept:commodity-spot-market",
+   "concept:compression",
    "concept:concentrated-liquidity",
+   "concept:confluence",
    "concept:continuous-trading-discovery",
    "concept:contract-specification",
    "concept:cross-market-discovery",
@@ -32099,10 +34537,16 @@
    "concept:cryptocurrency-spot-market",
    "concept:dark-pool",
    "concept:decentralized-exchange",
+   "concept:demand-zone",
+   "concept:distribution-pattern",
+   "concept:dynamic-level",
    "concept:electronic-communication-network",
+   "concept:equal-highs-and-lows",
    "concept:equity-settlement",
    "concept:equity-spot-market",
    "concept:execution-model",
+   "concept:expansion",
+   "concept:fair-value-gap",
    "concept:forex-spot-market",
    "concept:futures",
    "concept:futures-settlement",
@@ -32111,6 +34555,8 @@
    "concept:hedge-fund",
    "concept:high-frequency-trader",
    "concept:high-volatility-regime",
+   "concept:high-volume-node",
+   "concept:horizontal-level",
    "concept:iceberg-order",
    "concept:information-asymmetry",
    "concept:information-leakage",
@@ -32120,8 +34566,11 @@
    "concept:limit-order",
    "concept:liquidation-engine",
    "concept:liquidity",
+   "concept:liquidity-grab",
+   "concept:liquidity-pool",
    "concept:lit-exchange",
    "concept:low-volatility-regime",
+   "concept:low-volume-node",
    "concept:margin",
    "concept:market-efficiency",
    "concept:market-foundations",
@@ -32132,47 +34581,88 @@
    "concept:market-order",
    "concept:market-participant",
    "concept:market-regime",
+   "concept:market-structure",
+   "concept:multi-timeframe-analysis",
    "concept:option",
    "concept:order-flow",
    "concept:order-type",
    "concept:over-the-counter-market",
    "concept:perpetual-swap",
+   "concept:point-of-control",
    "concept:price-action",
    "concept:price-discovery",
    "concept:proprietary-trading-firm",
    "concept:put-option",
    "concept:quantitative-analysis",
+   "concept:ranging-market",
    "concept:regime-shift",
    "concept:retail-trader",
    "concept:risk-management",
+   "concept:sell-side-liquidity",
    "concept:settlement",
    "concept:slippage",
+   "concept:smart-money-concept",
    "concept:spot-market",
+   "concept:stop-hunt",
    "concept:stop-limit-order",
    "concept:stop-order",
+   "concept:supply-demand-zone",
+   "concept:supply-zone",
+   "concept:support-and-resistance",
    "concept:trading-venue",
    "concept:trailing-stop",
    "concept:transaction-cost",
+   "concept:trending-market",
+   "concept:value-area-high",
+   "concept:value-area-low",
+   "concept:volume",
+   "concept:volume-confirmation",
+   "concept:volume-divergence",
+   "concept:volume-profile",
    "fact:constant-product-amm",
    "fact:cost-of-carry-relationship",
    "fact:market-foundations-core-principles",
    "fact:market-mechanics-core-principles",
+   "fact:price-action-core-principles",
    "fact:put-call-parity",
+   "fact:regime-determines-archetype-effectiveness",
+   "fact:risk-is-multi-dimensional",
    "fact:square-root-market-impact-rule",
+   "fact:timeframe-ratio",
+   "fact:win-rate-is-not-risk",
    "judgment:market-foundations-best-practices",
    "judgment:market-mechanics-best-practices",
+   "judgment:price-action-best-practices",
+   "judgment:trend-is-your-friend",
+   "procedure:adx-trend-strength",
    "procedure:almgren-chriss-market-impact-model",
+   "procedure:bearish-fvg-detection",
    "procedure:black-scholes-call-price",
+   "procedure:bullish-fvg-detection",
+   "procedure:equal-level-detection",
+   "procedure:fvg-fill-status",
+   "procedure:fvg-validity",
    "procedure:garch-model",
    "procedure:implementation-shortfall",
+   "procedure:liquidity-zone-identification",
    "procedure:sniper-liquidity-seeking",
+   "procedure:structure-break-detection",
+   "procedure:swing-point-identification",
+   "procedure:trend-classification",
    "procedure:twap",
+   "procedure:value-area-calculation",
+   "procedure:volume-profile",
    "procedure:vwap",
+   "procedure:zone-identification",
    "property:amm-price-impact",
    "property:annualized-basis",
+   "property:atr-percentage",
    "property:basis",
+   "property:bollinger-band-width",
+   "property:candle-body-size",
    "property:component-share",
    "property:concentrated-liquidity-efficiency",
+   "property:confluence-score",
    "property:cross-rate",
    "property:effective-spread",
    "property:exposure-at-default",
@@ -32181,31 +34671,46 @@
    "property:impermanent-loss",
    "property:information-share",
    "property:intrinsic-and-time-value",
+   "property:level-strength-score",
    "property:leverage-ratio",
    "property:long-position-liquidation-price",
    "property:margin-ratio",
    "property:margin-requirement",
    "property:netting-benefit",
    "property:notional-value",
+   "property:order-flow-delta",
    "property:participation-rate",
    "property:perpetual-funding-rate",
    "property:pip-value",
+   "property:pivot-point",
    "property:position-profit-loss",
    "property:price-efficiency-ratio",
    "property:price-impact",
    "property:quoted-spread",
+   "property:range-ratio",
    "property:realized-spread",
    "property:relative-spread",
+   "property:relative-volume",
    "property:return-amplification",
    "property:short-position-liquidation-price",
    "property:simple-slippage",
    "property:spot-return",
+   "property:support-resistance-zone-width",
    "property:swap-rollover-calculation",
    "property:tick-value",
    "property:total-return",
-   "property:volatility-ratio"
+   "property:trend-alignment-score",
+   "property:volatility-ratio",
+   "property:volume-profile-metric",
+   "property:zone-freshness",
+   "property:zone-overlap"
   ],
   "derived_relations": [
+   [
+    "concept:accumulation-pattern",
+    "kind-of",
+    "concept:volume"
+   ],
    [
     "concept:arbitrageur",
     "about",
@@ -32232,6 +34737,11 @@
     "concept:crypto-specific-mechanics"
    ],
    [
+    "concept:bearish-fair-value-gap",
+    "kind-of",
+    "concept:fair-value-gap"
+   ],
+   [
     "concept:bid-ask-spread",
     "about",
     "fact:market-foundations-core-principles"
@@ -32250,6 +34760,26 @@
     "concept:bid-ask-spread",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:break-of-structure",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "concept:bullish-fair-value-gap",
+    "kind-of",
+    "concept:fair-value-gap"
+   ],
+   [
+    "concept:buy-side-liquidity",
+    "about",
+    "concept:equal-highs-and-lows"
+   ],
+   [
+    "concept:buy-side-liquidity",
+    "kind-of",
+    "concept:liquidity"
    ],
    [
     "concept:call-option",
@@ -32287,6 +34817,11 @@
     "concept:trading-venue"
    ],
    [
+    "concept:change-of-character",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
     "concept:chart-pattern",
     "about",
     "concept:pattern"
@@ -32307,6 +34842,11 @@
     "concept:market-mechanics"
    ],
    [
+    "concept:climactic-volume",
+    "kind-of",
+    "concept:volume"
+   ],
+   [
     "concept:commodity-spot-market",
     "about",
     "judgment:market-mechanics-best-practices"
@@ -32317,9 +34857,19 @@
     "concept:spot-market"
    ],
    [
+    "concept:compression",
+    "kind-of",
+    "concept:market-regime"
+   ],
+   [
     "concept:concentrated-liquidity",
     "kind-of",
     "concept:crypto-specific-mechanics"
+   ],
+   [
+    "concept:confluence",
+    "part-of",
+    "concept:price-action"
    ],
    [
     "concept:continuous-trading-discovery",
@@ -32432,6 +34982,21 @@
     "concept:automated-market-maker"
    ],
    [
+    "concept:demand-zone",
+    "kind-of",
+    "concept:supply-demand-zone"
+   ],
+   [
+    "concept:distribution-pattern",
+    "kind-of",
+    "concept:volume"
+   ],
+   [
+    "concept:dynamic-level",
+    "kind-of",
+    "concept:support-and-resistance"
+   ],
+   [
     "concept:electronic-communication-network",
     "about",
     "concept:bid-ask-spread"
@@ -32440,6 +35005,16 @@
     "concept:electronic-communication-network",
     "kind-of",
     "concept:trading-venue"
+   ],
+   [
+    "concept:equal-highs-and-lows",
+    "kind-of",
+    "concept:liquidity"
+   ],
+   [
+    "concept:equal-highs-and-lows",
+    "part-of",
+    "concept:price-action"
    ],
    [
     "concept:equity-settlement",
@@ -32470,6 +35045,16 @@
     "concept:execution-model",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:expansion",
+    "kind-of",
+    "concept:market-regime"
+   ],
+   [
+    "concept:fair-value-gap",
+    "part-of",
+    "concept:price-action"
    ],
    [
     "concept:forex-spot-market",
@@ -32577,6 +35162,21 @@
     "concept:market-regime"
    ],
    [
+    "concept:high-volume-node",
+    "about",
+    "concept:support-and-resistance"
+   ],
+   [
+    "concept:high-volume-node",
+    "part-of",
+    "concept:volume-profile"
+   ],
+   [
+    "concept:horizontal-level",
+    "kind-of",
+    "concept:support-and-resistance"
+   ],
+   [
     "concept:iceberg-order",
     "about",
     "concept:information-leakage"
@@ -32672,6 +35272,31 @@
     "concept:market-foundations"
    ],
    [
+    "concept:liquidity",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "concept:liquidity-grab",
+    "about",
+    "concept:liquidity-pool"
+   ],
+   [
+    "concept:liquidity-grab",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "concept:liquidity-pool",
+    "about",
+    "concept:stop-order"
+   ],
+   [
+    "concept:liquidity-pool",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
     "concept:lit-exchange",
     "about",
     "concept:price-discovery"
@@ -32690,6 +35315,16 @@
     "concept:low-volatility-regime",
     "uses",
     "property:historical-volatility"
+   ],
+   [
+    "concept:low-volume-node",
+    "about",
+    "concept:fair-value-gap"
+   ],
+   [
+    "concept:low-volume-node",
+    "part-of",
+    "concept:volume-profile"
    ],
    [
     "concept:margin",
@@ -32792,6 +35427,21 @@
     "concept:market-foundations"
    ],
    [
+    "concept:market-regime",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "concept:market-structure",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "concept:multi-timeframe-analysis",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
     "concept:option",
     "about",
     "fact:market-mechanics-core-principles"
@@ -32842,6 +35492,11 @@
     "concept:market-mechanics"
    ],
    [
+    "concept:point-of-control",
+    "part-of",
+    "concept:volume-profile"
+   ],
+   [
     "concept:price-action",
     "part-of",
     "object:mangrove-knowledge-space"
@@ -32877,6 +35532,11 @@
     "object:mangrove-knowledge-space"
    ],
    [
+    "concept:ranging-market",
+    "kind-of",
+    "concept:market-regime"
+   ],
+   [
     "concept:regime-shift",
     "about",
     "judgment:market-foundations-best-practices"
@@ -32902,6 +35562,16 @@
     "object:mangrove-knowledge-space"
    ],
    [
+    "concept:sell-side-liquidity",
+    "about",
+    "concept:equal-highs-and-lows"
+   ],
+   [
+    "concept:sell-side-liquidity",
+    "kind-of",
+    "concept:liquidity"
+   ],
+   [
     "concept:settlement",
     "about",
     "fact:market-mechanics-core-principles"
@@ -32927,6 +35597,16 @@
     "concept:market-foundations"
    ],
    [
+    "concept:smart-money-concept",
+    "about",
+    "concept:institutional-investor"
+   ],
+   [
+    "concept:smart-money-concept",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
     "concept:spot-market",
     "about",
     "fact:market-mechanics-core-principles"
@@ -32940,6 +35620,16 @@
     "concept:spot-market",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:stop-hunt",
+    "about",
+    "concept:liquidity-pool"
+   ],
+   [
+    "concept:stop-hunt",
+    "part-of",
+    "concept:price-action"
    ],
    [
     "concept:stop-limit-order",
@@ -32970,6 +35660,21 @@
     "concept:stop-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:supply-demand-zone",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "concept:supply-zone",
+    "kind-of",
+    "concept:supply-demand-zone"
+   ],
+   [
+    "concept:support-and-resistance",
+    "part-of",
+    "concept:price-action"
    ],
    [
     "concept:trading-venue",
@@ -33002,6 +35707,31 @@
     "concept:market-foundations"
    ],
    [
+    "concept:trending-market",
+    "kind-of",
+    "concept:market-regime"
+   ],
+   [
+    "concept:value-area-high",
+    "about",
+    "concept:support-and-resistance"
+   ],
+   [
+    "concept:value-area-high",
+    "part-of",
+    "concept:volume-profile"
+   ],
+   [
+    "concept:value-area-low",
+    "about",
+    "concept:support-and-resistance"
+   ],
+   [
+    "concept:value-area-low",
+    "part-of",
+    "concept:volume-profile"
+   ],
+   [
     "concept:volatility",
     "about",
     "fact:market-foundations-core-principles"
@@ -33015,6 +35745,31 @@
     "concept:volatility",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:volume",
+    "about",
+    "concept:order-flow"
+   ],
+   [
+    "concept:volume",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "concept:volume-confirmation",
+    "kind-of",
+    "concept:volume"
+   ],
+   [
+    "concept:volume-divergence",
+    "kind-of",
+    "concept:volume"
+   ],
+   [
+    "concept:volume-profile",
+    "part-of",
+    "concept:price-action"
    ],
    [
     "fact:constant-product-amm",
@@ -33047,6 +35802,11 @@
     "concept:market-mechanics"
    ],
    [
+    "fact:price-action-core-principles",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
     "fact:put-call-parity",
     "about",
     "concept:call-option"
@@ -33062,6 +35822,21 @@
     "concept:put-option"
    ],
    [
+    "fact:regime-determines-archetype-effectiveness",
+    "about",
+    "concept:market-regime"
+   ],
+   [
+    "fact:regime-determines-archetype-effectiveness",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "fact:risk-is-multi-dimensional",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
     "fact:square-root-market-impact-rule",
     "about",
     "concept:market-impact"
@@ -33070,6 +35845,26 @@
     "fact:square-root-market-impact-rule",
     "uses",
     "property:participation-rate"
+   ],
+   [
+    "fact:timeframe-ratio",
+    "about",
+    "concept:market-structure"
+   ],
+   [
+    "fact:timeframe-ratio",
+    "about",
+    "concept:multi-timeframe-analysis"
+   ],
+   [
+    "fact:win-rate-is-not-risk",
+    "about",
+    "fact:risk-is-multi-dimensional"
+   ],
+   [
+    "fact:win-rate-is-not-risk",
+    "part-of",
+    "concept:price-action"
    ],
    [
     "judgment:market-foundations-best-practices",
@@ -33082,6 +35877,41 @@
     "concept:market-mechanics"
    ],
    [
+    "judgment:price-action-best-practices",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "judgment:trend-is-your-friend",
+    "about",
+    "concept:trending-market"
+   ],
+   [
+    "judgment:trend-is-your-friend",
+    "part-of",
+    "concept:price-action"
+   ],
+   [
+    "procedure:adx-trend-strength",
+    "about",
+    "concept:market-regime"
+   ],
+   [
+    "procedure:adx-trend-strength",
+    "about",
+    "concept:ranging-market"
+   ],
+   [
+    "procedure:adx-trend-strength",
+    "about",
+    "concept:trending-market"
+   ],
+   [
+    "procedure:adx-trend-strength",
+    "uses",
+    "procedure:indicator-adx"
+   ],
+   [
     "procedure:almgren-chriss-market-impact-model",
     "about",
     "concept:market-impact"
@@ -33092,9 +35922,59 @@
     "property:historical-volatility"
    ],
    [
+    "procedure:bearish-fvg-detection",
+    "about",
+    "concept:bearish-fair-value-gap"
+   ],
+   [
+    "procedure:bearish-fvg-detection",
+    "about",
+    "concept:fair-value-gap"
+   ],
+   [
     "procedure:black-scholes-call-price",
     "about",
     "concept:option"
+   ],
+   [
+    "procedure:bullish-fvg-detection",
+    "about",
+    "concept:bullish-fair-value-gap"
+   ],
+   [
+    "procedure:bullish-fvg-detection",
+    "about",
+    "concept:fair-value-gap"
+   ],
+   [
+    "procedure:equal-level-detection",
+    "about",
+    "concept:equal-highs-and-lows"
+   ],
+   [
+    "procedure:equal-level-detection",
+    "uses",
+    "procedure:swing-point-identification"
+   ],
+   [
+    "procedure:fvg-fill-status",
+    "about",
+    "concept:fair-value-gap"
+   ],
+   [
+    "procedure:fvg-fill-status",
+    "uses",
+    "procedure:bullish-fvg-detection"
+   ],
+   [
+    "procedure:fvg-validity",
+    "about",
+    "concept:fair-value-gap"
+   ],
+   [
+    "procedure:fvg-validity",
+    "uses",
+    "procedure:indicator-atr"
    ],
    [
     "procedure:garch-model",
@@ -33122,6 +36002,46 @@
     "concept:volatility"
    ],
    [
+    "procedure:indicator-obv",
+    "about",
+    "concept:accumulation-pattern"
+   ],
+   [
+    "procedure:indicator-obv",
+    "about",
+    "concept:distribution-pattern"
+   ],
+   [
+    "procedure:indicator-obv",
+    "about",
+    "concept:volume"
+   ],
+   [
+    "procedure:indicator-obv",
+    "about",
+    "concept:volume-divergence"
+   ],
+   [
+    "procedure:indicator-vwap",
+    "about",
+    "concept:dynamic-level"
+   ],
+   [
+    "procedure:indicator-vwap",
+    "about",
+    "concept:volume"
+   ],
+   [
+    "procedure:liquidity-zone-identification",
+    "about",
+    "concept:liquidity-pool"
+   ],
+   [
+    "procedure:liquidity-zone-identification",
+    "uses",
+    "procedure:indicator-atr"
+   ],
+   [
     "procedure:sniper-liquidity-seeking",
     "about",
     "concept:dark-pool"
@@ -33132,6 +36052,46 @@
     "concept:execution-model"
    ],
    [
+    "procedure:structure-break-detection",
+    "about",
+    "concept:break-of-structure"
+   ],
+   [
+    "procedure:structure-break-detection",
+    "about",
+    "concept:change-of-character"
+   ],
+   [
+    "procedure:structure-break-detection",
+    "about",
+    "concept:market-structure"
+   ],
+   [
+    "procedure:structure-break-detection",
+    "uses",
+    "procedure:swing-point-identification"
+   ],
+   [
+    "procedure:swing-point-identification",
+    "about",
+    "concept:market-structure"
+   ],
+   [
+    "procedure:swing-point-identification",
+    "about",
+    "concept:price-action"
+   ],
+   [
+    "procedure:trend-classification",
+    "about",
+    "concept:market-structure"
+   ],
+   [
+    "procedure:trend-classification",
+    "uses",
+    "procedure:swing-point-identification"
+   ],
+   [
     "procedure:twap",
     "about",
     "concept:market-impact"
@@ -33140,6 +36100,26 @@
     "procedure:twap",
     "instance-of",
     "concept:execution-model"
+   ],
+   [
+    "procedure:value-area-calculation",
+    "about",
+    "concept:volume-profile"
+   ],
+   [
+    "procedure:value-area-calculation",
+    "uses",
+    "procedure:volume-profile"
+   ],
+   [
+    "procedure:volume-profile",
+    "about",
+    "concept:point-of-control"
+   ],
+   [
+    "procedure:volume-profile",
+    "about",
+    "concept:volume"
    ],
    [
     "procedure:vwap",
@@ -33155,6 +36135,26 @@
     "procedure:vwap",
     "uses",
     "procedure:indicator-vwap"
+   ],
+   [
+    "procedure:zone-identification",
+    "about",
+    "concept:demand-zone"
+   ],
+   [
+    "procedure:zone-identification",
+    "about",
+    "concept:supply-demand-zone"
+   ],
+   [
+    "procedure:zone-identification",
+    "about",
+    "concept:supply-zone"
+   ],
+   [
+    "procedure:zone-identification",
+    "uses",
+    "procedure:indicator-atr"
    ],
    [
     "property:amm-price-impact",
@@ -33177,6 +36177,21 @@
     "property:basis"
    ],
    [
+    "property:atr-percentage",
+    "about",
+    "concept:expansion"
+   ],
+   [
+    "property:atr-percentage",
+    "about",
+    "concept:market-regime"
+   ],
+   [
+    "property:atr-percentage",
+    "uses",
+    "procedure:indicator-atr"
+   ],
+   [
     "property:basis",
     "about",
     "concept:futures"
@@ -33185,6 +36200,31 @@
     "property:basis",
     "about",
     "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "property:bollinger-band-width",
+    "about",
+    "concept:compression"
+   ],
+   [
+    "property:bollinger-band-width",
+    "about",
+    "concept:market-regime"
+   ],
+   [
+    "property:bollinger-band-width",
+    "uses",
+    "procedure:indicator-bollingerbands"
+   ],
+   [
+    "property:candle-body-size",
+    "about",
+    "concept:price-action"
+   ],
+   [
+    "property:candle-body-size",
+    "uses",
+    "procedure:indicator-candlegeometry"
    ],
    [
     "property:component-share",
@@ -33205,6 +36245,16 @@
     "property:concentrated-liquidity-efficiency",
     "uses",
     "fact:constant-product-amm"
+   ],
+   [
+    "property:confluence-score",
+    "about",
+    "concept:confluence"
+   ],
+   [
+    "property:confluence-score",
+    "uses",
+    "property:level-strength-score"
    ],
    [
     "property:cross-rate",
@@ -33292,6 +36342,16 @@
     "procedure:black-scholes-call-price"
    ],
    [
+    "property:level-strength-score",
+    "about",
+    "concept:confluence"
+   ],
+   [
+    "property:level-strength-score",
+    "about",
+    "concept:support-and-resistance"
+   ],
+   [
     "property:leverage-ratio",
     "about",
     "concept:leverage"
@@ -33367,6 +36427,16 @@
     "judgment:market-mechanics-best-practices"
    ],
    [
+    "property:order-flow-delta",
+    "about",
+    "concept:order-flow"
+   ],
+   [
+    "property:order-flow-delta",
+    "about",
+    "concept:volume"
+   ],
+   [
     "property:participation-rate",
     "about",
     "concept:liquidity"
@@ -33395,6 +36465,16 @@
     "property:pip-value",
     "about",
     "fact:market-mechanics-core-principles"
+   ],
+   [
+    "property:pivot-point",
+    "about",
+    "concept:horizontal-level"
+   ],
+   [
+    "property:pivot-point",
+    "about",
+    "concept:support-and-resistance"
    ],
    [
     "property:position-profit-loss",
@@ -33447,6 +36527,16 @@
     "concept:market-microstructure"
    ],
    [
+    "property:range-ratio",
+    "about",
+    "concept:compression"
+   ],
+   [
+    "property:range-ratio",
+    "about",
+    "concept:market-regime"
+   ],
+   [
     "property:realized-spread",
     "about",
     "concept:bid-ask-spread"
@@ -33465,6 +36555,21 @@
     "property:relative-spread",
     "uses",
     "property:quoted-spread"
+   ],
+   [
+    "property:relative-volume",
+    "about",
+    "concept:climactic-volume"
+   ],
+   [
+    "property:relative-volume",
+    "about",
+    "concept:volume"
+   ],
+   [
+    "property:relative-volume",
+    "about",
+    "concept:volume-confirmation"
    ],
    [
     "property:return-amplification",
@@ -33500,6 +36605,16 @@
     "property:spot-return",
     "about",
     "concept:spot-market"
+   ],
+   [
+    "property:support-resistance-zone-width",
+    "about",
+    "concept:support-and-resistance"
+   ],
+   [
+    "property:support-resistance-zone-width",
+    "uses",
+    "procedure:indicator-atr"
    ],
    [
     "property:swap-rollover-calculation",
@@ -33542,6 +36657,16 @@
     "property:spot-return"
    ],
    [
+    "property:trend-alignment-score",
+    "about",
+    "concept:multi-timeframe-analysis"
+   ],
+   [
+    "property:trend-alignment-score",
+    "uses",
+    "procedure:trend-classification"
+   ],
+   [
     "property:volatility-ratio",
     "about",
     "concept:volatility"
@@ -33550,6 +36675,41 @@
     "property:volatility-ratio",
     "uses",
     "property:historical-volatility"
+   ],
+   [
+    "property:volume-profile-metric",
+    "about",
+    "concept:ranging-market"
+   ],
+   [
+    "property:volume-profile-metric",
+    "about",
+    "concept:volume-profile"
+   ],
+   [
+    "property:zone-freshness",
+    "about",
+    "concept:demand-zone"
+   ],
+   [
+    "property:zone-freshness",
+    "about",
+    "concept:supply-demand-zone"
+   ],
+   [
+    "property:zone-freshness",
+    "about",
+    "concept:supply-zone"
+   ],
+   [
+    "property:zone-overlap",
+    "about",
+    "concept:confluence"
+   ],
+   [
+    "property:zone-overlap",
+    "uses",
+    "property:support-resistance-zone-width"
    ]
   ],
   "doc_relations": 6,
@@ -33565,15 +36725,29 @@
    "procedure:indicator-atr"
   ],
   "folded_atom_ids": [
+   "concept:liquidity",
    "concept:market-foundations",
    "concept:market-mechanics",
+   "concept:market-regime",
+   "concept:price-action",
    "concept:volatility",
-   "procedure:indicator-atr"
+   "procedure:indicator-atr",
+   "procedure:indicator-obv",
+   "procedure:indicator-vwap"
   ],
   "chapter_instruments-market-mechanics_atoms": 57,
   "chapter_instruments-market-mechanics_relations": 135,
   "chapter_instruments-market-mechanics_folded": [
    "concept:market-mechanics"
+  ],
+  "chapter_core-trading-concepts_atoms": 71,
+  "chapter_core-trading-concepts_relations": 132,
+  "chapter_core-trading-concepts_folded": [
+   "concept:liquidity",
+   "concept:market-regime",
+   "concept:price-action",
+   "procedure:indicator-obv",
+   "procedure:indicator-vwap"
   ]
  }
 }

@@ -73,16 +73,16 @@ def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
 def test_uc1_orientation_values(kg, guide):
     s = kg.stats()
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
-    assert len(kg.schema()) == 32, "the guide says '32 shapes in total'"
-    assert "32 shapes in total" in guide
+    assert len(kg.schema()) == 34, "the guide says '34 shapes in total'"
+    assert "34 shapes in total" in guide
     for c in s["classes"]:                    # every class the guide lists must still exist
         assert c in guide, f"guide's class list is missing {c}"
 
 
 def test_uc2_divergence_search(kg, guide):
     r = kg.find("divergence", limit=None)
-    assert r.total == 38, "the guide says 38 matches"
-    assert "38 matches" in guide and "10 of 38" in guide
+    assert r.total == 40, "the guide says 38 matches"
+    assert "40 matches" in guide and "10 of 40" in guide
     top4 = [x["id"] for x in r.items[:4]]
     assert all("divergence" in i for i in top4), "name matches must still lead"
     for i in top4:
@@ -234,7 +234,7 @@ def test_uc11_resolve_and_recover(kg, guide):
 
     assert kg.resolve("rsi_oversold") == "procedure:signal-rsi-oversold"
     assert kg.resolve("RSI") == "procedure:indicator-rsi"
-    assert kg.resolve("bollinger") == "procedure:indicator-bollingerbands"
+    assert kg.resolve("bollingerbands") == "procedure:indicator-bollingerbands"
 
     with pytest.raises(NodeNotFound) as e:
         kg.resolve("rsi_over")

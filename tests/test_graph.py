@@ -303,6 +303,12 @@ def test_find_stays_deterministic_within_a_rank(kg):
         for i, fields in enumerate(SEARCH_TIERS):
             if "cross" in " ".join(_flatten(source.get(f)) for f in fields).lower():
                 return i
+        # The last band is everything the tiers do not name -- props a chapter introduced that no
+        # allow-list anticipated. It ranks below all of them.
+        ranked = {f for fields in SEARCH_TIERS for f in fields}
+        rest = " ".join(_flatten(v) for k, v in source.items() if k not in ranked).lower()
+        if "cross" in rest:
+            return len(SEARCH_TIERS)
         raise AssertionError(f"{node_id} matched in find() but in no tier")
 
     assert a == sorted(a, key=lambda i: (tier(i), i))

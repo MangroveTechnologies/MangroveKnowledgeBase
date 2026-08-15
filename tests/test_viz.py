@@ -130,7 +130,8 @@ def test_search_ranks_exactly_as_find_does(page):
     idx = json.loads(m.group(1))
     kg = KnowledgeGraph.load()
     assert len(idx) == len(kg.nodes)
-    assert all(len(r["t"]) == len(SEARCH_TIERS) for r in idx), "a tier is missing from the export"
+    # One band per declared tier, plus the catch-all for props no tier names.
+    assert all(len(r["t"]) == len(SEARCH_TIERS) + 1 for r in idx), "a tier is missing from the export"
 
     # Re-run the page's ranking in Python and compare it against find() itself.
     for query in ("divergence", "rsi", "mean reversion", "histogram", "oversold"):

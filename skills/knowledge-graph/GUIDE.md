@@ -45,7 +45,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 427, 1318
+s["nodes"], s["edges"]          # 498, 1450
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -54,7 +54,7 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  427 1318
+nodes, edges  498 1450
 primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
 relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
@@ -66,7 +66,7 @@ roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 32 shapes in total]
+               ... 34 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
@@ -76,7 +76,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (299 of 427) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (299 of 498) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -116,7 +116,8 @@ Text search is the wider net, for when they did *not* name an indicator, or name
 have:
 
 ```
-find("divergence") -> 38 matches, name matches first
+find("divergence") -> 40 matches, name matches first
+  concept:volume-divergence                        <- the knowledge-base concept, also named for it
   procedure:signal-rsi-bearish-divergence
   procedure:signal-rsi-bullish-divergence
   procedure:signal-rsi-hidden-bearish-divergence
@@ -138,7 +139,7 @@ first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
-shown you 10 of 38.
+shown you 10 of 40.
 
 **See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
@@ -294,7 +295,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 427 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 498 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -451,7 +452,7 @@ They gave you a name, not a node id. Every use case above starts from an id like
 ```python
 kg.resolve("rsi_oversold")     # exact function name
 kg.resolve("RSI")              # or an indicator name
-kg.resolve("bollinger")        # or an unambiguous fragment
+kg.resolve("bollingerbands")   # or an unambiguous fragment
 ```
 
 ```
@@ -660,7 +661,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 102 nodes
+kg.find(under="market foundations", limit=None)                 # 121 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```
