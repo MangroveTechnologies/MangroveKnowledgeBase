@@ -397,3 +397,68 @@ def test_outputs_finds_a_producer_by_output_name(kg):
     rows = kg.outputs("histogram", limit=None)
     assert {r["id"] for r in rows} == {"procedure:indicator-macd"}
     assert all("histogram" in r["output"] for r in rows)
+
+
+# --- asking a question, rather than matching its words -------------------------------------------
+
+def test_a_query_falls_back_to_its_best_subset_only_when_nothing_carries_all_of_it(kg):
+    """A sentence is a query too, and returning nothing leaves an agent with nowhere to walk from.
+
+    The fallback must not loosen a query that already works: `mean reversion` has nodes carrying
+    both words, so nodes carrying one of them stay out.
+    """
+    both = kg.find("mean reversion", limit=None)
+    assert both.total == 11, "a query that fully matches must not be widened"
+    for row in both.items:
+        hay = " ".join(kg._haystacks[row["id"]])
+        assert "mean" in hay and "reversion" in hay
+
+    question = kg.find("why do breakouts fail", limit=None)
+    assert question.total, "a question that carries no full match must still seed a traversal"
+    for row in question.items:
+        hay = " ".join(kg._haystacks[row["id"]])
+        assert "breakout" in hay and "fail" in hay, "the fallback kept a node matching neither term"
+
+
+def test_a_term_most_of_the_graph_carries_is_dropped_from_scoring(kg):
+    """`signal` is in 282 of 498 nodes: it says nothing about which one is meant.
+
+    Derived from this corpus rather than an English stop-word list -- "the" never appears in a node
+    name, while "signal", "price" and "trading" are stop words here and nowhere else.
+    """
+    assert kg._document_frequency("signal") > 0.4 * len(kg.nodes)
+    assert [r["id"] for r in kg.find("signal divergence", limit=None)] == \
+           [r["id"] for r in kg.find("divergence", limit=None)]
+
+
+def test_frequency_is_measured_over_the_graph_not_the_filtered_pool(kg):
+    """Otherwise `find(q)` and `find(q, under=...)` answer with different vocabularies, and the
+    scoped result stops being a subset of the open one -- which is what `under=` promises."""
+    scoped = {r["id"] for r in kg.find("volume profile", under="price action", limit=None)}
+    everywhere = {r["id"] for r in kg.find("volume profile", limit=None)}
+    assert scoped and scoped <= everywhere
+
+
+def test_ask_returns_the_seed_and_what_it_reaches_with_the_reason(kg):
+    r = kg.ask("what quantifies liquidity", hops=1, limit=None)
+    assert r.items, "a question that seeds should reach something"
+    ids = [x["id"] for x in r.items]
+    assert len(ids) == len(set(ids)), "a node reached twice must appear once"
+    for item in r.items:
+        reached = item["reached"]
+        assert reached["seed"] in ids and reached["hops"] in (0, 1)
+        if reached["hops"]:
+            assert reached["why"].strip(), "an edge is only an answer if it says why it holds"
+            assert reached["relation"] in RELATIONS
+    assert ids == [x["id"] for x in kg.ask("what quantifies liquidity", hops=1, limit=None).items]
+
+
+def test_ask_reaches_what_search_alone_cannot(kg):
+    """The whole point: the words of a question rarely appear in the node that answers it."""
+    words = {r["id"] for r in kg.find("stops beyond obvious levels", limit=None)}
+    reached = {x["id"] for x in kg.ask("stops beyond obvious levels", hops=1, limit=None)}
+    assert reached > words, "expanding over edges must reach more than the text match did"
+
+
+def test_ask_says_nothing_rather_than_guessing(kg):
+    assert kg.ask("zzzzqqq", limit=None).total == 0

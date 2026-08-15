@@ -458,21 +458,39 @@ SEARCH_UI = """
     if(t.endsWith('s')) return [t, t.slice(0,-1)];
     return [t, t+'s', t+'es'];
   }
+  const STOP_SHARE = 0.4;
   function rank(q){
-    const ts=terms(q); const res=[];
+    let ts=terms(q);
     if(!ts.length) return Object.assign([], {total:0});
-    for(const r of IDX){
-      let worst=0, all=true;
+    // Where each term hit, per node -- then the same two rules find() applies: a term most of the
+    // graph carries is dropped from scoring, and when nothing carries every term the best partial
+    // match answers instead of nothing at all.
+    const hits=IDX.map(r=>{
+      const h={};
       for(const t of ts){
         const vs=variants(t);
-        const tier=r.t.findIndex(h=>vs.some(v=>h.includes(v)));
-        if(tier<0){ all=false; break; }
-        if(tier>worst) worst=tier;
+        const tier=r.t.findIndex(x=>vs.some(v=>x.includes(v)));
+        if(tier>=0) h[t]=tier;
       }
-      if(all) res.push({r,tier:worst});
+      return {r,h};
+    });
+    if(ts.length>1){
+      const common=ts.filter(t=>hits.filter(x=>t in x.h).length > STOP_SHARE*IDX.length);
+      if(common.length && common.length<ts.length){
+        ts=ts.filter(t=>!common.includes(t));
+        for(const x of hits) for(const t of common) delete x.h[t];
+      }
     }
-    // rank, then id -- identical to find()'s sort key, so the two agree on ordering.
-    res.sort((a,b)=> a.tier-b.tier || (a.r.id<b.r.id?-1:a.r.id>b.r.id?1:0));
+    const counts=hits.map(x=>Object.keys(x.h).length);
+    const want = counts.includes(ts.length) ? ts.length : Math.max(...counts, 0);
+    const res=[];
+    if(want) for(const x of hits){
+      const got=Object.values(x.h);
+      if(got.length!==want) continue;
+      res.push({r:x.r, missing:ts.length-got.length, tier:Math.max(...got, 0)});
+    }
+    // missing, then tier, then id -- identical to find()'s sort key, so the two agree on ordering.
+    res.sort((a,b)=> a.missing-b.missing || a.tier-b.tier || (a.r.id<b.r.id?-1:a.r.id>b.r.id?1:0));
     const shown=res.slice(0,LIMIT);
     shown.total=res.length;                 // the list is capped; the count must not be
     return shown;

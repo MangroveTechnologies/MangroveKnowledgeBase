@@ -149,6 +149,21 @@ def _variants(term: str) -> tuple[str, ...]:
     return (term, term + "s", term + "es")
 
 
+def tiers_hit(hay: tuple[str, ...], terms: Sequence[str]) -> dict[str, int]:
+    """For each term the node carries, the best tier it appears in. Absent terms are absent.
+
+    The per-term detail is what lets a caller require all of them, or fall back to the best subset
+    when nothing carries all of them, without searching twice.
+    """
+    found = {}
+    for term in terms:
+        hit = next((i for i, text in enumerate(hay)
+                    if any(v in text for v in _variants(term))), None)
+        if hit is not None:
+            found[term] = hit
+    return found
+
+
 def rank_of(hay: tuple[str, ...], terms: Sequence[str]) -> int | None:
     """Which tier a query matched in, or None if the node does not carry every term.
 
@@ -156,14 +171,15 @@ def rank_of(hay: tuple[str, ...], terms: Sequence[str]) -> int | None:
     that has one in its name and the other buried in a formula. Ties break on id, so a result is
     reproducible.
     """
-    worst = 0
-    for term in terms:
-        hit = next((i for i, text in enumerate(hay)
-                    if any(v in text for v in _variants(term))), None)
-        if hit is None:
-            return None
-        worst = max(worst, hit)
-    return worst
+    hits = tiers_hit(hay, terms)
+    return max(hits.values()) if len(hits) == len(terms) else None
+
+
+#: A term carried by more than this share of the graph says nothing about which node is meant. It is
+#: dropped from scoring rather than from the query, and the share is measured against THIS corpus
+#: rather than taken from a stop-word list -- "signal", "price" and "trading" are stop words here
+#: and nowhere else, while "the" never appears in a node's name to begin with.
+STOP_SHARE = 0.4
 
 
 def haystacks(source: dict) -> tuple[str, ...]:
@@ -373,6 +389,7 @@ class KnowledgeGraph:
         # One lowercased haystack per node per tier, built once. The graph is a few hundred nodes,
         # so this is cheaper than re-flattening the nested slot dicts on every search.
         self._haystacks: dict[str, tuple[str, ...]] = {}
+        self._df: dict[str, int] = {}          # term -> how many nodes carry it; filled on demand
         for n in self.nodes.values():
             self._haystacks[n.id] = haystacks(
                 {"name": n.name, "id": n.id, "summary": n.summary, **n.props})
@@ -651,30 +668,134 @@ class KnowledgeGraph:
             raise GraphError(
                 f"a query needs {MIN_QUERY} characters to mean anything; {query.strip()!r} would "
                 "match most of the graph. Use find(kind=...), find(under=...) or resolve() instead.")
-        rows: list[tuple[int, str, dict[str, Any]]] = []
-        for n in self.nodes.values():
-            if pool is not None and n.id not in pool:
-                continue
-            if primitive and n.primitive != primitive:
-                continue
-            if status is not None and n.status != status:
-                continue
-            if requires is not None and requires not in (n.props.get("inputs") or {}):
-                continue
-            rank = 0
-            if terms:
-                # WHERE a query matched decides rank. Sorting purely by id buried the four signals
-                # actually NAMED "divergence" beneath five that merely mention it in prose -- and a
-                # caller reading the first few results concludes the thing does not exist. The tier
-                # index IS the rank; id breaks ties so results stay deterministic, which a public
-                # API needs.
-                hit = rank_of(self._haystacks[n.id], terms)
-                if hit is None:
-                    continue
-                rank = hit
-            rows.append((rank, n.id, n.brief()))
-        rows.sort(key=lambda r: (r[0], r[1]))
-        return _cap([r[2] for r in rows], limit, "matches")
+        eligible = [n for n in self.nodes.values()
+                    if (pool is None or n.id in pool)
+                    and (not primitive or n.primitive == primitive)
+                    and (status is None or n.status == status)
+                    and (requires is None or requires in (n.props.get("inputs") or {}))]
+        if not terms:
+            return _cap([n.brief() for n in sorted(eligible, key=lambda n: n.id)], limit, "matches")
+
+        # WHERE a query matched decides rank. Sorting purely by id buried the four signals actually
+        # NAMED "divergence" beneath five that merely mention it in prose -- and a caller reading
+        # the first few results concludes the thing does not exist. The tier index IS the rank; id
+        # breaks ties so results stay deterministic, which a public API needs.
+        scored = self._score([n.id for n in eligible], terms)
+        rows = sorted((s + (nid,) for nid, s in scored.items()))
+        return _cap([self.nodes[r[2]].brief() for r in rows], limit, "matches")
+
+    def _document_frequency(self, term: str) -> int:
+        """How many nodes carry a term. Cached per graph -- a question asks it once per word."""
+        if term not in self._df:
+            variants = _variants(term)
+            self._df[term] = sum(any(v in text for text in hay for v in variants)
+                                 for hay in self._haystacks.values())
+        return self._df[term]
+
+    def _score(self, ids: Sequence[str], terms: Sequence[str], *,
+               best_only: bool = True) -> dict[str, tuple[int, int]]:
+        """Every id that answers to the query, scored ``(terms missing, worst tier)``.
+
+        ``best_only=False`` scores every id given, including those that carry nothing of the query.
+        :meth:`find` needs the cut -- a search returns matches -- while :meth:`ask` needs the score
+        without it, because a neighbour reached over an edge is already a candidate and the question
+        is only where it belongs in the order.
+
+        Shared by :meth:`find` and :meth:`ask` so that a node keeps the same score whether it was
+        matched directly or reached over an edge -- two rankings would disagree about which of two
+        results is better, which is the bug the shared corpus builder exists to prevent one level up.
+        """
+        hits = {nid: tiers_hit(self._haystacks[nid], terms) for nid in ids}
+        # A term almost everything carries cannot discriminate, so it is dropped from scoring. This
+        # is what makes a whole question askable: "why do breakouts fail" required "why" and "do"
+        # and returned nothing, and dropping them by frequency needs no English stop-word list.
+        #
+        # Measured against the WHOLE graph, never the filtered pool: "volume" is common everywhere
+        # and discriminating nowhere, and if the frequency were taken over a scope of eleven nodes
+        # then `find(q)` and `find(q, under=...)` would be answering with different vocabularies.
+        if len(terms) > 1:
+            common = {t for t in terms if self._document_frequency(t) > STOP_SHARE * len(self.nodes)}
+            if common and len(common) < len(terms):
+                terms = [t for t in terms if t not in common]
+                hits = {i: {t: v for t, v in h.items() if t in terms} for i, h in hits.items()}
+
+        # Everything carrying all the terms, or -- when nothing does -- everything carrying as many
+        # of them as any node manages. A question is answered by its best partial match or not at
+        # all, and "not at all" leaves an agent with nothing to walk from.
+        unmatched = len(SEARCH_TIERS) + 1
+        if not best_only:
+            return {nid: (len(terms) - len(h), max(h.values()) if h else unmatched)
+                    for nid, h in hits.items()}
+        best = max((len(h) for h in hits.values()), default=0)
+        want = len(terms) if any(len(h) == len(terms) for h in hits.values()) else best
+        if not want:
+            return {}
+        return {nid: (len(terms) - len(h), max(h.values()))
+                for nid, h in hits.items() if len(h) == want}
+
+    def ask(self, question: str, *, seeds: int = 3, hops: int = 1,
+            relations: Sequence[str] | None = None,
+            limit: int | None = DEFAULT_LIMIT) -> Result:
+        """Search for where a question lands, then follow the edges out of it.
+
+        :meth:`find` matches words. A question is rarely answered by the node whose words it shares:
+        *"why do breakouts fail"* lands on ``concept:liquidity``, whose use cases literally include
+        that phrase, while the answer -- ``concept:liquidity-grab``, the sweep that a failed breakout
+        actually is -- shares no word with the question at all. It is one hop away, and one hop is
+        the whole difference between a search engine and a graph.
+
+        So: take the best ``seeds`` matches, walk out ``hops``, and return what that reaches with the
+        route that reached it. Each result carries ``reached``: which seed it came from, how many
+        hops away it is, the relation traversed and that edge's own ``why`` -- which is the reason
+        the answer is an answer, and is why this returns paths rather than a bag of nodes.
+
+        Ordering is seed rank first, then distance, then id: the seed itself outranks its neighbours,
+        and a neighbour of the best seed outranks the second seed. Deterministic, so two identical
+        questions give two identical answers.
+
+        Measured on twenty questions phrased the way someone actually asks them, search alone
+        answered seven; the misses were almost all one hop from a correct seed. What this cannot fix
+        is a question that seeds badly -- *"what happens when my margin runs out"* shares no
+        discriminating word with ``concept:liquidation-engine`` -- which is the case for embedding
+        the question rather than matching its words.
+        """
+        terms = query_terms(question)
+        if not terms:
+            return _cap([], limit, "reached")
+        found = self.find(question, limit=seeds)
+        if not found.items:
+            return _cap([], limit, "reached")
+        allowed = set(relations) if relations else None
+
+        # Expand: everything within `hops` of a seed, keeping the shortest route to each and the
+        # edge that took it there.
+        route: dict[str, dict[str, Any]] = {}
+        for seed in found.items:
+            sid = seed["id"]
+            frontier = [(sid, None)]
+            for distance in range(hops + 1):
+                nxt: list[tuple[str, Edge | None]] = []
+                for nid, edge in frontier:
+                    if nid in route and route[nid]["hops"] <= distance:
+                        continue
+                    route[nid] = {"seed": sid, "hops": distance}
+                    if edge is not None:
+                        route[nid] |= {"relation": edge.relation, "why": edge.why,
+                                       "from": edge.src, "to": edge.dst}
+                    if distance < hops:
+                        for e in self._out.get(nid, []) + self._in.get(nid, []):
+                            if allowed and e.relation not in allowed:
+                                continue
+                            nxt.append((e.dst if e.src == nid else e.src, e))
+                frontier = nxt
+
+        # Re-rank the whole pool against the question. Ordering by seed and then by distance sank
+        # the answer under the twenty kinds-of hanging off a worse seed; a neighbour that carries a
+        # word of the question is what deserves to come back, and distance only breaks ties.
+        scored = self._score(list(route), terms, best_only=False)
+        rows = sorted((score + (route[nid]["hops"], nid) for nid, score in scored.items()))
+        return _cap([{**self.nodes[r[3]].brief(), "reached": route[r[3]]} for r in rows],
+                    limit, "reached")
 
     def outputs(self, name: str = "", *, units: str | None = None, bounded: bool | None = None,
                 kind: str | None = None, limit: int | None = DEFAULT_LIMIT) -> Result:

@@ -133,13 +133,25 @@ def test_search_ranks_exactly_as_find_does(page):
     # One band per declared tier, plus the catch-all for props no tier names.
     assert all(len(r["t"]) == len(SEARCH_TIERS) + 1 for r in idx), "a tier is missing from the export"
 
-    # Re-run the page's ranking in Python and compare it against find() itself.
-    for query in ("divergence", "rsi", "mean reversion", "histogram", "oversold"):
-        q = query.lower()
-        hits = [(next(i for i, h in enumerate(r["t"]) if q in h), r["id"])
-                for r in idx if any(q in h for h in r["t"])]
-        hits.sort()
-        assert [h[1] for h in hits] == [r["id"] for r in kg.find(query, limit=None)], \
+    # Re-run the page's ranking in Python and compare it against find() itself. The questions
+    # matter as much as the keywords: the page grew a fallback and a frequency rule after find()
+    # did, and the queries here all full-AND matched, so neither new path was covered.
+    from mangrove_kb.graph import query_terms, tiers_hit
+    for query in ("divergence", "rsi", "mean reversion", "histogram", "oversold",
+                  "why do breakouts fail", "volume profile", "stop hunt"):
+        terms = query_terms(query)
+        hit = {r["id"]: tiers_hit(tuple(r["t"]), terms) for r in idx}
+        if len(terms) > 1:
+            common = {t for t in terms
+                      if sum(t in h for h in hit.values()) > 0.4 * len(idx)}
+            if common and len(common) < len(terms):
+                terms = [t for t in terms if t not in common]
+                hit = {i: {t: v for t, v in h.items() if t in terms} for i, h in hit.items()}
+        counts = [len(h) for h in hit.values()]
+        want = len(terms) if len(terms) in counts else max(counts, default=0)
+        rows = sorted((len(terms) - len(h), max(h.values()), i)
+                      for i, h in hit.items() if want and len(h) == want)
+        assert [r[2] for r in rows] == [r["id"] for r in kg.find(query, limit=None)], \
             f"the page and kg.find() disagree on {query!r}"
 
 
@@ -998,3 +1010,47 @@ def test_attribute_values_are_escaped_for_attributes(page):
     assert 'data-tip="${esc(' not in panel, "a tooltip is an attribute value"
     assert 'data-id="${esc(' not in panel and 'data-t="${esc(' not in panel
     assert 'data-tip="${attr(tip)}"' in panel
+
+
+def test_the_pages_own_javascript_ranks_as_find_does(page, tmp_path):
+    """Run the page's ranker in a JS engine, not a Python transcription of it.
+
+    The parity test above compares the exported index against `find()` using the library's own
+    matcher -- which proves the corpus is right and proves nothing about the code that reads it in
+    a browser. The page grew a fallback and a frequency rule after the library did, and a
+    transcription would have agreed with itself either way.
+    """
+    import json
+    import shutil
+
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("no JS engine available")
+
+    from mangrove_kb.graph import KnowledgeGraph
+
+    idx = re.search(r"const IDX = (\[.*?\]);\n", page, re.S)
+    body = re.search(r"  const STOP_SHARE = 0\.4;\n  function rank\(q\)\{.*?\n  \}\n", page, re.S)
+    helpers = re.search(r"  function terms\(q\)\{.*?function variants\(t\)\{.*?\n  \}\n",
+                        page, re.S)
+    assert idx and body and helpers, "the page's ranker is not where this test looks for it"
+
+    script = tmp_path / "rank.mjs"
+    script.write_text(
+        f"const WHY = ['name','abbrev','summary','detail','other'];\n"
+        f"const LIMIT = 40;\n"
+        f"const IDX = {idx.group(1)};\n{helpers.group(0)}{body.group(0)}\n"
+        "const out = {};\n"
+        "for (const q of JSON.parse(process.argv[2])) out[q] = rank(q).map(x => x.r.id);\n"
+        "console.log(JSON.stringify(out));\n", encoding="utf-8")
+
+    queries = ["divergence", "mean reversion", "why do breakouts fail", "stop hunt", "oversold"]
+    proc = subprocess.run([node, str(script), json.dumps(queries)],
+                          capture_output=True, text=True, timeout=120)
+    assert proc.returncode == 0, proc.stderr[-2000:]
+    ranked = json.loads(proc.stdout)
+
+    kg = KnowledgeGraph.load()
+    for q in queries:
+        want = [r["id"] for r in kg.find(q, limit=40)]
+        assert ranked[q] == want, f"the page's own JS and kg.find() disagree on {q!r}"

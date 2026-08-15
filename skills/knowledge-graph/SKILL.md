@@ -6,7 +6,7 @@ description: >-
   each plays in a strategy. Reach for this before grepping the source or guessing at names: "which
   indicators produce a bounded oscillator", "what reads RSI", "what would break if I change this
   output", "is there already a signal for X", "what does this signal actually need". Uses
-  mangrove_kb.graph (stats · find · get · outputs · neighbors · subgraph · path · all_paths).
+  mangrove_kb.graph (stats · find · ask · get · outputs · neighbors · subgraph · path · all_paths).
 ---
 
 # Ask the graph before you read the source
@@ -136,6 +136,7 @@ nothing to know.
 | what is in here at all? | `stats()` — always first |
 | what shapes can I even ask for? | `schema()` |
 | is there already a signal/indicator for X? | `find("keyword")` |
+| why does X happen? — a question, not a keyword | `ask("why do breakouts fail")` — search, then one hop |
 | everything of a class, or in a role, or both | `find(kind=…, role=…)` |
 | what needs a volume column? what is retired? | `find(requires=…)`, `find(status=…)` |
 | what does this thing compute — formula, params, outputs? | `get(id)` |
@@ -153,6 +154,12 @@ nothing to know.
 `neighbors` takes `category=` as well as `relation=`, so you can follow every `structural` edge
 without naming each one — useful when you want "how is this classified" regardless of which
 structural relation carries it.
+
+`ask()` is `find()` followed by the edges out of what it found, because the words of a question
+are rarely in the node that answers it: *"why do breakouts fail"* lands on `liquidity`, whose use
+cases say exactly that, while the answer is the sweep one hop further on. Every result carries
+`reached` — which seed, how many hops, which relation, and that edge's own `why`. Use `find()`
+when the query is a term and `ask()` when it is a sentence.
 
 `outputs()` is the one call that indexes **values rather than nodes**: a row is a single output, so
 an indicator with three outputs contributes three rows, and every row names its producer. It answers
