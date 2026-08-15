@@ -20,6 +20,10 @@
 every one with a machine-readable docstring — formula, inputs, parameters with ranges and defaults,
 typed outputs with units, and warmup.
 
+How it is built, stored and searched is drawn in [`docs/architecture/`](docs/architecture/README.md) — provenance, the node and
+edge schema, the search corpus, `find()`, `ask()`, the semantic index, and the three
+traversals that are easy to confuse.
+
 And a **knowledge graph built from that source** — 498 nodes and 1539 edges saying what each
 computation is, what it measures, what it reads, and what part it plays. It is generated from the
 code, so it is exact: not extracted from prose, not approximate, no ranking model in the way.

@@ -130,6 +130,9 @@ nothing to know.
 
 ## Which call
 
+Diagrams of the machinery behind these calls -- the search corpus, `find()`, `ask()` and the
+semantic index -- are in [`docs/architecture/`](../../docs/architecture/README.md).
+
 | question | call |
 |---|---|
 | the user gave me a name, not an id | `resolve("rsi_oversold")`, or `get()` which resolves too |

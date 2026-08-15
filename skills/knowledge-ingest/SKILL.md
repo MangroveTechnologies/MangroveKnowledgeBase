@@ -193,6 +193,8 @@ graph.
   does, an example, and the defect it exists to prevent.
 - **[`references/lessons.md`](references/lessons.md)** — the failure modes, each with the rule it
   produced.
+- **[`../../docs/architecture/README.md`](../../docs/architecture/README.md)** — the build
+  pipeline, the node and edge schema and the retrieval machinery, drawn.
 - **[`../knowledge-graph/SKILL.md`](../knowledge-graph/SKILL.md)** — querying the result: `find`,
   `under`, `neighbors`, `path`, `all_paths`.
 
