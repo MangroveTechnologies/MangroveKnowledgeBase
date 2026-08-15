@@ -73,6 +73,13 @@ is worse than a missing one, because it answers a query.
 "what quantifies liquidity", so pointing a venue at it corrupted an answer that was correct. Check
 which questions the target node already answers before adding to it.
 
+**A new property is invisible until something reads it.** A chapter that introduces a field —
+a comparison table, a caution, a heading nobody anticipated — puts content in the record that the
+retrieval surface does not know about. Four claims about strategy risk landed correctly and could
+not be found, because search read an allow-list of property names. After merging a chapter, search
+for a term that appears **only** in a field the chapter introduced, and check it comes back. The
+record being right is not the same as the graph answering.
+
 ## About the guards
 
 **A guard that fires on real data is a wrong guard.** The numbering check read a pip (`0.0001`) as a

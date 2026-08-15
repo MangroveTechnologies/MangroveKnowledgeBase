@@ -155,6 +155,11 @@ exists.
 **Statement lists.** `props.principles` and `props.practices` on the chapter's Fact and Judgment
 nodes are the progress measure. Empty means the chapter is fully connected.
 
+**Retrievable.** Pick a term the chapter states **only** in a field it introduced — a comparison
+table, a caution, a heading no earlier chapter had — and check `kg.find(term)` returns the node that
+holds it. Landing in the record and answering a question are different things, and a chapter can do
+the first without the second.
+
 **Counts and tests.** `python3 -m pytest tests/ -q`. `test_documented_counts.py` pins every node and
 edge count quoted in prose; `test_prose_is_not_glued.py` catches wrapped sentences that lost their
 spaces; `test_doc_derived_atoms.py` catches document numbering leaking into the graph.
