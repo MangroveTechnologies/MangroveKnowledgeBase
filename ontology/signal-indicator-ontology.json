@@ -157,9 +157,6 @@
      "Setting dynamic stop-losses using volatility-adjusted levels",
      "Forecasting future volatility for options pricing and risk management",
      "Identifying regime shifts for tactical allocation changes"
-    ],
-    "examples": [
-     "Regime Shift Triggers: Central bank policy changes Geopolitical events Financial crises or credit events Major economic data surprises Structural market changes"
     ]
    }
   },
@@ -18325,6 +18322,9 @@
    "props": {
     "reference_chapter": [
      "market-foundations"
+    ],
+    "examples": [
+     "Regime Shift Triggers: Central bank policy changes Geopolitical events Financial crises or credit events Major economic data surprises Structural market changes"
     ],
     "source_wording": "Transitions between different market regimes, often triggered by changes in fundamental conditions, sentiment, or structural factors.",
     "explanation": "Central bank policy, geopolitics, credit events and data surprises are the usual catalysts. The practical problem is asymmetry of speed: the shift happens faster than any detector recognises it, so a strategy that switches on a detected regime is always switching late. That argues for deciding in advance what to do rather than reacting."

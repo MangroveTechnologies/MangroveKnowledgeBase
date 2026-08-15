@@ -70,16 +70,33 @@ CHAPTERS: dict[str, dict] = {
             "The Greeks": "Concept",
         },
         # Same quantity stated twice under different headings: 2.2's Contract Value computes the
-        # notional of 2.8, and 2.6's position P&L is 2.8's P&L calculation. One node each.
+        # notional of 2.8, 2.6's position P&L is 2.8's P&L calculation, and 2.2's Futures Fair Value
+        # is 2.1's cost of carry in symbols. One node each; where the two statements use different
+        # conventions -- P&L in pips against P&L in ticks -- the second is written into the
+        # explanation rather than dropped.
+        #
+        # `Price Impact (AMM)` is renamed for the opposite reason. Chapter 1's price impact is Kyle
+        # lambda -- how far a book moves per unit of order flow. This is the constant-product curve,
+        # a property of an AMM's arithmetic and not of anyone's order flow. They would have folded
+        # onto one node on the strength of a shared name, which is the opposite of what folding is
+        # for.
         "rename": {"Price Impact (AMM)": "property:amm-price-impact",
                    "Contract Value": "property:notional-value",
+                   "Futures Fair Value": "fact:cost-of-carry-relationship",
                    "P&L Calculation": "property:position-profit-loss",
                    "Concentrated Liquidity (V3)": "property:concentrated-liquidity-efficiency"},
+        # Labels that name their subject nowhere in themselves. §2.4 defines margin, leverage and
+        # the liquidation engine together, and a return amplified by leverage says only "return".
+        # The AMM arithmetic is the other case: §2.5's subject is the whole of crypto mechanics,
+        # while these four quantify one venue model inside it, which is where they belong.
+        "formula_subject": {"Return Amplification": "concept:leverage",
+                            "Netting Benefit": "concept:clearing",
+                            "Exposure at Default": "concept:central-counterparty",
+                            "Constant Product AMM (Uniswap V2)": "concept:automated-market-maker",
+                            "Price Impact (AMM)": "concept:automated-market-maker",
+                            "Impermanent Loss": "concept:automated-market-maker",
+                            "Concentrated Liquidity (V3)": "concept:concentrated-liquidity"},
         "taxonomy": {"Spot Markets", "Options", "Crypto-Specific Mechanics", "Settlement & Clearing"},
-        # Same label, different thing. Chapter 1's price impact is Kyle lambda -- how far an order
-        # book moves per unit of order flow. This is the constant-product curve, which is a property
-        # of an AMM's arithmetic and not of anyone's order flow. They would have folded into one
-        # node on the strength of a shared name, which is the opposite of what folding is for.
         "wired": {},
     },
     "market-foundations": {
@@ -206,7 +223,12 @@ NOT_A_KIND = {"Regime Shift Triggers", "Information Events",
               # The execution-algorithm table lists Iceberg beside TWAP and VWAP. It is the same
               # thing as the order type of that name, which is already a node; a second one under a
               # different primitive would be a duplicate wearing a different hat.
-              "Iceberg"}
+              "Iceberg",
+              # A covered call is a position built from an option and a holding of the underlying,
+              # not a kind of option -- it sits beside the call and the put in §2.3's examples and
+              # is a different sort of thing. Its walkthrough stays on the option; the strategies
+              # themselves belong to the chapter that defines strategies.
+              "Covered Call"}
 
 #: Chapter term -> the node in the graph that IS that thing under a different id. A collision the
 #: slug cannot see: the chapter calls it "Average True Range", the library registers the class as
@@ -608,6 +630,337 @@ AUTHORED: dict[str, tuple[str, str]] = {
         'on down moves than up ones. Those regularities are what [[GARCH]] models. It is measured '
         'historically by [[Historical Volatility]], per bar by [[Average True Range]], and its change '
         'by [[Volatility Ratio]].'),
+
+    # --- 02 instruments & market mechanics -------------------------------------------------------
+    # The chapter explains most instruments through a priced example -- "AAPL Call, Strike $180,
+    # Premium $3.50" -- which says what one contract cost on one day and not what a call option is.
+    # Those examples are kept; these are the definitions they illustrate.
+    'concept:automated-market-maker': (
+        'A venue that prices trades from a formula over a pool of deposited reserves rather than by '
+        'matching orders against a book.',
+        'The pool always quotes, so there is no waiting for a counterparty, and the price walks along '
+        'the curve as the reserves shift -- which is why size costs more here than in a book of '
+        'comparable depth. Liquidity comes from depositors who earn the fees and carry '
+        '[[Impermanent Loss]] against simply holding the two assets.'),
+    'concept:call-option': (
+        'The right, not the obligation, to buy the underlying at the strike price on or before '
+        'expiration.',
+        'The buyer risks only the premium and keeps everything above the strike, which is the '
+        'asymmetry that makes an option a defined-risk way to hold a directional view. The seller has '
+        'the mirror image: the premium is the most that can be made and the loss above the strike is '
+        'unbounded unless the underlying is already held.'),
+    'concept:central-counterparty': (
+        'An entity that steps between the two sides of a trade, becoming buyer to the seller and '
+        'seller to the buyer so that neither depends on the other.',
+        'It converts a web of bilateral exposures into exposures to one guaranteed party, which is '
+        'what makes anonymous trading and [[Netting]] possible at all. The guarantee is paid for with '
+        'margin, and it concentrates the risk it removes -- the CCP is the party that must not fail.'),
+    'concept:centralized-exchange': (
+        'A crypto venue that holds customer assets and matches orders on its own book, off chain.',
+        'It offers the deepest liquidity and the fastest matching in the asset class, at the cost of '
+        'custody: the balance is the exchange\'s promise rather than a key you hold. Access is gated '
+        'by identity checks, and settlement is an entry in an internal ledger until a withdrawal '
+        'takes it on chain.'),
+    'concept:clearing': (
+        'Validating and matching a trade after execution, and netting the obligations it creates, so '
+        'that it is ready to settle.',
+        'It is the step between agreeing a trade and exchanging value, and its main economy is '
+        'netting: many gross obligations collapse into one net amount per party, so far less cash and '
+        'stock needs to move. Where a [[Central Counterparty]] clears, it also guarantees the '
+        'obligations it has netted.'),
+    'concept:commodity-spot-market': (
+        'The market for immediate purchase of a physical commodity, at the price for prompt delivery.',
+        'Ownership here is of a physical thing, so the cost of holding it -- storage, insurance, '
+        'financing -- is real and shows up in the [[Cost of Carry Relationship]] between spot and '
+        'futures. Settlement conventions vary with the commodity, and delivery can be taken or the '
+        'position held in a vault.'),
+    'concept:concentrated-liquidity': (
+        'An AMM design in which a provider supplies liquidity only across a chosen price range '
+        'instead of the whole curve.',
+        'Capital sitting where price never trades earns nothing, so restricting the range multiplies '
+        'the fees earned per unit deposited. The cost is that the position must be managed: once '
+        'price leaves the range the position stops earning and is left entirely in one of the two '
+        'assets.'),
+    'concept:contract-specification': (
+        'The standardised terms of a derivative contract -- size, tick increment, expiration and '
+        'settlement method.',
+        'The specification is what makes one contract fungible with another and is the arithmetic '
+        'behind every position calculation: [[Notional Value]], [[Tick Value]] and margin all follow '
+        'from the multiplier and the tick. Getting it wrong misstates exposure by whatever factor the '
+        'multiplier is.'),
+    'concept:crypto-settlement': (
+        'Settlement of a crypto trade, either as an entry in an exchange ledger or as a confirmed '
+        'transaction on a blockchain.',
+        'The two are different in kind. On a centralized venue the trade settles instantly because '
+        'nothing leaves the exchange; on chain, finality waits on block confirmation and costs a '
+        'network fee. A withdrawal is where the internal ledger becomes an on-chain fact.'),
+    'concept:crypto-specific-mechanics': (
+        'The trading infrastructure particular to digital assets: continuous markets, self-custody, '
+        'on-chain settlement and pool-based venues.',
+        'What sets the asset class apart is not the price behaviour but the plumbing. Markets never '
+        'close, so there is no opening auction and no overnight gap; assets can be held directly, so '
+        'counterparty risk is a choice; and settlement is a blockchain fact with a fee and a '
+        'confirmation time attached.'),
+    'concept:cryptocurrency-spot-market': (
+        'The market for immediate purchase of a cryptocurrency, settling on the blockchain or within '
+        'an exchange ledger.',
+        'Settlement is close to immediate and the asset can be withdrawn to a wallet the holder '
+        'controls, which is the feature the asset class is built around. Trading runs continuously, '
+        'so a position is exposed at every hour rather than only during a session.'),
+    'concept:decentralized-exchange': (
+        'A crypto venue where trades execute against a smart contract and assets stay in the '
+        "trader's own custody throughout.",
+        'Nothing is deposited with an operator and nothing is gated by identity checks, which is what '
+        'permissionless access means in practice. The costs are network fees on every interaction and '
+        'exposure to having the trade front-run by whoever orders the block.'),
+    'concept:equity-settlement': (
+        'Transfer of shares and cash two business days after an equity trade is executed.',
+        'The gap between trade date and settlement date is why the cash for a purchase must be there '
+        'later than the trade suggests, and why an entitlement such as a dividend depends on which '
+        'date the holder is recorded on.'),
+    'concept:equity-spot-market': (
+        'The market for immediate purchase of shares, conveying ownership of the company.',
+        'The buyer receives the full rights of a shareholder -- dividends, votes, corporate actions '
+        '-- which is the difference between holding stock and holding a derivative on it. Settlement '
+        'takes two business days.'),
+    'concept:forex-spot-market': (
+        'The market for immediate exchange of one currency for another at the prevailing rate.',
+        'Every price is a ratio of two currencies rather than the price of a thing, so a position is '
+        'always long one and short the other. Major pairs settle two business days out, and holding '
+        'past the close pays or receives the interest differential between them.'),
+    'concept:futures': (
+        'A standardised contract to buy or sell an asset at an agreed price on a stated future date.',
+        'The obligation is symmetric -- unlike an [[Option]], both sides must perform -- and the '
+        'position is marked to market daily, so profit and loss are paid as they accrue rather than '
+        'at expiration. Because only margin is posted, a small deposit controls a large notional, and '
+        'the price converges on spot as expiration approaches.'),
+    'concept:futures-settlement': (
+        'Daily exchange of variation margin against the marked price, with a final settlement at '
+        'expiration.',
+        'A futures position is settled continuously rather than once: each day the gain or loss moves '
+        'in cash, which is what keeps the exposure of the clearing house bounded. The final settlement '
+        'is in cash or in delivery, depending on the contract.'),
+    'concept:fx': (
+        'The global market for exchanging currencies, the largest and most liquid market there is.',
+        'It runs around the clock through overlapping regional sessions, with liquidity concentrated '
+        'where they overlap, and prices are driven by the policy and rate expectations of the two '
+        'central banks behind the pair. Its conventions -- pairs, pips, lots -- are what the '
+        'arithmetic of a position rests on.'),
+    'concept:greeks': (
+        'The family of sensitivities of an option price: to the underlying, to the rate of that '
+        'sensitivity, to time, to volatility and to interest rates.',
+        'Together they say how a position will behave when something changes, which is the whole of '
+        'options risk management: delta is directional exposure, gamma how fast it moves, theta the '
+        'daily cost of holding, vega exposure to a change in implied volatility, and rho to rates. '
+        'They are the reason an option position cannot be managed by direction alone.'),
+    'concept:leverage': (
+        'The ratio of position size to the capital backing it.',
+        'It amplifies the return on capital in both directions by the same factor, which is why the '
+        'move that liquidates a position gets smaller as leverage rises: at five times, a twenty per '
+        'cent adverse move is the whole margin. What it buys is capital efficiency, not edge.'),
+    'concept:liquidation-engine': (
+        'The exchange system that closes a position automatically once its margin falls below the '
+        'maintenance requirement.',
+        'It exists to stop an account going negative and taking the venue with it, so it acts on the '
+        'exchange\'s schedule rather than the trader\'s: the position is closed at whatever the book '
+        'offers, in the conditions that caused the shortfall. A stop placed above the liquidation '
+        'price is the trader keeping that decision.'),
+    'concept:margin': (
+        'Collateral posted against a position: an initial amount to open it and a maintenance amount '
+        'to keep it.',
+        'It is a performance bond rather than a payment, and the gap between the two thresholds is '
+        'the whole of the buffer -- once equity falls through the maintenance level the '
+        '[[Liquidation Engine]] acts. Held across the account it cushions more, and exposes more; '
+        'isolated to one position it caps the loss at that position.'),
+    'concept:option': (
+        'A contract conveying the right, but not the obligation, to buy or sell the underlying at a '
+        'stated strike price by a stated expiration.',
+        'The asymmetry is the point: the buyer can lose only the premium while the payoff above the '
+        'strike is open-ended, which makes an option the instrument for a view with a defined worst '
+        'case. That optionality is paid for in time value, which decays every day and vanishes at '
+        'expiration, and is priced from volatility rather than from direction.'),
+    'concept:perpetual-swap': (
+        'A futures-like contract with no expiration, held to the spot price by a periodic funding '
+        'payment between longs and shorts.',
+        'Without an expiration there is no convergence to enforce the price, so funding does it: when '
+        'the contract trades above spot, longs pay shorts and the premium is arbitraged away. It is '
+        'the dominant crypto derivative, and the funding rate is a running cost or income on a '
+        'position rather than a detail of it.'),
+    'concept:put-option': (
+        'The right, not the obligation, to sell the underlying at the strike price on or before '
+        'expiration.',
+        'It pays as the underlying falls, bounded by a price of zero, which makes it the direct way '
+        'to insure a holding: the premium is the cost of the insurance and the strike is the level '
+        'insured. The seller is paid that premium to stand ready to buy at the strike.'),
+    'concept:settlement': (
+        'The transfer of securities and cash that completes a trade and moves ownership.',
+        'A trade is an agreement; settlement is the moment it becomes ownership, and the delay '
+        'between the two is what a settlement cycle names. Exchanging both legs simultaneously is '
+        'what removes the risk of paying and receiving nothing.'),
+    'concept:spot-market': (
+        'A market where an instrument is bought and sold for immediate delivery at the current price.',
+        'What is traded is the asset itself rather than a claim on it later, so there is no '
+        'expiration to manage and the holder has the full rights of ownership. The spot price is the '
+        'reference every derivative is priced against, through the [[Cost of Carry Relationship]].'),
+
+    # --- 02 formulas -----------------------------------------------------------------------------
+    'fact:constant-product-amm': (
+        'The invariant of a constant-product pool: the product of the two reserves is unchanged by a '
+        'trade.',
+        'Holding the product constant is what defines the price at every point on the curve, and it '
+        'is why the price moves against the trader as size grows -- the curve steepens as one reserve '
+        'is drawn down. The output for a given input follows from the invariant alone.'),
+    'fact:cost-of-carry-relationship': (
+        'The fair price of a forward or future is the spot price carried forward at the financing '
+        'rate net of any yield the asset pays.',
+        'It is an arbitrage identity rather than a forecast: if the future strays from it, the trade '
+        'is to buy one leg, sell the other and hold to expiration. It explains contango and '
+        'backwardation as facts about rates, storage and convenience yield rather than as opinions '
+        'about direction, and it is the same identity §2.2 restates as F = S * e^((r - y) * T).'),
+    'fact:put-call-parity': (
+        'The identity linking a call and a put at the same strike and expiration to the underlying '
+        'and a discounted bond.',
+        'It holds by arbitrage, so it fixes each of the four prices in terms of the other three: an '
+        'option can be replicated synthetically, and a violation is a riskless trade rather than a '
+        'view. It is also the check that an implied volatility surface is internally consistent.'),
+    'procedure:black-scholes-call-price': (
+        'Prices a European call from the spot price, strike, time to expiration, interest rate and '
+        'volatility.',
+        'Every input but one is observable, which is what makes the model useful in reverse: quoted '
+        'against a market price it returns implied volatility, the number options actually trade on. '
+        'Its assumptions -- constant volatility, continuous hedging, no jumps -- are why the surface '
+        'is not flat in practice.'),
+    'property:amm-price-impact': (
+        'How far a trade moves the price of a constant-product pool, as a share of the reserve it '
+        'trades against.',
+        'It follows from the size of the trade relative to the pool and from nothing else -- no '
+        'queue, no counterparty, no time of day -- which makes execution cost on an AMM entirely '
+        'predictable before the trade. It is a different quantity from the order-book '
+        '[[Price Impact]] of chapter one, which measures how a book responds to order flow.'),
+    'property:annualized-basis': (
+        'The basis expressed as an annual rate, scaled by the days remaining to expiration.',
+        'It is what makes two contracts with different expirations comparable, and it turns the basis '
+        'into the yield of a cash-and-carry trade: buy spot, sell the future, and collect it to '
+        'expiration.'),
+    'property:basis': (
+        'The difference between the futures price and the spot price, in price terms or as a '
+        'percentage of spot.',
+        'It carries the market\'s financing and storage costs and converges to zero at expiration, '
+        'which is what makes it tradeable in its own right. Positive is contango, negative is '
+        'backwardation, and the sign is information about supply rather than about direction.'),
+    'property:concentrated-liquidity-efficiency': (
+        'The real reserves a concentrated position must hold to provide a given depth over its chosen '
+        'price range.',
+        'Narrowing the range means the same depth is supplied by less capital, which is the whole '
+        'gain of the design and the reason the position must be watched: outside the range it '
+        'provides no depth at all.'),
+    'property:cross-rate': (
+        'The rate between two currencies derived from each of their rates against a common third.',
+        'Most pairs are quoted against the dollar, so a rate between two others is implied by the two '
+        'quotes; when the implied and quoted rates differ, the difference is a triangular arbitrage.'),
+    'property:exposure-at-default': (
+        'What would be owed if a counterparty failed now: the cost of replacing the position plus '
+        'what it could still move against you.',
+        'It is the number margin is sized against, and it is forward-looking on purpose -- the '
+        'replacement cost at the moment of default is not the exposure, because the position must be '
+        'reopened into whatever market caused the default.'),
+    'property:forward-rate': (
+        'The exchange rate for a future date implied by the interest rates of the two currencies.',
+        'Interest rate parity fixes it: the forward must offset the rate differential exactly, or '
+        'borrowing in one currency and lending in the other would be riskless profit. It is also why '
+        'a carry trade earns the differential only if the spot rate does not move to erase it.'),
+    'property:impermanent-loss': (
+        'The shortfall of a liquidity position against simply holding the two assets, caused by the '
+        'pool rebalancing as their relative price moves.',
+        'The pool sells the asset that rises and buys the one that falls, so any divergence leaves '
+        'the provider with less than the holder; it is called impermanent because it reverses if the '
+        'price ratio returns. Fees are what has to cover it for provision to be worthwhile.'),
+    'property:intrinsic-and-time-value': (
+        'The split of an option premium into what it would be worth if exercised now and what is paid '
+        'for the time remaining.',
+        'Intrinsic value is arithmetic on the strike and the spot price; everything above it is the '
+        'market\'s price for uncertainty, and it decays to nothing by expiration. The split is what '
+        'separates a directional gain from the cost of waiting for one.'),
+    'property:leverage-ratio': (
+        'Position size divided by the capital backing it; effective leverage compares notional '
+        'exposure with account equity.',
+        'The two differ once there is more than one position or unrealised profit and loss, and the '
+        'effective figure is the one that governs risk. It is the multiplier on both return and loss, '
+        'and it sets how far price can move before the margin is gone.'),
+    'property:long-position-liquidation-price': (
+        'The price at which a long position\'s equity falls to the maintenance requirement and it is '
+        'closed automatically.',
+        'It follows from entry price and the two margin percentages, so it is knowable before the '
+        'position is opened -- which is what makes it the first calculation rather than a surprise. '
+        'Fees and funding move it closer over time.'),
+    'property:margin-ratio': (
+        'Maintenance margin required as a share of account equity.',
+        'It is the single number that says how close a position is to being closed out: at a hundred '
+        'per cent the [[Liquidation Engine]] acts. Watching it is how leverage is managed in practice, '
+        'because it moves with price, with funding and with the margin the venue demands in '
+        'volatility.'),
+    'property:margin-requirement': (
+        'The collateral needed to open a position, as a percentage of its notional value.',
+        'It is set by the venue rather than the trader and rises when volatility does, so the capital '
+        'a position needs is not constant -- a requirement raised mid-position must be met from the '
+        'same account that is already losing.'),
+    'property:netting-benefit': (
+        'How much of a set of gross obligations disappears once offsetting positions are netted.',
+        'It is the efficiency clearing exists to produce: the cash and stock that must actually move '
+        'is the net, not the gross, and the ratio between them is what a clearing house is measured '
+        'on.'),
+    'property:notional-value': (
+        'The value a contract controls: multiplier times price times the number of contracts.',
+        'It is the exposure, as distinct from the margin posted against it, and the two are confused '
+        'at the trader\'s expense -- risk is a share of notional while capital is a share of margin. '
+        'Every position calculation starts here.'),
+    'property:perpetual-funding-rate': (
+        'The periodic payment between longs and shorts on a perpetual contract, proportional to '
+        'position value.',
+        'It is the mechanism that substitutes for expiration: a positive rate means the contract is '
+        'above spot and longs pay to hold, which draws in the arbitrage that closes the premium. As a '
+        'running cost it can exceed the move being traded, and as a signal it says which side is '
+        'crowded.'),
+    'property:pip-value': (
+        'What one pip of movement is worth in the quote currency, for a given lot size.',
+        'It is what turns a rate move into money, and it depends on the pair and the lot rather than '
+        'being a constant: sizing an FX position without it is sizing by rate rather than by risk.'),
+    'property:position-profit-loss': (
+        'The gain or loss on a position: the distance price travelled, valued at what one unit of '
+        'movement is worth.',
+        'The two conventions in the chapter are the same arithmetic in different units -- FX values '
+        'the move in pips times pip value, futures in ticks times [[Tick Value]] times contracts -- '
+        'and both reduce to price distance times value per unit times size.'),
+    'property:return-amplification': (
+        'The return on capital under leverage: the underlying return multiplied by the leverage used.',
+        'It is symmetric, which is the part that gets forgotten -- five times leverage turns a two per '
+        'cent move into ten per cent in whichever direction it goes, and a twenty per cent adverse '
+        'move into the whole account.'),
+    'property:short-position-liquidation-price': (
+        'The price at which a short position\'s equity falls to the maintenance requirement and it is '
+        'closed automatically.',
+        'The arithmetic mirrors the long case, but the exposure does not: a short loses as price '
+        'rises, and price can rise without bound, so the distance to liquidation is the whole of the '
+        'protection.'),
+    'property:spot-return': (
+        'The change in price over a period, as a simple percentage or as a log return.',
+        'The two are not interchangeable: simple returns aggregate across positions in a portfolio, '
+        'log returns aggregate across time and are what volatility and most models are computed on.'),
+    'property:swap-rollover-calculation': (
+        'The interest paid or received for holding an FX position overnight, from the rate '
+        'differential between the two currencies.',
+        'It is the carry in a carry trade, applied nightly: long the higher-yielding currency earns '
+        'it, and the reverse pays it. Over a long hold it can dominate the price move it was meant to '
+        'accompany.'),
+    'property:tick-value': (
+        'What one minimum price increment is worth: tick size times the contract multiplier.',
+        'It is the unit every futures profit and loss is counted in, and the reason two contracts on '
+        'the same underlying can carry very different risk per point of index movement.'),
+    'property:total-return': (
+        'The return of a holding including the income it pays, not only its change in price.',
+        'Price return understates what a dividend-paying holding earned and misstates any comparison '
+        'against an instrument that pays nothing; it is also the yield term that shows up in the '
+        '[[Cost of Carry Relationship]].'),
 }
 
 #: Typed I/O for a chapter's stated formulas, in the shape the 71 code-derived indicators use. The
@@ -959,15 +1312,23 @@ def build(path: Path, chapter: str, parent: str,
         A section often defines several things -- §1.4 defines liquidity, slippage and market impact
         -- and every formula and every taxonomy member used to attach to whichever came first. So
         `simple slippage` was declared to be about LIQUIDITY, and `low volatility regime` was made a
-        kind of VOLATILITY rather than of market regime. Match on the label's head noun, and fall
-        back to the first subject only when nothing matches, which is the single-subject case anyway.
+        kind of VOLATILITY rather than of market regime. Match on the label's head noun, then on any
+        other word in it -- "Long Position Liquidation Price" heads on `price`, which names nothing,
+        while `liquidation` names the subject exactly. Fall back to the first subject only when
+        nothing matches, which is the single-subject case anyway.
+
+        `formula_subject` overrides both, for a label that names its subject nowhere in itself:
+        "Return Amplification" is about leverage and says so only in the formula body.
         """
+        if declared := decl.get("formula_subject", {}).get(label):
+            return declared
         if len(subjects) == 1:
             return subjects[0]
         head = head_noun(label)
-        if head:
+        words = [w for w in slug(re.sub(r"\(.*?\)", " ", label)).split("-") if w]
+        for candidate in ([head] if head else []) + list(reversed(words)):
             for sid in subjects:
-                if head in sid.split(":", 1)[1].split("-"):
+                if candidate in sid.split(":", 1)[1].split("-"):
                     return sid
         return subjects[0]
 
