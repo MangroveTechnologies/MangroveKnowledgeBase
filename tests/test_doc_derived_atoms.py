@@ -139,9 +139,13 @@ def test_the_graph_carries_no_document_numbering(kg):
     `01-market-foundations`, `§1.1` and a `1.4 ` prefix on every practice are all artifacts of the
     document. They also broke things: keying the taxonomy declarations on section numbers made every
     one of them silently inert on any other chapter.
+
+    A decimal is not a section number: a pip is 0.0001 and a tick is 0.25, and matching those made
+    the guard fire on the data it exists to protect. A section reference either wears a section mark
+    or is followed by the heading it numbers.
     """
     import re
-    numbered = re.compile(r"^\d+[-.]|\s§?\d+\.\d+\b")
+    numbered = re.compile(r"^\d+[-.]|§\d+(\.\d+)*|\b\d+\.\d+\s+[A-Z]")
     for nid in kg.nodes:
         node = kg.get(nid)
         for chapter in node.get("reference_chapter") or []:

@@ -19923,49 +19923,7 @@
     "reference_chapter": [
      "instruments-market-mechanics"
     ],
-    "principles": [
-     "Immediate Settlement: Transactions settle within a short timeframe (T+0 to T+2 depending on asset class)",
-     "Physical or Book-Entry Delivery: Actual ownership transfer of the underlying asset",
-     "Price Transparency: Spot prices reflect current supply and demand equilibrium",
-     "No Expiration: Unlike derivatives, spot positions have no expiration date",
-     "Direct Ownership: Holder has full ownership rights including dividends, voting rights, etc.",
-     "Leverage: Futures allow exposure to large notional values with smaller margin deposits",
-     "Mark-to-Market: Daily settlement of profits and losses",
-     "Standardization: Contract specifications (size, expiration, tick size) are standardized",
-     "Convergence: Futures prices converge to spot prices at expiration",
-     "Funding Rates (Perpetuals): Periodic payments between longs and shorts to anchor price to spot",
-     "Asymmetric Payoff: Limited downside (premium paid) with unlimited upside potential for buyers",
-     "Time Decay (Theta): Option value erodes as expiration approaches",
-     "Implied Volatility: Market's expectation of future volatility embedded in option prices",
-     "Non-Linear Risk: Option Greeks describe sensitivity to various factors",
-     "Exercise Styles: American (any time), European (expiration only)",
-     "Leverage Amplification: Leverage multiplies returns in both directions",
-     "Margin Call: Warning when equity approaches maintenance margin",
-     "Forced Liquidation: Automatic position closure to prevent negative equity",
-     "Cross vs. Isolated Margin: Cross uses entire account balance; isolated limits risk per position",
-     "Insurance Funds: Exchange reserves to cover liquidation shortfalls in volatile markets",
-     "24/7 Markets: No close, continuous trading globally",
-     "Self-Custody: Users can hold assets directly without intermediaries",
-     "On-Chain vs. Off-Chain: Settlement can occur on blockchain or within exchange databases",
-     "Decentralization Spectrum: From fully decentralized (DEX) to centralized (CEX)",
-     "Network Fees: Blockchain transactions incur gas/network fees",
-     "Finality: Settlement finality depends on blockchain confirmation times",
-     "Currency Pairs: Currencies traded in pairs (EUR/USD, USD/JPY), first is base, second is quote",
-     "Pips: Smallest price movement, typically 0.0001 for most pairs (0.01 for JPY pairs)",
-     "Lot Sizes: Standard (100,000 units), Mini (10,000), Micro (1,000)",
-     "Interest Rate Differentials: Carry trade opportunities from rate differences",
-     "Interbank Market: Primary market among major banks, others access via brokers",
-     "Counterparty Risk Mitigation: CCPs reduce bilateral counterparty exposure",
-     "Netting: Reducing gross obligations to net amounts for efficiency",
-     "Delivery vs. Payment (DvP): Simultaneous exchange of securities and cash",
-     "Settlement Cycles: T+0 (same day) to T+2 (trade date plus two days)",
-     "Margin Requirements: Collateral held by CCPs to cover potential losses",
-     "Standardization: Exchange-traded derivatives have fixed specifications",
-     "Multiplier/Contract Size: Defines notional value per contract",
-     "Tick Size: Minimum price increment",
-     "Expiration Rules: When and how contracts expire and settle",
-     "Trading Hours: Session times and any restrictions"
-    ]
+    "principles": []
    }
   },
   {
@@ -19979,62 +19937,7 @@
     "reference_chapter": [
      "instruments-market-mechanics"
     ],
-    "practices": [
-     "Understand settlement cycles to manage cash flow and margin requirements",
-     "Factor in custody and storage costs for physical commodities",
-     "Be aware of corporate actions affecting equity positions",
-     "Use spot markets for long-term directional exposure",
-     "Monitor spot-futures basis for arbitrage opportunities",
-     "Consider total cost of ownership including financing costs",
-     "Monitor margin requirements and maintain adequate buffer above maintenance margin",
-     "Understand roll costs when maintaining continuous exposure",
-     "Watch funding rates in perpetuals to avoid unexpected costs",
-     "Use contango/backwardation information for directional signals",
-     "Be aware of contract expiration dates and auto-liquidation rules",
-     "Calculate effective leverage including notional exposure",
-     "Never sell naked options without understanding unlimited loss potential",
-     "Monitor implied volatility relative to historical volatility",
-     "Understand all Greeks, especially for complex positions",
-     "Calculate max loss before entering any options trade",
-     "Be aware of dividend dates for early exercise risk on American options",
-     "Use options for defined-risk directional bets rather than naked futures/spot",
-     "Close or roll positions well before expiration to avoid gamma risk",
-     "Never use maximum available leverage",
-     "Calculate liquidation price before entering any leveraged position",
-     "Maintain margin buffer significantly above maintenance requirements",
-     "Use isolated margin for high-risk trades to limit account exposure",
-     "Set stop-losses well above liquidation price",
-     "Understand the exchange's liquidation mechanism (gradual vs. full)",
-     "Monitor funding rates and margin requirements during volatility spikes",
-     "Account for spread widening during volatile periods when calculating liquidation risk",
-     "Use hardware wallets for significant holdings",
-     "Compare CEX and DEX execution for best prices",
-     "Account for gas fees in trade profitability calculations",
-     "Be aware of MEV (Maximal Extractable Value) risks on DEX",
-     "Monitor blockchain congestion before executing time-sensitive trades",
-     "Use reputable bridges for cross-chain operations",
-     "Verify smart contract addresses before interacting",
-     "Understand impermanent loss before providing liquidity",
-     "Understand the economic calendars driving FX moves",
-     "Monitor central bank communications and interest rate expectations",
-     "Be aware of market sessions and liquidity variations",
-     "Use appropriate position sizing given FX leverage availability",
-     "Consider correlation between currency pairs in portfolio construction",
-     "Account for swap rates (rollover) for positions held overnight",
-     "Watch for intervention risk in certain currency pairs",
-     "Ensure sufficient funds available on settlement date",
-     "Understand settlement conventions for each asset class",
-     "Monitor CCP margin requirements for cleared positions",
-     "Be aware of settlement failures and their implications",
-     "Account for settlement timing in cash management",
-     "Understand the difference between trade date and settlement date accounting",
-     "Always verify contract specifications before trading new instruments",
-     "Calculate notional exposure and tick value before entering positions",
-     "Understand settlement procedures (cash vs. physical)",
-     "Be aware of contract roll dates and procedures",
-     "Monitor for specification changes announced by exchanges",
-     "Use correct specifications in backtesting and risk systems"
-    ]
+    "practices": []
    }
   }
  ],
@@ -31316,6 +31219,414 @@
    "to_id": "concept:contract-specification"
   },
   {
+   "from": "settlement",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Immediate Settlement: Transactions settle within a short timeframe (T+0 to T+2 depending on asset class) \u00b7 Physical or Book-Entry Delivery: Actual ownership transfer of the underlying asset \u00b7 Delivery vs. Payment (DvP): Simultaneous exchange of securities and cash \u00b7 Settlement Cycles: T+0 (same day) to T+2 (trade date plus two days)",
+   "from_id": "concept:settlement",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "spot markets",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Price Transparency: Spot prices reflect current supply and demand equilibrium \u00b7 No Expiration: Unlike derivatives, spot positions have no expiration date \u00b7 Direct Ownership: Holder has full ownership rights including dividends, voting rights, etc.",
+   "from_id": "concept:spot-market",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "futures",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Leverage: Futures allow exposure to large notional values with smaller margin deposits \u00b7 Convergence: Futures prices converge to spot prices at expiration",
+   "from_id": "concept:futures",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "futures settlement (daily)",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Mark-to-Market: Daily settlement of profits and losses",
+   "from_id": "concept:futures-settlement",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "contract specifications",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Standardization: Contract specifications (size, expiration, tick size) are standardized \u00b7 Standardization: Exchange-traded derivatives have fixed specifications \u00b7 Expiration Rules: When and how contracts expire and settle \u00b7 Trading Hours: Session times and any restrictions",
+   "from_id": "concept:contract-specification",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "perpetual funding rate",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Funding Rates (Perpetuals): Periodic payments between longs and shorts to anchor price to spot",
+   "from_id": "property:perpetual-funding-rate",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "options",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Asymmetric Payoff: Limited downside (premium paid) with unlimited upside potential for buyers \u00b7 Implied Volatility: Market's expectation of future volatility embedded in option prices \u00b7 Exercise Styles: American (any time), European (expiration only)",
+   "from_id": "concept:option",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "the greeks",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Time Decay (Theta): Option value erodes as expiration approaches \u00b7 Non-Linear Risk: Option Greeks describe sensitivity to various factors",
+   "from_id": "concept:greeks",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "return amplification",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Leverage Amplification: Leverage multiplies returns in both directions",
+   "from_id": "property:return-amplification",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "margin",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Margin Call: Warning when equity approaches maintenance margin \u00b7 Cross vs. Isolated Margin: Cross uses entire account balance; isolated limits risk per position",
+   "from_id": "concept:margin",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "liquidation engine",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Forced Liquidation: Automatic position closure to prevent negative equity \u00b7 Insurance Funds: Exchange reserves to cover liquidation shortfalls in volatile markets",
+   "from_id": "concept:liquidation-engine",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "crypto-specific mechanics",
+   "rel": "about",
+   "to": "core principles",
+   "why": "24/7 Markets: No close, continuous trading globally \u00b7 Self-Custody: Users can hold assets directly without intermediaries \u00b7 Decentralization Spectrum: From fully decentralized (DEX) to centralized (CEX) \u00b7 Network Fees: Blockchain transactions incur gas/network fees",
+   "from_id": "concept:crypto-specific-mechanics",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "crypto settlement",
+   "rel": "about",
+   "to": "core principles",
+   "why": "On-Chain vs. Off-Chain: Settlement can occur on blockchain or within exchange databases \u00b7 Finality: Settlement finality depends on blockchain confirmation times",
+   "from_id": "concept:crypto-settlement",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "fx basics",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Currency Pairs: Currencies traded in pairs (EUR/USD, USD/JPY), first is base, second is quote \u00b7 Lot Sizes: Standard (100,000 units), Mini (10,000), Micro (1,000) \u00b7 Interbank Market: Primary market among major banks, others access via brokers",
+   "from_id": "concept:fx",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "pip value",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Pips: Smallest price movement, typically 0.0001 for most pairs (0.01 for JPY pairs)",
+   "from_id": "property:pip-value",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "swap/rollover calculation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Interest Rate Differentials: Carry trade opportunities from rate differences",
+   "from_id": "property:swap-rollover-calculation",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "central counterparty (ccp)",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Counterparty Risk Mitigation: CCPs reduce bilateral counterparty exposure \u00b7 Margin Requirements: Collateral held by CCPs to cover potential losses",
+   "from_id": "concept:central-counterparty",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "clearing",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Netting: Reducing gross obligations to net amounts for efficiency",
+   "from_id": "concept:clearing",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "contract value",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Multiplier/Contract Size: Defines notional value per contract",
+   "from_id": "property:notional-value",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "tick value",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Tick Size: Minimum price increment",
+   "from_id": "property:tick-value",
+   "to_id": "fact:market-mechanics-core-principles"
+  },
+  {
+   "from": "settlement",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand settlement cycles to manage cash flow and margin requirements \u00b7 Ensure sufficient funds available on settlement date \u00b7 Understand settlement conventions for each asset class \u00b7 Be aware of settlement failures and their implications \u00b7 Account for settlement timing in cash management \u00b7 Understand the difference between trade date and settlement date accounting",
+   "from_id": "concept:settlement",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "commodity spot market",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Factor in custody and storage costs for physical commodities",
+   "from_id": "concept:commodity-spot-market",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "equity spot market",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Be aware of corporate actions affecting equity positions",
+   "from_id": "concept:equity-spot-market",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "spot markets",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use spot markets for long-term directional exposure",
+   "from_id": "concept:spot-market",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "basis",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor spot-futures basis for arbitrage opportunities \u00b7 Use contango/backwardation information for directional signals",
+   "from_id": "property:basis",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "cost of carry relationship",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider total cost of ownership including financing costs",
+   "from_id": "fact:cost-of-carry-relationship",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "margin",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor margin requirements and maintain adequate buffer above maintenance margin \u00b7 Use isolated margin for high-risk trades to limit account exposure",
+   "from_id": "concept:margin",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "futures",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand roll costs when maintaining continuous exposure",
+   "from_id": "concept:futures",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "perpetual funding rate",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Watch funding rates in perpetuals to avoid unexpected costs",
+   "from_id": "property:perpetual-funding-rate",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "contract specifications",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Be aware of contract expiration dates and auto-liquidation rules \u00b7 Always verify contract specifications before trading new instruments \u00b7 Be aware of contract roll dates and procedures \u00b7 Monitor for specification changes announced by exchanges \u00b7 Use correct specifications in backtesting and risk systems",
+   "from_id": "concept:contract-specification",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "leverage ratio",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Calculate effective leverage including notional exposure",
+   "from_id": "property:leverage-ratio",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "options",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Never sell naked options without understanding unlimited loss potential \u00b7 Calculate max loss before entering any options trade \u00b7 Use options for defined-risk directional bets rather than naked futures/spot",
+   "from_id": "concept:option",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "historical volatility (standard deviation of returns)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor implied volatility relative to historical volatility",
+   "from_id": "property:historical-volatility",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "the greeks",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand all Greeks, especially for complex positions \u00b7 Close or roll positions well before expiration to avoid gamma risk",
+   "from_id": "concept:greeks",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "call option",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Be aware of dividend dates for early exercise risk on American options",
+   "from_id": "concept:call-option",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "leverage",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Never use maximum available leverage \u00b7 Use appropriate position sizing given FX leverage availability",
+   "from_id": "concept:leverage",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "long position liquidation price",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Calculate liquidation price before entering any leveraged position",
+   "from_id": "property:long-position-liquidation-price",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "margin ratio",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Maintain margin buffer significantly above maintenance requirements",
+   "from_id": "property:margin-ratio",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "stop order (stop-loss)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Set stop-losses well above liquidation price",
+   "from_id": "concept:stop-order",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "liquidation engine",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand the exchange's liquidation mechanism (gradual vs. full)",
+   "from_id": "concept:liquidation-engine",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "high volatility regime",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor funding rates and margin requirements during volatility spikes",
+   "from_id": "concept:high-volatility-regime",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "bid-ask spread dynamics",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for spread widening during volatile periods when calculating liquidation risk",
+   "from_id": "concept:bid-ask-spread",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "crypto-specific mechanics",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use hardware wallets for significant holdings \u00b7 Compare CEX and DEX execution for best prices \u00b7 Use reputable bridges for cross-chain operations",
+   "from_id": "concept:crypto-specific-mechanics",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "decentralized exchange (dex)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for gas fees in trade profitability calculations \u00b7 Be aware of MEV (Maximal Extractable Value) risks on DEX \u00b7 Verify smart contract addresses before interacting",
+   "from_id": "concept:decentralized-exchange",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "crypto settlement",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor blockchain congestion before executing time-sensitive trades",
+   "from_id": "concept:crypto-settlement",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "impermanent loss",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand impermanent loss before providing liquidity",
+   "from_id": "property:impermanent-loss",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "fx basics",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand the economic calendars driving FX moves \u00b7 Monitor central bank communications and interest rate expectations \u00b7 Be aware of market sessions and liquidity variations \u00b7 Consider correlation between currency pairs in portfolio construction \u00b7 Watch for intervention risk in certain currency pairs",
+   "from_id": "concept:fx",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "swap/rollover calculation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for swap rates (rollover) for positions held overnight",
+   "from_id": "property:swap-rollover-calculation",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "central counterparty (ccp)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor CCP margin requirements for cleared positions",
+   "from_id": "concept:central-counterparty",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "contract value",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Calculate notional exposure and tick value before entering positions",
+   "from_id": "property:notional-value",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
+   "from": "futures settlement (daily)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand settlement procedures (cash vs. physical)",
+   "from_id": "concept:futures-settlement",
+   "to_id": "judgment:market-mechanics-best-practices"
+  },
+  {
    "from": "core principles",
    "rel": "part-of",
    "to": "market mechanics",
@@ -31519,13 +31830,33 @@
    ],
    [
     "concept:bid-ask-spread",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:bid-ask-spread",
     "part-of",
     "concept:market-foundations"
    ],
    [
     "concept:call-option",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:call-option",
     "kind-of",
     "concept:option"
+   ],
+   [
+    "concept:central-counterparty",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:central-counterparty",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:central-counterparty",
@@ -31544,8 +31875,18 @@
    ],
    [
     "concept:clearing",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:clearing",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:commodity-spot-market",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:commodity-spot-market",
@@ -31564,6 +31905,16 @@
    ],
    [
     "concept:contract-specification",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:contract-specification",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:contract-specification",
     "part-of",
     "concept:market-mechanics"
    ],
@@ -31574,8 +31925,28 @@
    ],
    [
     "concept:crypto-settlement",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:crypto-settlement",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:crypto-settlement",
     "kind-of",
     "concept:settlement"
+   ],
+   [
+    "concept:crypto-specific-mechanics",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:crypto-specific-mechanics",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:crypto-specific-mechanics",
@@ -31604,6 +31975,11 @@
    ],
    [
     "concept:decentralized-exchange",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:decentralized-exchange",
     "kind-of",
     "concept:crypto-specific-mechanics"
    ],
@@ -31616,6 +31992,11 @@
     "concept:equity-settlement",
     "kind-of",
     "concept:settlement"
+   ],
+   [
+    "concept:equity-spot-market",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:equity-spot-market",
@@ -31639,13 +32020,43 @@
    ],
    [
     "concept:futures",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:futures",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:futures",
     "part-of",
     "concept:market-mechanics"
    ],
    [
     "concept:futures-settlement",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:futures-settlement",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:futures-settlement",
     "kind-of",
     "concept:settlement"
+   ],
+   [
+    "concept:fx",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:fx",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:fx",
@@ -31656,6 +32067,16 @@
     "concept:greeks",
     "about",
     "concept:option"
+   ],
+   [
+    "concept:greeks",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:greeks",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:hedge-fund",
@@ -31676,6 +32097,11 @@
     "concept:high-volatility-regime",
     "about",
     "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:high-volatility-regime",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:high-volatility-regime",
@@ -31724,6 +32150,11 @@
    ],
    [
     "concept:leverage",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:leverage",
     "part-of",
     "concept:market-mechanics"
    ],
@@ -31736,6 +32167,16 @@
     "concept:limit-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:liquidation-engine",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:liquidation-engine",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:liquidation-engine",
@@ -31766,6 +32207,16 @@
     "concept:low-volatility-regime",
     "kind-of",
     "concept:market-regime"
+   ],
+   [
+    "concept:margin",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:margin",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:margin",
@@ -31859,6 +32310,16 @@
    ],
    [
     "concept:option",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:option",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:option",
     "part-of",
     "concept:market-mechanics"
    ],
@@ -31944,6 +32405,16 @@
    ],
    [
     "concept:settlement",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:settlement",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:settlement",
     "part-of",
     "concept:market-mechanics"
    ],
@@ -31956,6 +32427,16 @@
     "concept:slippage",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:spot-market",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "concept:spot-market",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:spot-market",
@@ -31981,6 +32462,11 @@
     "concept:stop-order",
     "about",
     "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:stop-order",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "concept:stop-order",
@@ -32041,6 +32527,11 @@
     "fact:cost-of-carry-relationship",
     "about",
     "concept:spot-market"
+   ],
+   [
+    "fact:cost-of-carry-relationship",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "fact:market-foundations-core-principles",
@@ -32138,6 +32629,11 @@
     "concept:futures"
    ],
    [
+    "property:basis",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
     "property:component-share",
     "about",
     "concept:price-discovery"
@@ -32178,9 +32674,19 @@
     "concept:volatility"
    ],
    [
+    "property:historical-volatility",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
     "property:impermanent-loss",
     "about",
     "concept:automated-market-maker"
+   ],
+   [
+    "property:impermanent-loss",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "property:information-share",
@@ -32198,14 +32704,29 @@
     "concept:leverage"
    ],
    [
+    "property:leverage-ratio",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
     "property:long-position-liquidation-price",
     "about",
     "concept:liquidation-engine"
    ],
    [
+    "property:long-position-liquidation-price",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
     "property:margin-ratio",
     "about",
     "concept:margin"
+   ],
+   [
+    "property:margin-ratio",
+    "about",
+    "judgment:market-mechanics-best-practices"
    ],
    [
     "property:margin-requirement",
@@ -32228,6 +32749,16 @@
     "concept:futures"
    ],
    [
+    "property:notional-value",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "property:notional-value",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
     "property:participation-rate",
     "about",
     "concept:liquidity"
@@ -32238,9 +32769,24 @@
     "concept:perpetual-swap"
    ],
    [
+    "property:perpetual-funding-rate",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "property:perpetual-funding-rate",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
     "property:pip-value",
     "about",
     "concept:fx"
+   ],
+   [
+    "property:pip-value",
+    "about",
+    "fact:market-mechanics-core-principles"
    ],
    [
     "property:position-profit-loss",
@@ -32288,6 +32834,11 @@
     "concept:leverage"
    ],
    [
+    "property:return-amplification",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
     "property:short-position-liquidation-price",
     "about",
     "concept:liquidation-engine"
@@ -32308,9 +32859,24 @@
     "concept:fx"
    ],
    [
+    "property:swap-rollover-calculation",
+    "about",
+    "fact:market-mechanics-core-principles"
+   ],
+   [
+    "property:swap-rollover-calculation",
+    "about",
+    "judgment:market-mechanics-best-practices"
+   ],
+   [
     "property:tick-value",
     "about",
     "concept:contract-specification"
+   ],
+   [
+    "property:tick-value",
+    "about",
+    "fact:market-mechanics-core-principles"
    ],
    [
     "property:total-return",
@@ -32342,7 +32908,7 @@
    "procedure:indicator-atr"
   ],
   "chapter_instruments-market-mechanics_atoms": 57,
-  "chapter_instruments-market-mechanics_relations": 60,
+  "chapter_instruments-market-mechanics_relations": 111,
   "chapter_instruments-market-mechanics_folded": [
    "concept:market-mechanics"
   ]

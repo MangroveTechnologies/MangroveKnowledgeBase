@@ -8,7 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 427 nodes, 1216 edges, in
+carries a formula stating the predicate it computes -- 427 nodes, 1267 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
