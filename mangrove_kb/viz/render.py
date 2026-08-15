@@ -402,7 +402,7 @@ FACETS = """
                      + 'Procedure, the darker blue is has-role inside descriptive. '
                      + 'Solid arrow = ordering relation (DAG). Dashed = free / fringe. '
                      + 'Green ring = selected. Yellow ring = deprecated; ratified is unmarked, '
-                     + 'because 301 of 303 nodes are.';
+                     + 'because nearly every node is.';
     }
   });
 })();
@@ -442,7 +442,9 @@ SEARCH_UI = """
   const wrap=document.createElement('span'); wrap.id='searchwrap';
   const box=document.createElement('input');
   box.id='search'; box.type='search'; box.autocomplete='off';
-  box.placeholder='Search 303 nodes \u2014 name, formula, outputs\u2026';
+  // Counted from the index rather than written down: the last hard-coded number here was
+  // three chapters out of date and read as a fact about the page a reader was looking at.
+  box.placeholder=`Search ${IDX.length} nodes \u2014 name, formula, outputs\u2026`;
   const out=document.createElement('div'); out.id='results';
   wrap.append(box,out); bar.insertBefore(wrap, document.getElementById('themesel'));
 

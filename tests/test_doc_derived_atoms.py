@@ -5,13 +5,15 @@ about the wiki, so running it alone and committing silently drops every doc-deri
 else would notice: the code-derived atoms would all still be there and the suite would be green.
 These tests are what notices.
 
-The pipeline is two stages, in this order:
+The pipeline, in this order -- the whole of it is drawn in `docs/architecture/README.md`:
 
     python3 ontology/build_signal_indicator_ontology.py
     python3 -m wiki_to_graph build ontology/wiki -o build/wiki-graph.json \\
             --map ontology/wiki-config/map.json --vocab ontology/wiki-config/vocab.json
     python3 ontology/wiki_to_atoms.py --wiki ontology/wiki --graph build/wiki-graph.json \\
             --ontology ontology/signal-indicator-ontology.json --out build/record.json
+    python3 ontology/chapter_to_atoms.py <chapter> ... --merge     # once per ingested chapter
+    python3 ontology/build_semantic_index.py                       # the index follows the graph
 """
 from __future__ import annotations
 

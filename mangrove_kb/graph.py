@@ -105,7 +105,8 @@ SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
     ("formula", "reference", "interpretation", "applications",
      "inputs", "params", "outputs",           # slot NAMES and their descriptions
      "explanation",                           # the doc-derived body (see `reference_chapter`)
-     # A chapter node's content IS these lists -- 39 principles, 50 practices, the worked examples.
+     # A chapter node's content IS these lists -- its principles, its practices, its worked
+     # examples -- and a statement moves onto an edge only when it earns one.
      # Leaving them out made `find("mean reversion")` miss the node that states it, which is the
      # exact false negative SEARCH_TIERS was widened to prevent.
      "principles", "practices", "examples"),

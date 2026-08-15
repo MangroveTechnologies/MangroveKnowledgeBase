@@ -127,6 +127,7 @@ from mangrove_kb.graph import KnowledgeGraph
 kg = KnowledgeGraph.load()
 kg.stats()                                  # counts + every value a filter accepts. ALWAYS first.
 kg.find(kind="momentum", role="trigger")    # two axes, intersected
+kg.ask("why do breakouts fail")             # a QUESTION: meaning, then one hop over the edges
 kg.all_paths("adosc_bearish", "momentum")   # the claim AND the reason
 ```
 

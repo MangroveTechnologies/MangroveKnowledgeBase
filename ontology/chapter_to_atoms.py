@@ -2553,8 +2553,8 @@ def build(path: Path, chapter: str, parent: str,
             # FROM the node, TO the list it draws on. A reader arrives at a concept and asks what
             # is known about it, and outgoing edges are the answer to that question -- so the
             # concept points at the principles and practices that govern it, not the reverse. It
-            # also keeps the two list nodes from accumulating 87 outgoing edges apiece while every
-            # concept sits there with none.
+            # also keeps the two list nodes from accumulating every statement as an outgoing
+            # edge apiece while every concept sits there with none.
             prior = next((r for r in rels if r["from_id"] == target and r["rel"] == "about"
                           and r["to_id"] == list_id), None)
             if prior:

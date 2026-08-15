@@ -322,8 +322,8 @@ Nodes group by **ontology primitive**, edges by **relation category**, and each 
 derived kind beneath it — so `signal` and `indicator` are separable inside `Procedure`, and `about`
 is separable from `has-role` inside `descriptive`.
 
-Sub-kinds are **shades of their parent's hue**, never new colours: all 289 of those dots are
-procedures, and the darker teal is the 71 indicators among them.
+Sub-kinds are **shades of their parent's hue**, never new colours: every dot in that group is a
+procedure, and the darker teal is the 71 indicators among them.
 
 Parent and child are **AND-ed**. Unticking `Procedure` hides every procedure whatever the children
 say, and the children grey out to show why — so the canvas can never empty for a reason that is not

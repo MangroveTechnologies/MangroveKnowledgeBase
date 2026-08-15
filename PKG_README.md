@@ -13,6 +13,8 @@ pip install mangrove-kb
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
 - **A knowledge graph of the library itself** -- 498 nodes, 1539 edges, queryable, shipped in the package
+- **Search by words or by meaning** -- `find()` matches terms, `ask()` seeds on a semantic index
+  built from the graph and follows the edges out of what it finds
 
 Dependencies: numpy, pandas. That's it.
 

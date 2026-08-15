@@ -34,7 +34,7 @@ reading before the first chapter rather than after.
 | [The scaffold](#the-scaffold-and-what-is-not-a-node) | The six headings a section carries, what each becomes, and what is deliberately not a node. |
 | [Procedure](#procedure) | The seven steps from an unread chapter to a committed, rendered graph. |
 | [Pipeline](#pipeline) | The exact commands that rebuild the record, and the dependency that fails silently. |
-| [Review gates](#review-gates) | The four checks to run before committing a chapter, with the code for the additive check. |
+| [Review gates](#review-gates) | The six checks to run before committing a chapter, with the code for the additive check. |
 | [Writing node prose](#writing-node-prose) | How authored summaries and explanations are written and merged. |
 | [Additional resources](#additional-resources) | Where the declaration reference, the failure modes and the query skill live. |
 
@@ -96,8 +96,9 @@ Everything emitted is `status: draft`. Promotion is a human act.
 5. **Merge** with `--merge`, then verify the merge is additive.
 6. **Wire the statements.** Every principle and practice that names a node moves out of its list and
    onto an `about` edge from that node, carrying the line as the edge's `why`.
-7. **Close the gaps, then commit.** No node reachable by a single edge. Update the documented counts,
-   run the suite, commit, re-render, watch CI to green.
+7. **Close the gaps, rebuild the index, then commit.** No node reachable by a single edge; rerun
+   `build_semantic_index.py` so retrieval follows the graph; update the documented counts; run the
+   suite, commit, re-render, watch CI to green.
 
 **See also:** [pipeline](#pipeline) · [review gates](#review-gates) ·
 [declarations](references/declarations.md)
@@ -135,7 +136,7 @@ which the build silently produces a graph in which every node reports degree 0.
 
 ## Review gates
 
-Run all four before committing a chapter.
+Run all six before committing a chapter.
 
 **Additive.** Only declared folds may touch an existing atom, and no edge may disappear:
 
