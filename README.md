@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-ff9e18.svg" alt="License: PolyForm Noncommercial 1.0.0">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/deps-numpy%20%2B%20pandas-2ec27e.svg" alt="Dependencies: numpy + pandas">
-  <img src="https://img.shields.io/badge/graph-427%20nodes%20%C2%B7%201267%20edges-42a7c6.svg" alt="Graph: 427 nodes, 1267 edges">
+  <img src="https://img.shields.io/badge/graph-427%20nodes%20%C2%B7%201318%20edges-42a7c6.svg" alt="Graph: 427 nodes, 1318 edges">
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
 
@@ -20,7 +20,7 @@
 every one with a machine-readable docstring — formula, inputs, parameters with ranges and defaults,
 typed outputs with units, and warmup.
 
-And a **knowledge graph built from that source** — 427 nodes and 1267 edges saying what each
+And a **knowledge graph built from that source** — 427 nodes and 1318 edges saying what each
 computation is, what it measures, what it reads, and what part it plays. It is generated from the
 code, so it is exact: not extracted from prose, not approximate, no ranking model in the way.
 
@@ -227,7 +227,7 @@ detail one click away.
 | Pane | Where | What it holds |
 | --- | --- | --- |
 | Rail | left | filters, by kind of node and kind of edge |
-| Map | middle | 427 nodes, 1267 edges |
+| Map | middle | 427 nodes, 1318 edges |
 | Panel | right | everything the library records about whatever you clicked |
 
 ### The inspector — what a node actually carries

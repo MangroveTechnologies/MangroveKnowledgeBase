@@ -30475,6 +30475,222 @@
    "to_id": "concept:information-leakage"
   },
   {
+   "from": "arbitrageurs",
+   "rel": "about",
+   "to": "market efficiency",
+   "why": "its trade is the mechanism that forces prices back together",
+   "from_id": "concept:arbitrageur",
+   "to_id": "concept:market-efficiency"
+  },
+  {
+   "from": "hedge funds",
+   "rel": "kind-of",
+   "to": "institutional investors",
+   "why": "an institution running its own strategies with outside capital",
+   "from_id": "concept:hedge-fund",
+   "to_id": "concept:institutional-investor"
+  },
+  {
+   "from": "proprietary trading firms",
+   "rel": "about",
+   "to": "order flow",
+   "why": "trades its own capital on short-horizon reads of the orders arriving",
+   "from_id": "concept:proprietary-trading-firm",
+   "to_id": "concept:order-flow"
+  },
+  {
+   "from": "retail traders",
+   "rel": "about",
+   "to": "information asymmetry",
+   "why": "sits at the bottom of the information hierarchy the chapter describes",
+   "from_id": "concept:retail-trader",
+   "to_id": "concept:information-asymmetry"
+  },
+  {
+   "from": "continuous trading discovery",
+   "rel": "uses",
+   "to": "order flow",
+   "why": "the price forms tick by tick out of the orders that arrive",
+   "from_id": "concept:continuous-trading-discovery",
+   "to_id": "concept:order-flow"
+  },
+  {
+   "from": "cross-market discovery",
+   "rel": "uses",
+   "to": "information share (hasbrouck)",
+   "why": "which venue moved first is what this measures",
+   "from_id": "concept:cross-market-discovery",
+   "to_id": "property:information-share"
+  },
+  {
+   "from": "lit exchanges (nyse, nasdaq, lse)",
+   "rel": "about",
+   "to": "price discovery",
+   "why": "displayed quotes are where public discovery happens",
+   "from_id": "concept:lit-exchange",
+   "to_id": "concept:price-discovery"
+  },
+  {
+   "from": "electronic communication networks (ecns)",
+   "rel": "about",
+   "to": "bid-ask spread dynamics",
+   "why": "participants matching directly, and competing to, is what narrows it",
+   "from_id": "concept:electronic-communication-network",
+   "to_id": "concept:bid-ask-spread"
+  },
+  {
+   "from": "internalization",
+   "rel": "about",
+   "to": "order flow",
+   "why": "a broker fills client orders in-house, so the flow never reaches an exchange",
+   "from_id": "concept:internalization",
+   "to_id": "concept:order-flow"
+  },
+  {
+   "from": "over-the-counter (otc) markets",
+   "rel": "about",
+   "to": "information leakage",
+   "why": "a negotiated trade never displays, so the market learns of it late",
+   "from_id": "concept:over-the-counter-market",
+   "to_id": "concept:information-leakage"
+  },
+  {
+   "from": "low volatility regime",
+   "rel": "uses",
+   "to": "historical volatility (standard deviation of returns)",
+   "why": "the measurement that classifies it",
+   "from_id": "concept:low-volatility-regime",
+   "to_id": "property:historical-volatility"
+  },
+  {
+   "from": "trailing stop",
+   "rel": "kind-of",
+   "to": "stop order (stop-loss)",
+   "why": "a stop whose trigger follows price in the favourable direction only",
+   "from_id": "concept:trailing-stop",
+   "to_id": "concept:stop-order"
+  },
+  {
+   "from": "chart pattern",
+   "rel": "about",
+   "to": "pattern",
+   "why": "the class of computation that measures these forms",
+   "from_id": "concept:chart-pattern",
+   "to_id": "concept:pattern"
+  },
+  {
+   "from": "effective spread",
+   "rel": "about",
+   "to": "transaction costs",
+   "why": "the honest input to a cost calculation",
+   "from_id": "property:effective-spread",
+   "to_id": "concept:transaction-cost"
+  },
+  {
+   "from": "simple slippage",
+   "rel": "about",
+   "to": "transaction costs",
+   "why": "the realised cost of an execution against the price expected",
+   "from_id": "property:simple-slippage",
+   "to_id": "concept:transaction-cost"
+  },
+  {
+   "from": "relative spread (percentage)",
+   "rel": "uses",
+   "to": "quoted spread",
+   "why": "the same spread as a fraction of the midpoint",
+   "from_id": "property:relative-spread",
+   "to_id": "property:quoted-spread"
+  },
+  {
+   "from": "realized spread (market maker profit after price movement)",
+   "rel": "uses",
+   "to": "effective spread",
+   "why": "the comparison that separates what the maker kept from what it lost",
+   "from_id": "property:realized-spread",
+   "to_id": "property:effective-spread"
+  },
+  {
+   "from": "price impact (kyle lambda)",
+   "rel": "uses",
+   "to": "order flow",
+   "why": "measures how far price moves per unit of signed flow",
+   "from_id": "property:price-impact",
+   "to_id": "concept:order-flow"
+  },
+  {
+   "from": "component share",
+   "rel": "uses",
+   "to": "price impact (kyle lambda)",
+   "why": "builds a venue's share out of permanent impact",
+   "from_id": "property:component-share",
+   "to_id": "property:price-impact"
+  },
+  {
+   "from": "price efficiency ratio",
+   "rel": "about",
+   "to": "market efficiency",
+   "why": "how close prices are to a random walk is the testable form of it",
+   "from_id": "property:price-efficiency-ratio",
+   "to_id": "concept:market-efficiency"
+  },
+  {
+   "from": "volatility ratio (regime detection)",
+   "rel": "uses",
+   "to": "historical volatility (standard deviation of returns)",
+   "why": "compares a short window against a long one",
+   "from_id": "property:volatility-ratio",
+   "to_id": "property:historical-volatility"
+  },
+  {
+   "from": "square root market impact rule (empirical)",
+   "rel": "uses",
+   "to": "participation rate",
+   "why": "impact scales with the share of volume taken",
+   "from_id": "fact:square-root-market-impact-rule",
+   "to_id": "property:participation-rate"
+  },
+  {
+   "from": "almgren-chriss market impact model",
+   "rel": "uses",
+   "to": "historical volatility (standard deviation of returns)",
+   "why": "the volatility term in the risk half of its cost",
+   "from_id": "procedure:almgren-chriss-market-impact-model",
+   "to_id": "property:historical-volatility"
+  },
+  {
+   "from": "garch(1,1) model (volatility forecasting)",
+   "rel": "uses",
+   "to": "historical volatility (standard deviation of returns)",
+   "why": "fits to the realised series it forecasts forward",
+   "from_id": "procedure:garch-model",
+   "to_id": "property:historical-volatility"
+  },
+  {
+   "from": "implementation shortfall",
+   "rel": "about",
+   "to": "market impact",
+   "why": "balances impact against the risk of price moving while it waits",
+   "from_id": "procedure:implementation-shortfall",
+   "to_id": "concept:market-impact"
+  },
+  {
+   "from": "twap",
+   "rel": "about",
+   "to": "market impact",
+   "why": "splits an order across time so no slice is large enough to move the price",
+   "from_id": "procedure:twap",
+   "to_id": "concept:market-impact"
+  },
+  {
+   "from": "sniper/liquidity seeking",
+   "rel": "about",
+   "to": "dark pools",
+   "why": "pings hidden venues for liquidity that never displays",
+   "from_id": "procedure:sniper-liquidity-seeking",
+   "to_id": "concept:dark-pool"
+  },
+  {
    "from": "order types",
    "rel": "about",
    "to": "core principles",
@@ -31219,6 +31435,198 @@
    "to_id": "concept:contract-specification"
   },
   {
+   "from": "centralized exchange (cex)",
+   "rel": "kind-of",
+   "to": "trading venues",
+   "why": "matches crypto orders on a book it operates",
+   "from_id": "concept:centralized-exchange",
+   "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "decentralized exchange (dex)",
+   "rel": "kind-of",
+   "to": "trading venues",
+   "why": "matches through a contract on a chain rather than an operator",
+   "from_id": "concept:decentralized-exchange",
+   "to_id": "concept:trading-venue"
+  },
+  {
+   "from": "decentralized exchange (dex)",
+   "rel": "uses",
+   "to": "automated market maker (amm)",
+   "why": "most price trades from a pooled curve rather than a book",
+   "from_id": "concept:decentralized-exchange",
+   "to_id": "concept:automated-market-maker"
+  },
+  {
+   "from": "cryptocurrency spot market",
+   "rel": "about",
+   "to": "crypto settlement",
+   "why": "what immediate delivery means when settlement is a block confirmation",
+   "from_id": "concept:cryptocurrency-spot-market",
+   "to_id": "concept:crypto-settlement"
+  },
+  {
+   "from": "equity settlement (t+2)",
+   "rel": "about",
+   "to": "equity spot market",
+   "why": "how a purchase of shares completes: two business days after the trade",
+   "from_id": "concept:equity-settlement",
+   "to_id": "concept:equity-spot-market"
+  },
+  {
+   "from": "cross rate",
+   "rel": "about",
+   "to": "forex spot market",
+   "why": "the rate between two currencies neither of which is quoted against the other",
+   "from_id": "property:cross-rate",
+   "to_id": "concept:forex-spot-market"
+  },
+  {
+   "from": "put-call parity",
+   "rel": "about",
+   "to": "call option",
+   "why": "fixes its price against the put at the same strike and expiration",
+   "from_id": "fact:put-call-parity",
+   "to_id": "concept:call-option"
+  },
+  {
+   "from": "put-call parity",
+   "rel": "about",
+   "to": "put option",
+   "why": "fixes its price against the call at the same strike and expiration",
+   "from_id": "fact:put-call-parity",
+   "to_id": "concept:put-option"
+  },
+  {
+   "from": "the greeks",
+   "rel": "uses",
+   "to": "black-scholes call price",
+   "why": "each sensitivity is a derivative of the value this prices",
+   "from_id": "concept:greeks",
+   "to_id": "procedure:black-scholes-call-price"
+  },
+  {
+   "from": "intrinsic and time value",
+   "rel": "uses",
+   "to": "black-scholes call price",
+   "why": "the premium it splits is what the model prices",
+   "from_id": "property:intrinsic-and-time-value",
+   "to_id": "procedure:black-scholes-call-price"
+  },
+  {
+   "from": "annualized basis",
+   "rel": "uses",
+   "to": "basis",
+   "why": "scales it by the days left to expiration",
+   "from_id": "property:annualized-basis",
+   "to_id": "property:basis"
+  },
+  {
+   "from": "price impact (amm)",
+   "rel": "uses",
+   "to": "constant product amm (uniswap v2)",
+   "why": "the price a trade gets follows from the invariant",
+   "from_id": "property:amm-price-impact",
+   "to_id": "fact:constant-product-amm"
+  },
+  {
+   "from": "concentrated liquidity (v3)",
+   "rel": "uses",
+   "to": "constant product amm (uniswap v2)",
+   "why": "measures a range position against the flat curve it replaces",
+   "from_id": "property:concentrated-liquidity-efficiency",
+   "to_id": "fact:constant-product-amm"
+  },
+  {
+   "from": "margin requirement (initial)",
+   "rel": "uses",
+   "to": "contract value",
+   "why": "a percentage of the notional it is posted against",
+   "from_id": "property:margin-requirement",
+   "to_id": "property:notional-value"
+  },
+  {
+   "from": "long position liquidation price",
+   "rel": "uses",
+   "to": "margin requirement (initial)",
+   "why": "the initial and maintenance percentages it is computed from",
+   "from_id": "property:long-position-liquidation-price",
+   "to_id": "property:margin-requirement"
+  },
+  {
+   "from": "short position liquidation price",
+   "rel": "uses",
+   "to": "margin requirement (initial)",
+   "why": "the initial and maintenance percentages it is computed from",
+   "from_id": "property:short-position-liquidation-price",
+   "to_id": "property:margin-requirement"
+  },
+  {
+   "from": "exposure at default",
+   "rel": "uses",
+   "to": "margin requirement (initial)",
+   "why": "what the collateral a clearing house holds is sized to cover",
+   "from_id": "property:exposure-at-default",
+   "to_id": "property:margin-requirement"
+  },
+  {
+   "from": "netting benefit",
+   "rel": "about",
+   "to": "central counterparty (ccp)",
+   "why": "what its netting saves the parties it stands between",
+   "from_id": "property:netting-benefit",
+   "to_id": "concept:central-counterparty"
+  },
+  {
+   "from": "forward rate (interest rate parity)",
+   "rel": "uses",
+   "to": "cost of carry relationship",
+   "why": "interest rate parity is the carry identity with the other currency's rate as the yield",
+   "from_id": "property:forward-rate",
+   "to_id": "fact:cost-of-carry-relationship"
+  },
+  {
+   "from": "swap/rollover calculation",
+   "rel": "uses",
+   "to": "forward rate (interest rate parity)",
+   "why": "the overnight charge is the forward premium, paid one night at a time",
+   "from_id": "property:swap-rollover-calculation",
+   "to_id": "property:forward-rate"
+  },
+  {
+   "from": "total return (with dividends)",
+   "rel": "uses",
+   "to": "spot return",
+   "why": "the price return plus the income the holding paid",
+   "from_id": "property:total-return",
+   "to_id": "property:spot-return"
+  },
+  {
+   "from": "position profit/loss",
+   "rel": "uses",
+   "to": "pip value",
+   "why": "values a currency move in the quote currency",
+   "from_id": "property:position-profit-loss",
+   "to_id": "property:pip-value"
+  },
+  {
+   "from": "position profit/loss",
+   "rel": "uses",
+   "to": "tick value",
+   "why": "values a futures move by the worth of one tick",
+   "from_id": "property:position-profit-loss",
+   "to_id": "property:tick-value"
+  },
+  {
+   "from": "historical volatility (standard deviation of returns)",
+   "rel": "uses",
+   "to": "spot return",
+   "why": "the periodic returns whose dispersion it measures",
+   "from_id": "property:historical-volatility",
+   "to_id": "property:spot-return"
+  },
+  {
    "from": "settlement",
    "rel": "about",
    "to": "core principles",
@@ -31800,6 +32208,11 @@
   "derived_relations": [
    [
     "concept:arbitrageur",
+    "about",
+    "concept:market-efficiency"
+   ],
+   [
+    "concept:arbitrageur",
     "kind-of",
     "concept:market-participant"
    ],
@@ -31869,6 +32282,16 @@
     "concept:crypto-specific-mechanics"
    ],
    [
+    "concept:centralized-exchange",
+    "kind-of",
+    "concept:trading-venue"
+   ],
+   [
+    "concept:chart-pattern",
+    "about",
+    "concept:pattern"
+   ],
+   [
     "concept:chart-pattern",
     "kind-of",
     "concept:technical-analysis"
@@ -31904,6 +32327,11 @@
     "concept:price-discovery"
    ],
    [
+    "concept:continuous-trading-discovery",
+    "uses",
+    "concept:order-flow"
+   ],
+   [
     "concept:contract-specification",
     "about",
     "fact:market-mechanics-core-principles"
@@ -31922,6 +32350,11 @@
     "concept:cross-market-discovery",
     "kind-of",
     "concept:price-discovery"
+   ],
+   [
+    "concept:cross-market-discovery",
+    "uses",
+    "property:information-share"
    ],
    [
     "concept:crypto-settlement",
@@ -31955,6 +32388,11 @@
    ],
    [
     "concept:cryptocurrency-spot-market",
+    "about",
+    "concept:crypto-settlement"
+   ],
+   [
+    "concept:cryptocurrency-spot-market",
     "kind-of",
     "concept:spot-market"
    ],
@@ -31984,9 +32422,29 @@
     "concept:crypto-specific-mechanics"
    ],
    [
+    "concept:decentralized-exchange",
+    "kind-of",
+    "concept:trading-venue"
+   ],
+   [
+    "concept:decentralized-exchange",
+    "uses",
+    "concept:automated-market-maker"
+   ],
+   [
+    "concept:electronic-communication-network",
+    "about",
+    "concept:bid-ask-spread"
+   ],
+   [
     "concept:electronic-communication-network",
     "kind-of",
     "concept:trading-venue"
+   ],
+   [
+    "concept:equity-settlement",
+    "about",
+    "concept:equity-spot-market"
    ],
    [
     "concept:equity-settlement",
@@ -32079,6 +32537,16 @@
     "judgment:market-mechanics-best-practices"
    ],
    [
+    "concept:greeks",
+    "uses",
+    "procedure:black-scholes-call-price"
+   ],
+   [
+    "concept:hedge-fund",
+    "kind-of",
+    "concept:institutional-investor"
+   ],
+   [
     "concept:hedge-fund",
     "kind-of",
     "concept:market-participant"
@@ -32145,6 +32613,11 @@
    ],
    [
     "concept:internalization",
+    "about",
+    "concept:order-flow"
+   ],
+   [
+    "concept:internalization",
     "kind-of",
     "concept:trading-venue"
    ],
@@ -32200,6 +32673,11 @@
    ],
    [
     "concept:lit-exchange",
+    "about",
+    "concept:price-discovery"
+   ],
+   [
+    "concept:lit-exchange",
     "kind-of",
     "concept:trading-venue"
    ],
@@ -32207,6 +32685,11 @@
     "concept:low-volatility-regime",
     "kind-of",
     "concept:market-regime"
+   ],
+   [
+    "concept:low-volatility-regime",
+    "uses",
+    "property:historical-volatility"
    ],
    [
     "concept:margin",
@@ -32345,6 +32828,11 @@
    ],
    [
     "concept:over-the-counter-market",
+    "about",
+    "concept:information-leakage"
+   ],
+   [
+    "concept:over-the-counter-market",
     "kind-of",
     "concept:trading-venue"
    ],
@@ -32370,6 +32858,11 @@
    ],
    [
     "concept:proprietary-trading-firm",
+    "about",
+    "concept:order-flow"
+   ],
+   [
+    "concept:proprietary-trading-firm",
     "kind-of",
     "concept:market-participant"
    ],
@@ -32392,6 +32885,11 @@
     "concept:regime-shift",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:retail-trader",
+    "about",
+    "concept:information-asymmetry"
    ],
    [
     "concept:retail-trader",
@@ -32494,6 +32992,11 @@
     "concept:order-type"
    ],
    [
+    "concept:trailing-stop",
+    "kind-of",
+    "concept:stop-order"
+   ],
+   [
     "concept:transaction-cost",
     "part-of",
     "concept:market-foundations"
@@ -32546,12 +33049,27 @@
    [
     "fact:put-call-parity",
     "about",
+    "concept:call-option"
+   ],
+   [
+    "fact:put-call-parity",
+    "about",
     "concept:option"
+   ],
+   [
+    "fact:put-call-parity",
+    "about",
+    "concept:put-option"
    ],
    [
     "fact:square-root-market-impact-rule",
     "about",
     "concept:market-impact"
+   ],
+   [
+    "fact:square-root-market-impact-rule",
+    "uses",
+    "property:participation-rate"
    ],
    [
     "judgment:market-foundations-best-practices",
@@ -32569,6 +33087,11 @@
     "concept:market-impact"
    ],
    [
+    "procedure:almgren-chriss-market-impact-model",
+    "uses",
+    "property:historical-volatility"
+   ],
+   [
     "procedure:black-scholes-call-price",
     "about",
     "concept:option"
@@ -32577,6 +33100,16 @@
     "procedure:garch-model",
     "about",
     "concept:volatility"
+   ],
+   [
+    "procedure:garch-model",
+    "uses",
+    "property:historical-volatility"
+   ],
+   [
+    "procedure:implementation-shortfall",
+    "about",
+    "concept:market-impact"
    ],
    [
     "procedure:implementation-shortfall",
@@ -32590,8 +33123,18 @@
    ],
    [
     "procedure:sniper-liquidity-seeking",
+    "about",
+    "concept:dark-pool"
+   ],
+   [
+    "procedure:sniper-liquidity-seeking",
     "instance-of",
     "concept:execution-model"
+   ],
+   [
+    "procedure:twap",
+    "about",
+    "concept:market-impact"
    ],
    [
     "procedure:twap",
@@ -32619,9 +33162,19 @@
     "concept:automated-market-maker"
    ],
    [
+    "property:amm-price-impact",
+    "uses",
+    "fact:constant-product-amm"
+   ],
+   [
     "property:annualized-basis",
     "about",
     "concept:futures"
+   ],
+   [
+    "property:annualized-basis",
+    "uses",
+    "property:basis"
    ],
    [
     "property:basis",
@@ -32639,9 +33192,24 @@
     "concept:price-discovery"
    ],
    [
+    "property:component-share",
+    "uses",
+    "property:price-impact"
+   ],
+   [
     "property:concentrated-liquidity-efficiency",
     "about",
     "concept:concentrated-liquidity"
+   ],
+   [
+    "property:concentrated-liquidity-efficiency",
+    "uses",
+    "fact:constant-product-amm"
+   ],
+   [
+    "property:cross-rate",
+    "about",
+    "concept:forex-spot-market"
    ],
    [
     "property:cross-rate",
@@ -32659,14 +33227,29 @@
     "concept:market-microstructure"
    ],
    [
+    "property:effective-spread",
+    "about",
+    "concept:transaction-cost"
+   ],
+   [
     "property:exposure-at-default",
     "about",
     "concept:central-counterparty"
    ],
    [
+    "property:exposure-at-default",
+    "uses",
+    "property:margin-requirement"
+   ],
+   [
     "property:forward-rate",
     "about",
     "concept:fx"
+   ],
+   [
+    "property:forward-rate",
+    "uses",
+    "fact:cost-of-carry-relationship"
    ],
    [
     "property:historical-volatility",
@@ -32677,6 +33260,11 @@
     "property:historical-volatility",
     "about",
     "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "property:historical-volatility",
+    "uses",
+    "property:spot-return"
    ],
    [
     "property:impermanent-loss",
@@ -32699,6 +33287,11 @@
     "concept:option"
    ],
    [
+    "property:intrinsic-and-time-value",
+    "uses",
+    "procedure:black-scholes-call-price"
+   ],
+   [
     "property:leverage-ratio",
     "about",
     "concept:leverage"
@@ -32719,6 +33312,11 @@
     "judgment:market-mechanics-best-practices"
    ],
    [
+    "property:long-position-liquidation-price",
+    "uses",
+    "property:margin-requirement"
+   ],
+   [
     "property:margin-ratio",
     "about",
     "concept:margin"
@@ -32732,6 +33330,16 @@
     "property:margin-requirement",
     "about",
     "concept:contract-specification"
+   ],
+   [
+    "property:margin-requirement",
+    "uses",
+    "property:notional-value"
+   ],
+   [
+    "property:netting-benefit",
+    "about",
+    "concept:central-counterparty"
    ],
    [
     "property:netting-benefit",
@@ -32799,6 +33407,21 @@
     "concept:fx"
    ],
    [
+    "property:position-profit-loss",
+    "uses",
+    "property:pip-value"
+   ],
+   [
+    "property:position-profit-loss",
+    "uses",
+    "property:tick-value"
+   ],
+   [
+    "property:price-efficiency-ratio",
+    "about",
+    "concept:market-efficiency"
+   ],
+   [
     "property:price-efficiency-ratio",
     "about",
     "concept:price-discovery"
@@ -32807,6 +33430,11 @@
     "property:price-impact",
     "about",
     "concept:market-microstructure"
+   ],
+   [
+    "property:price-impact",
+    "uses",
+    "concept:order-flow"
    ],
    [
     "property:quoted-spread",
@@ -32824,9 +33452,19 @@
     "concept:bid-ask-spread"
    ],
    [
+    "property:realized-spread",
+    "uses",
+    "property:effective-spread"
+   ],
+   [
     "property:relative-spread",
     "about",
     "concept:bid-ask-spread"
+   ],
+   [
+    "property:relative-spread",
+    "uses",
+    "property:quoted-spread"
    ],
    [
     "property:return-amplification",
@@ -32844,9 +33482,19 @@
     "concept:liquidation-engine"
    ],
    [
+    "property:short-position-liquidation-price",
+    "uses",
+    "property:margin-requirement"
+   ],
+   [
     "property:simple-slippage",
     "about",
     "concept:slippage"
+   ],
+   [
+    "property:simple-slippage",
+    "about",
+    "concept:transaction-cost"
    ],
    [
     "property:spot-return",
@@ -32869,6 +33517,11 @@
     "judgment:market-mechanics-best-practices"
    ],
    [
+    "property:swap-rollover-calculation",
+    "uses",
+    "property:forward-rate"
+   ],
+   [
     "property:tick-value",
     "about",
     "concept:contract-specification"
@@ -32884,9 +33537,19 @@
     "concept:spot-market"
    ],
    [
+    "property:total-return",
+    "uses",
+    "property:spot-return"
+   ],
+   [
     "property:volatility-ratio",
     "about",
     "concept:volatility"
+   ],
+   [
+    "property:volatility-ratio",
+    "uses",
+    "property:historical-volatility"
    ]
   ],
   "doc_relations": 6,
@@ -32895,7 +33558,7 @@
    "object:mangrove-knowledge-space"
   ],
   "chapter_market-foundations_atoms": 61,
-  "chapter_market-foundations_relations": 101,
+  "chapter_market-foundations_relations": 128,
   "chapter_market-foundations_folded": [
    "concept:market-foundations",
    "concept:volatility",
@@ -32908,7 +33571,7 @@
    "procedure:indicator-atr"
   ],
   "chapter_instruments-market-mechanics_atoms": 57,
-  "chapter_instruments-market-mechanics_relations": 111,
+  "chapter_instruments-market-mechanics_relations": 135,
   "chapter_instruments-market-mechanics_folded": [
    "concept:market-mechanics"
   ]
