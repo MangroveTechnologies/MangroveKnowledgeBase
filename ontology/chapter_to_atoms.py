@@ -52,6 +52,218 @@ BLOCK_LABEL = re.compile(r"^\*\*(.+?)\*\*\s*[::]?\s*$")
 #:
 #: A chapter absent from here raises rather than building with nothing.
 CHAPTERS: dict[str, dict] = {
+    "core-trading-concepts": {
+        # §3.0 has no Definition and no subject: it states four things about how trading behaves,
+        # each under its own heading, and they are the chapter's most load-bearing claims. The first
+        # is advice with reasons; the other three are assertions a strategy is judged against.
+        "blocks_as_nodes": {"Core Market Wisdom": {
+            "The Trend Is Your Friend": "Judgment",
+            "Win Rate Is Not Risk": "Fact",
+            "Risk Is Multi-Dimensional": "Fact",
+            "Regime Determines Archetype Effectiveness": "Fact"}},
+        # §3.4 states five real concepts as principles -- a stop hunt is a thing that happens, not a
+        # claim about a thing -- exactly as §1.1 did.
+        "principle_concepts": {
+            "Liquidity Pools": "concept", "Stop Hunts": "concept", "Liquidity Grab": "concept",
+            "Smart Money Concept": "concept", "Equal Highs/Lows": "concept",
+            "Break of Structure (BOS)": "concept", "Change of Character (CHoCH)": "concept",
+        },
+        # §3.11's Key Definitions table is five terms of the volume profile, not five procedures.
+        "tables": {"Key Definitions": ("concept:volume-profile", "part-of", "Concept")},
+        # A section heading names a section. Where the thing it defines is already in the graph the
+        # id folds onto it -- §3.1 defines price action, which is this chapter's own parent, and
+        # §3.3's three market states are §1.5's regimes under another name.
+        "rename": {"Price Action Theory": "concept:price-action",
+                   "Trend, Range, Compression/Expansion": "concept:market-regime",
+                   "Liquidity Theory": "concept:liquidity",
+                   "Volume & Order Flow": "concept:volume",
+                   "Support & Resistance": "concept:support-and-resistance",
+                   "Volume Profile & Market Auction Theory": "concept:volume-profile",
+                   "Equal Highs/Lows": "concept:equal-highs-and-lows",
+                   "Trending Market Characteristics": "concept:trending-market",
+                   "Ranging Market Characteristics": "concept:ranging-market",
+                   "Compression Phase": "concept:compression",
+                   "Expansion Phase": "concept:expansion",
+                   "Demand Zone Formation": "concept:demand-zone",
+                   "Supply Zone Formation": "concept:supply-zone",
+                   "Horizontal Support/Resistance": "concept:horizontal-level",
+                   "Dynamic Support/Resistance": "concept:dynamic-level",
+                   "Bullish Fair Value Gap": "concept:bullish-fair-value-gap",
+                   # Chapter 2's delta is an option's sensitivity to the underlying. This one is
+                   # buy volume minus sell volume, which shares the name and nothing else.
+                   "Delta (Order Flow)": "property:order-flow-delta",
+                   "Bearish Fair Value Gap": "concept:bearish-fair-value-gap",
+                   "On-Balance Volume (OBV)": "procedure:on-balance-volume",
+                   "Volume Weighted Average Price (VWAP)": "procedure:volume-weighted-average-price"},
+        "retitle": {"Trending Market Characteristics": "trending market",
+                    "Ranging Market Characteristics": "ranging market",
+                    "Compression Phase": "compression",
+                    "Expansion Phase": "expansion",
+                    "Demand Zone Formation": "demand zone",
+                    "Supply Zone Formation": "supply zone",
+                    "Horizontal Support/Resistance": "horizontal level",
+                    "Dynamic Support/Resistance": "dynamic level",
+                    "Equal Highs/Lows": "equal highs and lows",
+                    "Volume Profile & Market Auction Theory": "volume profile",
+                    "Support & Resistance": "support and resistance",
+                    "Trend, Range, Compression/Expansion": "market regime",
+                    "Liquidity Theory": "liquidity", "Price Action Theory": "price action",
+                    "Volume & Order Flow": "volume"},
+        # Read one at a time. A rule you evaluate over bars is a Procedure -- detection,
+        # classification, the value-area walk. A level or a score a chart has is a Property. The
+        # timeframe ratio is neither: it is a convention this chapter states as holding.
+        "formula_primitive": {
+            "Swing Point Identification": "Procedure",
+            "Trend Classification": "Procedure",
+            "Structure Break Detection": "Procedure",
+            "ADX Trend Strength": "Procedure",
+            "Equal Level Detection": "Procedure",
+            "On-Balance Volume (OBV)": "Procedure",
+            "Volume Weighted Average Price (VWAP)": "Procedure",
+            "Volume Profile": "Procedure",
+            "Zone Identification": "Procedure",
+            "Bullish FVG Detection": "Procedure",
+            "Bearish FVG Detection": "Procedure",
+            "FVG Validity (Significance Filter)": "Procedure",
+            "FVG Fill Status": "Procedure",
+            "Value Area Calculation": "Procedure",
+            "Liquidity Zone Identification": "Procedure",
+            "Timeframe Ratio": "Fact",
+        },
+        "formula_subject": {"Liquidity Zone Identification": "concept:liquidity-pool",
+                            "Equal Level Detection": "concept:equal-highs-and-lows",
+                            "Volume Profile": "concept:volume",
+                            "Delta (Order Flow)": "concept:order-flow",
+                            "Zone Identification": "concept:supply-demand-zone",
+                            "Zone Freshness": "concept:supply-demand-zone"},
+        "taxonomy": {"Trend, Range, Compression/Expansion", "Liquidity Theory",
+                     "Volume & Order Flow", "Support & Resistance", "Supply & Demand Zones",
+                     "Fair Value Gaps"},
+        # This chapter names computations the library already ships -- ATR, ADX, Bollinger bands,
+        # OBV, VWAP -- and states rules on top of them without ever saying they depend on one. It
+        # also defines a thing in one section and the rule that detects it in another.
+        "edges": [
+            ("property:atr-percentage", "uses", "procedure:indicator-atr",
+             "the range it scales against price"),
+            ("property:bollinger-band-width", "uses", "procedure:indicator-bollingerbands",
+             "the bands whose distance it measures"),
+            ("procedure:adx-trend-strength", "uses", "procedure:indicator-adx",
+             "the strength reading it thresholds"),
+            ("procedure:liquidity-zone-identification", "uses", "procedure:indicator-atr",
+             "the buffer it places the pool beyond the swing by"),
+            ("procedure:fvg-validity", "uses", "procedure:indicator-atr",
+             "the size a gap must exceed to be worth marking"),
+            ("procedure:zone-identification", "uses", "procedure:indicator-atr",
+             "the departure size that makes a base a zone"),
+            ("property:support-resistance-zone-width", "uses", "procedure:indicator-atr",
+             "how wide a level is drawn"),
+            ("procedure:trend-classification", "uses", "procedure:swing-point-identification",
+             "the swings it compares"),
+            ("procedure:structure-break-detection", "uses", "procedure:swing-point-identification",
+             "the swing a close is tested against"),
+            ("procedure:value-area-calculation", "uses", "procedure:volume-profile",
+             "the profile it walks outward from"),
+            # the thing, and the rule that finds it
+            ("procedure:swing-point-identification", "about", "concept:market-structure",
+             "the swings structure is defined over"),
+            ("procedure:adx-trend-strength", "about", "concept:trending-market",
+             "above twenty-five is what it calls one"),
+            ("procedure:adx-trend-strength", "about", "concept:ranging-market",
+             "below twenty is what it calls one"),
+            ("procedure:structure-break-detection", "about", "concept:break-of-structure",
+             "how one is detected"),
+            ("procedure:structure-break-detection", "about", "concept:change-of-character",
+             "the same test, applied against the prevailing trend"),
+            ("procedure:bullish-fvg-detection", "about", "concept:bullish-fair-value-gap",
+             "how one is found"),
+            ("procedure:bearish-fvg-detection", "about", "concept:bearish-fair-value-gap",
+             "how one is found"),
+            ("procedure:equal-level-detection", "about", "concept:equal-highs-and-lows",
+             "how they are found"),
+            ("procedure:zone-identification", "about", "concept:demand-zone",
+             "the base a rally left, marked"),
+            ("procedure:zone-identification", "about", "concept:supply-zone",
+             "the base a decline left, marked"),
+            ("procedure:volume-profile", "about", "concept:point-of-control",
+             "the level it returns as the busiest"),
+            ("property:relative-volume", "about", "concept:volume-confirmation",
+             "the objective form of above average"),
+            ("property:bollinger-band-width", "about", "concept:compression",
+             "low and falling is what one looks like"),
+            ("property:atr-percentage", "about", "concept:expansion",
+             "rising is what one looks like"),
+            ("property:pivot-point", "about", "concept:horizontal-level",
+             "levels everyone computes from the same bar, which is what makes them levels"),
+            ("procedure:indicator-obv", "about", "concept:accumulation-pattern",
+             "rising while price stays flat is what identifies one"),
+            ("procedure:indicator-obv", "about", "concept:distribution-pattern",
+             "falling while price holds up is what identifies one"),
+            ("procedure:indicator-vwap", "about", "concept:dynamic-level",
+             "a level that moves with price rather than sitting at one"),
+            ("concept:high-volume-node", "about", "concept:support-and-resistance",
+             "business done at a price is why it holds"),
+            # and back into chapters one and two
+            ("concept:volume", "about", "concept:order-flow",
+             "volume says how much traded; flow says which side was the aggressor"),
+            ("concept:liquidity-pool", "about", "concept:stop-order",
+             "the resting orders that make one are mostly stops"),
+            ("concept:stop-hunt", "about", "concept:liquidity-pool",
+             "the pool it runs"),
+            ("concept:liquidity-grab", "about", "concept:liquidity-pool",
+             "the same sweep, named for the fill it achieves"),
+            ("judgment:trend-is-your-friend", "about", "concept:trending-market",
+             "the state it advises trading with"),
+            ("fact:regime-determines-archetype-effectiveness", "about", "concept:market-regime",
+             "the regime it says selects the archetype"),
+            ("fact:win-rate-is-not-risk", "about", "fact:risk-is-multi-dimensional",
+             "skew is one of the dimensions it lists"),
+            # leaves: a thing the chapter states once and never connects to anything else
+            ("property:candle-body-size", "uses", "procedure:indicator-candlegeometry",
+             "the same anatomy, already computed"),
+            ("procedure:fvg-fill-status", "uses", "procedure:bullish-fvg-detection",
+             "the zone whose fill it tracks"),
+            ("concept:value-area-high", "about", "concept:support-and-resistance",
+             "the edge of value acts as a level in the session after it"),
+            ("concept:value-area-low", "about", "concept:support-and-resistance",
+             "the edge of value acts as a level in the session after it"),
+            ("concept:low-volume-node", "about", "concept:fair-value-gap",
+             "both mark price the market passed through rather than traded in"),
+            ("property:volume-profile-metric", "about", "concept:ranging-market",
+             "a value area wide against the session range is a rotational day"),
+            ("property:range-ratio", "about", "concept:compression",
+             "below half the average range is what one measures as"),
+            ("concept:smart-money-concept", "about", "concept:institutional-investor",
+             "the participants whose size is the whole of the argument"),
+            ("concept:buy-side-liquidity", "about", "concept:equal-highs-and-lows",
+             "it gathers above them"),
+            ("concept:sell-side-liquidity", "about", "concept:equal-highs-and-lows",
+             "it gathers below them"),
+            ("procedure:equal-level-detection", "uses", "procedure:swing-point-identification",
+             "the highs and lows it compares"),
+            ("procedure:indicator-obv", "about", "concept:volume-divergence",
+             "it rising while price does not is the classic form of one"),
+            ("property:relative-volume", "about", "concept:climactic-volume",
+             "several times normal is what makes it climactic"),
+            ("property:order-flow-delta", "about", "concept:volume",
+             "the same activity with a side attached to it"),
+            ("property:level-strength-score", "about", "concept:confluence",
+             "counting agreeing factors, applied to a single level"),
+            ("property:zone-freshness", "about", "concept:demand-zone",
+             "untested is the whole of its claim"),
+            ("property:zone-freshness", "about", "concept:supply-zone",
+             "untested is the whole of its claim"),
+            ("fact:timeframe-ratio", "about", "concept:market-structure",
+             "structure repeats at every scale, which is what makes two timeframes say different "
+             "things about the same market"),
+            ("property:trend-alignment-score", "uses", "procedure:trend-classification",
+             "the direction it scores on each timeframe"),
+            ("property:confluence-score", "uses", "property:level-strength-score",
+             "the weight each factor carries into the sum"),
+            ("property:zone-overlap", "uses", "property:support-resistance-zone-width",
+             "the widths it intersects"),
+        ],
+        "wired": {},
+    },
     "instruments-market-mechanics": {
         # Four of the eight sections list real kinds. 2.1 names four spot markets, 2.3 the option
         # types, 2.5 the crypto venue models and 2.7 the settlement regimes. The other four are
@@ -456,6 +668,10 @@ NOT_A_KIND = {"Regime Shift Triggers", "Information Events",
               # thing as the order type of that name, which is already a node; a second one under a
               # different primitive would be a duplicate wearing a different hat.
               "Iceberg",
+              # Attributes that make a zone strong, not a kind of zone; and a walkthrough of one
+              # level turning into the other, not a third kind of level.
+              "Zone Quality Factors", "Role Reversal Example", "Liquidity Sweep Setup",
+              "FVG as Entry",
               # A covered call is a position built from an option and a holding of the underlying,
               # not a kind of option -- it sits beside the call and the put in §2.3's examples and
               # is a different sort of thing. Its walkthrough stays on the option; the strategies
@@ -472,6 +688,10 @@ NOT_A_KIND = {"Regime Shift Triggers", "Information Events",
 #: code-derived is overwritten.
 MERGE_INTO = {
     "procedure:average-true-range": "procedure:indicator-atr",
+    # §3.5 states the definition of two computations the library already ships. The formula is the
+    # same formula; a second node would be the same measurement under a second name.
+    "procedure:on-balance-volume": "procedure:indicator-obv",
+    "procedure:volume-weighted-average-price": "procedure:indicator-vwap",
 }
 
 #: Authored definitions for terms the chapter names but never defines. Every one here is a place
@@ -1193,6 +1413,336 @@ AUTHORED: dict[str, tuple[str, str]] = {
         'Price return understates what a dividend-paying holding earned and misstates any comparison '
         'against an instrument that pays nothing; it is also the yield term that shows up in the '
         '[[Cost of Carry Relationship]].'),
+
+    # --- 03 core trading concepts ----------------------------------------------------------------
+    # This chapter characterises most things by what they look like on a chart -- "moving averages
+    # flat and intertwined" -- which tells a reader how to recognise one and not what it is. The
+    # characterisation is kept; these are the definitions beside them.
+    'concept:accumulation-pattern': (
+        'Sideways price with volume weighted towards up days -- the footprint of a buyer working a '
+        'large order without moving the price.',
+        'The tell is effort without result in one direction only: [[On-Balance Volume]] rises while '
+        'price stays flat. It is read as a large participant building a position quietly, and it '
+        'ends when the range breaks upward.'),
+    'concept:bearish-fair-value-gap': (
+        'A three-candle imbalance where the third candle\'s high stays below the first candle\'s '
+        'low, leaving a band price fell through without trading.',
+        'The gap is where selling was so one-sided that no two-way trade happened, and price often '
+        'returns to it before continuing down. The band runs from the first low to the third high.'),
+    'concept:break-of-structure': (
+        'Price closing beyond the most recent swing point in the direction of the trend.',
+        'It is the continuation signal: the sequence of higher highs and higher lows extends rather '
+        'than fails, which is what distinguishes it from a [[Change of Character]]. It is also where '
+        'the invalidation level for the position moves to.'),
+    'concept:buy-side-liquidity': (
+        'Resting buy orders above the market -- the stops of short positions and the entry orders of '
+        'breakout buyers.',
+        'It sits where everyone can see it: above swing highs and above [[Equal Highs and Lows]]. '
+        'That visibility is the point, because a large seller needs buyers to sell into, and this is '
+        'where they are.'),
+    'concept:bullish-fair-value-gap': (
+        'A three-candle imbalance where the third candle\'s low stays above the first candle\'s '
+        'high, leaving a band price rose through without trading.',
+        'It marks delivery too fast to be two-sided, and the market tends to return and trade the '
+        'band before continuing up. The band runs from the first high to the third low.'),
+    'concept:change-of-character': (
+        'Price breaking structure against the prevailing trend -- the first break that does not fit '
+        'the sequence.',
+        'It is a warning rather than a reversal: the trend has stopped extending, which is not yet '
+        'the same as turning. Treating it as an entry rather than as notice to tighten is the '
+        'mistake the chapter warns about.'),
+    'concept:climactic-volume': (
+        'A volume spike several times normal at a price extreme.',
+        'It reads as exhaustion rather than confirmation: everyone who was going to act has acted, '
+        'and there is no one left to continue the move. The same magnitude in the middle of a range '
+        'means nothing of the kind.'),
+    'concept:compression': (
+        'A phase of contracting range and falling volatility.',
+        'Ranges narrow, bands squeeze and volume dries up while the market waits. It resolves into '
+        '[[Expansion]], which is why compression is read as a setup rather than as a state to trade '
+        'inside.'),
+    'concept:confluence': (
+        'Several independent methods marking the same price or the same moment.',
+        'What earns the extra confidence is the independence: a moving average, a prior swing and a '
+        'retracement level agreeing say more together than any of them repeated. It raises the odds '
+        'and settles nothing on its own, which is why the chapter pairs it with position sizing '
+        'rather than with certainty.'),
+    'concept:demand-zone': (
+        'The base a strong rally departed from, taken to hold buying that was never filled.',
+        'The claim is about the origin of the move rather than the number of touches, which is what '
+        'separates it from [[Support and Resistance]]. It is strongest untested, and it weakens each '
+        'time price returns to it.'),
+    'concept:distribution-pattern': (
+        'Sideways price with volume weighted towards down days -- a large seller working out of a '
+        'position near the highs.',
+        'It is the mirror of [[Accumulation Pattern]]: [[On-Balance Volume]] falls while price holds '
+        'up, and the range usually breaks down. Price alone shows nothing, which is the reason to '
+        'look at volume at all.'),
+    'concept:dynamic-level': (
+        'A support or resistance level that moves with price: a moving average, a trend line, VWAP, '
+        'a band.',
+        'It is the same idea as a horizontal level with a different anchor -- the level is computed '
+        'from recent price rather than fixed at one -- and it is why the same instrument can respect '
+        'a rising line it never touched at a fixed price.'),
+    'concept:equal-highs-and-lows': (
+        'Two or more touches at the same level, which is where stops collect.',
+        'The obviousness is what makes them liquidity: every trader who drew the same line put a '
+        'stop just beyond it. The chapter\'s advice follows from that -- expect the level to be '
+        'swept before any real move, and place stops past it rather than at it.'),
+    'concept:expansion': (
+        'A phase of widening range and rising volatility.',
+        'Directional candles, rising [[Average True Range]] and rising volume: this is where trends '
+        'begin and resume, and where a strategy fitted to the quiet phase before it stops working.'),
+    'concept:fair-value-gap': (
+        'A band of price that one impulsive move passed through without two-sided trade.',
+        'The market treats it as unfinished business and tends to return to it, which makes it a '
+        'target for a pullback entry and a magnet for price that has run too far. A gap that is '
+        'filled has done its work; an unfilled one is still pulling.'),
+    'concept:high-volume-node': (
+        'A price level where a lot of volume has traded.',
+        'Business done at a price is agreement about value, and price tends to slow there, which is '
+        'why these act as support and resistance without being drawn from swings.'),
+    'concept:horizontal-level': (
+        'A support or resistance level fixed at a price -- a prior swing, a level tested repeatedly, '
+        'a round number, a high-volume node.',
+        'It holds because enough participants remember the same price, which is also why it stops '
+        'holding once everyone has traded around it.'),
+    'concept:liquidity-grab': (
+        'A quick move into a pool of resting orders followed immediately by a reversal.',
+        'It is how a large order gets filled without paying for the whole move: the stops it '
+        'triggers supply the other side. Read as a breakout it is a loss; read as a sweep it is the '
+        'entry.'),
+    'concept:liquidity-pool': (
+        'A cluster of resting orders -- stops and pending entries -- at a level everyone can see.',
+        'Price is drawn towards them because that is where size can be filled, which inverts the '
+        'naive reading of a level: the obvious stop is not protection but a target.'),
+    'concept:low-volume-node': (
+        'A price level where little volume has traded.',
+        'Little business means little agreement, so price crosses these quickly rather than settling '
+        'in them -- which makes them poor targets and good places to expect acceleration.'),
+    'concept:market-structure': (
+        'The arrangement of swing highs and lows that says whether a market is trending or ranging.',
+        'It gives trend a definition that can be checked rather than eyeballed: higher highs with '
+        'higher lows, or lower lows with lower highs, and neither in a range. Because it is defined '
+        'by swings it repeats at every timeframe, and it supplies the level at which a position is '
+        'wrong -- the structural point whose break invalidates the read.'),
+    'concept:multi-timeframe-analysis': (
+        'Reading the same market on several timeframes, taking context from the higher and timing '
+        'from the lower.',
+        'The higher timeframe wins where they disagree, because more participants and more capital '
+        'are expressed in it. Working downward -- trend, then level, then trigger -- is what stops a '
+        'good entry being taken against the move that matters.'),
+    'concept:point-of-control': (
+        'The price with the most volume traded in a session -- where the most business was done.',
+        'It is the session\'s fairest price by the market\'s own vote, and price returns to it '
+        'during balanced trade, which makes it a better target than an entry.'),
+    'concept:ranging-market': (
+        'A market oscillating between a floor and a ceiling, making no directional progress.',
+        'Moving averages flatten and cross, and [[ADX]] sits below twenty. Mean reversion is what '
+        'works here and trend following is what bleeds, which is the whole reason to classify the '
+        'state before choosing the strategy.'),
+    'concept:sell-side-liquidity': (
+        'Resting sell orders below the market -- the stops of long positions and the entry orders of '
+        'breakdown sellers.',
+        'It gathers under swing lows and under [[Equal Highs and Lows]], and it is where a large '
+        'buyer finds the size to buy.'),
+    'concept:smart-money-concept': (
+        'The reading of price as the footprint of participants large enough to need other people\'s '
+        'orders to fill their own.',
+        'The claim is mechanical rather than conspiratorial: size cannot be filled where there is no '
+        'liquidity, so it is filled where the stops are. Whether the label is right, the constraint '
+        'it names is real.'),
+    'concept:stop-hunt': (
+        'A move that runs the stops clustered at an obvious level and then turns.',
+        'It is [[Liquidity Grab]] seen from the side of the trader who was stopped out, and it is '
+        'the argument for placing stops past the obvious level rather than on it.'),
+    'concept:supply-demand-zone': (
+        'The area a strong impulsive move began from, expected to matter again when price returns.',
+        'It is defined by the origin of a move rather than by how often a level has been touched, '
+        'which is what distinguishes it from [[Support and Resistance]]. Fresh zones are the claim; '
+        'a zone tested twice has spent whatever imbalance it held.'),
+    'concept:supply-zone': (
+        'The base a strong decline departed from, taken to hold selling that was never filled.',
+        'The mirror of [[Demand Zone]]: the stronger and faster the move away, the stronger the '
+        'claim that unfilled orders remain behind it.'),
+    'concept:support-and-resistance': (
+        'Price levels where buying or selling has repeatedly been strong enough to stop a move.',
+        'They work because participants remember them and act again at the same price, which is why '
+        'a broken level reverses role: the buyers defending it become the sellers trapped above it. '
+        'They are zones rather than lines, and their weight comes from the timeframe they were drawn '
+        'on and how strongly price reacted before.'),
+    'concept:trending-market': (
+        'A market making higher highs and higher lows, or lower lows and lower highs, with pullbacks '
+        'shallow against the moves that make them.',
+        'Moving averages separate and slope, and [[ADX]] holds above twenty-five. This is where '
+        'trend following and momentum work and where mean reversion is most dangerous, because the '
+        'reversion it waits for does not come.'),
+    'concept:value-area-high': (
+        'The upper edge of the range holding roughly seventy per cent of a session\'s volume.',
+        'It is the boundary between accepted value and price the market has rejected, so a session '
+        'opening above it is making a directional statement rather than rotating.'),
+    'concept:value-area-low': (
+        'The lower edge of the range holding roughly seventy per cent of a session\'s volume.',
+        'Together with [[Value Area High]] it bounds where business was done, and both act as levels '
+        'in the next session for the same reason a [[High Volume Node]] does.'),
+    'concept:volume': (
+        'How much traded in a period -- the amount of activity behind a price move.',
+        'It is the second dimension of every move: the same distance travelled on twice the volume '
+        'is a different event, because more participants had to agree to produce it. Comparing '
+        'effort against result is what separates a move that will hold from one that will not.'),
+    'concept:volume-confirmation': (
+        'The requirement that a breakout come with above-average volume before it is believed.',
+        'A move on thin volume is a move few people took part in, and those are the breakouts that '
+        'fail back into the range. Requiring it costs some genuine breakouts and avoids most false '
+        'ones.'),
+    'concept:volume-divergence': (
+        'Price making new extremes while volume does not follow.',
+        'Participation is draining out of the move even as it continues, which is a warning rather '
+        'than a signal: divergences persist far longer than they look like they should.'),
+    'concept:volume-profile': (
+        'The distribution of traded volume across price rather than across time.',
+        'It answers a different question from a chart of price over time: not where price went, but '
+        'where business was actually done. From it come the [[Point of Control]] and the value area, '
+        'and with them the auction reading of a market -- price advertises, volume accepts or '
+        'rejects, and value migrates when one side keeps making progress.'),
+    'fact:risk-is-multi-dimensional': (
+        'Risk is not one number: per-trade exposure, the skew of the strategy, its fit to the '
+        'regime, drawdown, tail losses and correlation are each a separate one.',
+        'They are independent, which is the part that gets missed -- tightening a stop lowers the '
+        'first and leaves the second untouched. A mean reversion strategy with small losses still '
+        'holds a large one, and positions that look diversified converge exactly when it matters.'),
+    'fact:regime-determines-archetype-effectiveness': (
+        'Which family of strategy works is decided by the regime, not by the strategy.',
+        'Trend following and momentum earn in a strong trend and bleed in a range; mean reversion '
+        'does the reverse. Breakouts need volatility and carry needs quiet. So the regime is read '
+        'first and the archetype chosen second -- applying one without that read is a bet on the '
+        'market being in the state the strategy happens to need.'),
+    'fact:timeframe-ratio': (
+        'Timeframes are worth watching together when each is roughly four to six times the one '
+        'below it.',
+        'Closer than that and the two show the same thing twice; further apart and the lower gives '
+        'no context for the higher. Daily against four-hour is six to one; four-hour against hourly '
+        'is four to one.'),
+    'procedure:adx-trend-strength': (
+        'Classifies the market as trending, ranging or transitional from the level of [[ADX]].',
+        'Above twenty-five is a trend, below twenty is a range, and between them is the state in '
+        'which most strategies are least reliable. It measures how strong a trend is and says '
+        'nothing about which way it points.'),
+    'procedure:bearish-fvg-detection': (
+        'Detects a bearish gap: the third candle\'s high below the first candle\'s low.',
+        'The two bounding prices become the zone, and its size is what the significance filter is '
+        'applied to.'),
+    'procedure:bullish-fvg-detection': (
+        'Detects a bullish gap: the third candle\'s low above the first candle\'s high.',
+        'Three candles are enough because the imbalance is defined by the outer two failing to '
+        'overlap -- the middle candle is the impulse that caused it.'),
+    'procedure:equal-level-detection': (
+        'Finds highs or lows matching within a tolerance -- the levels where stops gather.',
+        'The tolerance is what makes it usable: exact equality almost never occurs, and a level a '
+        'few ticks apart is the same level to everyone looking at it.'),
+    'procedure:fvg-fill-status': (
+        'Classifies a gap as unfilled, partially filled or filled by how far price has traded back '
+        'through it.',
+        'The status is what makes a gap tradeable or spent: an unfilled gap is still a target, and a '
+        'filled one is history.'),
+    'procedure:fvg-validity': (
+        'Keeps only gaps larger than half the [[Average True Range]].',
+        'Every noisy series produces small gaps constantly; without a size filter the chart fills '
+        'with them and none of them mean anything.'),
+    'procedure:liquidity-zone-identification': (
+        'Places the buy-side and sell-side pools a fraction of an [[Average True Range]] beyond the '
+        'recent swing high and low.',
+        'The buffer is the point: stops sit past the level rather than on it, so the zone that gets '
+        'swept is above the high rather than at it.'),
+    'procedure:structure-break-detection': (
+        'Marks a break of structure when a close passes the previous swing high or low.',
+        'On the close rather than on the wick, which is what separates a structural break from a '
+        'sweep of the same level.'),
+    'procedure:swing-point-identification': (
+        'Marks a bar as a swing high or low when it exceeds the bars either side of it.',
+        'It is the primitive the rest of the chapter is built on: structure, liquidity pools and '
+        'zones are all defined in terms of swings, so the lookback chosen here sets what everything '
+        'downstream calls a trend.'),
+    'procedure:trend-classification': (
+        'Classifies the market as up, down or ranging by comparing consecutive swing highs and lows.',
+        'It turns "the trend is up" into something two people can check and agree on, and it returns '
+        'a range whenever the two conditions disagree rather than guessing.'),
+    'procedure:value-area-calculation': (
+        'Grows a range outward from the [[Point of Control]], taking the busier side each step, '
+        'until it holds seventy per cent of the volume.',
+        'Building outward from the busiest price is what makes the area an observation about where '
+        'business was done rather than a standard deviation of a distribution nobody checked was '
+        'normal.'),
+    'procedure:volume-profile': (
+        'Sums traded volume at each price level and takes the busiest as the point of control.',
+        'This is the computation behind the profile: bin by price rather than by time, and the shape '
+        'that results is where the levels come from.'),
+    'procedure:zone-identification': (
+        'Marks the consolidation before an impulsive move as a zone, valid when the departure '
+        'exceeds twice the [[Average True Range]].',
+        'The size test is what keeps every pause from becoming a zone; the base itself is bounded by '
+        'the extreme of the consolidation and the last body before the move.'),
+    'property:atr-percentage': (
+        'The [[Average True Range]] as a percentage of price.',
+        'Expressing range against price is what makes two instruments comparable, and its direction '
+        'is the objective form of [[Compression]] and [[Expansion]].'),
+    'property:bollinger-band-width': (
+        'The distance between the bands as a fraction of the middle band.',
+        'It is the standard measure of a squeeze: low and falling is compression, rising is the '
+        'expansion that follows it.'),
+    'property:candle-body-size': (
+        'The anatomy of one bar -- body, upper and lower wick, range, and the body as a share of the '
+        'range.',
+        'It is what the reading of a single candle reduces to: a large body is agreement through the '
+        'period, a long wick is a price the market visited and rejected.'),
+    'property:confluence-score': (
+        'The weighted count of independent factors agreeing at one level.',
+        'Weighting is what stops five weak agreements outranking one strong one; the chapter\'s '
+        'weights put a higher-timeframe level at three and a round number at one.'),
+    'property:level-strength-score': (
+        'How much weight a level carries, from the number of touches, the timeframes it appears on '
+        'and the volume traded there.',
+        'It makes explicit what is usually a judgement call, so that two levels can be ranked '
+        'instead of both being drawn and treated alike.'),
+    'property:order-flow-delta': (
+        'Buy volume minus sell volume, and its running total.',
+        'Volume says how much traded; delta says which side was the aggressor. A rising price on '
+        'negative cumulative delta is a move being sold into, which is invisible in volume alone.'),
+    'property:pivot-point': (
+        'A level derived from the previous period\'s high, low and close, with supports and '
+        'resistances stepped out from it.',
+        'The value is not in the arithmetic but in how many participants compute the same numbers '
+        'from the same bar, which is what makes them levels at all.'),
+    'property:range-ratio': (
+        'The current range against the average range of recent periods.',
+        'Below half is compression and above one and a half is expansion, which turns the phase of '
+        'the volatility cycle into a number rather than an impression.'),
+    'property:relative-volume': (
+        'Current volume against the average for the same period.',
+        'Absolute volume says nothing without its own baseline: above one and a half is real '
+        'participation, and it is the objective form of the confirmation the chapter demands of a '
+        'breakout.'),
+    'property:support-resistance-zone-width': (
+        'How wide to draw a level, scaled to the [[Average True Range]].',
+        'Drawing a zone rather than a line is what accommodates the wicks that pierce every level; '
+        'scaling it to volatility is what keeps one instrument\'s zone from being another\'s noise.'),
+    'property:trend-alignment-score': (
+        'The weighted sum of each timeframe\'s direction, scored plus one, minus one or zero.',
+        'It reduces the multi-timeframe read to one number, which is what the chapter\'s "two of '
+        'three must agree" rule is checking.'),
+    'property:volume-profile-metric': (
+        'The width of the value area, in price and as a share of the session range.',
+        'A narrow value area against a wide session says the market spent its time in one place and '
+        'travelled through the rest -- a directional day. A wide one says it rotated.'),
+    'property:zone-freshness': (
+        'How many times price has already traded into a zone.',
+        'Untouched is the whole claim: the orders presumed to rest there are filled by the first '
+        'test, so a second visit is weaker and a third is not worth taking.'),
+    'property:zone-overlap': (
+        'The intersection of the individual zones a level is made of.',
+        'It is what turns several near-agreements into one tradeable area, and it is only high '
+        'confluence if the overlap is tighter than an [[Average True Range]] and at least three '
+        'factors are in it.'),
 }
 
 #: Typed I/O for a chapter's stated formulas, in the shape the 71 code-derived indicators use. The
@@ -1312,7 +1862,9 @@ IRREGULAR = {"mechanics": "mechanics", "analysis": "analysis", "series": "series
              # Not plurals. "Basis" and "Greeks" are the terms themselves, and a futures contract
              # is "futures" -- a `future` is a different word. Stripping the s invented three terms
              # nobody uses: `basi`, `greek`, `future`.
-             "basis": "basis", "greeks": "greeks", "futures": "futures"}
+             "basis": "basis", "greeks": "greeks", "futures": "futures",
+             # "Status" is not a plural either; it was becoming `statu`.
+             "status": "status"}
 
 
 #: Trailing words that name the FORM of a thing rather than the thing: "Almgren-Chriss Market
@@ -1433,6 +1985,11 @@ def labelled_blocks(lines: list[str]) -> list[tuple[str, list[str]]]:
 ILLUSTRATIVE = ("result:", "indication:", "interpretation:")
 DEFINITIONAL = ("instruction:",)
 
+#: A bullet or a numbered step. §3.7 and §3.10 walk a zone and a gap through numbered steps rather
+#: than bullets, and reading only the bullets dropped every one of those blocks -- four concepts the
+#: chapter defines, and nothing said so.
+ITEM = re.compile(r"^(?:-|\d+\.)\s+")
+
 
 def split_block(body: list[str]) -> tuple[str, str]:
     """Return (definition, illustration) for one Examples sub-block.
@@ -1443,9 +2000,9 @@ def split_block(body: list[str]) -> tuple[str, str]:
     define, show = [], []
     for line in body:
         s = line.strip()
-        if not s.startswith("-"):
+        if not ITEM.match(s):
             continue
-        s = s.lstrip("- ").strip()
+        s = ITEM.sub("", s).strip()
         low = s.lower()
         if low.startswith(ILLUSTRATIVE):
             show.append(s)
@@ -1454,6 +2011,60 @@ def split_block(body: list[str]) -> tuple[str, str]:
         else:
             define.append(s)
     return " ".join(define), " ".join(show)
+
+
+#: `**Label:** text on the same line` -- the shape §3.0 states a claim in, as against the
+#: `**Label:**` on a line of its own that Examples and Formulas use.
+INLINE_LABEL = re.compile(r"^\*\*(.+?):?\*\*:?\s*(.*)$")
+
+
+def free_block(lines: list[str]) -> dict:
+    """A block that follows no scaffold, read for the four things such a block ever holds.
+
+    §3.0 states each piece of market wisdom as a definition, a list of reasons, sometimes a table
+    and sometimes a warning in a blockquote -- and the warning is the part that matters most
+    ("do NOT describe mean reversion as safer"). Reading only the bullets would drop it.
+    """
+    out: dict = {}
+    bullet_lines, quote, rows, prose = [], [], [], []
+    for raw in lines:
+        s = raw.strip()
+        if not s:
+            continue
+        if m := INLINE_LABEL.match(s):
+            label, rest = m.group(1).strip(), m.group(2).strip()
+            if label.lower() == "definition" and rest:
+                out["summary"] = rest
+            elif rest:
+                prose.append(f"{label}: {rest}")
+            continue
+        if s.startswith(">"):
+            quote.append(s.lstrip("> ").strip().replace("**", ""))
+        elif s.startswith("|"):
+            if set(s) <= set("|- :"):
+                continue
+            cells = [c.strip().replace("**", "") for c in s.strip("|").split("|")]
+            rows.append(" · ".join(c for c in cells if c))
+        elif s.startswith("-"):
+            bullet_lines.append(s.lstrip("- ").strip())
+        else:
+            prose.append(s.replace("**", ""))
+    if not out.get("summary") and prose:
+        out["summary"] = prose.pop(0)
+    if bullet_lines:
+        out["explanation"] = " ".join(bullet_lines)
+    if rows:
+        out["comparison"] = rows
+    if quote:
+        out["caution"] = " ".join(quote)
+    if prose:
+        out["notes"] = prose
+    return out
+
+
+def block_text(lines: list[str]) -> str:
+    """Everything a block says, code fences and all -- for a block nothing else claims."""
+    return " ".join(l.strip() for l in lines if l.strip() and not l.strip().startswith("```"))
 
 
 def table_rows(lines: list[str]) -> list[tuple[str, str]]:
@@ -1507,6 +2118,9 @@ def build(path: Path, chapter: str, parent: str,
         one node: the longer definition wins and the props union, rather than a second node or a
         build error. Deconfliction of the two wordings is a review step, not a parse-time decision."""
         nid = decl.get("rename", {}).get(title) or f"{kind.lower()}:{slug(title)}"
+        # A heading is written to head a section, not to name a node: "Trending Market
+        # Characteristics" heads a list of them. `rename` fixes the id; this fixes what it is called.
+        title = decl.get("retitle", {}).get(title, title)
         target = MERGE_INTO.get(nid, nid)
         if target in existing:
             # Already in the graph: FULL OUTER MERGE. The existing node keeps its identity and its
@@ -1575,6 +2189,10 @@ def build(path: Path, chapter: str, parent: str,
         return nid.split(":", 1)[1].replace("-", " ")
 
     def rel(src: str, relation: str, dst: str, why: str) -> None:
+        if src == dst:
+            # A section that defines the subject the whole chapter hangs off -- §3.1 defines price
+            # action, and price action is the chapter's parent -- would otherwise be part of itself.
+            return
         if not any(r["from_id"] == src and r["rel"] == relation and r["to_id"] == dst for r in rels):
             rels.append({"from": name_of(src), "rel": relation, "to": name_of(dst),
                          "why": why, "from_id": src, "to_id": dst})
@@ -1593,10 +2211,30 @@ def build(path: Path, chapter: str, parent: str,
         per_member = {name: text for name, text in use_bullets if name}
         uses = [text for name, text in use_bullets if not name]
 
+        # Blocks this chapter declares to be nodes in their own right. §3.0 states four pieces of
+        # market wisdom under headings of their own, with no Definition block and no subject: each
+        # is a claim about how trading behaves, not a thing the section is about.
+        as_nodes = decl.get("blocks_as_nodes", {}).get(sec["title"], {})
+        for heading, primitive in as_nodes.items():
+            if heading not in blocks:
+                raise ValueError(f"`blocks_as_nodes` names {heading!r}, which {sec['title']!r} "
+                                 "does not contain -- reworded?")
+            read = free_block(blocks[heading])
+            nid = atom(primitive, heading, read.pop("summary", ""), _section=num, **read)
+            rel(nid, "part-of", parent, f"stated under {sec['title'].lower()}")
+
         # The section's subject(s). Bolded bullets mean the section defines several things and has
         # no single subject; prose means the section IS about one thing, named by its own heading.
+        # A section with no Definition at all has no subject: it is a container for its blocks, and
+        # every one of them must be declared or the chapter refuses to build.
         if defined:
             subjects = [atom("Concept", name, text, _section=num) for name, text in defined]
+        elif not definition and as_nodes:
+            undeclared = [h for h in blocks if h not in as_nodes and h not in SCAFFOLD]
+            if undeclared:
+                raise ValueError(f"{sec['title']!r} has no Definition and no subject to hang "
+                                 f"{undeclared} on -- declare them in `blocks_as_nodes`")
+            subjects = []
         else:
             subjects = [atom("Concept", sec["title"], prose, applications=uses, _section=num)]
         for s in subjects:
@@ -1623,16 +2261,20 @@ def build(path: Path, chapter: str, parent: str,
                 rel(cid, "part-of", parent, f"defined under {sec['title'].lower()}")
                 continue
             principles.append(f"{name}: {text}" if name else text)
-        for _, text in bullets(blocks.get("Best Practices for Traders", [])):
-            practices.append(text)
+        # Every heading that advises, not only the one worded "for Traders": §3.11 titles its list
+        # "Best Practices for Volume Profile" and six practices were being dropped for it.
+        for heading, body in blocks.items():
+            if heading.startswith("Best Practices"):
+                for _, text in bullets(body):
+                    practices.append(text)
 
         if sec["title"] in decl["taxonomy"]:
             for label, body in labelled_blocks(blocks.get("Examples", [])):
                 if label in NOT_A_KIND:
                     # Not a kind, but not rubbish either -- "Regime Shift Triggers" lists what
                     # causes a shift. Kept on the subject rather than discarded.
-                    txt = " ".join(b.strip().lstrip("- ").strip() for b in body
-                                   if b.strip().startswith("-"))
+                    txt = " ".join(ITEM.sub("", b.strip()).strip() for b in body
+                                   if ITEM.match(b.strip()))
                     if txt:
                         target = subject_for(label, subjects)
                         (atoms[target]["props"].setdefault("examples", []).append(f"{label}: {txt}")
@@ -1654,9 +2296,12 @@ def build(path: Path, chapter: str, parent: str,
                 # The WHOLE block, not the prefixed lines: an illustration is the walkthrough,
                 # and splitting it kept "Indication: highly liquid" while dropping the bid, ask and
                 # spread figures that make the point.
-                text = " ".join(b.strip().lstrip("- ").strip()
-                                for b in body if b.strip().startswith("-"))
-                if not text:
+                # Bullets AND anything fenced: §3.2 draws its uptrend as ASCII art inside a code
+                # block, and reading only the bullets kept the caption and dropped the picture.
+                text = " ".join([ITEM.sub("", b.strip()).strip()
+                                 for b in body if ITEM.match(b.strip())]
+                                + ([code_of(body)] if code_of(body) else []))
+                if not text.strip():
                     continue
                 key = slug(re.sub(r"\bexample\b", "", label, flags=re.I))
                 target = next((s for s in subjects if s.endswith(f":{key}")), subjects[0])
@@ -1677,11 +2322,12 @@ def build(path: Path, chapter: str, parent: str,
                     if val:
                         atoms[mid]["props"][col] = val
 
-        for heading, (target, relation) in decl.get("tables", {}).items():
+        for heading, spec in decl.get("tables", {}).items():
+            target, relation, primitive = (*spec, "Procedure")[:3]
             for name, rest in table_rows(blocks.get(heading, [])):
                 if name in NOT_A_KIND:
                     continue
-                nid = atom("Procedure", name, rest, _generated=True, _section=num)
+                nid = atom(primitive, name, rest, _generated=True, _section=num)
                 rel(nid, relation, target, f"listed under {heading.lower()}")
 
         for label, body in labelled_blocks(blocks.get("Mathematical Rules/Formulas", [])):
@@ -1700,6 +2346,26 @@ def build(path: Path, chapter: str, parent: str,
                        formula=formula, _generated=True, _section=num)
             quantified = subject_for(label, subjects)
             rel(pid, "about", quantified, f"quantifies {name_of(quantified)}")
+
+        # Anything else the section says. A chapter is free to add a heading nobody anticipated --
+        # §3.11 has five of them, holding the interpretation of a volume profile and the auction
+        # scenarios it is read through -- and a block that matches no rule was previously dropped
+        # without a word. It is kept on the section's subject under its own name instead.
+        handled = set(SCAFFOLD) | set(as_nodes) | set(decl.get("tables", {})) \
+            | set(decl.get("table_properties", {}))
+        for heading, body in blocks.items():
+            if heading in handled or heading.startswith("Best Practices"):
+                continue
+            text = block_text(body)
+            if not text or not subjects:
+                if text and not subjects:
+                    raise ValueError(f"{sec['title']!r} says {heading!r} with no subject to keep "
+                                     "it on")
+                continue
+            target = subject_for(heading, subjects)
+            key = slug(heading).replace("-", "_")
+            (atoms[target]["props"] if target in atoms
+             else extra.setdefault(target, {})).setdefault(key, text)
 
     # The chapter's opening paragraph and its Summary section state what the chapter is for and
     # what it claims to deliver. Both were parsed and thrown away -- the only text in the file that
