@@ -1,0 +1,189 @@
+---
+name: knowledge-ingest
+description: >-
+  Turn a knowledge-base chapter into nodes and edges in the mangrove-kb graph. This skill should be
+  used when the task is to "add a chapter to the graph", "ingest the knowledge base", "turn these
+  docs into nodes", "extend the ontology from the chapters", or when editing
+  `ontology/chapter_to_atoms.py`, its `CHAPTERS` declarations, or
+  `ontology/signal-indicator-ontology.json`. Covers the extraction pipeline, the per-chapter
+  declarations, the review gates, and the failure modes that cost the most when skipped.
+---
+
+# Turn a chapter into graph
+
+The knowledge base is eight numbered chapters plus a glossary and a quick reference, held in
+`mangrove-platform-frontend-web` at `content/knowledge-base/*.md` on `origin/dev`. Each chapter
+becomes nodes and edges in `ontology/signal-indicator-ontology.json`, joining the code-derived nodes
+already there; a copy of each ingested chapter lands in `ontology/raw/`.
+
+The requirement is **all the information from a chapter reaches the graph**. The merge is an
+**outer join with dedupe**, never a choice between two sources: where the chapter and an authored
+definition differ materially both are kept (`source_wording`, `chapter_variants`); where they say the
+same thing in different words they collapse.
+
+This file is the reference for **how a chapter is ingested**.
+[`references/declarations.md`](references/declarations.md) is the reference for **which declaration
+fixes what**, and [`references/lessons.md`](references/lessons.md) for **what goes wrong** — worth
+reading before the first chapter rather than after.
+
+## Contents
+
+| Section | What it is for |
+|---|---|
+| [Two rules](#two-rules-that-account-for-most-of-the-cost) | The two habits that account for most of the wasted work on this task. |
+| [The scaffold](#the-scaffold-and-what-is-not-a-node) | The six headings a section carries, what each becomes, and what is deliberately not a node. |
+| [Procedure](#procedure) | The seven steps from an unread chapter to a committed, rendered graph. |
+| [Pipeline](#pipeline) | The exact commands that rebuild the record, and the dependency that fails silently. |
+| [Review gates](#review-gates) | The four checks to run before committing a chapter, with the code for the additive check. |
+| [Writing node prose](#writing-node-prose) | How authored summaries and explanations are written and merged. |
+| [Additional resources](#additional-resources) | Where the declaration reference, the failure modes and the query skill live. |
+
+## Two rules that account for most of the cost
+
+**Read the whole chapter before writing a single declaration.** Not a skim, not the headings, not the
+first section. Every extraction rule is a claim about what the document contains, and a claim made
+without reading gets debugged one defect per turn against parser output. Reading a 4,000-word chapter
+takes minutes; learning its contents through build failures takes a day.
+
+**Fix a wrong parse by declaring, never by editing output.** The record is generated. An edit to
+`signal-indicator-ontology.json` is erased by the next rebuild, and worse, hides that the extractor
+is still wrong. Every correction belongs in `CHAPTERS[<chapter>]` or one of the global tables in
+`ontology/chapter_to_atoms.py`.
+
+**See also:** [the scaffold](#the-scaffold-and-what-is-not-a-node) ·
+[failure modes](references/lessons.md)
+
+## The scaffold, and what is not a node
+
+Most sections carry six headings, each with a fixed meaning:
+
+```
+## N.M <Section title>
+### Definition                    -> the Concept(s) the section is about
+### Core Principles               -> claims about them        (one Fact node per chapter)
+### Common Use Cases              -> `applications` on the subject
+### Examples                      -> a taxonomy, or an illustration (declare which)
+### Best Practices for Traders    -> what to do about them    (one Judgment node per chapter)
+### Mathematical Rules/Formulas   -> Property / Procedure / Fact nodes
+```
+
+Not nodes: a heading, a worked example with figures in it, and any claim *about* a thing —
+"Liquidity is Dynamic" is something true of liquidity, not a second thing beside it. Core Principles
+and Best Practices are each **one** node holding the whole list, not one node per bullet: a bullet
+has no name to slug, and naming fifty of them means inventing fifty interpretations.
+
+A chapter is free to break this shape, and later ones do. Blocks matching no rule are kept on the
+section's subject under their own name rather than dropped, and a section with no `### Definition`
+must declare what its blocks are or the build refuses.
+
+Everything emitted is `status: draft`. Promotion is a human act.
+
+**See also:** [declarations](references/declarations.md) · [procedure](#procedure)
+
+## Procedure
+
+1. **Fetch and read the chapter.** `git show origin/dev:content/knowledge-base/<file>.md`. Read it
+   end to end. Note which `### Examples` blocks list real kinds rather than worked arithmetic; which
+   formulas are quantities, rules or identities; which terms the graph already holds under another
+   name; which sections break the scaffold.
+2. **Declare.** Add the chapter's entry to `CHAPTERS`. A chapter with no entry raises rather than
+   building — building without one emits a graph with no taxonomy and says nothing about it.
+3. **Dry-run and stop.** `--table` prints the node list without merging. Review it, and get it
+   reviewed. Feedback on a list is cheap; edge work on a wrong list is wasted.
+4. **Correct through declarations** until the table reads as intended. Boilerplate summaries
+   (`The quantity X.`), a worked example standing where a definition belongs, an id like
+   `procedure:fvg-fill-statu`, a formula attached to the wrong subject — each has a declaration.
+5. **Merge** with `--merge`, then verify the merge is additive.
+6. **Wire the statements.** Every principle and practice that names a node moves out of its list and
+   onto an `about` edge from that node, carrying the line as the edge's `why`.
+7. **Close the gaps, then commit.** No node reachable by a single edge. Update the documented counts,
+   run the suite, commit, re-render, watch CI to green.
+
+**See also:** [pipeline](#pipeline) · [review gates](#review-gates) ·
+[declarations](references/declarations.md)
+
+## Pipeline
+
+Three stages plus one per ingested chapter, each writing to `build/` and copied over the record only
+after the diff is checked:
+
+```bash
+ONTOLOGY_OUT=build/code.json python3 ontology/build_signal_indicator_ontology.py
+python3 -m wiki_to_graph build ontology/wiki -o build/wiki.json \
+        --map ontology/wiki-config/map.json --vocab ontology/wiki-config/vocab.json \
+        --dag-edges part-of,kind-of,instance-of,supersedes
+python3 ontology/wiki_to_atoms.py --wiki ontology/wiki --graph build/wiki.json \
+        --ontology build/code.json --out build/r1.json
+python3 ontology/chapter_to_atoms.py ontology/raw/01-market-foundations.md \
+        --chapter-id market-foundations --parent concept:market-foundations \
+        --ontology build/r1.json --merge --out build/ch1.json
+# one invocation per chapter, each taking the previous output as --ontology
+cp build/<last>.json ontology/signal-indicator-ontology.json
+```
+
+`build_signal_indicator_ontology.py` writes the code-derived nodes from the library's docstrings and
+is authoritative — nothing downstream may overwrite what it wrote. `wiki-to-graph` is a **dev
+dependency pinned to a commit** in `pyproject.toml`; the published release lacks `--vocab`, without
+which the build silently produces a graph in which every node reports degree 0.
+
+`--parent` is the chapter's subject-area node (`concept:market-foundations`,
+`concept:market-mechanics`, `concept:price-action`, …). Those six anchors are authored in
+`ontology/wiki/` and exist before any chapter lands.
+
+**See also:** [review gates](#review-gates) · [procedure](#procedure)
+
+## Review gates
+
+Run all four before committing a chapter.
+
+**Additive.** Only declared folds may touch an existing atom, and no edge may disappear:
+
+```python
+import json
+old = json.load(open('ontology/signal-indicator-ontology.json'))
+new = json.load(open('build/record.json'))
+o = {a['id']: a for a in old['atoms']}; n = {a['id']: a for a in new['atoms']}
+print('removed', set(o) - set(n), '| modified', [i for i in o if o[i] != n[i]])
+ro = {(r['from_id'], r['rel'], r['to_id']) for r in old['relations']}
+print('edges removed', ro - {(r['from_id'], r['rel'], r['to_id']) for r in new['relations']})
+```
+
+**Degree.** Count edges per node. A node with one is reachable by walking down from its parent and by
+no other question — give it the edge the chapter states and never draws, or say plainly why none
+exists.
+
+**Statement lists.** `props.principles` and `props.practices` on the chapter's Fact and Judgment
+nodes are the progress measure. Empty means the chapter is fully connected.
+
+**Counts and tests.** `python3 -m pytest tests/ -q`. `test_documented_counts.py` pins every node and
+edge count quoted in prose; `test_prose_is_not_glued.py` catches wrapped sentences that lost their
+spaces; `test_doc_derived_atoms.py` catches document numbering leaking into the graph.
+
+**See also:** [failure modes](references/lessons.md) · [writing node prose](#writing-node-prose)
+
+## Writing node prose
+
+Authored summaries and explanations go in the `AUTHORED` table, keyed by node id, as
+`(summary, explanation)`. The summary says **what the thing is**; the explanation says **why it
+matters and what it connects to**, with `[[Wiki Links]]` naming other nodes.
+
+Where the chapter states a real definition it stays as the summary and the authored one is kept
+beside it; where the chapter offers only a worked example ("AAPL Call, Strike $180"), the authored
+text becomes the summary and the example moves to `examples`. Neither is discarded.
+
+Write each wrapped line with a **trailing space**. Adjacent string literals concatenate with nothing
+between them, and a sentence wrapped without it reads "the spreadactually paid" in the published
+graph.
+
+**See also:** [declarations · AUTHORED](references/declarations.md) · [review gates](#review-gates)
+
+## Additional resources
+
+- **[`references/declarations.md`](references/declarations.md)** — every declaration key, what it
+  does, an example, and the defect it exists to prevent.
+- **[`references/lessons.md`](references/lessons.md)** — the failure modes, each with the rule it
+  produced.
+- **[`../knowledge-graph/SKILL.md`](../knowledge-graph/SKILL.md)** — querying the result: `find`,
+  `under`, `neighbors`, `path`, `all_paths`.
+
+**See also:** [procedure](#procedure) · [two rules](#two-rules-that-account-for-most-of-the-cost)
