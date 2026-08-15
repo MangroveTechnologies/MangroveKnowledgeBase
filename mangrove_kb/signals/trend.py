@@ -48,8 +48,8 @@ logger = logging.getLogger(__name__)
 
 @RuleRegistry.register("psar_bullish")
 @deprecated_signal(
-    "PSAR's level is only defined relative to a regime the indicator itself decides -- the"
-    "anchor, the acceleration factor and the update rule all switch on it -- so there is no"
+    "PSAR's level is only defined relative to a regime the indicator itself decides -- the "
+    "anchor, the acceleration factor and the update rule all switch on it -- so there is no "
     "regime-free measurement underneath and this signal is not in the ontology graph"
 )
 def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) -> bool:
@@ -84,8 +84,8 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
 
 @RuleRegistry.register("psar_bearish")
 @deprecated_signal(
-    "PSAR's level is only defined relative to a regime the indicator itself decides -- the"
-    "anchor, the acceleration factor and the update rule all switch on it -- so there is no"
+    "PSAR's level is only defined relative to a regime the indicator itself decides -- the "
+    "anchor, the acceleration factor and the update rule all switch on it -- so there is no "
     "regime-free measurement underneath and this signal is not in the ontology graph"
 )
 def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) -> bool:
@@ -120,8 +120,8 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
 
 @RuleRegistry.register("psar_reversal")
 @deprecated_signal(
-    "PSAR's level is only defined relative to a regime the indicator itself decides -- the"
-    "anchor, the acceleration factor and the update rule all switch on it -- so there is no"
+    "PSAR's level is only defined relative to a regime the indicator itself decides -- the "
+    "anchor, the acceleration factor and the update rule all switch on it -- so there is no "
     "regime-free measurement underneath and this signal is not in the ontology graph"
 )
 def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, direction: str = "bullish") -> bool:
@@ -238,8 +238,8 @@ def _supertrend_direction(df: pd.DataFrame, window: int, multiplier: float):
 
 @RuleRegistry.register("supertrend_long")
 @deprecated_signal(
-    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
-    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement, "
+    "so this signal has no measurement to inherit a class from and is not in the ontology "
     "graph"
 )
 def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
@@ -265,8 +265,8 @@ def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0)
 
 @RuleRegistry.register("supertrend_short")
 @deprecated_signal(
-    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
-    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement, "
+    "so this signal has no measurement to inherit a class from and is not in the ontology "
     "graph"
 )
 def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
@@ -292,8 +292,8 @@ def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0
 
 @RuleRegistry.register("supertrend_flip_up")
 @deprecated_signal(
-    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
-    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement, "
+    "so this signal has no measurement to inherit a class from and is not in the ontology "
     "graph"
 )
 def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
@@ -324,8 +324,8 @@ def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3
 
 @RuleRegistry.register("supertrend_flip_down")
 @deprecated_signal(
-    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement,"
-    "so this signal has no measurement to inherit a class from and is not in the ontology"
+    "SuperTrend emits `direction` (+1 long / -1 short), a verdict rather than a measurement, "
+    "so this signal has no measurement to inherit a class from and is not in the ontology "
     "graph"
 )
 def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
