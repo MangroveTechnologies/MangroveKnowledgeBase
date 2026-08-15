@@ -119,8 +119,8 @@ x402 payment is enforced on both HTTP and MCP via shared middleware.
 
 ## The Knowledge Graph
 
-`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 370 nodes
-and 1156 edges, generated from the source, shipped inside the wheel.
+`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 427 nodes
+and 1216 edges, generated from the source, shipped inside the wheel.
 
 ```python
 from mangrove_kb.graph import KnowledgeGraph

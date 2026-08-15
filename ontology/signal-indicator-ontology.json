@@ -17508,7 +17508,17 @@
     "reference_chapter": [
      "instruments-market-mechanics"
     ],
-    "explanation": "Spot markets, futures and perpetual swaps, options, margin and leverage and the liquidation engines that enforce them, crypto-specific mechanics, FX basics, settlement and clearing, and contract specifications. Distinct from market foundations: that subject area covers how a price forms, this one covers what is actually being traded and under whose rules."
+    "explanation": "Spot markets, futures and perpetual swaps, options, margin and leverage and the liquidation engines that enforce them, crypto-specific mechanics, FX basics, settlement and clearing, and contract specifications. Distinct from market foundations: that subject area covers how a price forms, this one covers what is actually being traded and under whose rules.",
+    "applications": [
+     "Capital Efficiency: Leverage availability varies dramatically across instruments",
+     "Risk Profile: Options offer defined risk; futures have unlimited downside",
+     "Settlement: Timing and method of settlement impacts cash management",
+     "Costs: Transaction costs, funding rates, and carry vary by instrument",
+     "Liquidity: Market depth and trading hours affect execution quality"
+    ],
+    "chapter_variants": {
+     "explanation": "This document covers the various financial instruments available for trading and the specific mechanics governing each market type, including derivatives, leverage, and crypto-specific considerations."
+    }
    }
   },
   {
@@ -18952,6 +18962,1078 @@
      "Understand the price discovery role of derivatives markets",
      "Be cautious trading immediately after major information releases",
      "Recognize that the first price after news is often not the right price"
+    ]
+   }
+  },
+  {
+   "id": "concept:spot-market",
+   "title": "spot markets",
+   "kind": "Concept",
+   "summary": "A market where an instrument is bought and sold for immediate delivery at the current price.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Long-term investment and portfolio construction",
+     "Basis for derivatives pricing (spot-futures relationships)",
+     "Arbitrage between spot and derivative markets",
+     "Direct exposure to asset price movements",
+     "Dividend capture and income strategies"
+    ],
+    "source_wording": "Spot markets (also called cash markets) are financial markets where financial instruments are traded for immediate delivery and settlement. The \"spot price\" represents the current market price at which an asset can be bought or sold for immediate exchange.",
+    "explanation": "What is traded is the asset itself rather than a claim on it later, so there is no expiration to manage and the holder has the full rights of ownership. The spot price is the reference every derivative is priced against, through the [[Cost of Carry Relationship]]."
+   }
+  },
+  {
+   "id": "concept:equity-spot-market",
+   "title": "equity spot market",
+   "kind": "Concept",
+   "summary": "The market for immediate purchase of shares, conveying ownership of the company.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "examples": [
+     "Purchase 100 shares of AAPL at $175.50 Settlement: T+2 (trade date plus two business days) Ownership: Full shareholder rights, dividends, voting"
+    ],
+    "explanation": "The buyer receives the full rights of a shareholder -- dividends, votes, corporate actions -- which is the difference between holding stock and holding a derivative on it. Settlement takes two business days."
+   }
+  },
+  {
+   "id": "concept:forex-spot-market",
+   "title": "forex spot market",
+   "kind": "Concept",
+   "summary": "The market for immediate exchange of one currency for another at the prevailing rate.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "examples": [
+     "Buy EUR/USD at 1.0850 Settlement: T+2 (standard for major pairs) Delivery: Exchange of currency amounts"
+    ],
+    "explanation": "Every price is a ratio of two currencies rather than the price of a thing, so a position is always long one and short the other. Major pairs settle two business days out, and holding past the close pays or receives the interest differential between them."
+   }
+  },
+  {
+   "id": "concept:cryptocurrency-spot-market",
+   "title": "cryptocurrency spot market",
+   "kind": "Concept",
+   "summary": "The market for immediate purchase of a cryptocurrency, settling on the blockchain or within an exchange ledger.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "examples": [
+     "Buy 1 BTC at $45,000 Settlement: Near-instantaneous (blockchain confirmation) Custody: Direct ownership, can withdraw to personal wallet"
+    ],
+    "explanation": "Settlement is close to immediate and the asset can be withdrawn to a wallet the holder controls, which is the feature the asset class is built around. Trading runs continuously, so a position is exposed at every hour rather than only during a session."
+   }
+  },
+  {
+   "id": "concept:commodity-spot-market",
+   "title": "commodity spot market",
+   "kind": "Concept",
+   "summary": "The market for immediate purchase of a physical commodity, at the price for prompt delivery.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "examples": [
+     "Buy 100 oz gold at $1,950/oz Settlement: Varies (T+2 or physical delivery arrangements) Delivery: Can take physical delivery or hold in vault"
+    ],
+    "explanation": "Ownership here is of a physical thing, so the cost of holding it -- storage, insurance, financing -- is real and shows up in the [[Cost of Carry Relationship]] between spot and futures. Settlement conventions vary with the commodity, and delivery can be taken or the position held in a vault."
+   }
+  },
+  {
+   "id": "property:spot-return",
+   "title": "spot return",
+   "kind": "Property",
+   "summary": "The change in price over a period, as a simple percentage or as a log return.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Simple Return = (P_t - P_(t-1)) / P_(t-1)\nLog Return = ln(P_t / P_(t-1))",
+    "source_wording": "The quantity spot return.",
+    "explanation": "The two are not interchangeable: simple returns aggregate across positions in a portfolio, log returns aggregate across time and are what volatility and most models are computed on."
+   }
+  },
+  {
+   "id": "property:total-return",
+   "title": "total return (with dividends)",
+   "kind": "Property",
+   "summary": "The return of a holding including the income it pays, not only its change in price.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Total Return = (P_t - P_(t-1) + Dividends) / P_(t-1)",
+    "source_wording": "The quantity total return (with dividends).",
+    "explanation": "Price return understates what a dividend-paying holding earned and misstates any comparison against an instrument that pays nothing; it is also the yield term that shows up in the [[Cost of Carry Relationship]]."
+   }
+  },
+  {
+   "id": "fact:cost-of-carry-relationship",
+   "title": "cost of carry relationship",
+   "kind": "Fact",
+   "summary": "The fair price of a forward or future is the spot price carried forward at the financing rate net of any yield the asset pays.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Futures Price = Spot Price * e^((r - y) * T)",
+    "source_wording": "The identity cost of carry relationship.",
+    "explanation": "It is an arbitrage identity rather than a forecast: if the future strays from it, the trade is to buy one leg, sell the other and hold to expiration. It explains contango and backwardation as facts about rates, storage and convenience yield rather than as opinions about direction, and it is the same identity \u00a72.2 restates as F = S * e^((r - y) * T)."
+   }
+  },
+  {
+   "id": "concept:futures",
+   "title": "futures",
+   "kind": "Concept",
+   "summary": "A standardised contract to buy or sell an asset at an agreed price on a stated future date.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Hedging existing spot positions against price risk",
+     "Speculating on price direction with leverage",
+     "Calendar spreads (trading the difference between expiration months)",
+     "Basis trading (spot-futures arbitrage)",
+     "Rolling exposure without physical delivery"
+    ],
+    "examples": [
+     "Futures Contract: Asset: E-mini S&P 500 (ES) Contract Size: $50 x S&P 500 Index Tick Size: 0.25 points ($12.50) Expiration: Quarterly (March, June, September, December) Settlement: Cash settled to index value",
+     "Contango vs. Backwardation: **Contango**: Futures price > Spot price (normal for storable commodities) **Backwardation**: Futures price < Spot price (indicates supply shortage or high convenience yield)",
+     "Perpetual Swap Funding: BTC-PERP trading at $45,100 (spot at $45,000) Premium indicates more longs than shorts Funding rate: +0.01% every 8 hours Longs pay shorts to hold positions Incentivizes arbitrage to close premium"
+    ],
+    "source_wording": "Standardized contracts obligating the buyer to purchase, or the seller to sell, an asset at a predetermined price on a specified future date.",
+    "explanation": "The obligation is symmetric -- unlike an [[Option]], both sides must perform -- and the position is marked to market daily, so profit and loss are paid as they accrue rather than at expiration. Because only margin is posted, a small deposit controls a large notional, and the price converges on spot as expiration approaches."
+   }
+  },
+  {
+   "id": "concept:perpetual-swap",
+   "title": "perpetual swaps",
+   "kind": "Concept",
+   "summary": "A futures-like contract with no expiration, held to the spot price by a periodic funding payment between longs and shorts.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Derivative contracts similar to futures but with no expiration date, commonly used in cryptocurrency markets, with periodic funding rate payments to maintain price alignment with spot.",
+    "explanation": "Without an expiration there is no convergence to enforce the price, so funding does it: when the contract trades above spot, longs pay shorts and the premium is arbitraged away. It is the dominant crypto derivative, and the funding rate is a running cost or income on a position rather than a detail of it."
+   }
+  },
+  {
+   "id": "property:basis",
+   "title": "basis",
+   "kind": "Property",
+   "summary": "The difference between the futures price and the spot price, in price terms or as a percentage of spot.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Basis = Futures Price - Spot Price\nBasis (%) = (F - S) / S * 100%",
+    "source_wording": "The quantity basis.",
+    "explanation": "It carries the market's financing and storage costs and converges to zero at expiration, which is what makes it tradeable in its own right. Positive is contango, negative is backwardation, and the sign is information about supply rather than about direction."
+   }
+  },
+  {
+   "id": "property:annualized-basis",
+   "title": "annualized basis",
+   "kind": "Property",
+   "summary": "The basis expressed as an annual rate, scaled by the days remaining to expiration.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Annualized Basis = (F/S - 1) * (365 / Days to Expiry) * 100%",
+    "source_wording": "The quantity annualized basis.",
+    "explanation": "It is what makes two contracts with different expirations comparable, and it turns the basis into the yield of a cash-and-carry trade: buy spot, sell the future, and collect it to expiration."
+   }
+  },
+  {
+   "id": "property:perpetual-funding-rate",
+   "title": "perpetual funding rate",
+   "kind": "Property",
+   "summary": "The periodic payment between longs and shorts on a perpetual contract, proportional to position value.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Funding Payment = Position Value * Funding Rate",
+    "source_wording": "The quantity perpetual funding rate.",
+    "explanation": "It is the mechanism that substitutes for expiration: a positive rate means the contract is above spot and longs pay to hold, which draws in the arbitrage that closes the premium. As a running cost it can exceed the move being traded, and as a signal it says which side is crowded."
+   }
+  },
+  {
+   "id": "property:notional-value",
+   "title": "contract value",
+   "kind": "Property",
+   "summary": "The value a contract controls: multiplier times price times the number of contracts.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Notional Value = Contract Multiplier * Current Price * Number of Contracts",
+    "source_wording": "The quantity contract value.",
+    "explanation": "It is the exposure, as distinct from the margin posted against it, and the two are confused at the trader's expense -- risk is a share of notional while capital is a share of margin. Every position calculation starts here."
+   }
+  },
+  {
+   "id": "concept:option",
+   "title": "options",
+   "kind": "Concept",
+   "summary": "A contract conveying the right, but not the obligation, to buy or sell the underlying at a stated strike price by a stated expiration.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Hedging portfolio against downside risk (protective puts)",
+     "Generating income from existing positions (covered calls)",
+     "Speculating on direction with defined risk",
+     "Volatility trading (straddles, strangles)",
+     "Complex multi-leg strategies for specific market views"
+    ],
+    "examples": [
+     "Covered Call: Own 100 shares AAPL at $175 Sell 1 Call, Strike $185, Premium $2.50 Outcome if price stays below $185: Keep shares + $250 premium Outcome if price exceeds $185: Shares called away at $185, total gain $12.50/share"
+    ],
+    "source_wording": "Options are derivative contracts that give the holder the right, but not the obligation, to buy (call) or sell (put) an underlying asset at a specified price (strike) before or on a specified date (expiration).",
+    "explanation": "The asymmetry is the point: the buyer can lose only the premium while the payoff above the strike is open-ended, which makes an option the instrument for a view with a defined worst case. That optionality is paid for in time value, which decays every day and vanishes at expiration, and is priced from volatility rather than from direction."
+   }
+  },
+  {
+   "id": "concept:call-option",
+   "title": "call option",
+   "kind": "Concept",
+   "summary": "The right, not the obligation, to buy the underlying at the strike price on or before expiration.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "examples": [
+     "AAPL Call, Strike $180, Expiration 30 days Premium: $3.50 Breakeven: $183.50 ($180 + $3.50) Max Loss: $3.50 (premium paid) Max Gain: Unlimited (above breakeven)"
+    ],
+    "explanation": "The buyer risks only the premium and keeps everything above the strike, which is the asymmetry that makes an option a defined-risk way to hold a directional view. The seller has the mirror image: the premium is the most that can be made and the loss above the strike is unbounded unless the underlying is already held."
+   }
+  },
+  {
+   "id": "concept:put-option",
+   "title": "put option",
+   "kind": "Concept",
+   "summary": "The right, not the obligation, to sell the underlying at the strike price on or before expiration.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "examples": [
+     "SPY Put, Strike $440, Expiration 45 days Premium: $5.00 Breakeven: $435.00 ($440 - $5.00) Max Loss: $5.00 (premium paid) Max Gain: $435.00 (if underlying goes to zero)"
+    ],
+    "explanation": "It pays as the underlying falls, bounded by a price of zero, which makes it the direct way to insure a holding: the premium is the cost of the insurance and the strike is the level insured. The seller is paid that premium to stand ready to buy at the strike."
+   }
+  },
+  {
+   "id": "procedure:black-scholes-call-price",
+   "title": "black-scholes call price",
+   "kind": "Procedure",
+   "summary": "Prices a European call from the spot price, strike, time to expiration, interest rate and volatility.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "C = S * N(d1) - K * e^(-rT) * N(d2)\n\nd1 = (ln(S/K) + (r + sigma^2/2) * T) / (sigma * sqrt(T))\nd2 = d1 - sigma * sqrt(T)",
+    "source_wording": "Computes black-scholes call price.",
+    "explanation": "Every input but one is observable, which is what makes the model useful in reverse: quoted against a market price it returns implied volatility, the number options actually trade on. Its assumptions -- constant volatility, continuous hedging, no jumps -- are why the surface is not flat in practice."
+   }
+  },
+  {
+   "id": "fact:put-call-parity",
+   "title": "put-call parity",
+   "kind": "Fact",
+   "summary": "The identity linking a call and a put at the same strike and expiration to the underlying and a discounted bond.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "C - P = S - K * e^(-rT)",
+    "source_wording": "The identity put-call parity.",
+    "explanation": "It holds by arbitrage, so it fixes each of the four prices in terms of the other three: an option can be replicated synthetically, and a violation is a riskless trade rather than a view. It is also the check that an implied volatility surface is internally consistent."
+   }
+  },
+  {
+   "id": "concept:greeks",
+   "title": "the greeks",
+   "kind": "Concept",
+   "summary": "The family of sensitivities of an option price: to the underlying, to the rate of that sensitivity, to time, to volatility and to interest rates.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Delta = dV/dS (sensitivity to underlying price)\nGamma = d(Delta)/dS (rate of change of delta)\nTheta = dV/dT (time decay per day)\nVega = dV/d(sigma) (sensitivity to volatility)\nRho = dV/dr (sensitivity to interest rates)",
+    "source_wording": "The family the greeks.",
+    "explanation": "Together they say how a position will behave when something changes, which is the whole of options risk management: delta is directional exposure, gamma how fast it moves, theta the daily cost of holding, vega exposure to a change in implied volatility, and rho to rates. They are the reason an option position cannot be managed by direction alone."
+   }
+  },
+  {
+   "id": "property:intrinsic-and-time-value",
+   "title": "intrinsic and time value",
+   "kind": "Property",
+   "summary": "The split of an option premium into what it would be worth if exercised now and what is paid for the time remaining.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Call Intrinsic = max(S - K, 0)\nPut Intrinsic = max(K - S, 0)\nTime Value = Option Price - Intrinsic Value",
+    "source_wording": "The quantity intrinsic and time value.",
+    "explanation": "Intrinsic value is arithmetic on the strike and the spot price; everything above it is the market's price for uncertainty, and it decays to nothing by expiration. The split is what separates a directional gain from the cost of waiting for one."
+   }
+  },
+  {
+   "id": "concept:margin",
+   "title": "margin",
+   "kind": "Concept",
+   "summary": "Collateral posted against a position: an initial amount to open it and a maintenance amount to keep it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Increasing capital efficiency for qualified strategies",
+     "Hedging with reduced capital requirements",
+     "Short selling (borrowing assets)",
+     "Futures and derivatives trading",
+     "Crypto perpetual swap trading"
+    ],
+    "examples": [
+     "Leverage Calculation: Account Balance: $10,000 Position Size: $50,000 Leverage: 5x ($50,000 / $10,000)",
+     "Margin Requirements: Initial Margin: 20% ($10,000 for $50,000 position) Maintenance Margin: 10% ($5,000) Liquidation Trigger: When equity falls below $5,000",
+     "Liquidation Scenario: Position: 5x Long BTC at $50,000 (1 BTC exposure, $10,000 margin) Liquidation Price: ~$40,000 (20% drop = 100% of margin) Calculation: Entry - (Margin / Position Size) = $50,000 - $10,000 = $40,000",
+     "Cross vs. Isolated Margin: Cross Margin: All account funds available for all positions Isolated Margin: Only allocated margin used for specific position Trade-off: Cross provides more buffer but exposes entire account to any position's loss"
+    ],
+    "source_wording": "Collateral deposited to cover potential losses, expressed as initial margin (to open) and maintenance margin (to maintain positions)",
+    "explanation": "It is a performance bond rather than a payment, and the gap between the two thresholds is the whole of the buffer -- once equity falls through the maintenance level the [[Liquidation Engine]] acts. Held across the account it cushions more, and exposes more; isolated to one position it caps the loss at that position."
+   }
+  },
+  {
+   "id": "concept:leverage",
+   "title": "leverage",
+   "kind": "Concept",
+   "summary": "The ratio of position size to the capital backing it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "The ratio of position size to margin, amplifying both gains and losses",
+    "explanation": "It amplifies the return on capital in both directions by the same factor, which is why the move that liquidates a position gets smaller as leverage rises: at five times, a twenty per cent adverse move is the whole margin. What it buys is capital efficiency, not edge."
+   }
+  },
+  {
+   "id": "concept:liquidation-engine",
+   "title": "liquidation engine",
+   "kind": "Concept",
+   "summary": "The exchange system that closes a position automatically once its margin falls below the maintenance requirement.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Automated system that forcibly closes positions when margin falls below maintenance requirements",
+    "explanation": "It exists to stop an account going negative and taking the venue with it, so it acts on the exchange's schedule rather than the trader's: the position is closed at whatever the book offers, in the conditions that caused the shortfall. A stop placed above the liquidation price is the trader keeping that decision."
+   }
+  },
+  {
+   "id": "property:leverage-ratio",
+   "title": "leverage ratio",
+   "kind": "Property",
+   "summary": "Position size divided by the capital backing it; effective leverage compares notional exposure with account equity.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Leverage = Position Size / Margin\nEffective Leverage = Notional Exposure / Account Equity",
+    "source_wording": "The quantity leverage ratio.",
+    "explanation": "The two differ once there is more than one position or unrealised profit and loss, and the effective figure is the one that governs risk. It is the multiplier on both return and loss, and it sets how far price can move before the margin is gone."
+   }
+  },
+  {
+   "id": "property:long-position-liquidation-price",
+   "title": "long position liquidation price",
+   "kind": "Property",
+   "summary": "The price at which a long position's equity falls to the maintenance requirement and it is closed automatically.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Liquidation Price = Entry Price * (1 - Initial Margin % + Maintenance Margin %)",
+    "source_wording": "The quantity long position liquidation price.",
+    "explanation": "It follows from entry price and the two margin percentages, so it is knowable before the position is opened -- which is what makes it the first calculation rather than a surprise. Fees and funding move it closer over time."
+   }
+  },
+  {
+   "id": "property:short-position-liquidation-price",
+   "title": "short position liquidation price",
+   "kind": "Property",
+   "summary": "The price at which a short position's equity falls to the maintenance requirement and it is closed automatically.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Liquidation Price = Entry Price * (1 + Initial Margin % - Maintenance Margin %)",
+    "source_wording": "The quantity short position liquidation price.",
+    "explanation": "The arithmetic mirrors the long case, but the exposure does not: a short loses as price rises, and price can rise without bound, so the distance to liquidation is the whole of the protection."
+   }
+  },
+  {
+   "id": "property:margin-ratio",
+   "title": "margin ratio",
+   "kind": "Property",
+   "summary": "Maintenance margin required as a share of account equity.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Margin Ratio = Maintenance Margin Required / Account Equity",
+    "source_wording": "The quantity margin ratio.",
+    "explanation": "It is the single number that says how close a position is to being closed out: at a hundred per cent the [[Liquidation Engine]] acts. Watching it is how leverage is managed in practice, because it moves with price, with funding and with the margin the venue demands in volatility."
+   }
+  },
+  {
+   "id": "property:return-amplification",
+   "title": "return amplification",
+   "kind": "Property",
+   "summary": "The return on capital under leverage: the underlying return multiplied by the leverage used.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Leveraged Return = Leverage * Underlying Return\n5x leverage, 2% move = 10% return (or loss)",
+    "source_wording": "The quantity return amplification.",
+    "explanation": "It is symmetric, which is the part that gets forgotten -- five times leverage turns a two per cent move into ten per cent in whichever direction it goes, and a twenty per cent adverse move into the whole account."
+   }
+  },
+  {
+   "id": "concept:crypto-specific-mechanics",
+   "title": "crypto-specific mechanics",
+   "kind": "Concept",
+   "summary": "The trading infrastructure particular to digital assets: continuous markets, self-custody, on-chain settlement and pool-based venues.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Trading on centralized exchanges (CEX) for liquidity and speed",
+     "Decentralized exchange (DEX) trading for self-custody and permissionless access",
+     "Yield farming and liquidity provision on AMMs",
+     "Cross-chain arbitrage",
+     "On-chain derivatives trading"
+    ],
+    "source_wording": "Crypto-specific mechanics encompass the unique trading infrastructure, settlement systems, and market structures particular to cryptocurrency and digital asset markets, including decentralized exchanges, automated market makers, and blockchain-based settlement.",
+    "explanation": "What sets the asset class apart is not the price behaviour but the plumbing. Markets never close, so there is no opening auction and no overnight gap; assets can be held directly, so counterparty risk is a choice; and settlement is a blockchain fact with a fee and a confirmation time attached."
+   }
+  },
+  {
+   "id": "concept:centralized-exchange",
+   "title": "centralized exchange (cex)",
+   "kind": "Concept",
+   "summary": "A crypto venue that holds customer assets and matches orders on its own book, off chain.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Examples: Binance, Coinbase, Kraken Order book model, high liquidity Custody held by exchange KYC required, faster execution Counterparty risk to exchange",
+    "explanation": "It offers the deepest liquidity and the fastest matching in the asset class, at the cost of custody: the balance is the exchange's promise rather than a key you hold. Access is gated by identity checks, and settlement is an entry in an internal ledger until a withdrawal takes it on chain."
+   }
+  },
+  {
+   "id": "concept:decentralized-exchange",
+   "title": "decentralized exchange (dex)",
+   "kind": "Concept",
+   "summary": "A crypto venue where trades execute against a smart contract and assets stay in the trader's own custody throughout.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Examples: Uniswap, SushiSwap, dYdX Self-custody throughout trading Permissionless, no KYC Higher fees (gas), potential MEV exposure Liquidity from liquidity pools",
+    "explanation": "Nothing is deposited with an operator and nothing is gated by identity checks, which is what permissionless access means in practice. The costs are network fees on every interaction and exposure to having the trade front-run by whoever orders the block."
+   }
+  },
+  {
+   "id": "concept:automated-market-maker",
+   "title": "automated market maker (amm)",
+   "kind": "Concept",
+   "summary": "A venue that prices trades from a formula over a pool of deposited reserves rather than by matching orders against a book.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Bonding curve pricing (x * y = k constant product) No order book, trades against liquidity pool Price impact proportional to trade size Liquidity providers earn fees but face impermanent loss Examples: Uniswap V2/V3, Curve, Balancer",
+    "explanation": "The pool always quotes, so there is no waiting for a counterparty, and the price walks along the curve as the reserves shift -- which is why size costs more here than in a book of comparable depth. Liquidity comes from depositors who earn the fees and carry [[Impermanent Loss]] against simply holding the two assets."
+   }
+  },
+  {
+   "id": "concept:concentrated-liquidity",
+   "title": "concentrated liquidity (clmm)",
+   "kind": "Concept",
+   "summary": "An AMM design in which a provider supplies liquidity only across a chosen price range instead of the whole curve.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Liquidity providers set price ranges More capital efficient than constant product AMMs Higher yields but requires active management Example: Uniswap V3",
+    "explanation": "Capital sitting where price never trades earns nothing, so restricting the range multiplies the fees earned per unit deposited. The cost is that the position must be managed: once price leaves the range the position stops earning and is left entirely in one of the two assets."
+   }
+  },
+  {
+   "id": "fact:constant-product-amm",
+   "title": "constant product amm (uniswap v2)",
+   "kind": "Fact",
+   "summary": "The invariant of a constant-product pool: the product of the two reserves is unchanged by a trade.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "x * y = k\n\nOutput Amount = (y * Input Amount) / (x + Input Amount)",
+    "source_wording": "The identity constant product amm (uniswap v2).",
+    "explanation": "Holding the product constant is what defines the price at every point on the curve, and it is why the price moves against the trader as size grows -- the curve steepens as one reserve is drawn down. The output for a given input follows from the invariant alone."
+   }
+  },
+  {
+   "id": "property:amm-price-impact",
+   "title": "price impact (amm)",
+   "kind": "Property",
+   "summary": "How far a trade moves the price of a constant-product pool, as a share of the reserve it trades against.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Price Impact = Trade Size / (Pool Reserve + Trade Size)",
+    "source_wording": "The quantity price impact (amm).",
+    "explanation": "It follows from the size of the trade relative to the pool and from nothing else -- no queue, no counterparty, no time of day -- which makes execution cost on an AMM entirely predictable before the trade. It is a different quantity from the order-book [[Price Impact]] of chapter one, which measures how a book responds to order flow."
+   }
+  },
+  {
+   "id": "property:impermanent-loss",
+   "title": "impermanent loss",
+   "kind": "Property",
+   "summary": "The shortfall of a liquidity position against simply holding the two assets, caused by the pool rebalancing as their relative price moves.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "IL = 2 * sqrt(price_ratio) / (1 + price_ratio) - 1",
+    "source_wording": "The quantity impermanent loss.",
+    "explanation": "The pool sells the asset that rises and buys the one that falls, so any divergence leaves the provider with less than the holder; it is called impermanent because it reverses if the price ratio returns. Fees are what has to cover it for provision to be worthwhile."
+   }
+  },
+  {
+   "id": "property:concentrated-liquidity-efficiency",
+   "title": "concentrated liquidity (v3)",
+   "kind": "Property",
+   "summary": "The real reserves a concentrated position must hold to provide a given depth over its chosen price range.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Real Reserves = Virtual Reserves * (sqrt(P_upper) - sqrt(P_lower)) / sqrt(P_current)",
+    "source_wording": "The quantity concentrated liquidity (v3).",
+    "explanation": "Narrowing the range means the same depth is supplied by less capital, which is the whole gain of the design and the reason the position must be watched: outside the range it provides no depth at all."
+   }
+  },
+  {
+   "id": "concept:fx",
+   "title": "fx basics",
+   "kind": "Concept",
+   "summary": "The global market for exchanging currencies, the largest and most liquid market there is.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Hedging foreign currency exposure for businesses",
+     "Carry trades exploiting interest rate differentials",
+     "Speculating on macroeconomic trends and central bank policy",
+     "Portfolio diversification across currencies",
+     "Arbitrage across currency crosses"
+    ],
+    "examples": [
+     "Quote Convention: EUR/USD = 1.0850 Interpretation: 1 Euro costs 1.0850 US Dollars Base currency: EUR Quote currency: USD",
+     "Pip Value Calculation: EUR/USD position: 100,000 units (1 standard lot) Pip = 0.0001 Pip Value = 100,000 * 0.0001 = $10 per pip",
+     "Carry Trade: Borrow JPY at 0.1% interest Invest in AUD at 4.0% interest Carry = 3.9% annually Risk: Currency movement can exceed carry return",
+     "Cross Rates: EUR/USD = 1.0850 USD/JPY = 150.00 EUR/JPY = 1.0850 * 150.00 = 162.75"
+    ],
+    "source_wording": "The foreign exchange (FX or forex) market is the global marketplace for trading currencies. It is the largest and most liquid financial market, with daily turnover exceeding $7 trillion, operating 24 hours from Sydney open to New York close.",
+    "explanation": "It runs around the clock through overlapping regional sessions, with liquidity concentrated where they overlap, and prices are driven by the policy and rate expectations of the two central banks behind the pair. Its conventions -- pairs, pips, lots -- are what the arithmetic of a position rests on."
+   }
+  },
+  {
+   "id": "property:pip-value",
+   "title": "pip value",
+   "kind": "Property",
+   "summary": "What one pip of movement is worth in the quote currency, for a given lot size.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Pip Value = (Pip Size / Exchange Rate) * Lot Size",
+    "source_wording": "The quantity pip value.",
+    "explanation": "It is what turns a rate move into money, and it depends on the pair and the lot rather than being a constant: sizing an FX position without it is sizing by rate rather than by risk."
+   }
+  },
+  {
+   "id": "property:position-profit-loss",
+   "title": "position profit/loss",
+   "kind": "Property",
+   "summary": "The gain or loss on a position: the distance price travelled, valued at what one unit of movement is worth.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "P/L = (Exit Price - Entry Price) * Lot Size * Pip Value",
+    "source_wording": "The quantity position profit/loss.",
+    "explanation": "The two conventions in the chapter are the same arithmetic in different units -- FX values the move in pips times pip value, futures in ticks times [[Tick Value]] times contracts -- and both reduce to price distance times value per unit times size."
+   }
+  },
+  {
+   "id": "property:swap-rollover-calculation",
+   "title": "swap/rollover calculation",
+   "kind": "Property",
+   "summary": "The interest paid or received for holding an FX position overnight, from the rate differential between the two currencies.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Swap = Position Size * (Base Currency Rate - Quote Currency Rate) / 365",
+    "source_wording": "The quantity swap/rollover calculation.",
+    "explanation": "It is the carry in a carry trade, applied nightly: long the higher-yielding currency earns it, and the reverse pays it. Over a long hold it can dominate the price move it was meant to accompany."
+   }
+  },
+  {
+   "id": "property:cross-rate",
+   "title": "cross rate",
+   "kind": "Property",
+   "summary": "The rate between two currencies derived from each of their rates against a common third.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "If EUR/USD = a and USD/JPY = b\nThen EUR/JPY = a * b",
+    "source_wording": "The quantity cross rate.",
+    "explanation": "Most pairs are quoted against the dollar, so a rate between two others is implied by the two quotes; when the implied and quoted rates differ, the difference is a triangular arbitrage."
+   }
+  },
+  {
+   "id": "property:forward-rate",
+   "title": "forward rate (interest rate parity)",
+   "kind": "Property",
+   "summary": "The exchange rate for a future date implied by the interest rates of the two currencies.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "F = S * ((1 + r_quote) / (1 + r_base))^T",
+    "source_wording": "The quantity forward rate (interest rate parity).",
+    "explanation": "Interest rate parity fixes it: the forward must offset the rate differential exactly, or borrowing in one currency and lending in the other would be riskless profit. It is also why a carry trade earns the differential only if the spot rate does not move to erase it."
+   }
+  },
+  {
+   "id": "concept:settlement",
+   "title": "settlement",
+   "kind": "Concept",
+   "summary": "The transfer of securities and cash that completes a trade and moves ownership.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Understanding when funds and securities become available",
+     "Managing cash flow around settlement dates",
+     "Assessing counterparty risk in OTC markets",
+     "Calculating margin requirements for cleared derivatives",
+     "Corporate action processing"
+    ],
+    "source_wording": "The process of transferring ownership of securities and funds between parties to complete a trade",
+    "explanation": "A trade is an agreement; settlement is the moment it becomes ownership, and the delay between the two is what a settlement cycle names. Exchanging both legs simultaneously is what removes the risk of paying and receiving nothing."
+   }
+  },
+  {
+   "id": "concept:clearing",
+   "title": "clearing",
+   "kind": "Concept",
+   "summary": "Validating and matching a trade after execution, and netting the obligations it creates, so that it is ready to settle.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "The process of validating, matching, and preparing trades for settlement, including netting of obligations",
+    "explanation": "It is the step between agreeing a trade and exchanging value, and its main economy is netting: many gross obligations collapse into one net amount per party, so far less cash and stock needs to move. Where a [[Central Counterparty]] clears, it also guarantees the obligations it has netted."
+   }
+  },
+  {
+   "id": "concept:central-counterparty",
+   "title": "central counterparty (ccp)",
+   "kind": "Concept",
+   "summary": "An entity that steps between the two sides of a trade, becoming buyer to the seller and seller to the buyer so that neither depends on the other.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Entity that interposes itself between buyers and sellers to guarantee trade completion",
+    "explanation": "It converts a web of bilateral exposures into exposures to one guaranteed party, which is what makes anonymous trading and [[Netting]] possible at all. The guarantee is paid for with margin, and it concentrates the risk it removes -- the CCP is the party that must not fail."
+   }
+  },
+  {
+   "id": "concept:equity-settlement",
+   "title": "equity settlement (t+2)",
+   "kind": "Concept",
+   "summary": "Transfer of shares and cash two business days after an equity trade is executed.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Trade executed Monday Settlement Wednesday Cash debited/credited and shares transferred",
+    "explanation": "The gap between trade date and settlement date is why the cash for a purchase must be there later than the trade suggests, and why an entitlement such as a dividend depends on which date the holder is recorded on."
+   }
+  },
+  {
+   "id": "concept:futures-settlement",
+   "title": "futures settlement (daily)",
+   "kind": "Concept",
+   "summary": "Daily exchange of variation margin against the marked price, with a final settlement at expiration.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "Daily mark-to-market Variation margin exchanged each day Final settlement at expiration",
+    "explanation": "A futures position is settled continuously rather than once: each day the gain or loss moves in cash, which is what keeps the exposure of the clearing house bounded. The final settlement is in cash or in delivery, depending on the contract."
+   }
+  },
+  {
+   "id": "concept:crypto-settlement",
+   "title": "crypto settlement",
+   "kind": "Concept",
+   "summary": "Settlement of a crypto trade, either as an entry in an exchange ledger or as a confirmed transaction on a blockchain.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "source_wording": "CEX: Internal ledger, instant DEX: On-chain, block confirmation time (seconds to minutes) Withdrawal: Network confirmation required",
+    "explanation": "The two are different in kind. On a centralized venue the trade settles instantly because nothing leaves the exchange; on chain, finality waits on block confirmation and costs a network fee. A withdrawal is where the internal ledger becomes an on-chain fact."
+   }
+  },
+  {
+   "id": "property:netting-benefit",
+   "title": "netting benefit",
+   "kind": "Property",
+   "summary": "How much of a set of gross obligations disappears once offsetting positions are netted.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Gross Obligations = Sum of all trade values\nNet Obligation = |Total Buys - Total Sells|\nNetting Efficiency = (Gross - Net) / Gross * 100%",
+    "source_wording": "The quantity netting benefit.",
+    "explanation": "It is the efficiency clearing exists to produce: the cash and stock that must actually move is the net, not the gross, and the ratio between them is what a clearing house is measured on."
+   }
+  },
+  {
+   "id": "property:exposure-at-default",
+   "title": "exposure at default",
+   "kind": "Property",
+   "summary": "What would be owed if a counterparty failed now: the cost of replacing the position plus what it could still move against you.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "EAD = Replacement Cost + Potential Future Exposure",
+    "source_wording": "The quantity exposure at default.",
+    "explanation": "It is the number margin is sized against, and it is forward-looking on purpose -- the replacement cost at the moment of default is not the exposure, because the position must be reopened into whatever market caused the default."
+   }
+  },
+  {
+   "id": "concept:contract-specification",
+   "title": "contract specifications",
+   "kind": "Concept",
+   "summary": "The standardised terms of a derivative contract -- size, tick increment, expiration and settlement method.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "applications": [
+     "Calculating position size and notional exposure",
+     "Determining margin requirements",
+     "Understanding roll procedures",
+     "Comparing similar contracts across exchanges",
+     "Backtesting with accurate contract specifications"
+    ],
+    "examples": [
+     "E-mini S&P 500 (ES): Exchange: CME Multiplier: $50 Tick Size: 0.25 points ($12.50) Settlement: Cash settled to S&P 500 index Expiration: Third Friday of contract month",
+     "Bitcoin Futures (BTC): Exchange: CME Multiplier: 5 BTC per contract Tick Size: $5 ($25 per tick) Settlement: Cash settled to CME CF Bitcoin Reference Rate",
+     "Crude Oil (CL): Exchange: NYMEX Multiplier: 1,000 barrels Tick Size: $0.01 ($10 per tick) Settlement: Physical delivery (most traders roll before expiration)"
+    ],
+    "source_wording": "Contract specifications define the standardized terms and conditions of derivative contracts, including size, tick increments, expiration rules, and settlement methods. Understanding specifications is essential for proper position sizing, risk calculation, and P&L computation.",
+    "explanation": "The specification is what makes one contract fungible with another and is the arithmetic behind every position calculation: [[Notional Value]], [[Tick Value]] and margin all follow from the multiplier and the tick. Getting it wrong misstates exposure by whatever factor the multiplier is."
+   }
+  },
+  {
+   "id": "property:tick-value",
+   "title": "tick value",
+   "kind": "Property",
+   "summary": "What one minimum price increment is worth: tick size times the contract multiplier.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Tick Value = Tick Size * Multiplier",
+    "source_wording": "The quantity tick value.",
+    "explanation": "It is the unit every futures profit and loss is counted in, and the reason two contracts on the same underlying can carry very different risk per point of index movement."
+   }
+  },
+  {
+   "id": "property:margin-requirement",
+   "title": "margin requirement (initial)",
+   "kind": "Property",
+   "summary": "The collateral needed to open a position, as a percentage of its notional value.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "formula": "Initial Margin = Notional Value * Initial Margin Percentage",
+    "source_wording": "The quantity margin requirement (initial).",
+    "explanation": "It is set by the venue rather than the trader and rises when volatility does, so the capital a position needs is not constant -- a requirement raised mid-position must be met from the same account that is already losing."
+   }
+  },
+  {
+   "id": "fact:market-mechanics-core-principles",
+   "title": "core principles",
+   "kind": "Fact",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "principles": [
+     "Immediate Settlement: Transactions settle within a short timeframe (T+0 to T+2 depending on asset class)",
+     "Physical or Book-Entry Delivery: Actual ownership transfer of the underlying asset",
+     "Price Transparency: Spot prices reflect current supply and demand equilibrium",
+     "No Expiration: Unlike derivatives, spot positions have no expiration date",
+     "Direct Ownership: Holder has full ownership rights including dividends, voting rights, etc.",
+     "Leverage: Futures allow exposure to large notional values with smaller margin deposits",
+     "Mark-to-Market: Daily settlement of profits and losses",
+     "Standardization: Contract specifications (size, expiration, tick size) are standardized",
+     "Convergence: Futures prices converge to spot prices at expiration",
+     "Funding Rates (Perpetuals): Periodic payments between longs and shorts to anchor price to spot",
+     "Asymmetric Payoff: Limited downside (premium paid) with unlimited upside potential for buyers",
+     "Time Decay (Theta): Option value erodes as expiration approaches",
+     "Implied Volatility: Market's expectation of future volatility embedded in option prices",
+     "Non-Linear Risk: Option Greeks describe sensitivity to various factors",
+     "Exercise Styles: American (any time), European (expiration only)",
+     "Leverage Amplification: Leverage multiplies returns in both directions",
+     "Margin Call: Warning when equity approaches maintenance margin",
+     "Forced Liquidation: Automatic position closure to prevent negative equity",
+     "Cross vs. Isolated Margin: Cross uses entire account balance; isolated limits risk per position",
+     "Insurance Funds: Exchange reserves to cover liquidation shortfalls in volatile markets",
+     "24/7 Markets: No close, continuous trading globally",
+     "Self-Custody: Users can hold assets directly without intermediaries",
+     "On-Chain vs. Off-Chain: Settlement can occur on blockchain or within exchange databases",
+     "Decentralization Spectrum: From fully decentralized (DEX) to centralized (CEX)",
+     "Network Fees: Blockchain transactions incur gas/network fees",
+     "Finality: Settlement finality depends on blockchain confirmation times",
+     "Currency Pairs: Currencies traded in pairs (EUR/USD, USD/JPY), first is base, second is quote",
+     "Pips: Smallest price movement, typically 0.0001 for most pairs (0.01 for JPY pairs)",
+     "Lot Sizes: Standard (100,000 units), Mini (10,000), Micro (1,000)",
+     "Interest Rate Differentials: Carry trade opportunities from rate differences",
+     "Interbank Market: Primary market among major banks, others access via brokers",
+     "Counterparty Risk Mitigation: CCPs reduce bilateral counterparty exposure",
+     "Netting: Reducing gross obligations to net amounts for efficiency",
+     "Delivery vs. Payment (DvP): Simultaneous exchange of securities and cash",
+     "Settlement Cycles: T+0 (same day) to T+2 (trade date plus two days)",
+     "Margin Requirements: Collateral held by CCPs to cover potential losses",
+     "Standardization: Exchange-traded derivatives have fixed specifications",
+     "Multiplier/Contract Size: Defines notional value per contract",
+     "Tick Size: Minimum price increment",
+     "Expiration Rules: When and how contracts expire and settle",
+     "Trading Hours: Session times and any restrictions"
+    ]
+   }
+  },
+  {
+   "id": "judgment:market-mechanics-best-practices",
+   "title": "best practices",
+   "kind": "Judgment",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "instruments-market-mechanics"
+    ],
+    "practices": [
+     "Understand settlement cycles to manage cash flow and margin requirements",
+     "Factor in custody and storage costs for physical commodities",
+     "Be aware of corporate actions affecting equity positions",
+     "Use spot markets for long-term directional exposure",
+     "Monitor spot-futures basis for arbitrage opportunities",
+     "Consider total cost of ownership including financing costs",
+     "Monitor margin requirements and maintain adequate buffer above maintenance margin",
+     "Understand roll costs when maintaining continuous exposure",
+     "Watch funding rates in perpetuals to avoid unexpected costs",
+     "Use contango/backwardation information for directional signals",
+     "Be aware of contract expiration dates and auto-liquidation rules",
+     "Calculate effective leverage including notional exposure",
+     "Never sell naked options without understanding unlimited loss potential",
+     "Monitor implied volatility relative to historical volatility",
+     "Understand all Greeks, especially for complex positions",
+     "Calculate max loss before entering any options trade",
+     "Be aware of dividend dates for early exercise risk on American options",
+     "Use options for defined-risk directional bets rather than naked futures/spot",
+     "Close or roll positions well before expiration to avoid gamma risk",
+     "Never use maximum available leverage",
+     "Calculate liquidation price before entering any leveraged position",
+     "Maintain margin buffer significantly above maintenance requirements",
+     "Use isolated margin for high-risk trades to limit account exposure",
+     "Set stop-losses well above liquidation price",
+     "Understand the exchange's liquidation mechanism (gradual vs. full)",
+     "Monitor funding rates and margin requirements during volatility spikes",
+     "Account for spread widening during volatile periods when calculating liquidation risk",
+     "Use hardware wallets for significant holdings",
+     "Compare CEX and DEX execution for best prices",
+     "Account for gas fees in trade profitability calculations",
+     "Be aware of MEV (Maximal Extractable Value) risks on DEX",
+     "Monitor blockchain congestion before executing time-sensitive trades",
+     "Use reputable bridges for cross-chain operations",
+     "Verify smart contract addresses before interacting",
+     "Understand impermanent loss before providing liquidity",
+     "Understand the economic calendars driving FX moves",
+     "Monitor central bank communications and interest rate expectations",
+     "Be aware of market sessions and liquidity variations",
+     "Use appropriate position sizing given FX leverage availability",
+     "Consider correlation between currency pairs in portfolio construction",
+     "Account for swap rates (rollover) for positions held overnight",
+     "Watch for intervention risk in certain currency pairs",
+     "Ensure sufficient funds available on settlement date",
+     "Understand settlement conventions for each asset class",
+     "Monitor CCP margin requirements for cleared positions",
+     "Be aware of settlement failures and their implications",
+     "Account for settlement timing in cash management",
+     "Understand the difference between trade date and settlement date accounting",
+     "Always verify contract specifications before trading new instruments",
+     "Calculate notional exposure and tick value before entering positions",
+     "Understand settlement procedures (cash vs. physical)",
+     "Be aware of contract roll dates and procedures",
+     "Monitor for specification changes announced by exchanges",
+     "Use correct specifications in backtesting and risk systems"
     ]
    }
   }
@@ -29768,6 +30850,486 @@
    "why": "stated across market-foundations",
    "from_id": "judgment:market-foundations-best-practices",
    "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "spot markets",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under spot markets",
+   "from_id": "concept:spot-market",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "equity spot market",
+   "rel": "kind-of",
+   "to": "spot markets",
+   "why": "a kind of spot markets",
+   "from_id": "concept:equity-spot-market",
+   "to_id": "concept:spot-market"
+  },
+  {
+   "from": "forex spot market",
+   "rel": "kind-of",
+   "to": "spot markets",
+   "why": "a kind of spot markets",
+   "from_id": "concept:forex-spot-market",
+   "to_id": "concept:spot-market"
+  },
+  {
+   "from": "cryptocurrency spot market",
+   "rel": "kind-of",
+   "to": "spot markets",
+   "why": "a kind of spot markets",
+   "from_id": "concept:cryptocurrency-spot-market",
+   "to_id": "concept:spot-market"
+  },
+  {
+   "from": "commodity spot market",
+   "rel": "kind-of",
+   "to": "spot markets",
+   "why": "a kind of spot markets",
+   "from_id": "concept:commodity-spot-market",
+   "to_id": "concept:spot-market"
+  },
+  {
+   "from": "spot return",
+   "rel": "about",
+   "to": "spot markets",
+   "why": "quantifies spot markets",
+   "from_id": "property:spot-return",
+   "to_id": "concept:spot-market"
+  },
+  {
+   "from": "total return (with dividends)",
+   "rel": "about",
+   "to": "spot markets",
+   "why": "quantifies spot markets",
+   "from_id": "property:total-return",
+   "to_id": "concept:spot-market"
+  },
+  {
+   "from": "cost of carry relationship",
+   "rel": "about",
+   "to": "spot markets",
+   "why": "quantifies spot markets",
+   "from_id": "fact:cost-of-carry-relationship",
+   "to_id": "concept:spot-market"
+  },
+  {
+   "from": "futures",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under futures & perpetual swaps",
+   "from_id": "concept:futures",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "perpetual swaps",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under futures & perpetual swaps",
+   "from_id": "concept:perpetual-swap",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "cost of carry relationship",
+   "rel": "about",
+   "to": "futures",
+   "why": "quantifies futures",
+   "from_id": "fact:cost-of-carry-relationship",
+   "to_id": "concept:futures"
+  },
+  {
+   "from": "basis",
+   "rel": "about",
+   "to": "futures",
+   "why": "quantifies futures",
+   "from_id": "property:basis",
+   "to_id": "concept:futures"
+  },
+  {
+   "from": "annualized basis",
+   "rel": "about",
+   "to": "futures",
+   "why": "quantifies futures",
+   "from_id": "property:annualized-basis",
+   "to_id": "concept:futures"
+  },
+  {
+   "from": "perpetual funding rate",
+   "rel": "about",
+   "to": "perpetual swaps",
+   "why": "quantifies perpetual swaps",
+   "from_id": "property:perpetual-funding-rate",
+   "to_id": "concept:perpetual-swap"
+  },
+  {
+   "from": "contract value",
+   "rel": "about",
+   "to": "futures",
+   "why": "quantifies futures",
+   "from_id": "property:notional-value",
+   "to_id": "concept:futures"
+  },
+  {
+   "from": "options",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under options",
+   "from_id": "concept:option",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "call option",
+   "rel": "kind-of",
+   "to": "options",
+   "why": "a kind of options",
+   "from_id": "concept:call-option",
+   "to_id": "concept:option"
+  },
+  {
+   "from": "put option",
+   "rel": "kind-of",
+   "to": "options",
+   "why": "a kind of options",
+   "from_id": "concept:put-option",
+   "to_id": "concept:option"
+  },
+  {
+   "from": "black-scholes call price",
+   "rel": "about",
+   "to": "options",
+   "why": "quantifies options",
+   "from_id": "procedure:black-scholes-call-price",
+   "to_id": "concept:option"
+  },
+  {
+   "from": "put-call parity",
+   "rel": "about",
+   "to": "options",
+   "why": "quantifies options",
+   "from_id": "fact:put-call-parity",
+   "to_id": "concept:option"
+  },
+  {
+   "from": "the greeks",
+   "rel": "about",
+   "to": "options",
+   "why": "quantifies options",
+   "from_id": "concept:greeks",
+   "to_id": "concept:option"
+  },
+  {
+   "from": "intrinsic and time value",
+   "rel": "about",
+   "to": "options",
+   "why": "quantifies options",
+   "from_id": "property:intrinsic-and-time-value",
+   "to_id": "concept:option"
+  },
+  {
+   "from": "margin",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under margin, leverage & liquidation engines",
+   "from_id": "concept:margin",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "leverage",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under margin, leverage & liquidation engines",
+   "from_id": "concept:leverage",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "liquidation engine",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under margin, leverage & liquidation engines",
+   "from_id": "concept:liquidation-engine",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "leverage ratio",
+   "rel": "about",
+   "to": "leverage",
+   "why": "quantifies leverage",
+   "from_id": "property:leverage-ratio",
+   "to_id": "concept:leverage"
+  },
+  {
+   "from": "long position liquidation price",
+   "rel": "about",
+   "to": "liquidation engine",
+   "why": "quantifies liquidation engine",
+   "from_id": "property:long-position-liquidation-price",
+   "to_id": "concept:liquidation-engine"
+  },
+  {
+   "from": "short position liquidation price",
+   "rel": "about",
+   "to": "liquidation engine",
+   "why": "quantifies liquidation engine",
+   "from_id": "property:short-position-liquidation-price",
+   "to_id": "concept:liquidation-engine"
+  },
+  {
+   "from": "margin ratio",
+   "rel": "about",
+   "to": "margin",
+   "why": "quantifies margin",
+   "from_id": "property:margin-ratio",
+   "to_id": "concept:margin"
+  },
+  {
+   "from": "return amplification",
+   "rel": "about",
+   "to": "leverage",
+   "why": "quantifies leverage",
+   "from_id": "property:return-amplification",
+   "to_id": "concept:leverage"
+  },
+  {
+   "from": "crypto-specific mechanics",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under crypto-specific mechanics",
+   "from_id": "concept:crypto-specific-mechanics",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "centralized exchange (cex)",
+   "rel": "kind-of",
+   "to": "crypto-specific mechanics",
+   "why": "a kind of crypto-specific mechanics",
+   "from_id": "concept:centralized-exchange",
+   "to_id": "concept:crypto-specific-mechanics"
+  },
+  {
+   "from": "decentralized exchange (dex)",
+   "rel": "kind-of",
+   "to": "crypto-specific mechanics",
+   "why": "a kind of crypto-specific mechanics",
+   "from_id": "concept:decentralized-exchange",
+   "to_id": "concept:crypto-specific-mechanics"
+  },
+  {
+   "from": "automated market maker (amm)",
+   "rel": "kind-of",
+   "to": "crypto-specific mechanics",
+   "why": "a kind of crypto-specific mechanics",
+   "from_id": "concept:automated-market-maker",
+   "to_id": "concept:crypto-specific-mechanics"
+  },
+  {
+   "from": "concentrated liquidity (clmm)",
+   "rel": "kind-of",
+   "to": "crypto-specific mechanics",
+   "why": "a kind of crypto-specific mechanics",
+   "from_id": "concept:concentrated-liquidity",
+   "to_id": "concept:crypto-specific-mechanics"
+  },
+  {
+   "from": "constant product amm (uniswap v2)",
+   "rel": "about",
+   "to": "automated market maker (amm)",
+   "why": "quantifies automated market maker (amm)",
+   "from_id": "fact:constant-product-amm",
+   "to_id": "concept:automated-market-maker"
+  },
+  {
+   "from": "price impact (amm)",
+   "rel": "about",
+   "to": "automated market maker (amm)",
+   "why": "quantifies automated market maker (amm)",
+   "from_id": "property:amm-price-impact",
+   "to_id": "concept:automated-market-maker"
+  },
+  {
+   "from": "impermanent loss",
+   "rel": "about",
+   "to": "automated market maker (amm)",
+   "why": "quantifies automated market maker (amm)",
+   "from_id": "property:impermanent-loss",
+   "to_id": "concept:automated-market-maker"
+  },
+  {
+   "from": "concentrated liquidity (v3)",
+   "rel": "about",
+   "to": "concentrated liquidity (clmm)",
+   "why": "quantifies concentrated liquidity (clmm)",
+   "from_id": "property:concentrated-liquidity-efficiency",
+   "to_id": "concept:concentrated-liquidity"
+  },
+  {
+   "from": "fx basics",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under fx basics",
+   "from_id": "concept:fx",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "pip value",
+   "rel": "about",
+   "to": "fx basics",
+   "why": "quantifies fx basics",
+   "from_id": "property:pip-value",
+   "to_id": "concept:fx"
+  },
+  {
+   "from": "position profit/loss",
+   "rel": "about",
+   "to": "fx basics",
+   "why": "quantifies fx basics",
+   "from_id": "property:position-profit-loss",
+   "to_id": "concept:fx"
+  },
+  {
+   "from": "swap/rollover calculation",
+   "rel": "about",
+   "to": "fx basics",
+   "why": "quantifies fx basics",
+   "from_id": "property:swap-rollover-calculation",
+   "to_id": "concept:fx"
+  },
+  {
+   "from": "cross rate",
+   "rel": "about",
+   "to": "fx basics",
+   "why": "quantifies fx basics",
+   "from_id": "property:cross-rate",
+   "to_id": "concept:fx"
+  },
+  {
+   "from": "forward rate (interest rate parity)",
+   "rel": "about",
+   "to": "fx basics",
+   "why": "quantifies fx basics",
+   "from_id": "property:forward-rate",
+   "to_id": "concept:fx"
+  },
+  {
+   "from": "settlement",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under settlement & clearing",
+   "from_id": "concept:settlement",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "clearing",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under settlement & clearing",
+   "from_id": "concept:clearing",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "central counterparty (ccp)",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under settlement & clearing",
+   "from_id": "concept:central-counterparty",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "equity settlement (t+2)",
+   "rel": "kind-of",
+   "to": "settlement",
+   "why": "a kind of settlement",
+   "from_id": "concept:equity-settlement",
+   "to_id": "concept:settlement"
+  },
+  {
+   "from": "futures settlement (daily)",
+   "rel": "kind-of",
+   "to": "settlement",
+   "why": "a kind of settlement",
+   "from_id": "concept:futures-settlement",
+   "to_id": "concept:settlement"
+  },
+  {
+   "from": "crypto settlement",
+   "rel": "kind-of",
+   "to": "settlement",
+   "why": "a kind of settlement",
+   "from_id": "concept:crypto-settlement",
+   "to_id": "concept:settlement"
+  },
+  {
+   "from": "netting benefit",
+   "rel": "about",
+   "to": "clearing",
+   "why": "quantifies clearing",
+   "from_id": "property:netting-benefit",
+   "to_id": "concept:clearing"
+  },
+  {
+   "from": "exposure at default",
+   "rel": "about",
+   "to": "central counterparty (ccp)",
+   "why": "quantifies central counterparty (ccp)",
+   "from_id": "property:exposure-at-default",
+   "to_id": "concept:central-counterparty"
+  },
+  {
+   "from": "contract specifications",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "defined under contract specifications",
+   "from_id": "concept:contract-specification",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "contract value",
+   "rel": "about",
+   "to": "contract specifications",
+   "why": "quantifies contract specifications",
+   "from_id": "property:notional-value",
+   "to_id": "concept:contract-specification"
+  },
+  {
+   "from": "tick value",
+   "rel": "about",
+   "to": "contract specifications",
+   "why": "quantifies contract specifications",
+   "from_id": "property:tick-value",
+   "to_id": "concept:contract-specification"
+  },
+  {
+   "from": "position profit/loss",
+   "rel": "about",
+   "to": "contract specifications",
+   "why": "quantifies contract specifications",
+   "from_id": "property:position-profit-loss",
+   "to_id": "concept:contract-specification"
+  },
+  {
+   "from": "margin requirement (initial)",
+   "rel": "about",
+   "to": "contract specifications",
+   "why": "quantifies contract specifications",
+   "from_id": "property:margin-requirement",
+   "to_id": "concept:contract-specification"
+  },
+  {
+   "from": "core principles",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "stated across instruments-market-mechanics",
+   "from_id": "fact:market-mechanics-core-principles",
+   "to_id": "concept:market-mechanics"
+  },
+  {
+   "from": "best practices",
+   "rel": "part-of",
+   "to": "market mechanics",
+   "why": "stated across instruments-market-mechanics",
+   "from_id": "judgment:market-mechanics-best-practices",
+   "to_id": "concept:market-mechanics"
   }
  ],
  "meta": {
@@ -29801,13 +31363,32 @@
   "derived_atom_ids": [
    "concept:arbitrageur",
    "concept:auction-based-discovery",
+   "concept:automated-market-maker",
    "concept:bid-ask-spread",
+   "concept:call-option",
+   "concept:central-counterparty",
+   "concept:centralized-exchange",
    "concept:chart-pattern",
+   "concept:clearing",
+   "concept:commodity-spot-market",
+   "concept:concentrated-liquidity",
    "concept:continuous-trading-discovery",
+   "concept:contract-specification",
    "concept:cross-market-discovery",
+   "concept:crypto-settlement",
+   "concept:crypto-specific-mechanics",
+   "concept:cryptocurrency-spot-market",
    "concept:dark-pool",
+   "concept:decentralized-exchange",
    "concept:electronic-communication-network",
+   "concept:equity-settlement",
+   "concept:equity-spot-market",
    "concept:execution-model",
+   "concept:forex-spot-market",
+   "concept:futures",
+   "concept:futures-settlement",
+   "concept:fx",
+   "concept:greeks",
    "concept:hedge-fund",
    "concept:high-frequency-trader",
    "concept:high-volatility-regime",
@@ -29816,10 +31397,13 @@
    "concept:information-leakage",
    "concept:institutional-investor",
    "concept:internalization",
+   "concept:leverage",
    "concept:limit-order",
+   "concept:liquidation-engine",
    "concept:liquidity",
    "concept:lit-exchange",
    "concept:low-volatility-regime",
+   "concept:margin",
    "concept:market-efficiency",
    "concept:market-foundations",
    "concept:market-impact",
@@ -29829,42 +31413,77 @@
    "concept:market-order",
    "concept:market-participant",
    "concept:market-regime",
+   "concept:option",
    "concept:order-flow",
    "concept:order-type",
    "concept:over-the-counter-market",
+   "concept:perpetual-swap",
    "concept:price-action",
    "concept:price-discovery",
    "concept:proprietary-trading-firm",
+   "concept:put-option",
    "concept:quantitative-analysis",
    "concept:regime-shift",
    "concept:retail-trader",
    "concept:risk-management",
+   "concept:settlement",
    "concept:slippage",
+   "concept:spot-market",
    "concept:stop-limit-order",
    "concept:stop-order",
    "concept:trading-venue",
    "concept:trailing-stop",
    "concept:transaction-cost",
+   "fact:constant-product-amm",
+   "fact:cost-of-carry-relationship",
    "fact:market-foundations-core-principles",
+   "fact:market-mechanics-core-principles",
+   "fact:put-call-parity",
    "fact:square-root-market-impact-rule",
    "judgment:market-foundations-best-practices",
+   "judgment:market-mechanics-best-practices",
    "procedure:almgren-chriss-market-impact-model",
+   "procedure:black-scholes-call-price",
    "procedure:garch-model",
    "procedure:implementation-shortfall",
    "procedure:sniper-liquidity-seeking",
    "procedure:twap",
    "procedure:vwap",
+   "property:amm-price-impact",
+   "property:annualized-basis",
+   "property:basis",
    "property:component-share",
+   "property:concentrated-liquidity-efficiency",
+   "property:cross-rate",
    "property:effective-spread",
+   "property:exposure-at-default",
+   "property:forward-rate",
    "property:historical-volatility",
+   "property:impermanent-loss",
    "property:information-share",
+   "property:intrinsic-and-time-value",
+   "property:leverage-ratio",
+   "property:long-position-liquidation-price",
+   "property:margin-ratio",
+   "property:margin-requirement",
+   "property:netting-benefit",
+   "property:notional-value",
    "property:participation-rate",
+   "property:perpetual-funding-rate",
+   "property:pip-value",
+   "property:position-profit-loss",
    "property:price-efficiency-ratio",
    "property:price-impact",
    "property:quoted-spread",
    "property:realized-spread",
    "property:relative-spread",
+   "property:return-amplification",
+   "property:short-position-liquidation-price",
    "property:simple-slippage",
+   "property:spot-return",
+   "property:swap-rollover-calculation",
+   "property:tick-value",
+   "property:total-return",
    "property:volatility-ratio"
   ],
   "derived_relations": [
@@ -29884,6 +31503,11 @@
     "concept:price-discovery"
    ],
    [
+    "concept:automated-market-maker",
+    "kind-of",
+    "concept:crypto-specific-mechanics"
+   ],
+   [
     "concept:bid-ask-spread",
     "about",
     "fact:market-foundations-core-principles"
@@ -29899,9 +31523,39 @@
     "concept:market-foundations"
    ],
    [
+    "concept:call-option",
+    "kind-of",
+    "concept:option"
+   ],
+   [
+    "concept:central-counterparty",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
+    "concept:centralized-exchange",
+    "kind-of",
+    "concept:crypto-specific-mechanics"
+   ],
+   [
     "concept:chart-pattern",
     "kind-of",
     "concept:technical-analysis"
+   ],
+   [
+    "concept:clearing",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
+    "concept:commodity-spot-market",
+    "kind-of",
+    "concept:spot-market"
+   ],
+   [
+    "concept:concentrated-liquidity",
+    "kind-of",
+    "concept:crypto-specific-mechanics"
    ],
    [
     "concept:continuous-trading-discovery",
@@ -29909,9 +31563,29 @@
     "concept:price-discovery"
    ],
    [
+    "concept:contract-specification",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
     "concept:cross-market-discovery",
     "kind-of",
     "concept:price-discovery"
+   ],
+   [
+    "concept:crypto-settlement",
+    "kind-of",
+    "concept:settlement"
+   ],
+   [
+    "concept:crypto-specific-mechanics",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
+    "concept:cryptocurrency-spot-market",
+    "kind-of",
+    "concept:spot-market"
    ],
    [
     "concept:dark-pool",
@@ -29929,9 +31603,24 @@
     "concept:trading-venue"
    ],
    [
+    "concept:decentralized-exchange",
+    "kind-of",
+    "concept:crypto-specific-mechanics"
+   ],
+   [
     "concept:electronic-communication-network",
     "kind-of",
     "concept:trading-venue"
+   ],
+   [
+    "concept:equity-settlement",
+    "kind-of",
+    "concept:settlement"
+   ],
+   [
+    "concept:equity-spot-market",
+    "kind-of",
+    "concept:spot-market"
    ],
    [
     "concept:execution-model",
@@ -29942,6 +31631,31 @@
     "concept:execution-model",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:forex-spot-market",
+    "kind-of",
+    "concept:spot-market"
+   ],
+   [
+    "concept:futures",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
+    "concept:futures-settlement",
+    "kind-of",
+    "concept:settlement"
+   ],
+   [
+    "concept:fx",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
+    "concept:greeks",
+    "about",
+    "concept:option"
    ],
    [
     "concept:hedge-fund",
@@ -30009,6 +31723,11 @@
     "concept:trading-venue"
    ],
    [
+    "concept:leverage",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
     "concept:limit-order",
     "about",
     "judgment:market-foundations-best-practices"
@@ -30017,6 +31736,11 @@
     "concept:limit-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:liquidation-engine",
+    "part-of",
+    "concept:market-mechanics"
    ],
    [
     "concept:liquidity",
@@ -30042,6 +31766,11 @@
     "concept:low-volatility-regime",
     "kind-of",
     "concept:market-regime"
+   ],
+   [
+    "concept:margin",
+    "part-of",
+    "concept:market-mechanics"
    ],
    [
     "concept:market-efficiency",
@@ -30129,6 +31858,11 @@
     "concept:market-foundations"
    ],
    [
+    "concept:option",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
     "concept:order-flow",
     "part-of",
     "concept:market-foundations"
@@ -30154,6 +31888,11 @@
     "concept:trading-venue"
    ],
    [
+    "concept:perpetual-swap",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
     "concept:price-action",
     "part-of",
     "object:mangrove-knowledge-space"
@@ -30172,6 +31911,11 @@
     "concept:proprietary-trading-firm",
     "kind-of",
     "concept:market-participant"
+   ],
+   [
+    "concept:put-option",
+    "kind-of",
+    "concept:option"
    ],
    [
     "concept:quantitative-analysis",
@@ -30199,6 +31943,11 @@
     "object:mangrove-knowledge-space"
    ],
    [
+    "concept:settlement",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
     "concept:slippage",
     "about",
     "judgment:market-foundations-best-practices"
@@ -30207,6 +31956,11 @@
     "concept:slippage",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:spot-market",
+    "part-of",
+    "concept:market-mechanics"
    ],
    [
     "concept:stop-limit-order",
@@ -30274,9 +32028,34 @@
     "concept:market-foundations"
    ],
    [
+    "fact:constant-product-amm",
+    "about",
+    "concept:automated-market-maker"
+   ],
+   [
+    "fact:cost-of-carry-relationship",
+    "about",
+    "concept:futures"
+   ],
+   [
+    "fact:cost-of-carry-relationship",
+    "about",
+    "concept:spot-market"
+   ],
+   [
     "fact:market-foundations-core-principles",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "fact:market-mechanics-core-principles",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
+    "fact:put-call-parity",
+    "about",
+    "concept:option"
    ],
    [
     "fact:square-root-market-impact-rule",
@@ -30289,9 +32068,19 @@
     "concept:market-foundations"
    ],
    [
+    "judgment:market-mechanics-best-practices",
+    "part-of",
+    "concept:market-mechanics"
+   ],
+   [
     "procedure:almgren-chriss-market-impact-model",
     "about",
     "concept:market-impact"
+   ],
+   [
+    "procedure:black-scholes-call-price",
+    "about",
+    "concept:option"
    ],
    [
     "procedure:garch-model",
@@ -30334,9 +32123,34 @@
     "procedure:indicator-vwap"
    ],
    [
+    "property:amm-price-impact",
+    "about",
+    "concept:automated-market-maker"
+   ],
+   [
+    "property:annualized-basis",
+    "about",
+    "concept:futures"
+   ],
+   [
+    "property:basis",
+    "about",
+    "concept:futures"
+   ],
+   [
     "property:component-share",
     "about",
     "concept:price-discovery"
+   ],
+   [
+    "property:concentrated-liquidity-efficiency",
+    "about",
+    "concept:concentrated-liquidity"
+   ],
+   [
+    "property:cross-rate",
+    "about",
+    "concept:fx"
    ],
    [
     "property:effective-spread",
@@ -30349,9 +32163,24 @@
     "concept:market-microstructure"
    ],
    [
+    "property:exposure-at-default",
+    "about",
+    "concept:central-counterparty"
+   ],
+   [
+    "property:forward-rate",
+    "about",
+    "concept:fx"
+   ],
+   [
     "property:historical-volatility",
     "about",
     "concept:volatility"
+   ],
+   [
+    "property:impermanent-loss",
+    "about",
+    "concept:automated-market-maker"
    ],
    [
     "property:information-share",
@@ -30359,9 +32188,69 @@
     "concept:price-discovery"
    ],
    [
+    "property:intrinsic-and-time-value",
+    "about",
+    "concept:option"
+   ],
+   [
+    "property:leverage-ratio",
+    "about",
+    "concept:leverage"
+   ],
+   [
+    "property:long-position-liquidation-price",
+    "about",
+    "concept:liquidation-engine"
+   ],
+   [
+    "property:margin-ratio",
+    "about",
+    "concept:margin"
+   ],
+   [
+    "property:margin-requirement",
+    "about",
+    "concept:contract-specification"
+   ],
+   [
+    "property:netting-benefit",
+    "about",
+    "concept:clearing"
+   ],
+   [
+    "property:notional-value",
+    "about",
+    "concept:contract-specification"
+   ],
+   [
+    "property:notional-value",
+    "about",
+    "concept:futures"
+   ],
+   [
     "property:participation-rate",
     "about",
     "concept:liquidity"
+   ],
+   [
+    "property:perpetual-funding-rate",
+    "about",
+    "concept:perpetual-swap"
+   ],
+   [
+    "property:pip-value",
+    "about",
+    "concept:fx"
+   ],
+   [
+    "property:position-profit-loss",
+    "about",
+    "concept:contract-specification"
+   ],
+   [
+    "property:position-profit-loss",
+    "about",
+    "concept:fx"
    ],
    [
     "property:price-efficiency-ratio",
@@ -30394,9 +32283,39 @@
     "concept:bid-ask-spread"
    ],
    [
+    "property:return-amplification",
+    "about",
+    "concept:leverage"
+   ],
+   [
+    "property:short-position-liquidation-price",
+    "about",
+    "concept:liquidation-engine"
+   ],
+   [
     "property:simple-slippage",
     "about",
     "concept:slippage"
+   ],
+   [
+    "property:spot-return",
+    "about",
+    "concept:spot-market"
+   ],
+   [
+    "property:swap-rollover-calculation",
+    "about",
+    "concept:fx"
+   ],
+   [
+    "property:tick-value",
+    "about",
+    "concept:contract-specification"
+   ],
+   [
+    "property:total-return",
+    "about",
+    "concept:spot-market"
    ],
    [
     "property:volatility-ratio",
@@ -30418,8 +32337,14 @@
   ],
   "folded_atom_ids": [
    "concept:market-foundations",
+   "concept:market-mechanics",
    "concept:volatility",
    "procedure:indicator-atr"
+  ],
+  "chapter_instruments-market-mechanics_atoms": 57,
+  "chapter_instruments-market-mechanics_relations": 60,
+  "chapter_instruments-market-mechanics_folded": [
+   "concept:market-mechanics"
   ]
  }
 }
