@@ -20,7 +20,14 @@ REPO = Path(__file__).resolve().parent.parent
 
 
 def looks_like_code(text: str) -> bool:
-    return " " not in text and any(c in text for c in "|;={}()<>")
+    """Markup, a regex or a line of script -- places where the missing space is the point.
+
+    Sentences do use a semicolon, so that alone does not disqualify one; angle brackets, braces,
+    pipes and assignment do. Tokenisation of f-strings changed in 3.12, so which of these literals
+    reach this check at all depends on the interpreter -- the rule has to be right on both.
+    """
+    return (any(c in text for c in "<>{}|=")
+            or (" " not in text and any(c in text for c in ";()")))
 
 
 def is_glued(left: str, right: str) -> bool:
@@ -73,3 +80,5 @@ def test_the_check_recognises_a_glued_join():
     assert not is_glued("a hyphenated compo-", "und word")
     assert not looks_like_code("a sentence; with a semicolon")
     assert looks_like_code("ctx.beginPath();ctx.arc(n.x,n.y)")
+    assert looks_like_code('<!doctype html><html lang="en"><head><meta charset="utf-8">')
+    assert looks_like_code("ference|References|Note|Notes|")
