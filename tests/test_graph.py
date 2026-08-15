@@ -462,3 +462,38 @@ def test_ask_reaches_what_search_alone_cannot(kg):
 
 def test_ask_says_nothing_rather_than_guessing(kg):
     assert kg.ask("zzzzqqq", limit=None).total == 0
+
+
+def test_every_walk_can_filter_on_the_reason_not_only_the_relation(kg):
+    """An edge is not only its relation: six `about` edges reach liquidity and they say two
+    different things, and the difference is written in the `why` and nowhere else."""
+    quantifies = {e["id"] for e in kg.neighbors("concept:liquidity", why="quantifies", limit=None)}
+    principles = {e["id"] for e in kg.neighbors("concept:liquidity", why="principle", limit=None)}
+    everything = {e["id"] for e in kg.neighbors("concept:liquidity", relation="about", limit=None)}
+    assert quantifies and principles
+    assert not (quantifies & principles), "the two readings of `about` must not overlap"
+    assert (quantifies | principles) <= everything
+
+    narrow = kg.subgraph("concept:liquidity", radius=1, why="quantifies")
+    wide = kg.subgraph("concept:liquidity", radius=1)
+    assert len(narrow["nodes"]) < len(wide["nodes"])
+    assert all("quantif" in e["why"] for e in narrow["edges"]), \
+        "an induced edge must satisfy the same filter as a traversed one"
+
+    hops = kg.path("concept:liquidity", "concept:stop-hunt", why="principle")
+    assert hops and all("principle" in h["via"]["why"] for h in hops[1:])
+    assert kg.path("concept:liquidity", "concept:stop-hunt", why="quantifies") is None, \
+        "a filter that excludes every route must say so, not fall back to another one"
+
+
+def test_a_concept_lifted_from_core_principles_reaches_its_subject(kg):
+    """`part-of` the chapter is scope; `about` the subject is what the chapter actually claims.
+
+    Without the second edge a stop hunt was part of price action in general, and the route from
+    liquidity to the sweep that empties it ran up to the chapter node and back down.
+    """
+    for nid in ("concept:liquidity-pool", "concept:stop-hunt", "concept:liquidity-grab"):
+        out = {e["id"]: e["relation"] for e in kg.neighbors(nid, direction="out", limit=None)}
+        assert out.get("concept:liquidity") == "about", f"{nid} does not reach its subject"
+        assert out.get("concept:price-action") == "part-of", f"{nid} lost its chapter scope"
+    assert len(kg.path("concept:liquidity", "concept:liquidity-grab")) == 2

@@ -31220,12 +31220,28 @@
    "to_id": "concept:market-foundations"
   },
   {
+   "from": "price discovery",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "stated as a principle of market microstructure",
+   "from_id": "concept:price-discovery",
+   "to_id": "concept:market-microstructure"
+  },
+  {
    "from": "order flow",
    "rel": "part-of",
    "to": "market foundations",
    "why": "defined under market microstructure",
    "from_id": "concept:order-flow",
    "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "order flow",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "stated as a principle of market microstructure",
+   "from_id": "concept:order-flow",
+   "to_id": "concept:market-microstructure"
   },
   {
    "from": "information asymmetry",
@@ -31236,6 +31252,14 @@
    "to_id": "concept:market-foundations"
   },
   {
+   "from": "information asymmetry",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "stated as a principle of market microstructure",
+   "from_id": "concept:information-asymmetry",
+   "to_id": "concept:market-microstructure"
+  },
+  {
    "from": "transaction costs",
    "rel": "part-of",
    "to": "market foundations",
@@ -31244,12 +31268,28 @@
    "to_id": "concept:market-foundations"
   },
   {
+   "from": "transaction costs",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "stated as a principle of market microstructure",
+   "from_id": "concept:transaction-cost",
+   "to_id": "concept:market-microstructure"
+  },
+  {
    "from": "market efficiency",
    "rel": "part-of",
    "to": "market foundations",
    "why": "defined under market microstructure",
    "from_id": "concept:market-efficiency",
    "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "market efficiency",
+   "rel": "about",
+   "to": "market microstructure",
+   "why": "stated as a principle of market microstructure",
+   "from_id": "concept:market-efficiency",
+   "to_id": "concept:market-microstructure"
   },
   {
    "from": "effective spread",
@@ -31290,6 +31330,14 @@
    "why": "defined under order types",
    "from_id": "concept:information-leakage",
    "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "information leakage",
+   "rel": "about",
+   "to": "order types",
+   "why": "stated as a principle of order types",
+   "from_id": "concept:information-leakage",
+   "to_id": "concept:order-type"
   },
   {
    "from": "market order",
@@ -33492,12 +33540,28 @@
    "to_id": "concept:price-action"
   },
   {
+   "from": "break of structure (bos)",
+   "rel": "about",
+   "to": "market structure",
+   "why": "stated as a principle of market structure",
+   "from_id": "concept:break-of-structure",
+   "to_id": "concept:market-structure"
+  },
+  {
    "from": "change of character (choch)",
    "rel": "part-of",
    "to": "price action",
    "why": "defined under market structure",
    "from_id": "concept:change-of-character",
    "to_id": "concept:price-action"
+  },
+  {
+   "from": "change of character (choch)",
+   "rel": "about",
+   "to": "market structure",
+   "why": "stated as a principle of market structure",
+   "from_id": "concept:change-of-character",
+   "to_id": "concept:market-structure"
   },
   {
    "from": "trend classification",
@@ -33604,12 +33668,28 @@
    "to_id": "concept:price-action"
   },
   {
+   "from": "liquidity pools",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "stated as a principle of liquidity",
+   "from_id": "concept:liquidity-pool",
+   "to_id": "concept:liquidity"
+  },
+  {
    "from": "stop hunts",
    "rel": "part-of",
    "to": "price action",
    "why": "defined under liquidity theory",
    "from_id": "concept:stop-hunt",
    "to_id": "concept:price-action"
+  },
+  {
+   "from": "stop hunts",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "stated as a principle of liquidity",
+   "from_id": "concept:stop-hunt",
+   "to_id": "concept:liquidity"
   },
   {
    "from": "liquidity grab",
@@ -33620,6 +33700,14 @@
    "to_id": "concept:price-action"
   },
   {
+   "from": "liquidity grab",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "stated as a principle of liquidity",
+   "from_id": "concept:liquidity-grab",
+   "to_id": "concept:liquidity"
+  },
+  {
    "from": "smart money concept",
    "rel": "part-of",
    "to": "price action",
@@ -33628,12 +33716,28 @@
    "to_id": "concept:price-action"
   },
   {
+   "from": "smart money concept",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "stated as a principle of liquidity",
+   "from_id": "concept:smart-money-concept",
+   "to_id": "concept:liquidity"
+  },
+  {
    "from": "equal highs and lows",
    "rel": "part-of",
    "to": "price action",
    "why": "defined under liquidity theory",
    "from_id": "concept:equal-highs-and-lows",
    "to_id": "concept:price-action"
+  },
+  {
+   "from": "equal highs and lows",
+   "rel": "about",
+   "to": "liquidity",
+   "why": "stated as a principle of liquidity",
+   "from_id": "concept:equal-highs-and-lows",
+   "to_id": "concept:liquidity"
   },
   {
    "from": "buy-side liquidity",
@@ -35256,6 +35360,11 @@
    [
     "concept:break-of-structure",
     "about",
+    "concept:market-structure"
+   ],
+   [
+    "concept:break-of-structure",
+    "about",
     "judgment:price-action-best-practices"
    ],
    [
@@ -35317,6 +35426,11 @@
     "concept:centralized-exchange",
     "kind-of",
     "concept:trading-venue"
+   ],
+   [
+    "concept:change-of-character",
+    "about",
+    "concept:market-structure"
    ],
    [
     "concept:change-of-character",
@@ -35556,6 +35670,11 @@
    [
     "concept:equal-highs-and-lows",
     "about",
+    "concept:liquidity"
+   ],
+   [
+    "concept:equal-highs-and-lows",
+    "about",
     "judgment:price-action-best-practices"
    ],
    [
@@ -35780,8 +35899,18 @@
    ],
    [
     "concept:information-asymmetry",
+    "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "concept:information-asymmetry",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:information-leakage",
+    "about",
+    "concept:order-type"
    ],
    [
     "concept:information-leakage",
@@ -35866,6 +35995,11 @@
    [
     "concept:liquidity-grab",
     "about",
+    "concept:liquidity"
+   ],
+   [
+    "concept:liquidity-grab",
+    "about",
     "concept:liquidity-pool"
    ],
    [
@@ -35877,6 +36011,11 @@
     "concept:liquidity-grab",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "concept:liquidity-pool",
+    "about",
+    "concept:liquidity"
    ],
    [
     "concept:liquidity-pool",
@@ -35937,6 +36076,11 @@
     "concept:margin",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:market-efficiency",
+    "about",
+    "concept:market-microstructure"
    ],
    [
     "concept:market-efficiency",
@@ -36091,6 +36235,11 @@
    [
     "concept:order-flow",
     "about",
+    "concept:market-microstructure"
+   ],
+   [
+    "concept:order-flow",
+    "about",
     "judgment:price-action-best-practices"
    ],
    [
@@ -36157,6 +36306,11 @@
     "concept:price-action",
     "part-of",
     "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:price-discovery",
+    "about",
+    "concept:market-microstructure"
    ],
    [
     "concept:price-discovery",
@@ -36271,6 +36425,11 @@
    [
     "concept:smart-money-concept",
     "about",
+    "concept:liquidity"
+   ],
+   [
+    "concept:smart-money-concept",
+    "about",
     "fact:price-action-core-principles"
    ],
    [
@@ -36292,6 +36451,11 @@
     "concept:spot-market",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:stop-hunt",
+    "about",
+    "concept:liquidity"
    ],
    [
     "concept:stop-hunt",
@@ -36402,6 +36566,11 @@
     "concept:trailing-stop",
     "kind-of",
     "concept:stop-order"
+   ],
+   [
+    "concept:transaction-cost",
+    "about",
+    "concept:market-microstructure"
    ],
    [
     "concept:transaction-cost",
@@ -37590,7 +37759,7 @@
    "object:mangrove-knowledge-space"
   ],
   "chapter_market-foundations_atoms": 61,
-  "chapter_market-foundations_relations": 128,
+  "chapter_market-foundations_relations": 134,
   "chapter_market-foundations_folded": [
    "concept:market-foundations",
    "concept:volatility",
@@ -37613,7 +37782,7 @@
    "concept:market-mechanics"
   ],
   "chapter_core-trading-concepts_atoms": 71,
-  "chapter_core-trading-concepts_relations": 208,
+  "chapter_core-trading-concepts_relations": 215,
   "chapter_core-trading-concepts_folded": [
    "concept:liquidity",
    "concept:market-regime",

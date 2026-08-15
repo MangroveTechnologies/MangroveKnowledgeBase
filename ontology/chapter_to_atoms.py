@@ -2389,6 +2389,14 @@ def build(path: Path, chapter: str, parent: str,
                 # A definition, not a claim: it becomes the thing it defines.
                 cid = atom(prim.capitalize(), name, text, _section=num)
                 rel(cid, "part-of", parent, f"defined under {sec['title'].lower()}")
+                # TWO edges, saying two different things. `part-of` the chapter is scope -- which
+                # subject area holds the term, and what `under=` walks. This one is subject: a
+                # liquidity pool is about LIQUIDITY, not about price action in general, and without
+                # it the route from liquidity to the sweep that empties it ran up to the chapter
+                # node and back down. `about` rather than `part-of` because the chapter says these
+                # concern the subject; it does not say they constitute it.
+                for sub in ({subject_for(name, subjects)} if subjects else set()) - {cid}:
+                    rel(cid, "about", sub, f"stated as a principle of {name_of(sub)}")
                 continue
             principles.append(f"{name}: {text}" if name else text)
         # Every heading that advises, not only the one worded "for Traders": §3.11 titles its list

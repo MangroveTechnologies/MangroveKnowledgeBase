@@ -44,13 +44,20 @@ def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
     # Every value the two new cases quote, checked against the graph rather than trusted.
     liq = kg.get("concept:liquidity")
     assert liq["summary"][:60] in guide
-    quantifiers = {e["id"] for e in kg.neighbors("concept:liquidity", relation="about",
+    # Incoming `about` carries two different claims and the guide teaches the difference, so the
+    # two readings are checked separately -- a measurement is not a concept stated of the subject.
+    quantifiers = {e["id"] for e in kg.neighbors("concept:liquidity", why="quantifies",
                                                  direction="in", limit=None)}
-    assert quantifiers, "nothing quantifies liquidity; the case's output is stale"
-    # The guide shows a representative few rather than all of them, so it must not claim a count and
-    # every id it DOES show must still be real.
+    stated = {e["id"] for e in kg.neighbors("concept:liquidity", why="principle",
+                                            direction="in", limit=None)}
+    assert quantifiers and stated, "the case's output is stale"
+    assert not (quantifiers & stated), "the guide's distinction has stopped being a distinction"
     for q in quantifiers:
         assert q in guide, f"{q} quantifies liquidity and the guide does not show it"
+    # The guide shows a representative few of the stated concepts rather than all of them, so it
+    # must not claim a count -- but every id it DOES show must still be real.
+    shown = {i for i in stated if i in guide}
+    assert shown, "the guide shows none of the concepts stated of liquidity"
 
     scope = kg.find(under="market foundations", limit=None)
     assert f"{scope.total} nodes" in guide, f"the guide's subject size is stale ({scope.total})"

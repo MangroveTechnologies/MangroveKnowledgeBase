@@ -175,6 +175,18 @@ def rank_of(hay: tuple[str, ...], terms: Sequence[str]) -> int | None:
     return max(hits.values()) if len(hits) == len(terms) else None
 
 
+def why_matches(text: str, terms: Sequence[str]) -> bool:
+    """Whether an edge's reason carries every term of a filter.
+
+    An edge is not only its relation. Six `about` edges leave `concept:liquidity` and they say
+    different things -- one quantifies it, five are concepts the knowledge base states of it -- and
+    the difference is written in the `why` and nowhere else. Filtering on the relation alone cannot
+    separate them, so every traversal takes `why=` alongside `relation=`.
+    """
+    low = text.lower()
+    return all(any(v in low for v in _variants(term)) for term in terms)
+
+
 #: A term carried by more than this share of the graph says nothing about which node is meant. It is
 #: dropped from scoring rather than from the query, and the share is measured against THIS corpus
 #: rather than taken from a stop-word list -- "signal", "price" and "trading" are stop words here
@@ -734,7 +746,7 @@ class KnowledgeGraph:
                 for nid, h in hits.items() if len(h) == want}
 
     def ask(self, question: str, *, seeds: int = 3, hops: int = 1,
-            relations: Sequence[str] | None = None,
+            relations: Sequence[str] | None = None, why: str | None = None,
             limit: int | None = DEFAULT_LIMIT) -> Result:
         """Search for where a question lands, then follow the edges out of it.
 
@@ -766,6 +778,7 @@ class KnowledgeGraph:
         if not found.items:
             return _cap([], limit, "reached")
         allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
 
         # Expand: everything within `hops` of a seed, keeping the shortest route to each and the
         # edge that took it there.
@@ -848,13 +861,18 @@ class KnowledgeGraph:
     # --- traversal -------------------------------------------------------------------------------
 
     def neighbors(self, ref: str, *, direction: str = "both", relation: str | None = None,
-                  category: str | None = None, limit: int | None = DEFAULT_LIMIT) -> Result:
+                  category: str | None = None, why: str | None = None,
+                  primitive: str | None = None, limit: int | None = DEFAULT_LIMIT) -> Result:
         """One hop. ``direction`` is ``"in"``, ``"out"`` or ``"both"``.
 
-        Filter by an exact ``relation`` or by a whole ``category`` -- the latter lets a caller follow
-        every structural edge without naming each one, which is what makes a poly-hierarchy
-        navigable. ``direction`` follows the ``mode="in"/"out"/"all"`` convention of igraph and
-        NetworkX rather than a boolean, because a boolean is unguessable.
+        Filter by an exact ``relation``, by a whole ``category``, by the ``primitive`` at the other
+        end, or by the edge's own reason with ``why=``. The last is not a convenience: the same
+        relation carries different claims, and the claim is in the reason. Six ``about`` edges point
+        at ``concept:liquidity`` -- ``why="quantifies"`` returns the measurement, ``why="principle"``
+        returns the concepts the knowledge base states of it.
+
+        ``direction`` follows the ``mode="in"/"out"/"all"`` convention of igraph and NetworkX rather
+        than a boolean, because a boolean is unguessable.
         """
         nid = self.resolve(ref)
         if direction not in ("in", "out", "both"):
@@ -864,6 +882,7 @@ class KnowledgeGraph:
         if category and category not in CATEGORIES:
             raise GraphError(f"unknown category {category!r}; known: {', '.join(CATEGORIES)}")
 
+        why_terms = query_terms(why or "")
         rows: list[dict[str, Any]] = []
         for e, out in [(e, True) for e in self._out.get(nid, [])] + \
                       [(e, False) for e in self._in.get(nid, [])]:
@@ -875,7 +894,11 @@ class KnowledgeGraph:
                 continue
             if category and e.category != category:
                 continue
+            if why_terms and not why_matches(e.why, why_terms):
+                continue
             other = e.dst if out else e.src
+            if primitive and self.nodes[other].primitive != primitive:
+                continue
             rows.append({**self.nodes[other].brief(),
                          "relation": e.relation, "category": e.category,
                          "direction": "out" if out else "in", "why": e.why, **e.props})
@@ -883,6 +906,7 @@ class KnowledgeGraph:
         return _cap(rows, limit, "neighbours")
 
     def subgraph(self, ref: str, *, radius: int = 1, relations: Sequence[str] | None = None,
+                 why: str | None = None,
                  max_nodes: int = DEFAULT_SUBGRAPH_NODES) -> dict[str, Any]:
         """The neighbourhood around a node, as an induced subgraph.
 
@@ -900,6 +924,7 @@ class KnowledgeGraph:
         if radius < 0:
             raise GraphError("radius must be >= 0")
         allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
         if allowed and (bad := allowed - set(RELATIONS)):
             raise GraphError(f"unknown relation(s): {', '.join(sorted(bad))}")
 
@@ -911,6 +936,8 @@ class KnowledgeGraph:
             for cur in frontier:
                 for e in self._out.get(cur, []) + self._in.get(cur, []):
                     if allowed and e.relation not in allowed:
+                        continue
+                    if why_terms and not why_matches(e.why, why_terms):
                         continue
                     other = e.dst if e.src == cur else e.src
                     if other in seen:
@@ -926,7 +953,8 @@ class KnowledgeGraph:
                 break
             frontier = nxt
         induced = [e for e in self.edges if e.src in seen and e.dst in seen
-                   and (not allowed or e.relation in allowed)]
+                   and (not allowed or e.relation in allowed)
+                   and (not why_terms or why_matches(e.why, why_terms))]
         return {
             "center": nid,
             "radius": radius,
@@ -934,13 +962,14 @@ class KnowledgeGraph:
             "edges": [e.as_dict() for e in induced],
             "truncated": truncated,
             "closure": "all nodes within radius over the permitted relations, plus every edge "
-                       "between them",
+                       "between them" + (" whose reason matches" if why_terms else ""),
             **({"note": f"stopped at max_nodes={max_nodes}; raise it or reduce radius"}
                if truncated else {}),
         }
 
     def path(self, from_ref: str, to_ref: str, *, max_depth: int = 6,
-             relations: Sequence[str] | None = None) -> list[dict[str, Any]] | None:
+             relations: Sequence[str] | None = None,
+             why: str | None = None) -> list[dict[str, Any]] | None:
         """The shortest connecting path, as alternating nodes and the relation traversed.
 
         Edges are followed in either direction: "how are these two related" is not a question about
@@ -961,6 +990,7 @@ class KnowledgeGraph:
         if a == b:
             return [{"node": self.nodes[a].brief()}]
         allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
         prev: dict[str, tuple[str, Edge]] = {}
         seen = {a}
         q = deque([(a, 0)])
@@ -970,6 +1000,8 @@ class KnowledgeGraph:
                 continue
             for e in self._out.get(cur, []) + self._in.get(cur, []):
                 if allowed and e.relation not in allowed:
+                    continue
+                if why_terms and not why_matches(e.why, why_terms):
                     continue
                 other = e.dst if e.src == cur else e.src
                 if other in seen:
@@ -995,6 +1027,7 @@ class KnowledgeGraph:
 
     def all_paths(self, from_ref: str, to_ref: str, *, max_depth: int = 4,
                   relations: Sequence[str] | None = None,
+                  why: str | None = None,
                   sibling_hops: bool = False,
                   limit: int | None = DEFAULT_LIMIT,
                   max_steps: int = 200_000) -> Result:
@@ -1034,6 +1067,7 @@ class KnowledgeGraph:
         if a == b:
             return Result([[{"node": self.nodes[a].brief()}]], 1)
         allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
 
         found: list[list[dict[str, Any]]] = []
         steps = 0
@@ -1048,6 +1082,8 @@ class KnowledgeGraph:
                 if not exhausted:
                     return
                 if allowed and e.relation not in allowed:
+                    continue
+                if why_terms and not why_matches(e.why, why_terms):
                     continue
                 other = e.dst if e.src == cur else e.src
                 if other in on_path:

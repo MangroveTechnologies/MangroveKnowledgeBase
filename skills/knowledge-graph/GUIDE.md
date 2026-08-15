@@ -45,7 +45,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 498, 1526
+s["nodes"], s["edges"]          # 498, 1539
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -54,7 +54,7 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  498 1526
+nodes, edges  498 1539
 primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
 relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
@@ -641,15 +641,21 @@ source_wording
               authored summary -- an outer join, so neither statement is lost.
 applications  Estimating realistic execution costs for strategy backtesting
               Determining optimal order sizing based on available liquidity
-neighbors  in   about    property:participation-rate
+neighbors  in   about    property:participation-rate     quantifies liquidity
+           in   about    concept:liquidity-pool          stated as a principle of liquidity
+           in   about    concept:stop-hunt               stated as a principle of liquidity
+           in   about    concept:liquidity-grab          stated as a principle of liquidity
            out  about    fact:market-foundations-core-principles
            out  about    judgment:market-foundations-best-practices
            out  part-of  concept:market-foundations
 ```
 
-Direction carries meaning. **Incoming** `about` is what quantifies liquidity — participation rate,
-a number an execution has. **Outgoing** `about` is what is known about it: the principles that hold
-and the practices that follow, each statement on its edge.
+Direction carries meaning, and so does the reason on each edge. **Incoming** `about` is everything
+the graph has to say about liquidity — a `property:` that measures it, and the concepts stated of
+it. Read the `why` to tell which: *"quantifies liquidity"* is a measurement, *"stated as a principle
+of liquidity"* is a term the knowledge base defines under it. Filter by either, with
+`neighbors(id, why="quantifies")` or `neighbors(id, primitive="Property")`. **Outgoing** `about` is
+the advice and the claims that govern it, each statement carried on its edge.
 
 Note the primitive. `property:` is a **quantity** something has, the way `atr` is a number a bar
 has; `procedure:` is a method you run. Neither has code behind it here — `get()` gives you the
@@ -661,7 +667,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 121 nodes
+kg.find(under="market foundations", limit=None)                 # 123 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```
