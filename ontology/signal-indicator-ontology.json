@@ -21180,56 +21180,7 @@
     "reference_chapter": [
      "core-trading-concepts"
     ],
-    "principles": [
-     "Price Discounts Everything: All known information is reflected in price",
-     "Raw Data Superiority: Price itself is the most immediate and unfiltered data source",
-     "Repetitive Patterns: Markets exhibit recurring behavioral patterns due to consistent human psychology",
-     "Context Dependency: Price action signals must be interpreted within broader market context",
-     "Simplicity: Fewer indicators reduce analysis paralysis and conflicting signals",
-     "Inefficient Price Delivery: Gaps represent areas where price moved too quickly",
-     "Rebalancing Tendency: Markets often return to fill FVGs",
-     "Imbalance Detection: Three-candle pattern identifies FVGs",
-     "Magnet Effect: Unfilled FVGs act as magnets for price",
-     "Partial vs. Full Fill: Gaps may be partially filled before price continues",
-     "Price as Advertisement: Price moves to attract participation; volume confirms acceptance",
-     "Value Area: The price range containing approximately 70% of session volume (one standard deviation)",
-     "Point of Control (POC): The price level with the highest traded volume; represents \"fair value\"",
-     "Acceptance vs. Rejection: High volume = acceptance at price; low volume = rejection",
-     "Balance and Imbalance: Markets alternate between balanced (range) and imbalanced (trending) states",
-     "Higher Highs, Higher Lows (HH/HL): Defines an uptrend",
-     "Lower Highs, Lower Lows (LH/LL): Defines a downtrend",
-     "Structure is Fractal: Patterns repeat across all timeframes",
-     "Trend Persistence: Trends tend to continue until clear reversal signals appear",
-     "Mean Reversion in Ranges: Prices oscillate around a central value in ranging markets",
-     "Compression Precedes Expansion: Low volatility periods often precede significant moves",
-     "Volatility Cycles: Markets alternate between compression and expansion phases",
-     "Strategy Adaptation: Different market states require different trading approaches",
-     "Volume Confirms Price: Price moves on high volume are more significant",
-     "Volume Precedes Price: Volume changes often precede price changes",
-     "Climactic Volume: Extreme volume at tops/bottoms signals exhaustion",
-     "Effort vs. Result: Compare volume (effort) to price movement (result)",
-     "Delta: Net difference between buying and selling volume",
-     "Role Reversal: Broken support becomes resistance; broken resistance becomes support",
-     "Strength Through Tests: Levels gain significance with each successful test",
-     "Round Numbers: Psychological levels often act as support/resistance",
-     "Multiple Timeframe Confluence: Levels aligned across timeframes are stronger",
-     "Zones Over Lines: Support/resistance are zones, not exact prices",
-     "Origin of Move: Zones form at the base of strong impulsive moves",
-     "Fresh Zones: Untested zones have highest probability of reaction",
-     "Strength Indication: Stronger the move away from zone, stronger the zone",
-     "Imbalance: Zones represent unfilled orders left by institutional traders",
-     "One-Time Use: Zones weaken or expire after being tested",
-     "Higher Timeframe Dominance: Higher timeframes carry more weight",
-     "Top-Down Approach: Analyze from higher to lower timeframes",
-     "Alignment: Best trades align across multiple timeframes",
-     "Context vs. Timing: Higher TF provides context; lower TF provides entry timing",
-     "Nested Structure: Lower timeframe trends exist within higher timeframe moves",
-     "Multiple Confirmation: More confirming factors increase probability",
-     "Independent Factors: Factors should be derived from different methodologies",
-     "Quality Over Quantity: Focus on significant factors, not minor alignments",
-     "Probabilistic Thinking: Confluence increases odds but doesn't guarantee outcomes",
-     "Hierarchy of Factors: Some factors are more significant than others"
-    ]
+    "principles": []
    }
   },
   {
@@ -21243,74 +21194,7 @@
     "reference_chapter": [
      "core-trading-concepts"
     ],
-    "practices": [
-     "Study candle anatomy: open, high, low, close, body, wicks",
-     "Always analyze price action in context of market structure",
-     "Look for confluence with key support/resistance levels",
-     "Practice reading charts without any indicators initially",
-     "Use higher timeframes to establish context before lower timeframe entries",
-     "Document recurring patterns and their outcomes",
-     "Focus on FVGs created by strong impulse moves",
-     "Higher timeframe FVGs are more significant",
-     "Combine FVGs with supply/demand zones for higher probability",
-     "Fresh (unfilled) FVGs have higher probability",
-     "Don't expect all FVGs to fill; use as targets, not certainties",
-     "Mark FVGs from significant moves, not minor swings",
-     "Use prior session's VA/POC as key reference levels",
-     "Monitor value migration for trend confirmation",
-     "POC is better as profit target than entry point",
-     "Expect rotational behavior when opening inside value",
-     "Initiative moves break and hold outside value area",
-     "Combine with price action for higher probability setups",
-     "Always identify structure on higher timeframe first",
-     "Mark significant swing points clearly on charts",
-     "Wait for structural breaks rather than anticipating",
-     "Use CHoCH as a warning, not an immediate reversal signal",
-     "Combine structure analysis with key support/resistance levels",
-     "Understand that minor structure breaks within major trends are normal",
-     "Classify market state before selecting strategy",
-     "Do not apply trend-following strategies in ranges",
-     "Watch for compression as setup for breakout trades",
-     "Use ATR and Bollinger Band width for objective measurement",
-     "Expect failed breakouts from ranges (test both sides)",
-     "Reduce position size during uncertain transitional periods",
-     "Place stops beyond obvious liquidity zones, not at them",
-     "Wait for liquidity sweeps before entering counter-trend trades",
-     "Recognize that \"obvious\" support/resistance attracts stop clusters",
-     "Use liquidity grabs as entry signals, not exit triggers",
-     "Understand that breakouts through liquidity often continue",
-     "Differentiate between liquidity grabs (quick reversal) and genuine breakouts",
-     "Always analyze volume alongside price action",
-     "Require volume confirmation for breakout trades",
-     "Watch for volume climaxes at support/resistance",
-     "Use volume profile to identify high-volume nodes (support/resistance)",
-     "Monitor relative volume (current vs. average)",
-     "Study order flow data (tape reading) for additional insight",
-     "Identify major support/resistance from higher timeframes first",
-     "Draw zones rather than single lines (price is not precise)",
-     "Note how strongly price reacted at each level historically",
-     "Expect some penetration of levels (wicks through levels are common)",
-     "Look for confluence of multiple support/resistance factors",
-     "Update levels as market structure evolves",
-     "Mark zones at the origin of impulsive moves",
-     "Focus on the consolidation/base before the move",
-     "Use the extreme of the zone for entries (demand zone low, supply zone high)",
-     "Place stops beyond the zone (demand: below low, supply: above high)",
-     "Expect zones to work once or twice maximum",
-     "Higher timeframe zones take precedence over lower timeframe zones",
-     "Start analysis from higher timeframe and work down",
-     "Never trade against higher timeframe trend without clear invalidation",
-     "Use higher timeframe levels for targets and major stops",
-     "Use lower timeframe patterns for entry triggers",
-     "Ensure at least 2 out of 3 timeframes agree before trading",
-     "Define your timeframes and stick to them consistently",
-     "Map all relevant factors before looking for trades",
-     "Require minimum 3 confirming factors for high-probability setups",
-     "Weight factors by their historical reliability",
-     "Don't force confluence where it doesn't exist",
-     "Note which types of confluence work best in your trading",
-     "Document confluence levels in trade journal"
-    ]
+    "practices": []
    }
   }
  ],
@@ -34464,6 +34348,614 @@
    "to_id": "property:support-resistance-zone-width"
   },
   {
+   "from": "market efficiency",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Price Discounts Everything: All known information is reflected in price",
+   "from_id": "concept:market-efficiency",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "price action",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Raw Data Superiority: Price itself is the most immediate and unfiltered data source \u00b7 Repetitive Patterns: Markets exhibit recurring behavioral patterns due to consistent human psychology \u00b7 Context Dependency: Price action signals must be interpreted within broader market context \u00b7 Simplicity: Fewer indicators reduce analysis paralysis and conflicting signals",
+   "from_id": "concept:price-action",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "fair value gaps",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Inefficient Price Delivery: Gaps represent areas where price moved too quickly \u00b7 Rebalancing Tendency: Markets often return to fill FVGs \u00b7 Magnet Effect: Unfilled FVGs act as magnets for price",
+   "from_id": "concept:fair-value-gap",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "bullish fvg detection",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Imbalance Detection: Three-candle pattern identifies FVGs",
+   "from_id": "procedure:bullish-fvg-detection",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "fvg fill status",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Partial vs. Full Fill: Gaps may be partially filled before price continues",
+   "from_id": "procedure:fvg-fill-status",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "volume profile",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Price as Advertisement: Price moves to attract participation; volume confirms acceptance",
+   "from_id": "concept:volume-profile",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "value area high",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Value Area: The price range containing approximately 70% of session volume (one standard deviation)",
+   "from_id": "concept:value-area-high",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "point of control",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Point of Control (POC): The price level with the highest traded volume; represents \"fair value\"",
+   "from_id": "concept:point-of-control",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "high volume node",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Acceptance vs. Rejection: High volume = acceptance at price; low volume = rejection",
+   "from_id": "concept:high-volume-node",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Balance and Imbalance: Markets alternate between balanced (range) and imbalanced (trending) states",
+   "from_id": "concept:market-regime",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "trending market",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Higher Highs, Higher Lows (HH/HL): Defines an uptrend \u00b7 Lower Highs, Lower Lows (LH/LL): Defines a downtrend \u00b7 Trend Persistence: Trends tend to continue until clear reversal signals appear",
+   "from_id": "concept:trending-market",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "market structure",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Structure is Fractal: Patterns repeat across all timeframes \u00b7 Nested Structure: Lower timeframe trends exist within higher timeframe moves",
+   "from_id": "concept:market-structure",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "ranging market",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Mean Reversion in Ranges: Prices oscillate around a central value in ranging markets",
+   "from_id": "concept:ranging-market",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "compression",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Compression Precedes Expansion: Low volatility periods often precede significant moves",
+   "from_id": "concept:compression",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "expansion",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volatility Cycles: Markets alternate between compression and expansion phases",
+   "from_id": "concept:expansion",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "regime determines archetype effectiveness",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Strategy Adaptation: Different market states require different trading approaches",
+   "from_id": "fact:regime-determines-archetype-effectiveness",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volume Confirms Price: Price moves on high volume are more significant",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "volume",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volume Precedes Price: Volume changes often precede price changes \u00b7 Effort vs. Result: Compare volume (effort) to price movement (result)",
+   "from_id": "concept:volume",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "climactic volume",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Climactic Volume: Extreme volume at tops/bottoms signals exhaustion",
+   "from_id": "concept:climactic-volume",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "delta (order flow)",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Delta: Net difference between buying and selling volume",
+   "from_id": "property:order-flow-delta",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "support and resistance",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Role Reversal: Broken support becomes resistance; broken resistance becomes support",
+   "from_id": "concept:support-and-resistance",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "level strength score",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Strength Through Tests: Levels gain significance with each successful test",
+   "from_id": "property:level-strength-score",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "horizontal level",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Round Numbers: Psychological levels often act as support/resistance",
+   "from_id": "concept:horizontal-level",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "confluence",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Multiple Timeframe Confluence: Levels aligned across timeframes are stronger \u00b7 Multiple Confirmation: More confirming factors increase probability \u00b7 Independent Factors: Factors should be derived from different methodologies \u00b7 Probabilistic Thinking: Confluence increases odds but doesn't guarantee outcomes",
+   "from_id": "concept:confluence",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "support/resistance zone width",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Zones Over Lines: Support/resistance are zones, not exact prices",
+   "from_id": "property:support-resistance-zone-width",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "supply & demand zones",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Origin of Move: Zones form at the base of strong impulsive moves \u00b7 Strength Indication: Stronger the move away from zone, stronger the zone",
+   "from_id": "concept:supply-demand-zone",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "zone freshness",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Fresh Zones: Untested zones have highest probability of reaction \u00b7 One-Time Use: Zones weaken or expire after being tested",
+   "from_id": "property:zone-freshness",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "smart money concept",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Imbalance: Zones represent unfilled orders left by institutional traders",
+   "from_id": "concept:smart-money-concept",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "multi-timeframe analysis",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Higher Timeframe Dominance: Higher timeframes carry more weight \u00b7 Top-Down Approach: Analyze from higher to lower timeframes \u00b7 Context vs. Timing: Higher TF provides context; lower TF provides entry timing",
+   "from_id": "concept:multi-timeframe-analysis",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "trend alignment score",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Alignment: Best trades align across multiple timeframes",
+   "from_id": "property:trend-alignment-score",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "confluence score",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Quality Over Quantity: Focus on significant factors, not minor alignments \u00b7 Hierarchy of Factors: Some factors are more significant than others",
+   "from_id": "property:confluence-score",
+   "to_id": "fact:price-action-core-principles"
+  },
+  {
+   "from": "candle body size",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Study candle anatomy: open, high, low, close, body, wicks",
+   "from_id": "property:candle-body-size",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "market structure",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Always analyze price action in context of market structure \u00b7 Always identify structure on higher timeframe first",
+   "from_id": "concept:market-structure",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "confluence",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Look for confluence with key support/resistance levels \u00b7 Map all relevant factors before looking for trades \u00b7 Don't force confluence where it doesn't exist \u00b7 Note which types of confluence work best in your trading \u00b7 Document confluence levels in trade journal",
+   "from_id": "concept:confluence",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "price action",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Practice reading charts without any indicators initially \u00b7 Document recurring patterns and their outcomes \u00b7 Combine with price action for higher probability setups",
+   "from_id": "concept:price-action",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "multi-timeframe analysis",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use higher timeframes to establish context before lower timeframe entries \u00b7 Higher timeframe zones take precedence over lower timeframe zones \u00b7 Start analysis from higher timeframe and work down \u00b7 Use higher timeframe levels for targets and major stops \u00b7 Use lower timeframe patterns for entry triggers",
+   "from_id": "concept:multi-timeframe-analysis",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "fair value gaps",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Focus on FVGs created by strong impulse moves \u00b7 Higher timeframe FVGs are more significant \u00b7 Don't expect all FVGs to fill; use as targets, not certainties",
+   "from_id": "concept:fair-value-gap",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "supply & demand zones",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine FVGs with supply/demand zones for higher probability \u00b7 Place stops beyond the zone (demand: below low, supply: above high)",
+   "from_id": "concept:supply-demand-zone",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "fvg fill status",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Fresh (unfilled) FVGs have higher probability",
+   "from_id": "procedure:fvg-fill-status",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "fvg validity (significance filter)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Mark FVGs from significant moves, not minor swings",
+   "from_id": "procedure:fvg-validity",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "point of control",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use prior session's VA/POC as key reference levels \u00b7 POC is better as profit target than entry point",
+   "from_id": "concept:point-of-control",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "volume profile metrics",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor value migration for trend confirmation",
+   "from_id": "property:volume-profile-metric",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "ranging market",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Expect rotational behavior when opening inside value \u00b7 Do not apply trend-following strategies in ranges \u00b7 Expect failed breakouts from ranges (test both sides)",
+   "from_id": "concept:ranging-market",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "value area high",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Initiative moves break and hold outside value area",
+   "from_id": "concept:value-area-high",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "swing point identification",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Mark significant swing points clearly on charts",
+   "from_id": "procedure:swing-point-identification",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "break of structure (bos)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Wait for structural breaks rather than anticipating",
+   "from_id": "concept:break-of-structure",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "change of character (choch)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use CHoCH as a warning, not an immediate reversal signal",
+   "from_id": "concept:change-of-character",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "support and resistance",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine structure analysis with key support/resistance levels \u00b7 Identify major support/resistance from higher timeframes first",
+   "from_id": "concept:support-and-resistance",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "structure break detection",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand that minor structure breaks within major trends are normal",
+   "from_id": "procedure:structure-break-detection",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Classify market state before selecting strategy \u00b7 Reduce position size during uncertain transitional periods",
+   "from_id": "concept:market-regime",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "compression",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Watch for compression as setup for breakout trades",
+   "from_id": "concept:compression",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "bollinger band width (compression measure)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use ATR and Bollinger Band width for objective measurement",
+   "from_id": "property:bollinger-band-width",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "liquidity pools",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Place stops beyond obvious liquidity zones, not at them",
+   "from_id": "concept:liquidity-pool",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "liquidity grab",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Wait for liquidity sweeps before entering counter-trend trades \u00b7 Use liquidity grabs as entry signals, not exit triggers",
+   "from_id": "concept:liquidity-grab",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "equal highs and lows",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Recognize that \"obvious\" support/resistance attracts stop clusters",
+   "from_id": "concept:equal-highs-and-lows",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "buy-side liquidity",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand that breakouts through liquidity often continue",
+   "from_id": "concept:buy-side-liquidity",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "stop hunts",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Differentiate between liquidity grabs (quick reversal) and genuine breakouts",
+   "from_id": "concept:stop-hunt",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "volume",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Always analyze volume alongside price action",
+   "from_id": "concept:volume",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Require volume confirmation for breakout trades",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "climactic volume",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Watch for volume climaxes at support/resistance",
+   "from_id": "concept:climactic-volume",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "high volume node",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use volume profile to identify high-volume nodes (support/resistance)",
+   "from_id": "concept:high-volume-node",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "relative volume",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor relative volume (current vs. average)",
+   "from_id": "property:relative-volume",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "order flow",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Study order flow data (tape reading) for additional insight",
+   "from_id": "concept:order-flow",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "support/resistance zone width",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Draw zones rather than single lines (price is not precise)",
+   "from_id": "property:support-resistance-zone-width",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "level strength score",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Note how strongly price reacted at each level historically",
+   "from_id": "property:level-strength-score",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "horizontal level",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Expect some penetration of levels (wicks through levels are common)",
+   "from_id": "concept:horizontal-level",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "zone overlap",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Look for confluence of multiple support/resistance factors",
+   "from_id": "property:zone-overlap",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "dynamic level",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Update levels as market structure evolves",
+   "from_id": "concept:dynamic-level",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "zone identification",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Mark zones at the origin of impulsive moves",
+   "from_id": "procedure:zone-identification",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "demand zone",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Focus on the consolidation/base before the move",
+   "from_id": "concept:demand-zone",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "supply zone",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use the extreme of the zone for entries (demand zone low, supply zone high)",
+   "from_id": "concept:supply-zone",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "zone freshness",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Expect zones to work once or twice maximum",
+   "from_id": "property:zone-freshness",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "the trend is your friend",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Never trade against higher timeframe trend without clear invalidation",
+   "from_id": "judgment:trend-is-your-friend",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "trend alignment score",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Ensure at least 2 out of 3 timeframes agree before trading",
+   "from_id": "property:trend-alignment-score",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "timeframe ratio",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Define your timeframes and stick to them consistently",
+   "from_id": "fact:timeframe-ratio",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
+   "from": "confluence score",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Require minimum 3 confirming factors for high-probability setups \u00b7 Weight factors by their historical reliability",
+   "from_id": "property:confluence-score",
+   "to_id": "judgment:price-action-best-practices"
+  },
+  {
    "from": "core principles",
    "rel": "part-of",
    "to": "price action",
@@ -34763,6 +35255,11 @@
    ],
    [
     "concept:break-of-structure",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:break-of-structure",
     "part-of",
     "concept:price-action"
    ],
@@ -34775,6 +35272,11 @@
     "concept:buy-side-liquidity",
     "about",
     "concept:equal-highs-and-lows"
+   ],
+   [
+    "concept:buy-side-liquidity",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:buy-side-liquidity",
@@ -34818,6 +35320,11 @@
    ],
    [
     "concept:change-of-character",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:change-of-character",
     "part-of",
     "concept:price-action"
    ],
@@ -34843,6 +35350,16 @@
    ],
    [
     "concept:climactic-volume",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:climactic-volume",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:climactic-volume",
     "kind-of",
     "concept:volume"
    ],
@@ -34858,6 +35375,16 @@
    ],
    [
     "concept:compression",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:compression",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:compression",
     "kind-of",
     "concept:market-regime"
    ],
@@ -34865,6 +35392,16 @@
     "concept:concentrated-liquidity",
     "kind-of",
     "concept:crypto-specific-mechanics"
+   ],
+   [
+    "concept:confluence",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:confluence",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:confluence",
@@ -34983,6 +35520,11 @@
    ],
    [
     "concept:demand-zone",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:demand-zone",
     "kind-of",
     "concept:supply-demand-zone"
    ],
@@ -34990,6 +35532,11 @@
     "concept:distribution-pattern",
     "kind-of",
     "concept:volume"
+   ],
+   [
+    "concept:dynamic-level",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:dynamic-level",
@@ -35005,6 +35552,11 @@
     "concept:electronic-communication-network",
     "kind-of",
     "concept:trading-venue"
+   ],
+   [
+    "concept:equal-highs-and-lows",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:equal-highs-and-lows",
@@ -35048,8 +35600,23 @@
    ],
    [
     "concept:expansion",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:expansion",
     "kind-of",
     "concept:market-regime"
+   ],
+   [
+    "concept:fair-value-gap",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:fair-value-gap",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:fair-value-gap",
@@ -35168,8 +35735,28 @@
    ],
    [
     "concept:high-volume-node",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:high-volume-node",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:high-volume-node",
     "part-of",
     "concept:volume-profile"
+   ],
+   [
+    "concept:horizontal-level",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:horizontal-level",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:horizontal-level",
@@ -35283,6 +35870,11 @@
    ],
    [
     "concept:liquidity-grab",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:liquidity-grab",
     "part-of",
     "concept:price-action"
    ],
@@ -35290,6 +35882,11 @@
     "concept:liquidity-pool",
     "about",
     "concept:stop-order"
+   ],
+   [
+    "concept:liquidity-pool",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:liquidity-pool",
@@ -35340,6 +35937,11 @@
     "concept:margin",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:market-efficiency",
+    "about",
+    "fact:price-action-core-principles"
    ],
    [
     "concept:market-efficiency",
@@ -35423,6 +36025,16 @@
    ],
    [
     "concept:market-regime",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:market-regime",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:market-regime",
     "part-of",
     "concept:market-foundations"
    ],
@@ -35433,8 +36045,28 @@
    ],
    [
     "concept:market-structure",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:market-structure",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:market-structure",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "concept:multi-timeframe-analysis",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:multi-timeframe-analysis",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:multi-timeframe-analysis",
@@ -35455,6 +36087,11 @@
     "concept:option",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:order-flow",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:order-flow",
@@ -35493,8 +36130,28 @@
    ],
    [
     "concept:point-of-control",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:point-of-control",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:point-of-control",
     "part-of",
     "concept:volume-profile"
+   ],
+   [
+    "concept:price-action",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:price-action",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:price-action",
@@ -35530,6 +36187,16 @@
     "concept:quantitative-analysis",
     "part-of",
     "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:ranging-market",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:ranging-market",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:ranging-market",
@@ -35603,6 +36270,11 @@
    ],
    [
     "concept:smart-money-concept",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:smart-money-concept",
     "part-of",
     "concept:price-action"
    ],
@@ -35625,6 +36297,11 @@
     "concept:stop-hunt",
     "about",
     "concept:liquidity-pool"
+   ],
+   [
+    "concept:stop-hunt",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:stop-hunt",
@@ -35663,13 +36340,38 @@
    ],
    [
     "concept:supply-demand-zone",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:supply-demand-zone",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:supply-demand-zone",
     "part-of",
     "concept:price-action"
    ],
    [
     "concept:supply-zone",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:supply-zone",
     "kind-of",
     "concept:supply-demand-zone"
+   ],
+   [
+    "concept:support-and-resistance",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:support-and-resistance",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:support-and-resistance",
@@ -35708,6 +36410,11 @@
    ],
    [
     "concept:trending-market",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:trending-market",
     "kind-of",
     "concept:market-regime"
    ],
@@ -35715,6 +36422,16 @@
     "concept:value-area-high",
     "about",
     "concept:support-and-resistance"
+   ],
+   [
+    "concept:value-area-high",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:value-area-high",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:value-area-high",
@@ -35753,8 +36470,28 @@
    ],
    [
     "concept:volume",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:volume",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:volume",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "concept:volume-confirmation",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "concept:volume-confirmation",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "concept:volume-confirmation",
@@ -35765,6 +36502,11 @@
     "concept:volume-divergence",
     "kind-of",
     "concept:volume"
+   ],
+   [
+    "concept:volume-profile",
+    "about",
+    "fact:price-action-core-principles"
    ],
    [
     "concept:volume-profile",
@@ -35828,6 +36570,11 @@
    ],
    [
     "fact:regime-determines-archetype-effectiveness",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "fact:regime-determines-archetype-effectiveness",
     "part-of",
     "concept:price-action"
    ],
@@ -35855,6 +36602,11 @@
     "fact:timeframe-ratio",
     "about",
     "concept:multi-timeframe-analysis"
+   ],
+   [
+    "fact:timeframe-ratio",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "fact:win-rate-is-not-risk",
@@ -35885,6 +36637,11 @@
     "judgment:trend-is-your-friend",
     "about",
     "concept:trending-market"
+   ],
+   [
+    "judgment:trend-is-your-friend",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "judgment:trend-is-your-friend",
@@ -35947,6 +36704,11 @@
     "concept:fair-value-gap"
    ],
    [
+    "procedure:bullish-fvg-detection",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
     "procedure:equal-level-detection",
     "about",
     "concept:equal-highs-and-lows"
@@ -35963,6 +36725,16 @@
    ],
    [
     "procedure:fvg-fill-status",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "procedure:fvg-fill-status",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "procedure:fvg-fill-status",
     "uses",
     "procedure:bullish-fvg-detection"
    ],
@@ -35970,6 +36742,11 @@
     "procedure:fvg-validity",
     "about",
     "concept:fair-value-gap"
+   ],
+   [
+    "procedure:fvg-validity",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "procedure:fvg-validity",
@@ -36068,6 +36845,11 @@
    ],
    [
     "procedure:structure-break-detection",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "procedure:structure-break-detection",
     "uses",
     "procedure:swing-point-identification"
    ],
@@ -36080,6 +36862,11 @@
     "procedure:swing-point-identification",
     "about",
     "concept:price-action"
+   ],
+   [
+    "procedure:swing-point-identification",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "procedure:trend-classification",
@@ -36153,6 +36940,11 @@
    ],
    [
     "procedure:zone-identification",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "procedure:zone-identification",
     "uses",
     "procedure:indicator-atr"
    ],
@@ -36213,6 +37005,11 @@
    ],
    [
     "property:bollinger-band-width",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "property:bollinger-band-width",
     "uses",
     "procedure:indicator-bollingerbands"
    ],
@@ -36220,6 +37017,11 @@
     "property:candle-body-size",
     "about",
     "concept:price-action"
+   ],
+   [
+    "property:candle-body-size",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "property:candle-body-size",
@@ -36250,6 +37052,16 @@
     "property:confluence-score",
     "about",
     "concept:confluence"
+   ],
+   [
+    "property:confluence-score",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "property:confluence-score",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "property:confluence-score",
@@ -36352,6 +37164,16 @@
     "concept:support-and-resistance"
    ],
    [
+    "property:level-strength-score",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "property:level-strength-score",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
     "property:leverage-ratio",
     "about",
     "concept:leverage"
@@ -36435,6 +37257,11 @@
     "property:order-flow-delta",
     "about",
     "concept:volume"
+   ],
+   [
+    "property:order-flow-delta",
+    "about",
+    "fact:price-action-core-principles"
    ],
    [
     "property:participation-rate",
@@ -36572,6 +37399,11 @@
     "concept:volume-confirmation"
    ],
    [
+    "property:relative-volume",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
     "property:return-amplification",
     "about",
     "concept:leverage"
@@ -36610,6 +37442,16 @@
     "property:support-resistance-zone-width",
     "about",
     "concept:support-and-resistance"
+   ],
+   [
+    "property:support-resistance-zone-width",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "property:support-resistance-zone-width",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "property:support-resistance-zone-width",
@@ -36663,6 +37505,16 @@
    ],
    [
     "property:trend-alignment-score",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "property:trend-alignment-score",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
+    "property:trend-alignment-score",
     "uses",
     "procedure:trend-classification"
    ],
@@ -36687,6 +37539,11 @@
     "concept:volume-profile"
    ],
    [
+    "property:volume-profile-metric",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
     "property:zone-freshness",
     "about",
     "concept:demand-zone"
@@ -36702,9 +37559,24 @@
     "concept:supply-zone"
    ],
    [
+    "property:zone-freshness",
+    "about",
+    "fact:price-action-core-principles"
+   ],
+   [
+    "property:zone-freshness",
+    "about",
+    "judgment:price-action-best-practices"
+   ],
+   [
     "property:zone-overlap",
     "about",
     "concept:confluence"
+   ],
+   [
+    "property:zone-overlap",
+    "about",
+    "judgment:price-action-best-practices"
    ],
    [
     "property:zone-overlap",
@@ -36741,7 +37613,7 @@
    "concept:market-mechanics"
   ],
   "chapter_core-trading-concepts_atoms": 71,
-  "chapter_core-trading-concepts_relations": 132,
+  "chapter_core-trading-concepts_relations": 208,
   "chapter_core-trading-concepts_folded": [
    "concept:liquidity",
    "concept:market-regime",
