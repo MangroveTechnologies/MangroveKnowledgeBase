@@ -45,20 +45,20 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 365, 1150
-s["primitives"]                 # {'Procedure': 295, 'Concept': 50, 'Property': 15, ...}
-s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 274, ...}
+s["nodes"], s["edges"]          # 370, 1156
+s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
+s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  365 1150
-primitives    {'Procedure': 295, 'Concept': 50, 'Property': 15, 'Object': 1,
+nodes, edges  370 1156
+primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
-relations     {'instance-of': 364, 'uses': 234, 'about': 274, 'has-role': 218,
-               'kind-of': 32, 'part-of': 26, 'supersedes': 2}
+relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
+               'kind-of': 32, 'part-of': 31, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:oscillator', 'concept:pattern',
                'concept:volatility']
@@ -66,7 +66,7 @@ roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 19 shapes in total]
+               ... 20 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
@@ -76,7 +76,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (299 of 365) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (299 of 370) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -294,7 +294,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 365 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 370 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -633,9 +633,11 @@ kg.neighbors("concept:liquidity", limit=None)           # what quantifies it, wh
 ```
 
 ```
-summary       The ease with which an asset can be bought or sold without significantly
-              affecting its price. High liquidity implies tight spreads, deep order books,
-              and minimal price impact.
+summary       The ease with which an asset can be bought or sold without materially moving
+              its price.
+source_wording
+              The chapter's own phrasing, kept when it differs materially from the
+              authored summary -- an outer join, so neither statement is lost.
 applications  Estimating realistic execution costs for strategy backtesting
               Determining optimal order sizing based on available liquidity
 neighbors  in   about    property:participation-rate
@@ -658,7 +660,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 95 nodes
+kg.find(under="market foundations", limit=None)                 # 100 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```

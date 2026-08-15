@@ -157,6 +157,9 @@
      "Setting dynamic stop-losses using volatility-adjusted levels",
      "Forecasting future volatility for options pricing and risk management",
      "Identifying regime shifts for tactical allocation changes"
+    ],
+    "examples": [
+     "Regime Shift Triggers: Central bank policy changes Geopolitical events Financial crises or credit events Major economic data surprises Structural market changes"
     ]
    }
   },
@@ -17485,7 +17488,16 @@
     "reference_chapter": [
      "market-foundations"
     ],
-    "explanation": "Market microstructure, order types, participant classes, liquidity and its price -- slippage and market impact -- volatility regimes and the shifts between them, trading venues and their execution models, bid-ask spread dynamics, and price discovery. This is the layer every computation in the graph silently assumes. An indicator consumes a price series; this subject area is where that series comes from."
+    "explanation": "Market microstructure, order types, participant classes, liquidity and its price -- slippage and market impact -- volatility regimes and the shifts between them, trading venues and their execution models, bid-ask spread dynamics, and price discovery. This is the layer every computation in the graph silently assumes. An indicator consumes a price series; this subject area is where that series comes from.",
+    "applications": [
+     "Execute efficiently by minimizing transaction costs and market impact",
+     "Manage risk by understanding liquidity constraints and volatility dynamics",
+     "Develop robust strategies that account for realistic market conditions",
+     "Adapt to changing conditions by recognizing regime shifts and adjusting accordingly"
+    ],
+    "chapter_variants": {
+     "explanation": "This document covers the fundamental concepts underlying financial markets, including market structure, order mechanics, participant dynamics, and execution considerations essential for systematic trading."
+    }
    }
   },
   {
@@ -17548,7 +17560,7 @@
    "id": "concept:market-microstructure",
    "title": "market microstructure",
    "kind": "Concept",
-   "summary": "The mechanics by which orders become trades and trades become prices: the matching rules, order flow, transaction costs and information asymmetries specific to a market's design.",
+   "summary": "The study of how the specific rules, protocols and institutional arrangements of a marketturn orders into trades and trades into prices.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17562,16 +17574,98 @@
      "Optimizing order placement and timing based on microstructure patterns",
      "Detecting market manipulation or unusual trading patterns"
     ],
+    "source_wording": "Market microstructure is the study of the processes and mechanisms through which securities are traded, including the dynamics of order flow, price formation, transaction costs, and the behavior of market participants. It examines how the specific trading rules, protocols, and institutional arrangements of a market affect trading outcomes.",
+    "explanation": "It is a field rather than a market object, and the chapter opens with it because everythingbelow is one of its subjects: [[Price Discovery]], [[Order Flow]], [[InformationAsymmetry]], [[Transaction Costs]] and [[Market Efficiency]]. Its practical claim is thatthe venue's design changes the outcome, so two identical strategies on two venues do notearn the same amount."
+   }
+  },
+  {
+   "id": "concept:price-discovery",
+   "title": "price discovery",
+   "kind": "Concept",
+   "summary": "The process by which a market price is determined, as buyers and sellers interact and theirorders are continuously matched.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ],
+    "applications": [
+     "Identifying which market or venue leads price discovery",
+     "Understanding how information flows into prices",
+     "Timing trades around information events",
+     "Designing strategies that exploit slow price discovery",
+     "Evaluating market efficiency"
+    ],
     "examples": [
-     "Market microstructure is the study of the processes and mechanisms through which securities are traded, including the dynamics of order flow, price formation, transaction costs, and the behavior of market participants. It examines how the specific trading rules, protocols, and institutional arrangements of a market affect trading outcomes."
-    ]
+     "Information Events: Earnings announcements: Large discrete price adjustments Economic data releases: Rapid repricing across multiple assets Central bank decisions: Regime-changing price discovery"
+    ],
+    "source_wording": "Price discovery is the process by which market prices are determined through the interaction of buyers and sellers. It encompasses the mechanisms through which information is incorporated into prices, reflecting the collective assessment of an asset's value.",
+    "explanation": "Prices are not announced, they are discovered. Each match moves the price a little, so thesequence of trades is the mechanism by which dispersed information becomes one number. Itruns through [[Auction-Based Discovery]] at the open and close, [[Continuous TradingDiscovery]] during the session, and [[Cross-Market Discovery]] between related instruments.How fast it works is what [[Market Efficiency]] measures."
+   }
+  },
+  {
+   "id": "concept:order-flow",
+   "title": "order flow",
+   "kind": "Concept",
+   "summary": "The sequence and volume of buy and sell orders arriving at a market, which is what drivesprice over short horizons.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ],
+    "source_wording": "The sequence and volume of buy and sell orders entering the market, which drives short-term price movements",
+    "explanation": "Flow is directional information before it is price: a run of buy orders consumes the offersand lifts the quote. Because the size and sequence of orders reveals intent, flow is boththe raw material of [[Price Discovery]] and the reason [[Information Leakage]] costs money.[[Market Impact]] is what your own contribution to the flow does to the price you get."
+   }
+  },
+  {
+   "id": "concept:information-asymmetry",
+   "title": "information asymmetry",
+   "kind": "Concept",
+   "summary": "The unequal distribution of information among participants, where some know more about anasset's value than the person on the other side of their trade.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ],
+    "source_wording": "The unequal distribution of information among market participants, where some traders possess superior information about asset values",
+    "explanation": "It is the reason a quote is not free. A [[Market Makers]] cannot tell an informedcounterparty from an uninformed one, so it widens the [[Bid-Ask Spread]] to cover the lossesit will take against the informed ones. Every participant class in the chapter sitssomewhere on this gradient, which is what makes [[Market Participants]] worth classifying atall."
+   }
+  },
+  {
+   "id": "concept:transaction-cost",
+   "title": "transaction costs",
+   "kind": "Concept",
+   "summary": "The total cost of trading: explicit costs such as commissions and fees, plus implicit costssuch as the spread, market impact and timing.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ],
+    "explanation": "The implicit half is usually the larger one and is invisible on a statement. Crossing the[[Bid-Ask Spread]] is a cost, [[Slippage]] is a cost, and [[Market Impact]] is a cost youinflict on yourself. A strategy evaluated without them is being measured against a marketthat does not exist."
+   }
+  },
+  {
+   "id": "concept:market-efficiency",
+   "title": "market efficiency",
+   "kind": "Concept",
+   "summary": "The degree to which prices already reflect the available information, set by how fast andhow accurately price discovery works.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ],
+    "explanation": "Efficiency is a matter of degree and speed rather than a yes or no. It depends on marketstructure: fragmented venues, wide spreads and thin books all slow the incorporation ofinformation. [[Arbitrageurs]] are the participants whose trading enforces it, and [[PriceDiscovery]] is the process it grades."
    }
   },
   {
    "id": "property:effective-spread",
    "title": "effective spread",
    "kind": "Property",
-   "summary": "The quantity effective spread (measures actual execution cost).",
+   "summary": "Twice the distance between the trade price and the midpoint at the time -- the spreadactually paid.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17579,6 +17673,8 @@
      "market-foundations"
     ],
     "formula": "Effective Spread = 2 * |Trade Price - Midpoint Price|",
+    "source_wording": "The quantity effective spread (measures actual execution cost).",
+    "explanation": "It measures the cost that was really incurred rather than the one advertised, and it differsfrom [[Quoted Spread]] whenever a trade fills inside the quote or walks through it. It isthe honest input to a [[Transaction Costs]] calculation.",
     "inputs": {
      "trade_price": {
       "type": "series",
@@ -17641,7 +17737,7 @@
    "id": "property:quoted-spread",
    "title": "quoted spread",
    "kind": "Property",
-   "summary": "The quantity quoted spread.",
+   "summary": "Ask minus bid -- the spread as displayed, before anyone trades.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17649,6 +17745,8 @@
      "market-foundations"
     ],
     "formula": "Quoted Spread = Ask Price - Bid Price\nRelative Spread = (Ask - Bid) / Midpoint * 100%",
+    "source_wording": "The quantity quoted spread.",
+    "explanation": "It is the headline number and the one that overstates what a patient trader pays, since alimit order need not cross it at all. Expressed as a fraction of the midpoint it becomescomparable across instruments at different price levels.",
     "inputs": {
      "bid": {
       "type": "series",
@@ -17676,27 +17774,37 @@
    "id": "concept:order-type",
    "title": "order types",
    "kind": "Concept",
-   "summary": "Order types are specific instructions traders use to communicate with the market about how they want their trades to be executed. Each order type defines the conditions under which a trade should occur, including price constraints, timing, and execution preferences.",
+   "summary": "The instructions a trader gives a market about how a trade should be executed: what price isacceptable, when it should trigger, and how much of it to reveal.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
     ],
-    "applications": [
-     "Immediate execution when speed is critical (news events, closing positions urgently)",
-     "Entering or exiting positions at desired prices, providing liquidity",
-     "Protecting positions from adverse moves, triggering entries on breakouts",
-     "Combining stop triggers with price limits to avoid poor fills",
-     "Locking in profits while allowing positions to run"
-    ]
+    "source_wording": "Order types are specific instructions traders use to communicate with the market about how they want their trades to be executed. Each order type defines the conditions under which a trade should occur, including price constraints, timing, and execution preferences.",
+    "explanation": "Every order type buys one thing at the price of another. [[Market Order]] buys certainty ofexecution with uncertainty of price; [[Limit Order]] does the reverse. [[Stop Order]] and[[Stop-Limit Order]] add a trigger condition; [[Trailing Stop]] moves that trigger with theprice; [[Iceberg Order]] buys concealment with queue position. Choosing among them ischoosing which risk to keep."
+   }
+  },
+  {
+   "id": "concept:information-leakage",
+   "title": "information leakage",
+   "kind": "Concept",
+   "summary": "The extent to which an order reveals a trader's intentions to the rest of the market beforeit is finished.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "market-foundations"
+    ],
+    "source_wording": "Some order types reveal trading intentions more than others",
+    "explanation": "Order types differ in how much they leak, and the difference is priced: once otherparticipants can infer that size is coming, they move ahead of it and the remaining fillsget worse. [[Iceberg Order]] and [[Dark Pools]] are the two answers the chapter gives, onehiding size in a lit book and the other moving the order off it. Leakage is the mechanism bywhich [[Information Asymmetry]] turns into a cost you pay."
    }
   },
   {
    "id": "concept:market-order",
    "title": "market order",
    "kind": "Concept",
-   "summary": "An instruction to trade immediately at the best price currently available. Execution is certain, the price is not.",
+   "summary": "An instruction to trade immediately at the best price currently available.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17706,14 +17814,21 @@
     "examples": [
      "Buy 100 shares at the best available price",
      "Result: Immediate fill at current ask price(s), guaranteed execution, uncertain price"
-    ]
+    ],
+    "execution_certainty": "High",
+    "price_certainty": "Low",
+    "use_case": "Urgent execution",
+    "applications": [
+     "Immediate execution when speed is critical (news events, closing positions urgently)"
+    ],
+    "explanation": "Execution is certain and the price is not: the order walks the book until it is filled, soin a thin market the average fill can be far from the quote. It is the order type that paysthe full [[Bid-Ask Spread]] and generates the most [[Slippage]], which is why the chapteradvises using it only when speed genuinely matters. A triggered [[Stop Order]] becomes oneof these."
    }
   },
   {
    "id": "concept:limit-order",
    "title": "limit order",
    "kind": "Concept",
-   "summary": "An instruction to trade only at a stated price or better. The price is certain, execution is not; the order rests in the book supplying liquidity until it fills or is cancelled.",
+   "summary": "An instruction to trade only at a stated price or better.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17723,14 +17838,21 @@
     "examples": [
      "Buy 100 shares at $50 or better",
      "Result: Only fills at $50 or below, may not execute if price never reaches $50"
-    ]
+    ],
+    "execution_certainty": "Low",
+    "price_certainty": "High",
+    "use_case": "Price-sensitive entries",
+    "applications": [
+     "Entering or exiting positions at desired prices, providing liquidity"
+    ],
+    "explanation": "The price is certain and execution is not. While it rests unfilled it is displayed liquiditythat someone else can trade against, which makes the limit order the instrument by whichordinary participants supply [[Liquidity]] rather than consume it. It is also how a traderavoids paying the whole [[Bid-Ask Spread]]."
    }
   },
   {
    "id": "concept:stop-order",
    "title": "stop order (stop-loss)",
    "kind": "Concept",
-   "summary": "A resting instruction that becomes a market order once price reaches a trigger level. The trigger is certain, the fill price is not.",
+   "summary": "A resting instruction that becomes a market order once the price reaches a trigger level.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17740,14 +17862,21 @@
     "examples": [
      "Sell 100 shares if price drops to $45",
      "Result: Becomes a market order when price touches $45, then executes at best available"
-    ]
+    ],
+    "execution_certainty": "Medium",
+    "price_certainty": "Low",
+    "use_case": "Loss protection, breakout entries",
+    "applications": [
+     "Protecting positions from adverse moves, triggering entries on breakouts"
+    ],
+    "explanation": "The trigger is certain; the fill is not, because once triggered it is a [[Market Order]] andtakes whatever the book offers. In a fast market that gap can be large, which is the failuremode the chapter warns about. Used below a position it caps loss, used above it enters on abreakout."
    }
   },
   {
    "id": "concept:stop-limit-order",
    "title": "stop-limit order",
    "kind": "Concept",
-   "summary": "A stop order that becomes a limit order rather than a market order when triggered, bounding the fill price at the risk of not filling at all in a fast market.",
+   "summary": "A stop order that becomes a limit order rather than a market order when triggered.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17757,14 +17886,21 @@
     "examples": [
      "Sell 100 shares if price drops to $45, but not below $44",
      "Result: Triggers at $45, but only fills at $44 or better (may not fill in fast markets)"
-    ]
+    ],
+    "execution_certainty": "Low",
+    "price_certainty": "High",
+    "use_case": "Controlled stop execution",
+    "applications": [
+     "Combining stop triggers with price limits to avoid poor fills"
+    ],
+    "explanation": "It bounds the fill price at the cost of possibly not filling at all -- exactly the risk aplain [[Stop Order]] avoids and exactly the protection it lacks. The chapter recommends itin volatile conditions, where the distance a triggered market order can travel is largest."
    }
   },
   {
    "id": "concept:trailing-stop",
    "title": "trailing stop",
    "kind": "Concept",
-   "summary": "A stop whose trigger follows price at a fixed distance in the favourable direction only, locking in gain while leaving the position room to run.",
+   "summary": "A stop whose trigger level follows the price at a fixed distance, moving only in thefavourable direction.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17774,14 +17910,21 @@
     "examples": [
      "Sell if price drops $2 from its highest point since order placed",
      "Result: Stop level adjusts upward as price rises, locks in gains"
-    ]
+    ],
+    "execution_certainty": "Medium",
+    "price_certainty": "Low",
+    "use_case": "Profit protection",
+    "applications": [
+     "Locking in profits while allowing positions to run"
+    ],
+    "explanation": "It converts a static exit into a ratchet: as the position gains, the stop rises behind itand locks in part of the move, but it never retreats. The distance is the whole designdecision, and setting it from [[Volatility]] rather than from a round percentage is whatmakes it survive normal noise."
    }
   },
   {
    "id": "concept:iceberg-order",
    "title": "iceberg order",
    "kind": "Concept",
-   "summary": "A large order that displays only part of its size at a time, refreshing as each slice fills, to reduce the information leakage and impact of showing full size.",
+   "summary": "A large order that displays only part of its size at a time, refreshing the visible slice aseach one fills, so the book never shows how much is really there.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17791,14 +17934,18 @@
     "examples": [
      "Buy 10,000 shares but only display 500 at a time",
      "Result: Hides true order size to minimize market impact"
-    ]
+    ],
+    "execution_certainty": "Medium",
+    "price_certainty": "Medium",
+    "use_case": "Large orders, reduced impact",
+    "explanation": "Showing full size is itself information: a resting order for ten thousand shares tellseveryone a large buyer is present and roughly what they will pay, and the market prices thatbefore the order is done. The iceberg withholds it. The cost is queue position, since eachrefreshed slice goes to the back of its price level, so it trades speed for concealment. Itexists to reduce [[Information Leakage]] and with it [[Market Impact]]."
    }
   },
   {
    "id": "concept:market-participant",
    "title": "market participants",
    "kind": "Concept",
-   "summary": "Market participants are individuals, institutions, or entities engaged in the buying and selling of financial instruments within a market. Each participant type has distinct motivations, time horizons, information sets, and trading behaviors that collectively shape market dynamics.",
+   "summary": "The individuals, institutions and firms buying and selling in a market, each with distinctmotives, time horizons and information.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17810,105 +17957,121 @@
      "Understanding the \"food chain\" of market participants to avoid being exploited",
      "Analyzing institutional order flow for directional signals",
      "Recognizing market maker behavior patterns around key levels"
-    ]
+    ],
+    "source_wording": "Market participants are individuals, institutions, or entities engaged in the buying and selling of financial instruments within a market. Each participant type has distinct motivations, time horizons, information sets, and trading behaviors that collectively shape market dynamics.",
+    "explanation": "The chapter's claim is that who is trading changes how the market behaves. Motives differ --speculation, hedging, liquidity provision, arbitrage -- and so do horizons, from themicroseconds of [[High-Frequency Traders]] to the years of [[Institutional Investors]]. Therelationship is adversarial in one direction only: informed participants profit fromuninformed ones, which is [[Information Asymmetry]] seen from the participant side."
    }
   },
   {
    "id": "concept:retail-trader",
    "title": "retail traders",
    "kind": "Concept",
-   "summary": "Individual investors trading for personal accounts Typically smaller position sizes, longer holding periods Often use technical analysis, may exhibit behavioral biases Tend to be net liquidity takers",
+   "summary": "Individuals trading their own accounts, typically in small size and over longer holdingperiods.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Individual investors trading for personal accounts Typically smaller position sizes, longer holding periods Often use technical analysis, may exhibit behavioral biases Tend to be net liquidity takers",
+    "explanation": "They tend to be net takers of [[Liquidity]] rather than providers of it, and they lean ontechnical analysis and are prone to behavioural bias. Their size rarely causes [[MarketImpact]], which means the costs that dominate for them are the [[Bid-Ask Spread]] and[[Slippage]] rather than the impact of their own flow."
    }
   },
   {
    "id": "concept:institutional-investor",
    "title": "institutional investors",
    "kind": "Concept",
-   "summary": "Mutual funds, pension funds, insurance companies, endowments Large position sizes requiring careful execution over time Focus on fundamental analysis, longer time horizons Create significant market impact when repositioning",
+   "summary": "Mutual funds, pension funds, insurance companies and endowments, trading large positions onlong horizons.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Mutual funds, pension funds, insurance companies, endowments Large position sizes requiring careful execution over time Focus on fundamental analysis, longer time horizons Create significant market impact when repositioning",
+    "explanation": "Size is their defining constraint: a position large enough to matter is large enough to movethe price, so execution has to be spread over time. That is what makes [[Market Impact]]their central cost and why [[Dark Pools]] and schedule algorithms like [[VWAP]] exist. Theirrepositioning is visible in volume patterns, which is why other participants watch for it."
    }
   },
   {
    "id": "concept:market-maker",
    "title": "market makers",
    "kind": "Concept",
-   "summary": "Provide continuous two-sided quotes (bid and ask) Profit from the bid-ask spread while managing inventory risk Obligated to provide liquidity in exchange markets Use sophisticated algorithms to manage quotes and hedge exposure",
+   "summary": "Participants who quote both sides continuously, earning the spread in exchange for standingready to trade.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Provide continuous two-sided quotes (bid and ask) Profit from the bid-ask spread while managing inventory risk Obligated to provide liquidity in exchange markets Use sophisticated algorithms to manage quotes and hedge exposure",
+    "explanation": "The [[Bid-Ask Spread]] is their compensation for two risks: holding inventory that may fallin value, and trading against someone who knows more. They widen the quote when they suspectthe second, which is why spreads open up around uncertainty. Competition among them is whatnarrows the quote back down. In exchange markets the obligation to keep quoting is formal,which makes them the supply side of [[Liquidity]]."
    }
   },
   {
    "id": "concept:high-frequency-trader",
    "title": "high-frequency traders (hft)",
    "kind": "Concept",
-   "summary": "Use ultra-low latency technology for speed advantage Strategies include market making, arbitrage, latency arbitrage Hold positions for milliseconds to seconds Provide significant liquidity but can withdraw in stress",
+   "summary": "Firms using ultra-low-latency technology to trade on horizons of milliseconds to seconds.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Use ultra-low latency technology for speed advantage Strategies include market making, arbitrage, latency arbitrage Hold positions for milliseconds to seconds Provide significant liquidity but can withdraw in stress",
+    "explanation": "Speed is the whole edge, applied to market making, arbitrage and latency arbitrage. Theysupply a great deal of [[Liquidity]] in normal conditions and can withdraw it under stress,which is the [[Liquidity]] illusion the chapter warns about. If an execution schedule ispredictable they can trade ahead of it, so predictability is itself [[Information Leakage]]."
    }
   },
   {
    "id": "concept:arbitrageur",
    "title": "arbitrageurs",
    "kind": "Concept",
-   "summary": "Exploit price discrepancies between related instruments ETF-underlying arbitrage, cross-exchange arbitrage, statistical arbitrage Force prices toward efficiency Generally market-neutral with hedged positions",
+   "summary": "Participants who exploit price discrepancies between related instruments, generally holdinghedged, market-neutral positions.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Exploit price discrepancies between related instruments ETF-underlying arbitrage, cross-exchange arbitrage, statistical arbitrage Force prices toward efficiency Generally market-neutral with hedged positions",
+    "explanation": "ETF against underlying, one exchange against another, statistical relationships betweensecurities: in each case the trade is the difference rather than the direction. Theiractivity is the mechanism that forces prices back together, which makes them the enforcersof [[Market Efficiency]] and a driver of [[Cross-Market Discovery]]."
    }
   },
   {
    "id": "concept:hedge-fund",
    "title": "hedge funds",
    "kind": "Concept",
-   "summary": "Pursue diverse strategies: long/short equity, macro, quantitative Aggressive risk-taking with leverage Shorter time horizons than traditional asset managers Can be liquidity providers or aggressive liquidity takers",
+   "summary": "Pooled investment firms running diverse strategies with leverage and shorter horizons thantraditional asset managers.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Pursue diverse strategies: long/short equity, macro, quantitative Aggressive risk-taking with leverage Shorter time horizons than traditional asset managers Can be liquidity providers or aggressive liquidity takers",
+    "explanation": "Long/short equity, macro and quantitative approaches sit under one label, so the categorydescribes a structure rather than a method. They can be either side of the [[Liquidity]]relationship depending on the strategy, providing it when they quote and consuming itaggressively when they need to move."
    }
   },
   {
    "id": "concept:proprietary-trading-firm",
    "title": "proprietary trading firms",
    "kind": "Concept",
-   "summary": "Trade firm capital using systematic or discretionary strategies Often specialize in specific markets or strategies May operate HFT or longer-term systematic strategies No external investor constraints",
+   "summary": "Firms trading their own capital, systematically or discretionarily, with no externalinvestors to answer to.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Trade firm capital using systematic or discretionary strategies Often specialize in specific markets or strategies May operate HFT or longer-term systematic strategies No external investor constraints",
+    "explanation": "The absence of client money removes the constraints that shape [[Institutional Investors]]-- no redemption risk, no mandate, no reporting horizon -- which lets them specialisenarrowly. Some operate at the speed of [[High-Frequency Traders]] and others on much longersystematic horizons."
    }
   },
   {
    "id": "concept:liquidity",
    "title": "liquidity",
    "kind": "Concept",
-   "summary": "The ease with which an asset can be bought or sold without significantly affecting its price. High liquidity implies tight spreads, deep order books, and minimal price impact.",
+   "summary": "The ease with which an asset can be bought or sold without materially moving its price.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17921,14 +18084,16 @@
      "Choosing execution algorithms (TWAP, VWAP, Implementation Shortfall)",
      "Identifying low-liquidity periods to avoid or exploit",
      "Stress-testing strategies for liquidity withdrawal scenarios"
-    ]
+    ],
+    "source_wording": "The ease with which an asset can be bought or sold without significantly affecting its price. High liquidity implies tight spreads, deep order books, and minimal price impact.",
+    "explanation": "High liquidity shows up as a tight [[Bid-Ask Spread]], a deep book and small [[MarketImpact]] -- three symptoms of one condition. It is not constant: it varies by time of dayand by regime, and displayed size often disappears when it is tested, so the book overstateswhat is really available. Everything about execution cost follows from it."
    }
   },
   {
    "id": "concept:slippage",
    "title": "slippage",
    "kind": "Concept",
-   "summary": "The difference between the expected price of a trade and the actual executed price, typically caused by market movement or insufficient liquidity.",
+   "summary": "The difference between the price a trade was expected to get and the price it actually got.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17937,14 +18102,16 @@
     ],
     "examples": [
      "Slippage Example: Expected buy price: $100.00 (midpoint) Market order for 1,000 shares Actual average fill: $100.15 Slippage: $0.15 per share ($150 total)"
-    ]
+    ],
+    "source_wording": "The difference between the expected price of a trade and the actual executed price, typically caused by market movement or insufficient liquidity.",
+    "explanation": "It comes from two sources that are worth separating: the market moving while the orderworks, and the book being too thin to fill it at the quote. The second is [[Liquidity]] andis partly under the trader's control through sizing and timing; the first is not. Because abacktest fills at a price nobody was offering, slippage assumptions are what make simulatedresults comparable to real ones."
    }
   },
   {
    "id": "concept:market-impact",
    "title": "market impact",
    "kind": "Concept",
-   "summary": "The effect that a trader's own order has on the market price of an asset, caused by consuming available liquidity.",
+   "summary": "The effect a trader's own order has on the price, caused by consuming the liquidity that wasthere.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -17953,7 +18120,8 @@
     ],
     "examples": [
      "Market Impact Example: Order: Buy 50,000 shares of a stock with 100,000 average daily volume Pre-trade price: $50.00 Execution over 2 hours raises price to $50.80 during buying Price settles to $50.50 after completion Temporary impact: $0.30 (reversed) Permanent impact: $0.50 (persisted)"
-    ]
+    ],
+    "explanation": "It grows faster than linearly with size, so doubling an order more than doubles the damage-- which is the entire argument for breaking orders up and for [[VWAP]] and [[TWAP]]schedules. Part of it reverses once the order stops (temporary) and part persists becausethe market has learned something (permanent). Working slower reduces it but exposes theorder to price movement, and that trade-off is what [[Implementation Shortfall]] tries tooptimise."
    }
   },
   {
@@ -18096,7 +18264,7 @@
    "id": "property:participation-rate",
    "title": "participation rate",
    "kind": "Property",
-   "summary": "The quantity participation rate.",
+   "summary": "Order size as a fraction of the volume traded over the execution window -- how much of themarket's activity is you.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18104,6 +18272,8 @@
      "market-foundations"
     ],
     "formula": "Participation Rate = Order Size / (ADV * Trading Duration in Days)",
+    "source_wording": "The quantity participation rate.",
+    "explanation": "It is the practical control on [[Market Impact]]: the chapter's guidance is to stay underroughly ten per cent of average daily volume, because impact scales with the share of flowyou represent rather than with the absolute size. It is computed as order size divided byaverage daily volume times the duration in days.",
     "inputs": {
      "order_size": {
       "type": "series",
@@ -18135,59 +18305,67 @@
    "id": "concept:market-regime",
    "title": "market regimes",
    "kind": "Concept",
-   "summary": "Distinct periods characterized by specific volatility patterns, trend behaviors, or correlation structures.",
+   "summary": "Distinct periods in which volatility, trend behaviour and correlation structure arecharacteristically different.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Distinct periods characterized by specific volatility patterns, trend behaviors, or correlation structures.",
+    "explanation": "A regime is a persistent state rather than a mood: markets stay in one until a catalystmoves them, which is why a strategy can work for a year and then stop. The chapter names twoby their volatility, [[Low Volatility Regime]] and [[High Volatility Regime]], andcorrelations behave differently in each -- they compress in calm and converge in stress, sodiversification fails exactly when it is needed."
    }
   },
   {
    "id": "concept:regime-shift",
    "title": "regime shifts",
    "kind": "Concept",
-   "summary": "Transitions between different market regimes, often triggered by changes in fundamental conditions, sentiment, or structural factors.",
+   "summary": "The transition from one market regime to another, triggered by a change in fundamentals,sentiment or structure.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Transitions between different market regimes, often triggered by changes in fundamental conditions, sentiment, or structural factors.",
+    "explanation": "Central bank policy, geopolitics, credit events and data surprises are the usual catalysts.The practical problem is asymmetry of speed: the shift happens faster than any detectorrecognises it, so a strategy that switches on a detected regime is always switching late.That argues for deciding in advance what to do rather than reacting."
    }
   },
   {
    "id": "concept:low-volatility-regime",
    "title": "low volatility regime",
    "kind": "Concept",
-   "summary": "VIX below 15 Tight trading ranges, mean-reverting price action Low correlations between assets Carry strategies and short volatility strategies perform well Trend-following strategies underperform",
+   "summary": "A market state of tight ranges and mean-reverting price action, conventionally marked by VIXbelow 15.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "VIX below 15 Tight trading ranges, mean-reverting price action Low correlations between assets Carry strategies and short volatility strategies perform well Trend-following strategies underperform",
+    "explanation": "Correlations between assets are low, so diversification actually works. Carry and short-volatility strategies do well and trend-following underperforms, because there is nosustained direction to follow. It is the state in which risk looks cheapest and is beingaccumulated."
    }
   },
   {
    "id": "concept:high-volatility-regime",
    "title": "high volatility regime",
    "kind": "Concept",
-   "summary": "VIX above 25-30 Large daily moves, trend persistence Elevated correlations (risk-on/risk-off behavior) Momentum and trend-following strategies perform well Mean reversion strategies suffer",
+   "summary": "A market state of large daily moves and persistent direction, conventionally marked by VIXabove 25 to 30.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "VIX above 25-30 Large daily moves, trend persistence Elevated correlations (risk-on/risk-off behavior) Momentum and trend-following strategies perform well Mean reversion strategies suffer",
+    "explanation": "Correlations rise together as everything trades risk-on or risk-off, so the diversificationthat worked in calm stops working. Momentum and trend-following do well and mean reversionsuffers. The chapter's guidance is to cut position size and leverage here rather than tochange the strategy."
    }
   },
   {
    "id": "property:historical-volatility",
    "title": "historical volatility (standard deviation of returns)",
    "kind": "Property",
-   "summary": "The quantity historical volatility (standard deviation of returns).",
+   "summary": "The realised dispersion of returns over a window, the standard deviation of returns scaledto a common horizon.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18195,6 +18373,8 @@
      "market-foundations"
     ],
     "formula": "sigma = sqrt(1/(n-1) * sum((r_i - r_bar)^2))\n\nAnnualized Vol = Daily Vol * sqrt(252)",
+    "source_wording": "The quantity historical volatility (standard deviation of returns).",
+    "explanation": "It is what volatility actually was, not what it is expected to be, and annualising it by thesquare root of the number of periods is what makes two windows comparable. Being backward-looking it reacts to a regime change only after the fact, which is the gap [[GARCH]] and[[Volatility Ratio]] try to close.",
     "inputs": {
      "returns": {
       "type": "series",
@@ -18222,7 +18402,7 @@
    "id": "procedure:garch-model",
    "title": "garch(1,1) model (volatility forecasting)",
    "kind": "Procedure",
-   "summary": "Computes garch(1,1) model (volatility forecasting).",
+   "summary": "A model that forecasts next period's variance from the last shock and the last variance.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18230,6 +18410,8 @@
      "market-foundations"
     ],
     "formula": "sigma_t^2 = omega + alpha * epsilon_(t-1)^2 + beta * sigma_(t-1)^2",
+    "source_wording": "Computes garch(1,1) model (volatility forecasting).",
+    "explanation": "It is the formal statement of two facts about [[Volatility]] -- that shocks persist and thatvariance reverts to a long-run level -- with one parameter for each plus a weight on thelong-run term. It is a model you run rather than a quantity you read off the tape, which iswhat separates it from [[Historical Volatility]].",
     "inputs": {
      "returns": {
       "type": "series",
@@ -18265,7 +18447,7 @@
    "id": "property:volatility-ratio",
    "title": "volatility ratio (regime detection)",
    "kind": "Property",
-   "summary": "The quantity volatility ratio (regime detection).",
+   "summary": "The dispersion of returns for a security or index, conventionally measured as their standarddeviation or variance.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18273,6 +18455,8 @@
      "market-foundations"
     ],
     "formula": "Vol Ratio = Short-term Vol / Long-term Vol",
+    "source_wording": "The quantity volatility ratio (regime detection).",
+    "explanation": "It behaves in ways that make it forecastable even though returns are not: it clusters, sohigh volatility follows high volatility; it reverts to a long-run average; and it rises moreon down moves than up ones. Those regularities are what [[GARCH]] models. It is measuredhistorically by [[Historical Volatility]], per bar by [[Average True Range]], and its changeby [[Volatility Ratio]].",
     "inputs": {
      "short_vol": {
       "type": "series",
@@ -18300,7 +18484,7 @@
    "id": "concept:trading-venue",
    "title": "trading venues",
    "kind": "Concept",
-   "summary": "Platforms or marketplaces where financial instruments are bought and sold, including exchanges, alternative trading systems, and over-the-counter markets.",
+   "summary": "The platforms and marketplaces where instruments trade: exchanges, alternative tradingsystems and over-the-counter markets.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18313,98 +18497,112 @@
      "Accessing specific participant pools (retail, institutional)",
      "Arbitraging price differences across venues",
      "Selecting venues based on fee structures (maker-taker, payment for order flow)"
-    ]
+    ],
+    "explanation": "Modern markets are fragmented across many of them, which is why routing is a decision atall. They differ along a transparency spectrum from fully lit to fully dark, in latency, andin the regulation they operate under. Brokers are obliged to seek the best price acrossthem, which is what makes fragmentation tractable rather than chaotic."
    }
   },
   {
    "id": "concept:execution-model",
    "title": "execution models",
    "kind": "Concept",
-   "summary": "Methods and protocols by which trades are matched and executed, varying by transparency, speed, and participant access.",
+   "summary": "The methods and protocols by which orders are matched and filled, differing in transparency,speed and who may participate.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Methods and protocols by which trades are matched and executed, varying by transparency, speed, and participant access.",
+    "explanation": "A venue is where you trade; an execution model is how the match happens once you are there-- continuous price-time priority, periodic auction, dealer quotation, or an algorithmworking an order across venues over time. [[TWAP]], [[VWAP]], [[Implementation Shortfall]]and liquidity-seeking algorithms are the schedules the chapter names."
    }
   },
   {
    "id": "concept:lit-exchange",
    "title": "lit exchanges (nyse, nasdaq, lse)",
    "kind": "Concept",
-   "summary": "Full pre-trade transparency (visible order book) Price-time priority for order matching Regulatory oversight and surveillance Best for price discovery and transparent execution",
+   "summary": "Venues with full pre-trade transparency: the order book is visible and matching followsprice-time priority.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Full pre-trade transparency (visible order book) Price-time priority for order matching Regulatory oversight and surveillance Best for price discovery and transparent execution",
+    "explanation": "Because everyone can see resting size, they are where [[Price Discovery]] mostly happens --and for the same reason they are where a large order leaks the most. Regulatory oversightand surveillance are part of the package."
    }
   },
   {
    "id": "concept:dark-pool",
    "title": "dark pools",
    "kind": "Concept",
-   "summary": "No pre-trade transparency (orders hidden until execution) Match large orders without market impact May offer midpoint pricing Used by institutional investors for block trades",
+   "summary": "Venues with no pre-trade transparency, where orders stay hidden until they execute.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "No pre-trade transparency (orders hidden until execution) Match large orders without market impact May offer midpoint pricing Used by institutional investors for block trades",
+    "explanation": "The whole point is matching size without announcing it, often at the midpoint, which is why[[Institutional Investors]] use them for block trades. The trade-off is that you cannot seewhat is there, so execution quality has to be measured after the fact rather than assumed.They solve the same problem as [[Iceberg Order]] by a different route: hiding the orderrather than hiding its size."
    }
   },
   {
    "id": "concept:electronic-communication-network",
    "title": "electronic communication networks (ecns)",
    "kind": "Concept",
-   "summary": "Automated matching of buy and sell orders Often offer extended trading hours Direct access without intermediaries Variable fee structures",
+   "summary": "Automated venues that match buy and sell orders directly, often outside standard tradinghours.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Automated matching of buy and sell orders Often offer extended trading hours Direct access without intermediaries Variable fee structures",
+    "explanation": "They give direct access without an intermediary and typically extend the session, which iswhere early reaction to news happens. Fee structures vary and are worth reading, because ona small spread the fee can exceed it."
    }
   },
   {
    "id": "concept:over-the-counter-market",
    "title": "over-the-counter (otc) markets",
    "kind": "Concept",
-   "summary": "Direct dealer-to-dealer or dealer-to-client trading Common for bonds, derivatives, FX Customizable contract terms Less standardization, more counterparty risk",
+   "summary": "Bilateral markets where dealers trade directly with each other or with clients rather thanthrough an exchange.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Direct dealer-to-dealer or dealer-to-client trading Common for bonds, derivatives, FX Customizable contract terms Less standardization, more counterparty risk",
+    "explanation": "Terms are negotiable rather than standardised, which is what makes them the home of bonds,many derivatives and FX. The cost of that flexibility is counterparty risk and less pricetransparency, since there is no central book to look at."
    }
   },
   {
    "id": "concept:internalization",
    "title": "internalization",
    "kind": "Concept",
-   "summary": "Broker fills customer order from own inventory No exchange fees, potentially faster execution Potential conflicts of interest Subject to best execution requirements",
+   "summary": "A broker filling a customer order from its own inventory instead of sending it to anexchange.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Broker fills customer order from own inventory No exchange fees, potentially faster execution Potential conflicts of interest Subject to best execution requirements",
+    "explanation": "It avoids exchange fees and can be faster, and it puts the broker on the other side of itsown customer -- which is why best-execution obligations exist and why the practice isscrutinised. The order never reaches a public book, so it contributes nothing to [[PriceDiscovery]]."
    }
   },
   {
    "id": "procedure:twap",
    "title": "twap",
    "kind": "Procedure",
-   "summary": "Steady execution over time. Splits order evenly across time",
+   "summary": "An execution schedule that splits an order evenly across a time window.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "explanation": "It makes no attempt to predict volume: it just spreads participation so no single momentcarries the whole order, which limits [[Market Impact]] at the cost of exposure to pricedrift over the window. Its evenness is also its weakness, since it trades the same amount inthin periods as in thick ones."
    }
   },
   {
@@ -18424,13 +18622,15 @@
    "id": "procedure:implementation-shortfall",
    "title": "implementation shortfall",
    "kind": "Procedure",
-   "summary": "Minimizing total cost. Balances impact vs. timing risk",
+   "summary": "An execution schedule that balances market impact against the risk of the price moving whilethe order works.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Minimizing total cost. Balances impact vs. timing risk",
+    "explanation": "It is the explicit statement of the urgency-cost trade-off: going fast costs [[MarketImpact]], going slow costs drift, and the optimum depends on volatility and order size.Where [[TWAP]] and [[VWAP]] follow a fixed rule, this one solves for a schedule."
    }
   },
   {
@@ -18450,7 +18650,7 @@
    "id": "concept:bid-ask-spread",
    "title": "bid-ask spread dynamics",
    "kind": "Concept",
-   "summary": "The bid-ask spread is the difference between the highest price a buyer is willing to pay (bid) and the lowest price a seller is willing to accept (ask). It represents the cost of immediacy and compensates liquidity providers for their services and risks.",
+   "summary": "The gap between the highest price a buyer will pay and the lowest a seller will accept --the price of immediacy.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18468,7 +18668,9 @@
      "Tight Spread (Liquid Market): Asset: SPY ETF Bid: $450.00 Ask: $450.01 Spread: $0.01 (0.002%) Indication: Highly liquid, low transaction cost",
      "Wide Spread (Illiquid Market): Asset: Small-cap stock Bid: $12.50 Ask: $12.80 Spread: $0.30 (2.4%) Indication: Illiquid, high transaction cost",
      "Spread Widening Event: Normal spread: $0.02 Pre-earnings announcement: $0.08 Post-earnings (uncertainty resolved): $0.02 Interpretation: Market makers charged premium for uncertainty"
-    ]
+    ],
+    "source_wording": "The bid-ask spread is the difference between the highest price a buyer is willing to pay (bid) and the lowest price a seller is willing to accept (ask). It represents the cost of immediacy and compensates liquidity providers for their services and risks.",
+    "explanation": "It is what [[Market Makers]] earn for standing ready to trade, and it moves for reasons thatare readable. It widens when they fear trading against someone informed, when inventory riskis high, and when [[Volatility]] rises; it narrows when more of them compete. Because itwidens under uncertainty, the spread doubles as an indicator of market stress rather thanonly a cost."
    }
   },
   {
@@ -18510,7 +18712,7 @@
    "id": "property:realized-spread",
    "title": "realized spread (market maker profit after price movement)",
    "kind": "Property",
-   "summary": "The quantity realized spread (market maker profit after price movement).",
+   "summary": "Twice the signed distance between the trade price and the midpoint some interval later --what the market maker kept.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -18518,6 +18720,8 @@
      "market-foundations"
     ],
     "formula": "Realized Spread = 2 * D * (Trade Price - Midpoint after t)",
+    "source_wording": "The quantity realized spread (market maker profit after price movement).",
+    "explanation": "Comparing it with [[Effective Spread]] separates the two halves of the spread: what theliquidity provider earned, and what it lost to price movement against it. The difference isthe cost of [[Information Asymmetry]], measured rather than assumed.",
     "inputs": {
      "trade_price": {
       "type": "series",
@@ -18546,62 +18750,48 @@
    }
   },
   {
-   "id": "concept:price-discovery",
-   "title": "price discovery mechanisms",
+   "id": "concept:auction-based-discovery",
+   "title": "auction-based discovery",
    "kind": "Concept",
-   "summary": "Price discovery is the process by which market prices are determined through the interaction of buyers and sellers. It encompasses the mechanisms through which information is incorporated into prices, reflecting the collective assessment of an asset's value.",
+   "summary": "Price discovery by batching orders and clearing them at a single price, as at the open andclose.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
     ],
-    "applications": [
-     "Identifying which market or venue leads price discovery",
-     "Understanding how information flows into prices",
-     "Timing trades around information events",
-     "Designing strategies that exploit slow price discovery",
-     "Evaluating market efficiency"
-    ]
-   }
-  },
-  {
-   "id": "concept:auction-based-discovery",
-   "title": "auction-based discovery",
-   "kind": "Concept",
-   "summary": "Opening/closing auctions aggregate orders to set a single clearing price Reduces volatility by batching orders Used for price-setting in many equity markets",
-   "epistemic": "observed",
-   "status": "draft",
-   "props": {
-    "reference_chapter": [
-     "market-foundations"
-    ]
+    "source_wording": "Opening/closing auctions aggregate orders to set a single clearing price Reduces volatility by batching orders Used for price-setting in many equity markets",
+    "explanation": "Aggregating a period's orders into one crossing dampens the volatility that continuousmatching produces at those moments, which is why many equity markets set official openingand closing prices this way. The batch is also where the day's largest concentrations ofinterest meet."
    }
   },
   {
    "id": "concept:continuous-trading-discovery",
    "title": "continuous trading discovery",
    "kind": "Concept",
-   "summary": "Prices update tick-by-tick as orders match Provides real-time price information Can be noisy in thin markets",
+   "summary": "Price discovery tick by tick, as individual orders match through the session.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Prices update tick-by-tick as orders match Provides real-time price information Can be noisy in thin markets",
+    "explanation": "It gives a live price at every moment, which is its value, and it is noisy in thin markets,which is its cost -- a single small order can move the print. It is the mode in which mostof the session runs, bracketed by [[Auction-Based Discovery]] at each end."
    }
   },
   {
    "id": "concept:cross-market-discovery",
    "title": "cross-market discovery",
    "kind": "Concept",
-   "summary": "Futures often lead spot price discovery Options markets embed volatility expectations ADRs and local shares influence each other ETFs and underlying baskets arbitrage to equilibrium",
+   "summary": "Price discovery that happens between related instruments rather than within one book.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "market-foundations"
-    ]
+    ],
+    "source_wording": "Futures often lead spot price discovery Options markets embed volatility expectations ADRs and local shares influence each other ETFs and underlying baskets arbitrage to equilibrium",
+    "explanation": "Futures often lead spot, options embed a volatility expectation the underlying does notshow, and ETFs and their baskets are pulled together by arbitrage. The consequence is thatthe price of one instrument carries information about another before that other has moved,which is what lead-lag analysis looks for and what [[Arbitrageurs]] enforce."
    }
   },
   {
@@ -18725,11 +18915,6 @@
      "market-foundations"
     ],
     "principles": [
-     "Price Discovery: The process by which market prices are determined through the interaction of supply and demand, facilitated by the continuous matching of buy and sell orders",
-     "Order Flow: The sequence and volume of buy and sell orders entering the market, which drives short-term price movements",
-     "Information Asymmetry: The unequal distribution of information among market participants, where some traders possess superior information about asset values",
-     "Transaction Costs: Total costs of trading including explicit costs (commissions, fees) and implicit costs (spread, market impact, timing costs)",
-     "Market Efficiency: The degree to which prices reflect all available information, influenced by the speed and accuracy of price discovery",
      "Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)"
     ]
    }
@@ -28786,6 +28971,46 @@
    "to_id": "concept:market-foundations"
   },
   {
+   "from": "price discovery",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined under market microstructure",
+   "from_id": "concept:price-discovery",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "order flow",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined under market microstructure",
+   "from_id": "concept:order-flow",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "information asymmetry",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined under market microstructure",
+   "from_id": "concept:information-asymmetry",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined under market microstructure",
+   "from_id": "concept:transaction-cost",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "market efficiency",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined under market microstructure",
+   "from_id": "concept:market-efficiency",
+   "to_id": "concept:market-foundations"
+  },
+  {
    "from": "effective spread",
    "rel": "about",
    "to": "market microstructure",
@@ -28815,6 +29040,14 @@
    "to": "market foundations",
    "why": "defined under order types",
    "from_id": "concept:order-type",
+   "to_id": "concept:market-foundations"
+  },
+  {
+   "from": "information leakage",
+   "rel": "part-of",
+   "to": "market foundations",
+   "why": "defined under order types",
+   "from_id": "concept:information-leakage",
    "to_id": "concept:market-foundations"
   },
   {
@@ -29186,58 +29419,50 @@
    "to_id": "concept:bid-ask-spread"
   },
   {
-   "from": "price discovery mechanisms",
-   "rel": "part-of",
-   "to": "market foundations",
-   "why": "defined under price discovery mechanisms",
-   "from_id": "concept:price-discovery",
-   "to_id": "concept:market-foundations"
-  },
-  {
    "from": "auction-based discovery",
    "rel": "kind-of",
-   "to": "price discovery mechanisms",
-   "why": "a kind of price discovery mechanisms",
+   "to": "price discovery",
+   "why": "a kind of price discovery",
    "from_id": "concept:auction-based-discovery",
    "to_id": "concept:price-discovery"
   },
   {
    "from": "continuous trading discovery",
    "rel": "kind-of",
-   "to": "price discovery mechanisms",
-   "why": "a kind of price discovery mechanisms",
+   "to": "price discovery",
+   "why": "a kind of price discovery",
    "from_id": "concept:continuous-trading-discovery",
    "to_id": "concept:price-discovery"
   },
   {
    "from": "cross-market discovery",
    "rel": "kind-of",
-   "to": "price discovery mechanisms",
-   "why": "a kind of price discovery mechanisms",
+   "to": "price discovery",
+   "why": "a kind of price discovery",
    "from_id": "concept:cross-market-discovery",
    "to_id": "concept:price-discovery"
   },
   {
    "from": "information share (hasbrouck)",
    "rel": "about",
-   "to": "price discovery mechanisms",
-   "why": "quantifies price discovery mechanisms",
+   "to": "price discovery",
+   "why": "quantifies price discovery",
    "from_id": "property:information-share",
    "to_id": "concept:price-discovery"
   },
   {
    "from": "component share",
    "rel": "about",
-   "to": "price discovery mechanisms",
-   "why": "quantifies price discovery mechanisms",
+   "to": "price discovery",
+   "why": "quantifies price discovery",
    "from_id": "property:component-share",
    "to_id": "concept:price-discovery"
   },
   {
    "from": "price efficiency ratio",
    "rel": "about",
-   "to": "price discovery mechanisms",
-   "why": "quantifies price discovery mechanisms",
+   "to": "price discovery",
+   "why": "quantifies price discovery",
    "from_id": "property:price-efficiency-ratio",
    "to_id": "concept:price-discovery"
   },
@@ -29248,6 +29473,22 @@
    "why": "executes against the price series this computes",
    "from_id": "procedure:vwap",
    "to_id": "procedure:indicator-vwap"
+  },
+  {
+   "from": "iceberg order",
+   "rel": "about",
+   "to": "information leakage",
+   "why": "displays partial size to reduce it",
+   "from_id": "concept:iceberg-order",
+   "to_id": "concept:information-leakage"
+  },
+  {
+   "from": "dark pools",
+   "rel": "about",
+   "to": "information leakage",
+   "why": "hides the order from the book entirely",
+   "from_id": "concept:dark-pool",
+   "to_id": "concept:information-leakage"
   },
   {
    "from": "order types",
@@ -29263,14 +29504,6 @@
    "to": "core principles",
    "why": "Conditional Execution: Stop orders become active only when a trigger price is reached",
    "from_id": "concept:stop-order",
-   "to_id": "fact:market-foundations-core-principles"
-  },
-  {
-   "from": "iceberg order",
-   "rel": "about",
-   "to": "core principles",
-   "why": "Information Leakage: Some order types reveal trading intentions more than others",
-   "from_id": "concept:iceberg-order",
    "to_id": "fact:market-foundations-core-principles"
   },
   {
@@ -29346,7 +29579,7 @@
    "to_id": "fact:market-foundations-core-principles"
   },
   {
-   "from": "price discovery mechanisms",
+   "from": "price discovery",
    "rel": "about",
    "to": "core principles",
    "why": "Information Aggregation: Prices aggregate dispersed information held by many participants \u00b7 Continuous Process: Price discovery occurs continuously as new information arrives \u00b7 Order Flow Information: The sequence and size of orders reveals information \u00b7 Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously \u00b7 Speed of Incorporation: The efficiency of price discovery depends on market structure",
@@ -29580,12 +29813,15 @@
    "concept:high-frequency-trader",
    "concept:high-volatility-regime",
    "concept:iceberg-order",
+   "concept:information-asymmetry",
+   "concept:information-leakage",
    "concept:institutional-investor",
    "concept:internalization",
    "concept:limit-order",
    "concept:liquidity",
    "concept:lit-exchange",
    "concept:low-volatility-regime",
+   "concept:market-efficiency",
    "concept:market-foundations",
    "concept:market-impact",
    "concept:market-maker",
@@ -29594,6 +29830,7 @@
    "concept:market-order",
    "concept:market-participant",
    "concept:market-regime",
+   "concept:order-flow",
    "concept:order-type",
    "concept:over-the-counter-market",
    "concept:price-action",
@@ -29608,6 +29845,7 @@
    "concept:stop-order",
    "concept:trading-venue",
    "concept:trailing-stop",
+   "concept:transaction-cost",
    "fact:market-foundations-core-principles",
    "fact:square-root-market-impact-rule",
    "judgment:market-foundations-best-practices",
@@ -29679,6 +29917,11 @@
    [
     "concept:dark-pool",
     "about",
+    "concept:information-leakage"
+   ],
+   [
+    "concept:dark-pool",
+    "about",
     "judgment:market-foundations-best-practices"
    ],
    [
@@ -29729,7 +29972,7 @@
    [
     "concept:iceberg-order",
     "about",
-    "fact:market-foundations-core-principles"
+    "concept:information-leakage"
    ],
    [
     "concept:iceberg-order",
@@ -29740,6 +29983,16 @@
     "concept:iceberg-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:information-asymmetry",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:information-leakage",
+    "part-of",
+    "concept:market-foundations"
    ],
    [
     "concept:institutional-investor",
@@ -29790,6 +30043,11 @@
     "concept:low-volatility-regime",
     "kind-of",
     "concept:market-regime"
+   ],
+   [
+    "concept:market-efficiency",
+    "part-of",
+    "concept:market-foundations"
    ],
    [
     "concept:market-foundations",
@@ -29868,6 +30126,11 @@
    ],
    [
     "concept:market-regime",
+    "part-of",
+    "concept:market-foundations"
+   ],
+   [
+    "concept:order-flow",
     "part-of",
     "concept:market-foundations"
    ],
@@ -29990,6 +30253,11 @@
     "concept:trailing-stop",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:transaction-cost",
+    "part-of",
+    "concept:market-foundations"
    ],
    [
     "concept:volatility",
@@ -30142,13 +30410,15 @@
    "concept:technical-analysis",
    "object:mangrove-knowledge-space"
   ],
-  "chapter_market-foundations_atoms": 56,
-  "chapter_market-foundations_relations": 95,
+  "chapter_market-foundations_atoms": 61,
+  "chapter_market-foundations_relations": 101,
   "chapter_market-foundations_folded": [
+   "concept:market-foundations",
    "concept:volatility",
    "procedure:indicator-atr"
   ],
   "folded_atom_ids": [
+   "concept:market-foundations",
    "concept:volatility",
    "procedure:indicator-atr"
   ]

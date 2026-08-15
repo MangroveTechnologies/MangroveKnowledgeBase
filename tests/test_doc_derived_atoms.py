@@ -122,9 +122,14 @@ def test_a_wired_concept_is_reachable_from_its_statement(kg):
     """The point of moving it: the concept stops being a leaf and the advice is one hop away."""
     out = kg.neighbors("concept:iceberg-order", direction="out", relation="about", limit=None)
     kinds = {e["id"].split(":", 1)[0] for e in out}
-    assert {"fact", "judgment"} <= kinds, (
-        "a concept points AT the principles and practices that govern it, so both should be "
-        f"outgoing from iceberg-order; got {kinds}")
+    # The judgment is the practice that says when to use it. The other end used to be the Fact,
+    # carrying "some order types reveal trading intentions" as an edge rationale -- until that
+    # principle turned out to be a DEFINITION and became `concept:information-leakage`. Pointing at
+    # the thing itself beats pointing at a list that mentions it, which is the whole direction of
+    # travel: a statement earns an edge, and a statement that defines something earns a node.
+    assert "judgment" in kinds, f"the practice that governs it should be outgoing; got {kinds}"
+    assert "concept:information-leakage" in {e["id"] for e in out}, (
+        "iceberg order exists to reduce information leakage; it should point at that node")
     assert all(e["why"].strip() for e in out), "every wired edge carries the statement it moved"
 
 

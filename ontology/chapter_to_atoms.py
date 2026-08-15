@@ -83,6 +83,20 @@ CHAPTERS: dict[str, dict] = {
         "wired": {},
     },
     "market-foundations": {
+        # §1.1 has no subject of its own: its Definition defines the FIELD ("the study of the
+        # processes and mechanisms"), and its five Core Principles are the section's actual
+        # concepts, each with a definition attached. Filed as principles, they sat inert in a list
+        # while two of them -- order flow, market efficiency -- existed nowhere in the graph.
+        "principle_concepts": {
+            "Price Discovery": "concept", "Order Flow": "concept",
+            "Information Asymmetry": "concept", "Transaction Costs": "concept",
+            "Market Efficiency": "concept", "Information Leakage": "concept",
+        },
+        # Row label names an existing node; the remaining columns become its properties. The Order
+        # Type Summary Table states execution and price certainty for all six order types and was
+        # read by nothing.
+        "table_properties": {"Order Type Summary Table":
+                             ["execution_certainty", "price_certainty", "use_case"]},
         # Read one at a time. Two are models you RUN, one is an empirical regularity, and the other
         # twelve are quantities something has -- a spread a book has, a rate an execution has.
         "formula_primitive": {
@@ -106,7 +120,13 @@ CHAPTERS: dict[str, dict] = {
         # targets. Different things with the same name, so neither folds into the other; the edge is
         # what stops them sitting side by side looking like a duplicate.
         "edges": [("procedure:vwap", "uses", "procedure:indicator-vwap",
-                   "executes against the price series this computes")],
+                   "executes against the price series this computes"),
+                  # Now that information leakage is a node rather than a line in a list, the order
+                  # type that exists to reduce it points at the thing itself.
+                  ("concept:iceberg-order", "about", "concept:information-leakage",
+                   "displays partial size to reduce it"),
+                  ("concept:dark-pool", "about", "concept:information-leakage",
+                   "hides the order from the book entirely")],
         "wired": {
             # --- order types -------------------------------------------------------------------
             "Use market orders sparingly": "concept:market-order",
@@ -118,10 +138,6 @@ CHAPTERS: dict[str, dict] = {
             "Set stop-losses based on technical levels": "concept:stop-order",
             "Consider using stop-limit orders": "concept:stop-limit-order",
             "Use iceberg orders for large positions": "concept:iceberg-order",
-            # Wired to the iceberg order rather than to `order-type`, where the sentence points:
-            # the node's own definition invokes information leakage, so this is the principle that
-            # accounts for what that node does.
-            "Information Leakage: Some order types reveal": "concept:iceberg-order",
             "Immediacy vs. Price Control": "concept:order-type",
             "Execution Certainty: Different order types": "concept:order-type",
             "Be aware of venue-specific order types": "concept:order-type",
@@ -233,6 +249,365 @@ DEFINITION = {
     "concept:market-microstructure":
         "The mechanics by which orders become trades and trades become prices: the matching rules, "
         "order flow, transaction costs and information asymmetries specific to a market's design.",
+}
+
+#: Authored prose, one entry per node: (definition, explanation). Written by reading the chapter,
+#: and merged rather than substituted -- an OUTER JOIN with dedupe. Where the chapter states a real
+#: definition it stays as the summary and this one is kept beside it; where the chapter offers only
+#: a worked example ("Instruction: buy 100 shares at the best available price"), this becomes the
+#: summary and the example moves to `examples`. The explanation has no counterpart in the source at
+#: all -- the chapter never says WHY an iceberg order costs queue position -- so it is always added.
+AUTHORED: dict[str, tuple[str, str]] = {
+    'concept:arbitrageur': (
+        'Participants who exploit price discrepancies between related instruments, generally holding'
+        'hedged, market-neutral positions.',
+        'ETF against underlying, one exchange against another, statistical relationships between'
+        'securities: in each case the trade is the difference rather than the direction. Their'
+        'activity is the mechanism that forces prices back together, which makes them the enforcers'
+        'of [[Market Efficiency]] and a driver of [[Cross-Market Discovery]].'),
+    'concept:auction-based-discovery': (
+        'Price discovery by batching orders and clearing them at a single price, as at the open and'
+        'close.',
+        "Aggregating a period's orders into one crossing dampens the volatility that continuous"
+        'matching produces at those moments, which is why many equity markets set official opening'
+        "and closing prices this way. The batch is also where the day's largest concentrations of"
+        'interest meet.'),
+    'concept:bid-ask-spread': (
+        'The gap between the highest price a buyer will pay and the lowest a seller will accept --'
+        'the price of immediacy.',
+        'It is what [[Market Makers]] earn for standing ready to trade, and it moves for reasons that'
+        'are readable. It widens when they fear trading against someone informed, when inventory risk'
+        'is high, and when [[Volatility]] rises; it narrows when more of them compete. Because it'
+        'widens under uncertainty, the spread doubles as an indicator of market stress rather than'
+        'only a cost.'),
+    'concept:continuous-trading-discovery': (
+        'Price discovery tick by tick, as individual orders match through the session.',
+        'It gives a live price at every moment, which is its value, and it is noisy in thin markets,'
+        'which is its cost -- a single small order can move the print. It is the mode in which most'
+        'of the session runs, bracketed by [[Auction-Based Discovery]] at each end.'),
+    'concept:cross-market-discovery': (
+        'Price discovery that happens between related instruments rather than within one book.',
+        'Futures often lead spot, options embed a volatility expectation the underlying does not'
+        'show, and ETFs and their baskets are pulled together by arbitrage. The consequence is that'
+        'the price of one instrument carries information about another before that other has moved,'
+        'which is what lead-lag analysis looks for and what [[Arbitrageurs]] enforce.'),
+    'concept:dark-pool': (
+        'Venues with no pre-trade transparency, where orders stay hidden until they execute.',
+        'The whole point is matching size without announcing it, often at the midpoint, which is why'
+        '[[Institutional Investors]] use them for block trades. The trade-off is that you cannot see'
+        'what is there, so execution quality has to be measured after the fact rather than assumed.'
+        'They solve the same problem as [[Iceberg Order]] by a different route: hiding the order'
+        'rather than hiding its size.'),
+    'concept:electronic-communication-network': (
+        'Automated venues that match buy and sell orders directly, often outside standard trading'
+        'hours.',
+        'They give direct access without an intermediary and typically extend the session, which is'
+        'where early reaction to news happens. Fee structures vary and are worth reading, because on'
+        'a small spread the fee can exceed it.'),
+    'concept:execution-model': (
+        'The methods and protocols by which orders are matched and filled, differing in transparency,'
+        'speed and who may participate.',
+        'A venue is where you trade; an execution model is how the match happens once you are there'
+        '-- continuous price-time priority, periodic auction, dealer quotation, or an algorithm'
+        'working an order across venues over time. [[TWAP]], [[VWAP]], [[Implementation Shortfall]]'
+        'and liquidity-seeking algorithms are the schedules the chapter names.'),
+    'concept:hedge-fund': (
+        'Pooled investment firms running diverse strategies with leverage and shorter horizons than'
+        'traditional asset managers.',
+        'Long/short equity, macro and quantitative approaches sit under one label, so the category'
+        'describes a structure rather than a method. They can be either side of the [[Liquidity]]'
+        'relationship depending on the strategy, providing it when they quote and consuming it'
+        'aggressively when they need to move.'),
+    'concept:high-frequency-trader': (
+        'Firms using ultra-low-latency technology to trade on horizons of milliseconds to seconds.',
+        'Speed is the whole edge, applied to market making, arbitrage and latency arbitrage. They'
+        'supply a great deal of [[Liquidity]] in normal conditions and can withdraw it under stress,'
+        'which is the [[Liquidity]] illusion the chapter warns about. If an execution schedule is'
+        'predictable they can trade ahead of it, so predictability is itself [[Information Leakage]].'),
+    'concept:high-volatility-regime': (
+        'A market state of large daily moves and persistent direction, conventionally marked by VIX'
+        'above 25 to 30.',
+        'Correlations rise together as everything trades risk-on or risk-off, so the diversification'
+        'that worked in calm stops working. Momentum and trend-following do well and mean reversion'
+        "suffers. The chapter's guidance is to cut position size and leverage here rather than to"
+        'change the strategy.'),
+    'concept:iceberg-order': (
+        'A large order that displays only part of its size at a time, refreshing the visible slice as'
+        'each one fills, so the book never shows how much is really there.',
+        'Showing full size is itself information: a resting order for ten thousand shares tells'
+        'everyone a large buyer is present and roughly what they will pay, and the market prices that'
+        'before the order is done. The iceberg withholds it. The cost is queue position, since each'
+        'refreshed slice goes to the back of its price level, so it trades speed for concealment. It'
+        'exists to reduce [[Information Leakage]] and with it [[Market Impact]].'),
+    'concept:information-asymmetry': (
+        'The unequal distribution of information among participants, where some know more about an'
+        "asset's value than the person on the other side of their trade.",
+        'It is the reason a quote is not free. A [[Market Makers]] cannot tell an informed'
+        'counterparty from an uninformed one, so it widens the [[Bid-Ask Spread]] to cover the losses'
+        'it will take against the informed ones. Every participant class in the chapter sits'
+        'somewhere on this gradient, which is what makes [[Market Participants]] worth classifying at'
+        'all.'),
+    'concept:information-leakage': (
+        "The extent to which an order reveals a trader's intentions to the rest of the market before"
+        'it is finished.',
+        'Order types differ in how much they leak, and the difference is priced: once other'
+        'participants can infer that size is coming, they move ahead of it and the remaining fills'
+        'get worse. [[Iceberg Order]] and [[Dark Pools]] are the two answers the chapter gives, one'
+        'hiding size in a lit book and the other moving the order off it. Leakage is the mechanism by'
+        'which [[Information Asymmetry]] turns into a cost you pay.'),
+    'concept:institutional-investor': (
+        'Mutual funds, pension funds, insurance companies and endowments, trading large positions on'
+        'long horizons.',
+        'Size is their defining constraint: a position large enough to matter is large enough to move'
+        'the price, so execution has to be spread over time. That is what makes [[Market Impact]]'
+        'their central cost and why [[Dark Pools]] and schedule algorithms like [[VWAP]] exist. Their'
+        'repositioning is visible in volume patterns, which is why other participants watch for it.'),
+    'concept:internalization': (
+        'A broker filling a customer order from its own inventory instead of sending it to an'
+        'exchange.',
+        'It avoids exchange fees and can be faster, and it puts the broker on the other side of its'
+        'own customer -- which is why best-execution obligations exist and why the practice is'
+        'scrutinised. The order never reaches a public book, so it contributes nothing to [[Price'
+        'Discovery]].'),
+    'concept:limit-order': (
+        'An instruction to trade only at a stated price or better.',
+        'The price is certain and execution is not. While it rests unfilled it is displayed liquidity'
+        'that someone else can trade against, which makes the limit order the instrument by which'
+        'ordinary participants supply [[Liquidity]] rather than consume it. It is also how a trader'
+        'avoids paying the whole [[Bid-Ask Spread]].'),
+    'concept:liquidity': (
+        'The ease with which an asset can be bought or sold without materially moving its price.',
+        'High liquidity shows up as a tight [[Bid-Ask Spread]], a deep book and small [[Market'
+        'Impact]] -- three symptoms of one condition. It is not constant: it varies by time of day'
+        'and by regime, and displayed size often disappears when it is tested, so the book overstates'
+        'what is really available. Everything about execution cost follows from it.'),
+    'concept:lit-exchange': (
+        'Venues with full pre-trade transparency: the order book is visible and matching follows'
+        'price-time priority.',
+        'Because everyone can see resting size, they are where [[Price Discovery]] mostly happens --'
+        'and for the same reason they are where a large order leaks the most. Regulatory oversight'
+        'and surveillance are part of the package.'),
+    'concept:low-volatility-regime': (
+        'A market state of tight ranges and mean-reverting price action, conventionally marked by VIX'
+        'below 15.',
+        'Correlations between assets are low, so diversification actually works. Carry and short-'
+        'volatility strategies do well and trend-following underperforms, because there is no'
+        'sustained direction to follow. It is the state in which risk looks cheapest and is being'
+        'accumulated.'),
+    'concept:market-efficiency': (
+        'The degree to which prices already reflect the available information, set by how fast and'
+        'how accurately price discovery works.',
+        'Efficiency is a matter of degree and speed rather than a yes or no. It depends on market'
+        'structure: fragmented venues, wide spreads and thin books all slow the incorporation of'
+        'information. [[Arbitrageurs]] are the participants whose trading enforces it, and [[Price'
+        'Discovery]] is the process it grades.'),
+    'concept:market-impact': (
+        "The effect a trader's own order has on the price, caused by consuming the liquidity that was"
+        'there.',
+        'It grows faster than linearly with size, so doubling an order more than doubles the damage'
+        '-- which is the entire argument for breaking orders up and for [[VWAP]] and [[TWAP]]'
+        'schedules. Part of it reverses once the order stops (temporary) and part persists because'
+        'the market has learned something (permanent). Working slower reduces it but exposes the'
+        'order to price movement, and that trade-off is what [[Implementation Shortfall]] tries to'
+        'optimise.'),
+    'concept:market-maker': (
+        'Participants who quote both sides continuously, earning the spread in exchange for standing'
+        'ready to trade.',
+        'The [[Bid-Ask Spread]] is their compensation for two risks: holding inventory that may fall'
+        'in value, and trading against someone who knows more. They widen the quote when they suspect'
+        'the second, which is why spreads open up around uncertainty. Competition among them is what'
+        'narrows the quote back down. In exchange markets the obligation to keep quoting is formal,'
+        'which makes them the supply side of [[Liquidity]].'),
+    'concept:market-microstructure': (
+        'The study of how the specific rules, protocols and institutional arrangements of a market'
+        'turn orders into trades and trades into prices.',
+        'It is a field rather than a market object, and the chapter opens with it because everything'
+        'below is one of its subjects: [[Price Discovery]], [[Order Flow]], [[Information'
+        'Asymmetry]], [[Transaction Costs]] and [[Market Efficiency]]. Its practical claim is that'
+        "the venue's design changes the outcome, so two identical strategies on two venues do not"
+        'earn the same amount.'),
+    'concept:market-order': (
+        'An instruction to trade immediately at the best price currently available.',
+        'Execution is certain and the price is not: the order walks the book until it is filled, so'
+        'in a thin market the average fill can be far from the quote. It is the order type that pays'
+        'the full [[Bid-Ask Spread]] and generates the most [[Slippage]], which is why the chapter'
+        'advises using it only when speed genuinely matters. A triggered [[Stop Order]] becomes one'
+        'of these.'),
+    'concept:market-participant': (
+        'The individuals, institutions and firms buying and selling in a market, each with distinct'
+        'motives, time horizons and information.',
+        "The chapter's claim is that who is trading changes how the market behaves. Motives differ --"
+        'speculation, hedging, liquidity provision, arbitrage -- and so do horizons, from the'
+        'microseconds of [[High-Frequency Traders]] to the years of [[Institutional Investors]]. The'
+        'relationship is adversarial in one direction only: informed participants profit from'
+        'uninformed ones, which is [[Information Asymmetry]] seen from the participant side.'),
+    'concept:market-regime': (
+        'Distinct periods in which volatility, trend behaviour and correlation structure are'
+        'characteristically different.',
+        'A regime is a persistent state rather than a mood: markets stay in one until a catalyst'
+        'moves them, which is why a strategy can work for a year and then stop. The chapter names two'
+        'by their volatility, [[Low Volatility Regime]] and [[High Volatility Regime]], and'
+        'correlations behave differently in each -- they compress in calm and converge in stress, so'
+        'diversification fails exactly when it is needed.'),
+    'concept:order-flow': (
+        'The sequence and volume of buy and sell orders arriving at a market, which is what drives'
+        'price over short horizons.',
+        'Flow is directional information before it is price: a run of buy orders consumes the offers'
+        'and lifts the quote. Because the size and sequence of orders reveals intent, flow is both'
+        'the raw material of [[Price Discovery]] and the reason [[Information Leakage]] costs money.'
+        '[[Market Impact]] is what your own contribution to the flow does to the price you get.'),
+    'concept:order-type': (
+        'The instructions a trader gives a market about how a trade should be executed: what price is'
+        'acceptable, when it should trigger, and how much of it to reveal.',
+        'Every order type buys one thing at the price of another. [[Market Order]] buys certainty of'
+        'execution with uncertainty of price; [[Limit Order]] does the reverse. [[Stop Order]] and'
+        '[[Stop-Limit Order]] add a trigger condition; [[Trailing Stop]] moves that trigger with the'
+        'price; [[Iceberg Order]] buys concealment with queue position. Choosing among them is'
+        'choosing which risk to keep.'),
+    'concept:over-the-counter-market': (
+        'Bilateral markets where dealers trade directly with each other or with clients rather than'
+        'through an exchange.',
+        'Terms are negotiable rather than standardised, which is what makes them the home of bonds,'
+        'many derivatives and FX. The cost of that flexibility is counterparty risk and less price'
+        'transparency, since there is no central book to look at.'),
+    'concept:price-discovery': (
+        'The process by which a market price is determined, as buyers and sellers interact and their'
+        'orders are continuously matched.',
+        'Prices are not announced, they are discovered. Each match moves the price a little, so the'
+        'sequence of trades is the mechanism by which dispersed information becomes one number. It'
+        'runs through [[Auction-Based Discovery]] at the open and close, [[Continuous Trading'
+        'Discovery]] during the session, and [[Cross-Market Discovery]] between related instruments.'
+        'How fast it works is what [[Market Efficiency]] measures.'),
+    'concept:proprietary-trading-firm': (
+        'Firms trading their own capital, systematically or discretionarily, with no external'
+        'investors to answer to.',
+        'The absence of client money removes the constraints that shape [[Institutional Investors]]'
+        '-- no redemption risk, no mandate, no reporting horizon -- which lets them specialise'
+        'narrowly. Some operate at the speed of [[High-Frequency Traders]] and others on much longer'
+        'systematic horizons.'),
+    'concept:regime-shift': (
+        'The transition from one market regime to another, triggered by a change in fundamentals,'
+        'sentiment or structure.',
+        'Central bank policy, geopolitics, credit events and data surprises are the usual catalysts.'
+        'The practical problem is asymmetry of speed: the shift happens faster than any detector'
+        'recognises it, so a strategy that switches on a detected regime is always switching late.'
+        'That argues for deciding in advance what to do rather than reacting.'),
+    'concept:retail-trader': (
+        'Individuals trading their own accounts, typically in small size and over longer holding'
+        'periods.',
+        'They tend to be net takers of [[Liquidity]] rather than providers of it, and they lean on'
+        'technical analysis and are prone to behavioural bias. Their size rarely causes [[Market'
+        'Impact]], which means the costs that dominate for them are the [[Bid-Ask Spread]] and'
+        '[[Slippage]] rather than the impact of their own flow.'),
+    'concept:slippage': (
+        'The difference between the price a trade was expected to get and the price it actually got.',
+        'It comes from two sources that are worth separating: the market moving while the order'
+        'works, and the book being too thin to fill it at the quote. The second is [[Liquidity]] and'
+        "is partly under the trader's control through sizing and timing; the first is not. Because a"
+        'backtest fills at a price nobody was offering, slippage assumptions are what make simulated'
+        'results comparable to real ones.'),
+    'concept:stop-limit-order': (
+        'A stop order that becomes a limit order rather than a market order when triggered.',
+        'It bounds the fill price at the cost of possibly not filling at all -- exactly the risk a'
+        'plain [[Stop Order]] avoids and exactly the protection it lacks. The chapter recommends it'
+        'in volatile conditions, where the distance a triggered market order can travel is largest.'),
+    'concept:stop-order': (
+        'A resting instruction that becomes a market order once the price reaches a trigger level.',
+        'The trigger is certain; the fill is not, because once triggered it is a [[Market Order]] and'
+        'takes whatever the book offers. In a fast market that gap can be large, which is the failure'
+        'mode the chapter warns about. Used below a position it caps loss, used above it enters on a'
+        'breakout.'),
+    'concept:trading-venue': (
+        'The platforms and marketplaces where instruments trade: exchanges, alternative trading'
+        'systems and over-the-counter markets.',
+        'Modern markets are fragmented across many of them, which is why routing is a decision at'
+        'all. They differ along a transparency spectrum from fully lit to fully dark, in latency, and'
+        'in the regulation they operate under. Brokers are obliged to seek the best price across'
+        'them, which is what makes fragmentation tractable rather than chaotic.'),
+    'concept:trailing-stop': (
+        'A stop whose trigger level follows the price at a fixed distance, moving only in the'
+        'favourable direction.',
+        'It converts a static exit into a ratchet: as the position gains, the stop rises behind it'
+        'and locks in part of the move, but it never retreats. The distance is the whole design'
+        'decision, and setting it from [[Volatility]] rather than from a round percentage is what'
+        'makes it survive normal noise.'),
+    'concept:transaction-cost': (
+        'The total cost of trading: explicit costs such as commissions and fees, plus implicit costs'
+        'such as the spread, market impact and timing.',
+        'The implicit half is usually the larger one and is invisible on a statement. Crossing the'
+        '[[Bid-Ask Spread]] is a cost, [[Slippage]] is a cost, and [[Market Impact]] is a cost you'
+        'inflict on yourself. A strategy evaluated without them is being measured against a market'
+        'that does not exist.'),
+    'procedure:garch-model': (
+        "A model that forecasts next period's variance from the last shock and the last variance.",
+        'It is the formal statement of two facts about [[Volatility]] -- that shocks persist and that'
+        'variance reverts to a long-run level -- with one parameter for each plus a weight on the'
+        'long-run term. It is a model you run rather than a quantity you read off the tape, which is'
+        'what separates it from [[Historical Volatility]].'),
+    'procedure:implementation-shortfall': (
+        'An execution schedule that balances market impact against the risk of the price moving while'
+        'the order works.',
+        'It is the explicit statement of the urgency-cost trade-off: going fast costs [[Market'
+        'Impact]], going slow costs drift, and the optimum depends on volatility and order size.'
+        'Where [[TWAP]] and [[VWAP]] follow a fixed rule, this one solves for a schedule.'),
+    'procedure:indicator-atr': (
+        "The smoothed average of the true range, where true range is the largest of the bar's own"
+        'span and its two gaps from the previous close.',
+        "Including the gaps is the point: a bar that opens away from yesterday's close has moved"
+        "further than its high minus its low admits. It is expressed in the instrument's own price"
+        'units, so it sizes stops and positions directly but does not compare across instruments.'),
+    'procedure:indicator-vwap': (
+        'An execution schedule that trades in proportion to market volume, so participation tracks'
+        "the day's own profile.",
+        'Trading more when the market is busy and less when it is thin keeps [[Participation Rate]]'
+        'roughly constant, which is the quantity [[Market Impact]] actually responds to. The name is'
+        'shared with the volume-weighted average price itself -- the benchmark the schedule is trying'
+        'to match -- and the library implements that price series as an indicator.'),
+    'procedure:twap': (
+        'An execution schedule that splits an order evenly across a time window.',
+        'It makes no attempt to predict volume: it just spreads participation so no single moment'
+        'carries the whole order, which limits [[Market Impact]] at the cost of exposure to price'
+        'drift over the window. Its evenness is also its weakness, since it trades the same amount in'
+        'thin periods as in thick ones.'),
+    'property:effective-spread': (
+        'Twice the distance between the trade price and the midpoint at the time -- the spread'
+        'actually paid.',
+        'It measures the cost that was really incurred rather than the one advertised, and it differs'
+        'from [[Quoted Spread]] whenever a trade fills inside the quote or walks through it. It is'
+        'the honest input to a [[Transaction Costs]] calculation.'),
+    'property:historical-volatility': (
+        'The realised dispersion of returns over a window, the standard deviation of returns scaled'
+        'to a common horizon.',
+        'It is what volatility actually was, not what it is expected to be, and annualising it by the'
+        'square root of the number of periods is what makes two windows comparable. Being backward-'
+        'looking it reacts to a regime change only after the fact, which is the gap [[GARCH]] and'
+        '[[Volatility Ratio]] try to close.'),
+    'property:participation-rate': (
+        'Order size as a fraction of the volume traded over the execution window -- how much of the'
+        "market's activity is you.",
+        "It is the practical control on [[Market Impact]]: the chapter's guidance is to stay under"
+        'roughly ten per cent of average daily volume, because impact scales with the share of flow'
+        'you represent rather than with the absolute size. It is computed as order size divided by'
+        'average daily volume times the duration in days.'),
+    'property:quoted-spread': (
+        'Ask minus bid -- the spread as displayed, before anyone trades.',
+        'It is the headline number and the one that overstates what a patient trader pays, since a'
+        'limit order need not cross it at all. Expressed as a fraction of the midpoint it becomes'
+        'comparable across instruments at different price levels.'),
+    'property:realized-spread': (
+        'Twice the signed distance between the trade price and the midpoint some interval later --'
+        'what the market maker kept.',
+        'Comparing it with [[Effective Spread]] separates the two halves of the spread: what the'
+        'liquidity provider earned, and what it lost to price movement against it. The difference is'
+        'the cost of [[Information Asymmetry]], measured rather than assumed.'),
+    'property:volatility-ratio': (
+        'The dispersion of returns for a security or index, conventionally measured as their standard'
+        'deviation or variance.',
+        'It behaves in ways that make it forecastable even though returns are not: it clusters, so'
+        'high volatility follows high volatility; it reverts to a long-run average; and it rises more'
+        'on down moves than up ones. Those regularities are what [[GARCH]] models. It is measured'
+        'historically by [[Historical Volatility]], per bar by [[Average True Range]], and its change'
+        'by [[Volatility Ratio]].'),
 }
 
 #: Typed I/O for a chapter's stated formulas, in the shape the 71 code-derived indicators use. The
@@ -383,6 +758,30 @@ def singular(word: str) -> str:
     if word.endswith("s") and not word.endswith("ss") and len(word) > 3:
         return word[:-1]
     return word
+
+
+#: A summary the chapter gave as a worked instance rather than a definition -- "Instruction: buy
+#: 100 shares", "AAPL Call, Strike $180". It belongs in `examples`, not in the summary slot, and it
+#: is not a competing definition to be preserved beside the real one.
+_ILLUSTRATION = ("instruction:", "buy ", "sell ", "own ", "purchase ")
+
+
+def _same_claim(a: str, b: str) -> bool:
+    """Two wordings of one statement. The dedupe half of the outer join.
+
+    "the ease with which an asset can be bought or sold without significantly affecting its price"
+    against "...without materially moving its price" is one definition twice, and keeping both as
+    rival wordings is noise presented as a conflict.
+    """
+    def toks(s):
+        return {w for w in re.sub(r"[^a-z0-9 ]", " ", s.lower()).split() if len(w) > 3}
+    x, y = toks(a), toks(b)
+    return bool(x and y) and len(x & y) / max(len(x), len(y)) >= 0.6
+
+
+def _is_illustration(text: str) -> bool:
+    low = text.strip().lower()
+    return low.startswith(_ILLUSTRATION) or "$" in text[:80]
 
 
 def slug(text: str) -> str:
@@ -588,13 +987,18 @@ def build(path: Path, chapter: str, parent: str,
                          "why": why, "from_id": src, "to_id": dst})
 
     principles, practices = [], []
+    deferred_uses: dict[str, list[str]] = {}
 
     for num, sec in sorted(sections.items()):
         blocks = sec["blocks"]
         definition = blocks.get("Definition", [])
         defined = bullets([l for l in definition if BULLET.match(l)])
         prose = " ".join(l.strip() for l in definition if l.strip() and not l.strip().startswith("-"))
-        uses = [t for _, t in bullets(blocks.get("Common Use Cases", []))]
+        use_bullets = bullets(blocks.get("Common Use Cases", []))
+        # §1.2 labels each use case with the order type it belongs to. Flattening them onto the
+        # section subject gave `order-type` five sentences and left every member with none.
+        per_member = {name: text for name, text in use_bullets if name}
+        uses = [text for name, text in use_bullets if not name]
 
         # The section's subject(s). Bolded bullets mean the section defines several things and has
         # no single subject; prose means the section IS about one thing, named by its own heading.
@@ -606,6 +1010,9 @@ def build(path: Path, chapter: str, parent: str,
             # The section's NAME, not its number. `§1.1` records a position in a file; the graph
             # holds what a thing is and where it is defined, and "market microstructure" says that.
             rel(s, "part-of", parent, f"defined under {sec['title'].lower()}")
+        for label, text in per_member.items():
+            deferred_uses.setdefault(f"concept:{slug(label)}", []).append(text)
+
         if defined and uses:
             # The section's subject may have folded into a node already in the graph, in which case
             # its use cases are an enrichment rather than a property of something new. Dropping them
@@ -616,6 +1023,12 @@ def build(path: Path, chapter: str, parent: str,
                 extra.setdefault(subjects[0], {}).setdefault("applications", uses)
 
         for name, text in bullets(blocks.get("Core Principles", [])):
+            prim = decl.get("principle_concepts", {}).get(name)
+            if prim:
+                # A definition, not a claim: it becomes the thing it defines.
+                cid = atom(prim.capitalize(), name, text, _section=num)
+                rel(cid, "part-of", parent, f"defined under {sec['title'].lower()}")
+                continue
             principles.append(f"{name}: {text}" if name else text)
         for _, text in bullets(blocks.get("Best Practices for Traders", [])):
             practices.append(text)
@@ -623,6 +1036,15 @@ def build(path: Path, chapter: str, parent: str,
         if sec["title"] in decl["taxonomy"]:
             for label, body in labelled_blocks(blocks.get("Examples", [])):
                 if label in NOT_A_KIND:
+                    # Not a kind, but not rubbish either -- "Regime Shift Triggers" lists what
+                    # causes a shift. Kept on the subject rather than discarded.
+                    txt = " ".join(b.strip().lstrip("- ").strip() for b in body
+                                   if b.strip().startswith("-"))
+                    if txt:
+                        target = subject_for(label, subjects)
+                        (atoms[target]["props"].setdefault("examples", []).append(f"{label}: {txt}")
+                         if target in atoms else
+                         extra.setdefault(target, {}).setdefault("examples", []).append(f"{label}: {txt}"))
                     continue
                 definition, illustration = split_block(body)
                 if not definition:
@@ -651,6 +1073,17 @@ def build(path: Path, chapter: str, parent: str,
                     extra.setdefault(target, {}).setdefault("examples", []).append(
                         f"{label}: {text}")
 
+        for heading, columns in decl.get("table_properties", {}).items():
+            for name, rest in table_rows(blocks.get(heading, [])):
+                mid = f"concept:{slug(name)}-order" if f"concept:{slug(name)}-order" in atoms \
+                      else f"concept:{slug(name)}"
+                values = [c.strip() for c in rest.split(".")]
+                if mid not in atoms:
+                    raise ValueError(f"table row {name!r} names no node in this chapter")
+                for col, val in zip(columns, values):
+                    if val:
+                        atoms[mid]["props"][col] = val
+
         for heading, (target, relation) in decl.get("tables", {}).items():
             for name, rest in table_rows(blocks.get(heading, [])):
                 if name in NOT_A_KIND:
@@ -674,6 +1107,22 @@ def build(path: Path, chapter: str, parent: str,
                        formula=formula, _generated=True, _section=num)
             quantified = subject_for(label, subjects)
             rel(pid, "about", quantified, f"quantifies {name_of(quantified)}")
+
+    # The chapter's opening paragraph and its Summary section state what the chapter is for and
+    # what it claims to deliver. Both were parsed and thrown away -- the only text in the file that
+    # described the whole subject rather than one part of it.
+    raw_text = path.read_text(encoding="utf-8")
+    intro = re.search(r"^# .+?\n\n(.+?)\n\n---", raw_text, re.S | re.M)
+    closing = re.search(r"^## Summary\n\n(.+)$", raw_text, re.S | re.M)
+    chapter_props = {}
+    if intro:
+        chapter_props["explanation"] = " ".join(intro.group(1).split())
+    if closing:
+        chapter_props["applications"] = [
+            re.sub(r"^\d+\.\s*", "", l.strip()).replace("**", "")
+            for l in closing.group(1).split("\n") if re.match(r"^\d+\.", l.strip())]
+    if chapter_props:
+        extra.setdefault(parent, {}).update(chapter_props)
 
     # Named for the SUBJECT, not the chapter file: `01-market-foundations-core-principles` carried
     # a sort key and a file extension into an identifier. The title is just "core principles" --
@@ -719,6 +1168,14 @@ def build(path: Path, chapter: str, parent: str,
 
         return kept
 
+    for mid, texts in deferred_uses.items():
+        if mid in atoms:
+            atoms[mid]["props"].setdefault("applications", []).extend(texts)
+        elif mid in existing:
+            extra.setdefault(mid, {}).setdefault("applications", []).extend(texts)
+        else:
+            raise ValueError(f"a use case names {mid!r}, which is not a node in this chapter")
+
     for src, relation, dst, why in decl.get("edges", []):
         for end in (src, dst):
             if end not in atoms and end not in existing:
@@ -741,7 +1198,18 @@ def build(path: Path, chapter: str, parent: str,
         a["props"].pop("_section", None)
         a["props"].pop("_generated", None)
         a["props"].pop("merged_from", None)
-        if nid in DEFINITION:
+        if nid in AUTHORED:
+            summary, explanation = AUTHORED[nid]
+            # Outer join: keep both statements, never silently replace one with the other.
+            if a["summary"] and a["summary"] != summary:
+                if _is_illustration(a["summary"]):
+                    a["props"].setdefault("examples", []).insert(0, a["summary"])
+                elif not _same_claim(a["summary"], summary):
+                    a["props"].setdefault("source_wording", a["summary"])
+            a["summary"] = summary
+            if explanation:
+                a["props"]["explanation"] = explanation
+        if nid in DEFINITION and nid not in AUTHORED:
             # The parsed text was an instance, not a definition: keep it as the illustration.
             if a["summary"] and a["summary"] not in (a["props"].get("examples") or []):
                 a["props"].setdefault("examples", []).insert(0, a["summary"])
