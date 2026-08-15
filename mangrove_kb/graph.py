@@ -119,6 +119,9 @@ _URL = re.compile(r"https?://\S+|www\.\S+")
 #: Two characters minimum. A single letter matches everything, which is not a search result.
 MIN_QUERY = 2
 
+#: Distinguishes "not looked for yet" from "looked for and absent".
+_UNSET = object()
+
 
 #: English function words: they carry no meaning in ANY corpus, which is exactly why measuring
 #: frequency in THIS one never catches them -- "why" appears in 26 nodes of 498 because our own
@@ -422,6 +425,7 @@ class KnowledgeGraph:
         # so this is cheaper than re-flattening the nested slot dicts on every search.
         self._haystacks: dict[str, tuple[str, ...]] = {}
         self._df: dict[str, int] = {}          # term -> how many nodes carry it; filled on demand
+        self._semantic: Any = _UNSET           # the semantic index, loaded on first use
         for n in self.nodes.values():
             self._haystacks[n.id] = haystacks(
                 {"name": n.name, "id": n.id, "summary": n.summary, **n.props})
@@ -765,8 +769,26 @@ class KnowledgeGraph:
         return {nid: (len(terms) - len(h), max(h.values()))
                 for nid, h in hits.items() if len(h) == want}
 
+    def semantic_index(self):
+        """The semantic index built from this graph, or None -- loaded once, never rebuilt here.
+
+        Absent or stale is not an error: every call that uses it falls back to the word search and
+        says so in the result's note. A stale index answers about a graph that has changed under it,
+        which is worse than not answering, so the checksum decides rather than the file's presence.
+        """
+        if self._semantic is _UNSET:
+            self._semantic = None
+            try:
+                from .semantic import SemanticIndex          # noqa: PLC0415 -- optional artifact
+                index = SemanticIndex.load()
+                self._semantic = index if (self.source and index.matches(self.source)) else None
+            except Exception:                                # missing, unreadable, or numpy-less
+                self._semantic = None
+        return self._semantic
+
     def ask(self, question: str, *, seeds: int = 3, hops: int = 1,
             relations: Sequence[str] | None = None, why: str | None = None,
+            semantic: bool | None = None,
             limit: int | None = DEFAULT_LIMIT) -> Result:
         """Search for where a question lands, then follow the edges out of it.
 
@@ -794,7 +816,20 @@ class KnowledgeGraph:
         terms = query_terms(question)
         if not terms:
             return _cap([], limit, "reached")
-        found = self.find(question, limit=seeds)
+        index = self.semantic_index() if semantic is not False else None
+        if semantic and index is None:
+            raise GraphError(
+                "no semantic index matches this graph. Build one with:\n"
+                "    python3 ontology/build_semantic_index.py")
+        if index is not None:
+            # At least as many seeds as results asked for. Three is a sensible breadth to EXPAND
+            # from; it is not a sensible number of candidates to rank when the caller wanted ten,
+            # and capping there silently made hops=0 answer with three.
+            wanted = max(seeds, limit or seeds)
+            seeded = [nid for nid, _ in index.similar(question, limit=wanted)]
+            found = Result([self.nodes[nid].brief() for nid in seeded], len(seeded))
+        else:
+            found = self.find(question, limit=seeds)
         if not found.items:
             return _cap([], limit, "reached")
         allowed = set(relations) if relations else None
@@ -825,8 +860,15 @@ class KnowledgeGraph:
         # Re-rank the whole pool against the question. Ordering by seed and then by distance sank
         # the answer under the twenty kinds-of hanging off a worse seed; a neighbour that carries a
         # word of the question is what deserves to come back, and distance only breaks ties.
-        scored = self._score(list(route), terms, best_only=False)
-        rows = sorted((score + (route[nid]["hops"], nid) for nid, score in scored.items()))
+        if index is not None:
+            # Ranked by meaning, over the pool the graph produced. The words of the question are
+            # already spent -- they chose where to start -- and re-ranking by them here would put
+            # the node that repeats the question above the one that answers it.
+            ranked = [nid for nid, _ in index.similar(question, limit=None, among=list(route))]
+            rows = [(0, 0, route[nid]["hops"], nid) for nid in ranked]
+        else:
+            scored = self._score(list(route), terms, best_only=False)
+            rows = sorted((score + (route[nid]["hops"], nid) for nid, score in scored.items()))
         return _cap([{**self.nodes[r[3]].brief(), "reached": route[r[3]]} for r in rows],
                     limit, "reached")
 

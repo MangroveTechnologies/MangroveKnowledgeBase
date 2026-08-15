@@ -37,6 +37,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    # Builds the semantic index (`ontology/build_semantic_index.py`); never needed to read one --
+    # the query side folds a question through the saved projection with numpy alone.
+    "scikit-learn>=1.3",
     "pytest>=7.0",
     # The audits compare our implementations against bukosabino `ta`. It used to be imported from a
     # hardcoded checkout path, which pinned them to one machine; 0.11.0 is the version that checkout
@@ -85,6 +88,10 @@ mangrove_kb = [
     "viz/assets/*.svg",      # the Mangrove wordmark, light and dark
     "viz/vendor/*.js",       # vendored 3d-force-graph -- the 3D view is dead without it
     "viz/*.sql",             # store schema
+    # The semantic index: built from the graph by `ontology/build_semantic_index.py` and read with
+    # numpy alone. It lives inside the package because it is data the library reads at runtime, not
+    # documentation about it.
+    "data/*.npz",
 ]
 
 [tool.setuptools_scm]

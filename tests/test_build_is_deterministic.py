@@ -95,9 +95,21 @@ def test_nothing_is_carried_forward(rebuilt):
 
 
 def test_only_one_builder_exists():
-    """A second builder is how the two drift apart and nobody notices which one ran."""
+    """A second builder OF THE GRAPH is how the two drift apart and nobody notices which one ran.
+
+    Scripts that build something FROM the graph are a different thing and are allowed: the semantic
+    index is derived from the committed graph and cannot write it, which is what this checks --
+    the rule is one writer, not one script.
+    """
     builders = sorted(p.name for p in (REPO / "ontology").glob("build*.py"))
-    assert builders == ["build_signal_indicator_ontology.py"], builders
+    writers = [name for name in builders
+               if "ONTOLOGY_OUT" in (REPO / "ontology" / name).read_text()]
+    assert writers == ["build_signal_indicator_ontology.py"], (
+        f"more than one script writes the graph: {writers}")
+    for name in set(builders) - set(writers):
+        text = (REPO / "ontology" / name).read_text()
+        assert 'signal-indicator-ontology.json"' not in text.split("OUT =")[-1].split("\n")[0], \
+            f"{name} appears to write the graph without going through the builder"
 
 
 def test_only_one_graph_file_exists():

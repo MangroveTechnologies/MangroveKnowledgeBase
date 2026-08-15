@@ -119,6 +119,7 @@ python3 ontology/chapter_to_atoms.py ontology/raw/01-market-foundations.md \
         --ontology build/r1.json --merge --out build/ch1.json
 # one invocation per chapter, each taking the previous output as --ontology
 cp build/<last>.json ontology/signal-indicator-ontology.json
+python3 ontology/build_semantic_index.py     # the graph changed; the index must follow
 ```
 
 `build_signal_indicator_ontology.py` writes the code-derived nodes from the library's docstrings and
@@ -154,6 +155,10 @@ exists.
 
 **Statement lists.** `props.principles` and `props.practices` on the chapter's Fact and Judgment
 nodes are the progress measure. Empty means the chapter is fully connected.
+
+**The index follows the graph.** `python3 ontology/build_semantic_index.py` after every merge.
+`tests/test_semantic.py` compares its checksum against the committed graph, so a chapter merged
+without it fails rather than answering yesterday's questions.
 
 **Retrievable.** Pick a term the chapter states **only** in a field it introduced — a comparison
 table, a caution, a heading no earlier chapter had — and check `kg.find(term)` returns the node that
