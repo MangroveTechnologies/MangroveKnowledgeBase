@@ -39,8 +39,10 @@ signals and indicators alike.
 """
 from __future__ import annotations
 
+import functools
 import json
 import os
+import re
 from collections import Counter, deque
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -109,6 +111,61 @@ SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
      "principles", "practices", "examples"),
 )
 
+#: A link is provenance, not content. Left in the corpus, ``find("com")`` returned 336 of 498 nodes
+#: and ``find("http")`` 233, because every code-derived node cites a URL -- and one useless query
+#: that returns most of the graph teaches a caller not to trust the search at all.
+_URL = re.compile(r"https?://\S+|www\.\S+")
+
+#: Two characters minimum. A single letter matches everything, which is not a search result.
+MIN_QUERY = 2
+
+
+def query_terms(query: str) -> list[str]:
+    """A query as the terms it is made of, so word order stops mattering.
+
+    ``"mean reversion"`` and ``"reversion mean"`` are the same question and used to return 11 nodes
+    and none, because the query was matched as one literal string. Each term is matched
+    independently and a node must carry all of them.
+    """
+    return [t for t in re.split(r"[^a-z0-9]+", query.lower()) if len(t) >= MIN_QUERY]
+
+
+@functools.lru_cache(maxsize=1024)
+def _variants(term: str) -> tuple[str, ...]:
+    """A term and the plural or singular of it, so ``zone`` and ``zones`` ask the same question.
+
+    Deliberately crude -- an English stemmer would fold ``basis`` to ``basi`` and ``futures`` to
+    ``future``, which are different words in this domain, so nothing is stripped from a term the
+    graph would then fail to find. Both forms are tried; whichever exists is what matches.
+    """
+    if len(term) < 4:
+        return (term,)
+    if term.endswith("ies"):
+        return (term, term[:-3] + "y")
+    if term.endswith("es"):
+        return (term, term[:-2], term[:-1])
+    if term.endswith("s"):
+        return (term, term[:-1])
+    return (term, term + "s", term + "es")
+
+
+def rank_of(hay: tuple[str, ...], terms: Sequence[str]) -> int | None:
+    """Which tier a query matched in, or None if the node does not carry every term.
+
+    The rank is the WORST tier among the terms: a node holding both words in its name outranks one
+    that has one in its name and the other buried in a formula. Ties break on id, so a result is
+    reproducible.
+    """
+    worst = 0
+    for term in terms:
+        hit = next((i for i, text in enumerate(hay)
+                    if any(v in text for v in _variants(term))), None)
+        if hit is None:
+            return None
+        worst = max(worst, hit)
+    return worst
+
+
 def haystacks(source: dict) -> tuple[str, ...]:
     """One lowercased string per search tier, for a node's fields.
 
@@ -123,7 +180,7 @@ def haystacks(source: dict) -> tuple[str, ...]:
     ranked = {f for tier in SEARCH_TIERS for f in tier}
     tiers = [" ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS]
     tiers.append(" ".join(_flatten(v) for k, v in source.items() if k not in ranked).lower())
-    return tuple(tiers)
+    return tuple(_URL.sub(" ", t) for t in tiers)
 
 
 #: Where the graph is looked for, in order. An explicit path always wins; ``MANGROVE_KB_ONTOLOGY``
@@ -589,7 +646,11 @@ class KnowledgeGraph:
             raise GraphError(f"nothing declares the input {requires!r}; "
                              f"declared: {', '.join(sorted(cols))}")
 
-        q = query.lower().strip()
+        terms = query_terms(query)
+        if query.strip() and not terms:
+            raise GraphError(
+                f"a query needs {MIN_QUERY} characters to mean anything; {query.strip()!r} would "
+                "match most of the graph. Use find(kind=...), find(under=...) or resolve() instead.")
         rows: list[tuple[int, str, dict[str, Any]]] = []
         for n in self.nodes.values():
             if pool is not None and n.id not in pool:
@@ -601,14 +662,13 @@ class KnowledgeGraph:
             if requires is not None and requires not in (n.props.get("inputs") or {}):
                 continue
             rank = 0
-            if q:
+            if terms:
                 # WHERE a query matched decides rank. Sorting purely by id buried the four signals
                 # actually NAMED "divergence" beneath five that merely mention it in prose -- and a
                 # caller reading the first few results concludes the thing does not exist. The tier
                 # index IS the rank; id breaks ties so results stay deterministic, which a public
                 # API needs.
-                hay = self._haystacks[n.id]
-                hit = next((i for i, text in enumerate(hay) if q in text), None)
+                hit = rank_of(self._haystacks[n.id], terms)
                 if hit is None:
                     continue
                 rank = hit

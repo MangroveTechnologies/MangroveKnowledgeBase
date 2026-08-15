@@ -448,11 +448,28 @@ SEARCH_UI = """
 
   let hits=[], cur=-1;
 
+  // Terms, plural/singular variants and the AND across them -- the same rules as query_terms(),
+  // _variants() and rank_of() in graph.py. The page and kg.find() must answer identically.
+  function terms(q){ return q.toLowerCase().split(/[^a-z0-9]+/).filter(t=>t.length>=2); }
+  function variants(t){
+    if(t.length<4) return [t];
+    if(t.endsWith('ies')) return [t, t.slice(0,-3)+'y'];
+    if(t.endsWith('es')) return [t, t.slice(0,-2), t.slice(0,-1)];
+    if(t.endsWith('s')) return [t, t.slice(0,-1)];
+    return [t, t+'s', t+'es'];
+  }
   function rank(q){
-    const res=[];
+    const ts=terms(q); const res=[];
+    if(!ts.length) return Object.assign([], {total:0});
     for(const r of IDX){
-      const tier=r.t.findIndex(h=>h.includes(q));
-      if(tier>=0) res.push({r,tier});
+      let worst=0, all=true;
+      for(const t of ts){
+        const vs=variants(t);
+        const tier=r.t.findIndex(h=>vs.some(v=>h.includes(v)));
+        if(tier<0){ all=false; break; }
+        if(tier>worst) worst=tier;
+      }
+      if(all) res.push({r,tier:worst});
     }
     // rank, then id -- identical to find()'s sort key, so the two agree on ordering.
     res.sort((a,b)=> a.tier-b.tier || (a.r.id<b.r.id?-1:a.r.id>b.r.id?1:0));

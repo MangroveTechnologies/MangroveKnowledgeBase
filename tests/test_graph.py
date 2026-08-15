@@ -297,19 +297,15 @@ def test_find_stays_deterministic_within_a_rank(kg):
     assert a == [r["id"] for r in kg.find("cross", limit=None)]
 
     def tier(node_id):
-        """Which SEARCH_TIERS band this id matched in -- recomputed independently of find()."""
-        source = {"name": kg.nodes[node_id].name, "id": node_id,
-                  "summary": kg.nodes[node_id].summary, **kg.nodes[node_id].props}
-        for i, fields in enumerate(SEARCH_TIERS):
-            if "cross" in " ".join(_flatten(source.get(f)) for f in fields).lower():
-                return i
-        # The last band is everything the tiers do not name -- props a chapter introduced that no
-        # allow-list anticipated. It ranks below all of them.
-        ranked = {f for fields in SEARCH_TIERS for f in fields}
-        rest = " ".join(_flatten(v) for k, v in source.items() if k not in ranked).lower()
-        if "cross" in rest:
-            return len(SEARCH_TIERS)
-        raise AssertionError(f"{node_id} matched in find() but in no tier")
+        """The band this id matched in, rebuilt from the node's own fields rather than read out of
+        find(). Uses the library's corpus builder and matcher -- a second copy of the tokenising,
+        the plural folding and the URL stripping would be testing a different search."""
+        from mangrove_kb.graph import haystacks, query_terms, rank_of
+        n = kg.nodes[node_id]
+        hay = haystacks({"name": n.name, "id": node_id, "summary": n.summary, **n.props})
+        rank = rank_of(hay, query_terms("cross"))
+        assert rank is not None, f"{node_id} matched in find() but in no tier"
+        return rank
 
     assert a == sorted(a, key=lambda i: (tier(i), i))
     assert len(set(map(tier, a))) > 1, "expected this query to hit more than one tier"

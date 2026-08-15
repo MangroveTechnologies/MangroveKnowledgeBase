@@ -116,7 +116,7 @@ Text search is the wider net, for when they did *not* name an indicator, or name
 have:
 
 ```
-find("divergence") -> 40 matches, name matches first
+find("divergence") -> 33 matches, name matches first
   concept:volume-divergence                        <- the knowledge-base concept, also named for it
   procedure:signal-rsi-bearish-divergence
   procedure:signal-rsi-bullish-divergence
@@ -139,7 +139,7 @@ first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
-shown you 10 of 40.
+shown you 10 of 33.
 
 **See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
