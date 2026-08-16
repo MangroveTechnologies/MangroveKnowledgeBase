@@ -86,6 +86,11 @@ Three uses:
    72nd indicator. The build now raises rather than minting an id there; rename to lead with
    something else (`procedure:entry-indicator-based`).
 
+**The declared id decides the primitive.** `rename` to `concept:risk-reward-ratio` makes the node a
+Concept whatever primitive the path that created it would have used, which is what lets §5.1's
+reward-to-risk row — arriving from a table of Properties — fold onto the concept §5.7 defines. No
+declaration disagrees with its own prefix, so the id is the more reliable of the two.
+
 `rename` also decides the id a **table row** resolves to. A row saying `| Momentum | 50-60% | ... |`
 under `table_properties` looks up the same declaration the heading did, so the archetype's win rate
 lands on `concept:momentum-strategy` and not on `concept:momentum`, the character an indicator

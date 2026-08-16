@@ -74,7 +74,9 @@ has no name to slug, and naming fifty of them means inventing fifty interpretati
 
 A chapter is free to break this shape, and later ones do. Blocks matching no rule are kept on the
 section's subject under their own name rather than dropped, and a section with no `### Definition`
-must declare what its blocks are or the build refuses.
+must declare what its blocks are or the build refuses. Whatever a section says **before** its first
+`###`, and whatever its chapter's Summary says outside the numbered list, are kept as `notes` — both
+were being dropped, and both carry the thesis in at least one chapter.
 
 Everything emitted is `status: draft`. Promotion is a human act.
 

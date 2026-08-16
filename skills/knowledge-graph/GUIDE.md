@@ -45,7 +45,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 632, 1945
+s["nodes"], s["edges"]          # 632, 1946
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -54,7 +54,7 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  632 1945
+nodes, edges  632 1946
 primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
 relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,

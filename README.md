@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-ff9e18.svg" alt="License: PolyForm Noncommercial 1.0.0">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/deps-numpy%20%2B%20pandas-2ec27e.svg" alt="Dependencies: numpy + pandas">
-  <img src="https://img.shields.io/badge/graph-632%20nodes%20%C2%B7%201945%20edges-42a7c6.svg" alt="Graph: 632 nodes, 1945 edges">
+  <img src="https://img.shields.io/badge/graph-632%20nodes%20%C2%B7%201946%20edges-42a7c6.svg" alt="Graph: 632 nodes, 1946 edges">
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
 
@@ -24,7 +24,7 @@ How it is built, stored and searched is drawn in [`docs/architecture/`](docs/arc
 edge schema, the search corpus, `find()`, `ask()`, the semantic index, and the three
 traversals that are easy to confuse.
 
-And a **knowledge graph built from that source** — 632 nodes and 1945 edges saying what each
+And a **knowledge graph built from that source** — 632 nodes and 1946 edges saying what each
 computation is, what it measures, what it reads, and what part it plays. It is generated from the
 code, so it is exact: not extracted from prose, not approximate, no ranking model in the way.
 
@@ -231,7 +231,7 @@ detail one click away.
 | Pane | Where | What it holds |
 | --- | --- | --- |
 | Rail | left | filters, by kind of node and kind of edge |
-| Map | middle | 632 nodes, 1945 edges |
+| Map | middle | 632 nodes, 1946 edges |
 | Panel | right | everything the library records about whatever you clicked |
 
 ### The inspector — what a node actually carries

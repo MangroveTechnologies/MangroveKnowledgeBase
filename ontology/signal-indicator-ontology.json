@@ -33454,6 +33454,14 @@
    "to_id": "object:mangrove-knowledge-space"
   },
   {
+   "from": "quantitative analysis",
+   "rel": "about",
+   "to": "technical analysis",
+   "why": "whether a class of computation has anything to find in the first place",
+   "from_id": "concept:quantitative-analysis",
+   "to_id": "concept:technical-analysis"
+  },
+  {
    "from": "risk management",
    "rel": "part-of",
    "to": "Mangrove Knowledge Space",
@@ -42365,6 +42373,11 @@
    ],
    [
     "concept:quantitative-analysis",
+    "about",
+    "concept:technical-analysis"
+   ],
+   [
+    "concept:quantitative-analysis",
     "part-of",
     "object:mangrove-knowledge-space"
    ],
@@ -45424,7 +45437,7 @@
     "property:support-resistance-zone-width"
    ]
   ],
-  "doc_relations": 7,
+  "doc_relations": 8,
   "doc_anchors": [
    "concept:technical-analysis",
    "object:mangrove-knowledge-space"

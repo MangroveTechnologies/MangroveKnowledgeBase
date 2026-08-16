@@ -186,16 +186,19 @@ flowchart TB
 
 ## 5. `ask()` — answering a question
 
-Seed, expand, re-rank. The expansion takes **every** neighbour — there is no picking during the walk
-— and selection happens afterwards, over the whole pool, because judging relevance before seeing the
-candidates is guessing.
+Seed, expand, re-rank. Seeding takes the nearest by meaning **and** anything carrying the question's
+own words, because the two disagree often enough to lose an answer either way round. The expansion
+takes **every** neighbour — there is no picking during the walk — and selection happens afterwards,
+over the whole pool, because judging relevance before seeing the candidates is guessing.
 
 ```mermaid
 flowchart TB
   q([question]) --> sem{"semantic index<br/>present and matching?"}
   sem -->|yes| seeds1["SemanticIndex.similar()<br/>nearest by meaning"]
+  sem -->|yes| seeds3["find()<br/>carries the words"]
   sem -->|no| seeds2["find()<br/>nearest by words"]
   seeds1 --> frontier
+  seeds3 --> frontier
   seeds2 --> frontier
 
   frontier[["seeds"]] --> bfs["breadth-first, undirected:<br/>every edge in or out"]

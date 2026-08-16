@@ -136,6 +136,16 @@ and every practice lost the name it was given. One line-coverage measurement fou
 single pass. Read the absences rather than the percentage — most are a table row stored as separate
 props, and the four real ones were sitting among them.
 
+**A chapter says things outside its blocks.** Three places, all of which were being dropped and all
+of which a line-coverage count found: the prose between a section heading and its first `###` (§5.0
+states *"risk is multi-dimensional"* there and nowhere else), a Summary's plain statements (chapter
+5 closes on *"preserve capital"*, which is neither a blockquote nor a numbered item), and the second
+of two list-valued props merging onto one node.
+
+**Watch what a fix does to the merge that follows it.** Keeping a displaced summary created a
+`notes` list, and the props merge skipped any key already present — so the block's own notes were
+dropped by the very fix that was recovering text. Both list props union now.
+
 **Replay the whole pipeline, not the stage you changed.** The determinism test rebuilt the
 code-derived half and stopped, so four of the five stages were verified only by whoever last ran
 them by hand. Every extractor change is a change to chapters already merged.

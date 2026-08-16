@@ -22,3 +22,7 @@ anything to find.
 ## Part of
 
 - [[Mangrove Knowledge Space]] -- subject area of the knowledge space
+
+## About
+
+- [[Technical Analysis]] -- whether a class of computation has anything to find in the first place
