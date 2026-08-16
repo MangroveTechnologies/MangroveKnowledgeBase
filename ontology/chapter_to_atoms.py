@@ -2705,6 +2705,12 @@ AUTHORED: dict[str, tuple[str, str]] = {
 #: bought or sold without materially moving its price" to a wordier paragraph that way.
 DOC_DERIVED: set[str] = set()
 
+#: The library's own vocabulary: the entity types and the character classes a computation is
+#: classified into. A chapter enriches these -- it never redefines them.
+CLASS_AXIS = {"concept:technical-analysis", "concept:indicator", "concept:signal",
+              "concept:averaging", "concept:momentum", "concept:oscillator", "concept:volatility",
+              "concept:flow", "concept:pattern", "concept:chart-pattern"}
+
 #: `chapter_variants` means "two wordings, nobody has decided" -- once someone has, recording the
 #: chapter's phrasing as a conflict reports work that is finished as work outstanding.
 RECONCILED = {"concept:volatility",
@@ -3863,7 +3869,12 @@ def build(path: Path, chapter: str, parent: str,
                     continue
                 authored_here = (tid in AUTHORED
                                  and _same_text(AUTHORED[tid][0], held_summary))
-                if tid in RECONCILED or tid in DOC_DERIVED or authored_here:
+                # The class axis is the library's own organisation and its definitions say what
+                # each class MEASURES. A chapter's category prose is a different claim wearing the
+                # same name -- "momentum indicators measure the speed or velocity of price changes,
+                # helping identify overbought/oversold conditions" describes how a trader reaches
+                # for them -- and it replaced four of the seven before this stopped it.
+                if tid in CLASS_AXIS or tid in RECONCILED or tid in DOC_DERIVED or authored_here:
                     # The wording here was written on purpose. The chapter's is still something it
                     # says, so it is kept beside it rather than dropped.
                     if not _same_text(v, held_summary):
@@ -3919,6 +3930,16 @@ def main() -> int:
             print(f"\n=== folded into the existing graph ({len(enrich)}) ===")
             for e in enrich:
                 print(f"  {e['id']:52} <- {', '.join(e['folded_from'])}")
+        # The one change a chapter makes to text that is already published, and the table showed
+        # nothing of it: an ungated version of this rule replaced `concept:liquidity`'s definition
+        # and stripped a wiki link out of another node, and neither was visible until the built
+        # record was diffed by hand. Step 4 is where that has to be reviewable.
+        if replaced := [e for e in enrich if e["props"].get("summary")]:
+            print(f"\n=== summaries this chapter REPLACES ({len(replaced)}) ===")
+            for e in replaced:
+                print(f"  {e['id']}")
+                print(f"      was: {(existing[e['id']]['summary'] or '')[:96]}")
+                print(f"      now: {e['props']['summary'][:96]}")
         print(f"\nnodes {len(atoms)}  {dict(by)}")
         print(f"edges {len(rels)}  "
               f"{dict(collections.Counter(r['rel'] for r in rels))}")

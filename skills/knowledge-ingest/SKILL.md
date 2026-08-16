@@ -72,9 +72,23 @@ Not nodes: a heading, a worked example with figures in it, and any claim *about*
 and Best Practices are each **one** node holding the whole list, not one node per bullet: a bullet
 has no name to slug, and naming fifty of them means inventing fifty interpretations.
 
-A chapter is free to break this shape, and later ones do. Blocks matching no rule are kept on the
-section's subject under their own name rather than dropped, and a section with no `### Definition`
-must declare what its blocks are or the build refuses. Whatever a section says **before** its first
+A chapter is free to break this shape, and every later one does. What has turned up so far, and
+what reads it — **check for these at step 1**, because each was found by a build that had already
+dropped something:
+
+| shape | first seen | read by |
+|---|---|---|
+| a section with no `### Definition` | §3.0 | `blocks_as_nodes`, or the build refuses |
+| `**Label:**` sub-blocks under a heading | §4.5 | `labelled_nodes` |
+| a code fence where a formula block belongs | §4.6 | the docstring becomes the summary, the code the `formula` |
+| a different label for the definition | §4.2 | `definition_labels` |
+| `#### ` sub-blocks, one scaffold per thing | §6.1.1 | `sub_blocks`, mapping each to a prop or to dropped |
+| numbered headings (`### 6.1.1 Simple Moving Average`) | §6.1.1 | stripped before the id is made |
+| an unnumbered `## ` section | §6.0 | kept as prose on the chapter |
+| a section whose categories contradict the library's | §6.1 | `sections_group_only` |
+
+Blocks matching no rule are kept on the section's subject under their own name rather than dropped,
+and a section with no `### Definition` must declare what its blocks are or the build refuses. Whatever a section says **before** its first
 `###`, and whatever its chapter's Summary says outside the numbered list, are kept as `notes` — both
 were being dropped, and both carry the thesis in at least one chapter.
 

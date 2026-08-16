@@ -119,42 +119,42 @@
    "id": "concept:averaging",
    "title": "averaging",
    "kind": "Concept",
-   "summary": "Beyond basic SMA and EMA, numerous moving average variants exist, each with different smoothing characteristics and applications.",
+   "summary": "Emits a reference level in price units, produced by averaging over a window.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
     ],
-    "source_wording": "Emits a reference level in price units, produced by averaging over a window."
+    "source_wording": "Beyond basic SMA and EMA, numerous moving average variants exist, each with different smoothing characteristics and applications."
    }
   },
   {
    "id": "concept:momentum",
    "title": "momentum",
    "kind": "Concept",
-   "summary": "Momentum indicators measure the speed or velocity of price changes, helping identify overbought/oversold conditions, divergences, and potential trend reversals. They oscillate around a centerline or within a bounded range.",
+   "summary": "Measures rate of change -- how fast, and in which direction, the input is moving.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
     ],
-    "source_wording": "Measures rate of change -- how fast, and in which direction, the input is moving."
+    "source_wording": "Momentum indicators measure the speed or velocity of price changes, helping identify overbought/oversold conditions, divergences, and potential trend reversals. They oscillate around a centerline or within a bounded range."
    }
   },
   {
    "id": "concept:oscillator",
    "title": "oscillator",
    "kind": "Concept",
-   "summary": "Oscillators are indicators that fluctuate within a bounded range, typically used to identify overbought/oversold conditions and momentum changes. This section provides advanced concepts for oscillator usage.",
+   "summary": "Bounded output where absolute thresholds are meaningful (overbought/oversold).",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
     ],
-    "source_wording": "Bounded output where absolute thresholds are meaningful (overbought/oversold)."
+    "source_wording": "Oscillators are indicators that fluctuate within a bounded range, typically used to identify overbought/oversold conditions and momentum changes. This section provides advanced concepts for oscillator usage."
    }
   },
   {
@@ -183,14 +183,14 @@
    "id": "concept:flow",
    "title": "flow",
    "kind": "Concept",
-   "summary": "Volume indicators analyze trading volume to confirm price movements, identify accumulation/distribution, and provide insight into the strength of market participation.",
+   "summary": "Running accumulation whose level is arbitrary but whose direction carries meaning.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
     ],
-    "source_wording": "Running accumulation whose level is arbitrary but whose direction carries meaning."
+    "source_wording": "Volume indicators analyze trading volume to confirm price movements, identify accumulation/distribution, and provide insight into the strength of market participation."
    }
   },
   {
