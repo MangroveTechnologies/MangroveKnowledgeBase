@@ -1094,6 +1094,244 @@ CHAPTERS: dict[str, dict] = {
             "Paper trade before committing real capital": "concept:strategy-validation",
         },
     },
+    "risk-management": {
+        # No `### Examples` and no `### Mathematical Rules/Formulas`: this chapter states its
+        # formulas as prose lines and points at MangroveAI's toolkit for the code.
+        "taxonomy": set(),
+        # §5.0 has no Definition and no subject -- like §3.0 it states things about risk itself.
+        # Two are claims chapter 3 already holds in one line each; they fold onto those nodes,
+        # because this is the chapter that argues them.
+        "blocks_as_nodes": {
+            "Risk Dimensions in Strategy Design": {
+                "The Risk Dimensions Framework": "Concept",
+                "Why Win Rate Is Misleading": "Fact",
+                "Per-Trade Risk vs. Strategy Risk": "Fact",
+                "Strategy-Level Risk Assessment Checklist": "Procedure",
+                "Practical Application": "Procedure"},
+            "Position Sizing": {"Fixed Fractional Position Sizing": "Procedure",
+                                "Volatility-Adjusted Position Sizing": "Procedure",
+                                "Kelly Criterion": "Procedure",
+                                "Universal Position Sizing Formula": "Property"},
+            "Drawdown Controls": {"Recovery Mathematics": "Fact",
+                                  "Maximum Drawdown Limits": "Procedure",
+                                  "Progressive Drawdown Response": "Procedure",
+                                  "Daily Loss Limits": "Procedure",
+                                  "Time-Based Drawdown Recovery": "Procedure"},
+            "Stop-Loss & Take-Profit Engineering": {"Fixed Percentage Stop": "Procedure",
+                                                    "ATR-Based Stop": "Procedure",
+                                                    "Structure-Based Stop": "Procedure",
+                                                    "Break-Even Stop": "Procedure"},
+            "Portfolio Risk": {"Correlation-Adjusted Position Sizing": "Procedure",
+                               "Concentration Limits": "Procedure",
+                               "Value at Risk (VaR)": "Property",
+                               "Expected Shortfall (CVaR)": "Property",
+                               "Portfolio Beta and Market Exposure": "Property"},
+            "Capital Efficiency": {"Capital Allocation Framework": "Procedure",
+                                   "Leverage Management": "Procedure",
+                                   "Capital Utilization Metrics": "Property"},
+            "Risk-Reward Ratios": {"Risk-Reward Calculation": "Property",
+                                   "Win Rate and R:R Relationship": "Property",
+                                   "Expectancy Calculation": "Property",
+                                   "Setting Realistic Targets": "Judgment"},
+            "Risk of Ruin": {"Risk of Ruin Formula": "Property",
+                             "Monte Carlo Ruin Estimation": "Procedure",
+                             "Reducing Risk of Ruin": "Judgment"},
+            "Scenario Analysis": {"Historical Stress Tests": "Procedure",
+                                  "Hypothetical Scenario Construction": "Procedure",
+                                  "Correlation Stress Testing": "Procedure",
+                                  "Tail Risk Analysis": "Procedure",
+                                  "Scenario Action Plans": "Judgment"},
+        },
+        # §5.4 writes its trailing variants and take-profit strategies as `**Label:**` sub-blocks.
+        "labelled_nodes": {
+            "Trailing Stop Variants": {"Percentage Trailing": "Procedure",
+                                       "Chandelier Exit (ATR Trailing)": "Procedure",
+                                       "Parabolic SAR-Based": "Procedure"},
+            "Take-Profit Strategies": {"Fixed Target": "Procedure",
+                                       "Risk-Multiple Targets": "Procedure",
+                                       "Partial Exits / Scale-Out": "Procedure",
+                                       "Trailing Behavior After Targets": "Judgment"},
+        },
+        "rename": {
+            "Why Win Rate Is Misleading": "fact:win-rate-is-not-risk",
+            # Both blocks say how to assess a strategy's risk before deploying it -- one as
+            # questions, one as steps. One node, holding both.
+            "Strategy-Level Risk Assessment Checklist": "procedure:strategy-risk-assessment",
+            "Practical Application": "procedure:strategy-risk-assessment",
+            # The rules chapter 4 already states, under this chapter's names for them.
+            "Fixed Percentage Stop": "procedure:fixed-stop",
+            "Percentage Trailing": "procedure:simple-trailing-stop",
+            "Chandelier Exit (ATR Trailing)": "procedure:atr-trailing-stop",
+            "Risk-Multiple Targets": "procedure:risk-multiple-target",
+            "Parabolic SAR-Based": "procedure:parabolic-sar-stop",
+            "Partial Exits / Scale-Out": "procedure:scale-out",
+            # Headings that name a section rather than a thing.
+            "The Risk Dimensions Framework": "concept:risk-dimension",
+            "Trading Rules & Protocols": "concept:trading-rule",
+            "Stop-Loss & Take-Profit Engineering": "concept:stop-and-target-engineering",
+            "Win Rate and R:R Relationship": "property:breakeven-win-rate",
+            "Expectancy Calculation": "property:expectancy",
+            "Risk-Reward Calculation": "concept:risk-reward-ratio",
+            "Universal Position Sizing Formula": "property:position-size",
+            "Reward-to-Risk Ratio": "concept:risk-reward-ratio",
+            "Position Sizing": "concept:position-sizing",
+        },
+        "retitle": {"The Risk Dimensions Framework": "risk dimension",
+                    "Trading Rules & Protocols": "trading rules",
+                    "Stop-Loss & Take-Profit Engineering": "stop-loss and take-profit engineering",
+                    "Strategy-Level Risk Assessment Checklist": "strategy risk assessment",
+                    "Win Rate and R:R Relationship": "break-even win rate",
+                    "Expectancy Calculation": "expectancy",
+                    "Universal Position Sizing Formula": "position size"},
+        "tables": {
+            "The Risk Dimensions Framework": ("concept:risk-dimension", "kind-of", "Concept"),
+            "Risk Rules Reference Table": ("concept:trading-rule", "part-of", "Property"),
+        },
+        "table_properties": {"Risk Rules Reference Table": ["description", "default_value"]},
+        # The dimensions table names what each one is measured by, in its own column, and the rules
+        # table names the control each limit is enforced by. Neither is drawn anywhere.
+        "edges": [
+            ("concept:per-trade-risk", "about", "concept:position-sizing",
+             "measured by position size and stop distance"),
+            ("concept:strategy-skew", "about", "concept:strategy-archetype",
+             "positive for trend, negative for mean reversion: the archetype decides it"),
+            ("concept:regime-risk", "about", "concept:market-regime",
+             "the mismatch between the strategy and the state it is running in"),
+            ("concept:drawdown-risk", "about", "concept:drawdown-control",
+             "peak-to-trough loss, and the controls that bound it"),
+            ("concept:tail-risk", "about", "property:value-at-risk",
+             "one of the two quantities it is measured by"),
+            ("concept:tail-risk", "about", "property:expected-shortfall",
+             "the other, and the more informative of the two"),
+            ("concept:correlation-risk", "about", "concept:portfolio-risk",
+             "diversification that fails when correlations spike"),
+            ("concept:liquidity-risk", "about", "concept:slippage",
+             "the cost of an exit that the book will not absorb"),
+            ("fact:per-trade-risk-vs-strategy-risk", "about", "fact:risk-is-multi-dimensional",
+             "why bounding one dimension leaves the others where they were"),
+            ("procedure:strategy-risk-assessment", "about", "concept:risk-dimension",
+             "the dimensions it walks, one question each"),
+            ("procedure:strategy-risk-assessment", "about", "concept:strategy-archetype",
+             "classifying it is the first question the checklist asks"),
+            ("property:max-daily-loss", "about", "procedure:daily-loss-limit",
+             "the control that enforces it"),
+            ("property:profit-lock-rule", "about", "procedure:daily-loss-limit",
+             "the same halt, triggered by a gain rather than a loss"),
+            ("property:max-weekly-loss", "about", "procedure:maximum-drawdown-limit",
+             "the circuit breaker it sets the level for"),
+            ("property:max-open-trade", "about", "procedure:concentration-limit",
+             "one position cap expressed as a count rather than a share"),
+            ("property:trading-hour", "about", "procedure:session-filter",
+             "the window, and the rule chapter 4 states for enforcing one"),
+        ],
+        "wired": {
+            # the resolver's one wrong pick: sizing during a losing streak is the concept, not
+            # the universal formula
+            "Reduce position size during losing streaks": "concept:position-sizing",
+            # candidates it declined to draw on one ordinary word, accepted
+            "Leverage Trade-offs": "concept:leverage",
+            "Monitor leverage continuously": "concept:leverage",
+            "Margin Efficiency": "concept:margin",
+            "Maintain cash buffer": "concept:margin",
+            "System Expectancy": "property:expectancy",
+            "Include commission and slippage": "concept:slippage",
+            # --- §5.1 trading rules -----------------------------------------------------------
+            "Pre-Commitment": "concept:trading-rule",
+            "Non-Negotiable Limits": "concept:trading-rule",
+            "Consistency: Rules must be applied": "concept:trading-rule",
+            "Periodic Review": "concept:trading-rule",
+            "Written Documentation": "concept:trading-rule",
+            "Document all rules in a trading plan": "concept:trading-rule",
+            "Review rules weekly": "concept:trading-rule",
+            "Never override rules during active trading": "concept:trading-rule",
+            "Use automated systems to enforce hard limits": "concept:trading-rule",
+            "Track rule violations": "concept:trading-rule",
+            "Implement cool-down periods": "property:cool-down-period",
+            # --- §5.2 position sizing ---------------------------------------------------------
+            "Capital Preservation": "concept:position-sizing",
+            "Risk Normalization": "concept:position-sizing",
+            "Volatility Adjustment": "procedure:volatility-adjusted-position-sizing",
+            "Conviction Scaling": "concept:position-sizing",
+            "Portfolio Context": "concept:portfolio-risk",
+            "Never risk more than 2% of account": "property:max-risk-per-trade",
+            "Use volatility-adjusted sizing": "procedure:volatility-adjusted-position-sizing",
+            "Consider Kelly as upper bound": "procedure:kelly-criterion",
+            "Account for correlation when sizing": "procedure:correlation-adjusted-position-sizing",
+            "Reduce size during drawdowns": "concept:drawdown-control",
+            # --- §5.3 drawdown controls -------------------------------------------------------
+            "Survival First": "concept:drawdown-control",
+            "Circuit Breakers": "procedure:maximum-drawdown-limit",
+            "Recovery Math:": "fact:recovery-mathematics",
+            "Psychological Protection": "concept:drawdown-control",
+            "Progressive Response": "procedure:progressive-drawdown-response",
+            "Set drawdown limits before trading": "concept:drawdown-control",
+            "Use multiple levels": "procedure:progressive-drawdown-response",
+            "Include daily and cumulative limits": "procedure:daily-loss-limit",
+            "Don't override limits during drawdown": "concept:drawdown-control",
+            "Have clear rules for resuming": "procedure:maximum-drawdown-limit",
+            "Track time in drawdown": "procedure:time-based-drawdown-recovery",
+            # --- §5.4 stops and targets -------------------------------------------------------
+            "Risk Definition: Stop defines": "concept:stop-and-target-engineering",
+            "Breathing Room": "concept:stop-and-target-engineering",
+            "Technical Validity": "procedure:structure-based-stop",
+            "Time Consistency": "concept:stop-and-target-engineering",
+            "Execution Consideration": "concept:stop-and-target-engineering",
+            "Use ATR for volatility-appropriate stops": "procedure:atr-based-stop",
+            "Place stops at technically meaningful levels": "procedure:structure-based-stop",
+            "Add buffer beyond obvious levels": "procedure:structure-based-stop",
+            "Trail stops as trade moves in favor": "concept:trailing-stop",
+            "Use break-even stops": "procedure:break-even-stop",
+            "Don't move stops to increase loss": "concept:stop-and-target-engineering",
+            # --- §5.5 portfolio risk ----------------------------------------------------------
+            "Diversification: Reduce risk": "concept:portfolio-risk",
+            "Correlation Awareness": "procedure:correlation-adjusted-position-sizing",
+            "Sector/Factor Exposure": "procedure:concentration-limit",
+            "Monitor correlation changes": "procedure:correlation-stress-testing",
+            "Maintain diversification across uncorrelated": "concept:portfolio-risk",
+            "Calculate VaR/ES regularly": "property:value-at-risk",
+            "Stress test portfolio for extreme scenarios": "concept:scenario-analysis",
+            "Consider gross and net exposure": "procedure:leverage-management",
+            # --- §5.6 capital efficiency ------------------------------------------------------
+            "Return on Capital": "concept:capital-efficiency",
+            "Cash Management": "concept:capital-efficiency",
+            "Opportunity Cost": "concept:capital-efficiency",
+            "Calculate return on total capital": "property:capital-utilization-metric",
+            "Consider margin requirements in position sizing": "concept:margin",
+            # --- §5.7 risk-reward -------------------------------------------------------------
+            "Minimum Standards": "concept:risk-reward-ratio",
+            "Win Rate Relationship": "property:breakeven-win-rate",
+            "Realistic Targets": "judgment:setting-realistic-target",
+            "Risk-First Thinking": "concept:risk-reward-ratio",
+            "Set minimum R:R requirement": "concept:risk-reward-ratio",
+            "Calculate R:R before entering": "concept:risk-reward-ratio",
+            "Ensure target is realistic": "judgment:setting-realistic-target",
+            "Track actual R:R achieved": "concept:risk-reward-ratio",
+            "Combine R:R with win rate for complete picture": "property:expectancy",
+            # --- §5.8 risk of ruin ------------------------------------------------------------
+            "Survival Probability": "concept:risk-of-ruin",
+            "Edge and Sizing": "concept:risk-of-ruin",
+            "Compounding Effect": "concept:risk-of-ruin",
+            "Conservative Sizing": "concept:risk-of-ruin",
+            "Long-Term Perspective": "concept:risk-of-ruin",
+            "Keep risk per trade below 2%": "property:max-risk-per-trade",
+            "Understand that even 1% ruin probability": "concept:risk-of-ruin",
+            "Use Monte Carlo simulation": "procedure:monte-carlo-ruin-estimation",
+            "Never risk total capital on any single strategy": "concept:risk-of-ruin",
+            "Have capital reserves outside": "concept:risk-of-ruin",
+            # --- §5.9 scenario analysis -------------------------------------------------------
+            "Stress Testing: Test portfolio": "concept:scenario-analysis",
+            "Historical Scenarios": "procedure:historical-stress-test",
+            "Hypothetical Scenarios": "procedure:hypothetical-scenario-construction",
+            "Correlation Changes": "procedure:correlation-stress-testing",
+            "Tail Events": "procedure:tail-risk-analysis",
+            "Test against both historical and hypothetical": "concept:scenario-analysis",
+            "Include correlation breakdown": "procedure:correlation-stress-testing",
+            "Update scenarios as market conditions": "concept:scenario-analysis",
+            "Have pre-defined action plans": "judgment:scenario-action-plan",
+            "Run scenarios regularly": "concept:scenario-analysis",
+            "Include scenarios where multiple risks": "concept:scenario-analysis",
+        },
+    },
 }
 
 #: Blocks inside a taxonomy section that are still NOT kinds: "Regime Shift Triggers" lists causes
@@ -1168,6 +1406,14 @@ DEFINITION = {
 #: summary and the example moves to `examples`. The explanation has no counterpart in the source at
 #: all -- the chapter never says WHY an iceberg order costs queue position -- so it is always added.
 AUTHORED: dict[str, tuple[str, str]] = {
+    'concept:risk-dimension': (
+        'One of the separate ways a strategy can lose money, each measured differently and none of '
+        'them a substitute for the others.',
+        'The chapter opens here because controlling one dimension reads as controlling risk: a '
+        'tight stop bounds [[Per-Trade Risk]] and leaves [[Strategy Skew]] and [[Regime Risk]] '
+        'exactly where they were. Seven are named -- per-trade, skew, regime, drawdown, tail, '
+        'correlation and liquidity -- and the common mistake against each is the false confidence '
+        'that comes from having addressed a different one.'),
     # The four styles are characterised only by a comparison table, so the parsed summary was that
     # table's row -- "Seconds to minutes. Seconds to minutes. Tiny moves, high volume" -- repeating
     # the `timeframe` and `holding_period` props verbatim and saying nothing they do not.
@@ -2332,8 +2578,9 @@ IRREGULAR = {"mechanics": "mechanics", "analysis": "analysis", "series": "series
              # "Status" is not a plural either; it was becoming `statu`.
              "status": "status",
              # Nor is "bias": chapter 4's five named biases were becoming `look-ahead-bia`,
-             # `survivorship-bia` and `selection-bia`.
-             "bias": "bias"}
+             # `survivorship-bia` and `selection-bia`. Nor "mathematics", which was becoming
+             # `recovery-mathematic`.
+             "bias": "bias", "mathematics": "mathematics"}
 
 
 #: Trailing words that name the FORM of a thing rather than the thing: "Almgren-Chriss Market
@@ -2402,8 +2649,16 @@ def slug(text: str) -> str:
     return "-".join(parts) or "untitled"
 
 
+#: The prose between a section heading and its first `###`. It was being dropped: §5.0 states
+#: "risk is multi-dimensional" there and nowhere else, which is the thesis of the whole chapter.
+LEAD = ""
+
+
 def parse(path: Path) -> dict:
-    """Split the chapter into {section_number: {"title": .., "blocks": {heading: [lines]}}}."""
+    """Split the chapter into {section_number: {"title": .., "blocks": {heading: [lines]}}}.
+
+    `blocks[LEAD]` holds whatever the section says before its first `###`.
+    """
     sections: dict[str, dict] = {}
     num = head = None
     for raw in path.read_text(encoding="utf-8").split("\n"):
@@ -2412,8 +2667,8 @@ def parse(path: Path) -> dict:
             if n is None:                      # "## Summary" and friends: not a numbered section
                 num = None
                 continue
-            num, head = n, None
-            sections[num] = {"title": title, "blocks": {}}
+            num, head = n, LEAD
+            sections[num] = {"title": title, "blocks": {LEAD: []}}
         elif num and (m := H3.match(raw)):
             head = m.group(1)
             sections[num]["blocks"].setdefault(head, [])
@@ -2679,7 +2934,13 @@ def build(path: Path, chapter: str, parent: str,
         """Create or MERGE. A term defined twice in one chapter (price discovery in 1.1 and 1.8) is
         one node: the longer definition wins and the props union, rather than a second node or a
         build error. Deconfliction of the two wordings is a review step, not a parse-time decision."""
-        nid = decl.get("rename", {}).get(title) or f"{kind.lower()}:{slug(title)}"
+        if declared := decl.get("rename", {}).get(title):
+            # The id names the primitive. §5.1's reward-to-risk row arrives from a table of
+            # Properties and is declared onto `concept:risk-reward-ratio`, the thing §5.7 defines;
+            # keeping the table's primitive would have made that concept a Property.
+            nid, kind = declared, declared.split(":", 1)[0].capitalize()
+        else:
+            nid = f"{kind.lower()}:{slug(title)}"
         # The code-derived builder owns `procedure:indicator-*`, one node per indicator class, and
         # anything counting indicators counts that prefix. A chapter minting an id inside it makes
         # a trading rule indistinguishable from a library indicator.
@@ -2726,7 +2987,11 @@ def build(path: Path, chapter: str, parent: str,
         if len(summary) > len(cur["summary"]):
             cur["summary"] = summary
         for k, v in props.items():
-            if v and k not in cur["props"]:
+            if not v:
+                continue
+            if isinstance(v, list) and isinstance(cur["props"].get(k), list):
+                cur["props"][k] += [x for x in v if x not in cur["props"][k]]
+            elif k not in cur["props"]:
                 cur["props"][k] = v
         cur["props"].setdefault("merged_from", []).append(props.get("_section", ""))
         return nid
@@ -2808,7 +3073,8 @@ def build(path: Path, chapter: str, parent: str,
         if defined:
             subjects = [atom("Concept", name, text, _section=num) for name, text in defined]
         elif not definition and as_nodes:
-            undeclared = [h for h in blocks if h not in as_nodes and h not in SCAFFOLD]
+            undeclared = [h for h in blocks
+                          if h not in as_nodes and h not in SCAFFOLD and h != LEAD]
             if undeclared:
                 raise ValueError(f"{sec['title']!r} has no Definition and no subject to hang "
                                  f"{undeclared} on -- declare them in `blocks_as_nodes`")
@@ -2828,6 +3094,11 @@ def build(path: Path, chapter: str, parent: str,
             # reachable only by walking down from the chapter.
             for sub in ({subject_for(heading, subjects)} if subjects else set()) - {nid}:
                 rel(nid, "about", sub, f"stated under {sec['title'].lower()}")
+
+        if lead := block_text(blocks.get(LEAD, [])).strip():
+            target = subjects[0] if subjects else parent
+            (atoms[target]["props"] if target in atoms
+             else extra.setdefault(target, {})).setdefault("notes", []).append(lead)
 
         for label, text in per_member.items():
             deferred_uses.setdefault(f"concept:{slug(label)}", []).append(text)
@@ -2942,9 +3213,13 @@ def build(path: Path, chapter: str, parent: str,
                 # `rename` is where this chapter's ids are decided, and a row names the node under
                 # the same heading the node was created under. Resolving the slug alone sent the
                 # archetype rows at `concept:momentum` -- the character an indicator measures.
+                # The rows of a table that `tables` also declares were created under that
+                # declaration's primitive, not as Concepts: §5.1's risk rules are Properties, and
+                # looking for `concept:max-risk-per-trade` found nothing at all.
+                prefix = (decl.get("tables", {}).get(heading, (None, None, "Concept"))[2]).lower()
                 mid = decl.get("rename", {}).get(name) \
                     or (f"concept:{slug(name)}-order" if f"concept:{slug(name)}-order" in atoms
-                        else f"concept:{slug(name)}")
+                        else f"{prefix}:{slug(name)}")
                 values = [c.strip() for c in rest.split(".")]
                 if mid not in atoms:
                     raise ValueError(f"table row {name!r} names no node in this chapter")
@@ -2973,7 +3248,7 @@ def build(path: Path, chapter: str, parent: str,
         # §3.11 has five of them, holding the interpretation of a volume profile and the auction
         # scenarios it is read through -- and a block that matches no rule was previously dropped
         # without a word. It is kept on the section's subject under its own name instead.
-        handled = set(SCAFFOLD) | set(as_nodes) | set(decl.get("tables", {})) \
+        handled = {LEAD} | set(SCAFFOLD) | set(as_nodes) | set(decl.get("tables", {})) \
             | set(decl.get("table_properties", {})) | set(decl.get("labelled_nodes", {}))
         for heading, body in blocks.items():
             if heading in handled or heading.startswith("Best Practices"):
@@ -3007,8 +3282,21 @@ def build(path: Path, chapter: str, parent: str,
         if quote := [l.strip().lstrip("> ").replace("**", "").strip()
                      for l in closing.group(1).split("\n") if l.strip().startswith(">")]:
             chapter_props["caution"] = " ".join(q for q in quote if q)
+        # Chapter 5 closes on "The First Rule of Trading: preserve capital", stated as bold prose
+        # rather than a quote or a numbered item, and read as neither it was dropped.
+        if rest := [l.strip().replace("**", "") for l in closing.group(1).split("\n")
+                    if l.strip() and not l.strip().startswith((">", "#"))
+                    and not re.match(r"^\d+\.", l.strip())]:
+            chapter_props["notes"] = rest
     if chapter_props:
-        extra.setdefault(parent, {}).update(chapter_props)
+        held = extra.setdefault(parent, {})
+        for k, v in chapter_props.items():
+            if isinstance(v, list) and isinstance(held.get(k), list):
+                # §5.0's lead prose reaches the parent as `notes`, and the Summary's closing
+                # statements reach it as `notes` too. Replacing lost the first of them.
+                held[k] = held[k] + [x for x in v if x not in held[k]]
+            else:
+                held[k] = v
 
     # Named for the SUBJECT, not the chapter file: `01-market-foundations-core-principles` carried
     # a sort key and a file extension into an identifier. The title is just "core principles" --

@@ -39,6 +39,7 @@ CHAPTERS = {
                                            "concept:market-mechanics"),
     "03-core-trading-concepts.md": ("core-trading-concepts", "concept:price-action"),
     "04-strategy-design.md": ("strategy-design", "concept:strategy-design"),
+    "05-risk-management.md": ("risk-management", "concept:risk-management"),
 }
 
 

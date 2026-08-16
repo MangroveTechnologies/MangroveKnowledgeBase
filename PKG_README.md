@@ -12,7 +12,7 @@ pip install mangrove-kb
 - **80 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
-- **A knowledge graph of the library itself** -- 571 nodes, 1760 edges, queryable, shipped in the package
+- **A knowledge graph of the library itself** -- 632 nodes, 1945 edges, queryable, shipped in the package
 - **Search by words or by meaning** -- `find()` matches terms, `ask()` seeds on a semantic index
   built from the graph and follows the edges out of what it finds
 

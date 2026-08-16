@@ -415,7 +415,7 @@ def test_a_query_falls_back_to_its_best_subset_only_when_nothing_carries_all_of_
     both words, so nodes carrying one of them stay out.
     """
     both = kg.find("mean reversion", limit=None)
-    assert both.total == 15, "a query that fully matches must not be widened"
+    assert both.total == 17, "a query that fully matches must not be widened"
     for row in both.items:
         hay = " ".join(kg._haystacks[row["id"]])
         assert "mean" in hay and "reversion" in hay

@@ -82,10 +82,16 @@ Everything emitted is `status: draft`. Promotion is a human act.
 
 ## Procedure
 
+**`chapter_to_atoms.py` creates every node. You create none.** Step 4 builds them in memory and
+prints them; step 6 is the only one that writes them to a file. Everything hand-written goes into
+two places — the `CHAPTERS` declarations and `AUTHORED` prose in `ontology/chapter_to_atoms.py`, and
+an anchor page in `ontology/wiki/`. Each step below names the command it runs and what that produces.
+
 1. **Fetch and read the chapter.** `git show origin/dev:content/knowledge-base/<file>.md`. Read it
    end to end. Note which `### Examples` blocks list real kinds rather than worked arithmetic; which
    formulas are quantities, rules or identities; which terms the graph already holds under another
    name; which sections break the scaffold.
+   *Produces:* a copy at `ontology/raw/<nn>-<chapter-id>.md`, which is what the replay reads.
 2. **Author the chapter's anchor if it has none.** `--parent` names a subject-area node, and only
    six of the eight chapters have one. A chapter whose anchor is missing needs a page in
    `ontology/wiki/` — `kind: concept`, `chapter: <chapter-id>`, a Summary, an Explanation, and
@@ -93,21 +99,33 @@ Everything emitted is `status: draft`. Promotion is a human act.
    wiki stage, so **the whole pipeline reruns**, not just the chapter merge.
    `tests/test_chapter_replay_is_reproducible.py` fails if a chapter hangs off an anchor no page
    authors. Chapter 6 (indicators) is the one still missing.
+   *You write:* a markdown page. *Produces:* a node, once the wiki stage runs.
 3. **Declare.** Add the chapter's entry to `CHAPTERS`. A chapter with no entry raises rather than
    building — building without one emits a graph with no taxonomy and says nothing about it.
+   *You write:* a dict literal in `chapter_to_atoms.py`. *Produces:* nothing yet.
 4. **Dry-run and stop.** `--table` prints the node list without merging. Review it, and get it
    reviewed. Feedback on a list is cheap; edge work on a wrong list is wasted.
+   *Runs:* `chapter_to_atoms.py <raw> --chapter-id <id> --parent <anchor> --ontology <record>
+   --table`. *Produces:* the node list on stdout. **Nothing is written.**
 5. **Correct through declarations** until the table reads as intended. Boilerplate summaries
    (`The quantity X.`), a worked example standing where a definition belongs, an id like
    `procedure:fvg-fill-statu`, a formula attached to the wrong subject — each has a declaration.
+   *You write:* more declarations. *Produces:* a better step 4. Never edit the record.
 6. **Merge** with `--merge`, then verify the merge is additive.
+   *Runs:* the same command plus `--merge --out build/ch<n>.json`. *Produces:* **the nodes, in a
+   file** — the previous record plus this chapter. The record itself is untouched until step 8.
 7. **Wire the statements.** The builder resolves every statement that names its node and prints
    what it drew, what it would not draw on one ordinary word, and what it could not place. Read
    that split; declare the residue, the candidates you accept and any wrong pick in `wired`. Both
    lists empty means the chapter is fully connected.
+   *Runs:* step 6 again after each edit. *Produces:* edges in place of list entries.
 8. **Close the gaps, rebuild the index, then commit.** No node reachable by a single edge, or a
    plain statement of why none exists; rerun `build_semantic_index.py` so retrieval follows the
    graph; update the documented counts; run the suite, commit, re-render, watch CI to green.
+   *Runs:* `cp build/ch<n>.json ontology/signal-indicator-ontology.json`, then
+   `PYTHONPATH=$PWD python3 ontology/build_semantic_index.py`, `python3 -m pytest tests/ -q`,
+   `python3 -m mangrove_kb.viz > <served>/index.html`. *Produces:* the shipped record, the index
+   beside it, and the rendered page.
 
 **See also:** [pipeline](#pipeline) · [review gates](#review-gates) ·
 [declarations](references/declarations.md)

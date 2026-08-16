@@ -6,7 +6,7 @@ part each signal plays in a strategy. It is generated from the source, so it is 
 extracted -- there is no text-mining noise to rank around.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (218 of 571 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (218 of 632 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -826,8 +826,16 @@ class KnowledgeGraph:
             # At least as many seeds as results asked for. Three is a sensible breadth to EXPAND
             # from; it is not a sensible number of candidates to rank when the caller wanted ten,
             # and capping there silently made hops=0 answer with three.
+            # `limit=None` asks for everything, and falling back to three seeds there answered a
+            # question with less than `find` did on the same words -- the caller who wants the whole
+            # answer gets at least as many seeds as there are nodes carrying the words.
             wanted = max(seeds, limit or seeds)
             seeded = [nid for nid, _ in index.similar(question, limit=wanted)]
+            # A node carrying the question's own words is an answer by the plainest reading there
+            # is, and meaning and words disagree often enough that the semantic seeds can miss it:
+            # "stops beyond obvious levels" matched `structure-based stop` on the words and did not
+            # rank it in the top three by meaning. Seeding from both loses neither.
+            seeded += [r["id"] for r in self.find(question, limit=wanted) if r["id"] not in seeded]
             found = Result([self.nodes[nid].brief() for nid in seeded], len(seeded))
         else:
             found = self.find(question, limit=seeds)

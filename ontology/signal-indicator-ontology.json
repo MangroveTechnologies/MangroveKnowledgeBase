@@ -17504,6 +17504,10 @@
      "Develop robust strategies that account for realistic market conditions",
      "Adapt to changing conditions by recognizing regime shifts and adjusting accordingly"
     ],
+    "notes": [
+     "Market foundations provide the essential infrastructure knowledge required for systematic trading. Understanding market microstructure, order types, participant dynamics, liquidity conditions, volatility regimes, and venue characteristics enables traders to:",
+     "These foundational concepts underpin all advanced trading strategies and should be thoroughly understood before proceeding to instrument-specific mechanics and trading methodologies."
+    ],
     "chapter_variants": {
      "explanation": "This document covers the fundamental concepts underlying financial markets, including market structure, order mechanics, participant dynamics, and execution considerations essential for systematic trading."
     }
@@ -17528,6 +17532,10 @@
      "Costs: Transaction costs, funding rates, and carry vary by instrument",
      "Liquidity: Market depth and trading hours affect execution quality"
     ],
+    "notes": [
+     "Understanding instruments and market mechanics is fundamental to successful trading. Each instrument type has unique characteristics affecting:",
+     "Traders should match instrument selection to their strategy requirements, risk tolerance, and operational capabilities. Master the mechanics before deploying capital."
+    ],
     "chapter_variants": {
      "explanation": "This document covers the various financial instruments available for trading and the specific mechanics governing each market type, including derivatives, leverage, and crypto-specific considerations."
     }
@@ -17545,7 +17553,17 @@
      "core-trading-concepts"
     ],
     "explanation": "Price action theory, market structure, trend versus range and compression versus expansion, liquidity theory, volume and order flow, support and resistance, supply and demand zones, multi-timeframe analysis, confluence, fair value gaps, and volume profile. Deliberately kept beside technical analysis rather than beneath it. Technical analysis is organised in this graph by what a computation *measures*, and its six subclasses are exactly those characters; price action names conclusions drawn from price geometry rather than a character a computation measures, so placing it there would misuse that axis.",
+    "notes": [
+     "Before diving into technical concepts, traders must internalize foundational truths that govern market behavior and strategy selection.",
+     "Core trading concepts provide the analytical framework for interpreting market behavior. These concepts are interconnected:",
+     "Master these concepts individually, then synthesize them into a cohesive analytical approach that matches your trading style and timeframe."
+    ],
     "applications": [
+     "Identifying entry and exit points based on candlestick patterns",
+     "Determining trend direction from swing highs and lows",
+     "Finding support and resistance levels from historical price reactions",
+     "Reading market sentiment through bar-by-bar analysis",
+     "Scalping and day trading without indicator lag",
      "Price Action reveals the story of buyer/seller conflict",
      "Market Structure defines the trend framework",
      "Trend/Range Analysis determines strategy selection",
@@ -17594,7 +17612,27 @@
     "reference_chapter": [
      "risk-management"
     ],
-    "explanation": "Risk dimensions in strategy design, trading rules and protocols, position sizing, drawdown controls, stop-loss and take-profit engineering, portfolio risk, capital efficiency, risk-reward ratios, risk of ruin, and scenario analysis. Signals decide whether to act; this subject area decides at what size and under what limits, and it constrains a strategy independently of which signals it composes."
+    "explanation": "Risk dimensions in strategy design, trading rules and protocols, position sizing, drawdown controls, stop-loss and take-profit engineering, portfolio risk, capital efficiency, risk-reward ratios, risk of ruin, and scenario analysis. Signals decide whether to act; this subject area decides at what size and under what limits, and it constrains a strategy independently of which signals it composes.",
+    "notes": [
+     "Before implementing specific risk controls, traders must understand that **risk is multi-dimensional**. Focusing on one dimension while ignoring others leads to false confidence.",
+     "Risk management is the foundation of sustainable trading success:",
+     "The First Rule of Trading: Preserve capital. You cannot recover from total loss.",
+     "The Second Rule: See Rule One.",
+     "Successful traders are not those who never lose, but those who manage losses so they can continue trading and capitalize on future opportunities."
+    ],
+    "applications": [
+     "Position Sizing: Risk appropriate amounts per trade",
+     "Drawdown Controls: Protect against cumulative losses",
+     "Stop-Loss Engineering: Balance protection against whipsaws",
+     "Portfolio Risk: Manage aggregate exposure and correlation",
+     "Capital Efficiency: Deploy capital wisely",
+     "Risk-Reward: Ensure favorable trade mathematics",
+     "Risk of Ruin: Ensure long-term survival",
+     "Scenario Analysis: Prepare for adverse conditions"
+    ],
+    "chapter_variants": {
+     "explanation": "This document covers comprehensive risk management principles and techniques essential for preserving capital and achieving sustainable trading performance. Risk management is the foundation upon which all successful trading is built."
+    }
    }
   },
   {
@@ -17618,6 +17656,9 @@
      "Rigorous validation and skepticism - Assume strategies don't work until proven otherwise"
     ],
     "caution": "Critical Insight: Strategies do not fail randomly - they fail when applied to the wrong market behavior. Mean reversion in a trend will blow up. Trend following in a range will bleed out. Know your archetype's risk profile and contraindications.",
+    "notes": [
+     "Effective strategy design requires:"
+    ],
     "chapter_variants": {
      "explanation": "This document covers the principles and methodologies for designing, developing, and validating systematic trading strategies, from initial concept through backtesting to deployment."
     }
@@ -20047,7 +20088,8 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "core-trading-concepts"
+     "core-trading-concepts",
+     "risk-management"
     ],
     "explanation": "Frequent small wins are psychologically rewarding This masks the tail risk of occasional large losses A single large loss can wipe out months of accumulated gains",
     "comparison": [
@@ -20056,7 +20098,18 @@
      "Skew \u00b7 Positive (large wins) \u00b7 Negative (large losses)",
      "Tail Risk \u00b7 Moderate \u00b7 High",
      "Blow-up Risk \u00b7 Low \u00b7 High"
-    ]
+    ],
+    "caution": "CRITICAL WARNING: Do NOT suggest mean reversion or carry strategies are \"safer\" or \"lower risk\" based on win rate. Their negative skew means tail losses are disproportionately large.",
+    "chapter_variants": {
+     "explanation": "High win rate strategies feel safer because you win frequently This masks the tail risk: when you lose, you lose big A single large loss can wipe out months of accumulated small wins",
+     "comparison": [
+      "Strategy Type \u00b7 Win Rate \u00b7 Skew \u00b7 Tail Risk \u00b7 Blow-Up Risk",
+      "Trend Following \u00b7 30-40% \u00b7 Positive \u00b7 Moderate \u00b7 Low",
+      "Mean Reversion \u00b7 60-70% \u00b7 Negative \u00b7 High \u00b7 High",
+      "Carry \u00b7 70-80% \u00b7 Negative \u00b7 High \u00b7 High"
+     ],
+     "summary": "A common error is equating high win rate with low risk. This is dangerously wrong."
+    }
    }
   },
   {
@@ -21965,9 +22018,20 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "risk-management"
     ],
-    "formula": "def fixed_stop_exit(entry_price, current_price, stop_pct=0.02, direction='long'):\n    \"\"\"\n    Exit on fixed percentage loss\n    \"\"\"\n    if direction == 'long':\n        stop_price = entry_price * (1 - stop_pct)\n        exit_signal = current_price <= stop_price\n    else:\n        stop_price = entry_price * (1 + stop_pct)\n        exit_signal = current_price >= stop_price\n    return exit_signal, stop_price"
+    "formula": "def fixed_stop_exit(entry_price, current_price, stop_pct=0.02, direction='long'):\n    \"\"\"\n    Exit on fixed percentage loss\n    \"\"\"\n    if direction == 'long':\n        stop_price = entry_price * (1 - stop_pct)\n        exit_signal = current_price <= stop_price\n    else:\n        stop_price = entry_price * (1 + stop_pct)\n        exit_signal = current_price >= stop_price\n    return exit_signal, stop_price",
+    "explanation": "Very liquid instruments with stable volatility. Short horizons where structure is unclear. High-volatility assets: frequent whipsaws. Trend days: too tight relative to ATR. ",
+    "notes": [
+     "When it works:",
+     "When it fails:",
+     "Toolkit: `fixed_percentage_stop`.",
+     "Limitations: Doesn't account for asset volatility or market structure."
+    ],
+    "chapter_variants": {
+     "summary": "Fixed percentage stops are simple, but volatility is not constant, so this method is easy to mis-calibrate."
+    }
    }
   },
   {
@@ -21979,9 +22043,19 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "risk-management"
     ],
-    "formula": "def atr_stop_exit(entry_price, current_price, atr, multiplier=2.0, direction='long'):\n    \"\"\"\n    Exit based on ATR distance\n    \"\"\"\n    stop_distance = atr * multiplier\n    if direction == 'long':\n        stop_price = entry_price - stop_distance\n        exit_signal = current_price <= stop_price\n    else:\n        stop_price = entry_price + stop_distance\n        exit_signal = current_price >= stop_price\n    return exit_signal, stop_price"
+    "formula": "def atr_stop_exit(entry_price, current_price, atr, multiplier=2.0, direction='long'):\n    \"\"\"\n    Exit based on ATR distance\n    \"\"\"\n    stop_distance = atr * multiplier\n    if direction == 'long':\n        stop_price = entry_price - stop_distance\n        exit_signal = current_price <= stop_price\n    else:\n        stop_price = entry_price + stop_distance\n        exit_signal = current_price >= stop_price\n    return exit_signal, stop_price",
+    "explanation": "1.5 ATR: tight, more whipsaws 2.0 ATR: common default 3.0 ATR: wide, fewer whipsaws but larger losses per stop Tight: 1.5 ATR (more whipsaws, quicker exit) Standard: 2.0 ATR (balanced) Wide: 3.0 ATR (fewer whipsaws, larger losses) ",
+    "notes": [
+     "How to choose a multiplier:",
+     "Calibration rule: pick a multiplier that matches your timeframe and validate it with backtests.",
+     "Toolkit: `atr_stop`."
+    ],
+    "chapter_variants": {
+     "summary": "ATR-based stops scale with volatility, producing more consistent behavior across assets and regimes."
+    }
    }
   },
   {
@@ -21993,9 +22067,14 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "risk-management"
     ],
-    "formula": "def fixed_target_exit(entry_price, current_price, target_pct=0.04, direction='long'):\n    \"\"\"\n    Exit on fixed percentage profit\n    \"\"\"\n    if direction == 'long':\n        target_price = entry_price * (1 + target_pct)\n        exit_signal = current_price >= target_price\n    else:\n        target_price = entry_price * (1 - target_pct)\n        exit_signal = current_price <= target_price\n    return exit_signal, target_price"
+    "formula": "def fixed_target_exit(entry_price, current_price, target_pct=0.04, direction='long'):\n    \"\"\"\n    Exit on fixed percentage profit\n    \"\"\"\n    if direction == 'long':\n        target_price = entry_price * (1 + target_pct)\n        exit_signal = current_price >= target_price\n    else:\n        target_price = entry_price * (1 - target_pct)\n        exit_signal = current_price <= target_price\n    return exit_signal, target_price",
+    "explanation": "Simple to implement but may leave profits on table",
+    "chapter_variants": {
+     "summary": "Set TP at predetermined price level based on structure or measured move"
+    }
    }
   },
   {
@@ -22007,9 +22086,14 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "risk-management"
     ],
-    "formula": "def risk_multiple_target(entry_price, stop_price, risk_multiple=2.0, direction='long'):\n    \"\"\"\n    Target based on multiple of risk\n    \"\"\"\n    risk = abs(entry_price - stop_price)\n    if direction == 'long':\n        target = entry_price + (risk * risk_multiple)\n    else:\n        target = entry_price - (risk * risk_multiple)\n    return target"
+    "formula": "def risk_multiple_target(entry_price, stop_price, risk_multiple=2.0, direction='long'):\n    \"\"\"\n    Target based on multiple of risk\n    \"\"\"\n    risk = abs(entry_price - stop_price)\n    if direction == 'long':\n        target = entry_price + (risk * risk_multiple)\n    else:\n        target = entry_price - (risk * risk_multiple)\n    return target",
+    "explanation": "Ensures favorable risk-reward mathematics",
+    "chapter_variants": {
+     "summary": "TP based on multiples of risk (1.5R, 2R, 3R)"
+    }
    }
   },
   {
@@ -22021,9 +22105,16 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "risk-management"
     ],
-    "formula": "def trailing_stop(prices, trail_pct=0.02, direction='long'):\n    \"\"\"\n    Trail stop behind price\n    \"\"\"\n    if direction == 'long':\n        highest = prices.expanding().max()\n        stop = highest * (1 - trail_pct)\n    else:\n        lowest = prices.expanding().min()\n        stop = lowest * (1 + trail_pct)\n    return stop"
+    "formula": "def trailing_stop(prices, trail_pct=0.02, direction='long'):\n    \"\"\"\n    Trail stop behind price\n    \"\"\"\n    if direction == 'long':\n        highest = prices.expanding().max()\n        stop = highest * (1 - trail_pct)\n    else:\n        lowest = prices.expanding().min()\n        stop = lowest * (1 + trail_pct)\n    return stop",
+    "notes": [
+     "Toolkit: `percentage_trailing_stop`."
+    ],
+    "chapter_variants": {
+     "summary": "Percentage trailing is simple and works best in smooth trends. It often fails in choppy conditions."
+    }
    }
   },
   {
@@ -22035,9 +22126,16 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "risk-management"
     ],
-    "formula": "def atr_trailing_stop(prices, atr, multiplier=2.5, direction='long'):\n    \"\"\"\n    Trail stop by ATR distance\n    \"\"\"\n    if direction == 'long':\n        highest = prices.expanding().max()\n        stop = highest - (atr * multiplier)\n    else:\n        lowest = prices.expanding().min()\n        stop = lowest + (atr * multiplier)\n    return stop"
+    "formula": "def atr_trailing_stop(prices, atr, multiplier=2.5, direction='long'):\n    \"\"\"\n    Trail stop by ATR distance\n    \"\"\"\n    if direction == 'long':\n        highest = prices.expanding().max()\n        stop = highest - (atr * multiplier)\n    else:\n        lowest = prices.expanding().min()\n        stop = lowest + (atr * multiplier)\n    return stop",
+    "notes": [
+     "Toolkit: `chandelier_exit`."
+    ],
+    "chapter_variants": {
+     "summary": "Chandelier exits adapt to volatility by trailing from the best price by an ATR multiple."
+    }
    }
   },
   {
@@ -22301,6 +22399,1058 @@
    "props": {
     "reference_chapter": [
      "strategy-design"
+    ],
+    "practices": []
+   }
+  },
+  {
+   "id": "concept:risk-dimension",
+   "title": "risk dimension",
+   "kind": "Concept",
+   "summary": "One of the separate ways a strategy can lose money, each measured differently and none of them a substitute for the others.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "comparison": [
+     "Dimension \u00b7 Definition \u00b7 What It Measures \u00b7 Common Mistake",
+     "Per-Trade Risk \u00b7 Capital at risk on a single trade \u00b7 Position size, stop loss distance \u00b7 Confusing small stops with low risk",
+     "Strategy Skew \u00b7 Shape of the return distribution \u00b7 Positive (trend) vs. negative (MR) \u00b7 Assuming high win rate = low risk",
+     "Regime Risk \u00b7 Mismatch between strategy and market \u00b7 Strategy applied to wrong conditions \u00b7 Not adapting to changing markets",
+     "Drawdown Risk \u00b7 Maximum capital decline \u00b7 Peak-to-trough loss, recovery time \u00b7 Ignoring time-in-drawdown",
+     "Tail Risk \u00b7 Extreme loss probability \u00b7 VaR, Expected Shortfall \u00b7 Underestimating \"black swan\" events",
+     "Correlation Risk \u00b7 Positions moving together \u00b7 Portfolio-level diversification \u00b7 \"Diversification\" failing in crisis",
+     "Liquidity Risk \u00b7 Ability to exit positions \u00b7 Slippage, market impact \u00b7 Assuming orderly exits in stress"
+    ],
+    "explanation": "The chapter opens here because controlling one dimension reads as controlling risk: a tight stop bounds [[Per-Trade Risk]] and leaves [[Strategy Skew]] and [[Regime Risk]] exactly where they were. Seven are named -- per-trade, skew, regime, drawdown, tail, correlation and liquidity -- and the common mistake against each is the false confidence that comes from having addressed a different one."
+   }
+  },
+  {
+   "id": "fact:per-trade-risk-vs-strategy-risk",
+   "title": "per-trade risk vs. strategy risk",
+   "kind": "Fact",
+   "summary": "Common Misconception: \"I use tight stops, so my strategy is low risk.\"",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Mean reversion with 0.5% per-trade risk still has negative skew Many small losses can accumulate into large drawdown A regime change can cause all positions to fail simultaneously",
+    "comparison": [
+     "Control \u00b7 What It Does \u00b7 What It Does NOT Do",
+     "Tight stop loss \u00b7 Limits loss on single trade \u00b7 Does not change skew or regime risk",
+     "Small position size \u00b7 Reduces dollar loss per trade \u00b7 Does not prevent strategy blow-up",
+     "Diversification \u00b7 Reduces single-asset risk \u00b7 Fails when correlations spike"
+    ],
+    "notes": [
+     "Reality: Per-trade risk controls (position sizing, stop losses) do NOT change strategy-level risk."
+    ]
+   }
+  },
+  {
+   "id": "procedure:strategy-risk-assessment",
+   "title": "strategy risk assessment",
+   "kind": "Procedure",
+   "summary": "Before deploying any strategy, answer these questions:",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "notes": [
+     "1. What is the skew? Positive (trend) or Negative (MR/carry)?",
+     "2. What regime does it require? Trending, ranging, or low volatility?",
+     "3. What causes it to blow up? Trend emergence? Volatility spike? Correlation breakdown?",
+     "4. How long can drawdowns last? Weeks? Months? Years?",
+     "5. What is the maximum historical drawdown? Can you survive it?",
+     "6. How correlated are the positions? Is diversification real or illusory?",
+     "When evaluating or building a strategy:",
+     "1. Classify the archetype - Trend following, momentum, mean reversion, carry, event-driven",
+     "2. Identify the skew - Will wins or losses be larger on average?",
+     "3. Define the failure mode - Under what conditions does this strategy fail catastrophically?",
+     "4. Size for the tail - Position size assuming the worst-case scenario happens",
+     "5. Monitor regime fit - Continuously assess if market conditions suit the strategy"
+    ],
+    "caution": "The First Rule of Risk: Preserve capital. You cannot recover from total loss."
+   }
+  },
+  {
+   "id": "concept:per-trade-risk",
+   "title": "per-trade risk",
+   "kind": "Concept",
+   "summary": "Capital at risk on a single trade. Position size, stop loss distance. Confusing small stops with low risk",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "concept:strategy-skew",
+   "title": "strategy skew",
+   "kind": "Concept",
+   "summary": "Shape of the return distribution. Positive (trend) vs. negative (MR). Assuming high win rate = low risk",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "concept:regime-risk",
+   "title": "regime risk",
+   "kind": "Concept",
+   "summary": "Mismatch between strategy and market. Strategy applied to wrong conditions. Not adapting to changing markets",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "concept:drawdown-risk",
+   "title": "drawdown risk",
+   "kind": "Concept",
+   "summary": "Maximum capital decline. Peak-to-trough loss, recovery time. Ignoring time-in-drawdown",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "concept:tail-risk",
+   "title": "tail risk",
+   "kind": "Concept",
+   "summary": "Extreme loss probability. VaR, Expected Shortfall. Underestimating \"black swan\" events",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "concept:correlation-risk",
+   "title": "correlation risk",
+   "kind": "Concept",
+   "summary": "Positions moving together. Portfolio-level diversification. \"Diversification\" failing in crisis",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "concept:liquidity-risk",
+   "title": "liquidity risk",
+   "kind": "Concept",
+   "summary": "Ability to exit positions. Slippage, market impact. Assuming orderly exits in stress",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "concept:trading-rule",
+   "title": "trading rules",
+   "kind": "Concept",
+   "summary": "Trading rules and protocols are predefined guidelines that govern trading behavior, risk limits, and decision-making processes. These rules establish boundaries that protect capital, enforce discipline, and remove emotional decision-making from trading operations.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "implementation_framework": "Implementation should behave like a pre-trade checklist with hard stops. How to operationalize: - Convert each rule into a measurable threshold (percent of equity, counts, ratios). - Run the checks before opening a trade, not after. - Treat violations as automatic \"no trade\" outcomes. - Review and adjust thresholds on a schedule (monthly/quarterly), not during a drawdown. Common failure modes: - Risk is computed using a stop you would not actually execute. - Multiple small, correlated positions create one big bet. - \"Make it back\" sizing after losses (breaks survival math). Toolkit: `TradingRules`, `check_trading_rules`, `daily_loss_limit_status` in `MangroveAI.utils.risk_management_toolkit`."
+   }
+  },
+  {
+   "id": "property:max-risk-per-trade",
+   "title": "max risk per trade",
+   "kind": "Property",
+   "summary": "Amount willing to lose on a single trade. 1% of account",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Amount willing to lose on a single trade",
+    "default_value": "1% of account"
+   }
+  },
+  {
+   "id": "property:max-daily-loss",
+   "title": "max daily loss",
+   "kind": "Property",
+   "summary": "Daily drawdown limit before stopping trading. 5% of account",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Daily drawdown limit before stopping trading",
+    "default_value": "5% of account"
+   }
+  },
+  {
+   "id": "property:max-weekly-loss",
+   "title": "max weekly loss",
+   "kind": "Property",
+   "summary": "Weekly drawdown limit before break/cooldown. 10% of account",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Weekly drawdown limit before break/cooldown",
+    "default_value": "10% of account"
+   }
+  },
+  {
+   "id": "property:max-open-trade",
+   "title": "max open trades",
+   "kind": "Property",
+   "summary": "Maximum simultaneous positions. 25 positions",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Maximum simultaneous positions",
+    "default_value": "25 positions"
+   }
+  },
+  {
+   "id": "concept:risk-reward-ratio",
+   "title": "reward-to-risk ratio",
+   "kind": "Concept",
+   "summary": "Risk-reward ratio (R:R) compares the potential profit of a trade to its potential loss. It is a fundamental metric for evaluating trade quality and setting realistic expectations.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Minimum acceptable R:R for any setup",
+    "default_value": ">= 2:1",
+    "notes": [
+     "Minimum acceptable R:R for any setup. >= 2:1",
+     "Risk-reward is only meaningful if the stop is real and the target is realistic.",
+     "Checklist:",
+     "Toolkit: `risk_reward_ratio`."
+    ],
+    "explanation": "Stop is placed at invalidation (not a random percent). Target is based on structure (not hope). If computed risk is non-positive, the setup is invalid. "
+   }
+  },
+  {
+   "id": "concept:position-sizing",
+   "title": "position sizing",
+   "kind": "Concept",
+   "summary": "Position sizing determines the amount of capital to allocate to each trade based on risk parameters, account size, and strategy characteristics. Proper position sizing balances potential returns against risk of ruin. The goal is to keep risk constant across trades regardless of entry price or volatility.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Contracts per trade",
+    "default_value": "(Account Balance x max risk) / (entry price - stop loss)",
+    "notes": [
+     "Contracts per trade. (Account Balance x max risk) / (entry price - stop loss)"
+    ],
+    "applications": [
+     "Determining number of shares/contracts per trade",
+     "Normalizing risk across different asset volatilities",
+     "Managing overall portfolio exposure",
+     "Scaling positions based on conviction",
+     "Adapting to changing market conditions"
+    ]
+   }
+  },
+  {
+   "id": "property:cool-down-period",
+   "title": "cool down period",
+   "kind": "Property",
+   "summary": "Time to stop trading after hitting daily loss. Remainder of the day",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Time to stop trading after hitting daily loss",
+    "default_value": "Remainder of the day"
+   }
+  },
+  {
+   "id": "property:trading-hour",
+   "title": "trading hours",
+   "kind": "Property",
+   "summary": "Allowed trading window. 8:00 AM - 11:30 AM",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Allowed trading window",
+    "default_value": "8:00 AM - 11:30 AM"
+   }
+  },
+  {
+   "id": "property:profit-lock-rule",
+   "title": "profit lock rule",
+   "kind": "Property",
+   "summary": "Stop trading after hitting daily goal. 1%-2% gain (competition: >5%)",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "description": "Stop trading after hitting daily goal",
+    "default_value": "1%-2% gain (competition: >5%)"
+   }
+  },
+  {
+   "id": "procedure:fixed-fractional-position-sizing",
+   "title": "fixed fractional position sizing",
+   "kind": "Procedure",
+   "summary": "Risk a fixed percentage of capital on each trade.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Account: $100,000 Risk per trade: 1% ($1,000) Entry: $50, Stop: $48 Risk per share: $2 Position size: $1,000 / $2 = 500 shares Conservative: 0.5% per trade Moderate: 1% per trade Aggressive: 2% per trade Maximum: 5% per trade (very risky) ",
+    "notes": [
+     "Position Size = floor((Account Value x Risk Fraction) / abs(Entry Price - Stop Price))",
+     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_fixed_fractional`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:volatility-adjusted-position-sizing",
+   "title": "volatility-adjusted position sizing",
+   "kind": "Procedure",
+   "summary": "Size positions inversely to asset volatility for equal risk contribution.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "notes": [
+     "Position Value = (Account Value x Target Volatility) / Asset Volatility",
+     "Position Size = floor(Position Value / Asset Price)",
+     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_volatility_target`.",
+     "Risk per Unit = ATR x ATR Multiplier",
+     "Position Size = floor((Account Value x Risk Fraction) / Risk per Unit)",
+     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_atr`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:kelly-criterion",
+   "title": "kelly criterion",
+   "kind": "Procedure",
+   "summary": "Mathematically optimal bet size to maximize long-term growth.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "notes": [
+     "Kelly Fraction = W - (1 - W) / R",
+     "Where:",
+     "W = Win rate (probability of winning, 0-1)",
+     "R = Win/Loss ratio (average win / average loss)",
+     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.kelly_fraction` and `MangroveAI.utils.risk_management_toolkit.fractional_kelly_fraction`.",
+     "Caution: Full Kelly is very aggressive. Most practitioners use Half-Kelly or Quarter-Kelly."
+    ]
+   }
+  },
+  {
+   "id": "property:position-size",
+   "title": "position size",
+   "kind": "Property",
+   "summary": "The fundamental position sizing formula ensures consistent risk across all trades:",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Account Balance: $50,000 Risk per Trade: 1% ($500) Entry Price: $100 Stop Loss: $95 Risk per Share: $5 Position Size: $500 / $5 = 100 shares ",
+    "notes": [
+     "Position Size = (Account Balance x Risk per Trade) / abs(Entry Price - Stop Loss)",
+     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_fixed_fractional`.",
+     "This formula normalizes risk regardless of the stock price or stop distance, ensuring each trade risks the same percentage of capital."
+    ]
+   }
+  },
+  {
+   "id": "concept:drawdown-control",
+   "title": "drawdown controls",
+   "kind": "Concept",
+   "summary": "Drawdown controls are mechanisms to limit cumulative losses during adverse periods, protecting capital and allowing recovery. They trigger protective actions when losses exceed predefined thresholds.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "applications": [
+     "Daily loss limits for day traders",
+     "Strategy-level drawdown stops",
+     "Portfolio-level risk budgets",
+     "Position reduction during adverse periods",
+     "Trading suspension triggers"
+    ]
+   }
+  },
+  {
+   "id": "fact:recovery-mathematics",
+   "title": "recovery mathematics",
+   "kind": "Fact",
+   "summary": "Implication: Avoiding large drawdowns is more important than maximizing returns.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "comparison": [
+     "Drawdown \u00b7 Required Recovery",
+     "10% \u00b7 11.1%",
+     "20% \u00b7 25%",
+     "30% \u00b7 42.9%",
+     "40% \u00b7 66.7%",
+     "50% \u00b7 100%",
+     "60% \u00b7 150%",
+     "75% \u00b7 300%"
+    ]
+   }
+  },
+  {
+   "id": "procedure:maximum-drawdown-limit",
+   "title": "maximum drawdown limits",
+   "kind": "Procedure",
+   "summary": "Maximum drawdown limits are portfolio-level circuit breakers. They are not predictions; they are safety rails.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Set a hard drawdown limit that halts trading (e.g., 20%). Add a warning level that forces size reduction (e.g., 10% if the limit is 20%). Decide resumption rules in advance (time-based cooldown, or performance-based reset). ",
+    "notes": [
+     "Practical guidance:",
+     "Toolkit: `max_drawdown_action`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:progressive-drawdown-response",
+   "title": "progressive drawdown response",
+   "kind": "Procedure",
+   "summary": "A progressive response reduces exposure as losses accumulate, which helps avoid keeping full size during your worst regime.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "0-5% drawdown: normal 5-10%: caution (reduce size modestly) 10-15%: reduce (cut size materially) 15-20%: minimal (only highest quality trades) >20%: stop ",
+    "notes": [
+     "One simple ladder:",
+     "Toolkit: `progressive_drawdown_response`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:daily-loss-limit",
+   "title": "daily loss limits",
+   "kind": "Procedure",
+   "summary": "Daily loss limits protect you from both streaks and emotional decision-making after losses.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Use a clear threshold in dollars or percent of equity (or both). Include a warning band (e.g., 80% of the limit) that forces reduced size. When the limit is hit, stop trading for the rest of the day. ",
+    "notes": [
+     "Implementation principles:",
+     "Toolkit: `daily_loss_limit_status`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:time-based-drawdown-recovery",
+   "title": "time-based drawdown recovery",
+   "kind": "Procedure",
+   "summary": "Drawdown depth is only half the story. Time-in-drawdown matters because strategies can be statistically viable but psychologically impossible to follow.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Frequency: how often you exceed a threshold. Duration: how long you remain above it. Trend: whether recovery time is increasing over months (possible regime change). ",
+    "notes": [
+     "Track:",
+     "Toolkit: `drawdown_recovery_stats`."
+    ]
+   }
+  },
+  {
+   "id": "concept:stop-and-target-engineering",
+   "title": "stop-loss and take-profit engineering",
+   "kind": "Concept",
+   "summary": "Stop-loss (SL) and take-profit (TP) orders are predetermined exit points that define risk and reward for each trade. A stop-loss caps potential losses by automatically closing a position when price moves against you, while a take-profit locks in gains by closing when price reaches a target level. Well-engineered SL/TP levels balance protecting capital against allowing normal price fluctuations.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "stop_placement_guideline": "**Where NOT to Place Stops:** - Exactly at round numbers (obvious to everyone) - Exactly at obvious support/resistance (liquidity targets) - Too tight (normal volatility triggers) - Too wide (defeats purpose of risk management) **Where to Place Stops:** - Below significant swing lows (for longs) - Above significant swing highs (for shorts) - Beyond ATR-defined volatility range - At levels that invalidate trade thesis ---",
+    "stop_loss_placement_guideline": "| Position | Stop Placement | |----------|----------------| | Long | Below support level or swing low | | Short | Above resistance level or swing high | | Volatility-Adjusted | Entry minus (ATR x 1.5 to 2.0) | **Where NOT to Place Stops:** - Exactly at round numbers (obvious to all) - Exactly at obvious support/resistance (liquidity targets) - Too tight (normal volatility triggers) - Too wide (defeats risk management purpose) ---"
+   }
+  },
+  {
+   "id": "procedure:structure-based-stop",
+   "title": "structure-based stop",
+   "kind": "Procedure",
+   "summary": "Structure-based stops place the stop where the trade thesis is invalidated (e.g., below the swing low for a long).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Use obvious invalidation points (prior swing, range boundary, key level). Add a buffer (often ATR-based) to reduce stop hunts. If the stop is too far, reduce size or skip the trade; do not widen risk beyond plan. ",
+    "notes": [
+     "Guidelines:",
+     "Toolkit: `structure_stop`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:break-even-stop",
+   "title": "break-even stop",
+   "kind": "Procedure",
+   "summary": "Break-even stops reduce downside after the trade has proven itself, but they also increase the chance of getting stopped out before the real move.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Trigger on profit fraction (e.g., +0.5% to +1%) or on an R multiple (e.g., 1R). Avoid moving to break-even too early in volatile markets. ",
+    "notes": [
+     "Use a trigger:",
+     "Toolkit: `break_even_stop`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:parabolic-sar-stop",
+   "title": "parabolic sar-based",
+   "kind": "Procedure",
+   "summary": "Parabolic SAR is a momentum-based trailing mechanism. It tends to flip quickly in sideways markets.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "notes": [
+     "Toolkit: `parabolic_sar_stop`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:scale-out",
+   "title": "partial exits / scale-out",
+   "kind": "Procedure",
+   "summary": "Scale-outs balance realized gains with participation in extended moves. A typical plan is 1.5R / 2R / 3R targets with a runner.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Define target fractions ahead of time (e.g., 33% / 33% / 34%). Move stops only according to plan (break-even after 1R, trail after 1.5R, etc.).",
+    "notes": [
+     "Risk controls:",
+     "Toolkit: `scale_out_targets`."
+    ]
+   }
+  },
+  {
+   "id": "judgment:trailing-behavior-after-target",
+   "title": "trailing behavior after targets",
+   "kind": "Judgment",
+   "summary": "Move stop to break-even after 1R",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Trail stop to lock in 1R after 1.5R Trail stop to lock in 1.5R after 2R Let runner ride with trailing stop"
+   }
+  },
+  {
+   "id": "concept:portfolio-risk",
+   "title": "portfolio risk",
+   "kind": "Concept",
+   "summary": "Portfolio risk management addresses the aggregate risk of multiple positions, considering correlations, concentration, and the interaction effects between positions.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "procedure:correlation-adjusted-position-sizing",
+   "title": "correlation-adjusted position sizing",
+   "kind": "Procedure",
+   "summary": "Correlation-adjusted sizing prevents accidental concentration. When assets are highly correlated, \"diversification\" is an illusion.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Compute covariance from recent returns. Estimate portfolio volatility under target weights. Scale weights down if volatility exceeds your budget. ",
+    "notes": [
+     "Practical approach:",
+     "Toolkit: `correlation_adjusted_weights`, `portfolio_volatility_from_covariance`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:concentration-limit",
+   "title": "concentration limits",
+   "kind": "Procedure",
+   "summary": "Concentration limits cap the damage from a single bad thesis.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Single position: 5-10% of portfolio Sector: 20-30% of portfolio Asset class: 40-60% of portfolio Correlated cluster: 15-25% of portfolio ",
+    "notes": [
+     "Toolkit: `check_concentration_limits`."
+    ]
+   }
+  },
+  {
+   "id": "property:value-at-risk",
+   "title": "value at risk (var)",
+   "kind": "Property",
+   "summary": "Maximum expected loss over a time period at a confidence level.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "VaR ignores the severity beyond the threshold (tail risk). VaR depends heavily on the chosen window and regime. ",
+    "notes": [
+     "VaR is a quantile of the loss distribution. It is a communication and budgeting tool, not a guarantee.",
+     "Key caveats:",
+     "Toolkit: `value_at_risk_historical`.",
+     "Interpretation: 95% VaR of 2% means there's a 5% chance of losing more than 2% on any given day."
+    ]
+   }
+  },
+  {
+   "id": "property:expected-shortfall",
+   "title": "expected shortfall (cvar)",
+   "kind": "Property",
+   "summary": "Expected loss given that loss exceeds VaR (average of worst cases).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "notes": [
+     "Expected Shortfall (CVaR) estimates the average loss in the worst tail and is generally more informative than VaR for risk control.",
+     "Toolkit: `expected_shortfall_historical`.",
+     "Use: More informative than VaR for tail risk assessment."
+    ]
+   }
+  },
+  {
+   "id": "property:portfolio-beta-and-market-exposure",
+   "title": "portfolio beta and market exposure",
+   "kind": "Property",
+   "summary": "Portfolio beta estimates sensitivity to a broad market factor. It helps answer: \"If the market drops 1%, how much should I expect to lose?\"",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Compute beta over multiple windows (short and medium term). Treat beta as a moving estimate, not a constant. ",
+    "notes": [
+     "Good practice:",
+     "Toolkit: `portfolio_beta`."
+    ]
+   }
+  },
+  {
+   "id": "concept:capital-efficiency",
+   "title": "capital efficiency",
+   "kind": "Concept",
+   "summary": "Capital efficiency measures how effectively capital is deployed to generate returns, balancing the use of leverage, margin, and buying power against risk.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "procedure:capital-allocation-framework",
+   "title": "capital allocation framework",
+   "kind": "Procedure",
+   "summary": "Capital allocation should separate \"risk budget\" from \"capital budget.\" The same dollar allocation can produce very different risk.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Reserve a cash buffer (for margin calls, volatility spikes, opportunities). Define allocation weights per strategy and review periodically. Avoid reallocating reactively based on short-term performance. ",
+    "notes": [
+     "Guidelines:",
+     "Toolkit: `allocate_capital`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:leverage-management",
+   "title": "leverage management",
+   "kind": "Procedure",
+   "summary": "Leverage is exposure relative to equity. It amplifies both returns and drawdowns.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Gross leverage (sum of absolute exposures / equity) Net leverage (net exposure / equity) Long/short balance (for hedged books) Conservative: 1x gross Moderate: 2x gross Aggressive: 3-4x gross Maximum institutional: 6-8x gross (hedge funds) ",
+    "notes": [
+     "Monitor:",
+     "Toolkit: `effective_leverage`."
+    ]
+   }
+  },
+  {
+   "id": "property:capital-utilization-metric",
+   "title": "capital utilization metrics",
+   "kind": "Property",
+   "summary": "Capital utilization matters because deploying capital without a risk budget is a common failure mode.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Utilization = capital deployed / max capital Return on deployed capital (annualized) Return on max capital (return on deployed x utilization) Efficiency ratio (return on deployed / utilization) ",
+    "notes": [
+     "Simple metrics:",
+     "Toolkit: `capital_efficiency_metrics`."
+    ]
+   }
+  },
+  {
+   "id": "property:breakeven-win-rate",
+   "title": "break-even win rate",
+   "kind": "Property",
+   "summary": "Break-even Win Rate = 1 / (1 + R:R)",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "comparison": [
+     "R:R Ratio \u00b7 Break-Even Win Rate",
+     "0.5:1 \u00b7 66.7%",
+     "1:1 \u00b7 50%",
+     "1.5:1 \u00b7 40%",
+     "2:1 \u00b7 33.3%",
+     "3:1 \u00b7 25%"
+    ],
+    "notes": [
+     "Toolkit: `breakeven_win_rate`."
+    ]
+   }
+  },
+  {
+   "id": "property:expectancy",
+   "title": "expectancy",
+   "kind": "Property",
+   "summary": "Expected return per dollar risked.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Expectancy = (Win Rate x Avg Win) - ((1 - Win Rate) x Avg Loss) ",
+    "notes": [
+     "Expectancy summarizes your edge:",
+     "Toolkit: `expectancy`.",
+     "Use R-multiples to compare strategies across assets and timeframes.",
+     "Toolkit: `r_multiple_expectancy`."
+    ]
+   }
+  },
+  {
+   "id": "judgment:setting-realistic-target",
+   "title": "setting realistic targets",
+   "kind": "Judgment",
+   "summary": "Targets should be achievable given volatility and nearby structure.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Target distance in ATR multiples (very large multiples are rarely hit). Obstacles between entry and target (major levels, ranges, pivots). If the target requires a market regime change, it is not a target, it is a dream. ",
+    "notes": [
+     "Sanity checks:",
+     "Toolkit: `evaluate_target_realism` is not implemented in the toolkit; treat this as a framework to build per-strategy."
+    ]
+   }
+  },
+  {
+   "id": "concept:risk-of-ruin",
+   "title": "risk of ruin",
+   "kind": "Concept",
+   "summary": "Risk of ruin is the probability of losing a specified percentage of capital (often defined as 50% or total loss) based on position sizing and strategy characteristics. It quantifies the survivability of a trading approach.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "risk_per_trade_vs_ruin_probability": "| Risk Per Trade | Approximate Ruin Probability* | |----------------|------------------------------| | 1% | < 1% | | 2% | 1-5% | | 5% | 5-20% | | 10% | 20-50% | | 20% | > 50% | *Assumes modest positive edge (55% win rate, 1:1 R:R) ---"
+   }
+  },
+  {
+   "id": "property:risk-of-ruin-formula",
+   "title": "risk of ruin formula",
+   "kind": "Property",
+   "summary": "Risk of ruin depends primarily on edge and risk-per-trade. Small increases in risk-per-trade can massively increase ruin probability.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "notes": [
+     "Toolkit: `risk_of_ruin_classic`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:monte-carlo-ruin-estimation",
+   "title": "monte carlo ruin estimation",
+   "kind": "Procedure",
+   "summary": "Monte Carlo simulation helps model streaks and compounding. Use conservative assumptions.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "notes": [
+     "Toolkit: `monte_carlo_ruin`."
+    ]
+   }
+  },
+  {
+   "id": "judgment:reducing-risk-of-ruin",
+   "title": "reducing risk of ruin",
+   "kind": "Judgment",
+   "summary": "Treat risk-per-trade as the main dial:",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Reduce risk-per-trade during drawdowns. Use fraction-of-Kelly as a ceiling, not a target. Prefer robustness over theoretical optimality. ",
+    "notes": [
+     "Toolkit: `safe_risk_fraction_for_target_ruin`, `fractional_kelly_fraction`."
+    ]
+   }
+  },
+  {
+   "id": "concept:scenario-analysis",
+   "title": "scenario analysis",
+   "kind": "Concept",
+   "summary": "Scenario analysis evaluates portfolio performance under specific hypothetical market conditions, including historical stress events and constructed worst-case scenarios.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ]
+   }
+  },
+  {
+   "id": "procedure:historical-stress-test",
+   "title": "historical stress tests",
+   "kind": "Procedure",
+   "summary": "Historical stress tests approximate: \"What would have happened if we lived through that again?\"",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Stress tests are scenarios, not forecasts. Include correlation spikes (diversification breaks in crises). ",
+    "notes": [
+     "Important:",
+     "Toolkit: `historical_stress_test`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:hypothetical-scenario-construction",
+   "title": "hypothetical scenario construction",
+   "kind": "Procedure",
+   "summary": "Hypothetical scenarios let you test combinations you have not experienced in the data.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Start from a base scenario and apply adjustments (worse equities, worse bonds, vol shock). Include a liquidity shock (wider spreads, bigger gaps) in operational planning. ",
+    "notes": [
+     "Approach:",
+     "Toolkit: `construct_scenario`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:correlation-stress-testing",
+   "title": "correlation stress testing",
+   "kind": "Procedure",
+   "summary": "Correlation stress testing asks: \"What if correlations move toward 1?\" This is often the real risk in diversified portfolios.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Compute volatility under normal covariance. Replace covariance/correlation with a stressed version and recompute. Compare the increase; size down if the stressed case is unacceptable. ",
+    "notes": [
+     "Practical steps:",
+     "Toolkit: `correlation_adjusted_weights`, `portfolio_volatility_from_covariance`."
+    ]
+   }
+  },
+  {
+   "id": "procedure:tail-risk-analysis",
+   "title": "tail risk analysis",
+   "kind": "Procedure",
+   "summary": "Tail risk analysis focuses on the worst outcomes rather than the average.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Left tail mean and worst loss (bad days) Right tail mean and best gain (good days) Tail ratio (are good tails large enough to justify bad tails?) ",
+    "notes": [
+     "What to watch:",
+     "Toolkit: `tail_risk_analysis`."
+    ]
+   }
+  },
+  {
+   "id": "judgment:scenario-action-plan",
+   "title": "scenario action plans",
+   "kind": "Judgment",
+   "summary": "Scenario action plans turn risk metrics into behavior so you are not improvising under stress.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "explanation": "Severe scenario: cut risk in half, remove leverage, raise cash Moderate: reduce size, tighten risk controls, add hedges Mild: monitor and review exposures ",
+    "notes": [
+     "Example actions:",
+     "Toolkit: `scenario_response_plan`."
+    ]
+   }
+  },
+  {
+   "id": "fact:risk-management-core-principles",
+   "title": "core principles",
+   "kind": "Fact",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
+    ],
+    "principles": []
+   }
+  },
+  {
+   "id": "judgment:risk-management-best-practices",
+   "title": "best practices",
+   "kind": "Judgment",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "risk-management"
     ],
     "practices": []
    }
@@ -37950,6 +39100,1486 @@
    "why": "stated across strategy-design",
    "from_id": "judgment:strategy-design-best-practices",
    "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "risk dimension",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk dimensions in strategy design",
+   "from_id": "concept:risk-dimension",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "win rate is not risk",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk dimensions in strategy design",
+   "from_id": "fact:win-rate-is-not-risk",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "per-trade risk vs. strategy risk",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk dimensions in strategy design",
+   "from_id": "fact:per-trade-risk-vs-strategy-risk",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "strategy risk assessment",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk dimensions in strategy design",
+   "from_id": "procedure:strategy-risk-assessment",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "per-trade risk",
+   "rel": "kind-of",
+   "to": "risk dimension",
+   "why": "listed under the risk dimensions framework",
+   "from_id": "concept:per-trade-risk",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "strategy skew",
+   "rel": "kind-of",
+   "to": "risk dimension",
+   "why": "listed under the risk dimensions framework",
+   "from_id": "concept:strategy-skew",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "regime risk",
+   "rel": "kind-of",
+   "to": "risk dimension",
+   "why": "listed under the risk dimensions framework",
+   "from_id": "concept:regime-risk",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "drawdown risk",
+   "rel": "kind-of",
+   "to": "risk dimension",
+   "why": "listed under the risk dimensions framework",
+   "from_id": "concept:drawdown-risk",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "tail risk",
+   "rel": "kind-of",
+   "to": "risk dimension",
+   "why": "listed under the risk dimensions framework",
+   "from_id": "concept:tail-risk",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "correlation risk",
+   "rel": "kind-of",
+   "to": "risk dimension",
+   "why": "listed under the risk dimensions framework",
+   "from_id": "concept:correlation-risk",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "liquidity risk",
+   "rel": "kind-of",
+   "to": "risk dimension",
+   "why": "listed under the risk dimensions framework",
+   "from_id": "concept:liquidity-risk",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "trading rules",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under trading rules & protocols",
+   "from_id": "concept:trading-rule",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "max risk per trade",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "property:max-risk-per-trade",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "max daily loss",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "property:max-daily-loss",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "max weekly loss",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "property:max-weekly-loss",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "max open trades",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "property:max-open-trade",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "reward-to-risk ratio",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "concept:risk-reward-ratio",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "position sizing",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "concept:position-sizing",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "cool down period",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "property:cool-down-period",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "trading hours",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "property:trading-hour",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "profit lock rule",
+   "rel": "part-of",
+   "to": "trading rules",
+   "why": "listed under risk rules reference table",
+   "from_id": "property:profit-lock-rule",
+   "to_id": "concept:trading-rule"
+  },
+  {
+   "from": "position sizing",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under position sizing",
+   "from_id": "concept:position-sizing",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "fixed fractional position sizing",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under position sizing",
+   "from_id": "procedure:fixed-fractional-position-sizing",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "fixed fractional position sizing",
+   "rel": "about",
+   "to": "position sizing",
+   "why": "stated under position sizing",
+   "from_id": "procedure:fixed-fractional-position-sizing",
+   "to_id": "concept:position-sizing"
+  },
+  {
+   "from": "volatility-adjusted position sizing",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under position sizing",
+   "from_id": "procedure:volatility-adjusted-position-sizing",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "volatility-adjusted position sizing",
+   "rel": "about",
+   "to": "position sizing",
+   "why": "stated under position sizing",
+   "from_id": "procedure:volatility-adjusted-position-sizing",
+   "to_id": "concept:position-sizing"
+  },
+  {
+   "from": "kelly criterion",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under position sizing",
+   "from_id": "procedure:kelly-criterion",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "kelly criterion",
+   "rel": "about",
+   "to": "position sizing",
+   "why": "stated under position sizing",
+   "from_id": "procedure:kelly-criterion",
+   "to_id": "concept:position-sizing"
+  },
+  {
+   "from": "position size",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under position sizing",
+   "from_id": "property:position-size",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "position size",
+   "rel": "about",
+   "to": "position sizing",
+   "why": "stated under position sizing",
+   "from_id": "property:position-size",
+   "to_id": "concept:position-sizing"
+  },
+  {
+   "from": "drawdown controls",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under drawdown controls",
+   "from_id": "concept:drawdown-control",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "recovery mathematics",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under drawdown controls",
+   "from_id": "fact:recovery-mathematics",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "recovery mathematics",
+   "rel": "about",
+   "to": "drawdown controls",
+   "why": "stated under drawdown controls",
+   "from_id": "fact:recovery-mathematics",
+   "to_id": "concept:drawdown-control"
+  },
+  {
+   "from": "maximum drawdown limits",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:maximum-drawdown-limit",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "maximum drawdown limits",
+   "rel": "about",
+   "to": "drawdown controls",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:maximum-drawdown-limit",
+   "to_id": "concept:drawdown-control"
+  },
+  {
+   "from": "progressive drawdown response",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:progressive-drawdown-response",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "progressive drawdown response",
+   "rel": "about",
+   "to": "drawdown controls",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:progressive-drawdown-response",
+   "to_id": "concept:drawdown-control"
+  },
+  {
+   "from": "daily loss limits",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:daily-loss-limit",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "daily loss limits",
+   "rel": "about",
+   "to": "drawdown controls",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:daily-loss-limit",
+   "to_id": "concept:drawdown-control"
+  },
+  {
+   "from": "time-based drawdown recovery",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:time-based-drawdown-recovery",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "time-based drawdown recovery",
+   "rel": "about",
+   "to": "drawdown controls",
+   "why": "stated under drawdown controls",
+   "from_id": "procedure:time-based-drawdown-recovery",
+   "to_id": "concept:drawdown-control"
+  },
+  {
+   "from": "stop-loss and take-profit engineering",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under stop-loss & take-profit engineering",
+   "from_id": "concept:stop-and-target-engineering",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "fixed stop",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:fixed-stop",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "fixed stop",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:fixed-stop",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "structure-based stop",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:structure-based-stop",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "structure-based stop",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:structure-based-stop",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "break-even stop",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:break-even-stop",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "break-even stop",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:break-even-stop",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "simple trailing stop",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:simple-trailing-stop",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "simple trailing stop",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under trailing stop variants",
+   "from_id": "procedure:simple-trailing-stop",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "atr trailing stop",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:atr-trailing-stop",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "atr trailing stop",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under trailing stop variants",
+   "from_id": "procedure:atr-trailing-stop",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "parabolic sar-based",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:parabolic-sar-stop",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "parabolic sar-based",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under trailing stop variants",
+   "from_id": "procedure:parabolic-sar-stop",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "fixed target",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:fixed-target",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "fixed target",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under take-profit strategies",
+   "from_id": "procedure:fixed-target",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "risk-multiple target",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:risk-multiple-target",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "risk-multiple target",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under take-profit strategies",
+   "from_id": "procedure:risk-multiple-target",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "partial exits / scale-out",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "procedure:scale-out",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "partial exits / scale-out",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under take-profit strategies",
+   "from_id": "procedure:scale-out",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "trailing behavior after targets",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under stop-loss & take-profit engineering",
+   "from_id": "judgment:trailing-behavior-after-target",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "trailing behavior after targets",
+   "rel": "about",
+   "to": "stop-loss and take-profit engineering",
+   "why": "stated under take-profit strategies",
+   "from_id": "judgment:trailing-behavior-after-target",
+   "to_id": "concept:stop-and-target-engineering"
+  },
+  {
+   "from": "portfolio risk",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under portfolio risk",
+   "from_id": "concept:portfolio-risk",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "correlation-adjusted position sizing",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under portfolio risk",
+   "from_id": "procedure:correlation-adjusted-position-sizing",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "correlation-adjusted position sizing",
+   "rel": "about",
+   "to": "portfolio risk",
+   "why": "stated under portfolio risk",
+   "from_id": "procedure:correlation-adjusted-position-sizing",
+   "to_id": "concept:portfolio-risk"
+  },
+  {
+   "from": "concentration limits",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under portfolio risk",
+   "from_id": "procedure:concentration-limit",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "concentration limits",
+   "rel": "about",
+   "to": "portfolio risk",
+   "why": "stated under portfolio risk",
+   "from_id": "procedure:concentration-limit",
+   "to_id": "concept:portfolio-risk"
+  },
+  {
+   "from": "value at risk (var)",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under portfolio risk",
+   "from_id": "property:value-at-risk",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "value at risk (var)",
+   "rel": "about",
+   "to": "portfolio risk",
+   "why": "stated under portfolio risk",
+   "from_id": "property:value-at-risk",
+   "to_id": "concept:portfolio-risk"
+  },
+  {
+   "from": "expected shortfall (cvar)",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under portfolio risk",
+   "from_id": "property:expected-shortfall",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "expected shortfall (cvar)",
+   "rel": "about",
+   "to": "portfolio risk",
+   "why": "stated under portfolio risk",
+   "from_id": "property:expected-shortfall",
+   "to_id": "concept:portfolio-risk"
+  },
+  {
+   "from": "portfolio beta and market exposure",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under portfolio risk",
+   "from_id": "property:portfolio-beta-and-market-exposure",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "portfolio beta and market exposure",
+   "rel": "about",
+   "to": "portfolio risk",
+   "why": "stated under portfolio risk",
+   "from_id": "property:portfolio-beta-and-market-exposure",
+   "to_id": "concept:portfolio-risk"
+  },
+  {
+   "from": "capital efficiency",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under capital efficiency",
+   "from_id": "concept:capital-efficiency",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "capital allocation framework",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under capital efficiency",
+   "from_id": "procedure:capital-allocation-framework",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "capital allocation framework",
+   "rel": "about",
+   "to": "capital efficiency",
+   "why": "stated under capital efficiency",
+   "from_id": "procedure:capital-allocation-framework",
+   "to_id": "concept:capital-efficiency"
+  },
+  {
+   "from": "leverage management",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under capital efficiency",
+   "from_id": "procedure:leverage-management",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "leverage management",
+   "rel": "about",
+   "to": "capital efficiency",
+   "why": "stated under capital efficiency",
+   "from_id": "procedure:leverage-management",
+   "to_id": "concept:capital-efficiency"
+  },
+  {
+   "from": "capital utilization metrics",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under capital efficiency",
+   "from_id": "property:capital-utilization-metric",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "capital utilization metrics",
+   "rel": "about",
+   "to": "capital efficiency",
+   "why": "stated under capital efficiency",
+   "from_id": "property:capital-utilization-metric",
+   "to_id": "concept:capital-efficiency"
+  },
+  {
+   "from": "reward-to-risk ratio",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under risk-reward ratios",
+   "from_id": "concept:risk-reward-ratio",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "break-even win rate",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk-reward ratios",
+   "from_id": "property:breakeven-win-rate",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "break-even win rate",
+   "rel": "about",
+   "to": "reward-to-risk ratio",
+   "why": "stated under risk-reward ratios",
+   "from_id": "property:breakeven-win-rate",
+   "to_id": "concept:risk-reward-ratio"
+  },
+  {
+   "from": "expectancy",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk-reward ratios",
+   "from_id": "property:expectancy",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "expectancy",
+   "rel": "about",
+   "to": "reward-to-risk ratio",
+   "why": "stated under risk-reward ratios",
+   "from_id": "property:expectancy",
+   "to_id": "concept:risk-reward-ratio"
+  },
+  {
+   "from": "setting realistic targets",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk-reward ratios",
+   "from_id": "judgment:setting-realistic-target",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "setting realistic targets",
+   "rel": "about",
+   "to": "reward-to-risk ratio",
+   "why": "stated under risk-reward ratios",
+   "from_id": "judgment:setting-realistic-target",
+   "to_id": "concept:risk-reward-ratio"
+  },
+  {
+   "from": "risk of ruin",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under risk of ruin",
+   "from_id": "concept:risk-of-ruin",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "risk of ruin formula",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk of ruin",
+   "from_id": "property:risk-of-ruin-formula",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "risk of ruin formula",
+   "rel": "about",
+   "to": "risk of ruin",
+   "why": "stated under risk of ruin",
+   "from_id": "property:risk-of-ruin-formula",
+   "to_id": "concept:risk-of-ruin"
+  },
+  {
+   "from": "monte carlo ruin estimation",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk of ruin",
+   "from_id": "procedure:monte-carlo-ruin-estimation",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "monte carlo ruin estimation",
+   "rel": "about",
+   "to": "risk of ruin",
+   "why": "stated under risk of ruin",
+   "from_id": "procedure:monte-carlo-ruin-estimation",
+   "to_id": "concept:risk-of-ruin"
+  },
+  {
+   "from": "reducing risk of ruin",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under risk of ruin",
+   "from_id": "judgment:reducing-risk-of-ruin",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "reducing risk of ruin",
+   "rel": "about",
+   "to": "risk of ruin",
+   "why": "stated under risk of ruin",
+   "from_id": "judgment:reducing-risk-of-ruin",
+   "to_id": "concept:risk-of-ruin"
+  },
+  {
+   "from": "scenario analysis",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "defined under scenario analysis",
+   "from_id": "concept:scenario-analysis",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "historical stress tests",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:historical-stress-test",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "historical stress tests",
+   "rel": "about",
+   "to": "scenario analysis",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:historical-stress-test",
+   "to_id": "concept:scenario-analysis"
+  },
+  {
+   "from": "hypothetical scenario construction",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:hypothetical-scenario-construction",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "hypothetical scenario construction",
+   "rel": "about",
+   "to": "scenario analysis",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:hypothetical-scenario-construction",
+   "to_id": "concept:scenario-analysis"
+  },
+  {
+   "from": "correlation stress testing",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:correlation-stress-testing",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "correlation stress testing",
+   "rel": "about",
+   "to": "scenario analysis",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:correlation-stress-testing",
+   "to_id": "concept:scenario-analysis"
+  },
+  {
+   "from": "tail risk analysis",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:tail-risk-analysis",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "tail risk analysis",
+   "rel": "about",
+   "to": "scenario analysis",
+   "why": "stated under scenario analysis",
+   "from_id": "procedure:tail-risk-analysis",
+   "to_id": "concept:scenario-analysis"
+  },
+  {
+   "from": "scenario action plans",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated under scenario analysis",
+   "from_id": "judgment:scenario-action-plan",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "scenario action plans",
+   "rel": "about",
+   "to": "scenario analysis",
+   "why": "stated under scenario analysis",
+   "from_id": "judgment:scenario-action-plan",
+   "to_id": "concept:scenario-analysis"
+  },
+  {
+   "from": "per-trade risk",
+   "rel": "about",
+   "to": "position sizing",
+   "why": "measured by position size and stop distance",
+   "from_id": "concept:per-trade-risk",
+   "to_id": "concept:position-sizing"
+  },
+  {
+   "from": "strategy skew",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "positive for trend, negative for mean reversion: the archetype decides it",
+   "from_id": "concept:strategy-skew",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "regime risk",
+   "rel": "about",
+   "to": "market regimes",
+   "why": "the mismatch between the strategy and the state it is running in",
+   "from_id": "concept:regime-risk",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "drawdown risk",
+   "rel": "about",
+   "to": "drawdown controls",
+   "why": "peak-to-trough loss, and the controls that bound it",
+   "from_id": "concept:drawdown-risk",
+   "to_id": "concept:drawdown-control"
+  },
+  {
+   "from": "tail risk",
+   "rel": "about",
+   "to": "value at risk (var)",
+   "why": "one of the two quantities it is measured by",
+   "from_id": "concept:tail-risk",
+   "to_id": "property:value-at-risk"
+  },
+  {
+   "from": "tail risk",
+   "rel": "about",
+   "to": "expected shortfall (cvar)",
+   "why": "the other, and the more informative of the two",
+   "from_id": "concept:tail-risk",
+   "to_id": "property:expected-shortfall"
+  },
+  {
+   "from": "correlation risk",
+   "rel": "about",
+   "to": "portfolio risk",
+   "why": "diversification that fails when correlations spike",
+   "from_id": "concept:correlation-risk",
+   "to_id": "concept:portfolio-risk"
+  },
+  {
+   "from": "liquidity risk",
+   "rel": "about",
+   "to": "slippage",
+   "why": "the cost of an exit that the book will not absorb",
+   "from_id": "concept:liquidity-risk",
+   "to_id": "concept:slippage"
+  },
+  {
+   "from": "per-trade risk vs. strategy risk",
+   "rel": "about",
+   "to": "risk is multi-dimensional",
+   "why": "why bounding one dimension leaves the others where they were",
+   "from_id": "fact:per-trade-risk-vs-strategy-risk",
+   "to_id": "fact:risk-is-multi-dimensional"
+  },
+  {
+   "from": "strategy risk assessment",
+   "rel": "about",
+   "to": "risk dimension",
+   "why": "the dimensions it walks, one question each",
+   "from_id": "procedure:strategy-risk-assessment",
+   "to_id": "concept:risk-dimension"
+  },
+  {
+   "from": "strategy risk assessment",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "classifying it is the first question the checklist asks",
+   "from_id": "procedure:strategy-risk-assessment",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "max daily loss",
+   "rel": "about",
+   "to": "daily loss limits",
+   "why": "the control that enforces it",
+   "from_id": "property:max-daily-loss",
+   "to_id": "procedure:daily-loss-limit"
+  },
+  {
+   "from": "profit lock rule",
+   "rel": "about",
+   "to": "daily loss limits",
+   "why": "the same halt, triggered by a gain rather than a loss",
+   "from_id": "property:profit-lock-rule",
+   "to_id": "procedure:daily-loss-limit"
+  },
+  {
+   "from": "max weekly loss",
+   "rel": "about",
+   "to": "maximum drawdown limits",
+   "why": "the circuit breaker it sets the level for",
+   "from_id": "property:max-weekly-loss",
+   "to_id": "procedure:maximum-drawdown-limit"
+  },
+  {
+   "from": "max open trades",
+   "rel": "about",
+   "to": "concentration limits",
+   "why": "one position cap expressed as a count rather than a share",
+   "from_id": "property:max-open-trade",
+   "to_id": "procedure:concentration-limit"
+  },
+  {
+   "from": "trading hours",
+   "rel": "about",
+   "to": "session filters",
+   "why": "the window, and the rule chapter 4 states for enforcing one",
+   "from_id": "property:trading-hour",
+   "to_id": "procedure:session-filter"
+  },
+  {
+   "from": "trading rules",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Pre-Commitment: Rules must be established before trading, not during \u00b7 Non-Negotiable Limits: Certain rules (max loss, max positions) are absolute \u00b7 Consistency: Rules must be applied uniformly across all trades \u00b7 Periodic Review: Rules should be reviewed and adjusted based on performance data \u00b7 Written Documentation: All rules must be documented and accessible",
+   "from_id": "concept:trading-rule",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "position sizing",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Capital Preservation: Position sizes should not threaten account survival \u00b7 Risk Normalization: Equal risk per trade, not equal dollar amount \u00b7 Conviction Scaling: Option to size based on signal strength",
+   "from_id": "concept:position-sizing",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "volatility-adjusted position sizing",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volatility Adjustment: Higher volatility assets require smaller positions",
+   "from_id": "procedure:volatility-adjusted-position-sizing",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "portfolio risk",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Portfolio Context: Individual positions must fit portfolio constraints \u00b7 Diversification: Reduce risk through uncorrelated positions",
+   "from_id": "concept:portfolio-risk",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "drawdown controls",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Survival First: Preserving capital enables recovery \u00b7 Psychological Protection: Limits prevent emotional decision-making",
+   "from_id": "concept:drawdown-control",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "maximum drawdown limits",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Circuit Breakers: Automatic stops when losses accumulate",
+   "from_id": "procedure:maximum-drawdown-limit",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "recovery mathematics",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Recovery Math: Larger drawdowns require exponentially larger recoveries",
+   "from_id": "fact:recovery-mathematics",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "progressive drawdown response",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Progressive Response: Graduated actions as drawdown deepens",
+   "from_id": "procedure:progressive-drawdown-response",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "stop-loss and take-profit engineering",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Risk Definition: Stop defines the risk per trade \u00b7 Breathing Room: Stops must allow normal volatility \u00b7 Time Consistency: Stop logic should match trading timeframe \u00b7 Execution Consideration: Wide stops in illiquid markets",
+   "from_id": "concept:stop-and-target-engineering",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "structure-based stop",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Technical Validity: Stops should be at meaningful levels",
+   "from_id": "procedure:structure-based-stop",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "correlation-adjusted position sizing",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Correlation Awareness: Correlated positions multiply risk",
+   "from_id": "procedure:correlation-adjusted-position-sizing",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "concentration limits",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Concentration Limits: No single position dominates portfolio \u00b7 Sector/Factor Exposure: Monitor and limit exposure concentrations",
+   "from_id": "procedure:concentration-limit",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "tail risk",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Tail Risk: Consider extreme scenarios where correlations spike",
+   "from_id": "concept:tail-risk",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "capital efficiency",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Return on Capital: Maximize risk-adjusted returns per dollar deployed \u00b7 Cash Management: Maintain appropriate cash buffers \u00b7 Opportunity Cost: Unused capital has cost (opportunity)",
+   "from_id": "concept:capital-efficiency",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "margin",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Margin Efficiency: Use margin wisely without excessive leverage",
+   "from_id": "concept:margin",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "leverage",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Leverage Trade-offs: Leverage increases both returns and risk",
+   "from_id": "concept:leverage",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "reward-to-risk ratio",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Minimum Standards: Set minimum R:R thresholds for trades \u00b7 Risk-First Thinking: Define risk before considering reward",
+   "from_id": "concept:risk-reward-ratio",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "break-even win rate",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Win Rate Relationship: Lower win rate requires higher R:R",
+   "from_id": "property:breakeven-win-rate",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "setting realistic targets",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Realistic Targets: Targets must be achievable, not aspirational",
+   "from_id": "judgment:setting-realistic-target",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "expectancy",
+   "rel": "about",
+   "to": "core principles",
+   "why": "System Expectancy: Combine R:R with win rate for expectancy",
+   "from_id": "property:expectancy",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "risk of ruin",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Survival Probability: Trading survival is prerequisite for profits \u00b7 Edge and Sizing: Ruin depends on edge size and bet size \u00b7 Compounding Effect: Small edges compounded beat large bets \u00b7 Conservative Sizing: Lower bet sizes dramatically reduce ruin probability \u00b7 Long-Term Perspective: Even small ruin probability matters over time",
+   "from_id": "concept:risk-of-ruin",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "scenario analysis",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Stress Testing: Test portfolio against extreme conditions",
+   "from_id": "concept:scenario-analysis",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "historical stress tests",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Historical Scenarios: Use past crises as test cases",
+   "from_id": "procedure:historical-stress-test",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "hypothetical scenario construction",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Hypothetical Scenarios: Construct plausible adverse scenarios",
+   "from_id": "procedure:hypothetical-scenario-construction",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "correlation stress testing",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Correlation Changes: Model correlation increases during stress",
+   "from_id": "procedure:correlation-stress-testing",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "tail risk analysis",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Tail Events: Focus on outcomes beyond normal distribution",
+   "from_id": "procedure:tail-risk-analysis",
+   "to_id": "fact:risk-management-core-principles"
+  },
+  {
+   "from": "trading rules",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Document all rules in a trading plan before trading \u00b7 Review rules weekly and adjust based on performance metrics \u00b7 Never override rules during active trading sessions \u00b7 Use automated systems to enforce hard limits where possible \u00b7 Track rule violations and their outcomes in a trading journal",
+   "from_id": "concept:trading-rule",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "cool down period",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Implement cool-down periods after hitting loss limits",
+   "from_id": "property:cool-down-period",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "max risk per trade",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Never risk more than 2% of account on single trade \u00b7 Keep risk per trade below 2% for sustainable trading",
+   "from_id": "property:max-risk-per-trade",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "volatility-adjusted position sizing",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use volatility-adjusted sizing for consistent risk",
+   "from_id": "procedure:volatility-adjusted-position-sizing",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "kelly criterion",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider Kelly as upper bound, not target",
+   "from_id": "procedure:kelly-criterion",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "correlation-adjusted position sizing",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for correlation when sizing multiple positions",
+   "from_id": "procedure:correlation-adjusted-position-sizing",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "drawdown controls",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Reduce size during drawdowns (some prefer fixed sizing) \u00b7 Set drawdown limits before trading, not during \u00b7 Don't override limits during drawdown (emotional state)",
+   "from_id": "concept:drawdown-control",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "slippage",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Include commission and slippage in risk calculations",
+   "from_id": "concept:slippage",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "progressive drawdown response",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use multiple levels (warning, reduce, stop)",
+   "from_id": "procedure:progressive-drawdown-response",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "daily loss limits",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Include daily and cumulative limits",
+   "from_id": "procedure:daily-loss-limit",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "maximum drawdown limits",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Have clear rules for resuming after drawdown stop",
+   "from_id": "procedure:maximum-drawdown-limit",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "time-based drawdown recovery",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Track time in drawdown as well as depth",
+   "from_id": "procedure:time-based-drawdown-recovery",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use ATR for volatility-appropriate stops",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "structure-based stop",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Place stops at technically meaningful levels \u00b7 Add buffer beyond obvious levels",
+   "from_id": "procedure:structure-based-stop",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "trailing stop",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Trail stops as trade moves in favor",
+   "from_id": "concept:trailing-stop",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "break-even stop",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use break-even stops to lock in risk-free trades",
+   "from_id": "procedure:break-even-stop",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "stop-loss and take-profit engineering",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Don't move stops to increase loss (never widen)",
+   "from_id": "concept:stop-and-target-engineering",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "correlation stress testing",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor correlation changes, especially during stress \u00b7 Include correlation breakdown in stress scenarios",
+   "from_id": "procedure:correlation-stress-testing",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "portfolio risk",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Maintain diversification across uncorrelated strategies",
+   "from_id": "concept:portfolio-risk",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "concentration limits",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Set and enforce concentration limits",
+   "from_id": "procedure:concentration-limit",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "value at risk (var)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Calculate VaR/ES regularly",
+   "from_id": "property:value-at-risk",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "scenario analysis",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Stress test portfolio for extreme scenarios \u00b7 Test against both historical and hypothetical scenarios \u00b7 Update scenarios as market conditions evolve \u00b7 Run scenarios regularly (monthly or quarterly) \u00b7 Include scenarios where multiple risks occur simultaneously",
+   "from_id": "concept:scenario-analysis",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "leverage management",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider gross and net exposure separately",
+   "from_id": "procedure:leverage-management",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "margin",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Maintain cash buffer for opportunities and margin calls \u00b7 Consider margin requirements in position sizing",
+   "from_id": "concept:margin",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "leverage",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor leverage continuously, not just at trade entry",
+   "from_id": "concept:leverage",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "capital utilization metrics",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Calculate return on total capital, not just deployed capital",
+   "from_id": "property:capital-utilization-metric",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "capital efficiency",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Balance capital efficiency against liquidity needs",
+   "from_id": "concept:capital-efficiency",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "reward-to-risk ratio",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Set minimum R:R requirement (typically 1.5:1 or 2:1) \u00b7 Calculate R:R before entering trade \u00b7 Track actual R:R achieved vs. planned",
+   "from_id": "concept:risk-reward-ratio",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "setting realistic targets",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Ensure target is realistic given market structure",
+   "from_id": "judgment:setting-realistic-target",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "expectancy",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine R:R with win rate for complete picture",
+   "from_id": "property:expectancy",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "risk of ruin",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand that even 1% ruin probability compounds over time \u00b7 Never risk total capital on any single strategy \u00b7 Have capital reserves outside trading account",
+   "from_id": "concept:risk-of-ruin",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "monte carlo ruin estimation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use Monte Carlo simulation for realistic estimates",
+   "from_id": "procedure:monte-carlo-ruin-estimation",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "position sizing",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Reduce position size during losing streaks",
+   "from_id": "concept:position-sizing",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "scenario action plans",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Have pre-defined action plans for each scenario",
+   "from_id": "judgment:scenario-action-plan",
+   "to_id": "judgment:risk-management-best-practices"
+  },
+  {
+   "from": "core principles",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated across risk-management",
+   "from_id": "fact:risk-management-core-principles",
+   "to_id": "concept:risk-management"
+  },
+  {
+   "from": "best practices",
+   "rel": "part-of",
+   "to": "risk management",
+   "why": "stated across risk-management",
+   "from_id": "judgment:risk-management-best-practices",
+   "to_id": "concept:risk-management"
   }
  ],
  "meta": {
@@ -37995,6 +40625,7 @@
    "concept:bullish-fair-value-gap",
    "concept:buy-side-liquidity",
    "concept:call-option",
+   "concept:capital-efficiency",
    "concept:central-counterparty",
    "concept:centralized-exchange",
    "concept:change-of-character",
@@ -38008,6 +40639,7 @@
    "concept:confluence",
    "concept:continuous-trading-discovery",
    "concept:contract-specification",
+   "concept:correlation-risk",
    "concept:cross-market-discovery",
    "concept:crypto-settlement",
    "concept:crypto-specific-mechanics",
@@ -38019,6 +40651,8 @@
    "concept:decentralized-exchange",
    "concept:demand-zone",
    "concept:distribution-pattern",
+   "concept:drawdown-control",
+   "concept:drawdown-risk",
    "concept:dynamic-level",
    "concept:electronic-communication-network",
    "concept:entry-logic",
@@ -38053,6 +40687,7 @@
    "concept:liquidity",
    "concept:liquidity-grab",
    "concept:liquidity-pool",
+   "concept:liquidity-risk",
    "concept:lit-exchange",
    "concept:look-ahead-bias",
    "concept:low-volatility-regime",
@@ -38076,8 +40711,11 @@
    "concept:order-type",
    "concept:over-the-counter-market",
    "concept:overfitting",
+   "concept:per-trade-risk",
    "concept:perpetual-swap",
    "concept:point-of-control",
+   "concept:portfolio-risk",
+   "concept:position-sizing",
    "concept:position-trading",
    "concept:price-action",
    "concept:price-discovery",
@@ -38086,11 +40724,16 @@
    "concept:quantitative-analysis",
    "concept:ranging-market",
    "concept:regime-detection",
+   "concept:regime-risk",
    "concept:regime-shift",
    "concept:retail-trader",
+   "concept:risk-dimension",
    "concept:risk-management",
+   "concept:risk-of-ruin",
+   "concept:risk-reward-ratio",
    "concept:rolling-walk-forward",
    "concept:scalping",
+   "concept:scenario-analysis",
    "concept:selection-bias",
    "concept:sell-side-liquidity",
    "concept:settlement",
@@ -38098,19 +40741,23 @@
    "concept:slippage",
    "concept:smart-money-concept",
    "concept:spot-market",
+   "concept:stop-and-target-engineering",
    "concept:stop-hunt",
    "concept:stop-limit-order",
    "concept:stop-order",
    "concept:strategy-archetype",
    "concept:strategy-design",
+   "concept:strategy-skew",
    "concept:strategy-validation",
    "concept:supply-demand-zone",
    "concept:supply-zone",
    "concept:support-and-resistance",
    "concept:survivorship-bias",
    "concept:swing-trading",
+   "concept:tail-risk",
    "concept:time-based-logic",
    "concept:trade-plan",
+   "concept:trading-rule",
    "concept:trading-style",
    "concept:trading-venue",
    "concept:trailing-stop",
@@ -38129,10 +40776,13 @@
    "fact:cost-of-carry-relationship",
    "fact:market-foundations-core-principles",
    "fact:market-mechanics-core-principles",
+   "fact:per-trade-risk-vs-strategy-risk",
    "fact:price-action-core-principles",
    "fact:put-call-parity",
+   "fact:recovery-mathematics",
    "fact:regime-determines-archetype-effectiveness",
    "fact:risk-is-multi-dimensional",
+   "fact:risk-management-core-principles",
    "fact:square-root-market-impact-rule",
    "fact:strategy-design-core-principles",
    "fact:timeframe-ratio",
@@ -38140,7 +40790,12 @@
    "judgment:market-foundations-best-practices",
    "judgment:market-mechanics-best-practices",
    "judgment:price-action-best-practices",
+   "judgment:reducing-risk-of-ruin",
+   "judgment:risk-management-best-practices",
+   "judgment:scenario-action-plan",
+   "judgment:setting-realistic-target",
    "judgment:strategy-design-best-practices",
+   "judgment:trailing-behavior-after-target",
    "judgment:trend-is-your-friend",
    "procedure:adx-trend-strength",
    "procedure:almgren-chriss-market-impact-model",
@@ -38148,9 +40803,15 @@
    "procedure:atr-trailing-stop",
    "procedure:bearish-fvg-detection",
    "procedure:black-scholes-call-price",
+   "procedure:break-even-stop",
    "procedure:breakout-entry",
    "procedure:bullish-fvg-detection",
    "procedure:calendar-filter",
+   "procedure:capital-allocation-framework",
+   "procedure:concentration-limit",
+   "procedure:correlation-adjusted-position-sizing",
+   "procedure:correlation-stress-testing",
+   "procedure:daily-loss-limit",
    "procedure:dividend-adjustment",
    "procedure:efficiency-ratio",
    "procedure:entry-indicator-based",
@@ -38158,35 +40819,49 @@
    "procedure:entry-statistical-based",
    "procedure:equal-level-detection",
    "procedure:exit-on-indicator",
+   "procedure:fixed-fractional-position-sizing",
    "procedure:fixed-stop",
    "procedure:fixed-target",
    "procedure:fvg-fill-status",
    "procedure:fvg-validity",
    "procedure:garch-model",
    "procedure:handling-missing-data",
+   "procedure:historical-stress-test",
    "procedure:hmm-regime-detection",
    "procedure:holding-period-constraint",
+   "procedure:hypothetical-scenario-construction",
    "procedure:implementation-shortfall",
+   "procedure:kelly-criterion",
+   "procedure:leverage-management",
    "procedure:liquidity-zone-identification",
    "procedure:look-ahead-bias-prevention",
+   "procedure:maximum-drawdown-limit",
+   "procedure:monte-carlo-ruin-estimation",
    "procedure:multi-factor-confirmation",
    "procedure:multiple-testing-correction",
    "procedure:opposing-signal-exit",
    "procedure:outlier-detection",
+   "procedure:parabolic-sar-stop",
    "procedure:parameter-optimization",
    "procedure:parameter-sensitivity",
+   "procedure:progressive-drawdown-response",
    "procedure:pullback-entry",
    "procedure:regime-filter",
    "procedure:returns-t-test",
    "procedure:risk-multiple-target",
+   "procedure:scale-out",
    "procedure:session-filter",
    "procedure:simple-trailing-stop",
    "procedure:slippage-modeling",
    "procedure:sniper-liquidity-seeking",
    "procedure:split-adjustment",
+   "procedure:strategy-risk-assessment",
+   "procedure:structure-based-stop",
    "procedure:structure-break-detection",
    "procedure:survivorship-bias-prevention",
    "procedure:swing-point-identification",
+   "procedure:tail-risk-analysis",
+   "procedure:time-based-drawdown-recovery",
    "procedure:time-based-exit",
    "procedure:time-period-stability",
    "procedure:timeframe-confirmation",
@@ -38195,6 +40870,7 @@
    "procedure:twap",
    "procedure:universe-stability",
    "procedure:value-area-calculation",
+   "procedure:volatility-adjusted-position-sizing",
    "procedure:volatility-filter",
    "procedure:volatility-percentile-regime",
    "procedure:volume-profile",
@@ -38205,12 +40881,17 @@
    "property:atr-percentage",
    "property:basis",
    "property:bollinger-band-width",
+   "property:breakeven-win-rate",
    "property:candle-body-size",
+   "property:capital-utilization-metric",
    "property:component-share",
    "property:concentrated-liquidity-efficiency",
    "property:confluence-score",
+   "property:cool-down-period",
    "property:cross-rate",
    "property:effective-spread",
+   "property:expectancy",
+   "property:expected-shortfall",
    "property:exposure-at-default",
    "property:forward-rate",
    "property:historical-volatility",
@@ -38222,6 +40903,10 @@
    "property:long-position-liquidation-price",
    "property:margin-ratio",
    "property:margin-requirement",
+   "property:max-daily-loss",
+   "property:max-open-trade",
+   "property:max-risk-per-trade",
+   "property:max-weekly-loss",
    "property:netting-benefit",
    "property:notional-value",
    "property:order-flow-delta",
@@ -38229,15 +40914,19 @@
    "property:perpetual-funding-rate",
    "property:pip-value",
    "property:pivot-point",
+   "property:portfolio-beta-and-market-exposure",
    "property:position-profit-loss",
+   "property:position-size",
    "property:price-efficiency-ratio",
    "property:price-impact",
+   "property:profit-lock-rule",
    "property:quoted-spread",
    "property:range-ratio",
    "property:realized-spread",
    "property:relative-spread",
    "property:relative-volume",
    "property:return-amplification",
+   "property:risk-of-ruin-formula",
    "property:short-position-liquidation-price",
    "property:simple-slippage",
    "property:spot-return",
@@ -38245,7 +40934,9 @@
    "property:swap-rollover-calculation",
    "property:tick-value",
    "property:total-return",
+   "property:trading-hour",
    "property:trend-alignment-score",
+   "property:value-at-risk",
    "property:volatility-ratio",
    "property:volume-profile-metric",
    "property:zone-freshness",
@@ -38396,6 +41087,21 @@
     "concept:call-option",
     "kind-of",
     "concept:option"
+   ],
+   [
+    "concept:capital-efficiency",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:capital-efficiency",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:capital-efficiency",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "concept:central-counterparty",
@@ -38558,6 +41264,16 @@
     "concept:market-mechanics"
    ],
    [
+    "concept:correlation-risk",
+    "about",
+    "concept:portfolio-risk"
+   ],
+   [
+    "concept:correlation-risk",
+    "kind-of",
+    "concept:risk-dimension"
+   ],
+   [
     "concept:cross-market-discovery",
     "kind-of",
     "concept:price-discovery"
@@ -38701,6 +41417,31 @@
     "concept:distribution-pattern",
     "kind-of",
     "concept:volume"
+   ],
+   [
+    "concept:drawdown-control",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:drawdown-control",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:drawdown-control",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "concept:drawdown-risk",
+    "about",
+    "concept:drawdown-control"
+   ],
+   [
+    "concept:drawdown-risk",
+    "kind-of",
+    "concept:risk-dimension"
    ],
    [
     "concept:dynamic-level",
@@ -39045,7 +41786,17 @@
    [
     "concept:leverage",
     "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:leverage",
+    "about",
     "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:leverage",
+    "about",
+    "judgment:risk-management-best-practices"
    ],
    [
     "concept:leverage",
@@ -39138,6 +41889,16 @@
     "concept:price-action"
    ],
    [
+    "concept:liquidity-risk",
+    "about",
+    "concept:slippage"
+   ],
+   [
+    "concept:liquidity-risk",
+    "kind-of",
+    "concept:risk-dimension"
+   ],
+   [
     "concept:lit-exchange",
     "about",
     "concept:price-discovery"
@@ -39190,7 +41951,17 @@
    [
     "concept:margin",
     "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:margin",
+    "about",
     "judgment:market-mechanics-best-practices"
+   ],
+   [
+    "concept:margin",
+    "about",
+    "judgment:risk-management-best-practices"
    ],
    [
     "concept:margin",
@@ -39473,6 +42244,16 @@
     "concept:strategy-design"
    ],
    [
+    "concept:per-trade-risk",
+    "about",
+    "concept:position-sizing"
+   ],
+   [
+    "concept:per-trade-risk",
+    "kind-of",
+    "concept:risk-dimension"
+   ],
+   [
     "concept:perpetual-swap",
     "part-of",
     "concept:market-mechanics"
@@ -39491,6 +42272,41 @@
     "concept:point-of-control",
     "part-of",
     "concept:volume-profile"
+   ],
+   [
+    "concept:portfolio-risk",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:portfolio-risk",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:portfolio-risk",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "concept:position-sizing",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:position-sizing",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:position-sizing",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "concept:position-sizing",
+    "part-of",
+    "concept:trading-rule"
    ],
    [
     "concept:position-trading",
@@ -39583,6 +42399,16 @@
     "concept:strategy-design"
    ],
    [
+    "concept:regime-risk",
+    "about",
+    "concept:market-regime"
+   ],
+   [
+    "concept:regime-risk",
+    "kind-of",
+    "concept:risk-dimension"
+   ],
+   [
     "concept:regime-shift",
     "about",
     "judgment:market-foundations-best-practices"
@@ -39608,9 +42434,49 @@
     "concept:market-participant"
    ],
    [
+    "concept:risk-dimension",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "concept:risk-management",
     "part-of",
     "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:risk-of-ruin",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:risk-of-ruin",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:risk-of-ruin",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "concept:risk-reward-ratio",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:risk-reward-ratio",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:risk-reward-ratio",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "concept:risk-reward-ratio",
+    "part-of",
+    "concept:trading-rule"
    ],
    [
     "concept:rolling-walk-forward",
@@ -39641,6 +42507,21 @@
     "concept:scalping",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "concept:scenario-analysis",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:scenario-analysis",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:scenario-analysis",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "concept:selection-bias",
@@ -39694,6 +42575,11 @@
    ],
    [
     "concept:slippage",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:slippage",
     "part-of",
     "concept:market-foundations"
    ],
@@ -39731,6 +42617,21 @@
     "concept:spot-market",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:stop-and-target-engineering",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:stop-and-target-engineering",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:stop-and-target-engineering",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "concept:stop-hunt",
@@ -39806,6 +42707,16 @@
     "concept:strategy-design",
     "part-of",
     "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:strategy-skew",
+    "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:strategy-skew",
+    "kind-of",
+    "concept:risk-dimension"
    ],
    [
     "concept:strategy-validation",
@@ -39893,6 +42804,26 @@
     "concept:strategy-design"
    ],
    [
+    "concept:tail-risk",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:tail-risk",
+    "about",
+    "property:expected-shortfall"
+   ],
+   [
+    "concept:tail-risk",
+    "about",
+    "property:value-at-risk"
+   ],
+   [
+    "concept:tail-risk",
+    "kind-of",
+    "concept:risk-dimension"
+   ],
+   [
     "concept:time-based-logic",
     "about",
     "fact:strategy-design-core-principles"
@@ -39916,6 +42847,21 @@
     "concept:trade-plan",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "concept:trading-rule",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:trading-rule",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "concept:trading-rule",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "concept:trading-style",
@@ -39946,6 +42892,11 @@
     "concept:trading-venue",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:trailing-stop",
+    "about",
+    "judgment:risk-management-best-practices"
    ],
    [
     "concept:trailing-stop",
@@ -40168,6 +43119,16 @@
     "concept:market-mechanics"
    ],
    [
+    "fact:per-trade-risk-vs-strategy-risk",
+    "about",
+    "fact:risk-is-multi-dimensional"
+   ],
+   [
+    "fact:per-trade-risk-vs-strategy-risk",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "fact:price-action-core-principles",
     "part-of",
     "concept:price-action"
@@ -40186,6 +43147,21 @@
     "fact:put-call-parity",
     "about",
     "concept:put-option"
+   ],
+   [
+    "fact:recovery-mathematics",
+    "about",
+    "concept:drawdown-control"
+   ],
+   [
+    "fact:recovery-mathematics",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "fact:recovery-mathematics",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "fact:regime-determines-archetype-effectiveness",
@@ -40211,6 +43187,11 @@
     "fact:risk-is-multi-dimensional",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "fact:risk-management-core-principles",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "fact:square-root-market-impact-rule",
@@ -40253,6 +43234,11 @@
     "concept:price-action"
    ],
    [
+    "fact:win-rate-is-not-risk",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "judgment:market-foundations-best-practices",
     "part-of",
     "concept:market-foundations"
@@ -40268,9 +43254,69 @@
     "concept:price-action"
    ],
    [
+    "judgment:reducing-risk-of-ruin",
+    "about",
+    "concept:risk-of-ruin"
+   ],
+   [
+    "judgment:reducing-risk-of-ruin",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "judgment:risk-management-best-practices",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "judgment:scenario-action-plan",
+    "about",
+    "concept:scenario-analysis"
+   ],
+   [
+    "judgment:scenario-action-plan",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "judgment:scenario-action-plan",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "judgment:setting-realistic-target",
+    "about",
+    "concept:risk-reward-ratio"
+   ],
+   [
+    "judgment:setting-realistic-target",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "judgment:setting-realistic-target",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "judgment:setting-realistic-target",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "judgment:strategy-design-best-practices",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "judgment:trailing-behavior-after-target",
+    "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "judgment:trailing-behavior-after-target",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "judgment:trend-is-your-friend",
@@ -40335,12 +43381,27 @@
    [
     "procedure:atr-based-stop",
     "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:atr-based-stop",
+    "about",
     "concept:stop-order"
    ],
    [
     "procedure:atr-based-stop",
     "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:atr-based-stop",
+    "about",
     "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:atr-based-stop",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:atr-based-stop",
@@ -40360,7 +43421,17 @@
    [
     "procedure:atr-trailing-stop",
     "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:atr-trailing-stop",
+    "about",
     "concept:trailing-stop"
+   ],
+   [
+    "procedure:atr-trailing-stop",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:atr-trailing-stop",
@@ -40386,6 +43457,21 @@
     "procedure:black-scholes-call-price",
     "about",
     "concept:option"
+   ],
+   [
+    "procedure:break-even-stop",
+    "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:break-even-stop",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:break-even-stop",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:breakout-entry",
@@ -40426,6 +43512,91 @@
     "procedure:calendar-filter",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:capital-allocation-framework",
+    "about",
+    "concept:capital-efficiency"
+   ],
+   [
+    "procedure:capital-allocation-framework",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:concentration-limit",
+    "about",
+    "concept:portfolio-risk"
+   ],
+   [
+    "procedure:concentration-limit",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:concentration-limit",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:concentration-limit",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:correlation-adjusted-position-sizing",
+    "about",
+    "concept:portfolio-risk"
+   ],
+   [
+    "procedure:correlation-adjusted-position-sizing",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:correlation-adjusted-position-sizing",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:correlation-adjusted-position-sizing",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:correlation-stress-testing",
+    "about",
+    "concept:scenario-analysis"
+   ],
+   [
+    "procedure:correlation-stress-testing",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:correlation-stress-testing",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:correlation-stress-testing",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:daily-loss-limit",
+    "about",
+    "concept:drawdown-control"
+   ],
+   [
+    "procedure:daily-loss-limit",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:daily-loss-limit",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:dividend-adjustment",
@@ -40498,6 +43669,16 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:fixed-fractional-position-sizing",
+    "about",
+    "concept:position-sizing"
+   ],
+   [
+    "procedure:fixed-fractional-position-sizing",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "procedure:fixed-stop",
     "about",
     "concept:exit-logic"
@@ -40505,7 +43686,17 @@
    [
     "procedure:fixed-stop",
     "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:fixed-stop",
+    "about",
     "concept:stop-order"
+   ],
+   [
+    "procedure:fixed-stop",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:fixed-stop",
@@ -40516,6 +43707,16 @@
     "procedure:fixed-target",
     "about",
     "concept:exit-logic"
+   ],
+   [
+    "procedure:fixed-target",
+    "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:fixed-target",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:fixed-target",
@@ -40578,6 +43779,21 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:historical-stress-test",
+    "about",
+    "concept:scenario-analysis"
+   ],
+   [
+    "procedure:historical-stress-test",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:historical-stress-test",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "procedure:hmm-regime-detection",
     "about",
     "concept:regime-detection"
@@ -40601,6 +43817,21 @@
     "procedure:holding-period-constraint",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:hypothetical-scenario-construction",
+    "about",
+    "concept:scenario-analysis"
+   ],
+   [
+    "procedure:hypothetical-scenario-construction",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:hypothetical-scenario-construction",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:implementation-shortfall",
@@ -40648,6 +43879,36 @@
     "concept:volume"
    ],
    [
+    "procedure:kelly-criterion",
+    "about",
+    "concept:position-sizing"
+   ],
+   [
+    "procedure:kelly-criterion",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:kelly-criterion",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:leverage-management",
+    "about",
+    "concept:capital-efficiency"
+   ],
+   [
+    "procedure:leverage-management",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:leverage-management",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "procedure:liquidity-zone-identification",
     "about",
     "concept:liquidity-pool"
@@ -40678,6 +43939,41 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:maximum-drawdown-limit",
+    "about",
+    "concept:drawdown-control"
+   ],
+   [
+    "procedure:maximum-drawdown-limit",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:maximum-drawdown-limit",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:maximum-drawdown-limit",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:monte-carlo-ruin-estimation",
+    "about",
+    "concept:risk-of-ruin"
+   ],
+   [
+    "procedure:monte-carlo-ruin-estimation",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:monte-carlo-ruin-estimation",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "procedure:multi-factor-confirmation",
     "about",
     "concept:entry-logic"
@@ -40738,6 +44034,16 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:parabolic-sar-stop",
+    "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:parabolic-sar-stop",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "procedure:parameter-optimization",
     "about",
     "concept:walk-forward-optimization"
@@ -40761,6 +44067,26 @@
     "procedure:parameter-sensitivity",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:progressive-drawdown-response",
+    "about",
+    "concept:drawdown-control"
+   ],
+   [
+    "procedure:progressive-drawdown-response",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:progressive-drawdown-response",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:progressive-drawdown-response",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:pullback-entry",
@@ -40809,8 +44135,28 @@
    ],
    [
     "procedure:risk-multiple-target",
+    "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:risk-multiple-target",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:risk-multiple-target",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:scale-out",
+    "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:scale-out",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:session-filter",
@@ -40915,7 +44261,17 @@
    [
     "procedure:simple-trailing-stop",
     "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:simple-trailing-stop",
+    "about",
     "concept:trailing-stop"
+   ],
+   [
+    "procedure:simple-trailing-stop",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:simple-trailing-stop",
@@ -40951,6 +44307,41 @@
     "procedure:split-adjustment",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:strategy-risk-assessment",
+    "about",
+    "concept:risk-dimension"
+   ],
+   [
+    "procedure:strategy-risk-assessment",
+    "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "procedure:strategy-risk-assessment",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:structure-based-stop",
+    "about",
+    "concept:stop-and-target-engineering"
+   ],
+   [
+    "procedure:structure-based-stop",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:structure-based-stop",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:structure-based-stop",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:structure-break-detection",
@@ -41006,6 +44397,36 @@
     "procedure:swing-point-identification",
     "about",
     "judgment:price-action-best-practices"
+   ],
+   [
+    "procedure:tail-risk-analysis",
+    "about",
+    "concept:scenario-analysis"
+   ],
+   [
+    "procedure:tail-risk-analysis",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:tail-risk-analysis",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "procedure:time-based-drawdown-recovery",
+    "about",
+    "concept:drawdown-control"
+   ],
+   [
+    "procedure:time-based-drawdown-recovery",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:time-based-drawdown-recovery",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:time-based-exit",
@@ -41091,6 +44512,26 @@
     "procedure:value-area-calculation",
     "uses",
     "procedure:volume-profile"
+   ],
+   [
+    "procedure:volatility-adjusted-position-sizing",
+    "about",
+    "concept:position-sizing"
+   ],
+   [
+    "procedure:volatility-adjusted-position-sizing",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "procedure:volatility-adjusted-position-sizing",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "procedure:volatility-adjusted-position-sizing",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "procedure:volatility-filter",
@@ -41228,6 +44669,21 @@
     "procedure:indicator-bollingerbands"
    ],
    [
+    "property:breakeven-win-rate",
+    "about",
+    "concept:risk-reward-ratio"
+   ],
+   [
+    "property:breakeven-win-rate",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "property:breakeven-win-rate",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "property:candle-body-size",
     "about",
     "concept:price-action"
@@ -41241,6 +44697,21 @@
     "property:candle-body-size",
     "uses",
     "procedure:indicator-candlegeometry"
+   ],
+   [
+    "property:capital-utilization-metric",
+    "about",
+    "concept:capital-efficiency"
+   ],
+   [
+    "property:capital-utilization-metric",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "property:capital-utilization-metric",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "property:component-share",
@@ -41283,6 +44754,16 @@
     "property:level-strength-score"
    ],
    [
+    "property:cool-down-period",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "property:cool-down-period",
+    "part-of",
+    "concept:trading-rule"
+   ],
+   [
     "property:cross-rate",
     "about",
     "concept:forex-spot-market"
@@ -41306,6 +44787,36 @@
     "property:effective-spread",
     "about",
     "concept:transaction-cost"
+   ],
+   [
+    "property:expectancy",
+    "about",
+    "concept:risk-reward-ratio"
+   ],
+   [
+    "property:expectancy",
+    "about",
+    "fact:risk-management-core-principles"
+   ],
+   [
+    "property:expectancy",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "property:expectancy",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
+    "property:expected-shortfall",
+    "about",
+    "concept:portfolio-risk"
+   ],
+   [
+    "property:expected-shortfall",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "property:exposure-at-default",
@@ -41433,6 +44944,46 @@
     "property:notional-value"
    ],
    [
+    "property:max-daily-loss",
+    "about",
+    "procedure:daily-loss-limit"
+   ],
+   [
+    "property:max-daily-loss",
+    "part-of",
+    "concept:trading-rule"
+   ],
+   [
+    "property:max-open-trade",
+    "about",
+    "procedure:concentration-limit"
+   ],
+   [
+    "property:max-open-trade",
+    "part-of",
+    "concept:trading-rule"
+   ],
+   [
+    "property:max-risk-per-trade",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "property:max-risk-per-trade",
+    "part-of",
+    "concept:trading-rule"
+   ],
+   [
+    "property:max-weekly-loss",
+    "about",
+    "procedure:maximum-drawdown-limit"
+   ],
+   [
+    "property:max-weekly-loss",
+    "part-of",
+    "concept:trading-rule"
+   ],
+   [
     "property:netting-benefit",
     "about",
     "concept:central-counterparty"
@@ -41518,6 +45069,16 @@
     "concept:support-and-resistance"
    ],
    [
+    "property:portfolio-beta-and-market-exposure",
+    "about",
+    "concept:portfolio-risk"
+   ],
+   [
+    "property:portfolio-beta-and-market-exposure",
+    "part-of",
+    "concept:risk-management"
+   ],
+   [
     "property:position-profit-loss",
     "about",
     "concept:contract-specification"
@@ -41536,6 +45097,16 @@
     "property:position-profit-loss",
     "uses",
     "property:tick-value"
+   ],
+   [
+    "property:position-size",
+    "about",
+    "concept:position-sizing"
+   ],
+   [
+    "property:position-size",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "property:price-efficiency-ratio",
@@ -41561,6 +45132,16 @@
     "property:price-impact",
     "uses",
     "concept:order-flow"
+   ],
+   [
+    "property:profit-lock-rule",
+    "about",
+    "procedure:daily-loss-limit"
+   ],
+   [
+    "property:profit-lock-rule",
+    "part-of",
+    "concept:trading-rule"
    ],
    [
     "property:quoted-spread",
@@ -41631,6 +45212,16 @@
     "property:return-amplification",
     "about",
     "fact:market-mechanics-core-principles"
+   ],
+   [
+    "property:risk-of-ruin-formula",
+    "about",
+    "concept:risk-of-ruin"
+   ],
+   [
+    "property:risk-of-ruin-formula",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "property:short-position-liquidation-price",
@@ -41718,6 +45309,16 @@
     "property:spot-return"
    ],
    [
+    "property:trading-hour",
+    "about",
+    "procedure:session-filter"
+   ],
+   [
+    "property:trading-hour",
+    "part-of",
+    "concept:trading-rule"
+   ],
+   [
     "property:trend-alignment-score",
     "about",
     "concept:multi-timeframe-analysis"
@@ -41736,6 +45337,21 @@
     "property:trend-alignment-score",
     "uses",
     "procedure:trend-classification"
+   ],
+   [
+    "property:value-at-risk",
+    "about",
+    "concept:portfolio-risk"
+   ],
+   [
+    "property:value-at-risk",
+    "about",
+    "judgment:risk-management-best-practices"
+   ],
+   [
+    "property:value-at-risk",
+    "part-of",
+    "concept:risk-management"
    ],
    [
     "property:volatility-ratio",
@@ -41826,12 +45442,20 @@
    "concept:market-mechanics",
    "concept:market-regime",
    "concept:price-action",
+   "concept:risk-management",
    "concept:strategy-design",
    "concept:volatility",
+   "fact:win-rate-is-not-risk",
    "procedure:adx-trend-strength",
+   "procedure:atr-based-stop",
+   "procedure:atr-trailing-stop",
+   "procedure:fixed-stop",
+   "procedure:fixed-target",
    "procedure:indicator-atr",
    "procedure:indicator-obv",
-   "procedure:indicator-vwap"
+   "procedure:indicator-vwap",
+   "procedure:risk-multiple-target",
+   "procedure:simple-trailing-stop"
   ],
   "chapter_instruments-market-mechanics_atoms": 57,
   "chapter_instruments-market-mechanics_relations": 135,
@@ -41852,6 +45476,18 @@
   "chapter_strategy-design_folded": [
    "concept:strategy-design",
    "procedure:adx-trend-strength"
+  ],
+  "chapter_risk-management_atoms": 61,
+  "chapter_risk-management_relations": 185,
+  "chapter_risk-management_folded": [
+   "concept:risk-management",
+   "fact:win-rate-is-not-risk",
+   "procedure:atr-based-stop",
+   "procedure:atr-trailing-stop",
+   "procedure:fixed-stop",
+   "procedure:fixed-target",
+   "procedure:risk-multiple-target",
+   "procedure:simple-trailing-stop"
   ]
  }
 }
