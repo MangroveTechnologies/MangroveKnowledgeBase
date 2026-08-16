@@ -94,14 +94,18 @@ an anchor page in `ontology/wiki/`. Each step below names the command it runs an
    formulas are quantities, rules or identities; which terms the graph already holds under another
    name; which sections break the scaffold.
    *Produces:* a copy at `ontology/raw/<nn>-<chapter-id>.md`, which is what the replay reads.
-2. **Author the chapter's anchor if it has none.** `--parent` names a subject-area node, and only
-   six of the eight chapters have one. A chapter whose anchor is missing needs a page in
-   `ontology/wiki/` — `kind: concept`, `chapter: <chapter-id>`, a Summary, an Explanation, and
-   `## Part of` → `[[Mangrove Knowledge Space]]` — copy `Risk Management.md`. It is created by the
-   wiki stage, so **the whole pipeline reruns**, not just the chapter merge.
-   `tests/test_chapter_replay_is_reproducible.py` fails if a chapter hangs off an anchor no page
-   authors. Chapter 6 (indicators) is the one still missing.
-   *You write:* a markdown page. *Produces:* a node, once the wiki stage runs.
+2. **Check the chapter has an anchor, and author one only if it does not.** `--parent` names the
+   node the chapter hangs off, and it comes from one of two places. Where the library computes the
+   subject, the **code builder** creates it and tags it with the chapter —
+   `concept:indicator` and `concept:technical-analysis` carry `reference_chapter=[CH_INDICATORS]`,
+   so chapter 6 hangs off `concept:indicator` and needs nothing authored. Where nothing in the
+   library computes it — market foundations, risk management — a page in `ontology/wiki/` supplies
+   it: `kind: concept`, `chapter: <chapter-id>`, a Summary, an Explanation, and `## Part of` →
+   `[[Mangrove Knowledge Space]]`; copy `Risk Management.md`. A page is created by the wiki stage,
+   so authoring one means **the whole pipeline reruns**, not just the chapter merge.
+   `tests/test_chapter_replay_is_reproducible.py` fails if a chapter hangs off an anchor that
+   nothing authors.
+   *You write:* a markdown page, or nothing. *Produces:* a node, once the wiki stage runs.
 3. **Declare.** Add the chapter's entry to `CHAPTERS`. A chapter with no entry raises rather than
    building — building without one emits a graph with no taxonomy and says nothing about it.
    *You write:* a dict literal in `chapter_to_atoms.py`. *Produces:* nothing yet.

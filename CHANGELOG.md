@@ -92,8 +92,7 @@ list -- the builder resolves the ones that name their node and reports the rest.
 ### Known gaps
 
 `concept:position-trading` carries one edge: the chapter names it in a comparison table and says
-nothing else about it. The `quantitative-analysis` anchor is empty until chapter 8 lands, and
-chapter 6 has no anchor page yet.
+nothing else about it. The `quantitative-analysis` anchor waits on chapter 8.
 
 216 of 247 signals are modelled. The 20 `onchain` / `defi_pro` signals read provider feeds rather
 than indicator outputs and have no class; 11 read a verdict and never will. All 31 still evaluate.
