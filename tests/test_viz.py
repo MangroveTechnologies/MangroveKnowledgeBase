@@ -908,8 +908,14 @@ console.log(JSON.stringify(probes.map(id => {{
             f"{node['id']}: rows claim {rows_total} between them, the fold takes {node['perType']}"
         assert node["perType"] <= node["combined"], "per-type can never exceed the combined walk"
     signal = next(n for n in out if n["id"] == "procedure:signal-rsi-cross-up")
-    assert all(k == 1 for _, k in signal["rows"]), f"this leaf's rows each reach one node: {signal}"
-    assert signal["perType"] == 4, "four rows, one node each"
+    rows = dict(signal["rows"])
+    # Its three structural edges each go to one node and stop. `about` is not pinned: it reaches
+    # the class the signal is concerned with, and whatever that class is in turn about -- chapter 6
+    # gave `concept:oscillator` edges to the statement lists, so the row legitimately grew.
+    assert all(rows[t] == 1 for t in ("uses", "has-role", "instance-of")), signal
+    assert rows["about"] >= 1, signal
+    assert signal["perType"] == sum(rows.values()), \
+        "the rows partition this leaf's neighbourhood: no node is reached by two of them"
     assert signal["combined"] > signal["perType"], \
         "the combined walk is exactly the bug: it crosses from one edge type onto another"
 

@@ -146,6 +146,20 @@ of two list-valued props merging onto one node.
 `notes` list, and the props merge skipped any key already present — so the block's own notes were
 dropped by the very fix that was recovering text. Both list props union now.
 
+**Containment is not sameness.** Collapsing two wordings when one contained the other threw away
+the sentence that made it longer: the graph held *"Shows both trend direction and overbought/oversold
+conditions"* and the chapter said *"Double-smoothed momentum indicator that shows both…"*. Same rule
+lost *"Where `n` is the lookback period"* off a formula. Equality collapses; length decides which of
+two unequal wordings wins.
+
+**A chapter may improve a docstring, never a sentence somebody wrote.** *"The indicator provide an
+indication of the degree of price volatility"* is not a definition of ATR and the chapter's is, so a
+chapter's definition replaces a **code-derived** summary and the builder's is kept as
+`source_wording`. Applied without that gate it also replaced `concept:liquidity` — *"the ease with
+which an asset can be bought or sold without materially moving its price"* — with a wordier
+paragraph, and stripped a `[[ADX]]` link out of another. The record already says which atoms a
+chapter or a wiki page wrote: `meta.derived_atom_ids`.
+
 **Replay the whole pipeline, not the stage you changed.** The determinism test rebuilt the
 code-derived half and stopped, so four of the five stages were verified only by whoever last ran
 them by hand. Every extractor change is a change to chapters already merged.

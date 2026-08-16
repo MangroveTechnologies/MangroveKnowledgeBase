@@ -154,6 +154,37 @@ Where a block is a code fence instead, the function's **docstring** is the summa
 becomes `formula` — chapter 4's rules are stated as python, and read as prose the summary came out
 as `def fixed_stop_exit(entry_price, current_price, stop_pct=0.02...)`.
 
+### `sub_blocks` — `#### ` headings inside a block, mapped to props
+
+```python
+"sub_blocks": {"Definition": "summary", "Formula": "formula",
+               "Interpretation": "interpretation", "Trading Applications": "applications",
+               "MangroveAI API Reference": "", "Related Trading Signals": ""},
+```
+
+For a chapter that gives each thing a fourth-level scaffold of its own — chapter 6 does it 221
+times. Read as one blob the summary came out as the literal string `#### Definition`, and the
+interpretation, which is the only part the code-derived node does not already hold, was
+indistinguishable from the rest.
+
+An empty target means **declared as dropped**: the API reference restates what the builder wrote
+and is authoritative there, and the signal cross-link is one sentence forty-one times. Undeclared
+`####` headings raise, so a chapter cannot quietly gain one.
+
+Where a sub-block is a fence followed by prose — `#### Formula` then *"Where `n` is the lookback
+period"* — both halves are kept. Taking the code alone dropped every such sentence.
+
+### `sections_group_only` — the section groups, it does not classify
+
+```python
+"sections_group_only": True,
+```
+
+Suppresses the `about` edge a promoted block otherwise draws to its section's subject. Chapter 6
+files RSI under "Momentum Indicators" and the library makes it an oscillator; **28 of its 42 shared
+indicators disagree that way**. The library decides membership, so the section heading is a reading
+aid and nothing more.
+
 ### `tables` — a markdown table whose rows are nodes
 
 ```python

@@ -8,7 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 632 nodes, 1946 edges, in
+carries a formula stating the predicate it computes -- 650 nodes, 2064 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
@@ -65,9 +65,9 @@ signals to 7. Files now: `averaging` 55, `momentum` 56, `oscillator` 30, `volati
 
 ### The knowledge base is in the graph
 
-Five of the eight knowledge-base chapters are now nodes and edges beside the code-derived ones:
-market foundations, instruments and market mechanics, core trading concepts, strategy design and
-risk management.
+Six of the eight knowledge-base chapters are now nodes and edges beside the code-derived ones:
+market foundations, instruments and market mechanics, core trading concepts, strategy design, risk
+management and indicators.
 The merge is an outer join -- where a chapter and the library define the same thing, the node keeps
 both wordings rather than one replacing the other.
 
@@ -85,6 +85,17 @@ shortfall, capital efficiency, expectancy and the break-even win rate, risk of r
 analysis. Where it states a rule chapter 4 already stated -- the fixed stop, the ATR stop, both
 trailing variants, both targets -- the two merge onto one node instead of duplicating, and its
 long argument for why win rate is not risk lands on the one-line claim chapter 3 makes.
+
+The indicators chapter is mostly an enrichment: 42 of the 50 indicators it documents already exist
+as code-derived nodes, and what it adds to them is the reading -- how to interpret the output and
+what to trade on it -- which no docstring carries. Where the graph's summary was a docstring rather
+than a definition, the chapter's definition replaces it and the docstring is kept as
+`source_wording`; a summary that somebody wrote deliberately is never replaced. Its own categories
+are not imposed on the library's: it files RSI under momentum where the library makes it an
+oscillator, so its sections group indicators for a reader without classifying them.
+
+Eight more indicators enter as knowledge without an implementation -- market breadth, VIX, standard
+deviation and Parabolic SAR among them.
 
 Every principle and practice a chapter states now sits on the edge it explains rather than in a
 list -- the builder resolves the ones that name their node and reports the rest.

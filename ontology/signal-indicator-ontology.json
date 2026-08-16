@@ -19,6 +19,21 @@
    "props": {
     "reference_chapter": [
      "indicators"
+    ],
+    "notes": [
+     "Trend indicators are mathematical calculations applied to price data to identify the direction and strength of market trends. They smooth price action to filter noise and reveal underlying directional bias, helping traders align with prevailing market momentum. **Core Principles:** - **Lag vs. Smoothing Trade-off**: More smoothing means more lag but cleaner signals - **Trend Confirmation**: Indicators confirm trend direction, not predict reversals - **Multiple Timeframe Agreement**: Trend indicators across timeframes should align - **Trend Following**: Best used in trending markets, not ranges - **Price Always Leads**: Indicators are derivatives of price; price changes first **Common Use Cases:** - Identifying trend direction for trade bias - Dynamic support/resistance levels - Entry triggers on pullbacks to moving averages - Exit signals when trend indicators turn - Filtering out counter-trend trades ---",
+     "Return indicators measure price changes over time, providing metrics for momentum, performance, and risk-adjusted returns. Unlike oscillators that normalize values, return indicators show actual percentage or absolute changes.",
+     "MangroveAI uses two signal types to categorize trading signals: - **TRIGGER**: Discrete events that occur at specific moments (e.g., crossovers, breakouts). These signals fire once when conditions transition from false to true. - **FILTER**: Continuous state conditions that remain true while conditions persist (e.g., price above MA, RSI overbought). These signals evaluate to true or false at each bar. Note: Terms like \"Entry\" and \"Exit\" are context-dependent. Any signal can be used for entries, exits, or filters depending on your strategy design. ---",
+     "Technical indicators are tools for interpreting market data, not crystal balls for prediction. Effective use requires:",
+     "Select indicators that complement each other (trend + momentum + volume) and match your trading style and timeframe."
+    ],
+    "explanation": "This document provides a comprehensive reference for technical indicators used in trading, organized by category. Each indicator includes its calculation, interpretation, and practical application guidelines. ## Signal Type Classifications MangroveAI uses two signal types to categorize trading signals: - **TRIGGER**: Discrete events that occur at specific moments (e.g., crossovers, breakouts). These signals fire once when conditions transition from false to true. - **FILTER**: Continuous state conditions that remain true while conditions persist (e.g., price above MA, RSI overbought). These signals evaluate to true or false at each bar. Note: Terms like \"Entry\" and \"Exit\" are context-dependent. Any signal can be used for entries, exits, or filters depending on your strategy design.",
+    "applications": [
+     "Understanding the math: Know what each indicator actually measures",
+     "Context awareness: Interpret indicators based on market conditions",
+     "Confirmation: Use multiple indicators from different categories",
+     "Price primacy: Indicators follow price; always consider price action first",
+     "Simplicity: More indicators don't equal better decisions"
     ]
    }
   },
@@ -104,39 +119,42 @@
    "id": "concept:averaging",
    "title": "averaging",
    "kind": "Concept",
-   "summary": "Emits a reference level in price units, produced by averaging over a window.",
+   "summary": "Beyond basic SMA and EMA, numerous moving average variants exist, each with different smoothing characteristics and applications.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
-    ]
+    ],
+    "source_wording": "Emits a reference level in price units, produced by averaging over a window."
    }
   },
   {
    "id": "concept:momentum",
    "title": "momentum",
    "kind": "Concept",
-   "summary": "Measures rate of change -- how fast, and in which direction, the input is moving.",
+   "summary": "Momentum indicators measure the speed or velocity of price changes, helping identify overbought/oversold conditions, divergences, and potential trend reversals. They oscillate around a centerline or within a bounded range.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
-    ]
+    ],
+    "source_wording": "Measures rate of change -- how fast, and in which direction, the input is moving."
    }
   },
   {
    "id": "concept:oscillator",
    "title": "oscillator",
    "kind": "Concept",
-   "summary": "Bounded output where absolute thresholds are meaningful (overbought/oversold).",
+   "summary": "Oscillators are indicators that fluctuate within a bounded range, typically used to identify overbought/oversold conditions and momentum changes. This section provides advanced concepts for oscillator usage.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
-    ]
+    ],
+    "source_wording": "Bounded output where absolute thresholds are meaningful (overbought/oversold)."
    }
   },
   {
@@ -151,6 +169,7 @@
      "indicators",
      "market-foundations"
     ],
+    "source_wording": "Volatility indicators measure the degree of price variation over time, helping traders assess risk, set stop-losses, determine position sizes, and identify potential breakout conditions.",
     "applications": [
      "Adjusting position sizes based on current volatility regime",
      "Switching strategy parameters or entire strategies based on detected regime",
@@ -164,13 +183,14 @@
    "id": "concept:flow",
    "title": "flow",
    "kind": "Concept",
-   "summary": "Running accumulation whose level is arbitrary but whose direction carries meaning.",
+   "summary": "Volume indicators analyze trading volume to confirm price movements, identify accumulation/distribution, and provide insight into the strength of market participation.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "reference_chapter": [
      "indicators"
-    ]
+    ],
+    "source_wording": "Running accumulation whose level is arbitrary but whose direction carries meaning."
    }
   },
   {
@@ -190,7 +210,7 @@
    "id": "procedure:indicator-adi",
    "title": "ADI",
    "kind": "Procedure",
-   "summary": "Acting as leading indicator of price movements.",
+   "summary": "Volume-based indicator measuring the cumulative flow of money into and out of a security.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -243,7 +263,11 @@
       "canonical_name": "Accumulation Distribution Line",
       "description": "running total of volume weighted by where the close sits within the bar's own high-low range. The weight (the Money Flow Multiplier, or Close Location Value) is hard-bounded -1..+1 -- +1 with the close on the high, -1 on the low, 0 at the midpoint -- so a bar can never contribute more than its own volume, unlike VPT. Critically it NEVER LOOKS AT THE PRIOR CLOSE, which is why a security can gap down and close lower while this line RISES, provided the close sits above the bar's midpoint; neither OBV nor VPT can do that. Unbounded, and the level depends on the arbitrary start of the series, so only the shape is meaningful. Zero-range bars (high equals low) are treated as zero flow here -- no source prescribes a convention for that case. Chaikin's original name for it was the Cumulative Money Flow Line"
      }
-    }
+    },
+    "source_wording": "Acting as leading indicator of price movements.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -325,7 +349,7 @@
    "id": "procedure:indicator-adx",
    "title": "ADX",
    "kind": "Procedure",
-   "summary": "The Plus Directional Indicator (+DI) and Minus Directional Indicator (-DI) are derived from smoothed averages of these differences, and measure trend direction over time. These two indicators are often referred to collectively as the Directional Movement Indicator (DMI). The Average Directional Index (ADX) is in turn derived from the smoothed averages of the difference between +DI and -DI, and measures the strength of the trend (regardless of direction) over time. Using these three indicators together, chartists can determine both the direction and strength of the trend.",
+   "summary": "Measures trend strength regardless of direction, derived from the Directional Movement Index (DMI) components +DI and -DI.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -401,7 +425,11 @@
       "canonical_name": "-DI",
       "description": "Minus Directional Indicator: the mirror of +DI for downward movement, with the same hard 0..100 bound and the same 15-bar zero-filled warmup. Crossings of +DI and -DI are the directional signal of Wilder's system"
      }
-    }
+    },
+    "source_wording": "The Plus Directional Indicator (+DI) and Minus Directional Indicator (-DI) are derived from smoothed averages of these differences, and measure trend direction over time. These two indicators are often referred to collectively as the Directional Movement Indicator (DMI). The Average Directional Index (ADX) is in turn derived from the smoothed averages of the difference between +DI and -DI, and measures the strength of the trend (regardless of direction) over time. Using these three indicators together, chartists can determine both the direction and strength of the trend.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -478,7 +506,7 @@
    "id": "procedure:indicator-atr",
    "title": "ATR",
    "kind": "Procedure",
-   "summary": "The indicator provide an indication of the degree of price volatility. Strong moves, in either direction, are often accompanied by large ranges, or large True Ranges.",
+   "summary": "Measures market volatility by calculating the average range of price movement, accounting for gaps.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -537,18 +565,20 @@
      }
     },
     "reference_chapter": [
-     "market-foundations"
+     "market-foundations",
+     "indicators"
     ],
     "chapter_variants": {
      "formula": "TR = max(High - Low, |High - Previous Close|, |Low - Previous Close|)\nATR = EMA(TR, n periods)"
-    }
+    },
+    "source_wording": "The indicator provide an indication of the degree of price volatility. Strong moves, in either direction, are often accompanied by large ranges, or large True Ranges."
    }
   },
   {
    "id": "procedure:indicator-aroon",
    "title": "Aroon",
    "kind": "Procedure",
-   "summary": "Identify when trends are likely to change direction. Aroon Up = ((N - Days Since N-day High) / N) x 100 Aroon Down = ((N - Days Since N-day Low) / N) x 100 Aroon Indicator = Aroon Up - Aroon Down",
+   "summary": "The Aroon indicator measures the time elapsed since the highest high and lowest low over a given period, helping identify trend strength and potential reversals.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -619,14 +649,18 @@
       "canonical_name": "Aroon Oscillator",
       "description": "aroon_up minus aroon_down, hard-bounded -100..100 as a difference of two [0,100] series. Positive favours an uptrend; +/-50 and +/-90 are conventional strength levels, not bounds"
      }
-    }
+    },
+    "source_wording": "Identify when trends are likely to change direction. Aroon Up = ((N - Days Since N-day High) / N) x 100 Aroon Down = ((N - Days Since N-day Low) / N) x 100 Aroon Indicator = Aroon Up - Aroon Down",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-awesomeoscillator",
    "title": "AwesomeOscillator",
    "kind": "Procedure",
-   "summary": "The Awesome Oscillator is an indicator used to measure market momentum. AO calculates the difference of a 34 Period and 5 Period Simple Moving Averages. The Simple Moving Averages that are used are not calculated using closing price but rather each bar's midpoints. AO is generally used to affirm trends or to anticipate possible reversals. MEDIAN PRICE = (HIGH+LOW)/2 AO = SMA(MEDIAN PRICE, 5)-SMA(MEDIAN PRICE, 34)",
+   "summary": "Momentum indicator that measures market momentum using the difference between a 5-period and 34-period simple moving average of the bar's midpoints.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -685,7 +719,11 @@
       "canonical_name": "Awesome Oscillator",
       "description": "5-period SMA minus 34-period SMA of MEDIAN price (high+low)/2, not close. Unbounded and in price units, so not comparable across instruments; zero is a structural level (the two SMAs are equal), not a bound. Plotted as a histogram whose bar colour encodes the change from the prior bar, not the sign -- the saucer and twin-peaks patterns are read from that"
      }
-    }
+    },
+    "source_wording": "The Awesome Oscillator is an indicator used to measure market momentum. AO calculates the difference of a 34 Period and 5 Period Simple Moving Averages. The Simple Moving Averages that are used are not calculated using closing price but rather each bar's midpoints. AO is generally used to affirm trends or to anticipate possible reversals. MEDIAN PRICE = (HIGH+LOW)/2 AO = SMA(MEDIAN PRICE, 5)-SMA(MEDIAN PRICE, 34)",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -850,14 +888,17 @@
       "canonical_name": "%B",
       "description": "position of close between the bands, (close - lband) / (hband - lband). 0 at the lower band, 1 at the upper, but NOT clamped -- exceeds 1 above hband and drops below 0 under lband, which the literature treats as significant rather than as an edge case. NaN when the bands coincide, explicitly guarded here unlike Keltner and Donchian"
      }
-    }
+    },
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-cci",
    "title": "CCI",
    "kind": "Procedure",
-   "summary": "CCI measures the difference between a security's price change and its average price change. High positive readings indicate that prices are well above their average, which is a show of strength. Low negative readings indicate that prices are well below their average, which is a show of weakness.",
+   "summary": "Oscillator measuring current price level relative to average price over a given period, designed to identify cyclical trends.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -920,14 +961,18 @@
       "canonical_name": "CCI",
       "description": "(typical price - its moving average) / (constant * mean absolute deviation) over window. NOT BOUNDED -- the familiar +/-100 band is a distributional convention created by Lambert's 0.015 constant, which he chose so that roughly 70-80% of readings fall inside it; the remainder lie outside BY DESIGN. Observed here from -320 to +327. This implementation computes the TRUE mean absolute deviation, measuring each window's deviations against that window's own mean, which matches the published formula; the common library shortcut of rolling-averaging |tp - rolling_mean| is a different quantity and diverges from this by over 150 CCI points on the same data"
      }
-    }
+    },
+    "source_wording": "CCI measures the difference between a security's price change and its average price change. High positive readings indicate that prices are well above their average, which is a show of strength. Low negative readings indicate that prices are well below their average, which is a show of weakness.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-cmf",
    "title": "CMF",
    "kind": "Procedure",
-   "summary": "It measures the amount of Money Flow Volume over a specific period.",
+   "summary": "Measures the amount of Money Flow Volume over a specific period.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -987,7 +1032,11 @@
       "canonical_name": "Chaikin Money Flow",
       "description": "sum of money-flow volume over sum of volume across window, where the multiplier ((close-low)-(high-close))/(high-low) is +1 at a close on the high and -1 on the low. Hard-bounded -1..1 as a volume-weighted average of a multiplier already confined to that range, but reaching an endpoint would need every bar in the window to close at its extreme -- the practical range is roughly +/-0.5, with +/-0.05 used as a buffer around the zero line. Zero-range bars are treated as ZERO flow here rather than undefined, which the literature does not specify. The multiplier is intrabar only and ignores gaps, a known weakness"
      }
-    }
+    },
+    "source_wording": "It measures the amount of Money Flow Volume over a specific period.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -1496,7 +1545,7 @@
    "id": "procedure:indicator-dema",
    "title": "DEMA",
    "kind": "Procedure",
-   "summary": "Reduces lag of a traditional EMA by applying EMA twice and combining.",
+   "summary": "A smoothing indicator that attempts to eliminate lag associated with traditional moving averages by applying EMA calculation twice.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -1543,14 +1592,18 @@
       "canonical_name": "Double Exponential Moving Average",
       "description": "2*EMA - EMA(EMA), both passes at the same window. Mulloy's construction subtracts the double-smoothed lag from the single-smoothed line, so it tracks closer to price and crosses earlier than an EMA. OVERSHOOT: the negative -EMA(EMA) term means this is NOT a convex combination of the window's prices and can print outside that window's high-low range -- measured on a step change, 53 of 181 bars printed outside, up to 3.46 price units beyond"
      }
-    }
+    },
+    "source_wording": "Reduces lag of a traditional EMA by applying EMA twice and combining.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-dpo",
    "title": "DPO",
    "kind": "Procedure",
-   "summary": "Is an indicator designed to remove trend from price and make it easier to identify cycles.",
+   "summary": "Removes trend from price to identify cycles and overbought/oversold levels relative to a displaced moving average.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -1598,7 +1651,11 @@
       "canonical_name": "Detrended Price Oscillator",
       "description": "close from (window/2 + 1) bars ago minus the current window-period SMA. This is the CAUSAL alignment -- it uses only past data and is lookahead-free, unlike the centred alignment that charting platforms plot, which reaches (window/2 + 1) bars into the future and therefore cannot produce a value on the most recent bar. The trade-off is that this series describes a state (window/2 + 1) bars STALE. Every primary source rules DPO out for momentum signals, overbought/oversold levels and scans -- it exists to identify cycle length by counting bars between its peaks and troughs. Unbounded, in price units, so not comparable across instruments"
      }
-    }
+    },
+    "source_wording": "Is an indicator designed to remove trend from price and make it easier to identify cycles.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -1695,14 +1752,19 @@
       "canonical_name": "simple return",
       "description": "one-bar percent change, (close / prior close - 1) * 100. HARD floor at -100 because prices cannot go below zero; no ceiling. Aggregates MULTIPLICATIVELY -- daily simple returns cannot be summed -- and is asymmetric, since a -50% move needs +100% to recover. It is the correct quantity for aggregating across assets at a point in time. Not a named technical indicator; it is the elementary finance quantity, identical to a 1-period Rate of Change"
      }
-    }
+    },
+    "reference_chapter": [
+     "indicators"
+    ],
+    "daily_return": "Daily Return = ((Close - Close[1]) / Close[1]) * 100\nMeasures the percentage change from the previous bar's close. **Formula**: **Use Cases**: - Track short-term performance - Identify volatility patterns - Risk management (daily drawdown limits)",
+    "cumulative_return": "Cumulative Return = ((Close - Close[start]) / Close[start]) * 100\nMeasures the total percentage change from a starting point. **Formula**: **Use Cases**: - Strategy performance tracking - Benchmark comparison - Target-based exits (e.g., exit at +20% cumulative return)"
    }
   },
   {
    "id": "procedure:indicator-donchianchannel",
    "title": "DonchianChannel",
    "kind": "Procedure",
-   "summary": "CONVENTION: the channel is measured over the `window` bars **preceding** the current one, which is what every source describing Donchian channels specifies -- Donchian's own 4-week rule (\"four preceding full calendar weeks\"), the Original Turtle Trading Rules (\"exceeding the high or low of the preceding 20 days\"), StockCharts, and TC2000. StockCharts states the reason directly: \"A channel break would not be possible if the most recent period was used.\" That is not a stylistic preference. Including the current bar makes a breakout arithmetically impossible: the current high is one of the values the upper band is the maximum of, so close can never exceed it. Measured on 400 bars, `include_current_bar=True` produced 0 closes above the upper band and 0 below the lower; excluding it produced 5 and 9. `include_current_bar=True` is retained for a caller who genuinely wants the raw rolling window -- it is a generic primitive (this is what pandas-ta, bukosabino/`ta` and Pine's `ta.highest` give you), not the Donchian convention, and no source argues for it. This parameter replaces the previous `offset`, which defaulted to the non-standard inclusive form and left each caller to remember to pass `offset=1`. The rename is deliberate: every existing call site now fails loudly on a missing parameter rather than silently changing meaning. Arbitrary additional lag is no longer a parameter -- shift the output series.",
+   "summary": "Price channels formed by the highest high and lowest low over a specified period, used in the famous Turtle Trading system.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -1806,6 +1868,13 @@
       "canonical_name": "none",
       "description": "position of close within the channel, (close - lband) / (hband - lband), computed from the same hband/lband reported alongside it. UNBOUNDED under the default convention: the bands span the preceding bars, so a close that breaks the channel reads below 0 or above 1 -- that excursion IS the breakout, and reading it is the point. Bounded to 0..1 only when include_current_bar=True, where close cannot sit outside its own channel. NaN where the band has zero width"
      }
+    },
+    "source_wording": "CONVENTION: the channel is measured over the `window` bars **preceding** the current one, which is what every source describing Donchian channels specifies -- Donchian's own 4-week rule (\"four preceding full calendar weeks\"), the Original Turtle Trading Rules (\"exceeding the high or low of the preceding 20 days\"), StockCharts, and TC2000. StockCharts states the reason directly: \"A channel break would not be possible if the most recent period was used.\" That is not a stylistic preference. Including the current bar makes a breakout arithmetically impossible: the current high is one of the values the upper band is the maximum of, so close can never exceed it. Measured on 400 bars, `include_current_bar=True` produced 0 closes above the upper band and 0 below the lower; excluding it produced 5 and 9. `include_current_bar=True` is retained for a caller who genuinely wants the raw rolling window -- it is a generic primitive (this is what pandas-ta, bukosabino/`ta` and Pine's `ta.highest` give you), not the Donchian convention, and no source argues for it. This parameter replaces the previous `offset`, which defaulted to the non-standard inclusive form and left each caller to remember to pass `offset=1`. The rename is deliberate: every existing call site now fails loudly on a missing parameter rather than silently changing meaning. Arbitrary additional lag is no longer a parameter -- shift the output series.",
+    "reference_chapter": [
+     "indicators"
+    ],
+    "chapter_variants": {
+     "formula": "Upper Channel = Highest High over n periods\nLower Channel = Lowest Low over n periods\nMiddle Line = (Upper + Lower) / 2\nStandard period: 20"
     }
    }
   },
@@ -1859,7 +1928,10 @@
       "canonical_name": "Exponential Moving Average",
       "description": "recursive average with alpha = 2/(window+1), weighting recent bars more heavily. Infinite memory (IIR): old data never fully leaves, so the whole history is embedded and the weighting halves each time the window doubles. Turns before an SMA of the same length. SEEDING CAVEAT: seeded from the FIRST observation (the statistics convention), not from an SMA of the first `window` bars as StockCharts, TradingView and Fidelity specify -- a warmup-only difference that decays to zero within roughly 100 bars"
      }
-    }
+    },
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -1911,7 +1983,7 @@
    "id": "procedure:indicator-easeofmovement",
    "title": "EaseOfMovement",
    "kind": "Procedure",
-   "summary": "It relate an asset's price change to its volume and is particularly useful for assessing the strength of a trend.",
+   "summary": "Volume-based oscillator that relates price change to volume, showing how easily price moves.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -1977,14 +2049,18 @@
       "canonical_name": "Ease of Movement",
       "description": "simple moving average (not exponential) of eom over window. This is the plotted series; zero-line crossings are its usual signal. The literature is explicit that it confirms other analysis rather than standing alone, since it largely tracks price"
      }
-    }
+    },
+    "source_wording": "It relate an asset's price change to its volume and is particularly useful for assessing the strength of a trend.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-forceindex",
    "title": "ForceIndex",
    "kind": "Procedure",
-   "summary": "It illustrates how strong the actual buying or selling pressure is. High positive values mean there is a strong rising trend, and low values signify a strong downward trend.",
+   "summary": "Combines price change and volume to measure the strength behind price moves.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2036,7 +2112,11 @@
       "canonical_name": "Force Index",
       "description": "Elder's combination of direction, extent and volume: (close - prior close) * volume, smoothed by an EMA. Units are price-change times volume -- not a price, percentage or ratio -- so the scale is arbitrary and readings are NOT comparable across instruments. Unbounded both ways with no normalising term anywhere in the formula. The sign of the unsmoothed 1-period form exactly tracks the close-to-close direction because volume is non-negative; after smoothing that guarantee is lost. Elder pairs a 2-period version for corrections with a 13- or 100-period version for trend"
      }
-    }
+    },
+    "source_wording": "It illustrates how strong the actual buying or selling pressure is. High positive values mean there is a strong rising trend, and low values signify a strong downward trend.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -2178,7 +2258,7 @@
    "id": "procedure:indicator-ichimoku",
    "title": "Ichimoku",
    "kind": "Procedure",
-   "summary": "A comprehensive indicator system providing support/resistance, trend direction, and momentum through five components. **Components:** ``` Tenkan-sen (Conversion Line) = (Highest High + Lowest Low) / 2 over 9 periods Kijun-sen (Base Line) = (Highest High + Lowest Low) / 2 over 26 periods Senkou Span A (Leading Span A) = (Tenkan + Kijun) / 2, plotted 26 periods ahead Senkou Span B (Leading Span B) = (Highest High + Lowest Low) / 2 over 52 periods, plotted 26 periods ahead Chikou Span (Lagging Span) = Current close, plotted 26 periods back ```",
+   "summary": "Tenkan-sen (Conversion Line) = (Highest High + Lowest Low) / 2 over 9 periods Kijun-sen (Base Line) = (Highest High + Lowest Low) / 2 over 26 periods Senkou Span A (Leading Span A) = (Tenkan + Kijun) / 2, plotted 26 periods ahead Senkou Span B (Leading Span B) = (Highest High + Lowest Low) / 2 over 52 periods, plotted 26 periods ahead Chikou Span (Lagging Span) = Current close, plotted 26 periods back A comprehensive indicator system providing support/resistance, trend direction, and momentum through five components. **Components:**",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2283,14 +2363,18 @@
       "canonical_name": "span_b",
       "description": "Senkou Span B: midpoint of the high/low range over window3. Which span is on top is what makes the cloud bullish or bearish."
      }
-    }
+    },
+    "source_wording": "A comprehensive indicator system providing support/resistance, trend direction, and momentum through five components. **Components:** ``` Tenkan-sen (Conversion Line) = (Highest High + Lowest Low) / 2 over 9 periods Kijun-sen (Base Line) = (Highest High + Lowest Low) / 2 over 26 periods Senkou Span A (Leading Span A) = (Tenkan + Kijun) / 2, plotted 26 periods ahead Senkou Span B (Leading Span B) = (Highest High + Lowest Low) / 2 over 52 periods, plotted 26 periods ahead Chikou Span (Lagging Span) = Current close, plotted 26 periods back ```",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-kama",
    "title": "KAMA",
    "kind": "Procedure",
-   "summary": "Moving average designed to account for market noise or volatility. KAMA will closely follow prices when the price swings are relatively small and the noise is low. KAMA will adjust when the price swings widen and follow prices from a greater distance. This trend-following indicator can be used to identify the overall trend, time turning points and filter price movements.",
+   "summary": "An adaptive moving average that adjusts its smoothing based on market volatility\u2014faster during trends, slower during consolidation.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2352,14 +2436,18 @@
       "canonical_name": "Kaufman's Adaptive Moving Average",
       "description": "genuinely data-driven adaptive average: the smoothing constant is recomputed each bar from the efficiency ratio, net directional movement divided by total path length. Efficient trends drive the constant toward the fast bound so the line hugs price; choppy action drives it toward the slow bound so the line nearly stops. A FLAT KAMA is itself information -- it means inefficient, ranging price, not merely unchanged price. The constant is squared, capping effective smoothing near 0.44 rather than 0.67, and stays within (0,1) so the line cannot overshoot. SEEDING CAVEAT: seeded with the price at the first valid bar; StockCharts specifies an initial SMA"
      }
-    }
+    },
+    "source_wording": "Moving average designed to account for market noise or volatility. KAMA will closely follow prices when the price swings are relatively small and the noise is low. KAMA will adjust when the price swings widen and follow prices from a greater distance. This trend-following indicator can be used to identify the overall trend, time turning points and filter price movements.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-kst",
    "title": "KST",
    "kind": "Procedure",
-   "summary": "It is useful to identify major stock market cycle junctures because its formula is weighed to be more greatly influenced by the longer and more dominant time spans, in order to better reflect the primary swings of stock market cycle.",
+   "summary": "Momentum oscillator based on the smoothed rate-of-change for four different timeframes, combined with weights.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2484,7 +2572,11 @@
       "canonical_name": "none",
       "description": "kst minus kst_signal. Convenience histogram; the literature defines only the KST line and its signal, and names no third series"
      }
-    }
+    },
+    "source_wording": "It is useful to identify major stock market cycle junctures because its formula is weighed to be more greatly influenced by the longer and more dominant time spans, in order to better reflect the primary swings of stock market cycle.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -2582,7 +2674,7 @@
    "id": "procedure:indicator-keltnerchannel",
    "title": "KeltnerChannel",
    "kind": "Procedure",
-   "summary": "Keltner Channels are a trend following indicator used to identify reversals with channel breakouts and channel direction. Channels can also be used to identify overbought and oversold levels when the trend is flat.",
+   "summary": "Volatility-based bands using ATR instead of standard deviation, typically around an EMA.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2697,14 +2789,18 @@
       "canonical_name": "none",
       "description": "position of close between the channel lines, (close - lband) / (hband - lband). Unclamped, so it exceeds 1 above the upper line and drops below 0 under the lower. NOT guarded against coinciding bands, unlike BollingerBands, so a zero-width channel can produce inf rather than NaN. No established literature name"
      }
-    }
+    },
+    "source_wording": "Keltner Channels are a trend following indicator used to identify reversals with channel breakouts and channel direction. Channels can also be used to identify overbought and oversold levels when the trend is flat.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-klingervolumeoscillator",
    "title": "KlingerVolumeOscillator",
    "kind": "Procedure",
-   "summary": "The full 1997 construction, as opposed to the simplified signed-volume form in `KVO`. Where the simplified variant weights volume by nothing more than the direction of the typical price change, this weights it by how far the current bar's range departs from a running measurement of range accumulated since the last trend change -- which is the part that gives the original its scale and its character:: tp    = (high + low + close) / 3 trend = +1 if tp > tp[-1] else -1                      # binary, no flat branch dm    = high - low                                     # this bar's range cm    = cm[-1] + dm       if trend == trend[-1]        # accumulate within a trend dm[-1] + dm       otherwise                    # reset on a trend change vf    = volume * abs(2 * (dm / cm - 1)) * trend * 100   # volume force KVO   = EMA(vf, fast) - EMA(vf, slow) signal = EMA(KVO, signal_window) Note `cm` is the reason this cannot be expressed as a rolling window: it is a path-dependent accumulator whose reset points are determined by the trend series itself. SCALE: roughly 145x the simplified `KVO` on identical data and identical 34/55 periods -- measured `[-4,970,310, 5,746,198]` against `[-39,493, 32,593]`. The two are read the same way (sign, slope, crossings of the signal line, and divergence against price) but their levels are not comparable and must never be mixed in one feature set as though they were the same measurement. SOURCING CAVEAT, stated plainly because it is unusual for this package: **the primary source could not be obtained.** Klinger's 1997 *Stocks & Commodities* original sits behind a Cloudflare challenge, and StockCharts has no Klinger page at all. This construction is reconciled across secondary platform documentation -- SierraChart, TradingView, CQG, MotiveWave, QuantShare -- which agree with each other on the formula above. That agreement is the whole of the evidence, and it is also how two incompatible variants came to circulate under one name in the first place.",
+   "summary": "Volume-based oscillator designed to identify long-term money flow trends.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2789,6 +2885,14 @@
       "canonical_name": "Signal Line",
       "description": "EMA of kvo over signal_window; also called the trigger line. Crossings of kvo against it are the primary documented signal"
      }
+    },
+    "source_wording": "The full 1997 construction, as opposed to the simplified signed-volume form in `KVO`. Where the simplified variant weights volume by nothing more than the direction of the typical price change, this weights it by how far the current bar's range departs from a running measurement of range accumulated since the last trend change -- which is the part that gives the original its scale and its character:: tp    = (high + low + close) / 3 trend = +1 if tp > tp[-1] else -1                      # binary, no flat branch dm    = high - low                                     # this bar's range cm    = cm[-1] + dm       if trend == trend[-1]        # accumulate within a trend dm[-1] + dm       otherwise                    # reset on a trend change vf    = volume * abs(2 * (dm / cm - 1)) * trend * 100   # volume force KVO   = EMA(vf, fast) - EMA(vf, slow) signal = EMA(KVO, signal_window) Note `cm` is the reason this cannot be expressed as a rolling window: it is a path-dependent accumulator whose reset points are determined by the trend series itself. SCALE: roughly 145x the simplified `KVO` on identical data and identical 34/55 periods -- measured `[-4,970,310, 5,746,198]` against `[-39,493, 32,593]`. The two are read the same way (sign, slope, crossings of the signal line, and divergence against price) but their levels are not comparable and must never be mixed in one feature set as though they were the same measurement. SOURCING CAVEAT, stated plainly because it is unusual for this package: **the primary source could not be obtained.** Klinger's 1997 *Stocks & Commodities* original sits behind a Cloudflare challenge, and StockCharts has no Klinger page at all. This construction is reconciled across secondary platform documentation -- SierraChart, TradingView, CQG, MotiveWave, QuantShare -- which agree with each other on the formula above. That agreement is the whole of the evidence, and it is also how two incompatible variants came to circulate under one name in the first place.",
+    "reference_chapter": [
+     "indicators"
+    ],
+    "chapter_variants": {
+     "formula": "Volume Force = Volume * |2 * (dm/cm) - 1| * trend * 100\nKVO = EMA(Volume Force, 34) - EMA(Volume Force, 55)\nSignal = EMA(KVO, 13)",
+     "interpretation": "- KVO above zero: Bullish volume pressure - KVO below zero: Bearish volume pressure - KVO crossing signal line: Potential trade signal - Divergences with price indicate weakening trends ---"
     }
    }
   },
@@ -2796,7 +2900,7 @@
    "id": "procedure:indicator-macd",
    "title": "MACD",
    "kind": "Procedure",
-   "summary": "Is a trend-following momentum indicator that shows the relationship between two moving averages of prices.",
+   "summary": "Trend-following momentum indicator showing the relationship between two EMAs of price, consisting of MACD line, Signal line, and Histogram.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2879,7 +2983,11 @@
       "canonical_name": "MACD Histogram",
       "description": "macd minus signal. Crosses zero exactly when macd crosses its signal line, and expands as the two diverge -- Aspray added it to anticipate those crossovers"
      }
-    }
+    },
+    "source_wording": "Is a trend-following momentum indicator that shows the relationship between two moving averages of prices.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -2970,7 +3078,7 @@
    "id": "procedure:indicator-mfi",
    "title": "MFI",
    "kind": "Procedure",
-   "summary": "Uses both price and volume to measure buying and selling pressure. It is positive when the typical price rises (buying pressure) and negative when the typical price declines (selling pressure). A ratio of positive and negative money flow is then plugged into an RSI formula to create an oscillator that moves between zero and one hundred.",
+   "summary": "Volume-weighted RSI that incorporates volume to measure buying and selling pressure.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3030,7 +3138,11 @@
       "canonical_name": "Money Flow Index",
       "description": "volume-weighted RSI: 100 - 100/(1 + positive money flow / negative money flow) over window, where money flow is typical price times volume signed by the direction of typical price. Hard-bounded 0..100 by the same construction as RSI, both sums being non-negative. Bars where typical price is unchanged contribute zero to either side. 80/20 are conventional thresholds; readings beyond 90/10 are described as rare and unsustainable"
      }
-    }
+    },
+    "source_wording": "Uses both price and volume to measure buying and selling pressure. It is positive when the typical price rises (buying pressure) and negative when the typical price declines (selling pressure). A ratio of positive and negative money flow is then plugged into an RSI formula to create an oscillator that moves between zero and one hundred.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -3093,7 +3205,7 @@
    "id": "procedure:indicator-massindex",
    "title": "MassIndex",
    "kind": "Procedure",
-   "summary": "It uses the high-low range to identify trend reversals based on range expansions. It identifies range bulges that can foreshadow a reversal of the current trend.",
+   "summary": "Identifies trend reversals by measuring the range between high and low prices, looking for range expansion followed by contraction.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3152,7 +3264,11 @@
       "canonical_name": "Mass Index",
       "description": "sum over window_slow of the ratio of a single- to a double-smoothed EMA of the high-low range. A pure RANGE-EXPANSION measure with no directional content -- a bulge signals that a reversal is near without saying which way, so it must be paired with a directional indicator. Strictly positive, with no ceiling; it rests near 25 because each of the 25 ratios sits near 1, but readings below 25 are entirely normal when volatility contracts. The reversal bulge at 27 with confirmation back below 26.5 is a conventional signal level, not a bound"
      }
-    }
+    },
+    "source_wording": "It uses the high-low range to identify trend reversals based on range expansions. It identifies range bulges that can foreshadow a reversal of the current trend.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -3340,14 +3456,17 @@
       "canonical_name": "none",
       "description": "EMA of nvi, conventionally over 255 bars (one year). Fosback's statistics are defined against this line, not against the index: roughly a 96% chance of a bull market when NVI sits above it, but only about 53% for a bear market when below -- the bullish reading is strong and the bearish one barely better than a coin flip. The literature gives this series no proper name, referring to it only descriptively. Note this EMA carries no minimum-periods guard, so its earliest values are dominated by the seed rather than by data"
      }
-    }
+    },
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-obv",
    "title": "OBV",
    "kind": "Procedure",
-   "summary": "It relates price and volume in the stock market. OBV is based on a cumulative total volume.",
+   "summary": "Cumulative volume indicator that adds volume on up days and subtracts on down days.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3393,18 +3512,17 @@
      }
     },
     "reference_chapter": [
-     "core-trading-concepts"
+     "core-trading-concepts",
+     "indicators"
     ],
-    "chapter_variants": {
-     "formula": "If Close > Previous_Close: OBV = Previous_OBV + Volume\nIf Close < Previous_Close: OBV = Previous_OBV - Volume\nIf Close = Previous_Close: OBV = Previous_OBV"
-    }
+    "source_wording": "It relates price and volume in the stock market. OBV is based on a cumulative total volume."
    }
   },
   {
    "id": "procedure:indicator-ppo",
    "title": "PPO",
    "kind": "Procedure",
-   "summary": "the difference between two moving averages as a percentage of the larger moving average.",
+   "summary": "Momentum oscillator showing the percentage difference between two EMAs, similar to MACD but normalized.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3487,14 +3605,18 @@
       "canonical_name": "PPO Histogram",
       "description": "ppo minus ppo_signal; anticipates signal-line crossovers the same way the MACD histogram does"
      }
-    }
+    },
+    "source_wording": "the difference between two moving averages as a percentage of the larger moving average.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-pvo",
    "title": "PVO",
    "kind": "Procedure",
-   "summary": "The PVO measures the difference between two volume-based moving averages as a percentage of the larger moving average.",
+   "summary": "Momentum oscillator for volume, showing the percentage difference between two volume EMAs.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3576,14 +3698,18 @@
       "canonical_name": "PVO Histogram",
       "description": "pvo minus pvo_signal. Unbounded either way, being a difference of two bounded-below series"
      }
-    }
+    },
+    "source_wording": "The PVO measures the difference between two volume-based moving averages as a percentage of the larger moving average.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-roc",
    "title": "ROC",
    "kind": "Procedure",
-   "summary": "The Rate-of-Change (ROC) indicator, which is also referred to as simply Momentum, is a pure momentum oscillator that measures the percent change in price from one period to the next. The ROC calculation compares the current price with the price \"n\" periods ago. The plot forms an oscillator that fluctuates above and below the zero line as the Rate-of-Change moves from positive to negative. As a momentum oscillator, ROC signals include centerline crossovers, divergences and overbought-oversold readings.",
+   "summary": "Measures the percentage change in price from one period to another, showing momentum as a percentage.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3631,6 +3757,19 @@
       "canonical_name": "Rate of Change",
       "description": "percent change of close over window: (close - close_n) / close_n * 100. HARD floor at -100 because a security can only fall to zero; no ceiling at all. The conventional +/-10 overbought/oversold band is volatility-dependent (+/-5 for quiet names, +/-15 for volatile ones) and is NOT a bound. The literature warns that ROC divergences fail more often than they work"
      }
+    },
+    "source_wording": "The Rate-of-Change (ROC) indicator, which is also referred to as simply Momentum, is a pure momentum oscillator that measures the percent change in price from one period to the next. The ROC calculation compares the current price with the price \"n\" periods ago. The plot forms an oscillator that fluctuates above and below the zero line as the Rate-of-Change moves from positive to negative. As a momentum oscillator, ROC signals include centerline crossovers, divergences and overbought-oversold readings.",
+    "reference_chapter": [
+     "indicators"
+    ],
+    "notes": [
+     "ROC = ((Close - Close_n) / Close_n) * 100\n\nTypical periods: 9, 12, 25",
+     "- ROC > 0: Upward momentum - ROC < 0: Downward momentum - Rising ROC: Accelerating momentum - Falling ROC: Decelerating momentum ---",
+     "ROC measures the percentage price change over a specified lookback period."
+    ],
+    "crypto_considerations": "- Crypto markets exhibit higher ROC volatility than traditional assets - Adjust thresholds higher for crypto (e.g., \u00b115-20% vs \u00b15-10% for stocks) - Shorter periods (6-9 bars) may work better on lower timeframes (5m, 15m) - Use in conjunction with volume to confirm momentum strength",
+    "chapter_variants": {
+     "formula": "ROC(n) = ((Close - Close[n]) / Close[n]) * 100\nWhere `n` is the lookback period (typically 12 bars)."
     }
    }
   },
@@ -3638,7 +3777,7 @@
    "id": "procedure:indicator-rsi",
    "title": "RSI",
    "kind": "Procedure",
-   "summary": "Compares the magnitude of recent gains and losses over a specified time period to measure speed and change of price movements of a security. It is primarily used to attempt to identify overbought or oversold conditions in the trading of an asset.",
+   "summary": "Oscillator measuring the speed and magnitude of recent price changes to evaluate overbought or oversold conditions, bounded between 0 and 100.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3688,7 +3827,11 @@
       "canonical_name": "Relative Strength Index",
       "description": "Wilder's momentum index, 100 - 100/(1 + avg_gain/avg_loss), with both averages Wilder-smoothed at alpha=1/window. Hard-bounded 0..100 by construction, not by convention: the ratio is non-negative so the expression cannot leave the range. Returns 100 where average loss is zero AND there are gains -- a genuine limit, since the ratio diverges. Returns NaN where there are neither gains nor losses (a perfectly flat window), which is 0/0 with no limit to take; an earlier guard tested only the denominator and returned 100 there, the all-gains answer for a market with no gains. That NaN convention matches StochasticOscillator, WilliamsR and StochRSI. 70/30 and 80/20 are conventional thresholds, NOT bounds; the traversed range shifts with regime (roughly 40-90 in bull markets, 10-60 in bear)"
      }
-    }
+    },
+    "source_wording": "Compares the magnitude of recent gains and losses over a specified time period to measure speed and change of price movements of a security. It is primarily used to attempt to identify overbought or oversold conditions in the trading of an asset.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -3742,7 +3885,10 @@
       "canonical_name": "Simple Moving Average",
       "description": "unweighted arithmetic mean of close over window -- every bar in the window carries equal weight. A finite-window (FIR) average: a value leaving the window changes the line even with no new price action. Lags by construction, and the longer the window the greater the lag"
      }
-    }
+    },
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -3903,7 +4049,7 @@
    "id": "procedure:indicator-stc",
    "title": "STC",
    "kind": "Procedure",
-   "summary": "The Schaff Trend Cycle (STC) is a charting indicator that is commonly used to identify market trends and provide buy and sell signals to traders. Developed in 1999 by noted currency trader Doug Schaff, STC is a type of oscillator and is based on the assumption that, regardless of time frame, currency trends accelerate and decelerate in cyclical patterns.",
+   "summary": "Combines MACD with a stochastic calculation to create a faster, smoother oscillator.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3980,7 +4126,11 @@
       "canonical_name": "STC",
       "description": "MACD line put through two successive rounds of stochastic normalisation, each followed by an EMA smoothing. Hard-bounded 0..100: each normalisation confines its output to that range and each smoothing is a convex combination of values already inside it, so unlike the MACD it is built from, this cannot leave the range. Verified to touch both 0 and 100 exactly. Pins at the extremes for extended stretches, so the turn rather than the level is the signal. 25/75 are the conventional thresholds"
      }
-    }
+    },
+    "source_wording": "The Schaff Trend Cycle (STC) is a charting indicator that is commonly used to identify market trends and provide buy and sell signals to traders. Developed in 1999 by noted currency trader Doug Schaff, STC is a type of oscillator and is based on the assumption that, regardless of time frame, currency trends accelerate and decelerate in cyclical patterns.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -4168,7 +4318,7 @@
    "id": "procedure:indicator-stochasticoscillator",
    "title": "StochasticOscillator",
    "kind": "Procedure",
-   "summary": "Developed in the late 1950s by George Lane. The stochastic oscillator presents the location of the closing price of a stock in relation to the high and low range of the price of a stock over a period of time, typically a 14-day period. VARIANT: this is the **Fast** stochastic. `stoch_k` is the raw %K and `stoch_d` is an SMA of it. The literature distinguishes Fast, Slow (%K itself smoothed, %D an SMA of that) and Full (user-specified smoothing on both); they produce materially different series, and neither the class name nor the parameters say which one this is.",
+   "summary": "Momentum indicator comparing closing price to price range over a specified period, showing where current price stands relative to recent high-low range.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4242,7 +4392,11 @@
       "canonical_name": "%D",
       "description": "signal line: simple moving average of stoch_k over smooth_window. Bounded 0..100 as an average of values already in that range. With the fast %K above, this is Fast %D"
      }
-    }
+    },
+    "source_wording": "Developed in the late 1950s by George Lane. The stochastic oscillator presents the location of the closing price of a stock in relation to the high and low range of the price of a stock over a period of time, typically a 14-day period. VARIANT: this is the **Fast** stochastic. `stoch_k` is the raw %K and `stoch_d` is an SMA of it. The literature distinguishes Fast, Slow (%K itself smoothed, %D an SMA of that) and Full (user-specified smoothing on both); they produce materially different series, and neither the class name nor the parameters say which one this is.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -4398,7 +4552,7 @@
    "id": "procedure:indicator-tema",
    "title": "TEMA",
    "kind": "Procedure",
-   "summary": "Further reduces lag over DEMA by combining three EMA passes.",
+   "summary": "Further reduces lag by applying EMA calculation three times.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4445,7 +4599,11 @@
       "canonical_name": "Triple Exponential Moving Average",
       "description": "3*EMA - 3*EMA(EMA) + EMA(EMA(EMA)), all passes at the same window. The name is a misnomer -- it is not a thrice-smoothed EMA but a composite of single, double and triple EMAs. Least lag of the EMA family and the earliest crossovers, at the cost of more whipsaw in sideways markets. OVERSHOOT: more pronounced than DEMA -- 57 of 181 bars outside the window's range, up to 5.05 price units, from the negative -3*EMA(EMA) term"
      }
-    }
+    },
+    "source_wording": "Further reduces lag over DEMA by combining three EMA passes.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -4508,7 +4666,7 @@
    "id": "procedure:indicator-trix",
    "title": "TRIX",
    "kind": "Procedure",
-   "summary": "Shows the percent rate of change of a triple exponentially smoothed moving average.",
+   "summary": "Triple exponential moving average oscillator that filters out noise and shows the rate of change of a triple-smoothed EMA.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4573,14 +4731,18 @@
       "canonical_name": "signal line",
       "description": "9-period EMA of TRIX. Signal-line crossovers are the primary documented TRIX signal: TRIX crossing above it is bullish, below it bearish. Same units and unbounded domain as TRIX itself, since it is a moving average of that series"
      }
-    }
+    },
+    "source_wording": "Shows the percent rate of change of a triple exponentially smoothed moving average.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-tsi",
    "title": "TSI",
    "kind": "Procedure",
-   "summary": "Shows both trend direction and overbought/oversold conditions.",
+   "summary": "Double-smoothed momentum indicator that shows both trend direction and overbought/oversold conditions.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4635,7 +4797,11 @@
       "canonical_name": "TSI",
       "description": "100 * double-smoothed momentum / double-smoothed absolute momentum, each an EMA over window_slow then an EMA over window_fast of close-to-close change. Hard-bounded -100..100: an EMA is a weighted average with non-negative weights, so the smoothed signed series can never exceed the smoothed absolute series in magnitude at either stage. In practice values cluster far inside, typically within +/-25, and the literature sets no fixed overbought level -- the zero-line crossover is the primary reading"
      }
-    }
+    },
+    "source_wording": "Shows both trend direction and overbought/oversold conditions.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -4748,14 +4914,17 @@
       "canonical_name": "Ulcer Index",
       "description": "downside-only volatility -- the quadratic mean of percentage drawdowns from the highest close in the window, sqrt(mean(r^2)) where r = 100 * (close - rolling_max) / rolling_max. Squaring penalises deep drawdowns disproportionately, so it measures depth and persistence of declines together. Upside contributes nothing, the deliberate difference from standard deviation and from ATR; approaches 0 when price keeps making new highs within the window. This is the rolling-window charting form, NOT Peter Martin's original, which measures retracement against the running peak over the whole sample and yields different values"
      }
-    }
+    },
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-ultimateoscillator",
    "title": "UltimateOscillator",
    "kind": "Procedure",
-   "summary": "Larry Williams' (1976) signal, a momentum oscillator designed to capture momentum across three different timeframes. BP = Close - Minimum(Low or Prior Close). TR = Maximum(High or Prior Close)  -  Minimum(Low or Prior Close) Average7 = (7-period BP Sum) / (7-period TR Sum) Average14 = (14-period BP Sum) / (14-period TR Sum) Average28 = (28-period BP Sum) / (28-period TR Sum) UO = 100 x [(4 x Average7)+(2 x Average14)+Average28]/(4+2+1)",
+   "summary": "Momentum oscillator that combines short, intermediate, and long timeframes to reduce false signals.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4846,14 +5015,18 @@
       "canonical_name": "Ultimate Oscillator",
       "description": "weighted blend of buying pressure over true range across three windows, 100 * (w1*avg1 + w2*avg2 + w3*avg3) / (w1+w2+w3). Each average is a SUM of buying pressure over a SUM of true range, not a mean of per-bar ratios. Hard-bounded 0..100 because buying pressure is non-negative and never exceeds true range on a bar. Blending three horizons is what damps the false divergences a single-period oscillator produces. 30/50/70 are conventional levels"
      }
-    }
+    },
+    "source_wording": "Larry Williams' (1976) signal, a momentum oscillator designed to capture momentum across three different timeframes. BP = Close - Minimum(Low or Prior Close). TR = Maximum(High or Prior Close)  -  Minimum(Low or Prior Close) Average7 = (7-period BP Sum) / (7-period TR Sum) Average14 = (14-period BP Sum) / (14-period TR Sum) Average28 = (28-period BP Sum) / (28-period TR Sum) UO = 100 x [(4 x Average7)+(2 x Average14)+Average28]/(4+2+1)",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
    "id": "procedure:indicator-vpt",
    "title": "VPT",
    "kind": "Procedure",
-   "summary": "Is based on a running cumulative volume that adds or substracts a multiple of the percentage change in share price trend and current volume, depending upon the investment's upward or downward movements.",
+   "summary": "Cumulative indicator that adds or subtracts a portion of volume based on the percentage change in price.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4905,7 +5078,11 @@
       "canonical_name": "Volume-Price Trend",
       "description": "running total of volume weighted by the FRACTIONAL price change, so unlike OBV it commits only a portion of each bar's volume in proportion to how far price moved. That also means the per-bar contribution is UNCAPPED -- a bar that doubles in price contributes twice its volume, where ADI can never exceed one times volume. Unbounded, and the level is explicitly arbitrary: only the shape is used, not the actual total. The core indicator is a raw cumulative sum with NO canonical smoothing; the optional smoothing_factor here is an overlay, and no source standardises a signal-line period. CAVEAT: the dropnans parameter DROPS ROWS, returning a shorter series than the input -- every other indicator in this corpus returns a full-length series aligned to the input index"
      }
-    }
+    },
+    "source_wording": "Is based on a running cumulative volume that adds or substracts a multiple of the percentage change in share price trend and current volume, depending upon the investment's upward or downward movements.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -4974,11 +5151,14 @@
      }
     },
     "reference_chapter": [
-     "core-trading-concepts"
+     "core-trading-concepts",
+     "indicators"
     ],
     "chapter_variants": {
-     "formula": "VWAP = Cumulative(Price * Volume) / Cumulative(Volume)"
-    }
+     "formula": "VWAP = Cumulative(Typical Price * Volume) / Cumulative(Volume)\nTypical Price = (High + Low + Close) / 3",
+     "applications": "- Institutional benchmark for execution quality - Intraday support/resistance - Entry/exit timing - Mean reversion trading ---"
+    },
+    "source_wording": "The average price weighted by volume, representing the average price a security has traded at throughout the day."
    }
   },
   {
@@ -5107,7 +5287,7 @@
    "id": "procedure:indicator-vortex",
    "title": "Vortex",
    "kind": "Procedure",
-   "summary": "It consists of two oscillators that capture positive and negative trend movement. A bullish signal triggers when the positive trend indicator crosses above the negative trend indicator or a key level.",
+   "summary": "Identifies trend direction and strength by comparing positive and negative trend movements.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -5184,7 +5364,11 @@
       "canonical_name": "none",
       "description": "vortex_pos minus vortex_neg -- greater separation means a stronger trend. The literature names no third Vortex series; five sources were checked"
      }
-    }
+    },
+    "source_wording": "It consists of two oscillators that capture positive and negative trend movement. A bullish signal triggers when the positive trend indicator crosses above the negative trend indicator or a key level.",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -5238,7 +5422,15 @@
       "canonical_name": "Weighted Moving Average",
       "description": "linearly weighted average -- the newest bar carries weight `window`, the next `window-1`, down to 1, normalised by the triangle number window*(window+1)/2. Finite window, so weights reach exactly zero at the edge, unlike the EMA's exponential tail. Not to be confused with VWMA, which weights by volume rather than recency"
      }
-    }
+    },
+    "reference_chapter": [
+     "indicators"
+    ],
+    "notes": [
+     "WMA = Sum(Price_i * Weight_i) / Sum(Weight_i)\nWhere Weight_i = (n - i + 1) for linear weighting",
+     "Gives more weight to recent prices linearly"
+    ],
+    "explanation": "Less lag than SMA, more than EMA"
    }
   },
   {
@@ -5362,7 +5554,7 @@
    "id": "procedure:indicator-williamsr",
    "title": "WilliamsR",
    "kind": "Procedure",
-   "summary": "Developed by Larry Williams, Williams %R is a momentum indicator that is the inverse of the Fast Stochastic Oscillator. Also referred to as %R, Williams %R reflects the level of the close relative to the highest high for the look-back period. In contrast, the Stochastic Oscillator reflects the level of the close relative to the lowest low. %R corrects for the inversion by multiplying the raw value by -100. As a result, the Fast Stochastic Oscillator and Williams %R produce the exact same lines, only the scaling is different. Williams %R oscillates from 0 to -100. Readings from 0 to -20 are considered overbought. Readings from -80 to -100 are considered oversold. %R = (Highest High - Close)/(Highest High - Lowest Low) * -100",
+   "summary": "Momentum oscillator measuring overbought/oversold levels, similar to stochastic but inverted scale.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -5418,7 +5610,11 @@
       "canonical_name": "%R",
       "description": "-100 * (highest high - close) / (highest high - lowest low) over window. NEGATIVE by construction: hard-bounded -100..0, where 0 means close sat at the window's high and -100 at its low. The minus sign is part of the canonical formula, not a display choice -- a 0..+100 implementation is computing Stochastic %K, not %R. Verified here to equal stoch_k - 100 exactly. -20/-80 are conventional thresholds. NaN when the window's high equals its low"
      }
-    }
+    },
+    "source_wording": "Developed by Larry Williams, Williams %R is a momentum indicator that is the inverse of the Fast Stochastic Oscillator. Also referred to as %R, Williams %R reflects the level of the close relative to the highest high for the look-back period. In contrast, the Stochastic Oscillator reflects the level of the close relative to the lowest low. %R corrects for the inversion by multiplying the raw value by -100. As a result, the Fast Stochastic Oscillator and Williams %R produce the exact same lines, only the scaling is different. Williams %R oscillates from 0 to -100. Readings from 0 to -20 are considered overbought. Readings from -80 to -100 are considered oversold. %R = (Highest High - Close)/(Highest High - Lowest Low) * -100",
+    "reference_chapter": [
+     "indicators"
+    ]
    }
   },
   {
@@ -17576,13 +17772,13 @@
      "Fair Value Gaps identify rebalancing opportunities",
      "Volume Profile & Auction Theory reveals institutional activity and fair value"
     ],
+    "source_wording": "Price action is a trading methodology that analyzes pure price movement on charts without relying on lagging indicators. It focuses on reading candles, bars, and price patterns to understand market psychology and predict future price direction based on historical price behavior.",
     "examples": [
      "Bullish Price Action: Higher highs and higher lows forming Strong closes near candle highs (buyer dominance) Rejection wicks at support levels Volume confirmation on up moves",
      "Bearish Price Action: Lower highs and lower lows forming Strong closes near candle lows (seller dominance) Rejection wicks at resistance levels Volume confirmation on down moves",
      "Reversal Price Action: Long wick candles (hammer, shooting star) Engulfing patterns at key levels Failure to make new highs/lows Climactic volume at extremes"
     ],
     "chapter_variants": {
-     "summary": "Price action is a trading methodology that analyzes pure price movement on charts without relying on lagging indicators. It focuses on reading candles, bars, and price patterns to understand market psychology and predict future price direction based on historical price behavior.",
      "explanation": "This document covers the fundamental analytical frameworks and concepts used by traders to interpret market behavior, identify opportunities, and make trading decisions."
     }
    }
@@ -18196,7 +18392,7 @@
      "Identifying low-liquidity periods to avoid or exploit",
      "Stress-testing strategies for liquidity withdrawal scenarios"
     ],
-    "source_wording": "The ease with which an asset can be bought or sold without significantly affecting its price. High liquidity implies tight spreads, deep order books, and minimal price impact.",
+    "source_wording": "Liquidity theory in trading context refers to understanding where resting orders (stop-losses, pending orders) accumulate in the market, and how price tends to seek out these liquidity pools before making significant moves. It explains why markets often \"hunt\" stops before reversing.",
     "explanation": "High liquidity shows up as a tight [[Bid-Ask Spread]], a deep book and small [[Market Impact]] -- three symptoms of one condition. It is not constant: it varies by time of day and by regime, and displayed size often disappears when it is tested, so the book overstates what is really available. Everything about execution cost follows from it.",
     "examples": [
      "Liquidity Sweep Setup: Identify obvious swing high with clustered stops above Wait for price to spike above high (sweeping liquidity) Look for immediate rejection (long wick, engulfing candle) Enter short with stop above the sweep Target opposing liquidity zone"
@@ -18208,8 +18404,7 @@
       "Entering trades after liquidity sweeps",
       "Understanding why breakouts fail",
       "Identifying where large players likely accumulate/distribute"
-     ],
-     "summary": "Liquidity theory in trading context refers to understanding where resting orders (stop-losses, pending orders) accumulate in the market, and how price tends to seek out these liquidity pools before making significant moves. It explains why markets often \"hunt\" stops before reversing."
+     ]
     }
    }
   },
@@ -18437,7 +18632,7 @@
      "market-foundations",
      "core-trading-concepts"
     ],
-    "source_wording": "Distinct periods characterized by specific volatility patterns, trend behaviors, or correlation structures.",
+    "source_wording": "Markets exist in one of three primary states: trending (directional movement), ranging (sideways consolidation), or transitioning between them. Compression refers to decreasing volatility and range contraction, while expansion refers to increasing volatility and range widening.",
     "explanation": "A regime is a persistent state rather than a mood: markets stay in one until a catalyst moves them, which is why a strategy can work for a year and then stop. The chapter names two by their volatility, [[Low Volatility Regime]] and [[High Volatility Regime]], and correlations behave differently in each -- they compress in calm and converge in stress, so diversification fails exactly when it is needed.",
     "applications": [
      "Selecting appropriate trading strategies for current conditions",
@@ -18445,10 +18640,7 @@
      "Identifying trend exhaustion",
      "Setting realistic profit targets based on market state",
      "Filtering trade signals based on trend alignment"
-    ],
-    "chapter_variants": {
-     "summary": "Markets exist in one of three primary states: trending (directional movement), ranging (sideways consolidation), or transitioning between them. Compression refers to decreasing volatility and range contraction, while expansion refers to increasing volatility and range widening."
-    }
+    ]
    }
   },
   {
@@ -20100,6 +20292,7 @@
      "Blow-up Risk \u00b7 Low \u00b7 High"
     ],
     "caution": "CRITICAL WARNING: Do NOT suggest mean reversion or carry strategies are \"safer\" or \"lower risk\" based on win rate. Their negative skew means tail losses are disproportionately large.",
+    "source_wording": "A common error is equating high win rate with low risk. This is dangerously wrong.",
     "chapter_variants": {
      "explanation": "High win rate strategies feel safer because you win frequently This masks the tail risk: when you lose, you lose big A single large loss can wipe out months of accumulated small wins",
      "comparison": [
@@ -20107,8 +20300,7 @@
       "Trend Following \u00b7 30-40% \u00b7 Positive \u00b7 Moderate \u00b7 Low",
       "Mean Reversion \u00b7 60-70% \u00b7 Negative \u00b7 High \u00b7 High",
       "Carry \u00b7 70-80% \u00b7 Negative \u00b7 High \u00b7 High"
-     ],
-     "summary": "A common error is equating high win rate with low risk. This is dangerously wrong."
+     ]
     }
    }
   },
@@ -20598,11 +20790,10 @@
      "strategy-design"
     ],
     "formula": "ADX > 25: Trending market\nADX < 20: Ranging market\nADX 20-25: Transitional",
-    "source_wording": "Computes adx trend strength.",
+    "source_wording": "Classify regime based on ADX",
     "explanation": "Above twenty-five is a trend, below twenty is a range, and between them is the state in which most strategies are least reliable. It measures how strong a trend is and says nothing about which way it points.",
     "chapter_variants": {
-     "formula": "def adx_regime(adx, trend_threshold=25, range_threshold=20):\n    \"\"\"\n    Classify regime based on ADX\n    \"\"\"\n    if adx > trend_threshold:\n        return 'trending'\n    elif adx < range_threshold:\n        return 'ranging'\n    else:\n        return 'transitional'",
-     "summary": "Classify regime based on ADX"
+     "formula": "def adx_regime(adx, trend_threshold=25, range_threshold=20):\n    \"\"\"\n    Classify regime based on ADX\n    \"\"\"\n    if adx > trend_threshold:\n        return 'trending'\n    elif adx < range_threshold:\n        return 'ranging'\n    else:\n        return 'transitional'"
     }
    }
   },
@@ -22029,9 +22220,7 @@
      "Toolkit: `fixed_percentage_stop`.",
      "Limitations: Doesn't account for asset volatility or market structure."
     ],
-    "chapter_variants": {
-     "summary": "Fixed percentage stops are simple, but volatility is not constant, so this method is easy to mis-calibrate."
-    }
+    "source_wording": "Fixed percentage stops are simple, but volatility is not constant, so this method is easy to mis-calibrate."
    }
   },
   {
@@ -22053,9 +22242,7 @@
      "Calibration rule: pick a multiplier that matches your timeframe and validate it with backtests.",
      "Toolkit: `atr_stop`."
     ],
-    "chapter_variants": {
-     "summary": "ATR-based stops scale with volatility, producing more consistent behavior across assets and regimes."
-    }
+    "source_wording": "ATR-based stops scale with volatility, producing more consistent behavior across assets and regimes."
    }
   },
   {
@@ -22072,9 +22259,7 @@
     ],
     "formula": "def fixed_target_exit(entry_price, current_price, target_pct=0.04, direction='long'):\n    \"\"\"\n    Exit on fixed percentage profit\n    \"\"\"\n    if direction == 'long':\n        target_price = entry_price * (1 + target_pct)\n        exit_signal = current_price >= target_price\n    else:\n        target_price = entry_price * (1 - target_pct)\n        exit_signal = current_price <= target_price\n    return exit_signal, target_price",
     "explanation": "Simple to implement but may leave profits on table",
-    "chapter_variants": {
-     "summary": "Set TP at predetermined price level based on structure or measured move"
-    }
+    "source_wording": "Set TP at predetermined price level based on structure or measured move"
    }
   },
   {
@@ -22091,9 +22276,7 @@
     ],
     "formula": "def risk_multiple_target(entry_price, stop_price, risk_multiple=2.0, direction='long'):\n    \"\"\"\n    Target based on multiple of risk\n    \"\"\"\n    risk = abs(entry_price - stop_price)\n    if direction == 'long':\n        target = entry_price + (risk * risk_multiple)\n    else:\n        target = entry_price - (risk * risk_multiple)\n    return target",
     "explanation": "Ensures favorable risk-reward mathematics",
-    "chapter_variants": {
-     "summary": "TP based on multiples of risk (1.5R, 2R, 3R)"
-    }
+    "source_wording": "TP based on multiples of risk (1.5R, 2R, 3R)"
    }
   },
   {
@@ -22112,9 +22295,7 @@
     "notes": [
      "Toolkit: `percentage_trailing_stop`."
     ],
-    "chapter_variants": {
-     "summary": "Percentage trailing is simple and works best in smooth trends. It often fails in choppy conditions."
-    }
+    "source_wording": "Percentage trailing is simple and works best in smooth trends. It often fails in choppy conditions."
    }
   },
   {
@@ -22133,9 +22314,7 @@
     "notes": [
      "Toolkit: `chandelier_exit`."
     ],
-    "chapter_variants": {
-     "summary": "Chandelier exits adapt to volatility by trailing from the best price by an ATR multiple."
-    }
+    "source_wording": "Chandelier exits adapt to volatility by trailing from the best price by an ATR multiple."
    }
   },
   {
@@ -23451,6 +23630,268 @@
    "props": {
     "reference_chapter": [
      "risk-management"
+    ],
+    "practices": []
+   }
+  },
+  {
+   "id": "procedure:parabolic-sar",
+   "title": "parabolic sar",
+   "kind": "Procedure",
+   "summary": "Stop and Reverse system that provides potential entry/exit points by plotting dots above or below price, indicating trend direction and potential reversal points.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "SAR_tomorrow = SAR_today + AF * (EP - SAR_today)\n\nWhere:\n  AF = Acceleration Factor (starts at 0.02, increments by 0.02, max 0.20)\n  EP = Extreme Point (highest high in uptrend, lowest low in downtrend)",
+    "interpretation": "- Dots below price: Uptrend (long) - Dots above price: Downtrend (short) - Dot flip signals potential trend reversal",
+    "applications": "- Trailing stop-loss placement - Trend direction confirmation - Entry signals when dots flip - Best in trending markets; poor in ranges (whipsaws)"
+   }
+  },
+  {
+   "id": "property:standard-deviation",
+   "title": "standard deviation",
+   "kind": "Property",
+   "summary": "Statistical measure of the dispersion of returns around the mean.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "Variance = Sum((x_i - mean)^2) / (n-1)\nStandard Deviation = sqrt(Variance)\n\nAnnualized Vol = Daily Std Dev * sqrt(252)",
+    "interpretation": "- Higher std dev: More volatile - Lower std dev: Less volatile - Used to normalize comparisons across assets ---"
+   }
+  },
+  {
+   "id": "property:volatility-index",
+   "title": "volatility index",
+   "kind": "Property",
+   "summary": "Market expectation of near-term volatility implied by S&P 500 index option prices.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "interpretation": "- VIX < 15: Low volatility / complacency - VIX 15-20: Normal volatility - VIX 20-30: Elevated volatility / uncertainty - VIX > 30: High volatility / fear - VIX spikes often coincide with market bottoms",
+    "applications": "- Market sentiment gauge - Regime classification - Volatility trading strategies - Portfolio hedging timing ---"
+   }
+  },
+  {
+   "id": "concept:market-breadth",
+   "title": "market breadth",
+   "kind": "Concept",
+   "summary": "Market breadth indicators measure the participation and health of the overall market by analyzing the number of advancing vs. declining stocks, new highs/lows, and other internal market metrics.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ]
+   }
+  },
+  {
+   "id": "procedure:advance-decline-line",
+   "title": "advance-decline line",
+   "kind": "Procedure",
+   "summary": "Cumulative measure of the difference between advancing and declining stocks.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "Daily A/D = Advancing Stocks - Declining Stocks\nA/D Line = Cumulative sum of Daily A/D",
+    "interpretation": "- Rising A/D Line: Broad participation, healthy market - Falling A/D Line: Narrow participation, weak market - A/D divergence from index: Warning signal - A/D making new highs with index: Confirms strength ---"
+   }
+  },
+  {
+   "id": "procedure:mcclellan-oscillator",
+   "title": "mcclellan oscillator",
+   "kind": "Procedure",
+   "summary": "Market breadth oscillator based on the difference between 19-day and 39-day EMAs of daily advance-decline data.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "McClellan Oscillator = EMA(A-D, 19) - EMA(A-D, 39)",
+    "interpretation": "- Oscillator > 0: Bullish breadth - Oscillator < 0: Bearish breadth - Extreme positive readings: Overbought - Extreme negative readings: Oversold - Divergences with price signal potential reversals ---"
+   }
+  },
+  {
+   "id": "procedure:mcclellan-summation-index",
+   "title": "mcclellan summation index",
+   "kind": "Procedure",
+   "summary": "Cumulative sum of the McClellan Oscillator, providing a longer-term view of market breadth.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "Summation Index = Cumulative sum of McClellan Oscillator",
+    "interpretation": "- Rising Summation Index: Bull market environment - Falling Summation Index: Bear market environment - Extreme readings indicate potential reversals ---"
+   }
+  },
+  {
+   "id": "procedure:arms-index",
+   "title": "arms index",
+   "kind": "Procedure",
+   "summary": "Measures the relationship between advancing/declining stocks and advancing/declining volume.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "TRIN = (Advancing Issues / Declining Issues) / (Advancing Volume / Declining Volume)",
+    "interpretation": "- TRIN < 1: Bullish (more volume in advancers) - TRIN > 1: Bearish (more volume in decliners) - TRIN < 0.5: Extremely bullish - TRIN > 2.0: Extremely bearish (often contrarian buy signal) ---"
+   }
+  },
+  {
+   "id": "concept:hidden-divergence",
+   "title": "hidden divergence",
+   "kind": "Concept",
+   "summary": "Bullish Hidden: Price makes higher low, oscillator makes lower low (trend continuation)",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "explanation": "Bearish Hidden: Price makes lower high, oscillator makes higher high (trend continuation)"
+   }
+  },
+  {
+   "id": "concept:failure-swing",
+   "title": "failure swings",
+   "kind": "Concept",
+   "summary": "Bullish Failure Swing: Oscillator fails to reach previous low, then breaks above intervening high",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "explanation": "Bearish Failure Swing: Oscillator fails to reach previous high, then breaks below intervening low"
+   }
+  },
+  {
+   "id": "judgment:oscillator-trend-line",
+   "title": "oscillator trend lines",
+   "kind": "Judgment",
+   "summary": "Draw trend lines on oscillator, not just price",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "explanation": "Oscillator trend line breaks can precede price breaks"
+   }
+  },
+  {
+   "id": "fact:range-shift",
+   "title": "range shift",
+   "kind": "Fact",
+   "summary": "In uptrends: RSI tends to oscillate 40-80 instead of 30-70",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "explanation": "In downtrends: RSI tends to oscillate 20-60 instead of 30-70 Adjust overbought/oversold thresholds based on trend"
+   }
+  },
+  {
+   "id": "procedure:hull-moving-average",
+   "title": "hull moving average (hma)",
+   "kind": "Procedure",
+   "summary": "Significantly reduces lag while maintaining smoothness",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "HMA = WMA(2 * WMA(n/2) - WMA(n), sqrt(n))",
+    "explanation": "Faster response than EMA"
+   }
+  },
+  {
+   "id": "procedure:kaufman-adaptive-moving-average",
+   "title": "kaufman adaptive moving average (kama)",
+   "kind": "Procedure",
+   "summary": "Adapts to market volatility",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "Efficiency Ratio (ER) = Change / Volatility\nSmoothing Constant (SC) = (ER * (Fast - Slow) + Slow)^2\nKAMA = Previous KAMA + SC * (Price - Previous KAMA)",
+    "explanation": "Slow in ranges, fast in trends"
+   }
+  },
+  {
+   "id": "procedure:variable-index-dynamic-average",
+   "title": "variable index dynamic average (vidya)",
+   "kind": "Procedure",
+   "summary": "Volatility-adjusted smoothing",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "explanation": "More responsive during high volatility"
+   }
+  },
+  {
+   "id": "procedure:arnaud-legoux-moving-average",
+   "title": "arnaud legoux moving average (alma)",
+   "kind": "Procedure",
+   "summary": "Smooth with minimal lag",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "formula": "ALMA applies Gaussian distribution weighting",
+    "explanation": "Reduces noise while maintaining responsiveness"
+   }
+  },
+  {
+   "id": "fact:indicator-core-principles",
+   "title": "core principles",
+   "kind": "Fact",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ],
+    "principles": []
+   }
+  },
+  {
+   "id": "judgment:indicator-best-practices",
+   "title": "best practices",
+   "kind": "Judgment",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
     ],
     "practices": []
    }
@@ -40588,6 +41029,950 @@
    "why": "stated across risk-management",
    "from_id": "judgment:risk-management-best-practices",
    "to_id": "concept:risk-management"
+  },
+  {
+   "from": "SMA",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-sma",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "EMA",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-ema",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "DEMA",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-dema",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "TEMA",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-tema",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "ADX",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-adx",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "parabolic sar",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:parabolic-sar",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "Ichimoku",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-ichimoku",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "Aroon",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-aroon",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "WMA",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-wma",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "KAMA",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-kama",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "TRIX",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-trix",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "Vortex",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-vortex",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "DPO",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under trend indicators",
+   "from_id": "procedure:indicator-dpo",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "momentum",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under momentum indicators",
+   "from_id": "concept:momentum",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "RSI",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-rsi",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "MACD",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-macd",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "StochasticOscillator",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-stochasticoscillator",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "CCI",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-cci",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "ROC",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-roc",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "WilliamsR",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-williamsr",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "MFI",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-mfi",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "AwesomeOscillator",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-awesomeoscillator",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "ForceIndex",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-forceindex",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "KST",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-kst",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "PPO",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-ppo",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "STC",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-stc",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "TSI",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-tsi",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "UltimateOscillator",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under momentum indicators",
+   "from_id": "procedure:indicator-ultimateoscillator",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "volatility",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under volatility indicators",
+   "from_id": "concept:volatility",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "BollingerBands",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "procedure:indicator-bollingerbands",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "ATR",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "procedure:indicator-atr",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "KeltnerChannel",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "procedure:indicator-keltnerchannel",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "standard deviation",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "property:standard-deviation",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "volatility index",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "property:volatility-index",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "DonchianChannel",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "procedure:indicator-donchianchannel",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "MassIndex",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "procedure:indicator-massindex",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "UlcerIndex",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volatility indicators",
+   "from_id": "procedure:indicator-ulcerindex",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "flow",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under volume & order flow indicators",
+   "from_id": "concept:flow",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "OBV",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-obv",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "ADI",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-adi",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "VWAP",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-vwap",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "CMF",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-cmf",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "KlingerVolumeOscillator",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-klingervolumeoscillator",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "EaseOfMovement",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-easeofmovement",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "NVI",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-nvi",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "PVO",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-pvo",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "VPT",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under volume & order flow indicators",
+   "from_id": "procedure:indicator-vpt",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "market breadth",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under breadth & market health",
+   "from_id": "concept:market-breadth",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "advance-decline line",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under breadth & market health",
+   "from_id": "procedure:advance-decline-line",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "mcclellan oscillator",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under breadth & market health",
+   "from_id": "procedure:mcclellan-oscillator",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "mcclellan summation index",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under breadth & market health",
+   "from_id": "procedure:mcclellan-summation-index",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "arms index",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under breadth & market health",
+   "from_id": "procedure:arms-index",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "oscillator",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under oscillators deep dive",
+   "from_id": "concept:oscillator",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "hidden divergence",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under oscillators deep dive",
+   "from_id": "concept:hidden-divergence",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "hidden divergence",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "stated under advanced oscillator concepts",
+   "from_id": "concept:hidden-divergence",
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "failure swings",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under oscillators deep dive",
+   "from_id": "concept:failure-swing",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "failure swings",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "stated under advanced oscillator concepts",
+   "from_id": "concept:failure-swing",
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "oscillator trend lines",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under oscillators deep dive",
+   "from_id": "judgment:oscillator-trend-line",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "oscillator trend lines",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "stated under advanced oscillator concepts",
+   "from_id": "judgment:oscillator-trend-line",
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "range shift",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under oscillators deep dive",
+   "from_id": "fact:range-shift",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "range shift",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "stated under advanced oscillator concepts",
+   "from_id": "fact:range-shift",
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "averaging",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under moving average variants",
+   "from_id": "concept:averaging",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "WMA",
+   "rel": "about",
+   "to": "averaging",
+   "why": "stated under moving average types",
+   "from_id": "procedure:indicator-wma",
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "hull moving average (hma)",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under moving average variants",
+   "from_id": "procedure:hull-moving-average",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "hull moving average (hma)",
+   "rel": "about",
+   "to": "averaging",
+   "why": "stated under moving average types",
+   "from_id": "procedure:hull-moving-average",
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "kaufman adaptive moving average (kama)",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under moving average variants",
+   "from_id": "procedure:kaufman-adaptive-moving-average",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "kaufman adaptive moving average (kama)",
+   "rel": "about",
+   "to": "averaging",
+   "why": "stated under moving average types",
+   "from_id": "procedure:kaufman-adaptive-moving-average",
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "variable index dynamic average (vidya)",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under moving average variants",
+   "from_id": "procedure:variable-index-dynamic-average",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "variable index dynamic average (vidya)",
+   "rel": "about",
+   "to": "averaging",
+   "why": "stated under moving average types",
+   "from_id": "procedure:variable-index-dynamic-average",
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "arnaud legoux moving average (alma)",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under moving average variants",
+   "from_id": "procedure:arnaud-legoux-moving-average",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "arnaud legoux moving average (alma)",
+   "rel": "about",
+   "to": "averaging",
+   "why": "stated under moving average types",
+   "from_id": "procedure:arnaud-legoux-moving-average",
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "DailyReturn",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "stated under return indicators",
+   "from_id": "procedure:indicator-dailyreturn",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "advance-decline line",
+   "rel": "about",
+   "to": "market breadth",
+   "why": "the cumulative advance-decline count breadth is read from",
+   "from_id": "procedure:advance-decline-line",
+   "to_id": "concept:market-breadth"
+  },
+  {
+   "from": "mcclellan oscillator",
+   "rel": "uses",
+   "to": "advance-decline line",
+   "why": "the advance-decline data it takes two EMAs of",
+   "from_id": "procedure:mcclellan-oscillator",
+   "to_id": "procedure:advance-decline-line"
+  },
+  {
+   "from": "mcclellan summation index",
+   "rel": "uses",
+   "to": "mcclellan oscillator",
+   "why": "the oscillator it accumulates",
+   "from_id": "procedure:mcclellan-summation-index",
+   "to_id": "procedure:mcclellan-oscillator"
+  },
+  {
+   "from": "arms index",
+   "rel": "about",
+   "to": "market breadth",
+   "why": "advancing issues against advancing volume",
+   "from_id": "procedure:arms-index",
+   "to_id": "concept:market-breadth"
+  },
+  {
+   "from": "standard deviation",
+   "rel": "about",
+   "to": "volatility",
+   "why": "the dispersion the class is defined as",
+   "from_id": "property:standard-deviation",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "volatility index",
+   "rel": "about",
+   "to": "volatility",
+   "why": "the same character, priced from options rather than measured from bars",
+   "from_id": "property:volatility-index",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "volatility index",
+   "rel": "about",
+   "to": "market regimes",
+   "why": "under fifteen is complacency and over thirty is fear: the chapter reads it as a state",
+   "from_id": "property:volatility-index",
+   "to_id": "concept:market-regime"
+  },
+  {
+   "from": "parabolic sar",
+   "rel": "about",
+   "to": "parabolic sar-based",
+   "why": "the dots, and the trailing rule chapter 5 states over them",
+   "from_id": "procedure:parabolic-sar",
+   "to_id": "procedure:parabolic-sar-stop"
+  },
+  {
+   "from": "parabolic sar",
+   "rel": "about",
+   "to": "trailing stop",
+   "why": "its stated use: a stop that follows price and flips with the trend",
+   "from_id": "procedure:parabolic-sar",
+   "to_id": "concept:trailing-stop"
+  },
+  {
+   "from": "oscillator",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Overbought/Oversold: Extreme readings suggest potential reversal but not certainty \u00b7 Bounded Range: Most oscillators move between fixed values (0-100 or centered on zero) \u00b7 Overbought/Oversold: Extreme readings don't guarantee reversals \u00b7 Centerline Significance: Crossing zero or 50 often significant \u00b7 Trend Context: Interpret oscillators differently in trends vs. ranges",
+   "from_id": "concept:oscillator",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "SwingDelta",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Divergence: Momentum diverging from price warns of potential trend change",
+   "from_id": "procedure:indicator-swingdelta",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "momentum",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Trend Confirmation: Momentum should confirm price moves for validity",
+   "from_id": "concept:momentum",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Mean Reversion: Momentum tends to return to neutral over time \u00b7 Mean Reversion: Extreme volatility tends to revert to average",
+   "from_id": "concept:mean-reversion",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "failure swings",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Failure Swings: Momentum failing to reach previous extreme can signal reversal",
+   "from_id": "concept:failure-swing",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "volatility",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volatility Cycles: Markets alternate between high and low volatility periods \u00b7 Volatility Clustering: High volatility tends to follow high volatility",
+   "from_id": "concept:volatility",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "compression",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Breakout Potential: Low volatility often precedes significant moves",
+   "from_id": "concept:compression",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "position sizing",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Risk Adjustment: Volatility should influence position sizing and stops",
+   "from_id": "concept:position-sizing",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volume Confirms Price: Strong moves should be accompanied by strong volume",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "volume",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volume Precedes Price: Volume changes often lead price changes \u00b7 Dry Up Warning: Decreasing volume in a move suggests weakening \u00b7 Effort vs. Result: Compare volume (effort) to price movement (result)",
+   "from_id": "concept:volume",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "climactic volume",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Climactic Volume: Extreme volume often occurs at turning points",
+   "from_id": "concept:climactic-volume",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "market breadth",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Confirmation: Healthy rallies should have broad participation \u00b7 Divergence Warning: Narrow rallies (few stocks leading) are suspect \u00b7 Extremes: Extreme breadth readings often precede reversals \u00b7 Internal vs. External: Breadth reveals what indices may hide \u00b7 Cumulative Analysis: Track breadth trends over time",
+   "from_id": "concept:market-breadth",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "price action",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Divergence Analysis: Comparing oscillator to price action",
+   "from_id": "concept:price-action",
+   "to_id": "fact:indicator-core-principles"
+  },
+  {
+   "from": "Indicator",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use longer-period indicators for trend direction, shorter for entry timing \u00b7 Adjust periods based on asset volatility and trading timeframe \u00b7 Remember that all trend indicators lag; price leads",
+   "from_id": "concept:indicator",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "averaging",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Don't fight the trend shown by major moving averages (50, 200) \u00b7 Match MA type to strategy requirements \u00b7 Test different variants on historical data",
+   "from_id": "concept:averaging",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "oscillator",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine trend indicators with oscillators for complete picture \u00b7 Don't fade strong trends based solely on overbought/oversold \u00b7 Consider trend context when interpreting readings",
+   "from_id": "concept:oscillator",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "momentum",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Don't rely solely on overbought/oversold signals in strong trends \u00b7 Combine momentum with trend indicators for confirmation \u00b7 Adjust overbought/oversold thresholds based on market conditions \u00b7 Use multiple momentum indicators for confluence",
+   "from_id": "concept:momentum",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "SwingDelta",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Look for divergences as early warning, not immediate signals \u00b7 Use divergence as a warning, not an entry trigger",
+   "from_id": "procedure:indicator-swingdelta",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "position sizing",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use ATR for stop-loss and position sizing calculations",
+   "from_id": "concept:position-sizing",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "compression",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Watch for volatility compression as setup for breakouts",
+   "from_id": "concept:compression",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "position size",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Reduce position size during high volatility periods",
+   "from_id": "property:position-size",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "volatility",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Normalize volatility when comparing different assets \u00b7 Remember that volatility is mean-reverting over time \u00b7 Adjust for asset volatility: Crypto needs wider thresholds than stocks",
+   "from_id": "concept:volatility",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Always confirm price breakouts with volume",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "volume",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Watch for volume divergences as early warnings \u00b7 Note that volume patterns differ by asset class",
+   "from_id": "concept:volume",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "VWAP",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use VWAP for intraday trading reference",
+   "from_id": "procedure:indicator-vwap",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "relative volume",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider relative volume (vs. average) not just absolute",
+   "from_id": "property:relative-volume",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "market breadth",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use breadth to confirm index moves \u00b7 Watch for divergences between breadth and price \u00b7 Extreme breadth readings often precede reversals \u00b7 Breadth is most useful for equity indices \u00b7 Combine multiple breadth indicators for confirmation",
+   "from_id": "concept:market-breadth",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "price action",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine oscillator signals with price action confirmation",
+   "from_id": "concept:price-action",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "failure swings",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Look for failure swings for higher probability signals",
+   "from_id": "concept:failure-swing",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "SMA",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use SMA for simplicity and wide recognition (200 SMA)",
+   "from_id": "procedure:indicator-sma",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "EMA",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use EMA for faster response to price changes",
+   "from_id": "procedure:indicator-ema",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "KAMA",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider HMA or KAMA for reduced lag",
+   "from_id": "procedure:indicator-kama",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "ROC",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine with trend indicators: ROC confirms trend direction \u00b7 Watch for divergences: Price and ROC disagreement can signal reversals",
+   "from_id": "procedure:indicator-roc",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "swing trading",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use appropriate periods: Shorter for day trading (6-9), longer for swing trading (12-25)",
+   "from_id": "concept:swing-trading",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "DailyReturn",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider timeframe: Daily returns on 5m bars vs 1d bars have different meanings",
+   "from_id": "procedure:indicator-dailyreturn",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "core principles",
+   "rel": "part-of",
+   "to": "indicator",
+   "why": "stated across indicators",
+   "from_id": "fact:indicator-core-principles",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "best practices",
+   "rel": "part-of",
+   "to": "indicator",
+   "why": "stated across indicators",
+   "from_id": "judgment:indicator-best-practices",
+   "to_id": "concept:indicator"
   }
  ],
  "meta": {
@@ -40672,6 +42057,7 @@
    "concept:exit-logic",
    "concept:exit-signal",
    "concept:expansion",
+   "concept:failure-swing",
    "concept:fair-value-gap",
    "concept:filter-signal",
    "concept:forex-spot-market",
@@ -40680,6 +42066,7 @@
    "concept:fx",
    "concept:greeks",
    "concept:hedge-fund",
+   "concept:hidden-divergence",
    "concept:high-frequency-trader",
    "concept:high-volatility-regime",
    "concept:high-volume-node",
@@ -40701,6 +42088,7 @@
    "concept:low-volatility-regime",
    "concept:low-volume-node",
    "concept:margin",
+   "concept:market-breadth",
    "concept:market-efficiency",
    "concept:market-foundations",
    "concept:market-impact",
@@ -40782,11 +42170,13 @@
    "concept:walk-forward-optimization",
    "fact:constant-product-amm",
    "fact:cost-of-carry-relationship",
+   "fact:indicator-core-principles",
    "fact:market-foundations-core-principles",
    "fact:market-mechanics-core-principles",
    "fact:per-trade-risk-vs-strategy-risk",
    "fact:price-action-core-principles",
    "fact:put-call-parity",
+   "fact:range-shift",
    "fact:recovery-mathematics",
    "fact:regime-determines-archetype-effectiveness",
    "fact:risk-is-multi-dimensional",
@@ -40795,8 +42185,10 @@
    "fact:strategy-design-core-principles",
    "fact:timeframe-ratio",
    "fact:win-rate-is-not-risk",
+   "judgment:indicator-best-practices",
    "judgment:market-foundations-best-practices",
    "judgment:market-mechanics-best-practices",
+   "judgment:oscillator-trend-line",
    "judgment:price-action-best-practices",
    "judgment:reducing-risk-of-ruin",
    "judgment:risk-management-best-practices",
@@ -40805,8 +42197,11 @@
    "judgment:strategy-design-best-practices",
    "judgment:trailing-behavior-after-target",
    "judgment:trend-is-your-friend",
+   "procedure:advance-decline-line",
    "procedure:adx-trend-strength",
    "procedure:almgren-chriss-market-impact-model",
+   "procedure:arms-index",
+   "procedure:arnaud-legoux-moving-average",
    "procedure:atr-based-stop",
    "procedure:atr-trailing-stop",
    "procedure:bearish-fvg-detection",
@@ -40837,18 +42232,23 @@
    "procedure:historical-stress-test",
    "procedure:hmm-regime-detection",
    "procedure:holding-period-constraint",
+   "procedure:hull-moving-average",
    "procedure:hypothetical-scenario-construction",
    "procedure:implementation-shortfall",
+   "procedure:kaufman-adaptive-moving-average",
    "procedure:kelly-criterion",
    "procedure:leverage-management",
    "procedure:liquidity-zone-identification",
    "procedure:look-ahead-bias-prevention",
    "procedure:maximum-drawdown-limit",
+   "procedure:mcclellan-oscillator",
+   "procedure:mcclellan-summation-index",
    "procedure:monte-carlo-ruin-estimation",
    "procedure:multi-factor-confirmation",
    "procedure:multiple-testing-correction",
    "procedure:opposing-signal-exit",
    "procedure:outlier-detection",
+   "procedure:parabolic-sar",
    "procedure:parabolic-sar-stop",
    "procedure:parameter-optimization",
    "procedure:parameter-sensitivity",
@@ -40878,6 +42278,7 @@
    "procedure:twap",
    "procedure:universe-stability",
    "procedure:value-area-calculation",
+   "procedure:variable-index-dynamic-average",
    "procedure:volatility-adjusted-position-sizing",
    "procedure:volatility-filter",
    "procedure:volatility-percentile-regime",
@@ -40938,6 +42339,7 @@
    "property:short-position-liquidation-price",
    "property:simple-slippage",
    "property:spot-return",
+   "property:standard-deviation",
    "property:support-resistance-zone-width",
    "property:swap-rollover-calculation",
    "property:tick-value",
@@ -40945,6 +42347,7 @@
    "property:trading-hour",
    "property:trend-alignment-score",
    "property:value-at-risk",
+   "property:volatility-index",
    "property:volatility-ratio",
    "property:volume-profile-metric",
    "property:zone-freshness",
@@ -40990,6 +42393,16 @@
     "concept:automated-market-maker",
     "kind-of",
     "concept:crypto-specific-mechanics"
+   ],
+   [
+    "concept:averaging",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:averaging",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "concept:backtesting",
@@ -41174,6 +42587,11 @@
    [
     "concept:climactic-volume",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:climactic-volume",
+    "about",
     "fact:price-action-core-principles"
    ],
    [
@@ -41199,7 +42617,17 @@
    [
     "concept:compression",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:compression",
+    "about",
     "fact:price-action-core-principles"
+   ],
+   [
+    "concept:compression",
+    "about",
+    "judgment:indicator-best-practices"
    ],
    [
     "concept:compression",
@@ -41572,6 +43000,26 @@
     "concept:market-regime"
    ],
    [
+    "concept:failure-swing",
+    "about",
+    "concept:oscillator"
+   ],
+   [
+    "concept:failure-swing",
+    "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:failure-swing",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:failure-swing",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "concept:fair-value-gap",
     "about",
     "fact:price-action-core-principles"
@@ -41595,6 +43043,11 @@
     "concept:filter-signal",
     "kind-of",
     "concept:signal-type"
+   ],
+   [
+    "concept:flow",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "concept:forex-spot-market",
@@ -41677,6 +43130,16 @@
     "concept:market-participant"
    ],
    [
+    "concept:hidden-divergence",
+    "about",
+    "concept:oscillator"
+   ],
+   [
+    "concept:hidden-divergence",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "concept:high-frequency-trader",
     "about",
     "judgment:market-foundations-best-practices"
@@ -41750,6 +43213,11 @@
     "concept:iceberg-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:indicator",
+    "about",
+    "judgment:indicator-best-practices"
    ],
    [
     "concept:information-asymmetry",
@@ -41977,6 +43445,21 @@
     "concept:market-mechanics"
    ],
    [
+    "concept:market-breadth",
+    "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:market-breadth",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:market-breadth",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "concept:market-efficiency",
     "about",
     "concept:market-microstructure"
@@ -42129,6 +43612,11 @@
    [
     "concept:mean-reversion",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
     "fact:win-rate-is-not-risk"
    ],
    [
@@ -42145,6 +43633,21 @@
     "concept:mean-reversion",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "concept:momentum",
+    "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:momentum",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:momentum",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "concept:momentum-strategy",
@@ -42220,6 +43723,21 @@
     "concept:order-type",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:oscillator",
+    "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:oscillator",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:oscillator",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "concept:over-the-counter-market",
@@ -42299,7 +43817,17 @@
    [
     "concept:position-sizing",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:position-sizing",
+    "about",
     "fact:risk-management-core-principles"
+   ],
+   [
+    "concept:position-sizing",
+    "about",
+    "judgment:indicator-best-practices"
    ],
    [
     "concept:position-sizing",
@@ -42324,7 +43852,17 @@
    [
     "concept:price-action",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:price-action",
+    "about",
     "fact:price-action-core-principles"
+   ],
+   [
+    "concept:price-action",
+    "about",
+    "judgment:indicator-best-practices"
    ],
    [
     "concept:price-action",
@@ -42808,6 +44346,11 @@
    ],
    [
     "concept:swing-trading",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:swing-trading",
     "kind-of",
     "concept:trading-style"
    ],
@@ -43004,12 +44547,27 @@
    [
     "concept:volatility",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:volatility",
+    "about",
     "fact:market-foundations-core-principles"
    ],
    [
     "concept:volatility",
     "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:volatility",
+    "about",
     "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:volatility",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "concept:volatility",
@@ -43044,7 +44602,17 @@
    [
     "concept:volume",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:volume",
+    "about",
     "fact:price-action-core-principles"
+   ],
+   [
+    "concept:volume",
+    "about",
+    "judgment:indicator-best-practices"
    ],
    [
     "concept:volume",
@@ -43059,7 +44627,17 @@
    [
     "concept:volume-confirmation",
     "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "concept:volume-confirmation",
+    "about",
     "fact:price-action-core-principles"
+   ],
+   [
+    "concept:volume-confirmation",
+    "about",
+    "judgment:indicator-best-practices"
    ],
    [
     "concept:volume-confirmation",
@@ -43122,6 +44700,11 @@
     "judgment:market-mechanics-best-practices"
    ],
    [
+    "fact:indicator-core-principles",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "fact:market-foundations-core-principles",
     "part-of",
     "concept:market-foundations"
@@ -43160,6 +44743,16 @@
     "fact:put-call-parity",
     "about",
     "concept:put-option"
+   ],
+   [
+    "fact:range-shift",
+    "about",
+    "concept:oscillator"
+   ],
+   [
+    "fact:range-shift",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "fact:recovery-mathematics",
@@ -43252,6 +44845,11 @@
     "concept:risk-management"
    ],
    [
+    "judgment:indicator-best-practices",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "judgment:market-foundations-best-practices",
     "part-of",
     "concept:market-foundations"
@@ -43260,6 +44858,16 @@
     "judgment:market-mechanics-best-practices",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "judgment:oscillator-trend-line",
+    "about",
+    "concept:oscillator"
+   ],
+   [
+    "judgment:oscillator-trend-line",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "judgment:price-action-best-practices",
@@ -43347,6 +44955,16 @@
     "concept:price-action"
    ],
    [
+    "procedure:advance-decline-line",
+    "about",
+    "concept:market-breadth"
+   ],
+   [
+    "procedure:advance-decline-line",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "procedure:adx-trend-strength",
     "about",
     "concept:market-regime"
@@ -43385,6 +45003,26 @@
     "procedure:almgren-chriss-market-impact-model",
     "uses",
     "property:historical-volatility"
+   ],
+   [
+    "procedure:arms-index",
+    "about",
+    "concept:market-breadth"
+   ],
+   [
+    "procedure:arms-index",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:arnaud-legoux-moving-average",
+    "about",
+    "concept:averaging"
+   ],
+   [
+    "procedure:arnaud-legoux-moving-average",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "procedure:atr-based-stop",
@@ -43832,6 +45470,16 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:hull-moving-average",
+    "about",
+    "concept:averaging"
+   ],
+   [
+    "procedure:hull-moving-average",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "procedure:hypothetical-scenario-construction",
     "about",
     "concept:scenario-analysis"
@@ -43857,9 +45505,144 @@
     "concept:execution-model"
    ],
    [
+    "procedure:indicator-adi",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-adx",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-aroon",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "procedure:indicator-atr",
     "about",
     "concept:volatility"
+   ],
+   [
+    "procedure:indicator-atr",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-awesomeoscillator",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-bollingerbands",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-cci",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-cmf",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-dailyreturn",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "procedure:indicator-dailyreturn",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-dema",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-donchianchannel",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-dpo",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-easeofmovement",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-ema",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "procedure:indicator-ema",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-forceindex",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-ichimoku",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-kama",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "procedure:indicator-kama",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-keltnerchannel",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-klingervolumeoscillator",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-kst",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-macd",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-massindex",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-mfi",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-nvi",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "procedure:indicator-obv",
@@ -43882,6 +45665,101 @@
     "concept:volume-divergence"
    ],
    [
+    "procedure:indicator-obv",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-ppo",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-pvo",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-roc",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "procedure:indicator-roc",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-rsi",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-sma",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "procedure:indicator-sma",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-stc",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-stochasticoscillator",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-swingdelta",
+    "about",
+    "fact:indicator-core-principles"
+   ],
+   [
+    "procedure:indicator-swingdelta",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "procedure:indicator-tema",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-trix",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-tsi",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-ulcerindex",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-ultimateoscillator",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-vortex",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-vpt",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "procedure:indicator-vwap",
     "about",
     "concept:dynamic-level"
@@ -43890,6 +45768,41 @@
     "procedure:indicator-vwap",
     "about",
     "concept:volume"
+   ],
+   [
+    "procedure:indicator-vwap",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "procedure:indicator-vwap",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-williamsr",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-wma",
+    "about",
+    "concept:averaging"
+   ],
+   [
+    "procedure:indicator-wma",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:kaufman-adaptive-moving-average",
+    "about",
+    "concept:averaging"
+   ],
+   [
+    "procedure:kaufman-adaptive-moving-average",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "procedure:kelly-criterion",
@@ -43972,6 +45885,26 @@
     "concept:risk-management"
    ],
    [
+    "procedure:mcclellan-oscillator",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:mcclellan-oscillator",
+    "uses",
+    "procedure:advance-decline-line"
+   ],
+   [
+    "procedure:mcclellan-summation-index",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:mcclellan-summation-index",
+    "uses",
+    "procedure:mcclellan-oscillator"
+   ],
+   [
     "procedure:monte-carlo-ruin-estimation",
     "about",
     "concept:risk-of-ruin"
@@ -44045,6 +45978,21 @@
     "procedure:outlier-detection",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:parabolic-sar",
+    "about",
+    "concept:trailing-stop"
+   ],
+   [
+    "procedure:parabolic-sar",
+    "about",
+    "procedure:parabolic-sar-stop"
+   ],
+   [
+    "procedure:parabolic-sar",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "procedure:parabolic-sar-stop",
@@ -44525,6 +46473,16 @@
     "procedure:value-area-calculation",
     "uses",
     "procedure:volume-profile"
+   ],
+   [
+    "procedure:variable-index-dynamic-average",
+    "about",
+    "concept:averaging"
+   ],
+   [
+    "procedure:variable-index-dynamic-average",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "procedure:volatility-adjusted-position-sizing",
@@ -45118,6 +47076,11 @@
    ],
    [
     "property:position-size",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "property:position-size",
     "part-of",
     "concept:risk-management"
    ],
@@ -45214,6 +47177,11 @@
    [
     "property:relative-volume",
     "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "property:relative-volume",
+    "about",
     "judgment:price-action-best-practices"
    ],
    [
@@ -45260,6 +47228,16 @@
     "property:spot-return",
     "about",
     "concept:spot-market"
+   ],
+   [
+    "property:standard-deviation",
+    "about",
+    "concept:volatility"
+   ],
+   [
+    "property:standard-deviation",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "property:support-resistance-zone-width",
@@ -45367,6 +47345,21 @@
     "concept:risk-management"
    ],
    [
+    "property:volatility-index",
+    "about",
+    "concept:market-regime"
+   ],
+   [
+    "property:volatility-index",
+    "about",
+    "concept:volatility"
+   ],
+   [
+    "property:volatility-index",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "property:volatility-ratio",
     "about",
     "concept:volatility"
@@ -45450,10 +47443,15 @@
    "procedure:indicator-atr"
   ],
   "folded_atom_ids": [
+   "concept:averaging",
+   "concept:flow",
+   "concept:indicator",
    "concept:liquidity",
    "concept:market-foundations",
    "concept:market-mechanics",
    "concept:market-regime",
+   "concept:momentum",
+   "concept:oscillator",
    "concept:price-action",
    "concept:risk-management",
    "concept:strategy-design",
@@ -45464,9 +47462,48 @@
    "procedure:atr-trailing-stop",
    "procedure:fixed-stop",
    "procedure:fixed-target",
+   "procedure:indicator-adi",
+   "procedure:indicator-adx",
+   "procedure:indicator-aroon",
    "procedure:indicator-atr",
+   "procedure:indicator-awesomeoscillator",
+   "procedure:indicator-bollingerbands",
+   "procedure:indicator-cci",
+   "procedure:indicator-cmf",
+   "procedure:indicator-dailyreturn",
+   "procedure:indicator-dema",
+   "procedure:indicator-donchianchannel",
+   "procedure:indicator-dpo",
+   "procedure:indicator-easeofmovement",
+   "procedure:indicator-ema",
+   "procedure:indicator-forceindex",
+   "procedure:indicator-ichimoku",
+   "procedure:indicator-kama",
+   "procedure:indicator-keltnerchannel",
+   "procedure:indicator-klingervolumeoscillator",
+   "procedure:indicator-kst",
+   "procedure:indicator-macd",
+   "procedure:indicator-massindex",
+   "procedure:indicator-mfi",
+   "procedure:indicator-nvi",
    "procedure:indicator-obv",
+   "procedure:indicator-ppo",
+   "procedure:indicator-pvo",
+   "procedure:indicator-roc",
+   "procedure:indicator-rsi",
+   "procedure:indicator-sma",
+   "procedure:indicator-stc",
+   "procedure:indicator-stochasticoscillator",
+   "procedure:indicator-tema",
+   "procedure:indicator-trix",
+   "procedure:indicator-tsi",
+   "procedure:indicator-ulcerindex",
+   "procedure:indicator-ultimateoscillator",
+   "procedure:indicator-vortex",
+   "procedure:indicator-vpt",
    "procedure:indicator-vwap",
+   "procedure:indicator-williamsr",
+   "procedure:indicator-wma",
    "procedure:risk-multiple-target",
    "procedure:simple-trailing-stop"
   ],
@@ -45501,6 +47538,58 @@
    "procedure:fixed-target",
    "procedure:risk-multiple-target",
    "procedure:simple-trailing-stop"
+  ],
+  "chapter_indicators_atoms": 18,
+  "chapter_indicators_relations": 118,
+  "chapter_indicators_folded": [
+   "concept:averaging",
+   "concept:flow",
+   "concept:indicator",
+   "concept:momentum",
+   "concept:oscillator",
+   "concept:volatility",
+   "procedure:indicator-adi",
+   "procedure:indicator-adx",
+   "procedure:indicator-aroon",
+   "procedure:indicator-atr",
+   "procedure:indicator-awesomeoscillator",
+   "procedure:indicator-bollingerbands",
+   "procedure:indicator-cci",
+   "procedure:indicator-cmf",
+   "procedure:indicator-dailyreturn",
+   "procedure:indicator-dema",
+   "procedure:indicator-donchianchannel",
+   "procedure:indicator-dpo",
+   "procedure:indicator-easeofmovement",
+   "procedure:indicator-ema",
+   "procedure:indicator-forceindex",
+   "procedure:indicator-ichimoku",
+   "procedure:indicator-kama",
+   "procedure:indicator-keltnerchannel",
+   "procedure:indicator-klingervolumeoscillator",
+   "procedure:indicator-kst",
+   "procedure:indicator-macd",
+   "procedure:indicator-massindex",
+   "procedure:indicator-mfi",
+   "procedure:indicator-nvi",
+   "procedure:indicator-obv",
+   "procedure:indicator-ppo",
+   "procedure:indicator-pvo",
+   "procedure:indicator-roc",
+   "procedure:indicator-rsi",
+   "procedure:indicator-sma",
+   "procedure:indicator-stc",
+   "procedure:indicator-stochasticoscillator",
+   "procedure:indicator-tema",
+   "procedure:indicator-trix",
+   "procedure:indicator-tsi",
+   "procedure:indicator-ulcerindex",
+   "procedure:indicator-ultimateoscillator",
+   "procedure:indicator-vortex",
+   "procedure:indicator-vpt",
+   "procedure:indicator-vwap",
+   "procedure:indicator-williamsr",
+   "procedure:indicator-wma"
   ]
  }
 }

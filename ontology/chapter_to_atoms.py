@@ -1332,6 +1332,242 @@ CHAPTERS: dict[str, dict] = {
             "Include scenarios where multiple risks": "concept:scenario-analysis",
         },
     },
+    "indicators": {
+        # Fifty indicators, forty-two of which the library already holds. What this chapter
+        # adds to those is the reading -- Interpretation and Trading Applications -- which no
+        # docstring carries. Seven more it names and the library does not implement.
+        "taxonomy": set(),
+        # Its sections group indicators the way a trader reaches for them; the library groups
+        # them by what the output measures, and the two disagree for twenty-eight of the
+        # forty-two. The library decides membership, so a section draws no `about` edge.
+        "sections_group_only": True,
+        "sub_blocks": {
+            "Definition": "summary",
+            "Formula": "formula",
+            "Interpretation": "interpretation",
+            "Trading Applications": "applications",
+            "Crypto-Specific Considerations": "crypto_considerations",
+            "Daily Return": "daily_return",
+            "Cumulative Return": "cumulative_return",
+            # The API reference restates what the code-derived node already holds and is
+            # authoritative there; the signal cross-link is the same sentence forty-one times.
+            "MangroveAI API Reference": "",
+            "Related Trading Signals": "",
+        },
+        "blocks_as_nodes": {
+            "Trend Indicators": {
+                "Simple Moving Average (SMA)": "Procedure",
+                "Exponential Moving Average (EMA)": "Procedure",
+                "Double Exponential Moving Average (DEMA)": "Procedure",
+                "Triple Exponential Moving Average (TEMA)": "Procedure",
+                "Average Directional Index (ADX)": "Procedure",
+                "Parabolic SAR": "Procedure",
+                "Ichimoku Cloud": "Procedure",
+                "Aroon": "Procedure",
+                "Weighted Moving Average (WMA)": "Procedure",
+                "KAMA (Kaufman Adaptive Moving Average)": "Procedure",
+                "TRIX": "Procedure",
+                "Vortex Indicator": "Procedure",
+                "DPO (Detrended Price Oscillator)": "Procedure",
+            },
+            "Momentum Indicators": {
+                "Relative Strength Index (RSI)": "Procedure",
+                "Moving Average Convergence Divergence (MACD)": "Procedure",
+                "Stochastic Oscillator": "Procedure",
+                "Commodity Channel Index (CCI)": "Procedure",
+                "Rate of Change (ROC)": "Procedure",
+                "Williams %R": "Procedure",
+                "Money Flow Index (MFI)": "Procedure",
+                "Awesome Oscillator (AO)": "Procedure",
+                "Force Index": "Procedure",
+                "KST (Know Sure Thing)": "Procedure",
+                "PPO (Percentage Price Oscillator)": "Procedure",
+                "STC (Schaff Trend Cycle)": "Procedure",
+                "TSI (True Strength Index)": "Procedure",
+                "Ultimate Oscillator": "Procedure",
+            },
+            "Volatility Indicators": {
+                "Bollinger Bands": "Procedure",
+                "Average True Range (ATR)": "Procedure",
+                "Keltner Channels": "Procedure",
+                "Standard Deviation": "Procedure",
+                "Volatility Index (VIX)": "Procedure",
+                "Donchian Channels": "Procedure",
+                "Mass Index": "Procedure",
+                "Ulcer Index": "Procedure",
+            },
+            "Volume & Order Flow Indicators": {
+                "On-Balance Volume (OBV)": "Procedure",
+                "Accumulation/Distribution Line (ADL)": "Procedure",
+                "Volume Weighted Average Price (VWAP)": "Procedure",
+                "Chaikin Money Flow (CMF)": "Procedure",
+                "Klinger Volume Oscillator": "Procedure",
+                "Ease of Movement (EMV)": "Procedure",
+                "NVI (Negative Volume Index)": "Procedure",
+                "PVO (Percentage Volume Oscillator)": "Procedure",
+                "VPT (Volume Price Trend)": "Procedure",
+            },
+            "Breadth & Market Health": {
+                "Advance-Decline Line": "Procedure",
+                "McClellan Oscillator": "Procedure",
+                "McClellan Summation Index": "Procedure",
+                "Arms Index (TRIN)": "Procedure",
+            },
+            "Return Indicators": {
+                "Rate of Change (ROC)": "Procedure",
+                "Daily and Cumulative Returns": "Procedure",
+            },
+        },
+        "labelled_nodes": {
+            "Advanced Oscillator Concepts": {"Hidden Divergence": "Concept",
+                                             "Failure Swings": "Concept",
+                                             "Oscillator Trend Lines": "Judgment",
+                                             "Range Shift": "Fact"},
+            "Moving Average Types": {"Weighted Moving Average (WMA)": "Procedure",
+                                     "Hull Moving Average (HMA)": "Procedure",
+                                     "Kaufman Adaptive Moving Average (KAMA)": "Procedure",
+                                     "Variable Index Dynamic Average (VIDYA)": "Procedure",
+                                     "Arnaud Legoux Moving Average (ALMA)": "Procedure"},
+        },
+        "rename": {
+            "Accumulation/Distribution Line (ADL)": "procedure:indicator-adi",
+            "Advance-Decline Line": "procedure:advance-decline-line",
+            "Arms Index (TRIN)": "procedure:arms-index",
+            "Aroon": "procedure:indicator-aroon",
+            "Average Directional Index (ADX)": "procedure:indicator-adx",
+            "Average True Range (ATR)": "procedure:indicator-atr",
+            "Awesome Oscillator (AO)": "procedure:indicator-awesomeoscillator",
+            "Bollinger Bands": "procedure:indicator-bollingerbands",
+            "Breadth & Market Health": "concept:market-breadth",
+            "Chaikin Money Flow (CMF)": "procedure:indicator-cmf",
+            "Commodity Channel Index (CCI)": "procedure:indicator-cci",
+            "DPO (Detrended Price Oscillator)": "procedure:indicator-dpo",
+            "Daily and Cumulative Returns": "procedure:indicator-dailyreturn",
+            "Donchian Channels": "procedure:indicator-donchianchannel",
+            "Double Exponential Moving Average (DEMA)": "procedure:indicator-dema",
+            "Ease of Movement (EMV)": "procedure:indicator-easeofmovement",
+            "Exponential Moving Average (EMA)": "procedure:indicator-ema",
+            "Force Index": "procedure:indicator-forceindex",
+            "Ichimoku Cloud": "procedure:indicator-ichimoku",
+            "KAMA (Kaufman Adaptive Moving Average)": "procedure:indicator-kama",
+            "KST (Know Sure Thing)": "procedure:indicator-kst",
+            "Keltner Channels": "procedure:indicator-keltnerchannel",
+            "Klinger Volume Oscillator": "procedure:indicator-klingervolumeoscillator",
+            "Mass Index": "procedure:indicator-massindex",
+            "McClellan Oscillator": "procedure:mcclellan-oscillator",
+            "McClellan Summation Index": "procedure:mcclellan-summation-index",
+            "Momentum Indicators": "concept:momentum",
+            "Money Flow Index (MFI)": "procedure:indicator-mfi",
+            "Moving Average Convergence Divergence (MACD)": "procedure:indicator-macd",
+            "Moving Average Variants": "concept:averaging",
+            "NVI (Negative Volume Index)": "procedure:indicator-nvi",
+            "On-Balance Volume (OBV)": "procedure:indicator-obv",
+            "Oscillators Deep Dive": "concept:oscillator",
+            "PPO (Percentage Price Oscillator)": "procedure:indicator-ppo",
+            "PVO (Percentage Volume Oscillator)": "procedure:indicator-pvo",
+            "Parabolic SAR": "procedure:parabolic-sar",
+            "Rate of Change (ROC)": "procedure:indicator-roc",
+            "Relative Strength Index (RSI)": "procedure:indicator-rsi",
+            "STC (Schaff Trend Cycle)": "procedure:indicator-stc",
+            "Simple Moving Average (SMA)": "procedure:indicator-sma",
+            "Standard Deviation": "property:standard-deviation",
+            "Stochastic Oscillator": "procedure:indicator-stochasticoscillator",
+            "TRIX": "procedure:indicator-trix",
+            "TSI (True Strength Index)": "procedure:indicator-tsi",
+            "Triple Exponential Moving Average (TEMA)": "procedure:indicator-tema",
+            "Ulcer Index": "procedure:indicator-ulcerindex",
+            "Ultimate Oscillator": "procedure:indicator-ultimateoscillator",
+            "VPT (Volume Price Trend)": "procedure:indicator-vpt",
+            "Volatility Index (VIX)": "property:volatility-index",
+            "Volatility Indicators": "concept:volatility",
+            "Volume & Order Flow Indicators": "concept:flow",
+            "Volume Weighted Average Price (VWAP)": "procedure:indicator-vwap",
+            "Vortex Indicator": "procedure:indicator-vortex",
+            "Weighted Moving Average (WMA)": "procedure:indicator-wma",
+            "Williams %R": "procedure:indicator-williamsr",
+        },
+        "retitle": {"Breadth & Market Health": "market breadth",
+                    "Volatility Index (VIX)": "volatility index",
+                    "Arms Index (TRIN)": "arms index"},
+        # The breadth indicators are defined in terms of each other, and the two the library does
+        # not implement measure characters it does. All stated in the chapter, none of it drawn.
+        "edges": [
+            ("procedure:advance-decline-line", "about", "concept:market-breadth",
+             "the cumulative advance-decline count breadth is read from"),
+            ("procedure:mcclellan-oscillator", "uses", "procedure:advance-decline-line",
+             "the advance-decline data it takes two EMAs of"),
+            ("procedure:mcclellan-summation-index", "uses", "procedure:mcclellan-oscillator",
+             "the oscillator it accumulates"),
+            ("procedure:arms-index", "about", "concept:market-breadth",
+             "advancing issues against advancing volume"),
+            ("property:standard-deviation", "about", "concept:volatility",
+             "the dispersion the class is defined as"),
+            ("property:volatility-index", "about", "concept:volatility",
+             "the same character, priced from options rather than measured from bars"),
+            ("property:volatility-index", "about", "concept:market-regime",
+             "under fifteen is complacency and over thirty is fear: the chapter reads it as a state"),
+            ("procedure:parabolic-sar", "about", "procedure:parabolic-sar-stop",
+             "the dots, and the trailing rule chapter 5 states over them"),
+            ("procedure:parabolic-sar", "about", "concept:trailing-stop",
+             "its stated use: a stop that follows price and flips with the trend"),
+        ],
+        "wired": {
+            # --- what each class is for -------------------------------------------------------
+            "Overbought/Oversold: Extreme readings suggest": "concept:oscillator",
+            "Overbought/Oversold: Extreme readings don't": "concept:oscillator",
+            "Bounded Range": "concept:oscillator",
+            "Centerline Significance": "concept:oscillator",
+            "Trend Context": "concept:oscillator",
+            "Don't fade strong trends": "concept:oscillator",
+            "Use divergence as a warning": "procedure:indicator-swingdelta",
+            "Consider trend context when interpreting": "concept:oscillator",
+            "Combine trend indicators with oscillators": "concept:oscillator",
+            "Divergence: Momentum diverging from price": "procedure:indicator-swingdelta",
+            "Look for divergences as early warning": "procedure:indicator-swingdelta",
+            "Trend Confirmation": "concept:momentum",
+            "Don't rely solely on overbought/oversold": "concept:momentum",
+            "Combine momentum with trend indicators": "concept:momentum",
+            "Adjust overbought/oversold thresholds": "concept:momentum",
+            "Use multiple momentum indicators": "concept:momentum",
+            # --- volatility -------------------------------------------------------------------
+            "Volatility Cycles": "concept:volatility",
+            "Volatility Clustering": "concept:volatility",
+            "Breakout Potential": "concept:compression",
+            "Watch for volatility compression": "concept:compression",
+            "Normalize volatility when comparing": "concept:volatility",
+            "Remember that volatility is mean-reverting": "concept:volatility",
+            # --- volume -----------------------------------------------------------------------
+            "Volume Confirms Price": "concept:volume-confirmation",
+            "Always confirm price breakouts with volume": "concept:volume-confirmation",
+            "Volume Precedes Price": "concept:volume",
+            "Dry Up Warning": "concept:volume",
+            "Effort vs. Result": "concept:volume",
+            "Watch for volume divergences": "concept:volume",
+            "Note that volume patterns differ": "concept:volume",
+            # --- breadth ----------------------------------------------------------------------
+            "Confirmation: Healthy rallies": "concept:market-breadth",
+            "Divergence Warning": "concept:market-breadth",
+            "Extremes: Extreme breadth readings": "concept:market-breadth",
+            "Internal vs. External": "concept:market-breadth",
+            "Cumulative Analysis": "concept:market-breadth",
+            "Use breadth to confirm index moves": "concept:market-breadth",
+            "Watch for divergences between breadth": "concept:market-breadth",
+            "Extreme breadth readings often precede": "concept:market-breadth",
+            "Breadth is most useful for equity": "concept:market-breadth",
+            "Combine multiple breadth indicators": "concept:market-breadth",
+            # --- moving averages, and indicators in general -----------------------------------
+            "Don't fight the trend shown by major moving averages": "concept:averaging",
+            "Use SMA for simplicity": "procedure:indicator-sma",
+            "Use EMA for faster response": "procedure:indicator-ema",
+            "Match MA type to strategy": "concept:averaging",
+            "Test different variants on historical data": "concept:averaging",
+            "Use longer-period indicators for trend direction": "concept:indicator",
+            "Adjust periods based on asset volatility": "concept:indicator",
+            "Remember that all trend indicators lag": "concept:indicator",
+            "Adjust for asset volatility": "concept:volatility",
+            "Consider timeframe: Daily returns": "procedure:indicator-dailyreturn",
+        },
+    },
 }
 
 #: Blocks inside a taxonomy section that are still NOT kinds: "Regime Shift Triggers" lists causes
@@ -2462,9 +2698,20 @@ AUTHORED: dict[str, tuple[str, str]] = {
 #: `quoted spread` to the bid and ask it reads. `range` uses None for an open end -- Infinity does
 #: not survive a JSON round trip in every consumer, and null means "unbounded" throughout.
 #: Existing nodes whose definition has already been reconciled by hand against this chapter's.
+#: Atoms a chapter or a wiki page wrote, read from the record's own meta. A chapter may improve a
+#: summary the CODE builder generated from a docstring -- "the indicator provide an indication of
+#: the degree of price volatility" is not a definition of ATR -- but it must not overwrite one
+#: somebody wrote deliberately: chapter 3's liquidity lost "the ease with which an asset can be
+#: bought or sold without materially moving its price" to a wordier paragraph that way.
+DOC_DERIVED: set[str] = set()
+
 #: `chapter_variants` means "two wordings, nobody has decided" -- once someone has, recording the
 #: chapter's phrasing as a conflict reports work that is finished as work outstanding.
-RECONCILED = {"concept:volatility"}
+RECONCILED = {"concept:volatility",
+              # VWAP's wording was settled by hand: this series is rolling, not session-anchored,
+              # because a 24/7 market has no session to anchor to. A chapter describing the
+              # textbook session form must not quietly put it back.
+              "procedure:indicator-vwap"}
 
 #: A stated line, and the node it concerns. A principle or a practice lives in its list until it
 #: earns an edge; then it MOVES -- out of the list, onto the edge as that edge's `why`. It is never
@@ -2619,6 +2866,27 @@ def singular(word: str) -> str:
 _ILLUSTRATION = ("instruction:", "buy ", "sell ", "own ", "purchase ")
 
 
+def _same_text(a, b) -> bool:
+    """One text in two shapes.
+
+    The research pass authored `interpretation` and `applications` on the indicators FROM chapter 6,
+    as lists; the chapter states the same bullets and the extractor reads them as one string. Read
+    with `!=`, a list never equals a string, so fifty-eight identical fields were being filed as
+    rival wordings nobody had reconciled. Flatten, strip punctuation, and allow containment -- the
+    string form carries the bullet marks the list form dropped.
+    """
+    def flat(v):
+        if isinstance(v, (list, tuple)):
+            v = " ".join(str(x) for x in v)
+        return " ".join(re.sub(r"[^a-z0-9]+", " ", str(v).lower()).split())
+    x, y = flat(a), flat(b)
+    # Equality only. Containment is not sameness: the chapter's ROC formula is the graph's plus
+    # "Where `n` is the lookback period", and treating the longer as a duplicate of the shorter
+    # discarded the sentence that made it longer. Which of two unequal wordings wins is decided
+    # where they meet, by length, not here.
+    return bool(x) and bool(y) and x == y
+
+
 def _same_claim(a: str, b: str) -> bool:
     """Two wordings of one statement. The dedupe half of the outer join.
 
@@ -2649,6 +2917,10 @@ def slug(text: str) -> str:
     return "-".join(parts) or "untitled"
 
 
+#: `### 6.1.1 Simple Moving Average (SMA)`. The number says where the block sits in the file and
+#: has no business in a node id or a declaration key; chapter 6 numbers all fifty of its headings.
+H3_NUMBER = re.compile(r"^\d+(?:\.\d+)*\s+")
+
 #: The prose between a section heading and its first `###`. It was being dropped: §5.0 states
 #: "risk is multi-dimensional" there and nowhere else, which is the thesis of the whole chapter.
 LEAD = ""
@@ -2664,23 +2936,35 @@ def parse(path: Path) -> dict:
     for raw in path.read_text(encoding="utf-8").split("\n"):
         if m := H2.match(raw):
             n, title = m.group(1), m.group(2)
-            if n is None:                      # "## Summary" and friends: not a numbered section
-                num = None
+            if n is None:
+                # "## Summary" is read separately, at the end. Any other unnumbered section is
+                # content: chapter 6 defines TRIGGER and FILTER under one, and it was dropped.
+                if title.strip().lower() == "summary":
+                    num = None
+                    continue
+                num, head = title.strip(), LEAD
+                sections[num] = {"title": title.strip(), "blocks": {LEAD: []}}
                 continue
             num, head = n, LEAD
             sections[num] = {"title": title, "blocks": {LEAD: []}}
         elif num and (m := H3.match(raw)):
-            head = m.group(1)
+            head = H3_NUMBER.sub("", m.group(1))
             sections[num]["blocks"].setdefault(head, [])
         elif num and head is not None:
             sections[num]["blocks"][head].append(raw)
     return sections
 
 
+#: `1. **Combine with trend indicators**: ROC confirms trend direction` -- §6.8 numbers its advice
+#: where every other section bullets it, and five practices were read as none.
+_NUMBERED = re.compile(r"^\s*\d+\.\s+")
+
+
 def bullets(lines: list[str]) -> list[tuple[str, str]]:
     """`- **Name**: text` pairs. A bullet with no bold lead-in yields ("", text)."""
     out = []
     for line in lines:
+        line = _NUMBERED.sub("- ", line) if _NUMBERED.match(line) else line
         if m := BULLET.match(line):
             out.append((m.group(1).strip(), m.group(2).strip()))
         elif m := PLAIN_BULLET.match(line):
@@ -2764,6 +3048,28 @@ def unfenced(lines: list[str]) -> list[str]:
             continue
         if not inside:
             out.append(line)
+    return out
+
+
+H4 = re.compile(r"^#### (.+)$")
+
+
+def sub_blocks(lines: list[str]) -> dict[str, list[str]]:
+    """`#### Heading` sections inside one block, in order, keyed by heading.
+
+    Chapter 6 gives every indicator a Definition, a Formula, an Interpretation and a set of Trading
+    Applications this way -- 221 of them. Read as one blob the summary came out as the literal
+    string "#### Definition", and the interpretation, which is the only thing here the code-derived
+    node does not already have, was indistinguishable from the rest of the text.
+    """
+    out: dict[str, list[str]] = {}
+    head = None
+    for line in lines:
+        if m := H4.match(line.strip()):
+            head = m.group(1).strip()
+            out.setdefault(head, [])
+        elif head is not None:
+            out[head].append(line)
     return out
 
 
@@ -2962,9 +3268,27 @@ def build(path: Path, chapter: str, parent: str,
             for k, v in props.items():
                 if k.startswith("_") or not v:
                     continue
+                # A chapter may describe one node twice -- §6.2.5 and §6.8.1 both define ROC -- and
+                # the second was overwriting the first. Keep the fuller text and the other beside it.
+                if (prior := add.get(k)) and not _same_text(prior, v):
+                    keep, other = ((v, prior) if len(str(v)) > len(str(prior)) else (prior, v))
+                    add[k] = keep
+                    notes = add.setdefault("notes", [])
+                    if other not in notes:
+                        notes.append(other)
+                    continue
+                if prior and len(str(prior)) >= len(str(v)):
+                    continue
                 add[k] = v
             if summary and not props.get("_generated"):
-                add["_summary"] = " ".join(summary.split())
+                summary = " ".join(summary.split())
+                if (prior := add.get("_summary")) and not _same_text(prior, summary):
+                    notes = add.setdefault("notes", [])
+                    loser = prior if len(summary) > len(prior) else summary
+                    if loser not in notes:
+                        notes.append(loser)
+                    summary = summary if len(summary) > len(prior) else prior
+                add["_summary"] = summary
             return target
         cur = atoms.get(nid)
         if cur is None:
@@ -3074,10 +3398,16 @@ def build(path: Path, chapter: str, parent: str,
             subjects = [atom("Concept", name, text, _section=num) for name, text in defined]
         elif not definition and as_nodes:
             undeclared = [h for h in blocks
-                          if h not in as_nodes and h not in SCAFFOLD and h != LEAD]
+                          if h not in as_nodes and h not in SCAFFOLD and h != LEAD
+                          and not h.startswith("Best Practices")]
             if undeclared:
                 raise ValueError(f"{sec['title']!r} has no Definition and no subject to hang "
                                  f"{undeclared} on -- declare them in `blocks_as_nodes`")
+            subjects = []
+        elif set(blocks) <= {LEAD}:
+            # A section that is nothing but prose -- chapter 6's "Signal Type Classifications" --
+            # has content but names no thing. Creating a subject from its heading made a node with
+            # an empty summary; the prose goes to the chapter instead.
             subjects = []
         else:
             subjects = [atom("Concept", sec["title"], prose, applications=uses, _section=num)]
@@ -3086,12 +3416,34 @@ def build(path: Path, chapter: str, parent: str,
             # holds what a thing is and where it is defined, and "market microstructure" says that.
             rel(s, "part-of", parent, f"defined under {sec['title'].lower()}")
         for heading, primitive in as_nodes.items():
-            read = free_block(blocks[heading], def_labels)
+            if (parts := sub_blocks(blocks[heading])) and decl.get("sub_blocks"):
+                read, unknown = {}, [h for h in parts if h not in decl["sub_blocks"]]
+                if unknown:
+                    raise ValueError(f"{heading!r} has `#### {unknown[0]}`, which `sub_blocks` does "
+                                     "not name -- declare it, or declare it as dropped")
+                for h, body in parts.items():
+                    if not (key := decl["sub_blocks"][h]):
+                        continue        # declared as boilerplate: the API reference, a cross-link
+                    # Both halves: `#### Formula` is a fence followed by "Where `n` is the
+                    # lookback period", and taking the code alone dropped every such sentence.
+                    fenced, plain = code_of(body), block_text(unfenced(body))
+                    text = "\n".join(x for x in (fenced, plain) if x) if fenced else plain
+                    if text:
+                        read.setdefault(key, text)
+            else:
+                read = free_block(blocks[heading], def_labels)
             nid = atom(primitive, heading, read.pop("summary", ""), _section=num, **read)
             rel(nid, "part-of", parent, f"stated under {sec['title'].lower()}")
             # §3.0's blocks had no subject to point at, so this edge never existed. §4.6 heads a
             # rule "Time-Based Exits" inside a section about exit logic, and without it the rule was
             # reachable only by walking down from the chapter.
+            #
+            # `sections_group_only` turns it off for a chapter whose sections group blocks for a
+            # reader rather than classify them. Chapter 6 files RSI under "Momentum Indicators" and
+            # the library makes it an oscillator; twenty-eight of its forty-two shared indicators
+            # disagree that way, so the edge would assert a membership the library denies.
+            if decl.get("sections_group_only"):
+                continue
             for sub in ({subject_for(heading, subjects)} if subjects else set()) - {nid}:
                 rel(nid, "about", sub, f"stated under {sec['title'].lower()}")
 
@@ -3501,15 +3853,30 @@ def build(path: Path, chapter: str, parent: str,
         held = node.get("props", {})
         for k, v in extra.get(tid, {}).items():
             if k == "_summary":
-                # The chapter's wording of something the graph already defines. The existing
-                # summary stands -- it is code-derived -- and this is kept beside it so the two
-                # can be deconflicted by a reader rather than one of them vanishing.
-                if v and v != node.get("summary") and tid not in RECONCILED:
-                    variants["summary"] = v
+                # A chapter that DEFINES something the graph knows from a docstring is the better
+                # source for what it is: a docstring says what the code does, and "the indicator
+                # provide an indication of the degree of price volatility" is not a definition of
+                # ATR. The chapter's wording becomes the summary and the docstring's is kept as
+                # `source_wording`, so nothing is lost and the substitution is visible.
+                held_summary = node.get("summary") or ""
+                if not v:
+                    continue
+                authored_here = (tid in AUTHORED
+                                 and _same_text(AUTHORED[tid][0], held_summary))
+                if tid in RECONCILED or tid in DOC_DERIVED or authored_here:
+                    # The wording here was written on purpose. The chapter's is still something it
+                    # says, so it is kept beside it rather than dropped.
+                    if not _same_text(v, held_summary):
+                        add.setdefault("source_wording", v)
+                elif not _same_text(v, held_summary) or len(v) > len(held_summary):
+                    # Containment is not equality: the graph held "Shows both trend direction and
+                    # overbought/oversold conditions" where the chapter says "Double-smoothed
+                    # momentum indicator that shows both...". The fuller sentence is the definition.
+                    add["summary"] = v
                 continue
             if k not in held:
                 add[k] = v
-            elif held[k] != v:
+            elif not _same_text(held[k], v):
                 variants[k] = v
         if variants:
             add["chapter_variants"] = variants
@@ -3533,7 +3900,9 @@ def main() -> int:
 
     existing = {}
     if args.ontology:
-        existing = {a["id"]: a for a in json.loads(args.ontology.read_text())["atoms"]}
+        record = json.loads(args.ontology.read_text())
+        existing = {a["id"]: a for a in record["atoms"]}
+        DOC_DERIVED.update(record.get("meta", {}).get("derived_atom_ids", ()))
     atoms, rels, enrich = build(args.chapter, args.chapter_id, args.parent, existing)
 
     if args.table:
@@ -3562,6 +3931,11 @@ def main() -> int:
         by_id = {a["id"]: a for a in rec["atoms"]}
         for e in enrich:                     # the folds, applied where they belong
             held = by_id[e["id"]]["props"]
+            if replacement := e["props"].pop("summary", None):
+                # `summary` sits on the atom, not in its props.
+                if (previous := by_id[e["id"]]["summary"]) and not _same_text(previous, replacement):
+                    held.setdefault("source_wording", previous)
+                by_id[e["id"]]["summary"] = replacement
             for k, v in e["props"].items():
                 # A list-valued prop UNIONS. `reference_chapter` is the one that matters: replacing
                 # it made chapter 01 erase chapter 06's claim on `concept:volatility`, so the node

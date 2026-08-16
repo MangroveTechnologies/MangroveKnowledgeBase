@@ -73,8 +73,19 @@ def test_atoms_are_reproduced_exactly(rebuilt, committed):
             ok = held == v or (isinstance(v, list) and isinstance(held, list)
                                and held[:len(v)] == v)
             assert ok, f"{i}.{k}: the fold changed a value the builder wrote, it did not only add"
-        assert {k: v for k, v in got[i].items() if k != "props"} == \
-               {k: v for k, v in want[i].items() if k != "props"}, f"{i}: a builder field changed"
+        # `summary` is the one builder field a chapter may replace, and only by KEEPING the
+        # builder's: a docstring says what the code does, and "the indicator provide an indication
+        # of the degree of price volatility" is not a definition of ATR. The replacement is
+        # recorded in `source_wording`, so nothing the builder wrote is lost and the substitution
+        # is visible in the record rather than inferred.
+        # `got` is the fresh code build, `want` is the committed record: the replacement lives in
+        # the record, and the builder's own sentence must be kept there as `source_wording`.
+        if got[i]["summary"] != want[i]["summary"]:
+            assert want[i]["props"].get("source_wording") == got[i]["summary"], (
+                f"{i}: the record replaced the builder's summary without keeping it")
+        assert {k: v for k, v in got[i].items() if k not in ("props", "summary")} == \
+               {k: v for k, v in want[i].items() if k not in ("props", "summary")}, \
+            f"{i}: a builder field changed"
     differing = [i for i in want if i not in folded and got[i] != want[i]]
     assert not differing, (
         f"{len(differing)} atoms differ, e.g. {differing[:3]}\n"

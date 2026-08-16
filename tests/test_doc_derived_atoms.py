@@ -168,13 +168,13 @@ def test_a_chapter_with_no_declarations_refuses_to_build():
     repo = Path(__file__).resolve().parent.parent
     # Any chapter with no entry in CHAPTERS. This one moves as chapters are ingested: it was 03
     # until 03 was declared, and the point of the test is the refusal, not the chapter.
-    src = repo / "knowledge-base" / "06-indicators.md"
+    src = repo / "knowledge-base" / "07-chart-patterns.md"
     if not src.is_file():
         import pytest
         pytest.skip("no undeclared chapter source in this checkout")
     r = subprocess.run(
         [sys.executable, str(repo / "ontology" / "chapter_to_atoms.py"), str(src),
-         "--chapter-id", "indicators", "--parent", "concept:technical-analysis",
+         "--chapter-id", "chart-patterns", "--parent", "concept:chart-pattern",
          "--ontology", str(repo / "ontology" / "signal-indicator-ontology.json"), "--table"],
         capture_output=True, text=True, timeout=120)
     assert r.returncode != 0, "an undeclared chapter built anyway"
