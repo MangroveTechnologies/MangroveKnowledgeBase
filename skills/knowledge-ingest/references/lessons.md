@@ -39,6 +39,37 @@ check; add the check to keep it passing, not to discover what is already known.
 points exist to carry it. Where a default conflicts with the design, the design wins — silently,
 without raising it as a question. A question settled in an earlier commit is not a question.
 
+## About what the builder should be doing
+
+**Do not hand-write what the text already says.** A hundred and eighteen statements were about to be
+mapped to their nodes by hand, and a third of them name the node outright — "always have a
+stop-loss for every position" against a node called `stop order (stop-loss)`. Transcribing what a
+document states is where the errors come from; the extractor should read it and print what it could
+not place. Declarations are for the residue, the ambiguities and the corrections, not for copying.
+
+**Size a pass by opening three of the items, never by a coverage ratio.** Chapters 1–3 carry
+authored prose on 85–90% of their nodes and chapter 4 on 1 of 74, which was read as ~58 nodes of
+writing to do. Opening three showed two needed edges rather than prose, and that the comparison was
+never valid: chapter 4's nodes carry the chapter's python in a field that is already a search tier.
+A ratio describes what earlier work did, not what these items lack.
+
+**A wrong edge is worse than a missing one, so a proposal must be visible.** Matching statements to
+node names by frequency alone drew `schema:strategy` from "reveal your strategy to sophisticated
+participants": when chapter 1 builds the graph is 310 nodes and `strategy` looks rare, by chapter 4
+it is in 98 of 571. Frequency is not enough on a growing corpus — only a compound name or an
+abbreviation is a citation, a single ordinary word is a candidate for review, and every resolution
+gets printed so it can be refused.
+
+**Do not mint an id inside a namespace something else counts.** `procedure:indicator-*` is one node
+per indicator class, and `procedure:indicator-based-entry` made the graph report 73 indicators
+where the library has 71. The count test caught it; the builder now raises instead.
+
+**Check which way a new edge points, not just that it exists.** `all_paths` suppresses detours
+through a hub by spotting two edges that both point *at* it — the shape every backbone relation
+has. Twelve example edges drawn *out* of `concept:signal-type` slipped past that guard and made
+twelve signals mutually two hops apart. Same claim, reversed to point up, and the existing
+suppression worked again.
+
 ## About the merge
 
 **Measure lossiness; do not assert it.** A transform claimed to be clean was dropping sixteen
@@ -97,6 +128,17 @@ source text have to be right on every version in the matrix.
 **Prose defects survive every test that does not read prose.** Adjacent string literals concatenate
 with nothing between them; 195 wrapped sentences shipped as "the spreadactually paid" through a green
 suite, a review and a published render.
+
+**Count the source lines that reach the record.** Six review gates passed while four kinds of
+content were being dropped: an authored explanation overwrote the chapter's own bullets, the loser
+of two wordings for one node fell on the floor, the Summary's closing blockquote was thrown away,
+and every practice lost the name it was given. One line-coverage measurement found all four in a
+single pass. Read the absences rather than the percentage — most are a table row stored as separate
+props, and the four real ones were sitting among them.
+
+**Replay the whole pipeline, not the stage you changed.** The determinism test rebuilt the
+code-derived half and stopped, so four of the five stages were verified only by whoever last ran
+them by hand. Every extractor change is a change to chapters already merged.
 
 ## About working
 

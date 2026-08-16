@@ -8,7 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 498 nodes, 1539 edges, in
+carries a formula stating the predicate it computes -- 571 nodes, 1760 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
@@ -63,7 +63,28 @@ signals to 7. Files now: `averaging` 55, `momentum` 56, `oscillator` 30, `volati
   on-chain window arithmetic counts observations rather than bars -- documented in
   [#109](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109), not yet fixed.
 
+### The knowledge base is in the graph
+
+Four of the eight knowledge-base chapters are now nodes and edges beside the code-derived ones:
+market foundations, instruments and market mechanics, core trading concepts, and strategy design.
+The merge is an outer join -- where a chapter and the library define the same thing, the node keeps
+both wordings rather than one replacing the other.
+
+Strategy design adds trading styles, the five strategy archetypes with their win rate, skew and
+tail risk, the trade plan, the four signal types, entry and exit rules, regime detection, data
+quality, backtesting, walk-forward optimisation and the validation biases. Its rules connect to the
+library they describe: an ATR-based stop `uses` the ATR indicator, the chapter's ADX regime rule
+merged into the one chapter 3 already stated, and the twelve signals the chapter names as examples
+point at the real signal nodes.
+
+Every principle and practice a chapter states now sits on the edge it explains rather than in a
+list -- the builder resolves the ones that name their node and reports the rest.
+
 ### Known gaps
+
+`concept:position-trading` carries one edge: the chapter names it in a comparison table and says
+nothing else about it. The `risk-management` and `quantitative-analysis` anchors are empty until
+their chapters land, and chapter 6 has no anchor page yet.
 
 216 of 247 signals are modelled. The 20 `onchain` / `defi_pro` signals read provider feeds rather
 than indicator outputs and have no class; 11 read a verdict and never will. All 31 still evaluate.

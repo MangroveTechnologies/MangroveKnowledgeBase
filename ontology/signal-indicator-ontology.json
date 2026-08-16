@@ -17598,6 +17598,32 @@
    }
   },
   {
+   "id": "concept:strategy-design",
+   "title": "strategy design",
+   "kind": "Concept",
+   "summary": "Turning a claim about market behaviour into rules an engine can run, and finding out whether the claim survives contact with data.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Trading styles and the cadence they imply, the archetypes that say why a trade has edge, the trade plan that writes both down, entry and exit logic, time and regime filters, data quality, and the backtesting, walk-forward and validation procedures a strategy has to pass before it is believed. Signals decide what is true of a bar; this subject area decides which signals to compose, in what role, and under what evidence the composition may be trusted.",
+    "applications": [
+     "Clear separation of style, archetype, and signal - Know when you trade vs. why you trade",
+     "Explicit alignment between market behavior and strategy logic - Match archetypes to regimes",
+     "Understanding of risk profiles - Win rate alone is misleading; skew determines survivability",
+     "Regime-aware deployment - Don't apply mean reversion in trends or trend following in ranges",
+     "Robust execution and exits - Entry is less important than risk management",
+     "Rigorous validation and skepticism - Assume strategies don't work until proven otherwise"
+    ],
+    "caution": "Critical Insight: Strategies do not fail randomly - they fail when applied to the wrong market behavior. Mean reversion in a trend will blow up. Trend following in a range will bleed out. Know your archetype's risk profile and contraindications.",
+    "chapter_variants": {
+     "explanation": "This document covers the principles and methodologies for designing, developing, and validating systematic trading strategies, from initial concept through backtesting to deployment."
+    }
+   }
+  },
+  {
    "id": "concept:market-microstructure",
    "title": "market microstructure",
    "kind": "Concept",
@@ -17629,6 +17655,9 @@
    "props": {
     "reference_chapter": [
      "market-foundations"
+    ],
+    "notes": [
+     "The process by which market prices are determined through the interaction of supply and demand, facilitated by the continuous matching of buy and sell orders"
     ],
     "applications": [
      "Identifying which market or venue leads price discovery",
@@ -18982,9 +19011,7 @@
     "reference_chapter": [
      "market-foundations"
     ],
-    "principles": [
-     "Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)"
-    ]
+    "principles": []
    }
   },
   {
@@ -19001,13 +19028,11 @@
     "practices": [
      "Be aware of the potential impact of large orders on market prices and plan execution accordingly",
      "Study the specific microstructure characteristics of each market traded (e.g., tick sizes, trading hours, circuit breakers)",
-     "Account for all transaction costs when calculating expected strategy returns",
      "Trade when your counterparty is likely to be uninformed (e.g., index rebalancing flows)",
      "Avoid trading patterns that reveal your strategy to sophisticated participants",
      "Break large orders into smaller child orders to reduce footprint",
      "Avoid trading during illiquid periods (market open, lunch hour, holidays)",
      "Monitor real-time market depth before executing larger orders",
-     "Use regime detection filters to enable/disable specific strategies",
      "Adapt trading strategies to current market conditions rather than forcing one approach",
      "Backtest strategies across multiple regimes to understand performance variation",
      "Have predefined plans for regime transitions rather than reacting emotionally",
@@ -19018,7 +19043,6 @@
      "Monitor spread changes as an indicator of market conditions",
      "Monitor lead-lag relationships between related markets",
      "Use pre-market and after-hours trading for early information",
-     "Understand the price discovery role of derivatives markets",
      "Be cautious trading immediately after major information releases",
      "Recognize that the first price after news is often not the right price"
     ]
@@ -20517,11 +20541,16 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "core-trading-concepts"
+     "core-trading-concepts",
+     "strategy-design"
     ],
     "formula": "ADX > 25: Trending market\nADX < 20: Ranging market\nADX 20-25: Transitional",
     "source_wording": "Computes adx trend strength.",
-    "explanation": "Above twenty-five is a trend, below twenty is a range, and between them is the state in which most strategies are least reliable. It measures how strong a trend is and says nothing about which way it points."
+    "explanation": "Above twenty-five is a trend, below twenty is a range, and between them is the state in which most strategies are least reliable. It measures how strong a trend is and says nothing about which way it points.",
+    "chapter_variants": {
+     "formula": "def adx_regime(adx, trend_threshold=25, range_threshold=20):\n    \"\"\"\n    Classify regime based on ADX\n    \"\"\"\n    if adx > trend_threshold:\n        return 'trending'\n    elif adx < range_threshold:\n        return 'ranging'\n    else:\n        return 'transitional'",
+     "summary": "Classify regime based on ADX"
+    }
    }
   },
   {
@@ -20642,6 +20671,9 @@
    "props": {
     "reference_chapter": [
      "core-trading-concepts"
+    ],
+    "notes": [
+     "Multiple touches at same level create liquidity buildup"
     ],
     "source_wording": "Multiple touches at same price create \"equal highs\" or \"equal lows\" Represent obvious stop-loss locations (retail traders place stops there) High probability of being swept before a real move",
     "explanation": "The obviousness is what makes them liquidity: every trader who drew the same line put a stop just beyond it. The chapter's advice follows from that -- expect the level to be swept before any real move, and place stops past it rather than at it."
@@ -21193,6 +21225,1082 @@
    "props": {
     "reference_chapter": [
      "core-trading-concepts"
+    ],
+    "practices": []
+   }
+  },
+  {
+   "id": "concept:trading-style",
+   "title": "trading styles",
+   "kind": "Concept",
+   "summary": "Trading styles define the timeframe and execution cadence a trader uses to engage with markets. Trading style is independent of strategy logic and reflects constraints such as available time, attention, and risk tolerance. > Important Distinction: > *Trading style defines when you trade. Strategy archetypes define why a trade has edge.*",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "concept:scalping",
+   "title": "scalping",
+   "kind": "Concept",
+   "summary": "Trading in seconds to minutes for one to ten ticks at a time, dozens to hundreds of times a day.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "The edge per trade is smaller than the [[Bid-Ask Spread]] on most instruments, which is why it needs direct market access, low commissions and the tightest spreads available: costs are not a deduction from the profit here, they are comparable to it. It also needs uninterrupted attention, which is the constraint that rules it out for most traders rather than the strategy logic.",
+    "notes": [
+     "Challenges: High transaction costs, requires constant attention, mentally exhausting.",
+     "Best For: Full-time traders with direct market access and low commissions.",
+     "Trade duration: Seconds to a few minutes Profit targets: 1-10 ticks/pips High frequency: Dozens to hundreds of trades per day Requires: Fast execution, tight spreads, intense focus"
+    ],
+    "timeframe": "Seconds to minutes",
+    "holding_period": "Seconds to minutes",
+    "key_traits": "Tiny moves, high volume, requires intense focus",
+    "source_wording": "Seconds to minutes. Seconds to minutes. Tiny moves, high volume, requires intense focus"
+   }
+  },
+  {
+   "id": "concept:day-trading",
+   "title": "day trading",
+   "kind": "Concept",
+   "summary": "Trading intraday moves and closing every position before the session ends, typically one to ten trades a day.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Flat at the close means the overnight gap cannot reach the position, and neither can the financing that [[Swap/Rollover Calculation]] measures -- the risk being avoided is the one that arrives while the market is shut and no stop can execute. The cost is that every position must resolve inside a session whether or not the move has finished.",
+    "notes": [
+     "Advantages: No overnight gap risk, fresh start each day, compounds learning quickly.",
+     "Best For: Traders who can dedicate market hours to active trading.",
+     "Trade duration: Minutes to hours All positions closed by market close No overnight risk exposure Typical trades: 1-10 per day"
+    ],
+    "timeframe": "Minutes to hours",
+    "holding_period": "Same day",
+    "key_traits": "Exploit intraday moves, avoid overnight risk",
+    "source_wording": "Minutes to hours. Same day. Exploit intraday moves, avoid overnight risk"
+   }
+  },
+  {
+   "id": "concept:swing-trading",
+   "title": "swing trading",
+   "kind": "Concept",
+   "summary": "Holding for days to weeks to capture a multi-day swing, trading selectively rather than often.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Fewer, larger targets make transaction costs a small share of the gain, which is what lets the style tolerate a lower hit rate. Holding through the close accepts gap risk in exchange for not having to be at the screen, and it is the shortest style that can be run alongside a full-time job.",
+    "notes": [
+     "Advantages: Less screen time, larger profit targets, lower transaction costs as percentage of gains.",
+     "Best For: Part-time traders, those seeking work-life balance.",
+     "Trade duration: Days to weeks Captures multi-day price swings Fewer trades, higher quality setups Can be done with a full-time job"
+    ],
+    "timeframe": "Days to weeks",
+    "holding_period": "Days to weeks",
+    "key_traits": "Fewer trades, larger moves, higher selectivity",
+    "source_wording": "Days to weeks. Days to weeks. Fewer trades, larger moves, higher selectivity"
+   }
+  },
+  {
+   "id": "concept:position-trading",
+   "title": "position trading",
+   "kind": "Concept",
+   "summary": "Holding for weeks to months on a regime or fundamental view rather than on a chart event.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "timeframe": "Weeks to months",
+    "holding_period": "Weeks to months",
+    "key_traits": "Regime- or fundamentally driven",
+    "source_wording": "Weeks to months. Weeks to months. Regime- or fundamentally driven",
+    "explanation": "The thesis is about the [[Market Regime]] itself, so the position is sized and stopped against a regime change rather than against a level. It is the only style whose holding period is long enough for carry, financing and correlation to dominate the outcome."
+   }
+  },
+  {
+   "id": "concept:backtesting",
+   "title": "backtesting",
+   "kind": "Concept",
+   "summary": "Backtesting is the process of applying a trading strategy to historical data to evaluate how it would have performed. Proper backtesting methodology is critical for realistic performance estimation.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "backtesting_framework": "class Backtester: def __init__(self, data, strategy, capital=100000): self.data = data self.strategy = strategy self.capital = capital self.positions = [] self.equity_curve = [] def run(self): \"\"\" Execute backtest \"\"\" equity = self.capital position = 0 for i in range(len(self.data)): # Get signal signal = self.strategy.generate_signal(self.data.iloc[:i+1]) # Execute trades with realistic costs if signal != position: trade_cost = self.calculate_costs(position, signal) equity -= trade_cost position = signal # Update equity if position != 0: returns = self.data['returns'].iloc[i] equity *= (1 + position * returns) self.equity_curve.append(equity) return self.calculate_metrics() def calculate_costs(self, old_pos, new_pos): \"\"\" Realistic transaction costs \"\"\" commission = 0.001  # 0.1% slippage = 0.0005   # 0.05% return abs(new_pos - old_pos) * (commission + slippage) * self.capital ---",
+    "performance_metric": "def calculate_backtest_metrics(returns): \"\"\" Standard backtest performance metrics \"\"\" metrics = { 'total_return': (1 + returns).prod() - 1, 'annual_return': returns.mean() * 252, 'annual_volatility': returns.std() * np.sqrt(252), 'sharpe_ratio': returns.mean() / returns.std() * np.sqrt(252), 'max_drawdown': calculate_max_drawdown(returns), 'win_rate': (returns > 0).mean(), 'profit_factor': returns[returns > 0].sum() / abs(returns[returns < 0].sum()), 'avg_win': returns[returns > 0].mean(), 'avg_loss': returns[returns < 0].mean(), 'num_trades': count_trades(returns) } return metrics ---"
+   }
+  },
+  {
+   "id": "procedure:transaction-cost-model",
+   "title": "transaction costs",
+   "kind": "Procedure",
+   "summary": "Realistic cost assumptions by asset class",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def calculate_transaction_costs(trade_value, asset_class):\n    \"\"\"\n    Realistic cost assumptions by asset class\n    \"\"\"\n    costs = {\n        'equities': 0.001,      # 10 bps\n        'futures': 0.0002,      # 2 bps\n        'fx': 0.0001,           # 1 bp\n        'crypto': 0.002,        # 20 bps\n        'options': 0.01         # $1 per contract + spread\n    }\n    return trade_value * costs.get(asset_class, 0.001)"
+   }
+  },
+  {
+   "id": "procedure:slippage-modeling",
+   "title": "slippage modeling",
+   "kind": "Procedure",
+   "summary": "Market impact estimation",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def estimate_slippage(trade_size, adv, volatility):\n    \"\"\"\n    Market impact estimation\n    \"\"\"\n    participation = trade_size / adv\n    impact = volatility * np.sqrt(participation) * 0.1\n    return impact"
+   }
+  },
+  {
+   "id": "concept:walk-forward-optimization",
+   "title": "walk-forward optimization",
+   "kind": "Concept",
+   "summary": "Walk-forward optimization (WFO) is a method for optimizing strategy parameters while avoiding overfitting by repeatedly optimizing on in-sample data and testing on subsequent out-of-sample data.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "walk_forward_process": "def walk_forward_optimization(data, strategy_class, optimization_window=252, test_window=63, param_grid=None): \"\"\" Walk-forward optimization framework \"\"\" results = [] for i in range(optimization_window, len(data) - test_window, test_window): # In-sample optimization window train_data = data.iloc[i-optimization_window:i] # Out-of-sample test window test_data = data.iloc[i:i+test_window] # Optimize parameters on training data best_params = optimize_parameters(train_data, strategy_class, param_grid) # Test on out-of-sample data strategy = strategy_class(**best_params) oos_returns = strategy.backtest(test_data) results.append({ 'period_start': data.index[i], 'period_end': data.index[i+test_window], 'params': best_params, 'oos_returns': oos_returns, 'oos_sharpe': calculate_sharpe(oos_returns) }) return pd.DataFrame(results) ---"
+   }
+  },
+  {
+   "id": "procedure:parameter-optimization",
+   "title": "parameter optimization",
+   "kind": "Procedure",
+   "summary": "Grid search for optimal parameters",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "from itertools import product\n\ndef optimize_parameters(data, strategy_class, param_grid):\n    \"\"\"\n    Grid search for optimal parameters\n    \"\"\"\n    best_sharpe = -np.inf\n    best_params = None\n    \n    # Generate all parameter combinations\n    param_combinations = list(product(*param_grid.values()))\n    \n    for params in param_combinations:\n        param_dict = dict(zip(param_grid.keys(), params))\n        \n        strategy = strategy_class(**param_dict)\n        returns = strategy.backtest(data)\n        sharpe = calculate_sharpe(returns)\n        \n        if sharpe > best_sharpe:\n            best_sharpe = sharpe\n            best_params = param_dict\n    \n    return best_params"
+   }
+  },
+  {
+   "id": "concept:anchored-walk-forward",
+   "title": "anchored (expanding window)",
+   "kind": "Concept",
+   "summary": "Training window expands over time",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def anchored_walk_forward(data, strategy_class, test_window=63):\n    \"\"\"\n    Training window expands over time\n    \"\"\"\n    min_train = 252\n    results = []\n    \n    for i in range(min_train, len(data) - test_window, test_window):\n        # Training: all data from start to i\n        train_data = data.iloc[:i]\n        test_data = data.iloc[i:i+test_window]\n        \n        # ... rest of optimization"
+   }
+  },
+  {
+   "id": "concept:rolling-walk-forward",
+   "title": "rolling (fixed window)",
+   "kind": "Concept",
+   "summary": "Training window is fixed size",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def rolling_walk_forward(data, strategy_class, train_window=252, test_window=63):\n    \"\"\"\n    Training window is fixed size\n    \"\"\"\n    results = []\n    \n    for i in range(train_window, len(data) - test_window, test_window):\n        # Training: fixed window before i\n        train_data = data.iloc[i-train_window:i]\n        test_data = data.iloc[i:i+test_window]\n        \n        # ... rest of optimization"
+   }
+  },
+  {
+   "id": "concept:strategy-validation",
+   "title": "strategy validation",
+   "kind": "Concept",
+   "summary": "Strategy validation involves rigorous testing procedures to ensure a strategy has genuine predictive power rather than being an artifact of data mining, overfitting, or statistical flukes.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "validation_checklist": "1. **Economic Rationale**: Can you explain why the strategy works? 2. **Out-of-Sample Testing**: Does it work on data not used in development? 3. **Statistical Significance**: Are returns significantly different from zero? 4. **Parameter Stability**: Do results hold across parameter variations? 5. **Time Period Stability**: Does it work in different market regimes? 6. **Transaction Costs**: Does it survive realistic costs? 7. **Capacity**: Can it be implemented at desired scale? 8. **Simplicity**: Is the strategy simpler than alternatives? ---"
+   }
+  },
+  {
+   "id": "concept:look-ahead-bias",
+   "title": "look-ahead bias",
+   "kind": "Concept",
+   "summary": "Using information not available at trade time",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Prevention: Use only data available at decision point"
+   }
+  },
+  {
+   "id": "concept:survivorship-bias",
+   "title": "survivorship bias",
+   "kind": "Concept",
+   "summary": "Excluding failed companies/assets from analysis",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Prevention: Use point-in-time databases with delisted securities"
+   }
+  },
+  {
+   "id": "concept:data-snooping-bias",
+   "title": "data snooping bias",
+   "kind": "Concept",
+   "summary": "Testing many variations until one works",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Prevention: Pre-specify tests, use out-of-sample data"
+   }
+  },
+  {
+   "id": "concept:selection-bias",
+   "title": "selection bias",
+   "kind": "Concept",
+   "summary": "Cherry-picking favorable time periods",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Prevention: Test across full available history"
+   }
+  },
+  {
+   "id": "concept:overfitting",
+   "title": "overfitting",
+   "kind": "Concept",
+   "summary": "Fitting noise rather than signal",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Prevention: Use simple models, walk-forward optimization "
+   }
+  },
+  {
+   "id": "procedure:returns-t-test",
+   "title": "t-test for returns",
+   "kind": "Procedure",
+   "summary": "Test if mean return is significantly different from null",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "from scipy import stats\n\ndef test_significance(returns, null_return=0):\n    \"\"\"\n    Test if mean return is significantly different from null\n    \"\"\"\n    t_stat, p_value = stats.ttest_1samp(returns, null_return)\n    \n    return {\n        't_statistic': t_stat,\n        'p_value': p_value,\n        'significant_5pct': p_value < 0.05,\n        'significant_1pct': p_value < 0.01\n    }"
+   }
+  },
+  {
+   "id": "procedure:multiple-testing-correction",
+   "title": "multiple testing correction",
+   "kind": "Procedure",
+   "summary": "Adjust for multiple hypothesis tests",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def bonferroni_correction(p_values, alpha=0.05):\n    \"\"\"\n    Adjust for multiple hypothesis tests\n    \"\"\"\n    n_tests = len(p_values)\n    adjusted_alpha = alpha / n_tests\n    \n    significant = p_values < adjusted_alpha\n    return significant, adjusted_alpha"
+   }
+  },
+  {
+   "id": "procedure:parameter-sensitivity",
+   "title": "parameter sensitivity",
+   "kind": "Procedure",
+   "summary": "Test how sensitive results are to parameter changes",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def parameter_sensitivity(data, strategy_class, param_name, param_range):\n    \"\"\"\n    Test how sensitive results are to parameter changes\n    \"\"\"\n    results = {}\n    for param_value in param_range:\n        strategy = strategy_class(**{param_name: param_value})\n        returns = strategy.backtest(data)\n        results[param_value] = calculate_sharpe(returns)\n    \n    # Check if results are stable across parameter range\n    values = list(results.values())\n    stability = np.std(values) / np.mean(values)\n    \n    return results, stability"
+   }
+  },
+  {
+   "id": "procedure:time-period-stability",
+   "title": "time period stability",
+   "kind": "Procedure",
+   "summary": "Test performance across different time periods",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def period_stability(data, strategy, periods):\n    \"\"\"\n    Test performance across different time periods\n    \"\"\"\n    period_results = {}\n    for period_name, (start, end) in periods.items():\n        period_data = data[start:end]\n        returns = strategy.backtest(period_data)\n        period_results[period_name] = calculate_metrics(returns)\n    \n    return period_results"
+   }
+  },
+  {
+   "id": "procedure:universe-stability",
+   "title": "universe stability",
+   "kind": "Procedure",
+   "summary": "Test on different asset universes",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def universe_stability(strategy, universes):\n    \"\"\"\n    Test on different asset universes\n    \"\"\"\n    universe_results = {}\n    for universe_name, universe_data in universes.items():\n        returns = strategy.backtest(universe_data)\n        universe_results[universe_name] = calculate_metrics(returns)\n    \n    return universe_results"
+   }
+  },
+  {
+   "id": "concept:strategy-archetype",
+   "title": "strategy archetypes",
+   "kind": "Concept",
+   "summary": "Strategy archetypes classify trading strategies by the market behavior they exploit, not by timeframe or instrument. Archetypes describe *why* a strategy has expected positive return under certain conditions.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "applications": [
+     "Strategy selection based on market conditions",
+     "Portfolio diversification across archetypes",
+     "Understanding strategy performance attribution",
+     "Designing hybrid approaches with clear signal hierarchy",
+     "Setting appropriate expectations for win rate and skew"
+    ]
+   }
+  },
+  {
+   "id": "concept:trend-following",
+   "title": "trend following",
+   "kind": "Concept",
+   "summary": "Markets exhibit persistent directional regimes driven by sustained capital flows.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Identify sustained directional movement Enter after trend confirmation Exit on regime break, not noise Win Rate: 30-40% (low) Skew: POSITIVE (occasional large wins) Tail Risk: MODERATE - losses are bounded by stops Drawdowns: Extended choppy periods cause bleeding Large winners offset frequent small losses Performs well in trending markets Underperforms in range-bound markets Positive skew means you profit from fat tails Moving average crossovers Donchian channel breakouts Time-series momentum Managed futures / CTA strategies ",
+    "caution": "*Should we be exposed in this direction?* Risk Warning: Trend following has LOW win rate. Do NOT expect to be right often. The edge comes from letting winners run far enough to compensate for frequent small losses.",
+    "win_rate": "30-40%",
+    "skew": "Positive",
+    "tail_risk": "Moderate",
+    "best_regime": "Strong trends",
+    "contraindicated_when": "Choppy/range-bound markets",
+    "why_it_fails": "Whipsaws accumulate losses"
+   }
+  },
+  {
+   "id": "concept:momentum-strategy",
+   "title": "momentum strategy",
+   "kind": "Concept",
+   "summary": "Price movement exhibits short-term persistence due to acceleration, positioning pressure, and behavioral effects.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Measure rate of change or acceleration Enter during expansion of pressure Exit as momentum decays Win Rate: 50-60% (moderate) Skew: NEUTRAL to slightly positive Tail Risk: MODERATE - vulnerable to sharp reversals Drawdowns: Quick reversals can trap momentum traders Higher win rate than trend following Shorter holding periods Vulnerable to sharp reversals Works both within and outside trends RSI / ROC momentum MACD-based systems Cross-sectional momentum Short-term continuation models ",
+    "caution": "*Is directional pressure increasing or fading right now?* Relationship to Trend Following: Trend defines *regime*. Momentum defines *timing*. In practice, trend is often used as a filter and momentum as an entry/exit engine.",
+    "win_rate": "50-60%",
+    "skew": "Neutral",
+    "tail_risk": "Moderate",
+    "best_regime": "Any with clear direction",
+    "contraindicated_when": "End of trend / momentum divergence",
+    "why_it_fails": "Reversal traps"
+   }
+  },
+  {
+   "id": "concept:breakout-strategy",
+   "title": "breakout strategy",
+   "kind": "Concept",
+   "summary": "Periods of volatility compression are followed by expansion as new information is revealed.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Often marks **trend initiation** Combines momentum entry with trend potential Accepts false breakouts as cost of discovery Win Rate: 40-50% Skew: POSITIVE (breakouts that work tend to run) Tail Risk: MODERATE - false breakouts are common Drawdowns: Choppy markets produce many false signals Range breakouts Volatility squeeze breakouts (Bollinger Band squeeze) Opening range breakouts ",
+    "caution": "*Is a new move beginning?* Usage Note: Breakouts bridge momentum (entry timing) and trend (regime establishment). They work best when combined with regime filters.",
+    "win_rate": "40-50%",
+    "skew": "Positive",
+    "tail_risk": "Moderate",
+    "best_regime": "After compression",
+    "contraindicated_when": "Low volatility / no compression",
+    "why_it_fails": "False breakouts dominate"
+   }
+  },
+  {
+   "id": "concept:volatility-strategy",
+   "title": "volatility strategy",
+   "kind": "Concept",
+   "summary": "Profit from significant price movements regardless of direction.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Trade when volatility expands Direction-agnostic (long or short based on breakout direction) Exit when volatility contracts or move exhausts Win Rate: 30-50% Skew: NEUTRAL to slightly positive Tail Risk: MODERATE - whipsaws during false breakouts Drawdowns: Choppy, range-bound markets produce losses Works in both trending and ranging markets Requires volatility to capture meaningful moves Often uses ATR, Bollinger Bands, or volatility indicators Not directionally biased ATR breakout strategies Bollinger Band squeeze breakouts Straddle/strangle equivalents in spot Keltner Channel expansions Volatility expansion trades ",
+    "caution": "*Is the market moving enough to capture profitable swings?* Usage Note: Volatility strategies don't predict direction - they trade movement size. Best in markets with alternating quiet and active periods.",
+    "win_rate": "40-50%",
+    "skew": "Neutral",
+    "tail_risk": "Moderate",
+    "best_regime": "High volatility periods",
+    "contraindicated_when": "Sustained low volatility",
+    "why_it_fails": "No meaningful moves to capture"
+   }
+  },
+  {
+   "id": "concept:mean-reversion",
+   "title": "mean reversion",
+   "kind": "Concept",
+   "summary": "Prices temporarily deviate from equilibrium and revert as liquidity providers and arbitrageurs act.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "explanation": "Buy oversold conditions Sell overbought conditions Exit near perceived mean Win Rate: 60-70% (high) Skew: NEGATIVE (occasional large losses) Tail Risk: HIGH - can fail catastrophically during trend emergence Drawdowns: Single large losses can wipe out many small wins High win rate is psychologically seductive Performs best in range-bound regimes **DANGEROUS** in trending markets Negative skew means tail losses are disproportionately large RSI mean reversion Bollinger Band reversion Pairs trading Statistical arbitrage ",
+    "caution": "*Has price extended too far from fair value?* CRITICAL WARNING: DO NOT describe mean reversion as \"lower risk\" or \"safer.\" High win rate does NOT equal low risk. The negative skew means losses, when they occur, are disproportionately large. Mean reversion strategies can and do blow up when trends emerge. \"The trend is your friend\" exists because fighting trends is dangerous.",
+    "win_rate": "60-70%",
+    "skew": "Negative",
+    "tail_risk": "High",
+    "best_regime": "Range-bound only",
+    "contraindicated_when": "Strong directional trends",
+    "why_it_fails": "Will blow up"
+   }
+  },
+  {
+   "id": "concept:trade-plan",
+   "title": "trade plan",
+   "kind": "Concept",
+   "summary": "A trade plan is a comprehensive document that defines all aspects of your trading approach, including entry criteria, exit rules, risk parameters, and psychological guidelines. It serves as your trading rulebook and removes emotional decision-making from the trading process.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "trade_plan_component": "#### 1. Entry Criteria Conditions required before taking a trade: - Price action setup (pattern, structure break, etc.) - Indicator alignment (trend confirmation, momentum) - Volume confirmation requirements - Higher timeframe alignment - Minimum reward-to-risk threshold def entry_checklist(setup): \"\"\" Validate all entry conditions are met \"\"\" criteria = { 'price_action_setup': setup.has_valid_pattern(), 'trend_alignment': setup.higher_tf_trend == setup.trade_direction, 'indicator_confirmation': setup.indicators_aligned(), 'volume_confirmation': setup.volume > setup.avg_volume, 'rr_threshold': setup.reward_risk >= 2.0, } # All criteria must be True return all(criteria.values()), criteria #### 2. Confirmation Rules Additional validation before execution: - Wait for candle close (don't enter on wick) - Retest of broken level - Volume spike on breakout - Indicator crossover completion #### 3. Exit Criteria **Stop-Loss Rules:** - Technical placement (below support, above resistance) - ATR-based calculation (e.g., 1.5x ATR) - Maximum dollar/percentage loss per trade **Take-Profit Rules:** - Technical targets (next resistance/support) - Risk-multiple targets (1.5R, 2R, 3R) - Partial exit strategy (scale out at levels) **Trailing Stop Rules:** - When to activate trailing stop - How much to trail (fixed % or ATR-based) **Indicator-Driven Exits:** - Specific conditions that signal exit regardless of P/L",
+    "trade_plan_template": "TRADE PLAN: [Strategy Name] Date: [Creation Date] Last Updated: [Date] MARKET & TIMEFRAME: - Markets traded: [e.g., ES, NQ, BTC] - Primary timeframe: [e.g., 15-min] - Higher timeframe for context: [e.g., 4-hour] ENTRY RULES: 1. [Specific condition 1] 2. [Specific condition 2] 3. [Specific condition 3] - Minimum R:R required: [e.g., 2:1] CONFIRMATION: - [What confirms the entry] EXIT RULES: - Stop-loss: [How determined] - Take-profit 1: [Level and size] - Take-profit 2: [Level and size] - Trailing stop: [When and how] POSITION SIZING: - Risk per trade: [e.g., 1% of account] - Maximum positions: [e.g., 3] TRADING HOURS: - [e.g., 8:00 AM - 11:30 AM EST] DAILY RULES: - Max daily loss: [e.g., 3%] - Stop trading after: [e.g., 3 consecutive losses]"
+   }
+  },
+  {
+   "id": "concept:signal-type",
+   "title": "signal types",
+   "kind": "Concept",
+   "summary": "Signal types classify trading signals by their role in the decision-making process. Understanding signal types helps traders combine signals effectively and build robust strategies.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "mapping_signal_types_to_archetype": "| Archetype | Typical Signal Role | |-----------|---------------------| | Trend Following | **Filter** - Establishes directional context | | Momentum | **Entry / Exit** - Times entries and exits | | Mean Reversion | **Entry** - Triggers counter-trend position | | Regime Detection | **Meta-Filter** - Gates which archetypes to deploy |",
+    "how_signal_types_work_together": "A typical strategy combines multiple signal types: def generate_trade_signal(data): \"\"\" Combine signal types for robust decision-making \"\"\" # FILTER: Is the environment right for trading? if not filter_price_above_200_sma(data): return None  # Only trade in uptrend # ENTRY: Should we get in now? if not entry_rsi_oversold(data): return None  # Wait for entry trigger # CONFIRMATION: Are we sure? if not confirmation_macd_positive(data): return None  # Need momentum confirmation return \"LONG\"  # All conditions met def check_exit(data, position): \"\"\" Exit signals close positions \"\"\" if position == \"LONG\": if exit_rsi_overbought(data): return \"CLOSE\" return \"HOLD\"",
+    "signal_type_characteristic": "**Entry Signals:** - Fire at specific moments when trade setup is complete - Typically require immediate action - Often based on crossovers, breakouts, or pattern completions - Examples: `sma_cross_up`, `macd_bullish_cross`, `rsi_oversold` **Exit Signals:** - Indicate when to close existing positions - Can be based on profit targets, stop losses, or reversal conditions - Should be defined before trade entry - Examples: `sma_cross_down`, `macd_bearish_cross`, `rsi_overbought` **Filter Signals:** - Provide ongoing context rather than discrete triggers - Answer: \"Should we be trading in this direction at all?\" - Reduce false signals by ensuring market environment is favorable - Examples: `is_above_sma`, `adx_strong_trend`, `vwap_above` **Confirmation Signals:** - Add conviction to entry signals - Reduce false positives by requiring multiple conditions - Often come from different indicator categories (trend + momentum + volume) - Examples: `macd_positive`, `obv_bullish`, `bb_squeeze`"
+   }
+  },
+  {
+   "id": "concept:entry-signal",
+   "title": "entry signal",
+   "kind": "Concept",
+   "summary": "Triggers opening a new position. When conditions favor starting a trade. `macd_bullish_cross` - MACD line crosses above signal line",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "concept:exit-signal",
+   "title": "exit signal",
+   "kind": "Concept",
+   "summary": "Triggers closing an existing position. When conditions suggest ending a trade. `rsi_overbought` - RSI exceeds 70, indicating potential reversal",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "concept:filter-signal",
+   "title": "filter signal",
+   "kind": "Concept",
+   "summary": "Screens out trades / Sets context. Continuous condition check that gates other signals. `adx_strong_trend` - Only trade when ADX > 25",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "concept:confirmation-signal",
+   "title": "confirmation signal",
+   "kind": "Concept",
+   "summary": "Validates another signal. Secondary check that strengthens conviction. `macd_positive` - Histogram positive confirms bullish momentum",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "concept:entry-logic",
+   "title": "entry logic",
+   "kind": "Concept",
+   "summary": "Entry logic frameworks are systematic approaches for determining when to initiate positions. A robust entry framework provides clear, repeatable criteria that generate consistent signal quality.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "procedure:entry-indicator-based",
+   "title": "indicator-based",
+   "kind": "Procedure",
+   "summary": "Enter when indicator crosses threshold",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def indicator_entry(data, indicator_threshold):\n    \"\"\"\n    Enter when indicator crosses threshold\n    \"\"\"\n    indicator_value = calculate_indicator(data)\n    signal = indicator_value > indicator_threshold\n    return signal"
+   }
+  },
+  {
+   "id": "procedure:entry-pattern-based",
+   "title": "pattern-based",
+   "kind": "Procedure",
+   "summary": "Enter when pattern is detected",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def pattern_entry(data, pattern_func):\n    \"\"\"\n    Enter when pattern is detected\n    \"\"\"\n    pattern_detected = pattern_func(data)\n    return pattern_detected"
+   }
+  },
+  {
+   "id": "procedure:entry-statistical-based",
+   "title": "statistical-based",
+   "kind": "Procedure",
+   "summary": "Enter on statistical deviation",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def statistical_entry(returns, threshold_zscore=2):\n    \"\"\"\n    Enter on statistical deviation\n    \"\"\"\n    zscore = (returns - returns.mean()) / returns.std()\n    long_signal = zscore < -threshold_zscore\n    short_signal = zscore > threshold_zscore\n    return long_signal, short_signal"
+   }
+  },
+  {
+   "id": "procedure:multi-factor-confirmation",
+   "title": "multi-factor confirmation",
+   "kind": "Procedure",
+   "summary": "Require multiple signals to align",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def multi_factor_entry(data):\n    \"\"\"\n    Require multiple signals to align\n    \"\"\"\n    trend_signal = calculate_trend_signal(data)\n    momentum_signal = calculate_momentum_signal(data)\n    volume_signal = calculate_volume_signal(data)\n    \n    # Require at least 2 of 3 signals\n    confirmation_count = trend_signal + momentum_signal + volume_signal\n    entry = confirmation_count >= 2\n    return entry"
+   }
+  },
+  {
+   "id": "procedure:timeframe-confirmation",
+   "title": "timeframe confirmation",
+   "kind": "Procedure",
+   "summary": "Require alignment across timeframes",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def multi_timeframe_entry(data_dict):\n    \"\"\"\n    Require alignment across timeframes\n    \"\"\"\n    htf_trend = calculate_trend(data_dict['daily'])\n    mtf_signal = calculate_signal(data_dict['4h'])\n    ltf_trigger = calculate_trigger(data_dict['1h'])\n    \n    # Long: HTF uptrend + MTF bullish + LTF trigger\n    long_entry = (htf_trend > 0) & (mtf_signal > 0) & ltf_trigger\n    return long_entry"
+   }
+  },
+  {
+   "id": "procedure:pullback-entry",
+   "title": "pullback entry",
+   "kind": "Procedure",
+   "summary": "Enter on pullback within trend",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def pullback_entry(price, trend_signal, pullback_threshold=0.02):\n    \"\"\"\n    Enter on pullback within trend\n    \"\"\"\n    recent_high = price.rolling(20).max()\n    pullback_pct = (recent_high - price) / recent_high\n    \n    entry = trend_signal & (pullback_pct > pullback_threshold)\n    return entry"
+   }
+  },
+  {
+   "id": "procedure:breakout-entry",
+   "title": "breakout entry",
+   "kind": "Procedure",
+   "summary": "Enter on breakout of recent range",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def breakout_entry(price, period=20):\n    \"\"\"\n    Enter on breakout of recent range\n    \"\"\"\n    high = price.rolling(period).max()\n    low = price.rolling(period).min()\n    \n    long_entry = price > high.shift(1)\n    short_entry = price < low.shift(1)\n    return long_entry, short_entry"
+   }
+  },
+  {
+   "id": "procedure:regime-filter",
+   "title": "regime filter",
+   "kind": "Procedure",
+   "summary": "Only trade in favorable regime",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def regime_filtered_entry(signal, regime):\n    \"\"\"\n    Only trade in favorable regime\n    \"\"\"\n    favorable_regime = regime == 'trending'\n    filtered_signal = signal & favorable_regime\n    return filtered_signal"
+   }
+  },
+  {
+   "id": "procedure:volatility-filter",
+   "title": "volatility filter",
+   "kind": "Procedure",
+   "summary": "Avoid extremes of volatility",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def volatility_filtered_entry(signal, volatility, min_vol, max_vol):\n    \"\"\"\n    Avoid extremes of volatility\n    \"\"\"\n    vol_okay = (volatility > min_vol) & (volatility < max_vol)\n    filtered_signal = signal & vol_okay\n    return filtered_signal"
+   }
+  },
+  {
+   "id": "concept:exit-logic",
+   "title": "exit logic",
+   "kind": "Concept",
+   "summary": "Exit logic determines when to close positions. Effective exit management is often more important than entry timing for overall strategy performance.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "procedure:time-based-exit",
+   "title": "time-based exits",
+   "kind": "Procedure",
+   "summary": "Exit after maximum holding period",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def time_based_exit(entry_time, current_time, max_holding_period):\n    \"\"\"\n    Exit after maximum holding period\n    \"\"\"\n    holding_time = current_time - entry_time\n    exit_signal = holding_time >= max_holding_period\n    return exit_signal"
+   }
+  },
+  {
+   "id": "procedure:fixed-stop",
+   "title": "fixed stop",
+   "kind": "Procedure",
+   "summary": "Exit on fixed percentage loss",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def fixed_stop_exit(entry_price, current_price, stop_pct=0.02, direction='long'):\n    \"\"\"\n    Exit on fixed percentage loss\n    \"\"\"\n    if direction == 'long':\n        stop_price = entry_price * (1 - stop_pct)\n        exit_signal = current_price <= stop_price\n    else:\n        stop_price = entry_price * (1 + stop_pct)\n        exit_signal = current_price >= stop_price\n    return exit_signal, stop_price"
+   }
+  },
+  {
+   "id": "procedure:atr-based-stop",
+   "title": "atr-based stop",
+   "kind": "Procedure",
+   "summary": "Exit based on ATR distance",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def atr_stop_exit(entry_price, current_price, atr, multiplier=2.0, direction='long'):\n    \"\"\"\n    Exit based on ATR distance\n    \"\"\"\n    stop_distance = atr * multiplier\n    if direction == 'long':\n        stop_price = entry_price - stop_distance\n        exit_signal = current_price <= stop_price\n    else:\n        stop_price = entry_price + stop_distance\n        exit_signal = current_price >= stop_price\n    return exit_signal, stop_price"
+   }
+  },
+  {
+   "id": "procedure:fixed-target",
+   "title": "fixed target",
+   "kind": "Procedure",
+   "summary": "Exit on fixed percentage profit",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def fixed_target_exit(entry_price, current_price, target_pct=0.04, direction='long'):\n    \"\"\"\n    Exit on fixed percentage profit\n    \"\"\"\n    if direction == 'long':\n        target_price = entry_price * (1 + target_pct)\n        exit_signal = current_price >= target_price\n    else:\n        target_price = entry_price * (1 - target_pct)\n        exit_signal = current_price <= target_price\n    return exit_signal, target_price"
+   }
+  },
+  {
+   "id": "procedure:risk-multiple-target",
+   "title": "risk-multiple target",
+   "kind": "Procedure",
+   "summary": "Target based on multiple of risk",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def risk_multiple_target(entry_price, stop_price, risk_multiple=2.0, direction='long'):\n    \"\"\"\n    Target based on multiple of risk\n    \"\"\"\n    risk = abs(entry_price - stop_price)\n    if direction == 'long':\n        target = entry_price + (risk * risk_multiple)\n    else:\n        target = entry_price - (risk * risk_multiple)\n    return target"
+   }
+  },
+  {
+   "id": "procedure:simple-trailing-stop",
+   "title": "simple trailing stop",
+   "kind": "Procedure",
+   "summary": "Trail stop behind price",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def trailing_stop(prices, trail_pct=0.02, direction='long'):\n    \"\"\"\n    Trail stop behind price\n    \"\"\"\n    if direction == 'long':\n        highest = prices.expanding().max()\n        stop = highest * (1 - trail_pct)\n    else:\n        lowest = prices.expanding().min()\n        stop = lowest * (1 + trail_pct)\n    return stop"
+   }
+  },
+  {
+   "id": "procedure:atr-trailing-stop",
+   "title": "atr trailing stop",
+   "kind": "Procedure",
+   "summary": "Trail stop by ATR distance",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def atr_trailing_stop(prices, atr, multiplier=2.5, direction='long'):\n    \"\"\"\n    Trail stop by ATR distance\n    \"\"\"\n    if direction == 'long':\n        highest = prices.expanding().max()\n        stop = highest - (atr * multiplier)\n    else:\n        lowest = prices.expanding().min()\n        stop = lowest + (atr * multiplier)\n    return stop"
+   }
+  },
+  {
+   "id": "procedure:exit-on-indicator",
+   "title": "indicator exit",
+   "kind": "Procedure",
+   "summary": "Exit when indicator crosses threshold",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def indicator_exit(position, indicator_value, exit_threshold):\n    \"\"\"\n    Exit when indicator crosses threshold\n    \"\"\"\n    if position == 'long':\n        exit_signal = indicator_value < exit_threshold\n    else:\n        exit_signal = indicator_value > exit_threshold\n    return exit_signal"
+   }
+  },
+  {
+   "id": "procedure:opposing-signal-exit",
+   "title": "opposing signal exit",
+   "kind": "Procedure",
+   "summary": "Exit when opposite signal triggers",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def opposing_signal_exit(current_position, new_signal):\n    \"\"\"\n    Exit when opposite signal triggers\n    \"\"\"\n    exit_signal = (current_position * new_signal) < 0\n    return exit_signal"
+   }
+  },
+  {
+   "id": "concept:time-based-logic",
+   "title": "time-based logic",
+   "kind": "Concept",
+   "summary": "Time-based logic incorporates temporal factors into trading decisions, including holding period constraints, session filtering, and calendar-based adjustments.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "procedure:session-filter",
+   "title": "session filters",
+   "kind": "Procedure",
+   "summary": "Filter trades by market session",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def session_filter(timestamp, allowed_sessions):\n    \"\"\"\n    Filter trades by market session\n    \"\"\"\n    # Example sessions\n    sessions = {\n        'asia': ('00:00', '08:00'),\n        'london': ('08:00', '16:00'),\n        'new_york': ('13:00', '21:00')\n    }\n    \n    time = timestamp.time()\n    for session in allowed_sessions:\n        start, end = sessions[session]\n        if start <= time <= end:\n            return True\n    return False"
+   }
+  },
+  {
+   "id": "procedure:holding-period-constraint",
+   "title": "holding period constraints",
+   "kind": "Procedure",
+   "summary": "Enforce minimum and maximum holding periods",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def enforce_holding_period(position_time, min_hold, max_hold):\n    \"\"\"\n    Enforce minimum and maximum holding periods\n    \"\"\"\n    can_exit = position_time >= min_hold\n    must_exit = position_time >= max_hold\n    return can_exit, must_exit"
+   }
+  },
+  {
+   "id": "procedure:calendar-filter",
+   "title": "calendar filters",
+   "kind": "Procedure",
+   "summary": "Avoid trading on specific dates",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def calendar_filter(date):\n    \"\"\"\n    Avoid trading on specific dates\n    \"\"\"\n    # Avoid NFP days, FOMC days, etc.\n    blackout_dates = load_economic_calendar()\n    \n    if date in blackout_dates:\n        return False\n    \n    # Avoid first/last day of month for some strategies\n    if date.day == 1 or date.day == date.days_in_month:\n        return False\n    \n    return True"
+   }
+  },
+  {
+   "id": "concept:regime-detection",
+   "title": "regime detection",
+   "kind": "Concept",
+   "summary": "Regime detection identifies the current market state (trending, ranging, volatile, calm) to adapt strategy behavior or filter signals inappropriate for current conditions.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "conceptual_anchor": "Market regimes explain **why archetypes rotate in effectiveness**. Regime detection does not predict markets - it **selects which behaviors to exploit**.",
+    "strategy_adaptation_by_regime": "def regime_adapted_strategy(price, regime): \"\"\" Select strategy based on regime \"\"\" if regime == 'trending': signal = trend_following_signal(price) elif regime == 'ranging': signal = mean_reversion_signal(price) else: signal = 0  # No trade in uncertain regime return signal ---"
+   }
+  },
+  {
+   "id": "procedure:efficiency-ratio",
+   "title": "efficiency ratio",
+   "kind": "Procedure",
+   "summary": "Efficiency ratio: Direction / Volatility",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def efficiency_ratio_regime(price, period=20):\n    \"\"\"\n    Efficiency ratio: Direction / Volatility\n    \"\"\"\n    direction = abs(price.diff(period))\n    volatility = price.diff().abs().rolling(period).sum()\n    \n    efficiency = direction / volatility\n    \n    if efficiency > 0.6:\n        return 'trending'\n    elif efficiency < 0.3:\n        return 'ranging'\n    else:\n        return 'mixed'"
+   }
+  },
+  {
+   "id": "procedure:volatility-percentile-regime",
+   "title": "percentile-based",
+   "kind": "Procedure",
+   "summary": "Classify volatility regime by percentile",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def volatility_regime(current_vol, historical_vol, lookback=252):\n    \"\"\"\n    Classify volatility regime by percentile\n    \"\"\"\n    percentile = (historical_vol < current_vol).rolling(lookback).mean()\n    \n    if percentile > 0.8:\n        return 'high_volatility'\n    elif percentile < 0.2:\n        return 'low_volatility'\n    else:\n        return 'normal_volatility'"
+   }
+  },
+  {
+   "id": "procedure:hmm-regime-detection",
+   "title": "hidden markov model",
+   "kind": "Procedure",
+   "summary": "HMM-based regime detection",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "from hmmlearn import hmm\n\ndef hmm_regime_detection(returns, n_states=2):\n    \"\"\"\n    HMM-based regime detection\n    \"\"\"\n    model = hmm.GaussianHMM(n_components=n_states, covariance_type=\"diag\")\n    model.fit(returns.values.reshape(-1, 1))\n    \n    regime = model.predict(returns.values.reshape(-1, 1))\n    return regime"
+   }
+  },
+  {
+   "id": "concept:data-quality",
+   "title": "data quality",
+   "kind": "Concept",
+   "summary": "Data quality and preprocessing ensure that strategy inputs are accurate, complete, and properly formatted. Poor data quality is a leading cause of strategy failure.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ]
+   }
+  },
+  {
+   "id": "procedure:handling-missing-data",
+   "title": "handling missing data",
+   "kind": "Procedure",
+   "summary": "Handle missing values appropriately",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def clean_missing_data(df):\n    \"\"\"\n    Handle missing values appropriately\n    \"\"\"\n    # Forward fill for prices (common approach)\n    df['close'] = df['close'].fillna(method='ffill')\n    \n    # Don't fill volume - missing volume is meaningful\n    # df['volume'] remains NaN\n    \n    # Drop rows with critical missing data\n    df = df.dropna(subset=['open', 'high', 'low', 'close'])\n    \n    return df"
+   }
+  },
+  {
+   "id": "procedure:outlier-detection",
+   "title": "outlier detection",
+   "kind": "Procedure",
+   "summary": "Identify potential data errors",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def detect_outliers(returns, threshold=5):\n    \"\"\"\n    Identify potential data errors\n    \"\"\"\n    zscore = (returns - returns.mean()) / returns.std()\n    outliers = abs(zscore) > threshold\n    return outliers"
+   }
+  },
+  {
+   "id": "procedure:split-adjustment",
+   "title": "split adjustment",
+   "kind": "Procedure",
+   "summary": "Adjust historical prices for stock splits",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def adjust_for_splits(price, splits):\n    \"\"\"\n    Adjust historical prices for stock splits\n    \"\"\"\n    adjusted = price.copy()\n    for split_date, split_ratio in splits.items():\n        adjusted.loc[:split_date] *= split_ratio\n    return adjusted"
+   }
+  },
+  {
+   "id": "procedure:dividend-adjustment",
+   "title": "dividend adjustment",
+   "kind": "Procedure",
+   "summary": "Create total return series including dividends",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def adjust_for_dividends(price, dividends):\n    \"\"\"\n    Create total return series including dividends\n    \"\"\"\n    # Calculate adjustment factor\n    adjustment = (price + dividends) / price\n    adjusted_price = price * adjustment.cumprod()\n    return adjusted_price"
+   }
+  },
+  {
+   "id": "procedure:survivorship-bias-prevention",
+   "title": "survivorship bias prevention",
+   "kind": "Procedure",
+   "summary": "Include stocks that existed on date, even if later delisted",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def include_delisted(universe, date):\n    \"\"\"\n    Include stocks that existed on date, even if later delisted\n    \"\"\"\n    # Point-in-time universe\n    available_stocks = universe[universe['listing_date'] <= date]\n    available_stocks = available_stocks[\n        (available_stocks['delisting_date'].isna()) | \n        (available_stocks['delisting_date'] > date)\n    ]\n    return available_stocks"
+   }
+  },
+  {
+   "id": "procedure:look-ahead-bias-prevention",
+   "title": "look-ahead bias prevention",
+   "kind": "Procedure",
+   "summary": "Return only data available on target_date",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "formula": "def point_in_time_data(df, target_date):\n    \"\"\"\n    Return only data available on target_date\n    \"\"\"\n    # Shift data to simulate reporting lag\n    reporting_lag = pd.Timedelta(days=1)  # Or appropriate lag\n    available_data = df[df.index <= target_date - reporting_lag]\n    return available_data"
+   }
+  },
+  {
+   "id": "fact:strategy-design-core-principles",
+   "title": "core principles",
+   "kind": "Fact",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
+    ],
+    "principles": []
+   }
+  },
+  {
+   "id": "judgment:strategy-design-best-practices",
+   "title": "best practices",
+   "kind": "Judgment",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "strategy-design"
     ],
     "practices": []
    }
@@ -31204,6 +32312,14 @@
    "to_id": "object:mangrove-knowledge-space"
   },
   {
+   "from": "strategy design",
+   "rel": "part-of",
+   "to": "Mangrove Knowledge Space",
+   "why": "subject area of the knowledge space",
+   "from_id": "concept:strategy-design",
+   "to_id": "object:mangrove-knowledge-space"
+  },
+  {
    "from": "market microstructure",
    "rel": "part-of",
    "to": "market foundations",
@@ -32044,6 +33160,14 @@
    "to_id": "fact:market-foundations-core-principles"
   },
   {
+   "from": "price impact (kyle lambda)",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Temporary vs. Permanent Impact: Some price impact reverses (temporary), some persists (permanent/information)",
+   "from_id": "property:price-impact",
+   "to_id": "fact:market-foundations-core-principles"
+  },
+  {
    "from": "volatility",
    "rel": "about",
    "to": "core principles",
@@ -32105,6 +33229,14 @@
    "to": "best practices",
    "why": "Use limit orders to control execution prices when liquidity permits \u00b7 Place limit orders at realistic prices based on current market conditions \u00b7 Use limit orders to avoid paying the full spread",
    "from_id": "concept:limit-order",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for all transaction costs when calculating expected strategy returns",
+   "from_id": "concept:transaction-cost",
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
@@ -32212,6 +33344,14 @@
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
+   "from": "volatility ratio (regime detection)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use regime detection filters to enable/disable specific strategies",
+   "from_id": "property:volatility-ratio",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
    "from": "regime shifts",
    "rel": "about",
    "to": "best practices",
@@ -32249,6 +33389,14 @@
    "to": "best practices",
    "why": "Always check the current spread before trading \u00b7 Avoid trading when spreads are abnormally wide unless necessary",
    "from_id": "concept:bid-ask-spread",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "price discovery",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand the price discovery role of derivatives markets",
+   "from_id": "concept:price-discovery",
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
@@ -35074,6 +36222,1734 @@
    "why": "stated across core-trading-concepts",
    "from_id": "judgment:price-action-best-practices",
    "to_id": "concept:price-action"
+  },
+  {
+   "from": "trading styles",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under trading styles",
+   "from_id": "concept:trading-style",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "scalping",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under trading styles",
+   "from_id": "concept:scalping",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "scalping",
+   "rel": "about",
+   "to": "trading styles",
+   "why": "stated under trading styles",
+   "from_id": "concept:scalping",
+   "to_id": "concept:trading-style"
+  },
+  {
+   "from": "day trading",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under trading styles",
+   "from_id": "concept:day-trading",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "day trading",
+   "rel": "about",
+   "to": "trading styles",
+   "why": "stated under trading styles",
+   "from_id": "concept:day-trading",
+   "to_id": "concept:trading-style"
+  },
+  {
+   "from": "swing trading",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under trading styles",
+   "from_id": "concept:swing-trading",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "swing trading",
+   "rel": "about",
+   "to": "trading styles",
+   "why": "stated under trading styles",
+   "from_id": "concept:swing-trading",
+   "to_id": "concept:trading-style"
+  },
+  {
+   "from": "scalping",
+   "rel": "kind-of",
+   "to": "trading styles",
+   "why": "listed under trading style comparison",
+   "from_id": "concept:scalping",
+   "to_id": "concept:trading-style"
+  },
+  {
+   "from": "day trading",
+   "rel": "kind-of",
+   "to": "trading styles",
+   "why": "listed under trading style comparison",
+   "from_id": "concept:day-trading",
+   "to_id": "concept:trading-style"
+  },
+  {
+   "from": "swing trading",
+   "rel": "kind-of",
+   "to": "trading styles",
+   "why": "listed under trading style comparison",
+   "from_id": "concept:swing-trading",
+   "to_id": "concept:trading-style"
+  },
+  {
+   "from": "position trading",
+   "rel": "kind-of",
+   "to": "trading styles",
+   "why": "listed under trading style comparison",
+   "from_id": "concept:position-trading",
+   "to_id": "concept:trading-style"
+  },
+  {
+   "from": "backtesting",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under backtesting best practices",
+   "from_id": "concept:backtesting",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under backtesting best practices",
+   "from_id": "procedure:transaction-cost-model",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "about",
+   "to": "backtesting",
+   "why": "stated under realistic assumptions",
+   "from_id": "procedure:transaction-cost-model",
+   "to_id": "concept:backtesting"
+  },
+  {
+   "from": "slippage modeling",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under backtesting best practices",
+   "from_id": "procedure:slippage-modeling",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "slippage modeling",
+   "rel": "about",
+   "to": "backtesting",
+   "why": "stated under realistic assumptions",
+   "from_id": "procedure:slippage-modeling",
+   "to_id": "concept:backtesting"
+  },
+  {
+   "from": "walk-forward optimization",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under walk-forward optimization",
+   "from_id": "concept:walk-forward-optimization",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "parameter optimization",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under walk-forward optimization",
+   "from_id": "procedure:parameter-optimization",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "parameter optimization",
+   "rel": "about",
+   "to": "walk-forward optimization",
+   "why": "stated under walk-forward optimization",
+   "from_id": "procedure:parameter-optimization",
+   "to_id": "concept:walk-forward-optimization"
+  },
+  {
+   "from": "anchored (expanding window)",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under walk-forward optimization",
+   "from_id": "concept:anchored-walk-forward",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "anchored (expanding window)",
+   "rel": "about",
+   "to": "walk-forward optimization",
+   "why": "stated under anchored vs. rolling walk-forward",
+   "from_id": "concept:anchored-walk-forward",
+   "to_id": "concept:walk-forward-optimization"
+  },
+  {
+   "from": "rolling (fixed window)",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under walk-forward optimization",
+   "from_id": "concept:rolling-walk-forward",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "rolling (fixed window)",
+   "rel": "about",
+   "to": "walk-forward optimization",
+   "why": "stated under anchored vs. rolling walk-forward",
+   "from_id": "concept:rolling-walk-forward",
+   "to_id": "concept:walk-forward-optimization"
+  },
+  {
+   "from": "strategy validation",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under strategy validation (avoiding biases)",
+   "from_id": "concept:strategy-validation",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "look-ahead bias",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "concept:look-ahead-bias",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "look-ahead bias",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under common biases to avoid",
+   "from_id": "concept:look-ahead-bias",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "survivorship bias",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "concept:survivorship-bias",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "survivorship bias",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under common biases to avoid",
+   "from_id": "concept:survivorship-bias",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "data snooping bias",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "concept:data-snooping-bias",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "data snooping bias",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under common biases to avoid",
+   "from_id": "concept:data-snooping-bias",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "selection bias",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "concept:selection-bias",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "selection bias",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under common biases to avoid",
+   "from_id": "concept:selection-bias",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "overfitting",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "concept:overfitting",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under common biases to avoid",
+   "from_id": "concept:overfitting",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "t-test for returns",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "procedure:returns-t-test",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "t-test for returns",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under statistical significance testing",
+   "from_id": "procedure:returns-t-test",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "multiple testing correction",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "procedure:multiple-testing-correction",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "multiple testing correction",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under statistical significance testing",
+   "from_id": "procedure:multiple-testing-correction",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "parameter sensitivity",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "procedure:parameter-sensitivity",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "parameter sensitivity",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under robustness checks",
+   "from_id": "procedure:parameter-sensitivity",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "time period stability",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "procedure:time-period-stability",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "time period stability",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under robustness checks",
+   "from_id": "procedure:time-period-stability",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "universe stability",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy validation (avoiding biases)",
+   "from_id": "procedure:universe-stability",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "universe stability",
+   "rel": "about",
+   "to": "strategy validation",
+   "why": "stated under robustness checks",
+   "from_id": "procedure:universe-stability",
+   "to_id": "concept:strategy-validation"
+  },
+  {
+   "from": "strategy archetypes",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under strategy archetypes",
+   "from_id": "concept:strategy-archetype",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "trend following",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:trend-following",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "trend following",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:trend-following",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "momentum strategy",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:momentum-strategy",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "momentum strategy",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:momentum-strategy",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "breakout strategy",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:breakout-strategy",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "breakout strategy",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:breakout-strategy",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "volatility strategy",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:volatility-strategy",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "volatility strategy",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:volatility-strategy",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:mean-reversion",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "stated under strategy archetypes",
+   "from_id": "concept:mean-reversion",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "trade plan",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under building a trade plan",
+   "from_id": "concept:trade-plan",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "signal types",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under signal types",
+   "from_id": "concept:signal-type",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "entry signal",
+   "rel": "kind-of",
+   "to": "signal types",
+   "why": "listed under the four signal types",
+   "from_id": "concept:entry-signal",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "exit signal",
+   "rel": "kind-of",
+   "to": "signal types",
+   "why": "listed under the four signal types",
+   "from_id": "concept:exit-signal",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "filter signal",
+   "rel": "kind-of",
+   "to": "signal types",
+   "why": "listed under the four signal types",
+   "from_id": "concept:filter-signal",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "confirmation signal",
+   "rel": "kind-of",
+   "to": "signal types",
+   "why": "listed under the four signal types",
+   "from_id": "concept:confirmation-signal",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "entry logic",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under entry logic frameworks",
+   "from_id": "concept:entry-logic",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "indicator-based",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:entry-indicator-based",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "indicator-based",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under signal generation approaches",
+   "from_id": "procedure:entry-indicator-based",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "pattern-based",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:entry-pattern-based",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "pattern-based",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under signal generation approaches",
+   "from_id": "procedure:entry-pattern-based",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "statistical-based",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:entry-statistical-based",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "statistical-based",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under signal generation approaches",
+   "from_id": "procedure:entry-statistical-based",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "multi-factor confirmation",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:multi-factor-confirmation",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "multi-factor confirmation",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under entry confirmation methods",
+   "from_id": "procedure:multi-factor-confirmation",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "timeframe confirmation",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:timeframe-confirmation",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "timeframe confirmation",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under entry confirmation methods",
+   "from_id": "procedure:timeframe-confirmation",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "pullback entry",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:pullback-entry",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "pullback entry",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under entry timing refinements",
+   "from_id": "procedure:pullback-entry",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "breakout entry",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:breakout-entry",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "breakout entry",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under entry timing refinements",
+   "from_id": "procedure:breakout-entry",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "regime filter",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:regime-filter",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "regime filter",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under entry filters",
+   "from_id": "procedure:regime-filter",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "volatility filter",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under entry logic frameworks",
+   "from_id": "procedure:volatility-filter",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "volatility filter",
+   "rel": "about",
+   "to": "entry logic",
+   "why": "stated under entry filters",
+   "from_id": "procedure:volatility-filter",
+   "to_id": "concept:entry-logic"
+  },
+  {
+   "from": "exit logic",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under exit logic",
+   "from_id": "concept:exit-logic",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "time-based exits",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:time-based-exit",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "time-based exits",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under exit logic",
+   "from_id": "procedure:time-based-exit",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "fixed stop",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:fixed-stop",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "fixed stop",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under stop-loss exits",
+   "from_id": "procedure:fixed-stop",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under stop-loss exits",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "fixed target",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:fixed-target",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "fixed target",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under profit target exits",
+   "from_id": "procedure:fixed-target",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "risk-multiple target",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:risk-multiple-target",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "risk-multiple target",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under profit target exits",
+   "from_id": "procedure:risk-multiple-target",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "simple trailing stop",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:simple-trailing-stop",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "simple trailing stop",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under trailing stop exits",
+   "from_id": "procedure:simple-trailing-stop",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "atr trailing stop",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:atr-trailing-stop",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "atr trailing stop",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under trailing stop exits",
+   "from_id": "procedure:atr-trailing-stop",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "indicator exit",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:exit-on-indicator",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "indicator exit",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under signal-based exits",
+   "from_id": "procedure:exit-on-indicator",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "opposing signal exit",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under exit logic",
+   "from_id": "procedure:opposing-signal-exit",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "opposing signal exit",
+   "rel": "about",
+   "to": "exit logic",
+   "why": "stated under signal-based exits",
+   "from_id": "procedure:opposing-signal-exit",
+   "to_id": "concept:exit-logic"
+  },
+  {
+   "from": "time-based logic",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under time-based logic",
+   "from_id": "concept:time-based-logic",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "session filters",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under time-based logic",
+   "from_id": "procedure:session-filter",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "session filters",
+   "rel": "about",
+   "to": "time-based logic",
+   "why": "stated under time-based logic",
+   "from_id": "procedure:session-filter",
+   "to_id": "concept:time-based-logic"
+  },
+  {
+   "from": "holding period constraints",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under time-based logic",
+   "from_id": "procedure:holding-period-constraint",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "holding period constraints",
+   "rel": "about",
+   "to": "time-based logic",
+   "why": "stated under time-based logic",
+   "from_id": "procedure:holding-period-constraint",
+   "to_id": "concept:time-based-logic"
+  },
+  {
+   "from": "calendar filters",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under time-based logic",
+   "from_id": "procedure:calendar-filter",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "calendar filters",
+   "rel": "about",
+   "to": "time-based logic",
+   "why": "stated under time-based logic",
+   "from_id": "procedure:calendar-filter",
+   "to_id": "concept:time-based-logic"
+  },
+  {
+   "from": "regime detection",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under regime detection & filtering",
+   "from_id": "concept:regime-detection",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "adx trend strength",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under regime detection & filtering",
+   "from_id": "procedure:adx-trend-strength",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "adx trend strength",
+   "rel": "about",
+   "to": "regime detection",
+   "why": "stated under trend vs. range detection",
+   "from_id": "procedure:adx-trend-strength",
+   "to_id": "concept:regime-detection"
+  },
+  {
+   "from": "efficiency ratio",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under regime detection & filtering",
+   "from_id": "procedure:efficiency-ratio",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "efficiency ratio",
+   "rel": "about",
+   "to": "regime detection",
+   "why": "stated under trend vs. range detection",
+   "from_id": "procedure:efficiency-ratio",
+   "to_id": "concept:regime-detection"
+  },
+  {
+   "from": "percentile-based",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under regime detection & filtering",
+   "from_id": "procedure:volatility-percentile-regime",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "percentile-based",
+   "rel": "about",
+   "to": "regime detection",
+   "why": "stated under volatility regime detection",
+   "from_id": "procedure:volatility-percentile-regime",
+   "to_id": "concept:regime-detection"
+  },
+  {
+   "from": "hidden markov model",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under regime detection & filtering",
+   "from_id": "procedure:hmm-regime-detection",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "hidden markov model",
+   "rel": "about",
+   "to": "regime detection",
+   "why": "stated under volatility regime detection",
+   "from_id": "procedure:hmm-regime-detection",
+   "to_id": "concept:regime-detection"
+  },
+  {
+   "from": "data quality",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "defined under data quality & preprocessing",
+   "from_id": "concept:data-quality",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "handling missing data",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under data quality & preprocessing",
+   "from_id": "procedure:handling-missing-data",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "handling missing data",
+   "rel": "about",
+   "to": "data quality",
+   "why": "stated under data cleaning",
+   "from_id": "procedure:handling-missing-data",
+   "to_id": "concept:data-quality"
+  },
+  {
+   "from": "outlier detection",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under data quality & preprocessing",
+   "from_id": "procedure:outlier-detection",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "outlier detection",
+   "rel": "about",
+   "to": "data quality",
+   "why": "stated under data cleaning",
+   "from_id": "procedure:outlier-detection",
+   "to_id": "concept:data-quality"
+  },
+  {
+   "from": "split adjustment",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under data quality & preprocessing",
+   "from_id": "procedure:split-adjustment",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "split adjustment",
+   "rel": "about",
+   "to": "data quality",
+   "why": "stated under corporate action adjustments",
+   "from_id": "procedure:split-adjustment",
+   "to_id": "concept:data-quality"
+  },
+  {
+   "from": "dividend adjustment",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under data quality & preprocessing",
+   "from_id": "procedure:dividend-adjustment",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "dividend adjustment",
+   "rel": "about",
+   "to": "data quality",
+   "why": "stated under corporate action adjustments",
+   "from_id": "procedure:dividend-adjustment",
+   "to_id": "concept:data-quality"
+  },
+  {
+   "from": "survivorship bias prevention",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under data quality & preprocessing",
+   "from_id": "procedure:survivorship-bias-prevention",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "survivorship bias prevention",
+   "rel": "about",
+   "to": "data quality",
+   "why": "stated under avoiding biases",
+   "from_id": "procedure:survivorship-bias-prevention",
+   "to_id": "concept:data-quality"
+  },
+  {
+   "from": "look-ahead bias prevention",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated under data quality & preprocessing",
+   "from_id": "procedure:look-ahead-bias-prevention",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "look-ahead bias prevention",
+   "rel": "about",
+   "to": "data quality",
+   "why": "stated under avoiding biases",
+   "from_id": "procedure:look-ahead-bias-prevention",
+   "to_id": "concept:data-quality"
+  },
+  {
+   "from": "sma_cross_up",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-sma-cross-up",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "macd_bullish_cross",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-macd-bullish-cross",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "rsi_oversold",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-rsi-oversold",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "sma_cross_down",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-sma-cross-down",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "macd_bearish_cross",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-macd-bearish-cross",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "rsi_overbought",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-rsi-overbought",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "is_above_sma",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-is-above-sma",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "adx_strong_trend",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-adx-strong-trend",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "vwap_above",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-vwap-above",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "macd_positive",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-macd-positive",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "obv_bullish",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-obv-bullish",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "bb_squeeze",
+   "rel": "about",
+   "to": "signal types",
+   "why": "the chapter's example of signal types",
+   "from_id": "procedure:signal-bb-squeeze",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "macd_bullish_cross",
+   "rel": "about",
+   "to": "entry signal",
+   "why": "the chapter's example of entry signal",
+   "from_id": "procedure:signal-macd-bullish-cross",
+   "to_id": "concept:entry-signal"
+  },
+  {
+   "from": "rsi_overbought",
+   "rel": "about",
+   "to": "exit signal",
+   "why": "the chapter's example of exit signal",
+   "from_id": "procedure:signal-rsi-overbought",
+   "to_id": "concept:exit-signal"
+  },
+  {
+   "from": "adx_strong_trend",
+   "rel": "about",
+   "to": "filter signal",
+   "why": "the chapter's example of filter signal",
+   "from_id": "procedure:signal-adx-strong-trend",
+   "to_id": "concept:filter-signal"
+  },
+  {
+   "from": "macd_positive",
+   "rel": "about",
+   "to": "confirmation signal",
+   "why": "the chapter's example of confirmation signal",
+   "from_id": "procedure:signal-macd-positive",
+   "to_id": "concept:confirmation-signal"
+  },
+  {
+   "from": "trend following",
+   "rel": "kind-of",
+   "to": "strategy archetypes",
+   "why": "the family that holds while a direction persists",
+   "from_id": "concept:trend-following",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "momentum strategy",
+   "rel": "kind-of",
+   "to": "strategy archetypes",
+   "why": "the family that reads whether pressure is building or fading",
+   "from_id": "concept:momentum-strategy",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "breakout strategy",
+   "rel": "kind-of",
+   "to": "strategy archetypes",
+   "why": "the family that acts as compression gives way",
+   "from_id": "concept:breakout-strategy",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "volatility strategy",
+   "rel": "kind-of",
+   "to": "strategy archetypes",
+   "why": "the family that trades movement size rather than direction",
+   "from_id": "concept:volatility-strategy",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "kind-of",
+   "to": "strategy archetypes",
+   "why": "the family that fades extension from fair value",
+   "from_id": "concept:mean-reversion",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "fixed stop",
+   "rel": "about",
+   "to": "stop order (stop-loss)",
+   "why": "the distance from entry it places one at",
+   "from_id": "procedure:fixed-stop",
+   "to_id": "concept:stop-order"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "about",
+   "to": "stop order (stop-loss)",
+   "why": "the same placement, scaled to how far the instrument moves",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "concept:stop-order"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "the range it multiplies to get the stop distance",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "procedure:indicator-atr"
+  },
+  {
+   "from": "atr trailing stop",
+   "rel": "uses",
+   "to": "ATR",
+   "why": "the range it holds the trail behind the extreme by",
+   "from_id": "procedure:atr-trailing-stop",
+   "to_id": "procedure:indicator-atr"
+  },
+  {
+   "from": "simple trailing stop",
+   "rel": "about",
+   "to": "trailing stop",
+   "why": "the level that follows price at a fixed percentage",
+   "from_id": "procedure:simple-trailing-stop",
+   "to_id": "concept:trailing-stop"
+  },
+  {
+   "from": "atr trailing stop",
+   "rel": "about",
+   "to": "trailing stop",
+   "why": "the same level, held at a volatility-scaled distance",
+   "from_id": "procedure:atr-trailing-stop",
+   "to_id": "concept:trailing-stop"
+  },
+  {
+   "from": "regime determines archetype effectiveness",
+   "rel": "about",
+   "to": "strategy archetypes",
+   "why": "the family whose effectiveness it says the regime decides",
+   "from_id": "fact:regime-determines-archetype-effectiveness",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "trend following",
+   "rel": "about",
+   "to": "trending market",
+   "why": "best regime: strong trends -- and whipsaws accumulate in the absence of one",
+   "from_id": "concept:trend-following",
+   "to_id": "concept:trending-market"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "ranging market",
+   "why": "best regime: range-bound only",
+   "from_id": "concept:mean-reversion",
+   "to_id": "concept:ranging-market"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "trending market",
+   "why": "the contraindication the chapter states most emphatically: it will blow up in one",
+   "from_id": "concept:mean-reversion",
+   "to_id": "concept:trending-market"
+  },
+  {
+   "from": "volatility strategy",
+   "rel": "about",
+   "to": "high volatility regime",
+   "why": "best regime: high volatility periods, with nothing to capture in a quiet one",
+   "from_id": "concept:volatility-strategy",
+   "to_id": "concept:high-volatility-regime"
+  },
+  {
+   "from": "breakout strategy",
+   "rel": "about",
+   "to": "compression",
+   "why": "best regime: after compression, which is the setup it waits for",
+   "from_id": "concept:breakout-strategy",
+   "to_id": "concept:compression"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "the trend is your friend",
+   "why": "the reason the chapter gives for why fading a trend is dangerous",
+   "from_id": "concept:mean-reversion",
+   "to_id": "judgment:trend-is-your-friend"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "win rate is not risk",
+   "why": "sixty to seventy per cent right, and negative skew: the case the fact is about",
+   "from_id": "concept:mean-reversion",
+   "to_id": "fact:win-rate-is-not-risk"
+  },
+  {
+   "from": "trading styles",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Timeframe Selection: Choose style based on available time, personality, and goals \u00b7 Consistency: Stick to one primary style rather than mixing approaches \u00b7 Capital Requirements: Different styles have different capital and margin needs \u00b7 Risk Profile: Each style has characteristic risk/reward patterns \u00b7 Lifestyle Fit: Trading style must align with personal schedule and temperament",
+   "from_id": "concept:trading-style",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "backtesting",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Historical Simulation: Test strategy on past data \u00b7 Out-of-Sample Testing: Reserve data for validation \u00b7 Realistic Assumptions: Include costs, slippage, constraints \u00b7 Multiple Tests: Test across different periods and conditions \u00b7 Skepticism: Assume backtest overstates live performance",
+   "from_id": "concept:backtesting",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "rolling (fixed window)",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Rolling Optimization: Optimize on window, test on next period",
+   "from_id": "concept:rolling-walk-forward",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "walk-forward optimization",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Out-of-Sample Validation: Only OOS results count \u00b7 Adaptive Parameters: Parameters adjust to changing market conditions \u00b7 Realistic Performance: OOS results estimate true performance",
+   "from_id": "concept:walk-forward-optimization",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Overfitting Prevention: Reduces curve-fitting to historical data",
+   "from_id": "concept:overfitting",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "strategy validation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Skepticism: Assume the strategy doesn't work until proven otherwise \u00b7 Economic Rationale: Strategy should have logical explanation \u00b7 Robustness: Results should hold across variations",
+   "from_id": "concept:strategy-validation",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "multiple testing correction",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Multiple Testing: Account for trying many strategies/parameters",
+   "from_id": "procedure:multiple-testing-correction",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "t-test for returns",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Statistical Significance: Returns should be statistically significant",
+   "from_id": "procedure:returns-t-test",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "strategy archetypes",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Behavioral Alignment: Each archetype exploits a specific market dynamic \u00b7 Regime Dependence: Archetypes rotate in effectiveness across regimes \u00b7 Style Purity: Mixing archetypes without intention creates fragile strategies \u00b7 Distinct Risk Profiles: Each archetype has characteristic skew and drawdowns \u00b7 Complementarity: Robust systems often combine multiple archetypes with clear hierarchy",
+   "from_id": "concept:strategy-archetype",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "trade plan",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Pre-Definition: All rules defined before trading, not during \u00b7 Specificity: Rules must be clear enough that another trader could execute them \u00b7 Completeness: Plan covers all scenarios: entry, exit, sizing, timing \u00b7 Documentation: Written down and accessible during trading \u00b7 Evolution: Reviewed and updated based on performance data",
+   "from_id": "concept:trade-plan",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "entry logic",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Objectivity: Rules should be unambiguous and programmable \u00b7 Edge Definition: Understand why the entry has expected positive return \u00b7 Timing: Entry timing affects risk/reward ratio",
+   "from_id": "concept:entry-logic",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "confirmation signal",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Confirmation: Multiple confirming factors improve reliability",
+   "from_id": "concept:confirmation-signal",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "filter signal",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Filter Quality: Pre-entry filters reduce false signals",
+   "from_id": "concept:filter-signal",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "exit logic",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Protect Capital: Exits should limit losses first, maximize gains second \u00b7 Let Winners Run: Don't exit winning trades prematurely \u00b7 Cut Losers Short: Remove losing positions quickly \u00b7 Rule-Based: Exits should be as systematic as entries \u00b7 Exit Reason: Know why you're exiting (stop, target, time, signal)",
+   "from_id": "concept:exit-logic",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "holding period constraints",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Holding Period: Strategies have optimal holding periods",
+   "from_id": "procedure:holding-period-constraint",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "session filters",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Session Selection: Not all trading hours are equal",
+   "from_id": "procedure:session-filter",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "calendar filters",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Calendar Awareness: Certain dates have predictable behavior",
+   "from_id": "procedure:calendar-filter",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "time-based logic",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Time Decay: Time affects option and volatility strategies \u00b7 Periodicity: Returns may cluster at specific times",
+   "from_id": "concept:time-based-logic",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Market States: Markets cycle through distinct regimes \u00b7 Strategy Matching: Different strategies excel in different regimes",
+   "from_id": "concept:market-regime",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "regime detection",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Lag Acceptance: Regime detection has inherent lag \u00b7 Probabilistic: Regime identification is probabilistic, not certain \u00b7 Adaptation: Strategies should adapt to detected regime",
+   "from_id": "concept:regime-detection",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "data quality",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Garbage In, Garbage Out: Strategy is only as good as its data \u00b7 Corporate Actions: Adjust for splits, dividends, mergers",
+   "from_id": "concept:data-quality",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "survivorship bias",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Survivorship Bias: Ensure delisted assets are included",
+   "from_id": "concept:survivorship-bias",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "look-ahead bias",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Look-Ahead Bias: Never use future information",
+   "from_id": "concept:look-ahead-bias",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "look-ahead bias prevention",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Point-in-Time: Use data as it was available at each historical point",
+   "from_id": "procedure:look-ahead-bias-prevention",
+   "to_id": "fact:strategy-design-core-principles"
+  },
+  {
+   "from": "trading styles",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Match trading style to available time and lifestyle \u00b7 Start with longer timeframes (swing) before attempting shorter (day/scalp) \u00b7 Consider psychological fit: can you hold overnight? Can you focus for hours? \u00b7 Paper trade the style before committing capital",
+   "from_id": "concept:trading-style",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for transaction costs relative to target profits \u00b7 Include realistic transaction costs and slippage",
+   "from_id": "procedure:transaction-cost-model",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "backtesting",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use out-of-sample data for final validation \u00b7 Be skeptical of exceptional results \u00b7 Compare to simple benchmarks \u00b7 Document all assumptions and parameters",
+   "from_id": "concept:backtesting",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Test across multiple market regimes",
+   "from_id": "concept:market-regime",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "walk-forward optimization",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use at least 2-3 years of data for optimization windows \u00b7 Test windows should be long enough for statistical significance \u00b7 Aggregate OOS results for overall performance estimate \u00b7 Be wary of strategies that require frequent reoptimization",
+   "from_id": "concept:walk-forward-optimization",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "parameter sensitivity",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor parameter stability across periods \u00b7 Test robustness to reasonable parameter perturbations",
+   "from_id": "procedure:parameter-sensitivity",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "data snooping bias",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Pre-register hypotheses before testing",
+   "from_id": "concept:data-snooping-bias",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "strategy validation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use out-of-sample data for final validation only \u00b7 Require economic rationale, not just statistical evidence \u00b7 Be skeptical of Sharpe ratios above 2.0 without clear edge \u00b7 Paper trade before committing real capital",
+   "from_id": "concept:strategy-validation",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "multiple testing correction",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for multiple testing in significance claims",
+   "from_id": "procedure:multiple-testing-correction",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "strategy archetypes",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Match archetypes to current market regime \u00b7 Combine complementary archetypes with clear hierarchy \u00b7 Understand skew and tail risk for each archetype \u00b7 **Never combine conflicting archetypes without explicit priority** (e.g., momentum vs mean reversion) \u00b7 Size positions according to archetype risk profile, not just win rate",
+   "from_id": "concept:strategy-archetype",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "regime shifts",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor regime transitions and adapt allocation",
+   "from_id": "concept:regime-shift",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "trade plan",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Write your plan when not actively trading (clear head) \u00b7 Be specific: vague rules lead to inconsistent execution \u00b7 Include \"what if\" scenarios and how to handle them \u00b7 Review plan performance weekly/monthly \u00b7 Update based on data, not emotions or single trades \u00b7 Treat the plan as non-negotiable during trading hours",
+   "from_id": "concept:trade-plan",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "signal types",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Layer signals intentionally: Filter -> Entry -> Confirmation is a common flow \u00b7 Match signal types to archetype: Trend-following needs different filters than mean reversion \u00b7 Test signal combinations: Backtest which combinations improve expectancy \u00b7 Document signal roles: Know why each signal is in your strategy",
+   "from_id": "concept:signal-type",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "confirmation signal",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Don't over-confirm: 2-3 signals is usually sufficient; more adds lag",
+   "from_id": "concept:confirmation-signal",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "entry logic",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Define entry criteria precisely before coding \u00b7 Test entries with various exit rules to isolate entry quality \u00b7 Track entry efficiency (how far price moves from entry in intended direction)",
+   "from_id": "concept:entry-logic",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "multi-factor confirmation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use multiple confirmation factors",
+   "from_id": "procedure:multi-factor-confirmation",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Avoid overly complex entry rules that overfit",
+   "from_id": "concept:overfitting",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "regime filter",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Include regime and volatility filters",
+   "from_id": "procedure:regime-filter",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "stop order (stop-loss)",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Always have a stop-loss for every position",
+   "from_id": "concept:stop-order",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "atr-based stop",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use ATR-based stops for volatility-adjusted risk",
+   "from_id": "procedure:atr-based-stop",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "trailing stop",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider trailing stops for trend-following strategies",
+   "from_id": "concept:trailing-stop",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "exit logic",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Don't let winners turn into losers (use break-even stops) \u00b7 Test different exit strategies with same entry to find optimal \u00b7 Document reason for each exit in trade log",
+   "from_id": "concept:exit-logic",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "regime detection",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Accept lag in regime detection; don't expect real-time accuracy \u00b7 Use multiple regime indicators for confirmation \u00b7 Have default behavior for uncertain/transitional regimes \u00b7 Backtest regime detection separately from strategy \u00b7 Consider regime detection failures in risk management",
+   "from_id": "concept:regime-detection",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "data quality",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Validate data against multiple sources \u00b7 Document data sources and any adjustments made",
+   "from_id": "concept:data-quality",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "outlier detection",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Check for obvious errors (negative prices, impossible moves)",
+   "from_id": "procedure:outlier-detection",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "look-ahead bias prevention",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use point-in-time databases when available \u00b7 Account for reporting lags in fundamental data",
+   "from_id": "procedure:look-ahead-bias-prevention",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "survivorship bias prevention",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Include delisted securities in backtests",
+   "from_id": "procedure:survivorship-bias-prevention",
+   "to_id": "judgment:strategy-design-best-practices"
+  },
+  {
+   "from": "core principles",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated across strategy-design",
+   "from_id": "fact:strategy-design-core-principles",
+   "to_id": "concept:strategy-design"
+  },
+  {
+   "from": "best practices",
+   "rel": "part-of",
+   "to": "strategy design",
+   "why": "stated across strategy-design",
+   "from_id": "judgment:strategy-design-best-practices",
+   "to_id": "concept:strategy-design"
   }
  ],
  "meta": {
@@ -35095,23 +37971,27 @@
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],
   "indicators_missing_description": [],
-  "doc_atoms": 6,
+  "doc_atoms": 7,
   "doc_atom_ids": [
    "concept:chart-pattern",
    "concept:market-foundations",
    "concept:market-mechanics",
    "concept:price-action",
    "concept:quantitative-analysis",
-   "concept:risk-management"
+   "concept:risk-management",
+   "concept:strategy-design"
   ],
   "derived_atom_ids": [
    "concept:accumulation-pattern",
+   "concept:anchored-walk-forward",
    "concept:arbitrageur",
    "concept:auction-based-discovery",
    "concept:automated-market-maker",
+   "concept:backtesting",
    "concept:bearish-fair-value-gap",
    "concept:bid-ask-spread",
    "concept:break-of-structure",
+   "concept:breakout-strategy",
    "concept:bullish-fair-value-gap",
    "concept:buy-side-liquidity",
    "concept:call-option",
@@ -35124,6 +38004,7 @@
    "concept:commodity-spot-market",
    "concept:compression",
    "concept:concentrated-liquidity",
+   "concept:confirmation-signal",
    "concept:confluence",
    "concept:continuous-trading-discovery",
    "concept:contract-specification",
@@ -35132,17 +38013,25 @@
    "concept:crypto-specific-mechanics",
    "concept:cryptocurrency-spot-market",
    "concept:dark-pool",
+   "concept:data-quality",
+   "concept:data-snooping-bias",
+   "concept:day-trading",
    "concept:decentralized-exchange",
    "concept:demand-zone",
    "concept:distribution-pattern",
    "concept:dynamic-level",
    "concept:electronic-communication-network",
+   "concept:entry-logic",
+   "concept:entry-signal",
    "concept:equal-highs-and-lows",
    "concept:equity-settlement",
    "concept:equity-spot-market",
    "concept:execution-model",
+   "concept:exit-logic",
+   "concept:exit-signal",
    "concept:expansion",
    "concept:fair-value-gap",
+   "concept:filter-signal",
    "concept:forex-spot-market",
    "concept:futures",
    "concept:futures-settlement",
@@ -35165,6 +38054,7 @@
    "concept:liquidity-grab",
    "concept:liquidity-pool",
    "concept:lit-exchange",
+   "concept:look-ahead-bias",
    "concept:low-volatility-regime",
    "concept:low-volume-node",
    "concept:margin",
@@ -35178,43 +38068,63 @@
    "concept:market-participant",
    "concept:market-regime",
    "concept:market-structure",
+   "concept:mean-reversion",
+   "concept:momentum-strategy",
    "concept:multi-timeframe-analysis",
    "concept:option",
    "concept:order-flow",
    "concept:order-type",
    "concept:over-the-counter-market",
+   "concept:overfitting",
    "concept:perpetual-swap",
    "concept:point-of-control",
+   "concept:position-trading",
    "concept:price-action",
    "concept:price-discovery",
    "concept:proprietary-trading-firm",
    "concept:put-option",
    "concept:quantitative-analysis",
    "concept:ranging-market",
+   "concept:regime-detection",
    "concept:regime-shift",
    "concept:retail-trader",
    "concept:risk-management",
+   "concept:rolling-walk-forward",
+   "concept:scalping",
+   "concept:selection-bias",
    "concept:sell-side-liquidity",
    "concept:settlement",
+   "concept:signal-type",
    "concept:slippage",
    "concept:smart-money-concept",
    "concept:spot-market",
    "concept:stop-hunt",
    "concept:stop-limit-order",
    "concept:stop-order",
+   "concept:strategy-archetype",
+   "concept:strategy-design",
+   "concept:strategy-validation",
    "concept:supply-demand-zone",
    "concept:supply-zone",
    "concept:support-and-resistance",
+   "concept:survivorship-bias",
+   "concept:swing-trading",
+   "concept:time-based-logic",
+   "concept:trade-plan",
+   "concept:trading-style",
    "concept:trading-venue",
    "concept:trailing-stop",
    "concept:transaction-cost",
+   "concept:trend-following",
    "concept:trending-market",
    "concept:value-area-high",
    "concept:value-area-low",
+   "concept:volatility-strategy",
    "concept:volume",
    "concept:volume-confirmation",
    "concept:volume-divergence",
    "concept:volume-profile",
+   "concept:walk-forward-optimization",
    "fact:constant-product-amm",
    "fact:cost-of-carry-relationship",
    "fact:market-foundations-core-principles",
@@ -35224,29 +38134,69 @@
    "fact:regime-determines-archetype-effectiveness",
    "fact:risk-is-multi-dimensional",
    "fact:square-root-market-impact-rule",
+   "fact:strategy-design-core-principles",
    "fact:timeframe-ratio",
    "fact:win-rate-is-not-risk",
    "judgment:market-foundations-best-practices",
    "judgment:market-mechanics-best-practices",
    "judgment:price-action-best-practices",
+   "judgment:strategy-design-best-practices",
    "judgment:trend-is-your-friend",
    "procedure:adx-trend-strength",
    "procedure:almgren-chriss-market-impact-model",
+   "procedure:atr-based-stop",
+   "procedure:atr-trailing-stop",
    "procedure:bearish-fvg-detection",
    "procedure:black-scholes-call-price",
+   "procedure:breakout-entry",
    "procedure:bullish-fvg-detection",
+   "procedure:calendar-filter",
+   "procedure:dividend-adjustment",
+   "procedure:efficiency-ratio",
+   "procedure:entry-indicator-based",
+   "procedure:entry-pattern-based",
+   "procedure:entry-statistical-based",
    "procedure:equal-level-detection",
+   "procedure:exit-on-indicator",
+   "procedure:fixed-stop",
+   "procedure:fixed-target",
    "procedure:fvg-fill-status",
    "procedure:fvg-validity",
    "procedure:garch-model",
+   "procedure:handling-missing-data",
+   "procedure:hmm-regime-detection",
+   "procedure:holding-period-constraint",
    "procedure:implementation-shortfall",
    "procedure:liquidity-zone-identification",
+   "procedure:look-ahead-bias-prevention",
+   "procedure:multi-factor-confirmation",
+   "procedure:multiple-testing-correction",
+   "procedure:opposing-signal-exit",
+   "procedure:outlier-detection",
+   "procedure:parameter-optimization",
+   "procedure:parameter-sensitivity",
+   "procedure:pullback-entry",
+   "procedure:regime-filter",
+   "procedure:returns-t-test",
+   "procedure:risk-multiple-target",
+   "procedure:session-filter",
+   "procedure:simple-trailing-stop",
+   "procedure:slippage-modeling",
    "procedure:sniper-liquidity-seeking",
+   "procedure:split-adjustment",
    "procedure:structure-break-detection",
+   "procedure:survivorship-bias-prevention",
    "procedure:swing-point-identification",
+   "procedure:time-based-exit",
+   "procedure:time-period-stability",
+   "procedure:timeframe-confirmation",
+   "procedure:transaction-cost-model",
    "procedure:trend-classification",
    "procedure:twap",
+   "procedure:universe-stability",
    "procedure:value-area-calculation",
+   "procedure:volatility-filter",
+   "procedure:volatility-percentile-regime",
    "procedure:volume-profile",
    "procedure:vwap",
    "procedure:zone-identification",
@@ -35308,6 +38258,16 @@
     "concept:volume"
    ],
    [
+    "concept:anchored-walk-forward",
+    "about",
+    "concept:walk-forward-optimization"
+   ],
+   [
+    "concept:anchored-walk-forward",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "concept:arbitrageur",
     "about",
     "concept:market-efficiency"
@@ -35331,6 +38291,21 @@
     "concept:automated-market-maker",
     "kind-of",
     "concept:crypto-specific-mechanics"
+   ],
+   [
+    "concept:backtesting",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:backtesting",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:backtesting",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "concept:bearish-fair-value-gap",
@@ -35371,6 +38346,26 @@
     "concept:break-of-structure",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "concept:breakout-strategy",
+    "about",
+    "concept:compression"
+   ],
+   [
+    "concept:breakout-strategy",
+    "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:breakout-strategy",
+    "kind-of",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:breakout-strategy",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "concept:bullish-fair-value-gap",
@@ -35508,6 +38503,21 @@
     "concept:crypto-specific-mechanics"
    ],
    [
+    "concept:confirmation-signal",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:confirmation-signal",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:confirmation-signal",
+    "kind-of",
+    "concept:signal-type"
+   ],
+   [
     "concept:confluence",
     "about",
     "fact:price-action-core-principles"
@@ -35613,6 +38623,51 @@
     "concept:trading-venue"
    ],
    [
+    "concept:data-quality",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:data-quality",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:data-quality",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:data-snooping-bias",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "concept:data-snooping-bias",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:data-snooping-bias",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:day-trading",
+    "about",
+    "concept:trading-style"
+   ],
+   [
+    "concept:day-trading",
+    "kind-of",
+    "concept:trading-style"
+   ],
+   [
+    "concept:day-trading",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "concept:decentralized-exchange",
     "about",
     "judgment:market-mechanics-best-practices"
@@ -35668,6 +38723,26 @@
     "concept:trading-venue"
    ],
    [
+    "concept:entry-logic",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:entry-logic",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:entry-logic",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:entry-signal",
+    "kind-of",
+    "concept:signal-type"
+   ],
+   [
     "concept:equal-highs-and-lows",
     "about",
     "concept:liquidity"
@@ -35718,6 +38793,26 @@
     "concept:market-foundations"
    ],
    [
+    "concept:exit-logic",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:exit-logic",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:exit-logic",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:exit-signal",
+    "kind-of",
+    "concept:signal-type"
+   ],
+   [
     "concept:expansion",
     "about",
     "fact:price-action-core-principles"
@@ -35741,6 +38836,16 @@
     "concept:fair-value-gap",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "concept:filter-signal",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:filter-signal",
+    "kind-of",
+    "concept:signal-type"
    ],
    [
     "concept:forex-spot-market",
@@ -36043,6 +39148,21 @@
     "concept:trading-venue"
    ],
    [
+    "concept:look-ahead-bias",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "concept:look-ahead-bias",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:look-ahead-bias",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "concept:low-volatility-regime",
     "kind-of",
     "concept:market-regime"
@@ -36175,7 +39295,17 @@
    [
     "concept:market-regime",
     "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:market-regime",
+    "about",
     "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:market-regime",
+    "about",
+    "judgment:strategy-design-best-practices"
    ],
    [
     "concept:market-regime",
@@ -36201,6 +39331,56 @@
     "concept:market-structure",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
+    "concept:ranging-market"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
+    "concept:trending-market"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
+    "fact:win-rate-is-not-risk"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
+    "judgment:trend-is-your-friend"
+   ],
+   [
+    "concept:mean-reversion",
+    "kind-of",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:mean-reversion",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:momentum-strategy",
+    "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:momentum-strategy",
+    "kind-of",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:momentum-strategy",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "concept:multi-timeframe-analysis",
@@ -36273,6 +39453,26 @@
     "concept:trading-venue"
    ],
    [
+    "concept:overfitting",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "concept:overfitting",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:overfitting",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:overfitting",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "concept:perpetual-swap",
     "part-of",
     "concept:market-mechanics"
@@ -36291,6 +39491,11 @@
     "concept:point-of-control",
     "part-of",
     "concept:volume-profile"
+   ],
+   [
+    "concept:position-trading",
+    "kind-of",
+    "concept:trading-style"
    ],
    [
     "concept:price-action",
@@ -36316,6 +39521,11 @@
     "concept:price-discovery",
     "about",
     "fact:market-foundations-core-principles"
+   ],
+   [
+    "concept:price-discovery",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:price-discovery",
@@ -36358,9 +39568,29 @@
     "concept:market-regime"
    ],
    [
+    "concept:regime-detection",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:regime-detection",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:regime-detection",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "concept:regime-shift",
     "about",
     "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:regime-shift",
+    "about",
+    "judgment:strategy-design-best-practices"
    ],
    [
     "concept:regime-shift",
@@ -36381,6 +39611,46 @@
     "concept:risk-management",
     "part-of",
     "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:rolling-walk-forward",
+    "about",
+    "concept:walk-forward-optimization"
+   ],
+   [
+    "concept:rolling-walk-forward",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:rolling-walk-forward",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:scalping",
+    "about",
+    "concept:trading-style"
+   ],
+   [
+    "concept:scalping",
+    "kind-of",
+    "concept:trading-style"
+   ],
+   [
+    "concept:scalping",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:selection-bias",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "concept:selection-bias",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "concept:sell-side-liquidity",
@@ -36406,6 +39676,16 @@
     "concept:settlement",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:signal-type",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:signal-type",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "concept:slippage",
@@ -36499,8 +39779,48 @@
    ],
    [
     "concept:stop-order",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:stop-order",
     "kind-of",
     "concept:order-type"
+   ],
+   [
+    "concept:strategy-archetype",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:strategy-archetype",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:strategy-archetype",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:strategy-design",
+    "part-of",
+    "object:mangrove-knowledge-space"
+   ],
+   [
+    "concept:strategy-validation",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:strategy-validation",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:strategy-validation",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "concept:supply-demand-zone",
@@ -36543,6 +39863,76 @@
     "concept:price-action"
    ],
    [
+    "concept:survivorship-bias",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "concept:survivorship-bias",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:survivorship-bias",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:swing-trading",
+    "about",
+    "concept:trading-style"
+   ],
+   [
+    "concept:swing-trading",
+    "kind-of",
+    "concept:trading-style"
+   ],
+   [
+    "concept:swing-trading",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:time-based-logic",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:time-based-logic",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:trade-plan",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:trade-plan",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:trade-plan",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "concept:trading-style",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:trading-style",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:trading-style",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "concept:trading-venue",
     "about",
     "fact:market-foundations-core-principles"
@@ -36556,6 +39946,11 @@
     "concept:trading-venue",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:trailing-stop",
+    "about",
+    "judgment:strategy-design-best-practices"
    ],
    [
     "concept:trailing-stop",
@@ -36574,8 +39969,33 @@
    ],
    [
     "concept:transaction-cost",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:transaction-cost",
     "part-of",
     "concept:market-foundations"
+   ],
+   [
+    "concept:trend-following",
+    "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:trend-following",
+    "about",
+    "concept:trending-market"
+   ],
+   [
+    "concept:trend-following",
+    "kind-of",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:trend-following",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "concept:trending-market",
@@ -36633,6 +40053,26 @@
     "concept:market-foundations"
    ],
    [
+    "concept:volatility-strategy",
+    "about",
+    "concept:high-volatility-regime"
+   ],
+   [
+    "concept:volatility-strategy",
+    "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:volatility-strategy",
+    "kind-of",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:volatility-strategy",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "concept:volume",
     "about",
     "concept:order-flow"
@@ -36681,6 +40121,21 @@
     "concept:volume-profile",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "concept:walk-forward-optimization",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:walk-forward-optimization",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:walk-forward-optimization",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "fact:constant-product-amm",
@@ -36740,6 +40195,11 @@
    [
     "fact:regime-determines-archetype-effectiveness",
     "about",
+    "concept:strategy-archetype"
+   ],
+   [
+    "fact:regime-determines-archetype-effectiveness",
+    "about",
     "fact:price-action-core-principles"
    ],
    [
@@ -36761,6 +40221,11 @@
     "fact:square-root-market-impact-rule",
     "uses",
     "property:participation-rate"
+   ],
+   [
+    "fact:strategy-design-core-principles",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "fact:timeframe-ratio",
@@ -36803,6 +40268,11 @@
     "concept:price-action"
    ],
    [
+    "judgment:strategy-design-best-practices",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "judgment:trend-is-your-friend",
     "about",
     "concept:trending-market"
@@ -36830,7 +40300,17 @@
    [
     "procedure:adx-trend-strength",
     "about",
+    "concept:regime-detection"
+   ],
+   [
+    "procedure:adx-trend-strength",
+    "about",
     "concept:trending-market"
+   ],
+   [
+    "procedure:adx-trend-strength",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "procedure:adx-trend-strength",
@@ -36848,6 +40328,51 @@
     "property:historical-volatility"
    ],
    [
+    "procedure:atr-based-stop",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:atr-based-stop",
+    "about",
+    "concept:stop-order"
+   ],
+   [
+    "procedure:atr-based-stop",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:atr-based-stop",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:atr-based-stop",
+    "uses",
+    "procedure:indicator-atr"
+   ],
+   [
+    "procedure:atr-trailing-stop",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:atr-trailing-stop",
+    "about",
+    "concept:trailing-stop"
+   ],
+   [
+    "procedure:atr-trailing-stop",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:atr-trailing-stop",
+    "uses",
+    "procedure:indicator-atr"
+   ],
+   [
     "procedure:bearish-fvg-detection",
     "about",
     "concept:bearish-fair-value-gap"
@@ -36861,6 +40386,16 @@
     "procedure:black-scholes-call-price",
     "about",
     "concept:option"
+   ],
+   [
+    "procedure:breakout-entry",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:breakout-entry",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "procedure:bullish-fvg-detection",
@@ -36878,6 +40413,71 @@
     "fact:price-action-core-principles"
    ],
    [
+    "procedure:calendar-filter",
+    "about",
+    "concept:time-based-logic"
+   ],
+   [
+    "procedure:calendar-filter",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "procedure:calendar-filter",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:dividend-adjustment",
+    "about",
+    "concept:data-quality"
+   ],
+   [
+    "procedure:dividend-adjustment",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:efficiency-ratio",
+    "about",
+    "concept:regime-detection"
+   ],
+   [
+    "procedure:efficiency-ratio",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:entry-indicator-based",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:entry-indicator-based",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:entry-pattern-based",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:entry-pattern-based",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:entry-statistical-based",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:entry-statistical-based",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "procedure:equal-level-detection",
     "about",
     "concept:equal-highs-and-lows"
@@ -36886,6 +40486,41 @@
     "procedure:equal-level-detection",
     "uses",
     "procedure:swing-point-identification"
+   ],
+   [
+    "procedure:exit-on-indicator",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:exit-on-indicator",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:fixed-stop",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:fixed-stop",
+    "about",
+    "concept:stop-order"
+   ],
+   [
+    "procedure:fixed-stop",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:fixed-target",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:fixed-target",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "procedure:fvg-fill-status",
@@ -36931,6 +40566,41 @@
     "procedure:garch-model",
     "uses",
     "property:historical-volatility"
+   ],
+   [
+    "procedure:handling-missing-data",
+    "about",
+    "concept:data-quality"
+   ],
+   [
+    "procedure:handling-missing-data",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:hmm-regime-detection",
+    "about",
+    "concept:regime-detection"
+   ],
+   [
+    "procedure:hmm-regime-detection",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:holding-period-constraint",
+    "about",
+    "concept:time-based-logic"
+   ],
+   [
+    "procedure:holding-period-constraint",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "procedure:holding-period-constraint",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "procedure:implementation-shortfall",
@@ -36988,6 +40658,281 @@
     "procedure:indicator-atr"
    ],
    [
+    "procedure:look-ahead-bias-prevention",
+    "about",
+    "concept:data-quality"
+   ],
+   [
+    "procedure:look-ahead-bias-prevention",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "procedure:look-ahead-bias-prevention",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:look-ahead-bias-prevention",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:multi-factor-confirmation",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:multi-factor-confirmation",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:multi-factor-confirmation",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:multiple-testing-correction",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "procedure:multiple-testing-correction",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "procedure:multiple-testing-correction",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:multiple-testing-correction",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:opposing-signal-exit",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:opposing-signal-exit",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:outlier-detection",
+    "about",
+    "concept:data-quality"
+   ],
+   [
+    "procedure:outlier-detection",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:outlier-detection",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:parameter-optimization",
+    "about",
+    "concept:walk-forward-optimization"
+   ],
+   [
+    "procedure:parameter-optimization",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:parameter-sensitivity",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "procedure:parameter-sensitivity",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:parameter-sensitivity",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:pullback-entry",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:pullback-entry",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:regime-filter",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:regime-filter",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:regime-filter",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:returns-t-test",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "procedure:returns-t-test",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "procedure:returns-t-test",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:risk-multiple-target",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:risk-multiple-target",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:session-filter",
+    "about",
+    "concept:time-based-logic"
+   ],
+   [
+    "procedure:session-filter",
+    "about",
+    "fact:strategy-design-core-principles"
+   ],
+   [
+    "procedure:session-filter",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:signal-adx-strong-trend",
+    "about",
+    "concept:filter-signal"
+   ],
+   [
+    "procedure:signal-adx-strong-trend",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-bb-squeeze",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-is-above-sma",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-macd-bearish-cross",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-macd-bullish-cross",
+    "about",
+    "concept:entry-signal"
+   ],
+   [
+    "procedure:signal-macd-bullish-cross",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-macd-positive",
+    "about",
+    "concept:confirmation-signal"
+   ],
+   [
+    "procedure:signal-macd-positive",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-obv-bullish",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-rsi-overbought",
+    "about",
+    "concept:exit-signal"
+   ],
+   [
+    "procedure:signal-rsi-overbought",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-rsi-oversold",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-sma-cross-down",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-sma-cross-up",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:signal-vwap-above",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "procedure:simple-trailing-stop",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:simple-trailing-stop",
+    "about",
+    "concept:trailing-stop"
+   ],
+   [
+    "procedure:simple-trailing-stop",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:slippage-modeling",
+    "about",
+    "concept:backtesting"
+   ],
+   [
+    "procedure:slippage-modeling",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "procedure:sniper-liquidity-seeking",
     "about",
     "concept:dark-pool"
@@ -36996,6 +40941,16 @@
     "procedure:sniper-liquidity-seeking",
     "instance-of",
     "concept:execution-model"
+   ],
+   [
+    "procedure:split-adjustment",
+    "about",
+    "concept:data-quality"
+   ],
+   [
+    "procedure:split-adjustment",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "procedure:structure-break-detection",
@@ -37023,6 +40978,21 @@
     "procedure:swing-point-identification"
    ],
    [
+    "procedure:survivorship-bias-prevention",
+    "about",
+    "concept:data-quality"
+   ],
+   [
+    "procedure:survivorship-bias-prevention",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:survivorship-bias-prevention",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "procedure:swing-point-identification",
     "about",
     "concept:market-structure"
@@ -37036,6 +41006,51 @@
     "procedure:swing-point-identification",
     "about",
     "judgment:price-action-best-practices"
+   ],
+   [
+    "procedure:time-based-exit",
+    "about",
+    "concept:exit-logic"
+   ],
+   [
+    "procedure:time-based-exit",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:time-period-stability",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "procedure:time-period-stability",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:timeframe-confirmation",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:timeframe-confirmation",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:transaction-cost-model",
+    "about",
+    "concept:backtesting"
+   ],
+   [
+    "procedure:transaction-cost-model",
+    "about",
+    "judgment:strategy-design-best-practices"
+   ],
+   [
+    "procedure:transaction-cost-model",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "procedure:trend-classification",
@@ -37058,6 +41073,16 @@
     "concept:execution-model"
    ],
    [
+    "procedure:universe-stability",
+    "about",
+    "concept:strategy-validation"
+   ],
+   [
+    "procedure:universe-stability",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
     "procedure:value-area-calculation",
     "about",
     "concept:volume-profile"
@@ -37066,6 +41091,26 @@
     "procedure:value-area-calculation",
     "uses",
     "procedure:volume-profile"
+   ],
+   [
+    "procedure:volatility-filter",
+    "about",
+    "concept:entry-logic"
+   ],
+   [
+    "procedure:volatility-filter",
+    "part-of",
+    "concept:strategy-design"
+   ],
+   [
+    "procedure:volatility-percentile-regime",
+    "about",
+    "concept:regime-detection"
+   ],
+   [
+    "procedure:volatility-percentile-regime",
+    "part-of",
+    "concept:strategy-design"
    ],
    [
     "procedure:volume-profile",
@@ -37509,6 +41554,11 @@
    ],
    [
     "property:price-impact",
+    "about",
+    "fact:market-foundations-core-principles"
+   ],
+   [
+    "property:price-impact",
     "uses",
     "concept:order-flow"
    ],
@@ -37694,6 +41744,11 @@
    ],
    [
     "property:volatility-ratio",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "property:volatility-ratio",
     "uses",
     "property:historical-volatility"
    ],
@@ -37753,13 +41808,13 @@
     "property:support-resistance-zone-width"
    ]
   ],
-  "doc_relations": 6,
+  "doc_relations": 7,
   "doc_anchors": [
    "concept:technical-analysis",
    "object:mangrove-knowledge-space"
   ],
   "chapter_market-foundations_atoms": 61,
-  "chapter_market-foundations_relations": 134,
+  "chapter_market-foundations_relations": 138,
   "chapter_market-foundations_folded": [
    "concept:market-foundations",
    "concept:volatility",
@@ -37771,7 +41826,9 @@
    "concept:market-mechanics",
    "concept:market-regime",
    "concept:price-action",
+   "concept:strategy-design",
    "concept:volatility",
+   "procedure:adx-trend-strength",
    "procedure:indicator-atr",
    "procedure:indicator-obv",
    "procedure:indicator-vwap"
@@ -37789,6 +41846,12 @@
    "concept:price-action",
    "procedure:indicator-obv",
    "procedure:indicator-vwap"
+  ],
+  "chapter_strategy-design_atoms": 72,
+  "chapter_strategy-design_relations": 216,
+  "chapter_strategy-design_folded": [
+   "concept:strategy-design",
+   "procedure:adx-trend-strength"
   ]
  }
 }

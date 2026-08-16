@@ -4,6 +4,8 @@ These run against the real committed ontology rather than fixtures. A hand-writt
 pass while the shipped graph was broken, and the shape of the real graph -- disjoint axis
 populations, hubs of degree 200+ -- is exactly what the API has to cope with.
 """
+import re
+
 import pytest
 
 from mangrove_kb.graph import (BACKBONE, FUNCTION_WORDS, RELATIONS, ROLE_RELATION, SEARCH_TIERS,
@@ -322,9 +324,14 @@ def test_search_reads_the_authored_detail_not_only_the_headline(kg):
     """
     for term in ("mean reversion", "crossover", "overbought"):
         found = {r["id"] for r in kg.find(term, limit=None)}
+        # Normalised the way the search reads text, not by raw substring: chapter 4 states a rule
+        # as `mean_reversion_signal(price)`, which mentions mean reversion in every sense that
+        # matters and contains no space. A cruder check here reports the match as a false positive.
+        def plain(text: str) -> str:
+            return re.sub(r"[^a-z0-9]+", " ", text.lower())
         mentioned = {n.id for n in kg.nodes.values()
-                     if term in _flatten({"name": n.name, "id": n.id,
-                                          "summary": n.summary, **n.props}).lower()}
+                     if plain(term) in plain(_flatten({"name": n.name, "id": n.id,
+                                                       "summary": n.summary, **n.props}))}
         assert mentioned, f"expected {term!r} somewhere in the graph"
         assert found == mentioned, f"{term!r}: {len(mentioned - found)} nodes mention it but do not match"
 
@@ -408,7 +415,7 @@ def test_a_query_falls_back_to_its_best_subset_only_when_nothing_carries_all_of_
     both words, so nodes carrying one of them stay out.
     """
     both = kg.find("mean reversion", limit=None)
-    assert both.total == 11, "a query that fully matches must not be widened"
+    assert both.total == 15, "a query that fully matches must not be widened"
     for row in both.items:
         hay = " ".join(kg._haystacks[row["id"]])
         assert "mean" in hay and "reversion" in hay

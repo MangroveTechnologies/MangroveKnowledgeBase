@@ -788,6 +788,312 @@ CHAPTERS: dict[str, dict] = {
             "Study auction dynamics": "concept:auction-based-discovery",
         },
     },
+    "strategy-design": {
+        # This chapter states nothing under `### Examples` and nothing under `### Mathematical
+        # Rules/Formulas`. What earlier chapters wrote as a taxonomy block it writes as sibling
+        # `###` headings, and what they wrote as a formula it writes as a python function.
+        "taxonomy": set(),
+        # §4.2 heads each archetype's definition `**Core Premise:**`, where §3.0 wrote
+        # `**Definition:**`. Both name the same slot.
+        "definition_labels": ("Definition", "Core Premise"),
+        # §4.1 and §4.2 each list their members as headings of their own rather than under Examples.
+        # Position trading is named only in the comparison table, and the table declaration below
+        # creates it; the other three carry a block, and merge with their row.
+        "blocks_as_nodes": {
+            "Trading Styles": {"Scalping": "Concept", "Day Trading": "Concept",
+                               "Swing Trading": "Concept"},
+            "Strategy Archetypes": {"Trend Following": "Concept", "Momentum": "Concept",
+                                    "Breakouts (Transition Archetype)": "Concept",
+                                    "Volatility": "Concept", "Mean Reversion": "Concept"},
+            # Headings holding one unlabelled recipe each. A rule you evaluate over bars is a
+            # Procedure, whatever the chapter chose to head it with.
+            "Exit Logic": {"Time-Based Exits": "Procedure"},
+            "Time-Based Logic": {"Session Filters": "Procedure",
+                                 "Holding Period Constraints": "Procedure",
+                                 "Calendar Filters": "Procedure"},
+            "Walk-Forward Optimization": {"Parameter Optimization": "Procedure"},
+        },
+        # §4.5 onwards states its rules as `**Label:**` sub-blocks rather than as headings. Each is
+        # a named thing -- a stop placement, a regime test, a bias -- and left inside the heading
+        # none of them can carry an edge.
+        "labelled_nodes": {
+            "Signal Generation Approaches": {"Indicator-Based": "Procedure",
+                                             "Pattern-Based": "Procedure",
+                                             "Statistical-Based": "Procedure"},
+            "Entry Confirmation Methods": {"Multi-Factor Confirmation": "Procedure",
+                                           "Timeframe Confirmation": "Procedure"},
+            "Entry Timing Refinements": {"Pullback Entry": "Procedure",
+                                         "Breakout Entry": "Procedure"},
+            "Entry Filters": {"Regime Filter": "Procedure", "Volatility Filter": "Procedure"},
+            "Stop-Loss Exits": {"Fixed Stop": "Procedure", "ATR-Based Stop": "Procedure"},
+            "Profit Target Exits": {"Fixed Target": "Procedure",
+                                    "Risk-Multiple Target": "Procedure"},
+            "Trailing Stop Exits": {"Simple Trailing Stop": "Procedure",
+                                    "ATR Trailing Stop": "Procedure"},
+            "Signal-Based Exits": {"Indicator Exit": "Procedure",
+                                   "Opposing Signal Exit": "Procedure"},
+            "Trend vs. Range Detection": {"ADX-Based": "Procedure", "Efficiency Ratio": "Procedure"},
+            "Volatility Regime Detection": {"Percentile-Based": "Procedure",
+                                            "Hidden Markov Model": "Procedure"},
+            "Data Cleaning": {"Handling Missing Data": "Procedure",
+                              "Outlier Detection": "Procedure"},
+            "Corporate Action Adjustments": {"Split Adjustment": "Procedure",
+                                             "Dividend Adjustment": "Procedure"},
+            "Avoiding Biases": {"Survivorship Bias Prevention": "Procedure",
+                                "Look-Ahead Bias Prevention": "Procedure"},
+            "Realistic Assumptions": {"Transaction Costs": "Procedure",
+                                      "Slippage Modeling": "Procedure"},
+            "Anchored vs. Rolling Walk-Forward": {"Anchored (Expanding Window)": "Concept",
+                                                  "Rolling (Fixed Window)": "Concept"},
+            # A bias is a thing that happens to a study, not a rule you run.
+            "Common Biases to Avoid": {"Look-Ahead Bias": "Concept", "Survivorship Bias": "Concept",
+                                       "Data Snooping Bias": "Concept", "Selection Bias": "Concept",
+                                       "Overfitting": "Concept"},
+            "Statistical Significance Testing": {"T-Test for Returns": "Procedure",
+                                                 "Multiple Testing Correction": "Procedure"},
+            "Robustness Checks": {"Parameter Sensitivity": "Procedure",
+                                  "Time Period Stability": "Procedure",
+                                  "Universe Stability": "Procedure"},
+        },
+        # An archetype is a family of strategies, not a thing an indicator measures. Momentum and
+        # volatility are already in the graph as characters a computation reads -- rate of change,
+        # dispersion of returns -- and folding a strategy family onto them would make "what
+        # measures volatility" answer with a trading approach. Breakout is held apart from the
+        # chart pattern of that name, which chapter 7 defines.
+        "rename": {"Momentum": "concept:momentum-strategy",
+                   "Volatility": "concept:volatility-strategy",
+                   "Breakouts (Transition Archetype)": "concept:breakout-strategy",
+                   # The two summary tables list it under the shorter name it is called everywhere
+                   # else in the chapter.
+                   "Breakouts": "concept:breakout-strategy",
+                   # A heading names a section: "Building a Trade Plan" is the section, the trade
+                   # plan is the thing. "Backtesting Best Practices" would singularise to
+                   # `backtesting-best-practice`, which names the list rather than the procedure.
+                   "Building a Trade Plan": "concept:trade-plan",
+                   "Entry Logic Frameworks": "concept:entry-logic",
+                   "Regime Detection & Filtering": "concept:regime-detection",
+                   "Data Quality & Preprocessing": "concept:data-quality",
+                   "Backtesting Best Practices": "concept:backtesting",
+                   # The four signal types are the chapter's own words for the axis the library
+                   # calls `role`. `Entry` alone would slug to `concept:entry`.
+                   "Entry": "concept:entry-signal", "Exit": "concept:exit-signal",
+                   "Filter": "concept:filter-signal", "Confirmation": "concept:confirmation-signal",
+                   # §4.8's ADX rule IS §3.2's: trending above twenty-five, ranging below twenty.
+                   # Same thresholds, same reading. It folds; the python arrives as a variant of
+                   # the pseudocode already held.
+                   "ADX-Based": "procedure:adx-trend-strength",
+                   # Labels that name the approach and leave the subject implicit.
+                   # `procedure:indicator-*` is the library's namespace -- 71 nodes built from the
+                   # indicator classes -- and `procedure:indicator-based-entry` would be counted as
+                   # a 72nd. Lead with the thing these are approaches TO.
+                   "Indicator-Based": "procedure:entry-indicator-based",
+                   "Pattern-Based": "procedure:entry-pattern-based",
+                   "Statistical-Based": "procedure:entry-statistical-based",
+                   "Indicator Exit": "procedure:exit-on-indicator",
+                   "Percentile-Based": "procedure:volatility-percentile-regime",
+                   "Hidden Markov Model": "procedure:hmm-regime-detection",
+                   "T-Test for Returns": "procedure:returns-t-test",
+                   # A cost model, not the cost: `concept:transaction-cost` is already the thing.
+                   "Transaction Costs": "procedure:transaction-cost-model",
+                   # Parenthesised ids: the slug drops what is in brackets, leaving `anchored`.
+                   "Anchored (Expanding Window)": "concept:anchored-walk-forward",
+                   "Rolling (Fixed Window)": "concept:rolling-walk-forward"},
+        "retitle": {"Momentum": "momentum strategy", "Volatility": "volatility strategy",
+                    "Breakouts (Transition Archetype)": "breakout strategy",
+                    "Building a Trade Plan": "trade plan",
+                    "Entry Logic Frameworks": "entry logic",
+                    "Regime Detection & Filtering": "regime detection",
+                    "Data Quality & Preprocessing": "data quality",
+                    "Backtesting Best Practices": "backtesting",
+                    "Strategy Validation (Avoiding Biases)": "strategy validation",
+                    "Entry": "entry signal", "Exit": "exit signal",
+                    "Filter": "filter signal", "Confirmation": "confirmation signal"},
+        # Two tables whose rows are the members of a taxonomy, and two whose rows are properties of
+        # members already created.
+        "tables": {"Trading Style Comparison": ("concept:trading-style", "kind-of", "Concept"),
+                   "The Four Signal Types": ("concept:signal-type", "kind-of", "Concept")},
+        "table_properties": {
+            "Trading Style Comparison": ["timeframe", "holding_period", "key_traits"],
+            "Archetype Risk Summary Table": ["win_rate", "skew", "tail_risk", "best_regime"],
+            "Archetype Contraindications": ["contraindicated_when", "why_it_fails"],
+        },
+        "edges": [
+            ("concept:trend-following", "kind-of", "concept:strategy-archetype",
+             "the family that holds while a direction persists"),
+            ("concept:momentum-strategy", "kind-of", "concept:strategy-archetype",
+             "the family that reads whether pressure is building or fading"),
+            ("concept:breakout-strategy", "kind-of", "concept:strategy-archetype",
+             "the family that acts as compression gives way"),
+            ("concept:volatility-strategy", "kind-of", "concept:strategy-archetype",
+             "the family that trades movement size rather than direction"),
+            ("concept:mean-reversion", "kind-of", "concept:strategy-archetype",
+             "the family that fades extension from fair value"),
+            # --- the exit rules and the orders they place ------------------------------------
+            # Chapter 2 defines the order; this chapter defines where it rests. §4.3 states the
+            # stop-loss rules as "technical placement" and "ATR-based calculation (e.g. 1.5x ATR)".
+            ("procedure:fixed-stop", "about", "concept:stop-order",
+             "the distance from entry it places one at"),
+            ("procedure:atr-based-stop", "about", "concept:stop-order",
+             "the same placement, scaled to how far the instrument moves"),
+            ("procedure:atr-based-stop", "uses", "procedure:indicator-atr",
+             "the range it multiplies to get the stop distance"),
+            ("procedure:atr-trailing-stop", "uses", "procedure:indicator-atr",
+             "the range it holds the trail behind the extreme by"),
+            ("procedure:simple-trailing-stop", "about", "concept:trailing-stop",
+             "the level that follows price at a fixed percentage"),
+            ("procedure:atr-trailing-stop", "about", "concept:trailing-stop",
+             "the same level, held at a volatility-scaled distance"),
+            # --- the archetype, and the regime that decides whether it works -------------------
+            # Chapter 3 states this and had nothing to point it at: `strategy archetype` was not a
+            # node until this chapter. Each `best_regime` below is the summary table's own column.
+            ("fact:regime-determines-archetype-effectiveness", "about", "concept:strategy-archetype",
+             "the family whose effectiveness it says the regime decides"),
+            ("concept:trend-following", "about", "concept:trending-market",
+             "best regime: strong trends -- and whipsaws accumulate in the absence of one"),
+            ("concept:mean-reversion", "about", "concept:ranging-market",
+             "best regime: range-bound only"),
+            ("concept:mean-reversion", "about", "concept:trending-market",
+             "the contraindication the chapter states most emphatically: it will blow up in one"),
+            ("concept:volatility-strategy", "about", "concept:high-volatility-regime",
+             "best regime: high volatility periods, with nothing to capture in a quiet one"),
+            ("concept:breakout-strategy", "about", "concept:compression",
+             "best regime: after compression, which is the setup it waits for"),
+            # §4.2's warning quotes chapter 3's judgment by name -- '"The trend is your friend"
+            # exists because fighting trends is dangerous' -- and restates its fact.
+            ("concept:mean-reversion", "about", "judgment:trend-is-your-friend",
+             "the reason the chapter gives for why fading a trend is dangerous"),
+            ("concept:mean-reversion", "about", "fact:win-rate-is-not-risk",
+             "sixty to seventy per cent right, and negative skew: the case the fact is about"),
+        ],
+        # What the resolver could not settle from the text: a statement whose subject is named
+        # nowhere in it, a single ordinary word it refuses to treat as a citation, and three where
+        # it matched the longer of two names and chose the wrong one. Keys are distinctive
+        # fragments; a key matching no line raises, so a reworded source fails loudly.
+        "wired": {
+            # --- the resolver's three wrong picks, corrected -----------------------------------
+            "Consider trailing stops for trend-following": "concept:trailing-stop",
+            "Never combine conflicting archetypes": "concept:strategy-archetype",
+            "Match signal types to archetype": "concept:signal-type",
+            # --- single words it declined to draw on, accepted --------------------------------
+            "Rolling Optimization": "concept:rolling-walk-forward",
+            "Overfitting Prevention": "concept:overfitting",
+            # --- §4.1 trading styles ----------------------------------------------------------
+            "Timeframe Selection": "concept:trading-style",
+            "Consistency: Stick to one primary style": "concept:trading-style",
+            "Capital Requirements": "concept:trading-style",
+            "Risk Profile: Each style": "concept:trading-style",
+            "Lifestyle Fit": "concept:trading-style",
+            "Match trading style to available time": "concept:trading-style",
+            "Start with longer timeframes": "concept:trading-style",
+            "Consider psychological fit": "concept:trading-style",
+            "Paper trade the style": "concept:trading-style",
+            # --- §4.2 archetypes --------------------------------------------------------------
+            "Behavioral Alignment": "concept:strategy-archetype",
+            "Regime Dependence": "concept:strategy-archetype",
+            "Style Purity": "concept:strategy-archetype",
+            "Distinct Risk Profiles": "concept:strategy-archetype",
+            "Complementarity": "concept:strategy-archetype",
+            "Match archetypes to current market regime": "concept:strategy-archetype",
+            "Combine complementary archetypes": "concept:strategy-archetype",
+            "Understand skew and tail risk": "concept:strategy-archetype",
+            "Size positions according to archetype": "concept:strategy-archetype",
+            "Monitor regime transitions": "concept:regime-shift",
+            # --- §4.3 the trade plan ----------------------------------------------------------
+            "Pre-Definition": "concept:trade-plan",
+            "Specificity: Rules must be clear": "concept:trade-plan",
+            "Completeness: Plan covers": "concept:trade-plan",
+            "Documentation: Written down": "concept:trade-plan",
+            "Evolution: Reviewed and updated": "concept:trade-plan",
+            "Write your plan when not actively trading": "concept:trade-plan",
+            "Be specific: vague rules": "concept:trade-plan",
+            'Include "what if" scenarios': "concept:trade-plan",
+            "Review plan performance": "concept:trade-plan",
+            "Update based on data, not emotions": "concept:trade-plan",
+            "Treat the plan as non-negotiable": "concept:trade-plan",
+            # --- §4.4 signal types ------------------------------------------------------------
+            "Layer signals intentionally": "concept:signal-type",
+            "Test signal combinations": "concept:signal-type",
+            "Document signal roles": "concept:signal-type",
+            "Don't over-confirm": "concept:confirmation-signal",
+            # --- §4.5 entry logic -------------------------------------------------------------
+            "Objectivity: Rules should be unambiguous": "concept:entry-logic",
+            "Edge Definition": "concept:entry-logic",
+            "Timing: Entry timing": "concept:entry-logic",
+            "Confirmation: Multiple confirming factors": "concept:confirmation-signal",
+            "Filter Quality": "concept:filter-signal",
+            "Define entry criteria precisely": "concept:entry-logic",
+            "Use multiple confirmation factors": "procedure:multi-factor-confirmation",
+            "Test entries with various exit rules": "concept:entry-logic",
+            "Track entry efficiency": "concept:entry-logic",
+            "Avoid overly complex entry rules that overfit": "concept:overfitting",
+            "Include regime and volatility filters": "procedure:regime-filter",
+            # --- §4.6 exit logic --------------------------------------------------------------
+            "Protect Capital": "concept:exit-logic",
+            "Let Winners Run": "concept:exit-logic",
+            "Cut Losers Short": "concept:exit-logic",
+            "Rule-Based: Exits should be as systematic": "concept:exit-logic",
+            "Exit Reason": "concept:exit-logic",
+            "Use ATR-based stops": "procedure:atr-based-stop",
+            "Don't let winners turn into losers": "concept:exit-logic",
+            "Test different exit strategies": "concept:exit-logic",
+            "Document reason for each exit": "concept:exit-logic",
+            # --- §4.7 time-based logic --------------------------------------------------------
+            "Holding Period: Strategies have optimal": "procedure:holding-period-constraint",
+            "Session Selection": "procedure:session-filter",
+            "Calendar Awareness": "procedure:calendar-filter",
+            "Time Decay": "concept:time-based-logic",
+            "Periodicity": "concept:time-based-logic",
+            # --- §4.8 regime detection --------------------------------------------------------
+            "Market States": "concept:market-regime",
+            "Strategy Matching": "concept:market-regime",
+            "Probabilistic: Regime identification": "concept:regime-detection",
+            "Adaptation: Strategies should adapt": "concept:regime-detection",
+            "Use multiple regime indicators": "concept:regime-detection",
+            "Have default behavior for uncertain": "concept:regime-detection",
+            # --- §4.9 data quality ------------------------------------------------------------
+            "Garbage In, Garbage Out": "concept:data-quality",
+            "Point-in-Time: Use data as it was available": "procedure:look-ahead-bias-prevention",
+            "Corporate Actions": "concept:data-quality",
+            "Validate data against multiple sources": "concept:data-quality",
+            "Check for obvious errors": "procedure:outlier-detection",
+            "Document data sources": "concept:data-quality",
+            "Use point-in-time databases": "procedure:look-ahead-bias-prevention",
+            "Include delisted securities": "procedure:survivorship-bias-prevention",
+            "Account for reporting lags": "procedure:look-ahead-bias-prevention",
+            # --- §4.10 backtesting ------------------------------------------------------------
+            "Historical Simulation": "concept:backtesting",
+            "Out-of-Sample Testing": "concept:backtesting",
+            "Realistic Assumptions": "concept:backtesting",
+            "Multiple Tests: Test across different periods": "concept:backtesting",
+            "Skepticism: Assume backtest overstates": "concept:backtesting",
+            "Be skeptical of exceptional results": "concept:backtesting",
+            "Compare to simple benchmarks": "concept:backtesting",
+            "Document all assumptions and parameters": "concept:backtesting",
+            # --- §4.11 walk-forward -----------------------------------------------------------
+            "Out-of-Sample Validation": "concept:walk-forward-optimization",
+            "Adaptive Parameters": "concept:walk-forward-optimization",
+            "Realistic Performance": "concept:walk-forward-optimization",
+            "Use at least 2-3 years of data": "concept:walk-forward-optimization",
+            "Test windows should be long enough": "concept:walk-forward-optimization",
+            "Monitor parameter stability": "procedure:parameter-sensitivity",
+            "Aggregate OOS results": "concept:walk-forward-optimization",
+            "Be wary of strategies that require frequent": "concept:walk-forward-optimization",
+            # --- §4.12 validation. The longer key first: "final validation" is a prefix of it.
+            "final validation only": "concept:strategy-validation",
+            "Use out-of-sample data for final validation": "concept:backtesting",
+            "Skepticism: Assume the strategy doesn't work": "concept:strategy-validation",
+            "Multiple Testing: Account for trying many": "procedure:multiple-testing-correction",
+            "Economic Rationale": "concept:strategy-validation",
+            "Robustness: Results should hold": "concept:strategy-validation",
+            "Statistical Significance: Returns should be": "procedure:returns-t-test",
+            "Pre-register hypotheses": "concept:data-snooping-bias",
+            "Account for multiple testing": "procedure:multiple-testing-correction",
+            "Require economic rationale": "concept:strategy-validation",
+            "Test robustness to reasonable parameter": "procedure:parameter-sensitivity",
+            "Be skeptical of Sharpe ratios": "concept:strategy-validation",
+            "Paper trade before committing real capital": "concept:strategy-validation",
+        },
+    },
 }
 
 #: Blocks inside a taxonomy section that are still NOT kinds: "Regime Shift Triggers" lists causes
@@ -862,6 +1168,36 @@ DEFINITION = {
 #: summary and the example moves to `examples`. The explanation has no counterpart in the source at
 #: all -- the chapter never says WHY an iceberg order costs queue position -- so it is always added.
 AUTHORED: dict[str, tuple[str, str]] = {
+    # The four styles are characterised only by a comparison table, so the parsed summary was that
+    # table's row -- "Seconds to minutes. Seconds to minutes. Tiny moves, high volume" -- repeating
+    # the `timeframe` and `holding_period` props verbatim and saying nothing they do not.
+    'concept:scalping': (
+        'Trading in seconds to minutes for one to ten ticks at a time, dozens to hundreds of times '
+        'a day.',
+        'The edge per trade is smaller than the [[Bid-Ask Spread]] on most instruments, which is '
+        'why it needs direct market access, low commissions and the tightest spreads available: '
+        'costs are not a deduction from the profit here, they are comparable to it. It also needs '
+        'uninterrupted attention, which is the constraint that rules it out for most traders '
+        'rather than the strategy logic.'),
+    'concept:day-trading': (
+        'Trading intraday moves and closing every position before the session ends, typically one '
+        'to ten trades a day.',
+        'Flat at the close means the overnight gap cannot reach the position, and neither can the '
+        'financing that [[Swap/Rollover Calculation]] measures -- the risk being avoided is the '
+        'one that arrives while the market is shut and no stop can execute. The cost is that every '
+        "position must resolve inside a session whether or not the move has finished."),
+    'concept:swing-trading': (
+        'Holding for days to weeks to capture a multi-day swing, trading selectively rather than '
+        'often.',
+        'Fewer, larger targets make transaction costs a small share of the gain, which is what '
+        'lets the style tolerate a lower hit rate. Holding through the close accepts gap risk in '
+        'exchange for not having to be at the screen, and it is the shortest style that can be run '
+        'alongside a full-time job.'),
+    'concept:position-trading': (
+        'Holding for weeks to months on a regime or fundamental view rather than on a chart event.',
+        'The thesis is about the [[Market Regime]] itself, so the position is sized and stopped '
+        'against a regime change rather than against a level. It is the only style whose holding '
+        'period is long enough for carry, financing and correlation to dominate the outcome.'),
     'concept:arbitrageur': (
         'Participants who exploit price discrepancies between related instruments, generally holding '
         'hedged, market-neutral positions.',
@@ -1994,7 +2330,10 @@ IRREGULAR = {"mechanics": "mechanics", "analysis": "analysis", "series": "series
              # nobody uses: `basi`, `greek`, `future`.
              "basis": "basis", "greeks": "greeks", "futures": "futures",
              # "Status" is not a plural either; it was becoming `statu`.
-             "status": "status"}
+             "status": "status",
+             # Nor is "bias": chapter 4's five named biases were becoming `look-ahead-bia`,
+             # `survivorship-bia` and `selection-bia`.
+             "bias": "bias"}
 
 
 #: Trailing words that name the FORM of a thing rather than the thing: "Almgren-Chriss Market
@@ -2148,22 +2487,58 @@ def split_block(body: list[str]) -> tuple[str, str]:
 INLINE_LABEL = re.compile(r"^\*\*(.+?):?\*\*:?\s*(.*)$")
 
 
-def free_block(lines: list[str]) -> dict:
-    """A block that follows no scaffold, read for the four things such a block ever holds.
+#: The first line of a python docstring -- what the recipe says it does. Chapter 4 states its rules
+#: as functions rather than as prose, and every one of them is documented: `"""Exit on fixed
+#: percentage loss"""` is the definition of a fixed stop, in the chapter's own words.
+_DOCSTRING = re.compile(r'"""\s*(.*?)\s*"""', re.S)
+
+
+def docstring_of(code: str) -> str:
+    if not (m := _DOCSTRING.search(code)):
+        return ""
+    lines = [l.strip() for l in m.group(1).splitlines() if l.strip()]
+    return lines[0].rstrip(".") if lines else ""
+
+
+def unfenced(lines: list[str]) -> list[str]:
+    """Everything outside the code fences."""
+    out, inside = [], False
+    for line in lines:
+        if line.strip().startswith("```"):
+            inside = not inside
+            continue
+        if not inside:
+            out.append(line)
+    return out
+
+
+def free_block(lines: list[str], definition_labels: tuple[str, ...] = ("definition",)) -> dict:
+    """A block that follows no scaffold, read for the five things such a block ever holds.
 
     §3.0 states each piece of market wisdom as a definition, a list of reasons, sometimes a table
     and sometimes a warning in a blockquote -- and the warning is the part that matters most
     ("do NOT describe mean reversion as safer"). Reading only the bullets would drop it.
+
+    Chapter 4 states most of its content as python. The code is the rule and belongs in `formula`,
+    the way a stated equation does; read as prose it became a summary reading
+    "def fixed_stop_exit(entry_price, current_price, stop_pct=0.02, direction='long'):".
     """
     out: dict = {}
+    code, doc = code_of(lines), ""
+    if code:
+        out["formula"] = code
+        doc = docstring_of(code)
     bullet_lines, quote, rows, prose = [], [], [], []
-    for raw in lines:
+    for raw in unfenced(lines):
         s = raw.strip()
         if not s:
             continue
         if m := INLINE_LABEL.match(s):
             label, rest = m.group(1).strip(), m.group(2).strip()
-            if label.lower() == "definition" and rest:
+            # Which label carries the definition is the chapter's choice: §3.0 writes
+            # `**Definition:**`, §4.2 writes `**Core Premise:**`. Read as an ordinary label the
+            # premise became the summary with its own label glued to the front of it.
+            if label.lower() in definition_labels and rest:
                 out["summary"] = rest
             elif rest:
                 prose.append(f"{label}: {rest}")
@@ -2179,8 +2554,17 @@ def free_block(lines: list[str]) -> dict:
             bullet_lines.append(s.lstrip("- ").strip())
         else:
             prose.append(s.replace("**", ""))
-    if not out.get("summary") and prose:
-        out["summary"] = prose.pop(0)
+    # What the block says it is, in order of how directly it says it: the label the chapter uses
+    # for a definition, then the docstring of the rule it states, then its opening prose, then its
+    # first bullet -- "Using information not available at trade time" is what look-ahead bias IS,
+    # and read as one more reason among five it left the node with no summary at all.
+    if not out.get("summary"):
+        if doc:
+            out["summary"] = doc
+        elif prose:
+            out["summary"] = prose.pop(0)
+        elif bullet_lines:
+            out["summary"] = bullet_lines.pop(0)
     if bullet_lines:
         out["explanation"] = " ".join(bullet_lines)
     if rows:
@@ -2198,17 +2582,23 @@ def block_text(lines: list[str]) -> str:
 
 
 def table_rows(lines: list[str]) -> list[tuple[str, str]]:
-    """`| name | ... |` rows as (name, the rest joined). Header and rule rows are skipped."""
+    """`| name | ... |` rows as (name, the rest joined). Rule rows and the header are skipped.
+
+    The header is the FIRST row, by position. Naming the header cells that had been seen so far
+    read "Style", "Archetype" and "Type" as members, and a taxonomy whose first kind is `concept:style`
+    looks like a real node in every count. Cell emphasis is markup: `| **Entry** |` names the same
+    thing as `| Entry |`, and keeping the stars puts them in the id.
+    """
     out = []
     for line in lines:
         s = line.strip()
         if not s.startswith("|") or set(s) <= set("|- :"):
             continue
-        cells = [c.strip() for c in s.strip("|").split("|")]
-        if len(cells) < 2 or cells[0].lower() in ("algorithm", "order type", "name", "term"):
+        cells = [c.strip().replace("**", "") for c in s.strip("|").split("|")]
+        if len(cells) < 2:
             continue
         out.append((cells[0], ". ".join(c for c in cells[1:] if c)))
-    return out
+    return out[1:]
 
 
 def code_of(lines: list[str]) -> str:
@@ -2220,6 +2610,48 @@ def code_of(lines: list[str]) -> str:
         if inside:
             out.append(line)
     return "\n".join(out).strip()
+
+
+#: What the formula path writes when the chapter states a formula and no definition: "The quantity
+#: effective spread." is a label, not a wording worth keeping when a real one displaces it.
+_GENERATED_SUMMARY = ("The quantity ", "The identity ", "Computes ", "The family ")
+
+#: A name appearing in more than this share of the GRAPH is ordinary vocabulary rather than a
+#: reference to one node: `signal` is in 289 of 571 nodes, `strategy` 98, `indicator` 95, against
+#: `stop loss` at 12 and `transaction cost` at 3. Measured over the whole graph and not over the
+#: chapter, which is the mistake that let "reveal your strategy to sophisticated participants" draw
+#: an edge to `schema:strategy`: a hundred statements are far too small a corpus to tell a common
+#: noun from a name. Same corpus-derived rule the query layer uses for stop words, no hand list.
+GENERIC_SHARE = 0.05
+
+#: An abbreviation is short by construction and still unambiguous -- ATR, OBV, VWAP. Everything
+#: else has to be long enough that a chance substring is not a match.
+MIN_ALIAS, MIN_ABBREVIATION = 6, 3
+
+
+def _norm(text: str) -> str:
+    """Space-padded, punctuation-free, for whole-word containment. "stop-loss" and "stop loss" are
+    the same term, and the padding is what stops `entry` matching inside `re-entry`."""
+    return f" {re.sub(r'[^a-z0-9]+', ' ', text.lower()).strip()} "
+
+
+def aliases_of(node: dict) -> set[str]:
+    """Every name a statement might call this node by.
+
+    A title carries more than one: `stop order (stop-loss)` is called both, and the parenthetical is
+    usually the one prose uses -- "always have a stop-loss for every position" names that node and
+    matches neither the id nor the full title.
+    """
+    out: set[str] = set()
+    if title := " ".join((node.get("title") or "").split()).lower():
+        out.add(title)
+        out.add(" ".join(re.sub(r"\(.*?\)", " ", title).split()))
+        out.update(" ".join(m.split()) for m in re.findall(r"\((.*?)\)", title))
+    out = {a for a in out if len(a) >= MIN_ALIAS}
+    if isinstance(abbr := node.get("props", {}).get("abbreviation"), str):
+        if len(abbr) >= MIN_ABBREVIATION:
+            out.add(abbr.lower())
+    return out
 
 
 def build(path: Path, chapter: str, parent: str,
@@ -2248,6 +2680,13 @@ def build(path: Path, chapter: str, parent: str,
         one node: the longer definition wins and the props union, rather than a second node or a
         build error. Deconfliction of the two wordings is a review step, not a parse-time decision."""
         nid = decl.get("rename", {}).get(title) or f"{kind.lower()}:{slug(title)}"
+        # The code-derived builder owns `procedure:indicator-*`, one node per indicator class, and
+        # anything counting indicators counts that prefix. A chapter minting an id inside it makes
+        # a trading rule indistinguishable from a library indicator.
+        if nid.startswith("procedure:indicator-") and nid not in existing:
+            raise ValueError(
+                f"{title!r} would take {nid!r}, inside the library's indicator namespace. Declare a "
+                "`rename` that leads with something else.")
         # A heading is written to head a section, not to name a node: "Trending Market
         # Characteristics" heads a list of them. `rename` fixes the id; this fixes what it is called.
         title = decl.get("retitle", {}).get(title, title)
@@ -2274,8 +2713,18 @@ def build(path: Path, chapter: str, parent: str,
                           "props": {"reference_chapter": [chapter],
                                     **{k: v for k, v in props.items() if v}}}
             return nid
+        summary = " ".join(summary.split())
+        if summary and summary != cur["summary"]:
+            # Whichever wording loses is still something the chapter says. §4.1 characterises
+            # scalping in a block and again in the comparison table, and the row -- being longer --
+            # was replacing "Best For: full-time traders with direct market access" with nothing.
+            loser = cur["summary"] if len(summary) > len(cur["summary"]) else summary
+            if loser and not loser.startswith(_GENERATED_SUMMARY):
+                notes = cur["props"].setdefault("notes", [])
+                if loser not in notes:
+                    notes.append(loser)
         if len(summary) > len(cur["summary"]):
-            cur["summary"] = " ".join(summary.split())
+            cur["summary"] = summary
         for k, v in props.items():
             if v and k not in cur["props"]:
                 cur["props"][k] = v
@@ -2329,12 +2778,14 @@ def build(path: Path, chapter: str, parent: str,
 
     principles, practices = [], []
     deferred_uses: dict[str, list[str]] = {}
+    def_labels = tuple(l.lower() for l in decl.get("definition_labels", ("Definition",)))
 
     for num, sec in sorted(sections.items()):
         blocks = sec["blocks"]
         definition = blocks.get("Definition", [])
         defined = bullets([l for l in definition if BULLET.match(l)])
-        prose = " ".join(l.strip() for l in definition if l.strip() and not l.strip().startswith("-"))
+        prose = " ".join(l.strip() for l in definition
+                         if l.strip() and not l.strip().startswith("-")).replace("**", "")
         use_bullets = bullets(blocks.get("Common Use Cases", []))
         # §1.2 labels each use case with the order type it belongs to. Flattening them onto the
         # section subject gave `order-type` five sentences and left every member with none.
@@ -2345,13 +2796,10 @@ def build(path: Path, chapter: str, parent: str,
         # market wisdom under headings of their own, with no Definition block and no subject: each
         # is a claim about how trading behaves, not a thing the section is about.
         as_nodes = decl.get("blocks_as_nodes", {}).get(sec["title"], {})
-        for heading, primitive in as_nodes.items():
+        for heading in as_nodes:
             if heading not in blocks:
                 raise ValueError(f"`blocks_as_nodes` names {heading!r}, which {sec['title']!r} "
                                  "does not contain -- reworded?")
-            read = free_block(blocks[heading])
-            nid = atom(primitive, heading, read.pop("summary", ""), _section=num, **read)
-            rel(nid, "part-of", parent, f"stated under {sec['title'].lower()}")
 
         # The section's subject(s). Bolded bullets mean the section defines several things and has
         # no single subject; prose means the section IS about one thing, named by its own heading.
@@ -2371,8 +2819,38 @@ def build(path: Path, chapter: str, parent: str,
             # The section's NAME, not its number. `§1.1` records a position in a file; the graph
             # holds what a thing is and where it is defined, and "market microstructure" says that.
             rel(s, "part-of", parent, f"defined under {sec['title'].lower()}")
+        for heading, primitive in as_nodes.items():
+            read = free_block(blocks[heading], def_labels)
+            nid = atom(primitive, heading, read.pop("summary", ""), _section=num, **read)
+            rel(nid, "part-of", parent, f"stated under {sec['title'].lower()}")
+            # §3.0's blocks had no subject to point at, so this edge never existed. §4.6 heads a
+            # rule "Time-Based Exits" inside a section about exit logic, and without it the rule was
+            # reachable only by walking down from the chapter.
+            for sub in ({subject_for(heading, subjects)} if subjects else set()) - {nid}:
+                rel(nid, "about", sub, f"stated under {sec['title'].lower()}")
+
         for label, text in per_member.items():
             deferred_uses.setdefault(f"concept:{slug(label)}", []).append(text)
+
+        # Chapter 4 writes its rules as `**Label:**` sub-blocks inside a heading, where earlier
+        # chapters wrote a heading per rule. Left whole, a heading holds eight named things as one
+        # string: the ADX regime rule cannot fold onto the identical rule chapter 3 already states,
+        # and an ATR stop cannot say which indicator it reads. Declaring the labels promotes them.
+        for heading, labels in decl.get("labelled_nodes", {}).items():
+            if heading not in blocks:
+                continue
+            found = labelled_blocks(blocks[heading])
+            if undeclared := [l for l, _ in found if l not in labels]:
+                raise ValueError(f"{heading!r} states {undeclared}, which `labelled_nodes` does "
+                                 "not name -- declare them, or the heading keeps them whole")
+            for label, body in found:
+                read = free_block(body, def_labels)
+                nid = atom(labels[label], label, read.pop("summary", ""), _section=num, **read)
+                rel(nid, "part-of", parent, f"stated under {sec['title'].lower()}")
+                # The same two edges the principle-concepts get: `part-of` is scope, `about` is
+                # what the thing concerns. A fixed stop is about exit logic, not about the chapter.
+                for sub in ({subject_for(label, subjects)} if subjects else set()) - {nid}:
+                    rel(nid, "about", sub, f"stated under {heading.lower()}")
 
         if defined and uses:
             # The section's subject may have folded into a node already in the graph, in which case
@@ -2403,8 +2881,10 @@ def build(path: Path, chapter: str, parent: str,
         # "Best Practices for Volume Profile" and six practices were being dropped for it.
         for heading, body in blocks.items():
             if heading.startswith("Best Practices"):
-                for _, text in bullets(body):
-                    practices.append(text)
+                for name, text in bullets(body):
+                    # Same shape as a principle. Dropping the bolded name lost what the practice is
+                    # CALLED -- "Layer signals intentionally" -- and kept only its elaboration.
+                    practices.append(f"{name}: {text}" if name else text)
 
         if sec["title"] in decl["taxonomy"]:
             for label, body in labelled_blocks(blocks.get("Examples", [])):
@@ -2449,17 +2929,6 @@ def build(path: Path, chapter: str, parent: str,
                     extra.setdefault(target, {}).setdefault("examples", []).append(
                         f"{label}: {text}")
 
-        for heading, columns in decl.get("table_properties", {}).items():
-            for name, rest in table_rows(blocks.get(heading, [])):
-                mid = f"concept:{slug(name)}-order" if f"concept:{slug(name)}-order" in atoms \
-                      else f"concept:{slug(name)}"
-                values = [c.strip() for c in rest.split(".")]
-                if mid not in atoms:
-                    raise ValueError(f"table row {name!r} names no node in this chapter")
-                for col, val in zip(columns, values):
-                    if val:
-                        atoms[mid]["props"][col] = val
-
         for heading, spec in decl.get("tables", {}).items():
             target, relation, primitive = (*spec, "Procedure")[:3]
             for name, rest in table_rows(blocks.get(heading, [])):
@@ -2467,6 +2936,21 @@ def build(path: Path, chapter: str, parent: str,
                     continue
                 nid = atom(primitive, name, rest, _generated=True, _section=num)
                 rel(nid, relation, target, f"listed under {heading.lower()}")
+
+        for heading, columns in decl.get("table_properties", {}).items():
+            for name, rest in table_rows(blocks.get(heading, [])):
+                # `rename` is where this chapter's ids are decided, and a row names the node under
+                # the same heading the node was created under. Resolving the slug alone sent the
+                # archetype rows at `concept:momentum` -- the character an indicator measures.
+                mid = decl.get("rename", {}).get(name) \
+                    or (f"concept:{slug(name)}-order" if f"concept:{slug(name)}-order" in atoms
+                        else f"concept:{slug(name)}")
+                values = [c.strip() for c in rest.split(".")]
+                if mid not in atoms:
+                    raise ValueError(f"table row {name!r} names no node in this chapter")
+                for col, val in zip(columns, values):
+                    if val:
+                        atoms[mid]["props"][col] = val
 
         for label, body in labelled_blocks(blocks.get("Mathematical Rules/Formulas", [])):
             formula = code_of(body)
@@ -2490,7 +2974,7 @@ def build(path: Path, chapter: str, parent: str,
         # scenarios it is read through -- and a block that matches no rule was previously dropped
         # without a word. It is kept on the section's subject under its own name instead.
         handled = set(SCAFFOLD) | set(as_nodes) | set(decl.get("tables", {})) \
-            | set(decl.get("table_properties", {}))
+            | set(decl.get("table_properties", {})) | set(decl.get("labelled_nodes", {}))
         for heading, body in blocks.items():
             if heading in handled or heading.startswith("Best Practices"):
                 continue
@@ -2518,6 +3002,11 @@ def build(path: Path, chapter: str, parent: str,
         chapter_props["applications"] = [
             re.sub(r"^\d+\.\s*", "", l.strip()).replace("**", "")
             for l in closing.group(1).split("\n") if re.match(r"^\d+\.", l.strip())]
+        # §4's Summary ends in a blockquote -- "strategies do not fail randomly, they fail when
+        # applied to the wrong market behaviour" -- and reading only the numbered items dropped it.
+        if quote := [l.strip().lstrip("> ").replace("**", "").strip()
+                     for l in closing.group(1).split("\n") if l.strip().startswith(">")]:
+            chapter_props["caution"] = " ".join(q for q in quote if q)
     if chapter_props:
         extra.setdefault(parent, {}).update(chapter_props)
 
@@ -2540,11 +3029,74 @@ def build(path: Path, chapter: str, parent: str,
                   # between this node and the Fact beside it.
                   "epistemic": "inferred", "status": "draft",
                   "props": {"reference_chapter": [chapter], "practices": practices}}
+    def resolve_statements(lines: list[str]) -> dict[str, str]:
+        """Which node each statement names, by reading the statement rather than by declaration.
+
+        A statement earns its edge when it names the node it concerns, and many of them do -- the
+        chapter writes "always have a stop-loss for every position" and the node is called
+        `stop order (stop-loss)`. Transcribing those by hand is copying out something the text
+        already says, which is where the mistakes come from.
+
+        Four rules keep it from inventing edges, because a wrong edge answers a query and a missing
+        one does not:
+
+        * A name in a large share of the graph is vocabulary, not a reference.
+        * Only a compound name or an abbreviation is a citation. One ordinary word is not --
+          "reveal your strategy to sophisticated participants" does not cite `schema:strategy` --
+          and frequency alone cannot tell, because the graph is smaller when chapter 1 builds than
+          when chapter 4 does and the same word scores differently. Single-word matches are printed
+          as candidates for `wired` to accept, never drawn.
+        * The longest name wins: `mean reversion` is more specific than `reversion`.
+        * Two nodes matching at that length is an ambiguity, not a coin toss. Reported, not guessed.
+        """
+        index: dict[str, str] = {}
+        abbreviations: set[str] = set()
+        for nid, node in list(atoms.items()) + list(existing.items()):
+            if nid in (parent, fid, jid):
+                continue
+            for alias in aliases_of(node):
+                key = _norm(alias).strip()
+                index.setdefault(key, nid)
+                if isinstance(node.get("props", {}).get("abbreviation"), str) \
+                        and key == node["props"]["abbreviation"].lower():
+                    abbreviations.add(key)
+        corpus = [_norm(json.dumps(node))
+                  for node in list(atoms.values()) + list(existing.values())]
+        generic = {a for a in index
+                   if sum(f" {a} " in doc for doc in corpus) > GENERIC_SHARE * len(corpus)}
+        out, ambiguous, candidates = {}, [], []
+        for line in lines:
+            norm = _norm(line)
+            matched = [(a, index[a]) for a in index
+                       if a not in generic and f" {a} " in norm]
+            strong = [(a, n) for a, n in matched if " " in a or a in abbreviations]
+            if not strong:
+                if matched:
+                    candidates.append((line, sorted({n for _, n in matched})))
+                continue
+            best = max(len(a) for a, _ in strong)
+            top = {n for a, n in strong if len(a) == best}
+            if len(top) > 1:
+                ambiguous.append((line, sorted(top)))
+                continue
+            out[line] = top.pop()
+        for label, rows in (("names more than one node", ambiguous),
+                            ("names one ordinary word", candidates)):
+            if rows:
+                print(f"  wiring: {len(rows)} statement(s) {label} -- `wired` decides:",
+                      file=sys.stderr)
+                for line, ids in rows:
+                    print(f"    {line[:66]!r} -> {ids}", file=sys.stderr)
+        return out
+
+    resolved = resolve_statements(principles + practices)
+
     def wire(list_id: str, lines: list[str]) -> list[str]:
         """Move every wired line out of the list and onto an `about` edge carrying it as the why."""
         kept = []
         for line in lines:
-            target = next((v for k, v in decl["wired"].items() if k in line), None)
+            # The declaration wins: it exists to correct or to supply what the text does not say.
+            target = next((v for k, v in decl["wired"].items() if k in line), resolved.get(line))
             if target is None:
                 kept.append(line)
                 continue
@@ -2573,6 +3125,24 @@ def build(path: Path, chapter: str, parent: str,
         else:
             raise ValueError(f"a use case names {mid!r}, which is not a node in this chapter")
 
+    # A term in backticks is the chapter citing something by the name the library registers it
+    # under -- §4.4 illustrates each signal type with `macd_bullish_cross`, `rsi_overbought`,
+    # `adx_strong_trend`, and all twelve it names are nodes. Code fences are excluded: `close` and
+    # `df` inside a python block are variables, not citations.
+    # The edge runs FROM the thing named TO the node that cites it, which is the direction
+    # everything else in this graph points: a member at its type, `instance-of` and `kind-of` and
+    # `has-role` all aim up. Drawn the other way it fans out of the citing node, and `all_paths`
+    # suppresses a detour through a hub by spotting two edges that both point AT it -- so twelve
+    # signals hanging off `concept:signal-type` became mutually two hops apart, and the suppression
+    # could not see it. Same edge, same claim, and the existing guard works.
+    named = {(a.get("title") or "").strip().lower(): nid
+             for nid, a in list(existing.items()) + list(atoms.items())}
+    for nid, a in atoms.items():
+        text = " ".join(str(v) for k, v in a["props"].items() if k != "formula")
+        for token in re.findall(r"`([^`\n]+)`", f"{a['summary']} {text}"):
+            if (src := named.get(token.strip().lower())) and src != nid:
+                rel(src, "about", nid, f"the chapter's example of {a['title']}")
+
     for src, relation, dst, why in decl.get("edges", []):
         for end in (src, dst):
             if end not in atoms and end not in existing:
@@ -2584,6 +3154,20 @@ def build(path: Path, chapter: str, parent: str,
         raise ValueError(f"`wired` keys match no line in {chapter} -- reworded? {sorted(unused)}")
     atoms[fid]["props"]["principles"] = wire(fid, principles)
     atoms[jid]["props"]["practices"] = wire(jid, practices)
+    # The measure of the chapter's connectedness, printed rather than inferred: what remains in the
+    # two lists is exactly what nothing in the graph is known to be about yet.
+    left = atoms[fid]["props"]["principles"] + atoms[jid]["props"]["practices"]
+    print(f"  wiring: {len(principles) + len(practices)} statements -- "
+          f"{len(resolved)} resolved by name, "
+          f"{len([l for l in principles + practices if any(k in l for k in decl['wired'])])} "
+          f"declared, {len(left)} unresolved", file=sys.stderr)
+    # Every resolution is printed, not just the failures: a name match is a proposal, and a wrong
+    # edge answers a query, which is worse than a missing one. `wired` is where a wrong one is
+    # overruled, so the reviewer has to be able to see them all.
+    for line, target in resolved.items():
+        print(f"    resolved:   {target:38} <- {line[:70]}", file=sys.stderr)
+    for line in left:
+        print(f"    unresolved: {line[:96]}", file=sys.stderr)
     atoms[fid]["summary"] = FACT_SUMMARY
     atoms[jid]["summary"] = JUDGMENT_SUMMARY
 
@@ -2605,6 +3189,12 @@ def build(path: Path, chapter: str, parent: str,
                     a["props"].setdefault("source_wording", a["summary"])
             a["summary"] = summary
             if explanation:
+                # Same outer join as the summary above: the chapter's own bullets are kept, not
+                # replaced. Scalping's four characteristics were vanishing behind authored prose.
+                if (parsed := a["props"].get("explanation")) and parsed != explanation:
+                    notes = a["props"].setdefault("notes", [])
+                    if parsed not in notes:
+                        notes.append(parsed)
                 a["props"]["explanation"] = explanation
         if nid in DEFINITION and nid not in AUTHORED:
             # The parsed text was an instance, not a definition: keep it as the illustration.

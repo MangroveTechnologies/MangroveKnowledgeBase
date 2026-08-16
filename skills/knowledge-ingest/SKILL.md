@@ -32,9 +32,9 @@ reading before the first chapter rather than after.
 |---|---|
 | [Two rules](#two-rules-that-account-for-most-of-the-cost) | The two habits that account for most of the wasted work on this task. |
 | [The scaffold](#the-scaffold-and-what-is-not-a-node) | The six headings a section carries, what each becomes, and what is deliberately not a node. |
-| [Procedure](#procedure) | The seven steps from an unread chapter to a committed, rendered graph. |
+| [Procedure](#procedure) | The eight steps from an unread chapter to a committed, rendered graph. |
 | [Pipeline](#pipeline) | The exact commands that rebuild the record, and the dependency that fails silently. |
-| [Review gates](#review-gates) | The six checks to run before committing a chapter, with the code for the additive check. |
+| [Review gates](#review-gates) | The seven checks to run before committing a chapter, with the code for the additive check. |
 | [Writing node prose](#writing-node-prose) | How authored summaries and explanations are written and merged. |
 | [Additional resources](#additional-resources) | Where the declaration reference, the failure modes and the query skill live. |
 
@@ -86,19 +86,28 @@ Everything emitted is `status: draft`. Promotion is a human act.
    end to end. Note which `### Examples` blocks list real kinds rather than worked arithmetic; which
    formulas are quantities, rules or identities; which terms the graph already holds under another
    name; which sections break the scaffold.
-2. **Declare.** Add the chapter's entry to `CHAPTERS`. A chapter with no entry raises rather than
+2. **Author the chapter's anchor if it has none.** `--parent` names a subject-area node, and only
+   six of the eight chapters have one. A chapter whose anchor is missing needs a page in
+   `ontology/wiki/` — `kind: concept`, `chapter: <chapter-id>`, a Summary, an Explanation, and
+   `## Part of` → `[[Mangrove Knowledge Space]]` — copy `Risk Management.md`. It is created by the
+   wiki stage, so **the whole pipeline reruns**, not just the chapter merge.
+   `tests/test_chapter_replay_is_reproducible.py` fails if a chapter hangs off an anchor no page
+   authors. Chapter 6 (indicators) is the one still missing.
+3. **Declare.** Add the chapter's entry to `CHAPTERS`. A chapter with no entry raises rather than
    building — building without one emits a graph with no taxonomy and says nothing about it.
-3. **Dry-run and stop.** `--table` prints the node list without merging. Review it, and get it
+4. **Dry-run and stop.** `--table` prints the node list without merging. Review it, and get it
    reviewed. Feedback on a list is cheap; edge work on a wrong list is wasted.
-4. **Correct through declarations** until the table reads as intended. Boilerplate summaries
+5. **Correct through declarations** until the table reads as intended. Boilerplate summaries
    (`The quantity X.`), a worked example standing where a definition belongs, an id like
    `procedure:fvg-fill-statu`, a formula attached to the wrong subject — each has a declaration.
-5. **Merge** with `--merge`, then verify the merge is additive.
-6. **Wire the statements.** Every principle and practice that names a node moves out of its list and
-   onto an `about` edge from that node, carrying the line as the edge's `why`.
-7. **Close the gaps, rebuild the index, then commit.** No node reachable by a single edge; rerun
-   `build_semantic_index.py` so retrieval follows the graph; update the documented counts; run the
-   suite, commit, re-render, watch CI to green.
+6. **Merge** with `--merge`, then verify the merge is additive.
+7. **Wire the statements.** The builder resolves every statement that names its node and prints
+   what it drew, what it would not draw on one ordinary word, and what it could not place. Read
+   that split; declare the residue, the candidates you accept and any wrong pick in `wired`. Both
+   lists empty means the chapter is fully connected.
+8. **Close the gaps, rebuild the index, then commit.** No node reachable by a single edge, or a
+   plain statement of why none exists; rerun `build_semantic_index.py` so retrieval follows the
+   graph; update the documented counts; run the suite, commit, re-render, watch CI to green.
 
 **See also:** [pipeline](#pipeline) · [review gates](#review-gates) ·
 [declarations](references/declarations.md)
@@ -118,10 +127,18 @@ python3 ontology/wiki_to_atoms.py --wiki ontology/wiki --graph build/wiki.json \
 python3 ontology/chapter_to_atoms.py ontology/raw/01-market-foundations.md \
         --chapter-id market-foundations --parent concept:market-foundations \
         --ontology build/r1.json --merge --out build/ch1.json
-# one invocation per chapter, each taking the previous output as --ontology
+# one invocation per chapter, each taking the previous output as --ontology:
+#   02 instruments-market-mechanics -> concept:market-mechanics
+#   03 core-trading-concepts        -> concept:price-action
+#   04 strategy-design              -> concept:strategy-design
 cp build/<last>.json ontology/signal-indicator-ontology.json
-python3 ontology/build_semantic_index.py     # the graph changed; the index must follow
+PYTHONPATH=$PWD python3 ontology/build_semantic_index.py   # the graph changed; the index follows
 ```
+
+The chain reruns **from the top** whenever a wiki page changes, which includes authoring a new
+chapter anchor. `PYTHONPATH` matters for the index build: run as a script, `ontology/` leads
+`sys.path` and `import mangrove_kb` resolves to the installed copy in site-packages rather than the
+one in the tree.
 
 `build_signal_indicator_ontology.py` writes the code-derived nodes from the library's docstrings and
 is authoritative — nothing downstream may overwrite what it wrote. `wiki-to-graph` is a **dev
@@ -136,7 +153,7 @@ which the build silently produces a graph in which every node reports degree 0.
 
 ## Review gates
 
-Run all six before committing a chapter.
+Run all seven before committing a chapter.
 
 **Additive.** Only declared folds may touch an existing atom, and no edge may disappear:
 
@@ -166,9 +183,28 @@ table, a caution, a heading no earlier chapter had — and check `kg.find(term)`
 holds it. Landing in the record and answering a question are different things, and a chapter can do
 the first without the second.
 
+**Parity.** Count how many of the chapter's content lines reach the record, and quote the number.
+Six gates passed while four kinds of content were being dropped -- an authored explanation
+overwriting the chapter's bullets, a displaced summary falling on the floor, the closing blockquote,
+the name of every practice -- and one line-coverage measurement found all four:
+
+```python
+raw = pathlib.Path('ontology/raw/<chapter>.md').read_text()
+hay = re.sub(r'[^a-z0-9]+', ' ', json.dumps(json.load(open(RECORD))).lower())
+for line in raw.split('---', 2)[2].splitlines():
+    t = re.sub(r'[^a-z0-9]+', ' ', line.strip().lower()).strip()
+    if len(t) >= 12 and not line.strip().startswith(('#', '---', '```')) and t not in hay:
+        print('absent:', line)
+```
+
+Expect the low nineties: a table row is stored as separate props, a `**Label:**` line keeps its
+content and drops the label, and a numbered item loses its number. **Read every absence and say
+which kind it is** -- the number alone proves nothing, and the four defects above were hiding among
+exactly these.
+
 **Counts and tests.** `python3 -m pytest tests/ -q`. `test_documented_counts.py` pins every node and
 edge count quoted in prose; `test_prose_is_not_glued.py` catches wrapped sentences that lost their
-spaces; `test_doc_derived_atoms.py` catches document numbering leaking into the graph.
+spaces; `test_doc_derived_atoms.py` catches document numbering leaking into the graph; `test_chapter_replay_is_reproducible.py` replays the whole pipeline and compares it to the committed record, so an extractor change that quietly alters an earlier chapter fails here rather than in a diff nobody ran.
 
 **See also:** [failure modes](references/lessons.md) · [writing node prose](#writing-node-prose)
 

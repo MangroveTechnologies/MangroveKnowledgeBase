@@ -81,6 +81,15 @@ Three uses:
    quantity; folding them on the strength of the name is the opposite of what folding is for.
 3. **Fix an id a heading would produce.** `concept:trend-range-compression-expansion` names a heading,
    not a thing.
+4. **Keep out of the library's namespace.** `procedure:indicator-*` is one node per indicator class
+   and everything that counts indicators counts that prefix, so `Indicator-Based` entry became a
+   72nd indicator. The build now raises rather than minting an id there; rename to lead with
+   something else (`procedure:entry-indicator-based`).
+
+`rename` also decides the id a **table row** resolves to. A row saying `| Momentum | 50-60% | ... |`
+under `table_properties` looks up the same declaration the heading did, so the archetype's win rate
+lands on `concept:momentum-strategy` and not on `concept:momentum`, the character an indicator
+measures.
 
 ### `retitle` — the name a node displays
 
@@ -105,6 +114,40 @@ whose bullets become `explanation`, whose table becomes `comparison` and whose b
 a quote ("do NOT describe mean reversion as safer").
 
 A section with no Definition and an undeclared block raises rather than dropping it.
+
+### `labelled_nodes` — `**Label:**` sub-blocks that are nodes
+
+```python
+"labelled_nodes": {"Stop-Loss Exits": {"Fixed Stop": "Procedure",
+                                       "ATR-Based Stop": "Procedure"}},
+```
+
+Keyed by the `###` heading, then by the label inside it. For a chapter that writes several named
+things under one heading rather than a heading each — chapter 4 states forty rules that way, as
+`**Fixed Stop:**` followed by a python function.
+
+Left inside the heading they become one string on the section's subject, and a string cannot carry
+an edge: the ADX regime rule could not fold onto the identical rule chapter 3 states, and an ATR
+stop could not say which indicator it reads. Each promoted block gets `part-of` the chapter and
+`about` the section's subject, the same two edges a principle-concept gets.
+
+**A declared heading must have every one of its labels declared**, or the build raises. Half a
+heading promoted and half left in the prop is content in two shapes with nothing saying which.
+
+### `definition_labels` — which label carries the definition
+
+```python
+"definition_labels": ("Definition", "Core Premise"),
+```
+
+`free_block` treats one label as the thing's definition and everything else as elaboration. §3.0
+writes `**Definition:**`; §4.2 writes `**Core Premise:**`. Read as an ordinary label, the premise
+became the summary with its own label glued to the front: *"Core Premise: markets exhibit
+persistent directional regimes"*.
+
+Where a block is a code fence instead, the function's **docstring** is the summary and the code
+becomes `formula` — chapter 4's rules are stated as python, and read as prose the summary came out
+as `def fixed_stop_exit(entry_price, current_price, stop_pct=0.02...)`.
 
 ### `tables` — a markdown table whose rows are nodes
 
@@ -151,6 +194,23 @@ Every `why` is mandatory and is the reason the edge holds, not a restatement of 
 A principle or practice lives in its list until it earns an edge; then it **moves** — out of the
 list, onto an `about` edge from that node to the list node, as the edge's `why`. Never in both
 places, so the copies cannot drift, and what remains in a list is exactly what is not yet connected.
+
+**The builder resolves what it can first, and prints the split.** A statement that names its node
+is drawn without a declaration — "always have a stop-loss for every position" finds
+`stop order (stop-loss)` through the alias in its parentheses. Three rules stop it inventing edges,
+because a wrong edge answers a query and a missing one does not:
+
+- a name in more than 5% of the graph is vocabulary, not a reference (`signal` is in 289 of 571
+  nodes, `strategy` 98);
+- only a **compound name or an abbreviation** counts as a citation. A single ordinary word is
+  reported as a candidate and never drawn — frequency alone cannot judge it, because the graph is
+  smaller when chapter 1 builds than when chapter 4 does and the same word scores differently;
+- two nodes matching equally well is an ambiguity, reported rather than guessed.
+
+So `wired` holds three things: the residue the text does not name, the candidates you accept, and
+the overrides where the resolver picked the wrong one of two names in the same sentence. Read the
+`wiring:` lines on stderr — every resolution is printed, because a proposal you cannot see is a
+proposal you cannot refuse.
 
 Keyed by a distinctive fragment rather than the whole sentence; a key matching no line raises, so a
 reworded source fails loudly instead of silently drawing no edge. The edge runs **from** the concept
