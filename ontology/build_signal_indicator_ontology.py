@@ -1046,7 +1046,8 @@ atom(ROOT, ROOT_TITLE, "Object",
 # question ("which chapter covers this?") has one answer across both halves of the graph.
 CH_INDICATORS = "indicators"
 CH_PATTERNS = "chart-patterns"
-CH_STRATEGY = "strategy-design-modeling"
+# The chapter id, which is what `reference_chapter` means everywhere else. It named the old
+CH_STRATEGY = "strategy-design"
 
 # entity types
 #
@@ -1105,8 +1106,18 @@ rel("Role", "part-of", "Signal", "axis along which signals are placed", "propert
 # `arm` was declared here and never used: zero signals carried it, and SKILL.md documents the role
 # vocabulary as trigger and filter. A value nothing takes is not a vocabulary, it is a claim the
 # graph cannot support -- `stats()` offered it as a legal filter that always returns nothing.
+# What each role IS, not just its name. "Signal role: trigger." is the label repeated back, and
+# these are the two nodes every one of the 218 signals points at -- chapter 6 states the
+# distinction the library encodes, so the definition comes from there.
+ROLE_MEANING = {
+    "trigger": "The part a signal plays when it fires once, on the bar a condition becomes true -- "
+               "a crossing, a breakout, a pattern completing. The event, not the state after it.",
+    "filter": "The part a signal plays when it holds for as long as a condition persists -- price "
+              "above a moving average, ADX above twenty-five. A state that gates other signals "
+              "rather than firing on its own.",
+}
 for r in ("trigger", "filter"):
-    atom(f"property:role-{r}", r, "Property", f"Signal role: {r}.",
+    atom(f"property:role-{r}", r, "Property", ROLE_MEANING[r],
          reference_chapter=[CH_INDICATORS])
     rel(r, "kind-of", "Role", "role value", f"property:role-{r}", "property:role")
 

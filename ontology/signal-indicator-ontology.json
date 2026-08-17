@@ -21,8 +21,6 @@
      "indicators"
     ],
     "notes": [
-     "Trend indicators are mathematical calculations applied to price data to identify the direction and strength of market trends. They smooth price action to filter noise and reveal underlying directional bias, helping traders align with prevailing market momentum. **Core Principles:** - **Lag vs. Smoothing Trade-off**: More smoothing means more lag but cleaner signals - **Trend Confirmation**: Indicators confirm trend direction, not predict reversals - **Multiple Timeframe Agreement**: Trend indicators across timeframes should align - **Trend Following**: Best used in trending markets, not ranges - **Price Always Leads**: Indicators are derivatives of price; price changes first **Common Use Cases:** - Identifying trend direction for trade bias - Dynamic support/resistance levels - Entry triggers on pullbacks to moving averages - Exit signals when trend indicators turn - Filtering out counter-trend trades ---",
-     "Return indicators measure price changes over time, providing metrics for momentum, performance, and risk-adjusted returns. Unlike oscillators that normalize values, return indicators show actual percentage or absolute changes.",
      "MangroveAI uses two signal types to categorize trading signals: - **TRIGGER**: Discrete events that occur at specific moments (e.g., crossovers, breakouts). These signals fire once when conditions transition from false to true. - **FILTER**: Continuous state conditions that remain true while conditions persist (e.g., price above MA, RSI overbought). These signals evaluate to true or false at each bar. Note: Terms like \"Entry\" and \"Exit\" are context-dependent. Any signal can be used for entries, exits, or filters depending on your strategy design. ---",
      "Technical indicators are tools for interpreting market data, not crystal balls for prediction. Effective use requires:",
      "Select indicators that complement each other (trend + momentum + volume) and match your trading style and timeframe."
@@ -59,7 +57,7 @@
    "status": "ratified",
    "props": {
     "reference_chapter": [
-     "strategy-design-modeling"
+     "strategy-design"
     ]
    }
   },
@@ -80,7 +78,7 @@
    "id": "property:role-trigger",
    "title": "trigger",
    "kind": "Property",
-   "summary": "Signal role: trigger.",
+   "summary": "The part a signal plays when it fires once, on the bar a condition becomes true -- a crossing, a breakout, a pattern completing. The event, not the state after it.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -93,7 +91,7 @@
    "id": "property:role-filter",
    "title": "filter",
    "kind": "Property",
-   "summary": "Signal role: filter.",
+   "summary": "The part a signal plays when it holds for as long as a condition persists -- price above a moving average, ADX above twenty-five. A state that gates other signals rather than firing on its own.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -444,7 +442,7 @@
    "id": "procedure:indicator-alma",
    "title": "ALMA",
    "kind": "Procedure",
-   "summary": "Gaussian-weighted moving average where `offset` controls which part of the window carries most weight and `sigma` controls spread. Offset near 1 reacts faster to recent bars; offset near 0 resembles an SMA.",
+   "summary": "Smooth with minimal lag",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -507,6 +505,14 @@
       "canonical_name": "Arnaud Legoux Moving Average",
       "description": "Gaussian-weighted average: weight exp(-0.5*((sigma/window)*(i-k))^2) with the peak at k = floor(offset*(window-1)), normalised to sum to 1. `offset` slides the peak toward the newest bars (higher = more responsive); `sigma` sets the bell's width (higher = smoother). NOT adaptive in the data-driven sense -- the weights are fixed at configuration time and never respond to market state, unlike KAMA or MAMA. All weights positive and normalised, so it CANNOT overshoot the window's price range -- measured 0 excursions"
      }
+    },
+    "source_wording": "Gaussian-weighted moving average where `offset` controls which part of the window carries most weight and `sigma` controls spread. Offset near 1 reacts faster to recent bars; offset near 0 resembles an SMA.",
+    "reference_chapter": [
+     "indicators"
+    ],
+    "explanation": "Reduces noise while maintaining responsiveness",
+    "chapter_variants": {
+     "formula": "ALMA applies Gaussian distribution weighting"
     }
    }
   },
@@ -2131,7 +2137,7 @@
    "id": "procedure:indicator-hma",
    "title": "HMA",
    "kind": "Procedure",
-   "summary": "Low-lag moving average designed to track price without sacrificing smoothness. Reduces lag compared to EMA/SMA while remaining smoother than WMA.",
+   "summary": "Significantly reduces lag while maintaining smoothness",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -2180,6 +2186,14 @@
       "canonical_name": "Hull Moving Average",
       "description": "WMA(2*WMA(window/2) - WMA(window), sqrt(window)) -- Alan Hull's construction, near-zero lag while staying smooth. Both window/2 and sqrt(window) are FLOORED here, matching Tulip and the Chart manual; StockCharts rounds window/2 up instead, so odd windows differ between implementations and Hull's own listing settles neither. OVERSHOOT: weights go negative beyond about window/2 bars back, so it can print outside the window's range -- 14 of 181 bars measured, the largest excursion of the family at 7.64 price units. Hull explicitly advises AGAINST crossover signals, since those rely on the lag he removed; read the turning points instead"
      }
+    },
+    "source_wording": "Low-lag moving average designed to track price without sacrificing smoothness. Reduces lag compared to EMA/SMA while remaining smoother than WMA.",
+    "reference_chapter": [
+     "indicators"
+    ],
+    "explanation": "Faster response than EMA",
+    "chapter_variants": {
+     "formula": "HMA = WMA(2 * WMA(n/2) - WMA(n), sqrt(n))"
     }
    }
   },
@@ -2448,7 +2462,12 @@
     "source_wording": "Moving average designed to account for market noise or volatility. KAMA will closely follow prices when the price swings are relatively small and the noise is low. KAMA will adjust when the price swings widen and follow prices from a greater distance. This trend-following indicator can be used to identify the overall trend, time turning points and filter price movements.",
     "reference_chapter": [
      "indicators"
-    ]
+    ],
+    "notes": [
+     "Efficiency Ratio (ER) = Change / Volatility\nSmoothing Constant (SC) = (ER * (Fast - Slow) + Slow)^2\nKAMA = Previous KAMA + SC * (Price - Previous KAMA)",
+     "Adapts to market volatility"
+    ],
+    "explanation": "Slow in ranges, fast in trends"
    }
   },
   {
@@ -19503,27 +19522,7 @@
     "reference_chapter": [
      "market-foundations"
     ],
-    "practices": [
-     "Be aware of the potential impact of large orders on market prices and plan execution accordingly",
-     "Study the specific microstructure characteristics of each market traded (e.g., tick sizes, trading hours, circuit breakers)",
-     "Trade when your counterparty is likely to be uninformed (e.g., index rebalancing flows)",
-     "Avoid trading patterns that reveal your strategy to sophisticated participants",
-     "Break large orders into smaller child orders to reduce footprint",
-     "Avoid trading during illiquid periods (market open, lunch hour, holidays)",
-     "Monitor real-time market depth before executing larger orders",
-     "Adapt trading strategies to current market conditions rather than forcing one approach",
-     "Backtest strategies across multiple regimes to understand performance variation",
-     "Have predefined plans for regime transitions rather than reacting emotionally",
-     "Select venues based on order characteristics (size, urgency, information sensitivity)",
-     "Monitor execution quality metrics across venues",
-     "Understand fee structures (maker-taker rebates can influence routing)",
-     "Factor spread costs into strategy profitability calculations",
-     "Monitor spread changes as an indicator of market conditions",
-     "Monitor lead-lag relationships between related markets",
-     "Use pre-market and after-hours trading for early information",
-     "Be cautious trading immediately after major information releases",
-     "Recognize that the first price after news is often not the right price"
-    ]
+    "practices": []
    }
   },
   {
@@ -23920,6 +23919,19 @@
    }
   },
   {
+   "id": "concept:trend-indicator",
+   "title": "trend indicators",
+   "kind": "Concept",
+   "summary": "Trend indicators are mathematical calculations applied to price data to identify the direction and strength of market trends. They smooth price action to filter noise and reveal underlying directional bias, helping traders align with prevailing market momentum. **Core Principles:** - **Lag vs. Smoothing Trade-off**: More smoothing means more lag but cleaner signals - **Trend Confirmation**: Indicators confirm trend direction, not predict reversals - **Multiple Timeframe Agreement**: Trend indicators across timeframes should align - **Trend Following**: Best used in trending markets, not ranges - **Price Always Leads**: Indicators are derivatives of price; price changes first **Common Use Cases:** - Identifying trend direction for trade bias - Dynamic support/resistance levels - Entry triggers on pullbacks to moving averages - Exit signals when trend indicators turn - Filtering out counter-trend trades ---",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "indicators"
+    ]
+   }
+  },
+  {
    "id": "procedure:parabolic-sar",
    "title": "parabolic sar",
    "kind": "Procedure",
@@ -24095,36 +24107,6 @@
    }
   },
   {
-   "id": "procedure:hull-moving-average",
-   "title": "hull moving average (hma)",
-   "kind": "Procedure",
-   "summary": "Significantly reduces lag while maintaining smoothness",
-   "epistemic": "observed",
-   "status": "draft",
-   "props": {
-    "reference_chapter": [
-     "indicators"
-    ],
-    "formula": "HMA = WMA(2 * WMA(n/2) - WMA(n), sqrt(n))",
-    "explanation": "Faster response than EMA"
-   }
-  },
-  {
-   "id": "procedure:kaufman-adaptive-moving-average",
-   "title": "kaufman adaptive moving average (kama)",
-   "kind": "Procedure",
-   "summary": "Adapts to market volatility",
-   "epistemic": "observed",
-   "status": "draft",
-   "props": {
-    "reference_chapter": [
-     "indicators"
-    ],
-    "formula": "Efficiency Ratio (ER) = Change / Volatility\nSmoothing Constant (SC) = (ER * (Fast - Slow) + Slow)^2\nKAMA = Previous KAMA + SC * (Price - Previous KAMA)",
-    "explanation": "Slow in ranges, fast in trends"
-   }
-  },
-  {
    "id": "procedure:variable-index-dynamic-average",
    "title": "variable index dynamic average (vidya)",
    "kind": "Procedure",
@@ -24139,18 +24121,16 @@
    }
   },
   {
-   "id": "procedure:arnaud-legoux-moving-average",
-   "title": "arnaud legoux moving average (alma)",
-   "kind": "Procedure",
-   "summary": "Smooth with minimal lag",
+   "id": "concept:return-indicator",
+   "title": "return indicators",
+   "kind": "Concept",
+   "summary": "Return indicators measure price changes over time, providing metrics for momentum, performance, and risk-adjusted returns. Unlike oscillators that normalize values, return indicators show actual percentage or absolute changes.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "indicators"
-    ],
-    "formula": "ALMA applies Gaussian distribution weighting",
-    "explanation": "Reduces noise while maintaining responsiveness"
+    ]
    }
   },
   {
@@ -24226,7 +24206,7 @@
    "id": "concept:head-and-shoulders",
    "title": "head and shoulders",
    "kind": "Concept",
-   "summary": "Three peaks with the middle one highest, their intervening lows forming a neckline the pattern completes by closing below.",
+   "summary": "Left Shoulder: Rally and decline",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24234,38 +24214,34 @@
      "chart-patterns"
     ],
     "formula": "Head > Left_Shoulder > Neckline\nHead > Right_Shoulder > Neckline\nRight_Shoulder approximately equals Left_Shoulder height\nBoth shoulders retrace to approximately same neckline level",
-    "explanation": "A distribution pattern: the failure of the third rally to reach the second is the tell, and the neckline is where that reading is confirmed or refuted. The measured move -- head to neckline, projected down from the break -- is the target the chapter gives it.",
+    "explanation": "Head: Higher rally and decline to similar level (neckline) Right Shoulder: Lower rally and decline Neckline: Connect the lows after each shoulder Entry: Break below neckline Stop: Above right shoulder Target: Measured move (head to neckline distance projected down) ",
     "notes": [
-     "Interpretation: Distribution pattern; bearish reversal after uptrend.",
-     "Head: Higher rally and decline to similar level (neckline) Right Shoulder: Lower rally and decline Neckline: Connect the lows after each shoulder Entry: Break below neckline Stop: Above right shoulder Target: Measured move (head to neckline distance projected down) "
-    ],
-    "source_wording": "Left Shoulder: Rally and decline"
+     "Interpretation: Distribution pattern; bearish reversal after uptrend."
+    ]
    }
   },
   {
    "id": "concept:inverse-head-and-shoulders",
    "title": "inverse head and shoulders",
    "kind": "Concept",
-   "summary": "The same three-trough shape inverted, completing on a close above the neckline that joins its intervening highs.",
+   "summary": "Mirror image of head and shoulders.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Accumulation rather than distribution, and read the same way: the third decline failing to reach the second is what makes it a base rather than a pause.",
+    "explanation": "Left Shoulder: Decline and rally Head: Lower decline and rally Right Shoulder: Higher decline and rally Neckline: Connect the highs Entry: Break above neckline Stop: Below right shoulder Target: Measured move (head to neckline distance projected up) ",
     "notes": [
-     "Interpretation: Accumulation pattern; bullish reversal after downtrend.",
-     "Left Shoulder: Decline and rally Head: Lower decline and rally Right Shoulder: Higher decline and rally Neckline: Connect the highs Entry: Break above neckline Stop: Below right shoulder Target: Measured move (head to neckline distance projected up) "
-    ],
-    "source_wording": "Mirror image of head and shoulders."
+     "Interpretation: Accumulation pattern; bullish reversal after downtrend."
+    ]
    }
   },
   {
    "id": "concept:double-top-double-bottom",
    "title": "double top / double bottom",
    "kind": "Concept",
-   "summary": "Two tests of nearly the same level with a retracement between them, completing on a close beyond that retracement.",
+   "summary": "Two peaks at approximately the same price level",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24273,18 +24249,14 @@
      "chart-patterns"
     ],
     "formula": "Double_Top:\n  |High_Peak1 - High_Peak2| < threshold\n  Valley_Low < both Peak_Highs\n  Confirmation: Close below Valley_Low",
-    "explanation": "The second test failing to exceed the first is the whole signal -- the level held twice, so the move that made it is spent. The valley or peak between the tests is both the trigger and the measuring stick for the target.",
-    "source_wording": "Two peaks at approximately the same price level",
-    "notes": [
-     "Valley between peaks (neckline) Failure to exceed first peak indicates weakening Entry: Break below valley Target: Distance from peaks to valley projected down Two troughs at approximately the same price level Peak between troughs (neckline) Failure to break first low indicates support Entry: Break above peak Target: Distance from troughs to peak projected up "
-    ]
+    "explanation": "Valley between peaks (neckline) Failure to exceed first peak indicates weakening Entry: Break below valley Target: Distance from peaks to valley projected down Two troughs at approximately the same price level Peak between troughs (neckline) Failure to break first low indicates support Entry: Break above peak Target: Distance from troughs to peak projected up "
    }
   },
   {
    "id": "concept:triple-top-triple-bottom",
    "title": "triple top / triple bottom",
    "kind": "Concept",
-   "summary": "The same shape with three tests of the level rather than two.",
+   "summary": "Similar to double top/bottom but with three peaks/troughs.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24294,16 +24266,14 @@
     "notes": [
      "Interpretation: Stronger reversal signal than double top/bottom due to additional test.",
      "Trading Application: Same as double top/bottom but often more reliable."
-    ],
-    "source_wording": "Similar to double top/bottom but with three peaks/troughs.",
-    "explanation": "The chapter rates it more reliable for the obvious reason -- one more rejection at the same price -- and trades it identically."
+    ]
    }
   },
   {
    "id": "concept:triangle",
    "title": "triangles",
    "kind": "Concept",
-   "summary": "Converging boundaries drawn across the highs and the lows, completing on a close beyond either of them.",
+   "summary": "Horizontal resistance line (flat tops)",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24311,83 +24281,63 @@
      "chart-patterns"
     ],
     "formula": "Ascending_Triangle:\n  High values form horizontal line (within tolerance)\n  Low values form upward sloping line\n  Lines converging",
-    "explanation": "Which boundary is flat decides the reading: a flat top with rising lows is buyers paying up into a fixed offer, a flat bottom with falling highs is the reverse, and two sloping lines say only that range is contracting. The chapter puts the first two at seventy per cent in their stated direction and the symmetrical case at a coin toss.",
-    "source_wording": "Horizontal resistance line (flat tops)",
-    "notes": [
-     "Rising support line (higher lows) Buyers becoming more aggressive Breakout typically upward (70% of cases) Horizontal support line (flat bottoms) Falling resistance line (lower highs) Sellers becoming more aggressive Breakout typically downward (70% of cases) Converging trend lines Lower highs and higher lows Consolidation pattern Breakout direction determines trend Entry: Breakout beyond triangle boundary Stop: Opposite side of triangle or last swing Target: Height of triangle base projected from breakout "
-    ]
+    "explanation": "Rising support line (higher lows) Buyers becoming more aggressive Breakout typically upward (70% of cases) Horizontal support line (flat bottoms) Falling resistance line (lower highs) Sellers becoming more aggressive Breakout typically downward (70% of cases) Converging trend lines Lower highs and higher lows Consolidation pattern Breakout direction determines trend Entry: Breakout beyond triangle boundary Stop: Opposite side of triangle or last swing Target: Height of triangle base projected from breakout "
    }
   },
   {
    "id": "concept:flags-and-pennants",
    "title": "flags and pennants",
    "kind": "Concept",
-   "summary": "A brief consolidation against the direction of a sharp move, resolving in the direction of the move that preceded it.",
+   "summary": "Sharp rally (flagpole)",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Continuation rather than reversal, and the pole is the measuring stick: its length projected from the break is the target. A flag drifts in a parallel channel, a pennant contracts to a point, and both are short by definition -- one that outlasts the move that made it has stopped being a pause.",
-    "source_wording": "Sharp rally (flagpole)",
-    "notes": [
-     "Consolidation that slopes against trend (parallel channel down) Continuation pattern Entry: Break above flag resistance Target: Flagpole length projected from breakout Sharp decline (flagpole) Consolidation that slopes against trend (parallel channel up) Continuation pattern Entry: Break below flag support Target: Flagpole length projected from breakout Similar to flag but consolidation forms symmetrical triangle Very short-term pattern (1-3 weeks typically) Strong continuation pattern "
-    ]
+    "explanation": "Consolidation that slopes against trend (parallel channel down) Continuation pattern Entry: Break above flag resistance Target: Flagpole length projected from breakout Sharp decline (flagpole) Consolidation that slopes against trend (parallel channel up) Continuation pattern Entry: Break below flag support Target: Flagpole length projected from breakout Similar to flag but consolidation forms symmetrical triangle Very short-term pattern (1-3 weeks typically) Strong continuation pattern "
    }
   },
   {
    "id": "concept:wedge",
    "title": "wedges",
    "kind": "Concept",
-   "summary": "Two converging boundaries sloping the same way, read against their slope rather than with it.",
+   "summary": "Both support and resistance lines slope upward",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "The counter-intuitive one: a rising wedge is bearish and a falling wedge bullish, whichever trend they appear in, because the converging slope says each push is shorter than the last.",
-    "source_wording": "Both support and resistance lines slope upward",
-    "notes": [
-     "Resistance line has gentler slope Lines converge Typically bearish regardless of trend context Breakout usually downward Both support and resistance lines slope downward Support line has gentler slope Lines converge Typically bullish regardless of trend context Breakout usually upward "
-    ]
+    "explanation": "Resistance line has gentler slope Lines converge Typically bearish regardless of trend context Breakout usually downward Both support and resistance lines slope downward Support line has gentler slope Lines converge Typically bullish regardless of trend context Breakout usually upward "
    }
   },
   {
    "id": "concept:channel",
    "title": "channels",
    "kind": "Concept",
-   "summary": "Parallel boundaries containing price, traded from edge to edge until one of them breaks.",
+   "summary": "Parallel upward sloping lines containing price",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "The break is the event: while it holds, the channel is a range with a slope, and the edges are [[Dynamic Level]]s. Ascending, descending and horizontal differ only in that slope.",
-    "source_wording": "Parallel upward sloping lines containing price",
-    "notes": [
-     "Buy at lower channel line Sell at upper channel line Channel break can signal acceleration or reversal Parallel downward sloping lines containing price Sell at upper channel line Cover at lower channel line Channel break can signal acceleration or reversal Horizontal parallel lines containing price Range-bound trading Breakout direction determines next trend "
-    ]
+    "explanation": "Buy at lower channel line Sell at upper channel line Channel break can signal acceleration or reversal Parallel downward sloping lines containing price Sell at upper channel line Cover at lower channel line Channel break can signal acceleration or reversal Horizontal parallel lines containing price Range-bound trading Breakout direction determines next trend "
    }
   },
   {
    "id": "concept:cup-and-handle",
    "title": "cup and handle",
    "kind": "Concept",
-   "summary": "A rounded base followed by a shallow drift, completing on a close above the rim.",
+   "summary": "Cup: Rounded bottom formation (U-shape, not V)",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "The shape is the argument -- a U rather than a V says the base was built rather than spiked, and a handle deeper than half the cup says the base did not hold. Continuation, and the cup depth is the target.",
-    "source_wording": "Cup: Rounded bottom formation (U-shape, not V)",
-    "notes": [
-     "Handle: Small consolidation after cup (slight downward drift) Bullish continuation pattern Entry: Break above handle resistance / cup rim Stop: Below handle low Target: Depth of cup projected from breakout "
-    ]
+    "explanation": "Handle: Small consolidation after cup (slight downward drift) Bullish continuation pattern Entry: Break above handle resistance / cup rim Stop: Below handle low Target: Depth of cup projected from breakout "
    }
   },
   {
@@ -24593,18 +24543,14 @@
    "id": "concept:entry-timing-option",
    "title": "entry timing options",
    "kind": "Concept",
-   "summary": "The three moments a completed pattern can be entered on: the break itself, the close beyond it, or the retest of it.",
+   "summary": "Enter on intrabar break of pattern boundary",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "They trade certainty against price. Entering intrabar gets the tightest stop and the most failures; waiting for the retest confirms the boundary reversed roles and misses the moves that never come back.",
-    "source_wording": "Enter on intrabar break of pattern boundary",
-    "notes": [
-     "Tighter stop, larger potential move capture Higher failure rate Enter on close beyond pattern boundary Balanced approach Moderate failure rate Enter on retest of broken boundary Confirmation of role reversal May miss some moves but better R:R "
-    ]
+    "explanation": "Tighter stop, larger potential move capture Higher failure rate Enter on close beyond pattern boundary Balanced approach Moderate failure rate Enter on retest of broken boundary Confirmation of role reversal May miss some moves but better R:R "
    }
   },
   {
@@ -24702,15 +24648,14 @@
    "id": "procedure:statistical-testing-for-seasonality",
    "title": "statistical testing for seasonality",
    "kind": "Procedure",
-   "summary": "Compares returns inside a calendar period against returns outside it, and reports whether the difference could be chance.",
+   "summary": "",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "from scipy import stats\n\ndef test_seasonal_effect(returns, is_seasonal):\n    seasonal_returns = returns[is_seasonal]\n    non_seasonal_returns = returns[~is_seasonal]\n    \n    t_stat, p_value = stats.ttest_ind(seasonal_returns, non_seasonal_returns)\n    \n    return {\n        'seasonal_mean': seasonal_returns.mean(),\n        'non_seasonal_mean': non_seasonal_returns.mean(),\n        't_statistic': t_stat,\n        'p_value': p_value,\n        'significant': p_value < 0.05\n    }",
-    "explanation": "A two-sample t-test, which is what separates a seasonal effect from a story about one. The chapter is explicit that well-published effects decay, so the test is worth rerunning rather than citing."
+    "formula": "from scipy import stats\n\ndef test_seasonal_effect(returns, is_seasonal):\n    seasonal_returns = returns[is_seasonal]\n    non_seasonal_returns = returns[~is_seasonal]\n    \n    t_stat, p_value = stats.ttest_ind(seasonal_returns, non_seasonal_returns)\n    \n    return {\n        'seasonal_mean': seasonal_returns.mean(),\n        'non_seasonal_mean': non_seasonal_returns.mean(),\n        't_statistic': t_stat,\n        'p_value': p_value,\n        'significant': p_value < 0.05\n    }"
    }
   },
   {
@@ -24737,7 +24682,7 @@
    "id": "procedure:garch-family-model",
    "title": "garch family models",
    "kind": "Procedure",
-   "summary": "Models tomorrow's variance as a weighted sum of a long-run level, the most recent shock, and today's variance.",
+   "summary": "Where:",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24745,28 +24690,24 @@
      "quantitative-analysis"
     ],
     "formula": "sigma_t^2 = omega + alpha * epsilon_(t-1)^2 + beta * sigma_(t-1)^2\nfrom arch import arch_model\n\n# Fit GARCH(1,1)\nmodel = arch_model(returns, vol='Garch', p=1, q=1)\nresults = model.fit()\n\n# Forecast volatility\nforecast = results.forecast(horizon=5)\npredicted_vol = np.sqrt(forecast.variance.values[-1])",
-    "explanation": "The two weights are the whole model: how hard a shock hits, and how slowly it decays. Their sum approaching one is persistence -- which is [[Volatility Clustering]] measured rather than observed -- and must stay below one for the process to have a long-run level at all.",
+    "explanation": "sigma_t^2 = Conditional variance at time t omega = Long-run variance weight alpha = Reaction to recent shock (typically 0.05-0.15) beta = Persistence parameter (typically 0.80-0.95) alpha + beta < 1 for stationarity ",
     "notes": [
-     "Key Insight: alpha + beta close to 1 means high persistence (volatility shocks take long to decay).",
-     "sigma_t^2 = Conditional variance at time t omega = Long-run variance weight alpha = Reaction to recent shock (typically 0.05-0.15) beta = Persistence parameter (typically 0.80-0.95) alpha + beta < 1 for stationarity "
-    ],
-    "source_wording": "Where:"
+     "Key Insight: alpha + beta close to 1 means high persistence (volatility shocks take long to decay)."
+    ]
    }
   },
   {
    "id": "procedure:egarch",
    "title": "egarch",
    "kind": "Procedure",
-   "summary": "The same model on the logarithm of variance, with a term that lets a fall move volatility differently from a rise.",
+   "summary": "Key Feature: Captures asymmetry - gamma parameter allows negative returns to impact volatility differently than positive returns (leverage effect).",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "log(sigma_t^2) = omega + alpha * (|z_(t-1)| - E|z|) + gamma * z_(t-1) + beta * log(sigma_(t-1)^2)",
-    "source_wording": "Key Feature: Captures asymmetry - gamma parameter allows negative returns to impact volatility differently than positive returns (leverage effect).",
-    "explanation": "The asymmetry is the point: the leverage effect is real and symmetric GARCH cannot express it. Working in logs also removes the need to constrain the parameters positive."
+    "formula": "log(sigma_t^2) = omega + alpha * (|z_(t-1)| - E|z|) + gamma * z_(t-1) + beta * log(sigma_(t-1)^2)"
    }
   },
   {
@@ -24852,30 +24793,28 @@
    "id": "procedure:bollinger-band-mean-reversion",
    "title": "bollinger band mean reversion",
    "kind": "Procedure",
-   "summary": "Buys below the lower band and sells above the upper, closing as price returns to the middle.",
+   "summary": "",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def bollinger_mean_reversion(close, window=20, num_std=2):\n    middle = close.rolling(window).mean()\n    std = close.rolling(window).std()\n    upper = middle + (num_std * std)\n    lower = middle - (num_std * std)\n    \n    signals = pd.Series(0, index=close.index)\n    signals[close < lower] = 1   # Long when below lower band\n    signals[close > upper] = -1  # Short when above upper band\n    signals[close.between(middle - std, middle + std)] = 0  # Exit near middle\n    \n    return signals",
-    "explanation": "The bands are a z-score in price units, so this is the [[Z-Score]] rule with a moving standard deviation: two deviations out, and back to the mean. It fails exactly where [[Mean Reversion]] fails -- when the band is being walked rather than tested."
+    "formula": "def bollinger_mean_reversion(close, window=20, num_std=2):\n    middle = close.rolling(window).mean()\n    std = close.rolling(window).std()\n    upper = middle + (num_std * std)\n    lower = middle - (num_std * std)\n    \n    signals = pd.Series(0, index=close.index)\n    signals[close < lower] = 1   # Long when below lower band\n    signals[close > upper] = -1  # Short when above upper band\n    signals[close.between(middle - std, middle + std)] = 0  # Exit near middle\n    \n    return signals"
    }
   },
   {
    "id": "procedure:rsi-mean-reversion",
    "title": "rsi mean reversion",
    "kind": "Procedure",
-   "summary": "Buys oversold and sells overbought on RSI, exiting as it returns to the midpoint.",
+   "summary": "",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def rsi_mean_reversion(rsi, oversold=30, overbought=70, exit=50):\n    signals = pd.Series(0, index=rsi.index)\n    signals[rsi < oversold] = 1   # Long when oversold\n    signals[rsi > overbought] = -1  # Short when overbought\n    \n    # Exit conditions\n    # Long exit: RSI crosses above exit threshold\n    # Short exit: RSI crosses below exit threshold\n    \n    return signals",
-    "explanation": "The same trade as the band version with a bounded oscillator in place of a distance: thirty and seventy rather than two deviations, and fifty as the exit. Chapter 6 states the caution that matters here -- in a strong trend RSI shifts its range and stays extreme."
+    "formula": "def rsi_mean_reversion(rsi, oversold=30, overbought=70, exit=50):\n    signals = pd.Series(0, index=rsi.index)\n    signals[rsi < oversold] = 1   # Long when oversold\n    signals[rsi > overbought] = -1  # Short when overbought\n    \n    # Exit conditions\n    # Long exit: RSI crosses above exit threshold\n    # Short exit: RSI crosses below exit threshold\n    \n    return signals"
    }
   },
   {
@@ -24926,15 +24865,14 @@
    "id": "procedure:breakout-confirmation-filter",
    "title": "breakout confirmation filters",
    "kind": "Procedure",
-   "summary": "Requires volume above its average, or momentum in the breakout direction, before a break counts.",
+   "summary": "",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def volume_confirmed_breakout(price_breakout, volume, avg_volume_period=20, threshold=1.5):\n    avg_volume = volume.rolling(avg_volume_period).mean()\n    volume_confirmation = volume > (threshold * avg_volume)\n    \n    confirmed_breakout = price_breakout & volume_confirmation\n    return confirmed_breakout\ndef momentum_confirmed_breakout(price_breakout, rsi, rsi_threshold=50):\n    # Bullish breakout confirmed by RSI > 50\n    # Bearish breakout confirmed by RSI < 50\n    bullish_confirmed = price_breakout & (price_breakout > 0) & (rsi > rsi_threshold)\n    bearish_confirmed = price_breakout & (price_breakout < 0) & (rsi < rsi_threshold)\n    \n    return bullish_confirmed, bearish_confirmed",
-    "explanation": "The chapter puts breakout failure at fifty to sixty per cent, and both filters attack the same failure: a level given up without participation behind it. The cost is the breaks that run without waiting."
+    "formula": "def volume_confirmed_breakout(price_breakout, volume, avg_volume_period=20, threshold=1.5):\n    avg_volume = volume.rolling(avg_volume_period).mean()\n    volume_confirmation = volume > (threshold * avg_volume)\n    \n    confirmed_breakout = price_breakout & volume_confirmation\n    return confirmed_breakout\ndef momentum_confirmed_breakout(price_breakout, rsi, rsi_threshold=50):\n    # Bullish breakout confirmed by RSI > 50\n    # Bearish breakout confirmed by RSI < 50\n    bullish_confirmed = price_breakout & (price_breakout > 0) & (rsi > rsi_threshold)\n    bearish_confirmed = price_breakout & (price_breakout < 0) & (rsi < rsi_threshold)\n    \n    return bullish_confirmed, bearish_confirmed"
    }
   },
   {
@@ -25063,46 +25001,42 @@
    "id": "procedure:feature-engineering-for-trading",
    "title": "feature engineering for trading",
    "kind": "Procedure",
-   "summary": "Turns raw bars into the inputs a model reads: returns, distance from a moving average, volatility and range over several lookbacks.",
+   "summary": "",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def create_price_features(df, periods=[5, 10, 20, 50]):\n    features = pd.DataFrame(index=df.index)\n    \n    for p in periods:\n        # Returns\n        features[f'return_{p}d'] = df['close'].pct_change(p)\n        \n        # Moving average distance\n        features[f'ma_dist_{p}d'] = df['close'] / df['close'].rolling(p).mean() - 1\n        \n        # Volatility\n        features[f'vol_{p}d'] = df['close'].pct_change().rolling(p).std()\n        \n        # Range\n        features[f'range_{p}d'] = (df['high'].rolling(p).max() - df['low'].rolling(p).min()) / df['close']\n    \n    return features\ndef create_indicator_features(df):\n    features = pd.DataFrame(index=df.index)\n    \n    # RSI\n    features['rsi_14'] = calculate_rsi(df['close'], 14)\n    \n    # MACD\n    features['macd'], features['macd_signal'], features['macd_hist'] = calculate_macd(df['close'])\n    \n    # Bollinger %B\n    features['bb_pct_b'] = calculate_bollinger_pct_b(df['close'])\n    \n    # ADX\n    features['adx'] = calculate_adx(df['high'], df['low'], df['close'])\n    \n    return features",
-    "explanation": "The chapter puts this above model choice, and the features are mostly the library's own indicators computed at several horizons. Every one of them is a lookback decision, which is where [[Overfitting]] enters before any model is fitted."
+    "formula": "def create_price_features(df, periods=[5, 10, 20, 50]):\n    features = pd.DataFrame(index=df.index)\n    \n    for p in periods:\n        # Returns\n        features[f'return_{p}d'] = df['close'].pct_change(p)\n        \n        # Moving average distance\n        features[f'ma_dist_{p}d'] = df['close'] / df['close'].rolling(p).mean() - 1\n        \n        # Volatility\n        features[f'vol_{p}d'] = df['close'].pct_change().rolling(p).std()\n        \n        # Range\n        features[f'range_{p}d'] = (df['high'].rolling(p).max() - df['low'].rolling(p).min()) / df['close']\n    \n    return features\ndef create_indicator_features(df):\n    features = pd.DataFrame(index=df.index)\n    \n    # RSI\n    features['rsi_14'] = calculate_rsi(df['close'], 14)\n    \n    # MACD\n    features['macd'], features['macd_signal'], features['macd_hist'] = calculate_macd(df['close'])\n    \n    # Bollinger %B\n    features['bb_pct_b'] = calculate_bollinger_pct_b(df['close'])\n    \n    # ADX\n    features['adx'] = calculate_adx(df['high'], df['low'], df['close'])\n    \n    return features"
    }
   },
   {
    "id": "procedure:classification-model",
    "title": "classification models",
    "kind": "Procedure",
-   "summary": "Predicts the direction of the next period from those features, validated on time-ordered splits rather than shuffled ones.",
+   "summary": "Predict next-period return direction",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "from sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import TimeSeriesSplit\n\ndef train_direction_classifier(features, returns, n_splits=5):\n    \"\"\"\n    Predict next-period return direction\n    \"\"\"\n    # Create target: 1 if positive return, 0 if negative\n    target = (returns.shift(-1) > 0).astype(int)\n    \n    # Align features and target\n    aligned = pd.concat([features, target], axis=1).dropna()\n    X = aligned.iloc[:, :-1]\n    y = aligned.iloc[:, -1]\n    \n    # Time series cross-validation\n    tscv = TimeSeriesSplit(n_splits=n_splits)\n    \n    scores = []\n    for train_idx, test_idx in tscv.split(X):\n        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]\n        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]\n        \n        model = RandomForestClassifier(n_estimators=100, max_depth=5)\n        model.fit(X_train, y_train)\n        \n        score = model.score(X_test, y_test)\n        scores.append(score)\n    \n    return np.mean(scores), model",
-    "source_wording": "Predict next-period return direction",
-    "explanation": "The split is the whole discipline: shuffling puts tomorrow in the training set, which is [[Look-Ahead Bias]] with a respectable name."
+    "formula": "from sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import TimeSeriesSplit\n\ndef train_direction_classifier(features, returns, n_splits=5):\n    \"\"\"\n    Predict next-period return direction\n    \"\"\"\n    # Create target: 1 if positive return, 0 if negative\n    target = (returns.shift(-1) > 0).astype(int)\n    \n    # Align features and target\n    aligned = pd.concat([features, target], axis=1).dropna()\n    X = aligned.iloc[:, :-1]\n    y = aligned.iloc[:, -1]\n    \n    # Time series cross-validation\n    tscv = TimeSeriesSplit(n_splits=n_splits)\n    \n    scores = []\n    for train_idx, test_idx in tscv.split(X):\n        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]\n        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]\n        \n        model = RandomForestClassifier(n_estimators=100, max_depth=5)\n        model.fit(X_train, y_train)\n        \n        score = model.score(X_test, y_test)\n        scores.append(score)\n    \n    return np.mean(scores), model"
    }
   },
   {
    "id": "procedure:neural-network-pattern",
    "title": "neural network patterns",
    "kind": "Procedure",
-   "summary": "Reads a window of bars as a sequence rather than a row of features, learning order-dependent structure.",
+   "summary": "",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "import tensorflow as tf\nfrom tensorflow.keras.models import Sequential\nfrom tensorflow.keras.layers import LSTM, Dense, Dropout\n\ndef build_lstm_model(sequence_length, n_features):\n    model = Sequential([\n        LSTM(50, return_sequences=True, input_shape=(sequence_length, n_features)),\n        Dropout(0.2),\n        LSTM(50, return_sequences=False),\n        Dropout(0.2),\n        Dense(25, activation='relu'),\n        Dense(1, activation='sigmoid')  # Binary classification\n    ])\n    \n    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])\n    return model",
-    "explanation": "The trade-off the chapter states plainly: more capacity to find structure, and less ability to say what was found. Its value depends on there being sequential structure to learn, which is what [[Autocorrelation]] measures directly and cheaply."
+    "formula": "import tensorflow as tf\nfrom tensorflow.keras.models import Sequential\nfrom tensorflow.keras.layers import LSTM, Dense, Dropout\n\ndef build_lstm_model(sequence_length, n_features):\n    model = Sequential([\n        LSTM(50, return_sequences=True, input_shape=(sequence_length, n_features)),\n        Dropout(0.2),\n        LSTM(50, return_sequences=False),\n        Dropout(0.2),\n        Dense(25, activation='relu'),\n        Dense(1, activation='sigmoid')  # Binary classification\n    ])\n    \n    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])\n    return model"
    }
   },
   {
@@ -36145,7 +36079,7 @@
    "from": "liquidity",
    "rel": "about",
    "to": "best practices",
-   "why": "Monitor order book depth continuously to assess real-time liquidity conditions \u00b7 Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal) \u00b7 Trade during high liquidity periods for tighter spreads",
+   "why": "Monitor order book depth continuously to assess real-time liquidity conditions \u00b7 Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal) \u00b7 Avoid trading during illiquid periods (market open, lunch hour, holidays) \u00b7 Monitor real-time market depth before executing larger orders \u00b7 Trade during high liquidity periods for tighter spreads",
    "from_id": "concept:liquidity",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36155,6 +36089,22 @@
    "to": "best practices",
    "why": "Use limit orders to control execution prices when liquidity permits \u00b7 Place limit orders at realistic prices based on current market conditions \u00b7 Use limit orders to avoid paying the full spread",
    "from_id": "concept:limit-order",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "market impact",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Be aware of the potential impact of large orders on market prices and plan execution accordingly \u00b7 Consider total cost of execution including fees, spread, and market impact",
+   "from_id": "concept:market-impact",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "market microstructure",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Study the specific microstructure characteristics of each market traded (e.g., tick sizes, trading hours, circuit breakers)",
+   "from_id": "concept:market-microstructure",
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
@@ -36193,7 +36143,7 @@
    "from": "iceberg order",
    "rel": "about",
    "to": "best practices",
-   "why": "Use iceberg orders for large positions to reduce information leakage",
+   "why": "Use iceberg orders for large positions to reduce information leakage \u00b7 Break large orders into smaller child orders to reduce footprint",
    "from_id": "concept:iceberg-order",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36227,6 +36177,22 @@
    "to": "best practices",
    "why": "Be aware that HFT can front-run large orders if execution is predictable",
    "from_id": "concept:high-frequency-trader",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "information asymmetry",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Trade when your counterparty is likely to be uninformed (e.g., index rebalancing flows)",
+   "from_id": "concept:information-asymmetry",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "information leakage",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Avoid trading patterns that reveal your strategy to sophisticated participants",
+   "from_id": "concept:information-leakage",
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
@@ -36278,10 +36244,26 @@
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Adapt trading strategies to current market conditions rather than forcing one approach",
+   "from_id": "concept:market-regime",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "backtesting",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Backtest strategies across multiple regimes to understand performance variation",
+   "from_id": "concept:backtesting",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
    "from": "regime shifts",
    "rel": "about",
    "to": "best practices",
-   "why": "Consider that regime shifts often occur faster than regime detection algorithms can identify",
+   "why": "Have predefined plans for regime transitions rather than reacting emotionally \u00b7 Consider that regime shifts often occur faster than regime detection algorithms can identify",
    "from_id": "concept:regime-shift",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36289,8 +36271,16 @@
    "from": "trading venues",
    "rel": "about",
    "to": "best practices",
-   "why": "Use smart order routers (SOR) to access multiple venues simultaneously",
+   "why": "Use smart order routers (SOR) to access multiple venues simultaneously \u00b7 Select venues based on order characteristics (size, urgency, information sensitivity) \u00b7 Understand fee structures (maker-taker rebates can influence routing)",
    "from_id": "concept:trading-venue",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "execution models",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor execution quality metrics across venues",
+   "from_id": "concept:execution-model",
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
@@ -36302,26 +36292,34 @@
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
-   "from": "market impact",
-   "rel": "about",
-   "to": "best practices",
-   "why": "Consider total cost of execution including fees, spread, and market impact",
-   "from_id": "concept:market-impact",
-   "to_id": "judgment:market-foundations-best-practices"
-  },
-  {
    "from": "bid-ask spread dynamics",
    "rel": "about",
    "to": "best practices",
-   "why": "Always check the current spread before trading \u00b7 Avoid trading when spreads are abnormally wide unless necessary",
+   "why": "Always check the current spread before trading \u00b7 Factor spread costs into strategy profitability calculations \u00b7 Monitor spread changes as an indicator of market conditions \u00b7 Avoid trading when spreads are abnormally wide unless necessary",
    "from_id": "concept:bid-ask-spread",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "cross-market discovery",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor lead-lag relationships between related markets",
+   "from_id": "concept:cross-market-discovery",
+   "to_id": "judgment:market-foundations-best-practices"
+  },
+  {
+   "from": "session filter",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use pre-market and after-hours trading for early information",
+   "from_id": "procedure:session-filter",
    "to_id": "judgment:market-foundations-best-practices"
   },
   {
    "from": "price discovery",
    "rel": "about",
    "to": "best practices",
-   "why": "Understand the price discovery role of derivatives markets",
+   "why": "Understand the price discovery role of derivatives markets \u00b7 Be cautious trading immediately after major information releases \u00b7 Recognize that the first price after news is often not the right price",
    "from_id": "concept:price-discovery",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -42358,6 +42356,14 @@
    "to_id": "concept:risk-management"
   },
   {
+   "from": "trend indicators",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under trend indicators",
+   "from_id": "concept:trend-indicator",
+   "to_id": "concept:indicator"
+  },
+  {
    "from": "SMA",
    "rel": "part-of",
    "to": "Indicator",
@@ -42862,35 +42868,27 @@
    "to_id": "concept:averaging"
   },
   {
-   "from": "hull moving average (hma)",
+   "from": "HMA",
    "rel": "part-of",
    "to": "Indicator",
    "why": "stated under moving average variants",
-   "from_id": "procedure:hull-moving-average",
+   "from_id": "procedure:indicator-hma",
    "to_id": "concept:indicator"
   },
   {
-   "from": "hull moving average (hma)",
+   "from": "HMA",
    "rel": "about",
    "to": "averaging",
    "why": "stated under moving average types",
-   "from_id": "procedure:hull-moving-average",
+   "from_id": "procedure:indicator-hma",
    "to_id": "concept:averaging"
   },
   {
-   "from": "kaufman adaptive moving average (kama)",
-   "rel": "part-of",
-   "to": "Indicator",
-   "why": "stated under moving average variants",
-   "from_id": "procedure:kaufman-adaptive-moving-average",
-   "to_id": "concept:indicator"
-  },
-  {
-   "from": "kaufman adaptive moving average (kama)",
+   "from": "KAMA",
    "rel": "about",
    "to": "averaging",
    "why": "stated under moving average types",
-   "from_id": "procedure:kaufman-adaptive-moving-average",
+   "from_id": "procedure:indicator-kama",
    "to_id": "concept:averaging"
   },
   {
@@ -42910,20 +42908,28 @@
    "to_id": "concept:averaging"
   },
   {
-   "from": "arnaud legoux moving average (alma)",
+   "from": "ALMA",
    "rel": "part-of",
    "to": "Indicator",
    "why": "stated under moving average variants",
-   "from_id": "procedure:arnaud-legoux-moving-average",
+   "from_id": "procedure:indicator-alma",
    "to_id": "concept:indicator"
   },
   {
-   "from": "arnaud legoux moving average (alma)",
+   "from": "ALMA",
    "rel": "about",
    "to": "averaging",
    "why": "stated under moving average types",
-   "from_id": "procedure:arnaud-legoux-moving-average",
+   "from_id": "procedure:indicator-alma",
    "to_id": "concept:averaging"
+  },
+  {
+   "from": "return indicators",
+   "rel": "part-of",
+   "to": "Indicator",
+   "why": "defined under return indicators",
+   "from_id": "concept:return-indicator",
+   "to_id": "concept:indicator"
   },
   {
    "from": "DailyReturn",
@@ -42932,6 +42938,30 @@
    "why": "stated under return indicators",
    "from_id": "procedure:indicator-dailyreturn",
    "to_id": "concept:indicator"
+  },
+  {
+   "from": "averaging",
+   "rel": "about",
+   "to": "trend indicators",
+   "why": "most of what the chapter calls a trend indicator is one of these",
+   "from_id": "concept:averaging",
+   "to_id": "concept:trend-indicator"
+  },
+  {
+   "from": "momentum",
+   "rel": "about",
+   "to": "return indicators",
+   "why": "a return over a lookback is a rate of change, which is what this class measures",
+   "from_id": "concept:momentum",
+   "to_id": "concept:return-indicator"
+  },
+  {
+   "from": "trend indicators",
+   "rel": "about",
+   "to": "trending market",
+   "why": "the state it exists to identify",
+   "from_id": "concept:trend-indicator",
+   "to_id": "concept:trending-market"
   },
   {
    "from": "advance-decline line",
@@ -43262,11 +43292,11 @@
    "to_id": "judgment:indicator-best-practices"
   },
   {
-   "from": "ROC",
+   "from": "trend indicators",
    "rel": "about",
    "to": "best practices",
-   "why": "Combine with trend indicators: ROC confirms trend direction \u00b7 Watch for divergences: Price and ROC disagreement can signal reversals",
-   "from_id": "procedure:indicator-roc",
+   "why": "Combine with trend indicators: ROC confirms trend direction",
+   "from_id": "concept:trend-indicator",
    "to_id": "judgment:indicator-best-practices"
   },
   {
@@ -43275,6 +43305,14 @@
    "to": "best practices",
    "why": "Use appropriate periods: Shorter for day trading (6-9), longer for swing trading (12-25)",
    "from_id": "concept:swing-trading",
+   "to_id": "judgment:indicator-best-practices"
+  },
+  {
+   "from": "ROC",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Watch for divergences: Price and ROC disagreement can signal reversals",
+   "from_id": "procedure:indicator-roc",
    "to_id": "judgment:indicator-best-practices"
   },
   {
@@ -45615,6 +45653,7 @@
    "concept:regime-risk",
    "concept:regime-shift",
    "concept:retail-trader",
+   "concept:return-indicator",
    "concept:risk-dimension",
    "concept:risk-management",
    "concept:risk-of-ruin",
@@ -45652,6 +45691,7 @@
    "concept:trailing-stop",
    "concept:transaction-cost",
    "concept:trend-following",
+   "concept:trend-indicator",
    "concept:trending-market",
    "concept:triangle",
    "concept:triple-top-triple-bottom",
@@ -45710,7 +45750,6 @@
    "procedure:adx-trend-strength",
    "procedure:almgren-chriss-market-impact-model",
    "procedure:arms-index",
-   "procedure:arnaud-legoux-moving-average",
    "procedure:atr-based-stop",
    "procedure:atr-trailing-stop",
    "procedure:autocorrelation-analysis",
@@ -45754,10 +45793,8 @@
    "procedure:historical-stress-test",
    "procedure:hmm-regime-detection",
    "procedure:holding-period-constraint",
-   "procedure:hull-moving-average",
    "procedure:hypothetical-scenario-construction",
    "procedure:implementation-shortfall",
-   "procedure:kaufman-adaptive-moving-average",
    "procedure:kelly-criterion",
    "procedure:leverage-management",
    "procedure:liquidity-zone-identification",
@@ -45958,6 +45995,11 @@
    [
     "concept:averaging",
     "about",
+    "concept:trend-indicator"
+   ],
+   [
+    "concept:averaging",
+    "about",
     "judgment:indicator-best-practices"
    ],
    [
@@ -45979,6 +46021,11 @@
     "concept:backtesting",
     "about",
     "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:backtesting",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:backtesting",
@@ -46372,6 +46419,11 @@
    ],
    [
     "concept:cross-market-discovery",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:cross-market-discovery",
     "kind-of",
     "concept:price-discovery"
    ],
@@ -46687,6 +46739,11 @@
    ],
    [
     "concept:execution-model",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:execution-model",
     "part-of",
     "concept:market-foundations"
    ],
@@ -46997,6 +47054,11 @@
    ],
    [
     "concept:information-asymmetry",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:information-asymmetry",
     "part-of",
     "concept:market-foundations"
    ],
@@ -47004,6 +47066,11 @@
     "concept:information-leakage",
     "about",
     "concept:order-type"
+   ],
+   [
+    "concept:information-leakage",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:information-leakage",
@@ -47327,6 +47394,11 @@
    ],
    [
     "concept:market-microstructure",
+    "about",
+    "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:market-microstructure",
     "part-of",
     "concept:market-foundations"
    ],
@@ -47379,6 +47451,11 @@
     "concept:market-regime",
     "about",
     "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:market-regime",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "concept:market-regime",
@@ -47469,6 +47546,11 @@
     "concept:mean-reversion",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "concept:momentum",
+    "about",
+    "concept:return-indicator"
    ],
    [
     "concept:momentum",
@@ -47979,6 +48061,11 @@
     "concept:retail-trader",
     "kind-of",
     "concept:market-participant"
+   ],
+   [
+    "concept:return-indicator",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "concept:risk-dimension",
@@ -48559,6 +48646,21 @@
     "concept:trend-following",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "concept:trend-indicator",
+    "about",
+    "concept:trending-market"
+   ],
+   [
+    "concept:trend-indicator",
+    "about",
+    "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:trend-indicator",
+    "part-of",
+    "concept:indicator"
    ],
    [
     "concept:trending-market",
@@ -49276,16 +49378,6 @@
     "concept:indicator"
    ],
    [
-    "procedure:arnaud-legoux-moving-average",
-    "about",
-    "concept:averaging"
-   ],
-   [
-    "procedure:arnaud-legoux-moving-average",
-    "part-of",
-    "concept:indicator"
-   ],
-   [
     "procedure:atr-based-stop",
     "about",
     "concept:exit-logic"
@@ -49956,16 +50048,6 @@
     "concept:strategy-design"
    ],
    [
-    "procedure:hull-moving-average",
-    "about",
-    "concept:averaging"
-   ],
-   [
-    "procedure:hull-moving-average",
-    "part-of",
-    "concept:indicator"
-   ],
-   [
     "procedure:hypothetical-scenario-construction",
     "about",
     "concept:scenario-analysis"
@@ -49997,6 +50079,16 @@
    ],
    [
     "procedure:indicator-adx",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
+    "procedure:indicator-alma",
+    "about",
+    "concept:averaging"
+   ],
+   [
+    "procedure:indicator-alma",
     "part-of",
     "concept:indicator"
    ],
@@ -50081,9 +50173,24 @@
     "concept:indicator"
    ],
    [
+    "procedure:indicator-hma",
+    "about",
+    "concept:averaging"
+   ],
+   [
+    "procedure:indicator-hma",
+    "part-of",
+    "concept:indicator"
+   ],
+   [
     "procedure:indicator-ichimoku",
     "part-of",
     "concept:indicator"
+   ],
+   [
+    "procedure:indicator-kama",
+    "about",
+    "concept:averaging"
    ],
    [
     "procedure:indicator-kama",
@@ -50277,16 +50384,6 @@
    ],
    [
     "procedure:indicator-wma",
-    "part-of",
-    "concept:indicator"
-   ],
-   [
-    "procedure:kaufman-adaptive-moving-average",
-    "about",
-    "concept:averaging"
-   ],
-   [
-    "procedure:kaufman-adaptive-moving-average",
     "part-of",
     "concept:indicator"
    ],
@@ -50684,6 +50781,11 @@
     "procedure:session-filter",
     "about",
     "fact:strategy-design-core-principles"
+   ],
+   [
+    "procedure:session-filter",
+    "about",
+    "judgment:market-foundations-best-practices"
    ],
    [
     "procedure:session-filter",
@@ -52297,7 +52399,7 @@
    "object:mangrove-knowledge-space"
   ],
   "chapter_market-foundations_atoms": 61,
-  "chapter_market-foundations_relations": 138,
+  "chapter_market-foundations_relations": 146,
   "chapter_market-foundations_folded": [
    "concept:market-foundations",
    "concept:volatility",
@@ -52332,6 +52434,7 @@
    "procedure:hmm-regime-detection",
    "procedure:indicator-adi",
    "procedure:indicator-adx",
+   "procedure:indicator-alma",
    "procedure:indicator-aroon",
    "procedure:indicator-atr",
    "procedure:indicator-awesomeoscillator",
@@ -52345,6 +52448,7 @@
    "procedure:indicator-easeofmovement",
    "procedure:indicator-ema",
    "procedure:indicator-forceindex",
+   "procedure:indicator-hma",
    "procedure:indicator-ichimoku",
    "procedure:indicator-kama",
    "procedure:indicator-keltnerchannel",
@@ -52433,8 +52537,8 @@
    "procedure:risk-multiple-target",
    "procedure:simple-trailing-stop"
   ],
-  "chapter_indicators_atoms": 18,
-  "chapter_indicators_relations": 118,
+  "chapter_indicators_atoms": 17,
+  "chapter_indicators_relations": 123,
   "chapter_indicators_folded": [
    "concept:averaging",
    "concept:flow",
@@ -52444,6 +52548,7 @@
    "concept:volatility",
    "procedure:indicator-adi",
    "procedure:indicator-adx",
+   "procedure:indicator-alma",
    "procedure:indicator-aroon",
    "procedure:indicator-atr",
    "procedure:indicator-awesomeoscillator",
@@ -52457,6 +52562,7 @@
    "procedure:indicator-easeofmovement",
    "procedure:indicator-ema",
    "procedure:indicator-forceindex",
+   "procedure:indicator-hma",
    "procedure:indicator-ichimoku",
    "procedure:indicator-kama",
    "procedure:indicator-keltnerchannel",

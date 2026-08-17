@@ -45,7 +45,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 715, 2329
+s["nodes"], s["edges"]          # 714, 2342
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -54,7 +54,7 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  715 2329
+nodes, edges  714 2342
 primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
 relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
@@ -76,7 +76,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (375 of 715) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (375 of 714) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -298,7 +298,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 715 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 714 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -670,7 +670,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 137 nodes
+kg.find(under="market foundations", limit=None)                 # 140 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```
@@ -701,8 +701,9 @@ kg.neighbors("concept:market-impact", relation="about", direction="out")
 fact:…-core-principles      Impact is Non-Linear: market impact grows faster than linearly with
                             order size · Urgency-Cost Tradeoff: faster execution incurs higher
                             market impact; slower execution risks adverse price movement
-judgment:…-best-practices   Consider total cost of execution including fees, spread, and market
-                            impact
+judgment:…-best-practices   Be aware of the potential impact of large orders on market prices and
+                            plan execution accordingly · Consider total cost of execution including
+                            fees, spread, and market impact
 ```
 
 Two hops from the node to the reason, and the reason is on the edge rather than buried in a
@@ -710,9 +711,10 @@ thirty-line property. `concept:dark-pool` answers the same way, and so does ever
 chapter says anything about.
 
 **A statement lives in exactly one place.** Until it concerns a node it sits in the list; once it
-does, it moves onto the edge. So what remains in `["principles"]` and `["practices"]` is precisely
-what has not been connected yet — a backlog, not an index. Read the lists to see what is missing;
-read the edges to see what is known.
+does, it moves onto the edge. **Every one of the eight chapters' lists is now empty** — 700-odd
+principles and practices, each on the edge it explains — so the lists are a backlog that has been
+worked off rather than an index to read. If a future chapter leaves something in one, that is the
+thing nothing in the graph is known to be about.
 
 **Where the book and the code disagree.** When a chapter defines something the library already
 implements, the node folds and the two statements are kept side by side rather than one overwriting

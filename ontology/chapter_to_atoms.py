@@ -786,6 +786,27 @@ CHAPTERS: dict[str, dict] = {
             "Multiple Venues": "concept:price-discovery",
             "Speed of Incorporation": "concept:price-discovery",
             "Study auction dynamics": "concept:auction-based-discovery",
+            # --- forward references: the node each of these names is created by a LATER chapter,
+            # which is the only reason chapter 1 could not resolve them on its own pass.
+            "Be aware of the potential impact of large orders": "concept:market-impact",
+            "Study the specific microstructure characteristics": "concept:market-microstructure",
+            "Trade when your counterparty is likely to be uninformed": "concept:information-asymmetry",
+            "Avoid trading patterns that reveal your strategy": "concept:information-leakage",
+            "Break large orders into smaller child orders": "concept:iceberg-order",
+            "Avoid trading during illiquid periods": "concept:liquidity",
+            "Monitor real-time market depth": "concept:liquidity",
+            "Adapt trading strategies to current market conditions": "concept:market-regime",
+            "Backtest strategies across multiple regimes": "concept:backtesting",
+            "Have predefined plans for regime transitions": "concept:regime-shift",
+            "Select venues based on order characteristics": "concept:trading-venue",
+            "Monitor execution quality metrics across venues": "concept:execution-model",
+            "Understand fee structures": "concept:trading-venue",
+            "Factor spread costs into strategy profitability": "concept:bid-ask-spread",
+            "Monitor spread changes as an indicator": "concept:bid-ask-spread",
+            "Monitor lead-lag relationships": "concept:cross-market-discovery",
+            "Use pre-market and after-hours trading": "procedure:session-filter",
+            "Be cautious trading immediately after major information": "concept:price-discovery",
+            "Recognize that the first price after news": "concept:price-discovery",
         },
     },
     "strategy-design": {
@@ -1337,6 +1358,10 @@ CHAPTERS: dict[str, dict] = {
         # adds to those is the reading -- Interpretation and Trading Applications -- which no
         # docstring carries. Seven more it names and the library does not implement.
         "taxonomy": set(),
+        # Two families the library has no class for: its trend section spans averaging and
+        # momentum, and its return section is momentum. Both define the family in a paragraph
+        # before the first member, with no `### Definition` heading.
+        "lead_is_definition": ("Trend Indicators", "Return Indicators"),
         # Its sections group indicators the way a trader reaches for them; the library groups
         # them by what the output measures, and the two disagree for twenty-eight of the
         # forty-two. The library decides membership, so a section draws no `about` edge.
@@ -1456,6 +1481,14 @@ CHAPTERS: dict[str, dict] = {
             "Mass Index": "procedure:indicator-massindex",
             "McClellan Oscillator": "procedure:mcclellan-oscillator",
             "McClellan Summation Index": "procedure:mcclellan-summation-index",
+            # §6.7 names five moving averages and the library implements four of them. Only VIDYA
+            # is new; the rest fold, or the graph holds each of them twice.
+            "Hull Moving Average (HMA)": "procedure:indicator-hma",
+            "Kaufman Adaptive Moving Average (KAMA)": "procedure:indicator-kama",
+            "Arnaud Legoux Moving Average (ALMA)": "procedure:indicator-alma",
+            "Weighted Moving Average (WMA)": "procedure:indicator-wma",
+            "Trend Indicators": "concept:trend-indicator",
+            "Return Indicators": "concept:return-indicator",
             "Momentum Indicators": "concept:momentum",
             "Money Flow Index (MFI)": "procedure:indicator-mfi",
             "Moving Average Convergence Divergence (MACD)": "procedure:indicator-macd",
@@ -1492,6 +1525,19 @@ CHAPTERS: dict[str, dict] = {
         # The breadth indicators are defined in terms of each other, and the two the library does
         # not implement measure characters it does. All stated in the chapter, none of it drawn.
         "edges": [
+            # The library has no trend class -- it replaced use-case grouping with what the output
+            # measures -- but most of what this chapter calls a trend indicator is an averaging one,
+            # and what they identify is a trending market. Prose with two edges, and no membership:
+            # every indicator's class still comes from the library.
+            # Drawn FROM the class, not at it: an `about` edge into a character class is how a
+            # signal declares its class, and `in_class` reads them. Pointing a prose node at
+            # `concept:momentum` made it a member of momentum.
+            ("concept:averaging", "about", "concept:trend-indicator",
+             "most of what the chapter calls a trend indicator is one of these"),
+            ("concept:momentum", "about", "concept:return-indicator",
+             "a return over a lookback is a rate of change, which is what this class measures"),
+            ("concept:trend-indicator", "about", "concept:trending-market",
+             "the state it exists to identify"),
             ("procedure:advance-decline-line", "about", "concept:market-breadth",
              "the cumulative advance-decline count breadth is read from"),
             ("procedure:mcclellan-oscillator", "uses", "procedure:advance-decline-line",
@@ -2024,116 +2070,6 @@ DEFINITION = {
 #: summary and the example moves to `examples`. The explanation has no counterpart in the source at
 #: all -- the chapter never says WHY an iceberg order costs queue position -- so it is always added.
 AUTHORED: dict[str, tuple[str, str]] = {
-    # The nine classical formations. Each states its `**Structure:**` as a list of components --
-    # left shoulder, head, neckline -- so the parsed summary is the first component rather than
-    # what the pattern IS.
-    'concept:head-and-shoulders': (
-        'Three peaks with the middle one highest, their intervening lows forming a neckline the '
-        'pattern completes by closing below.',
-        'A distribution pattern: the failure of the third rally to reach the second is the tell, '
-        'and the neckline is where that reading is confirmed or refuted. The measured move -- head '
-        'to neckline, projected down from the break -- is the target the chapter gives it.'),
-    'concept:inverse-head-and-shoulders': (
-        'The same three-trough shape inverted, completing on a close above the neckline that joins '
-        'its intervening highs.',
-        'Accumulation rather than distribution, and read the same way: the third decline failing to '
-        'reach the second is what makes it a base rather than a pause.'),
-    'concept:double-top-double-bottom': (
-        'Two tests of nearly the same level with a retracement between them, completing on a close '
-        'beyond that retracement.',
-        'The second test failing to exceed the first is the whole signal -- the level held twice, so '
-        'the move that made it is spent. The valley or peak between the tests is both the trigger '
-        'and the measuring stick for the target.'),
-    'concept:triple-top-triple-bottom': (
-        'The same shape with three tests of the level rather than two.',
-        'The chapter rates it more reliable for the obvious reason -- one more rejection at the same '
-        'price -- and trades it identically.'),
-    'concept:triangle': (
-        'Converging boundaries drawn across the highs and the lows, completing on a close beyond '
-        'either of them.',
-        'Which boundary is flat decides the reading: a flat top with rising lows is buyers paying '
-        'up into a fixed offer, a flat bottom with falling highs is the reverse, and two sloping '
-        'lines say only that range is contracting. The chapter puts the first two at seventy per '
-        'cent in their stated direction and the symmetrical case at a coin toss.'),
-    'concept:flags-and-pennants': (
-        'A brief consolidation against the direction of a sharp move, resolving in the direction of '
-        'the move that preceded it.',
-        'Continuation rather than reversal, and the pole is the measuring stick: its length '
-        'projected from the break is the target. A flag drifts in a parallel channel, a pennant '
-        'contracts to a point, and both are short by definition -- one that outlasts the move that '
-        'made it has stopped being a pause.'),
-    'concept:wedge': (
-        'Two converging boundaries sloping the same way, read against their slope rather than with '
-        'it.',
-        'The counter-intuitive one: a rising wedge is bearish and a falling wedge bullish, whichever '
-        'trend they appear in, because the converging slope says each push is shorter than the last.'),
-    'concept:channel': (
-        'Parallel boundaries containing price, traded from edge to edge until one of them breaks.',
-        'The break is the event: while it holds, the channel is a range with a slope, and the edges '
-        'are [[Dynamic Level]]s. Ascending, descending and horizontal differ only in that slope.'),
-    'concept:cup-and-handle': (
-        'A rounded base followed by a shallow drift, completing on a close above the rim.',
-        'The shape is the argument -- a U rather than a V says the base was built rather than '
-        'spiked, and a handle deeper than half the cup says the base did not hold. Continuation, '
-        'and the cup depth is the target.'),
-    'concept:entry-timing-option': (
-        'The three moments a completed pattern can be entered on: the break itself, the close '
-        'beyond it, or the retest of it.',
-        'They trade certainty against price. Entering intrabar gets the tightest stop and the most '
-        'failures; waiting for the retest confirms the boundary reversed roles and misses the moves '
-        'that never come back.'),
-    # Eight blocks whose content is a python function with no docstring, so there is no sentence
-    # in the chapter saying what they are.
-    'procedure:bollinger-band-mean-reversion': (
-        'Buys below the lower band and sells above the upper, closing as price returns to the middle.',
-        'The bands are a z-score in price units, so this is the [[Z-Score]] rule with a moving '
-        'standard deviation: two deviations out, and back to the mean. It fails exactly where '
-        '[[Mean Reversion]] fails -- when the band is being walked rather than tested.'),
-    'procedure:rsi-mean-reversion': (
-        'Buys oversold and sells overbought on RSI, exiting as it returns to the midpoint.',
-        'The same trade as the band version with a bounded oscillator in place of a distance: '
-        'thirty and seventy rather than two deviations, and fifty as the exit. Chapter 6 states the '
-        'caution that matters here -- in a strong trend RSI shifts its range and stays extreme.'),
-    'procedure:breakout-confirmation-filter': (
-        'Requires volume above its average, or momentum in the breakout direction, before a break '
-        'counts.',
-        'The chapter puts breakout failure at fifty to sixty per cent, and both filters attack the '
-        'same failure: a level given up without participation behind it. The cost is the breaks '
-        'that run without waiting.'),
-    'procedure:statistical-testing-for-seasonality': (
-        'Compares returns inside a calendar period against returns outside it, and reports whether '
-        'the difference could be chance.',
-        'A two-sample t-test, which is what separates a seasonal effect from a story about one. '
-        'The chapter is explicit that well-published effects decay, so the test is worth rerunning '
-        'rather than citing.'),
-    'procedure:feature-engineering-for-trading': (
-        'Turns raw bars into the inputs a model reads: returns, distance from a moving average, '
-        'volatility and range over several lookbacks.',
-        'The chapter puts this above model choice, and the features are mostly the library\'s own '
-        'indicators computed at several horizons. Every one of them is a lookback decision, which '
-        'is where [[Overfitting]] enters before any model is fitted.'),
-    'procedure:classification-model': (
-        'Predicts the direction of the next period from those features, validated on time-ordered '
-        'splits rather than shuffled ones.',
-        'The split is the whole discipline: shuffling puts tomorrow in the training set, which is '
-        '[[Look-Ahead Bias]] with a respectable name.'),
-    'procedure:neural-network-pattern': (
-        'Reads a window of bars as a sequence rather than a row of features, learning order-dependent '
-        'structure.',
-        'The trade-off the chapter states plainly: more capacity to find structure, and less ability '
-        'to say what was found. Its value depends on there being sequential structure to learn, '
-        'which is what [[Autocorrelation]] measures directly and cheaply.'),
-    'procedure:garch-family-model': (
-        'Models tomorrow\'s variance as a weighted sum of a long-run level, the most recent shock, '
-        'and today\'s variance.',
-        'The two weights are the whole model: how hard a shock hits, and how slowly it decays. Their '
-        'sum approaching one is persistence -- which is [[Volatility Clustering]] measured rather '
-        'than observed -- and must stay below one for the process to have a long-run level at all.'),
-    'procedure:egarch': (
-        'The same model on the logarithm of variance, with a term that lets a fall move volatility '
-        'differently from a rise.',
-        'The asymmetry is the point: the leverage effect is real and symmetric GARCH cannot express '
-        'it. Working in logs also removes the need to constrain the parameters positive.'),
     'procedure:support-resistance-detection': (
         'Collects every swing high and low over a window and clusters the ones that fall within a '
         'tolerance of each other into levels.',
@@ -3963,6 +3899,12 @@ def build(path: Path, chapter: str, parent: str,
         # every one of them must be declared or the chapter refuses to build.
         if defined:
             subjects = [atom("Concept", name, text, _section=num) for name, text in defined]
+        elif sec["title"] in decl.get("lead_is_definition", ()):
+            # §6.1 and §6.8 open with a paragraph defining the family and then go straight to the
+            # members, with no `### Definition` between. Read as a section with no subject, that
+            # paragraph landed as a note on the chapter root and the family had no node at all.
+            subjects = [atom("Concept", sec["title"],
+                             block_text(unfenced(blocks.get(LEAD, []))), _section=num)]
         elif not definition and as_nodes:
             undeclared = [h for h in blocks
                           if h not in as_nodes and h not in SCAFFOLD and h != LEAD
@@ -4014,7 +3956,8 @@ def build(path: Path, chapter: str, parent: str,
             for sub in ({subject_for(heading, subjects)} if subjects else set()) - {nid}:
                 rel(nid, "about", sub, f"stated under {sec['title'].lower()}")
 
-        if lead := block_text(blocks.get(LEAD, [])).strip():
+        if (lead := block_text(blocks.get(LEAD, [])).strip()) \
+                and sec["title"] not in decl.get("lead_is_definition", ()):
             target = subjects[0] if subjects else parent
             (atoms[target]["props"] if target in atoms
              else extra.setdefault(target, {})).setdefault("notes", []).append(lead)
@@ -4344,7 +4287,13 @@ def build(path: Path, chapter: str, parent: str,
                 kept.append(line)
                 continue
             if target not in atoms and target not in existing:
-                raise ValueError(f"`wired` points at {target!r}, which is not a node")
+                # A forward reference. Chapter 1 advises "avoid trading patterns that reveal your
+                # strategy" and the node it names is chapter 2's; chapter 1 builds first, so at
+                # this point it does not exist yet. The edge is written and the guarantee moves to
+                # the finished record, where `test_no_edge_points_at_a_missing_node` enforces it.
+                if not re.match(r"^(concept|procedure|property|fact|judgment|schema|object):[a-z0-9-]+$",
+                                target):
+                    raise ValueError(f"`wired` points at {target!r}, which is not an id")
             # FROM the node, TO the list it draws on. A reader arrives at a concept and asks what
             # is known about it, and outgoing edges are the answer to that question -- so the
             # concept points at the principles and practices that govern it, not the reverse. It
