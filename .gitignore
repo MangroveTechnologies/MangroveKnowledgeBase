@@ -66,7 +66,7 @@ audit_results/
 # kb-next-steps.md and findings/session-summary-2026-02-22.md were all committed and all stale, and
 # one of them opened with the words "Not committed. Working note only."
 #
-# Scoped to .md so nothing shadows real code (kb_server has a status route).
+# Scoped to .md so nothing shadows real code.
 # `tests/test_discoverability.py` fails the build if one is committed anyway -- belt and braces,
 # because .gitignore does nothing for a file already tracked or added with `-f`.
 [Ss][Tt][Aa][Tt][Uu][Ss].md
@@ -80,3 +80,13 @@ audit_results/
 # Anything date-stamped: notes-2026-08-10.md, summary_2026_08_10.md, report-20260810.md
 *[-_][0-9][0-9][0-9][0-9][-_][0-9][0-9][-_][0-9][0-9].md
 *[-_][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].md
+
+# `tests/test_architecture_docs.py` parses every mermaid block with the real mermaid library, which
+# is a local `npm install mermaid jsdom` away and skips without it. The install is a developer's
+# tool, not a repo asset -- thousands of vendored files that nothing here imports.
+node_modules/
+
+# The MCP server over the graph. Untracked for now: it is a CONSUMER of the installed package
+# rather than part of it, and its home is beside the agent that uses it.
+mangrove_kb_mcp.py
+mangrove_kb_mcp.md

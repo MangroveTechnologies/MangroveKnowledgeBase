@@ -69,6 +69,15 @@ def test_the_packaged_graph_is_the_committed_graph(wheel):
     assert wheel.read(want) == committed, "the wheel's graph differs from the committed one"
 
 
+def test_the_semantic_index_is_in_the_wheel(wheel):
+    """Without it `ask()` silently drops to the word search -- twelve of twenty rather than sixteen,
+    with nothing in the answer saying which one the caller got."""
+    want = f"{PKG}/data/semantic-index.npz"
+    assert want in wheel.namelist(), (
+        f"{want} is not in the wheel; present data files: "
+        f"{[n for n in wheel.namelist() if '/data/' in n] or 'none'}")
+
+
 def test_the_skills_are_in_the_wheel(wheel):
     """An agent that installs the package should get the instructions for using it."""
     for name in ("SKILL.md", "GUIDE.md"):

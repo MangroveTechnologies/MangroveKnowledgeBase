@@ -1,6 +1,6 @@
 # Agent guide: using the knowledge graph
 
-Thirteen tasks an agent actually gets asked to do with this library, and how to do each one with
+Sixteen tasks an agent actually gets asked to do with this library, and how to do each one with
 `mangrove_kb.graph`. Every call here was executed against the committed graph; the outputs are real.
 
 The skill (`SKILL.md`, beside this file) is the reference for *which call*. This is the
@@ -13,6 +13,31 @@ kg = KnowledgeGraph.load()
 
 ---
 
+## Contents
+
+Sixteen jobs. Each is self-contained — jump to the one you have, and follow the links at its end
+when the answer needs a second call.
+
+| | job | |
+|---|---|---|
+| 1 | [Orient yourself in a library you have never seen](#1-orient-yourself-in-a-library-you-have-never-seen) | Start from the graph's own summary rather than the file tree. |
+| 2 | [Check whether something already exists](#2-check-whether-something-already-exists-before-building-it) | The duplicate you are about to write is one hop from the indicator it would read. |
+| 3 | [Work out what a change breaks](#3-work-out-what-a-change-breaks) | Who reads this, and which specific output each of them takes. |
+| 4 | [Compose a strategy from both axes](#4-compose-a-strategy-from-both-axes) | Intersect what a thing measures with the part it plays. |
+| 5 | [Find out what a signal needs to run](#5-find-out-what-a-signal-needs-to-run) | Params, warm-up and the indicators beneath it, before you call anything. |
+| 6 | [Decide whether two outputs are comparable](#6-decide-whether-two-outputs-are-comparable) | Bounded does not mean same-scale; units and range say which. |
+| 7 | [Check whether something is deprecated](#7-check-whether-something-is-deprecated-and-what-replaced-it) | And what supersedes it, from the edge rather than a naming convention. |
+| 8 | [Explain why something is classified as it is](#8-explain-why-something-is-classified-the-way-it-is) | The claim and the derivation behind it are different routes through the graph. |
+| 9 | [Ask about the values, not the nodes](#9-ask-about-the-values-not-the-nodes) | The output index answers questions `get()` cannot reach one node at a time. |
+| 10 | [Filter by what something needs, and whether it is current](#10-filter-by-what-something-needs-and-whether-it-is-still-current) | Two enumerable vocabularies that reject a guess instead of returning nothing. |
+| 11 | [Turn what the user said into a node](#11-turn-what-the-user-said-into-a-node) | Resolving a spoken name to an id, and what to do when it does not resolve. |
+| 12 | [Go from the graph to an answer about live data](#12-go-from-the-graph-to-an-answer-about-live-data) | Using the graph to choose what to compute, then computing it. |
+| 13 | [Compute an indicator the graph told you about](#13-compute-an-indicator-the-graph-told-you-about) | The node's `name` is the registered name — that is the join to runnable code. |
+| 14 | [Pull what the knowledge base says about a subject](#14-pull-what-the-knowledge-base-says-about-a-subject) | Everything under a subject, whatever kind of node it is, by walking containment. |
+| 15 | [Find the reasoning behind a piece of advice](#15-find-the-reasoning-behind-a-piece-of-advice) | The Judgment holds what to do, the Fact holds why, and folds hold where the two sources disagree. |
+| 16 | [Answer a question nobody phrased in our words](#16-answer-a-question-nobody-phrased-in-our-words) | Start from a sentence rather than a name, and read the route that reached the answer. |
+| — | [What this guide does not tell you](#what-this-guide-does-not-tell-you) | The graph's limits, and the questions it is the wrong tool for. |
+
 ## 1. Orient yourself in a library you have never seen
 
 **Task:** "Have a look at mangrove-kb and tell me what's in it."
@@ -21,26 +46,28 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 303, 1049
-s["primitives"]                 # {'Procedure': 289, 'Concept': 9, 'Property': 3, ...}
-s["relations"]                  # {'instance-of': 360, 'uses': 233, 'about': 222, ...}
-s["classes"]                    # the six character classes -- what find(kind=) is for
+s["nodes"], s["edges"]          # 714, 2342
+s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
+s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
+s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  303 1049
-primitives    {'Procedure': 289, 'Concept': 9, 'Property': 3, 'Object': 1, 'Schema': 1}
-relations     {'instance-of': 360, 'uses': 233, 'about': 222, 'has-role': 218,
-               'kind-of': 8, 'part-of': 6, 'supersedes': 2}
-classes       ['concept:averaging', 'concept:flow', 'concept:momentum',
-               'concept:oscillator', 'concept:pattern', 'concept:volatility']
+nodes, edges  714 2342
+primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
+               'Schema': 1, 'Fact': 2, 'Judgment': 1}
+relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
+               'kind-of': 32, 'part-of': 31, 'supersedes': 2}
+classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
+               'concept:momentum', 'concept:oscillator', 'concept:pattern',
+               'concept:volatility']
 roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 12 shapes in total]
+               ... 42 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
@@ -50,9 +77,11 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (295 of 303) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (375 of 714) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
+
+**See also:** [§2 does it exist](GUIDE.md#2-check-whether-something-already-exists-before-building-it) · [SKILL · which call](SKILL.md#which-call) · [§14 the knowledge layer](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
 ---
 
@@ -88,7 +117,9 @@ Text search is the wider net, for when they did *not* name an indicator, or name
 have:
 
 ```
-find("divergence") -> 37 matches, name matches first
+find("divergence") -> 40 matches, name matches first
+  concept:hidden-divergence                        <- the knowledge-base concepts, also named for it
+  concept:volume-divergence
   procedure:signal-rsi-bearish-divergence
   procedure:signal-rsi-bullish-divergence
   procedure:signal-rsi-hidden-bearish-divergence
@@ -110,7 +141,9 @@ first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
-shown you 10 of 37.
+shown you 10 of 40.
+
+**See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
 ---
 
@@ -126,7 +159,8 @@ for r in readers:
 ```
 
 ```
-8 readers
+9 readers
+  procedure:rsi-mean-reversion             {'rsi': {'type': 'series'}}
   procedure:signal-rsi-bearish-divergence  {'rsi': {'type': 'series'}}
   procedure:signal-rsi-bullish-divergence  {'rsi': {'type': 'series'}}
   procedure:signal-rsi-cross-down          {'rsi': {'type': 'series'}}
@@ -134,8 +168,9 @@ for r in readers:
   ...
 ```
 
-All eight read the same single output, so a change to `rsi` touches all of them and a change to
-anything else touches none.
+All nine read the same single output, so a change to `rsi` touches all of them and a change to
+anything else touches none. Eight are signals the library ships; the ninth is a strategy chapter 8
+describes, which the same question reaches because it declares what it reads the same way.
 
 The `inputs` on the edge is the point: a reader that only takes `rsi` is unaffected by a change to a
 second output, and the graph tells you which is which without opening a file.
@@ -145,6 +180,8 @@ Widen to the neighbourhood when you need the shape rather than the list:
 ```python
 kg.subgraph("procedure:indicator-rsi", radius=1)
 ```
+
+**See also:** [§12 graph to live data](GUIDE.md#12-go-from-the-graph-to-an-answer-about-live-data) · [SKILL · edges carry data](SKILL.md#the-typed-detail-is-the-point)
 
 ---
 
@@ -178,6 +215,8 @@ distinguishable so you can always ask *why* (use case 8).
 **Trap:** a signal can be about **two** classes. The RSI divergence signals read both an oscillator
 and a momentum indicator, so they appear under both. Do not assume the sets are disjoint.
 
+**See also:** [SKILL · the two axes](SKILL.md#the-two-axes-the-thing-to-understand) · [§8 why it is classified that way](GUIDE.md#8-explain-why-something-is-classified-the-way-it-is) · [§5 what it needs to run](GUIDE.md#5-find-out-what-a-signal-needs-to-run)
+
 ---
 
 ## 5. Find out what a signal needs to run
@@ -205,6 +244,8 @@ So with the default `window=14` it needs 14 bars, and 50 is plenty. With `window
 **Trap:** `warmup_bars` is a formula, not a number — `window * 3 - 1`, and worse. To answer "is 50
 bars enough", substitute the params you intend to use. Comparing the string numerically is
 meaningless.
+
+**See also:** [§13 run it](GUIDE.md#13-compute-an-indicator-the-graph-told-you-about) · [SKILL · the typed detail](SKILL.md#the-typed-detail-is-the-point)
 
 ---
 
@@ -236,6 +277,8 @@ shared scale with anything bounded.
 for unbounded outputs. Test the endpoints for infinity — or let `outputs(bounded=…)` do it, which is
 the next use case.
 
+**See also:** [§9 the value index](GUIDE.md#9-ask-about-the-values-not-the-nodes) · [SKILL · units and range](SKILL.md#the-typed-detail-is-the-point)
+
 ## 7. Check whether something is deprecated, and what replaced it
 
 **Task:** "Should I use `hanging_man_trigger`?"
@@ -256,8 +299,11 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 303 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 714 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
+
+
+**See also:** [§10 filter by status](GUIDE.md#10-filter-by-what-something-needs-and-whether-it-is-still-current) · [§2 before building](GUIDE.md#2-check-whether-something-already-exists-before-building-it)
 
 ---
 
@@ -307,6 +353,8 @@ If you use `path` for an explanation, constrain it — `relations=["uses", "inst
 `max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
 related?" "they both read RSI"*.
 
+**See also:** [SKILL · the two axes](SKILL.md#the-two-axes-the-thing-to-understand) · [§15 reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [§4 compose](GUIDE.md#4-compose-a-strategy-from-both-axes)
+
 ---
 
 ## 9. Ask about the values, not the nodes
@@ -353,7 +401,7 @@ kg.outputs("histogram", limit=None)
 #   'macd minus signal. Crosses zero exactly when macd crosses it'
 ```
 
-The other filters are `units=` (`kg.stats()["units"]` enumerates them; `percent` matches 26) and
+The other filters are `units=` (`kg.stats()["units"]` enumerates them; `percent` matches 28) and
 `bounded=False` for the unbounded tail.
 
 **Trap:** `units=` is an exact match against a deliberately heterogeneous vocabulary — a unit is a
@@ -361,6 +409,8 @@ statement about what a computation measures, so a percentage change, a price, a 
 index number are labelled differently on purpose. SwingDelta goes further: its deltas are labelled
 `indicator units` because they carry whatever unit the companion indicator it reads has, which is
 not knowable until you supply one. Read `stats()["units"]` and filter on what is there.
+
+**See also:** [§6 comparability](GUIDE.md#6-decide-whether-two-outputs-are-comparable) · [SKILL · the typed detail](SKILL.md#the-typed-detail-is-the-point)
 
 ---
 
@@ -380,12 +430,15 @@ deprecated        2    procedure:signal-hanging-man-trigger
                        procedure:signal-shooting-star-trigger
 ```
 
-Both vocabularies are enumerable — `stats()["input_columns"]` is `close, high, indicator, low, open,
-price, volume`, and `stats()["statuses"]` is `deprecated, ratified`. Use case 7 checks deprecation on
+Both vocabularies are enumerable — `stats()["input_columns"]` runs from the implemented
+indicators' columns (`close, high, low, open, volume`) to the terms the chapter formulas declare
+(`bid`, `ask`, `adv`, `order_size`, …), and `stats()["statuses"]` is `draft, deprecated, ratified`. Use case 7 checks deprecation on
 a node you already suspect; this is the sweep that finds the ones you did not.
 
 **Trap:** a guessed value raises rather than returning an empty result. `find(requires="vwap")` is a
-`GraphError` naming the seven real columns, not a quiet zero you would read as "nothing needs it".
+`GraphError` naming the real columns, not a quiet zero you would read as "nothing needs it".
+
+**See also:** [§7 deprecation](GUIDE.md#7-check-whether-something-is-deprecated-and-what-replaced-it) · [§5 what it needs](GUIDE.md#5-find-out-what-a-signal-needs-to-run)
 
 ---
 
@@ -403,7 +456,7 @@ They gave you a name, not a node id. Every use case above starts from an id like
 ```python
 kg.resolve("rsi_oversold")     # exact function name
 kg.resolve("RSI")              # or an indicator name
-kg.resolve("bollinger")        # or an unambiguous fragment
+kg.resolve("bollingerbands")   # or an unambiguous fragment
 ```
 
 ```
@@ -452,6 +505,8 @@ lookup("rsi_over")["id"]                    # 'procedure:signal-rsi-overbought' 
 `rsi_oversold` because rank ties break on id alphabetically. If the user named an indicator too,
 filter on it — `kg.find("oversold", kind="oscillator")` — or resolve the indicator first and look at
 what reads it. Do not assume the first hit is the one they meant.
+
+**See also:** [§2 does it exist](GUIDE.md#2-check-whether-something-already-exists-before-building-it) · [SKILL · which call](SKILL.md#which-call)
 
 ---
 
@@ -526,6 +581,8 @@ kg.subgraph(t["id"], radius=1)
 `from mangrove_kb.signals import momentum, volatility` (or whichever class the graph gave you — the
 module is named for it) before evaluating, or you get `Unknown rule name`.
 
+**See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§13 compute it](GUIDE.md#13-compute-an-indicator-the-graph-told-you-about)
+
 ---
 
 ## 13. Compute an indicator the graph told you about
@@ -564,7 +621,166 @@ both dimensionless on [0, 100]  ->  one panel is fine
 **Trap:** `usage_example` writes `params={'window': value}` — `value` is a placeholder, not a
 default. The real defaults are in `kg.get(id)["params"]`, with `min` and `max` beside them.
 
+**See also:** [§5 what it needs](GUIDE.md#5-find-out-what-a-signal-needs-to-run) · [§12 graph to live data](GUIDE.md#12-go-from-the-graph-to-an-answer-about-live-data)
+
 ---
+
+## 14. Pull what the knowledge base says about a subject
+
+**Task:** "What do we actually know about liquidity?"
+
+The graph holds two kinds of thing and one call spans both. Start with the node, then widen:
+
+```python
+kg.get("concept:liquidity")
+kg.find(under="concept:liquidity", limit=None)          # everything beneath it, any primitive
+kg.neighbors("concept:liquidity", limit=None)           # what quantifies it, what it is part of
+```
+
+```
+summary       The ease with which an asset can be bought or sold without materially moving
+              its price.
+source_wording
+              The chapter's own phrasing, kept when it differs materially from the
+              authored summary -- an outer join, so neither statement is lost.
+applications  Estimating realistic execution costs for strategy backtesting
+              Determining optimal order sizing based on available liquidity
+neighbors  in   about    property:participation-rate     quantifies liquidity
+           in   about    concept:liquidity-pool          stated as a principle of liquidity
+           in   about    concept:stop-hunt               stated as a principle of liquidity
+           in   about    concept:liquidity-grab          stated as a principle of liquidity
+           out  about    fact:market-foundations-core-principles
+           out  about    judgment:market-foundations-best-practices
+           out  part-of  concept:market-foundations
+```
+
+Direction carries meaning, and so does the reason on each edge. **Incoming** `about` is everything
+the graph has to say about liquidity — a `property:` that measures it, and the concepts stated of
+it. Read the `why` to tell which: *"quantifies liquidity"* is a measurement, *"stated as a principle
+of liquidity"* is a term the knowledge base defines under it. Filter by either, with
+`neighbors(id, why="quantifies")` or `neighbors(id, primitive="Property")`. **Outgoing** `about` is
+the advice and the claims that govern it, each statement carried on its edge.
+
+Note the primitive. `property:` is a **quantity** something has, the way `atr` is a number a bar
+has; `procedure:` is a method you run. Neither has code behind it here — `get()` gives you the
+formula and there is no `RuleRegistry` name to call. Reading every stated formula as a Procedure is
+the easy mistake, and it hides the other two: `Put-Call Parity` is a `Fact`, an identity that holds,
+and breaking it is an arbitrage rather than a failed function call.
+
+Widen by subject rather than by node when the question is broader. `find(under=…)` walks containment
+— `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
+
+```python
+kg.find(under="market foundations", limit=None)                 # 140 nodes
+kg.find(under="market foundations", primitive="Procedure")      # just its computations
+kg.find("spread", under="market foundations")                   # scoped text search
+```
+
+**Trap:** do not reach for `reference_chapter`. It is provenance on nodes that predate a chapter
+node, not the retrieval mechanism — the edges are, and they are what `under=` walks.
+
+**See also:** [SKILL · two halves, one surface](SKILL.md#two-halves-one-retrieval-surface) · [§15 the reasoning](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [§2 does it exist](GUIDE.md#2-check-whether-something-already-exists-before-building-it)
+
+---
+
+## 15. Find the reasoning behind a piece of advice
+
+**Task:** "Why does executing a large order slowly cost less?"
+
+Each subject carries two nodes beside its concepts: a `Fact` holding what is true of it, and a
+`Judgment` holding what to do about it. They are separate primitives because they answer to
+different standards — a Fact is settled by measurement, a Judgment by argument.
+
+**Ask the concept, not the lists.** A statement that concerns a node hangs off that node, and the
+edge carries the statement itself:
+
+```python
+kg.neighbors("concept:market-impact", relation="about", direction="out")
+```
+
+```
+fact:…-core-principles      Impact is Non-Linear: market impact grows faster than linearly with
+                            order size · Urgency-Cost Tradeoff: faster execution incurs higher
+                            market impact; slower execution risks adverse price movement
+judgment:…-best-practices   Be aware of the potential impact of large orders on market prices and
+                            plan execution accordingly · Consider total cost of execution including
+                            fees, spread, and market impact
+```
+
+Two hops from the node to the reason, and the reason is on the edge rather than buried in a
+thirty-line property. `concept:dark-pool` answers the same way, and so does every concept the
+chapter says anything about.
+
+**A statement lives in exactly one place.** Until it concerns a node it sits in the list; once it
+does, it moves onto the edge. **Every one of the eight chapters' lists is now empty** — 700-odd
+principles and practices, each on the edge it explains — so the lists are a backlog that has been
+worked off rather than an index to read. If a future chapter leaves something in one, that is the
+thing nothing in the graph is known to be about.
+
+**Where the book and the code disagree.** When a chapter defines something the library already
+implements, the node folds and the two statements are kept side by side rather than one overwriting
+the other:
+
+```python
+kg.get("procedure:indicator-atr")["chapter_variants"]
+# {'formula': 'TR = max(High - Low, |High - Previous Close|, |Low - Previous Close|)\n
+#              ATR = EMA(TR, n periods)'}
+```
+
+The node's own `formula` is the implementation's; `chapter_variants` is the chapter's wording of the
+same computation, unreconciled. A key in there means nobody has decided yet — not that either is
+wrong.
+
+**Trap:** a Judgment is not a fact and must not be reported as one. It is argued from practice and
+is context-dependent — "use limit orders" is advice to a liquidity taker and meaningless to a market
+maker. Quote it as guidance, with the principle behind it.
+
+**See also:** [§14 the whole subject](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject) · [SKILL · two halves, one surface](SKILL.md#two-halves-one-retrieval-surface) · [§8 classification](GUIDE.md#8-explain-why-something-is-classified-the-way-it-is)
+
+---
+
+## 16. Answer a question nobody phrased in our words
+
+**Task:** "How far away from my entry should the stop go?"
+
+Every other job here starts from something you can name — an id, a function, a class. This one starts
+from a sentence, which is what an agent is usually handed. `find()` is the wrong call: it matches
+words, and the words of a question are rarely in the node that answers it.
+
+```python
+kg.ask("how far away from my entry should the stop go", limit=4)
+```
+
+```
+procedure:atr-based-stop                     h0
+procedure:atr-trailing-stop                  h0
+procedure:fixed-stop                         h0
+concept:stop-and-target-engineering          h1  <- about from procedure:atr-based-stop
+    why: stated under stop-loss & take-profit engineering
+```
+
+Three rules and the subject they sit under, from a sentence containing none of their words. The
+fourth row is the shape to notice: `reached` says it came one hop from `atr-based-stop` along an
+`about` edge, and carries that edge's own `why`. **That is the reason the answer is an answer** — not
+a relevance score, an actual stated connection you can quote.
+
+**Read `reached` before you trust a row.** `hops: 0` means the retrieval put it there; `hops: 1` means
+the graph did, and the `why` tells you on what grounds.
+
+**Trap: it answers about three questions in four, and the failure is silent.** Measured over
+twenty-five questions phrased the way a trader asks them, `ask()` returns a fair answer in the top
+five 18 times. The other seven come back with plausible neighbours and no signal that they are wrong
+— *"what are the odds I wipe out the account"* returns the risk-limit properties rather than
+`concept:risk-of-ruin`. So when the result looks off-topic, it probably is: re-ask with a term from
+the domain (`"risk of ruin"`), or fall back to `find()` on a word you can guess. Two phrasings cost
+nothing; the graph is small and every call is local.
+
+**Trap: the first call is slow.** `ask()` seeds from two indices, one of which is a sentence encoder,
+so the first call in a process spends about four seconds loading it — and downloads it once on a
+machine that has never run it. Later calls are ~50 ms. `find()` never pays this, so do not reach for
+`ask()` when a term would do.
+
+**See also:** [§14 pull what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject) · [§15 the reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [SKILL · which call](SKILL.md#which-call)
 
 ## What this guide does not tell you
 

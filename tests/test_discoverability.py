@@ -136,7 +136,9 @@ def test_nothing_still_claims_the_repo_is_mit():
         if not path.is_file() or path.suffix not in {".md", ".toml", ".py", ".json"}:
             continue
         rel = path.relative_to(REPO)
-        if ".git" in rel.parts or "build" in rel.parts or str(rel) in dated:
+        # `node_modules` is a developer install for the mermaid diagram check, and twenty of its
+        # vendored packages carry that licence honestly. Scanning them tested npm, not us.
+        if ({".git", "build", "node_modules", ".venv"} & set(rel.parts)) or str(rel) in dated:
             continue
         if re.search(r"\bMIT[- ](?:licen[cs]ed|License)\b", path.read_text()):
             offenders.append(str(rel))

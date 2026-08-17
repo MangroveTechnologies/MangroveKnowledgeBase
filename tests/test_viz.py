@@ -130,15 +130,28 @@ def test_search_ranks_exactly_as_find_does(page):
     idx = json.loads(m.group(1))
     kg = KnowledgeGraph.load()
     assert len(idx) == len(kg.nodes)
-    assert all(len(r["t"]) == len(SEARCH_TIERS) for r in idx), "a tier is missing from the export"
+    # One band per declared tier, plus the catch-all for props no tier names.
+    assert all(len(r["t"]) == len(SEARCH_TIERS) + 1 for r in idx), "a tier is missing from the export"
 
-    # Re-run the page's ranking in Python and compare it against find() itself.
-    for query in ("divergence", "rsi", "mean reversion", "histogram", "oversold"):
-        q = query.lower()
-        hits = [(next(i for i, h in enumerate(r["t"]) if q in h), r["id"])
-                for r in idx if any(q in h for h in r["t"])]
-        hits.sort()
-        assert [h[1] for h in hits] == [r["id"] for r in kg.find(query, limit=None)], \
+    # Re-run the page's ranking in Python and compare it against find() itself. The questions
+    # matter as much as the keywords: the page grew a fallback and a frequency rule after find()
+    # did, and the queries here all full-AND matched, so neither new path was covered.
+    from mangrove_kb.graph import query_terms, tiers_hit
+    for query in ("divergence", "rsi", "mean reversion", "histogram", "oversold",
+                  "why do breakouts fail", "volume profile", "stop hunt"):
+        terms = query_terms(query)
+        hit = {r["id"]: tiers_hit(tuple(r["t"]), terms) for r in idx}
+        if len(terms) > 1:
+            common = {t for t in terms
+                      if sum(t in h for h in hit.values()) > 0.4 * len(idx)}
+            if common and len(common) < len(terms):
+                terms = [t for t in terms if t not in common]
+                hit = {i: {t: v for t, v in h.items() if t in terms} for i, h in hit.items()}
+        counts = [len(h) for h in hit.values()]
+        want = len(terms) if len(terms) in counts else max(counts, default=0)
+        rows = sorted((len(terms) - len(h), max(h.values()), i)
+                      for i, h in hit.items() if want and len(h) == want)
+        assert [r[2] for r in rows] == [r["id"] for r in kg.find(query, limit=None)], \
             f"the page and kg.find() disagree on {query!r}"
 
 
@@ -311,9 +324,12 @@ for(const n of DATA.nodes){
 }
 console.log(JSON.stringify({threw: bad, braces, count: DATA.nodes.length}));
 """, tmp_path)
+    from mangrove_kb.graph import KnowledgeGraph
     assert out["threw"] == [], f"the formatter threw on {out['threw']}"
     assert out["braces"] == [], f"raw JSON still reaches the panel for {out['braces']}"
-    assert out["count"] == 303
+    # Every node, counted from the graph rather than a literal: the claim is coverage, and a
+    # literal turns each node added to the ontology into a spurious failure here.
+    assert out["count"] == len(KnowledgeGraph.load().nodes)
 
 
 def test_unbounded_and_unauthored_are_different_things(page, tmp_path):
@@ -554,7 +570,8 @@ console.log(JSON.stringify(names));
 """, tmp_path)
     assert "epistemic status" not in out, \
         "epistemic must live in provenance on every node, not as its own section on some"
-    assert out.get("provenance &amp; extras") == 303, \
+    from mangrove_kb.graph import KnowledgeGraph
+    assert out.get("provenance &amp; extras") == len(KnowledgeGraph.load().nodes), \
         f"every node carries an epistemic status, so every node has the section: {out}"
     # warm-up is a sentence about the parameters when there are any, and its own section when
     # there are not -- saying "an expression in these parameters" beside no parameters is a lie.
@@ -891,8 +908,14 @@ console.log(JSON.stringify(probes.map(id => {{
             f"{node['id']}: rows claim {rows_total} between them, the fold takes {node['perType']}"
         assert node["perType"] <= node["combined"], "per-type can never exceed the combined walk"
     signal = next(n for n in out if n["id"] == "procedure:signal-rsi-cross-up")
-    assert all(k == 1 for _, k in signal["rows"]), f"this leaf's rows each reach one node: {signal}"
-    assert signal["perType"] == 4, "four rows, one node each"
+    rows = dict(signal["rows"])
+    # Its three structural edges each go to one node and stop. `about` is not pinned: it reaches
+    # the class the signal is concerned with, and whatever that class is in turn about -- chapter 6
+    # gave `concept:oscillator` edges to the statement lists, so the row legitimately grew.
+    assert all(rows[t] == 1 for t in ("uses", "has-role", "instance-of")), signal
+    assert rows["about"] >= 1, signal
+    assert signal["perType"] == sum(rows.values()), \
+        "the rows partition this leaf's neighbourhood: no node is reached by two of them"
     assert signal["combined"] > signal["perType"], \
         "the combined walk is exactly the bug: it crosses from one edge type onto another"
 
@@ -993,3 +1016,47 @@ def test_attribute_values_are_escaped_for_attributes(page):
     assert 'data-tip="${esc(' not in panel, "a tooltip is an attribute value"
     assert 'data-id="${esc(' not in panel and 'data-t="${esc(' not in panel
     assert 'data-tip="${attr(tip)}"' in panel
+
+
+def test_the_pages_own_javascript_ranks_as_find_does(page, tmp_path):
+    """Run the page's ranker in a JS engine, not a Python transcription of it.
+
+    The parity test above compares the exported index against `find()` using the library's own
+    matcher -- which proves the corpus is right and proves nothing about the code that reads it in
+    a browser. The page grew a fallback and a frequency rule after the library did, and a
+    transcription would have agreed with itself either way.
+    """
+    import json
+    import shutil
+
+    node = shutil.which("node")
+    if not node:
+        pytest.skip("no JS engine available")
+
+    from mangrove_kb.graph import KnowledgeGraph
+
+    idx = re.search(r"const IDX = (\[.*?\]);\n", page, re.S)
+    body = re.search(r"  const STOP_SHARE = 0\.4;\n  function rank\(q\)\{.*?\n  \}\n", page, re.S)
+    helpers = re.search(r"  const FUNCTION = new Set\(.*?function variants\(t\)\{.*?\n  \}\n",
+                        page, re.S)
+    assert idx and body and helpers, "the page's ranker is not where this test looks for it"
+
+    script = tmp_path / "rank.mjs"
+    script.write_text(
+        f"const WHY = ['name','abbrev','summary','detail','other'];\n"
+        f"const LIMIT = 40;\n"
+        f"const IDX = {idx.group(1)};\n{helpers.group(0)}{body.group(0)}\n"
+        "const out = {};\n"
+        "for (const q of JSON.parse(process.argv[2])) out[q] = rank(q).map(x => x.r.id);\n"
+        "console.log(JSON.stringify(out));\n", encoding="utf-8")
+
+    queries = ["divergence", "mean reversion", "why do breakouts fail", "stop hunt", "oversold"]
+    proc = subprocess.run([node, str(script), json.dumps(queries)],
+                          capture_output=True, text=True, timeout=120)
+    assert proc.returncode == 0, proc.stderr[-2000:]
+    ranked = json.loads(proc.stdout)
+
+    kg = KnowledgeGraph.load()
+    for q in queries:
+        want = [r["id"] for r in kg.find(q, limit=40)]
+        assert ranked[q] == want, f"the page's own JS and kg.find() disagree on {q!r}"

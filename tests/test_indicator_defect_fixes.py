@@ -676,9 +676,14 @@ def test_graph_atoms_use_the_ontology_value_vocabularies():
     assert not bad_e, f"illegal epistemic values: {bad_e}"
     assert not bad_s, f"illegal status values: {bad_s}"
 
-    # Everything here is read from the code and verified by executing it, never interpreted from
-    # prose -- the indicators and signals whose behaviour is unsettled are held out of scope.
-    assert {a["epistemic"] for a in atoms} == {"observed"}
+    # The code-derived half is read from the source and verified by executing it, so all of it is
+    # `observed`. Doc-derived atoms are not automatically so: a Judgment is argued from accumulated
+    # practice rather than measured, which is `inferred`, and that difference is the point of the
+    # field. The assertion is therefore per-half, not one value for the whole graph -- collapsing
+    # it back would forbid the graph from ever holding anything it did not read off the code.
+    derived = set(graph["meta"].get("derived_atom_ids", ()))
+    assert {a["epistemic"] for a in atoms if a["id"] not in derived} == {"observed"}
+    assert {a["epistemic"] for a in atoms if a["id"] in derived} <= EPISTEMIC
 
 
 def test_gap_requiring_patterns_can_fire_in_a_247_market():

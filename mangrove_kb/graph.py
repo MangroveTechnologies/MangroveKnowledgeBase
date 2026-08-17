@@ -1,12 +1,18 @@
 """Query the signal/indicator knowledge graph.
 
-The knowledge space is a curated graph over the library's own indicators and signals: what each
-computation *is*, what it consumes and produces, which signals read which of its outputs, and what
-part each signal plays in a strategy. It is generated from the source, so it is exact rather than
-extracted -- there is no text-mining noise to rank around.
+The knowledge space has two halves that share one schema. One is generated from the library's own
+source: what each computation *is*, what it consumes and produces, which signals read which of its
+outputs, and what part each signal plays in a strategy -- exact rather than extracted, because it is
+compiled from the code. The other is the trading knowledge base -- market structure, instruments,
+risk, chart patterns, quantitative method -- ingested from its chapters as nodes and edges beside
+them, so a question about *why* an indicator is used reaches prose and a question about *what* it
+computes reaches the signature.
+
+The join is what makes either half worth querying: ``procedure:atr-based-stop`` is a rule a chapter
+states, and it ``uses`` an indicator the code defines.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (218 of 303 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (218 of 714 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -32,6 +38,12 @@ Usage::
     kg.find(kind="momentum", role="trigger")         # both axes at once
     kg.get("procedure:indicator-rsi")["outputs"]     # typed outputs with units and range
     kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # who reads it
+    kg.ask("how far away from my entry should the stop go")   # a question, not a term
+
+:meth:`find` matches words and :meth:`ask` matches meaning -- the latter over two indices, LSA
+(:mod:`mangrove_kb.semantic`) and a pretrained encoder (:mod:`mangrove_kb.dense`), fused by
+reciprocal rank and then expanded one hop along the edges. On twenty-five questions phrased the way a
+trader asks them, words alone answer 5 and ``ask`` answers 18.
 
 A signal's class is not a property it declares -- it is derived from the graph: ``signal --uses-->
 indicator --instance-of--> class``. :meth:`KnowledgeGraph.in_class` walks that, so ``kind`` reaches
@@ -39,8 +51,10 @@ signals and indicators alike.
 """
 from __future__ import annotations
 
+import functools
 import json
 import os
+import re
 from collections import Counter, deque
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -94,13 +108,144 @@ CATEGORIES: tuple[str, ...] = ("structural", "descriptive", "associative", "meta
 #: question the search is for -- "is there already something for X". ``find("mean reversion")``
 #: returned nothing while two nodes described it in prose, and ``find("crossover")`` returned 32 of
 #: the 62 nodes that mention it. The authored detail is where a computation is actually explained.
+#: A doc-derived node has no formula, params or outputs -- its ``explanation`` body is the same
+#: thing for it, so it belongs in the same tier rather than a tier of its own.
 SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
     ("name", "id"),
     ("abbreviation",),
     ("summary",),
     ("formula", "reference", "interpretation", "applications",
-     "inputs", "params", "outputs"),          # slot NAMES and their descriptions
+     "inputs", "params", "outputs",           # slot NAMES and their descriptions
+     "explanation",                           # the doc-derived body (see `reference_chapter`)
+     # A chapter node's content IS these lists -- its principles, its practices, its worked
+     # examples -- and a statement moves onto an edge only when it earns one.
+     # Leaving them out made `find("mean reversion")` miss the node that states it, which is the
+     # exact false negative SEARCH_TIERS was widened to prevent.
+     "principles", "practices", "examples"),
 )
+
+#: A link is provenance, not content. Left in the corpus, ``find("com")`` returned 336 of 498 nodes
+#: and ``find("http")`` 233, because every code-derived node cites a URL -- and one useless query
+#: that returns most of the graph teaches a caller not to trust the search at all.
+_URL = re.compile(r"https?://\S+|www\.\S+")
+
+#: Two characters minimum. A single letter matches everything, which is not a search result.
+MIN_QUERY = 2
+
+#: Distinguishes "not looked for yet" from "looked for and absent".
+_UNSET = object()
+
+
+#: English function words: they carry no meaning in ANY corpus, which is exactly why measuring
+#: frequency in THIS one never catches them -- "why" appears in 26 nodes of 498 because our own
+#: prose says "which is why", and it was scoring as though it discriminated. Ranking a question by
+#: it put two nodes that merely say "why" above the one that answers it.
+#:
+#: Domain words that look like function words are deliberately absent: "up", "down", "over",
+#: "under", "high", "low", "open", "close", "long", "short", "range", "point", "value" and "level"
+#: all mean something specific here, and dropping them would break the queries this exists to serve.
+FUNCTION_WORDS = frozenset("""
+an as at be been being but by can could did do does doing done for from had has have if in into is
+it its may might must no not of on or shall should so some such than that the their them then there
+these they this those through to too was were what when where whether which while who whom why will
+with within would you your our we us me my i am are also been each every any both either neither
+""".split())
+
+
+def query_terms(query: str) -> list[str]:
+    """A query as the terms it is made of, so word order stops mattering.
+
+    ``"mean reversion"`` and ``"reversion mean"`` are the same question and used to return 11 nodes
+    and none, because the query was matched as one literal string. Each term is matched
+    independently and a node must carry all of them.
+
+    Function words are dropped -- unless that would leave nothing, so ``find("what")`` still asks
+    what it asked.
+    """
+    words = [t for t in re.split(r"[^a-z0-9]+", query.lower()) if len(t) >= MIN_QUERY]
+    return [t for t in words if t not in FUNCTION_WORDS] or words
+
+
+@functools.lru_cache(maxsize=1024)
+def _variants(term: str) -> tuple[str, ...]:
+    """A term and the plural or singular of it, so ``zone`` and ``zones`` ask the same question.
+
+    Deliberately crude -- an English stemmer would fold ``basis`` to ``basi`` and ``futures`` to
+    ``future``, which are different words in this domain, so nothing is stripped from a term the
+    graph would then fail to find. Both forms are tried; whichever exists is what matches.
+    """
+    if len(term) < 4:
+        return (term,)
+    if term.endswith("ies"):
+        return (term, term[:-3] + "y")
+    if term.endswith("es"):
+        return (term, term[:-2], term[:-1])
+    if term.endswith("s"):
+        return (term, term[:-1])
+    return (term, term + "s", term + "es")
+
+
+def tiers_hit(hay: tuple[str, ...], terms: Sequence[str]) -> dict[str, int]:
+    """For each term the node carries, the best tier it appears in. Absent terms are absent.
+
+    The per-term detail is what lets a caller require all of them, or fall back to the best subset
+    when nothing carries all of them, without searching twice.
+    """
+    found = {}
+    for term in terms:
+        hit = next((i for i, text in enumerate(hay)
+                    if any(v in text for v in _variants(term))), None)
+        if hit is not None:
+            found[term] = hit
+    return found
+
+
+def rank_of(hay: tuple[str, ...], terms: Sequence[str]) -> int | None:
+    """Which tier a query matched in, or None if the node does not carry every term.
+
+    The rank is the WORST tier among the terms: a node holding both words in its name outranks one
+    that has one in its name and the other buried in a formula. Ties break on id, so a result is
+    reproducible.
+    """
+    hits = tiers_hit(hay, terms)
+    return max(hits.values()) if len(hits) == len(terms) else None
+
+
+def why_matches(text: str, terms: Sequence[str]) -> bool:
+    """Whether an edge's reason carries every term of a filter.
+
+    An edge is not only its relation. Six `about` edges leave `concept:liquidity` and they say
+    different things -- one quantifies it, five are concepts the knowledge base states of it -- and
+    the difference is written in the `why` and nowhere else. Filtering on the relation alone cannot
+    separate them, so every traversal takes `why=` alongside `relation=`.
+    """
+    low = text.lower()
+    return all(any(v in low for v in _variants(term)) for term in terms)
+
+
+#: A term carried by more than this share of the graph says nothing about which node is meant. It is
+#: dropped from scoring rather than from the query, and the share is measured against THIS corpus
+#: rather than taken from a stop-word list -- "signal", "price" and "trading" are stop words here
+#: and nowhere else, while "the" never appears in a node's name to begin with.
+STOP_SHARE = 0.4
+
+
+def haystacks(source: dict) -> tuple[str, ...]:
+    """One lowercased string per search tier, for a node's fields.
+
+    The last band is everything the tiers do not name. An allow-list had to grow every time a
+    chapter introduced a prop -- a comparison table, a caution, a heading nobody anticipated -- and
+    until it did, a term stated only there was invisible to the search that answers "do we have
+    anything for X?".
+
+    Defined once because two callers need identical ranking: the query layer, and the viewer's
+    precomputed index. A second copy in the renderer would drift from this one silently.
+    """
+    ranked = {f for tier in SEARCH_TIERS for f in tier}
+    tiers = [" ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS]
+    tiers.append(" ".join(_flatten(v) for k, v in source.items() if k not in ranked).lower())
+    return tuple(_URL.sub(" ", t) for t in tiers)
+
 
 #: Where the graph is looked for, in order. An explicit path always wins; ``MANGROVE_KB_ONTOLOGY``
 #: lets a caller point at a build output; then the copy shipped inside the package; then the
@@ -256,6 +401,36 @@ def _cap(rows: list[dict[str, Any]], limit: int | None, what: str) -> Result:
                   f"showing {limit} of {total} {what}; raise limit or narrow the query")
 
 
+#: Damping in reciprocal rank fusion -- how much the very top of any single ranking dominates.
+#: Swept over the twenty-five paraphrased questions: 3 and 5 and 10 all score 18, 20 scores 17, and
+#: the literature's default of 60 scores 16. That default is tuned for many more retrievers than the
+#: two fused here, each of which is individually good.
+RRF_K = 5
+
+#: How deep to take each retriever before fusing. Fusion can only rank what it is given, and the
+#: answers it rescues are typically ranked 6-30 by one retriever and highly by the other.
+FUSE_POOL = 60
+
+
+def _fuse(rankings: Sequence[Sequence[str]], k: float = RRF_K) -> list[str]:
+    """Reciprocal rank fusion: combine several rankings into one by ``sum of 1/(k + rank)``.
+
+    Two retrievers that fail differently cannot be merged by taking turns. Interleaving spends the
+    top five slots alternating, so a node ranked third by one lands sixth overall; measured, that
+    scored 15 of 25 while the union of the two top-fives already contained 18. Fusion rewards
+    agreement instead -- a node both indices like outranks one only the better index likes -- and
+    recovers all 18.
+
+    Cormack, Clarke & Buettcher, *Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank
+    Learning Methods*, SIGIR 2009.
+    """
+    score: dict[str, float] = {}
+    for ranking in rankings:
+        for rank, nid in enumerate(ranking, start=1):
+            score[nid] = score.get(nid, 0.0) + 1.0 / (k + rank)
+    return [nid for nid, _ in sorted(score.items(), key=lambda kv: (-kv[1], kv[0]))]
+
+
 class KnowledgeGraph:
     """An in-memory view of the signal/indicator knowledge space.
 
@@ -292,10 +467,20 @@ class KnowledgeGraph:
         # One lowercased haystack per node per tier, built once. The graph is a few hundred nodes,
         # so this is cheaper than re-flattening the nested slot dicts on every search.
         self._haystacks: dict[str, tuple[str, ...]] = {}
+        self._df: dict[str, int] = {}          # term -> how many nodes carry it; filled on demand
+        self._semantic: Any = _UNSET           # the LSA index, loaded on first use
+        self._dense: Any = _UNSET              # the pretrained-encoder index, likewise
         for n in self.nodes.values():
-            source = {"name": n.name, "id": n.id, "summary": n.summary, **n.props}
-            self._haystacks[n.id] = tuple(
-                " ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS)
+            # A wired statement lives on the edge it explains, not in a list on the node -- which
+            # took roughly a hundred thousand characters of the knowledge base out of the search
+            # corpus the moment the chapters were wired. `find("keep risk per trade below")` came
+            # back with `concept:option` while that exact sentence sat on an edge out of
+            # `property:max-risk-per-trade`. The reasons on a node's own edges are things said
+            # about that node, so they are part of what it can be found by.
+            reasons = " ".join(e.why for e in self._out.get(n.id, ()) if e.why)
+            self._haystacks[n.id] = haystacks(
+                {"name": n.name, "id": n.id, "summary": n.summary, **n.props,
+                 "_edge_reasons": reasons})
 
     # --- loading ---------------------------------------------------------------------------------
 
@@ -355,7 +540,7 @@ class KnowledgeGraph:
 
         This deliberately does **not** return every node the backbone points at. That set also holds
         ``concept:indicator`` (71 results), ``concept:signal`` (218), ``concept:technical-analysis``
-        (295 of 303 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
+        (299 of 498 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
         class vocabulary invites a filter that looks like a query and returns almost everything.
         They remain legal ``kind=`` arguments, and :meth:`find` documents them; they are just not
         classes.
@@ -447,6 +632,36 @@ class KnowledgeGraph:
                     q.append(e.src)
         return out
 
+    def under(self, ref: str) -> set[str]:
+        """Everything beneath this node, whatever primitive it is -- the containment question.
+
+        :meth:`descendants` answers *what is a kind of this*, over the rigid backbone. That is the
+        wrong question for "give me everything from market foundations": an order type is not a
+        KIND of market foundations, it is PART of it, and `part-of` is not on the backbone -- so the
+        walk stopped at the first composition edge and returned almost nothing.
+
+        This follows every transitive structural relation (`part-of` alongside `kind-of`, both
+        declared transitive in :data:`RELATIONS`) plus `instance-of` for the leaf members, and then
+        the same one-hop `about` projection :meth:`in_class` uses, so a computation concerned with
+        something in scope comes along with it.
+
+        The point is that it is primitive-blind. A Fact, a Concept, an indicator and a chapter
+        formula are all reached by this one call, because the graph already records which chapter
+        each belongs to -- as edges. Nothing needs a `reference_chapter` filter to be found.
+        """
+        nid = self.resolve(ref)
+        down = {r for r, spec in RELATIONS.items() if spec.get("transitive")} | {"instance-of"}
+        seen = {nid}
+        q = deque([nid])
+        while q:
+            cur = q.popleft()
+            for e in self._in.get(cur, []):
+                if e.relation in down and e.src not in seen:
+                    seen.add(e.src)
+                    q.append(e.src)
+        via_about = {e.src for e in self.edges if e.relation == "about" and e.dst in seen}
+        return (seen | via_about) - {nid}
+
     def bearers(self, role: str) -> list[str]:
         """Nodes that bear this role. **One hop, never transitive** -- roles are not inherited."""
         rid = self.resolve(role)
@@ -486,7 +701,8 @@ class KnowledgeGraph:
 
     def find(self, query: str = "", *, kind: str | None = None, role: str | None = None,
              primitive: str | None = None, status: str | None = None,
-             requires: str | None = None, limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
+             requires: str | None = None, under: str | None = None,
+             limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
         """Search by text, and/or filter by class, role, status and required input.
 
         ``kind`` and ``role`` are separate parameters on purpose, and they intersect. ``kind`` is
@@ -498,6 +714,14 @@ class KnowledgeGraph:
             kg.find(kind="momentum", role="trigger")   # momentum-class signals used as triggers
             kg.find(kind="oscillator")                 # everything in the oscillator class
             kg.find(role="filter")                     # signals playing the filter part
+
+        ``under`` scopes to everything beneath a node by containment -- and it is primitive-blind,
+        so one call reaches the Concepts, the Facts, the advice and the formulas of a subject
+        alike::
+
+            kg.find(under="market foundations")            # the whole subject, every kind of node
+            kg.find(under="market foundations", primitive="Procedure")   # just its computations
+            kg.find("spread", under="market foundations")  # text search, scoped to the subject
 
         ``status`` and ``requires`` are flat node predicates with small enumerable vocabularies --
         both are listed by :meth:`stats`, so neither can be guessed wrong::
@@ -512,8 +736,11 @@ class KnowledgeGraph:
         from being invisible.
         """
         pool: set[str] | None = None
+        if under is not None:
+            pool = self.under(under)
         if kind is not None:
-            pool = self.in_class(kind)
+            got = self.in_class(kind)
+            pool = got if pool is None else (pool & got)
         if role is not None:
             rid = self.resolve(role)
             borne = set(self.bearers(rid))
@@ -524,32 +751,226 @@ class KnowledgeGraph:
             raise GraphError(f"nothing declares the input {requires!r}; "
                              f"declared: {', '.join(sorted(cols))}")
 
-        q = query.lower().strip()
-        rows: list[tuple[int, str, dict[str, Any]]] = []
-        for n in self.nodes.values():
-            if pool is not None and n.id not in pool:
-                continue
-            if primitive and n.primitive != primitive:
-                continue
-            if status is not None and n.status != status:
-                continue
-            if requires is not None and requires not in (n.props.get("inputs") or {}):
-                continue
-            rank = 0
-            if q:
-                # WHERE a query matched decides rank. Sorting purely by id buried the four signals
-                # actually NAMED "divergence" beneath five that merely mention it in prose -- and a
-                # caller reading the first few results concludes the thing does not exist. The tier
-                # index IS the rank; id breaks ties so results stay deterministic, which a public
-                # API needs.
-                hay = self._haystacks[n.id]
-                hit = next((i for i, text in enumerate(hay) if q in text), None)
-                if hit is None:
-                    continue
-                rank = hit
-            rows.append((rank, n.id, n.brief()))
-        rows.sort(key=lambda r: (r[0], r[1]))
-        return _cap([r[2] for r in rows], limit, "matches")
+        terms = query_terms(query)
+        if query.strip() and not terms:
+            raise GraphError(
+                f"a query needs {MIN_QUERY} characters to mean anything; {query.strip()!r} would "
+                "match most of the graph. Use find(kind=...), find(under=...) or resolve() instead.")
+        eligible = [n for n in self.nodes.values()
+                    if (pool is None or n.id in pool)
+                    and (not primitive or n.primitive == primitive)
+                    and (status is None or n.status == status)
+                    and (requires is None or requires in (n.props.get("inputs") or {}))]
+        if not terms:
+            return _cap([n.brief() for n in sorted(eligible, key=lambda n: n.id)], limit, "matches")
+
+        # WHERE a query matched decides rank. Sorting purely by id buried the four signals actually
+        # NAMED "divergence" beneath five that merely mention it in prose -- and a caller reading
+        # the first few results concludes the thing does not exist. The tier index IS the rank; id
+        # breaks ties so results stay deterministic, which a public API needs.
+        scored = self._score([n.id for n in eligible], terms)
+        rows = sorted((s + (nid,) for nid, s in scored.items()))
+        return _cap([self.nodes[r[2]].brief() for r in rows], limit, "matches")
+
+    def _document_frequency(self, term: str) -> int:
+        """How many nodes carry a term. Cached per graph -- a question asks it once per word."""
+        if term not in self._df:
+            variants = _variants(term)
+            self._df[term] = sum(any(v in text for text in hay for v in variants)
+                                 for hay in self._haystacks.values())
+        return self._df[term]
+
+    def _score(self, ids: Sequence[str], terms: Sequence[str], *,
+               best_only: bool = True) -> dict[str, tuple[int, int]]:
+        """Every id that answers to the query, scored ``(terms missing, worst tier)``.
+
+        ``best_only=False`` scores every id given, including those that carry nothing of the query.
+        :meth:`find` needs the cut -- a search returns matches -- while :meth:`ask` needs the score
+        without it, because a neighbour reached over an edge is already a candidate and the question
+        is only where it belongs in the order.
+
+        Shared by :meth:`find` and :meth:`ask` so that a node keeps the same score whether it was
+        matched directly or reached over an edge -- two rankings would disagree about which of two
+        results is better, which is the bug the shared corpus builder exists to prevent one level up.
+        """
+        hits = {nid: tiers_hit(self._haystacks[nid], terms) for nid in ids}
+        # A term almost everything carries cannot discriminate, so it is dropped from scoring. This
+        # is what makes a whole question askable: "why do breakouts fail" required "why" and "do"
+        # and returned nothing, and dropping them by frequency needs no English stop-word list.
+        #
+        # Measured against the WHOLE graph, never the filtered pool: "volume" is common everywhere
+        # and discriminating nowhere, and if the frequency were taken over a scope of eleven nodes
+        # then `find(q)` and `find(q, under=...)` would be answering with different vocabularies.
+        if len(terms) > 1:
+            common = {t for t in terms if self._document_frequency(t) > STOP_SHARE * len(self.nodes)}
+            if common and len(common) < len(terms):
+                terms = [t for t in terms if t not in common]
+                hits = {i: {t: v for t, v in h.items() if t in terms} for i, h in hits.items()}
+
+        # Everything carrying all the terms, or -- when nothing does -- everything carrying as many
+        # of them as any node manages. A question is answered by its best partial match or not at
+        # all, and "not at all" leaves an agent with nothing to walk from.
+        unmatched = len(SEARCH_TIERS) + 1
+        if not best_only:
+            return {nid: (len(terms) - len(h), max(h.values()) if h else unmatched)
+                    for nid, h in hits.items()}
+        best = max((len(h) for h in hits.values()), default=0)
+        want = len(terms) if any(len(h) == len(terms) for h in hits.values()) else best
+        if not want:
+            return {}
+        return {nid: (len(terms) - len(h), max(h.values()))
+                for nid, h in hits.items() if len(h) == want}
+
+    def semantic_index(self):
+        """The semantic index built from this graph, or None -- loaded once, never rebuilt here.
+
+        Absent or stale is not an error: every call that uses it falls back to the word search and
+        says so in the result's note. A stale index answers about a graph that has changed under it,
+        which is worse than not answering, so the checksum decides rather than the file's presence.
+        """
+        if self._semantic is _UNSET:
+            self._semantic = None
+            try:
+                from .semantic import SemanticIndex          # noqa: PLC0415 -- optional artifact
+                index = SemanticIndex.load()
+                self._semantic = index if (self.source and index.matches(self.source)) else None
+            except Exception:                                # missing, unreadable, or numpy-less
+                self._semantic = None
+        return self._semantic
+
+    def dense_index(self):
+        """The pretrained-encoder index built from this graph, or None -- loaded once.
+
+        Same contract as :meth:`semantic_index`: absent or stale degrades to what remains rather
+        than raising, because a search that answers less is better than one that answers wrongly.
+        """
+        if self._dense is _UNSET:
+            self._dense = None
+            try:
+                from .dense import DenseIndex                # noqa: PLC0415 -- optional artifact
+                index = DenseIndex.load()
+                self._dense = index if (self.source and index.matches(self.source)) else None
+            except Exception:                                # missing, unreadable, or stale
+                self._dense = None
+        return self._dense
+
+    def ask(self, question: str, *, seeds: int = 3, hops: int = 1,
+            relations: Sequence[str] | None = None, why: str | None = None,
+            semantic: bool | None = None,
+            limit: int | None = DEFAULT_LIMIT) -> Result:
+        """Search for where a question lands, then follow the edges out of it.
+
+        :meth:`find` matches words. A question is rarely answered by the node whose words it shares:
+        *"why do breakouts fail"* lands on ``concept:liquidity``, whose use cases literally include
+        that phrase, while the answer -- ``concept:liquidity-grab``, the sweep that a failed breakout
+        actually is -- shares no word with the question at all. It is one hop away, and one hop is
+        the whole difference between a search engine and a graph.
+
+        So: take the best ``seeds`` matches, walk out ``hops``, and return what that reaches with the
+        route that reached it. Each result carries ``reached``: which seed it came from, how many
+        hops away it is, the relation traversed and that edge's own ``why`` -- which is the reason
+        the answer is an answer, and is why this returns paths rather than a bag of nodes.
+
+        Ordering is seed rank first, then distance, then id: the seed itself outranks its neighbours,
+        and a neighbour of the best seed outranks the second seed. Deterministic, so two identical
+        questions give two identical answers.
+
+        Measured on twenty questions phrased the way someone actually asks them, search alone
+        answered seven; the misses were almost all one hop from a correct seed. What this cannot fix
+        is a question that seeds badly -- *"what happens when my margin runs out"* shares no
+        discriminating word with ``concept:liquidation-engine`` -- which is the case for embedding
+        the question rather than matching its words.
+        """
+        terms = query_terms(question)
+        if not terms:
+            return _cap([], limit, "reached")
+        # Nothing in the question is a word this graph has ever used, so there is no question here
+        # to answer. The LSA index got this for free -- a query outside its vocabulary folds to a
+        # zero vector and it returns nothing -- but a pretrained encoder embeds ANY string, and
+        # `ask("zzzzqqq")` came back with the seven nodes nearest to gibberish.
+        #
+        # A similarity floor cannot do this job: over these 714 nodes the best cosine for a real
+        # question runs down to 0.26 while nonsense reaches 0.28, so the two ranges overlap and any
+        # threshold that rejects the nonsense also rejects real questions. Knowing the words is a
+        # property of the corpus and is exactly what the old behaviour tested.
+        if not any(self._document_frequency(t) for t in terms):
+            return _cap([], limit, "reached")
+        indexes = [i for i in ((self.semantic_index(), self.dense_index())
+                               if semantic is not False else ()) if i is not None]
+        if semantic and not indexes:
+            raise GraphError(
+                "no semantic index matches this graph. Build them with:\n"
+                "    python3 ontology/build_semantic_index.py\n"
+                "    python3 ontology/build_dense_index.py")
+        if indexes:
+            # At least as many seeds as results asked for. Three is a sensible breadth to EXPAND
+            # from; it is not a sensible number of candidates to rank when the caller wanted ten,
+            # and capping there silently made hops=0 answer with three.
+            # `limit=None` asks for everything, and falling back to three seeds there answered a
+            # question with less than `find` did on the same words -- the caller who wants the whole
+            # answer gets at least as many seeds as there are nodes carrying the words.
+            wanted = max(seeds, limit or seeds)
+            # Fused, not concatenated. The two indices know different things -- LSA knows what this
+            # corpus puts together, the encoder knows what English does -- and each is wrong often
+            # enough that taking one's word for the top of the list loses the other's rescues.
+            #
+            # The WORD search is deliberately not a third input here. It is a fine way to find a
+            # node whose text you can half-remember and a poor way to answer a question: alone it
+            # answers 5 of 25, and fusing it in drags the pair from 18 down to 16. Its seeds are
+            # appended below instead, where they widen the pool without displacing the ranking.
+            seeded = _fuse([[nid for nid, _ in i.similar(question, limit=FUSE_POOL)]
+                            for i in indexes])[:wanted]
+            # A node carrying the question's own words is an answer by the plainest reading there
+            # is, and meaning and words disagree often enough that the semantic seeds can miss it:
+            # "stops beyond obvious levels" matched `structure-based stop` on the words and did not
+            # rank it in the top three by meaning. Seeding from both loses neither.
+            seeded += [r["id"] for r in self.find(question, limit=wanted) if r["id"] not in seeded]
+            found = Result([self.nodes[nid].brief() for nid in seeded], len(seeded))
+        else:
+            found = self.find(question, limit=seeds)
+        if not found.items:
+            return _cap([], limit, "reached")
+        allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
+
+        # Expand: everything within `hops` of a seed, keeping the shortest route to each and the
+        # edge that took it there.
+        route: dict[str, dict[str, Any]] = {}
+        for seed in found.items:
+            sid = seed["id"]
+            frontier = [(sid, None)]
+            for distance in range(hops + 1):
+                nxt: list[tuple[str, Edge | None]] = []
+                for nid, edge in frontier:
+                    if nid in route and route[nid]["hops"] <= distance:
+                        continue
+                    route[nid] = {"seed": sid, "hops": distance}
+                    if edge is not None:
+                        route[nid] |= {"relation": edge.relation, "why": edge.why,
+                                       "from": edge.src, "to": edge.dst}
+                    if distance < hops:
+                        for e in self._out.get(nid, []) + self._in.get(nid, []):
+                            if allowed and e.relation not in allowed:
+                                continue
+                            nxt.append((e.dst if e.src == nid else e.src, e))
+                frontier = nxt
+
+        # Re-rank the whole pool against the question. Ordering by seed and then by distance sank
+        # the answer under the twenty kinds-of hanging off a worse seed; a neighbour that carries a
+        # word of the question is what deserves to come back, and distance only breaks ties.
+        if indexes:
+            # Ranked by meaning, over the pool the graph produced -- and by both indices, fused the
+            # same way the seeds were. The words of the question are already spent -- they chose
+            # where to start -- and re-ranking by them here would put the node that repeats the
+            # question above the one that answers it.
+            ranked = _fuse([[nid for nid, _ in i.similar(question, limit=None, among=list(route))]
+                            for i in indexes])
+            rows = [(0, 0, route[nid]["hops"], nid) for nid in ranked]
+        else:
+            scored = self._score(list(route), terms, best_only=False)
+            rows = sorted((score + (route[nid]["hops"], nid) for nid, score in scored.items()))
+        return _cap([{**self.nodes[r[3]].brief(), "reached": route[r[3]]} for r in rows],
+                    limit, "reached")
 
     def outputs(self, name: str = "", *, units: str | None = None, bounded: bool | None = None,
                 kind: str | None = None, limit: int | None = DEFAULT_LIMIT) -> Result:
@@ -558,7 +979,7 @@ class KnowledgeGraph:
         The other operations answer questions about a node's place in the graph. This one answers
         questions about the values themselves -- *what produces an output called* ``histogram``,
         *which computations emit a percentage*, *which are bounded and therefore comparable on one
-        axis*. Those were previously reachable only by fetching all 303 nodes and looping, which is
+        axis*. Those were previously reachable only by fetching all 498 nodes and looping, which is
         why they were not being asked.
 
         A row is an **output**, not a node: an indicator with three outputs contributes three rows,
@@ -602,13 +1023,18 @@ class KnowledgeGraph:
     # --- traversal -------------------------------------------------------------------------------
 
     def neighbors(self, ref: str, *, direction: str = "both", relation: str | None = None,
-                  category: str | None = None, limit: int | None = DEFAULT_LIMIT) -> Result:
+                  category: str | None = None, why: str | None = None,
+                  primitive: str | None = None, limit: int | None = DEFAULT_LIMIT) -> Result:
         """One hop. ``direction`` is ``"in"``, ``"out"`` or ``"both"``.
 
-        Filter by an exact ``relation`` or by a whole ``category`` -- the latter lets a caller follow
-        every structural edge without naming each one, which is what makes a poly-hierarchy
-        navigable. ``direction`` follows the ``mode="in"/"out"/"all"`` convention of igraph and
-        NetworkX rather than a boolean, because a boolean is unguessable.
+        Filter by an exact ``relation``, by a whole ``category``, by the ``primitive`` at the other
+        end, or by the edge's own reason with ``why=``. The last is not a convenience: the same
+        relation carries different claims, and the claim is in the reason. Six ``about`` edges point
+        at ``concept:liquidity`` -- ``why="quantifies"`` returns the measurement, ``why="principle"``
+        returns the concepts the knowledge base states of it.
+
+        ``direction`` follows the ``mode="in"/"out"/"all"`` convention of igraph and NetworkX rather
+        than a boolean, because a boolean is unguessable.
         """
         nid = self.resolve(ref)
         if direction not in ("in", "out", "both"):
@@ -618,6 +1044,7 @@ class KnowledgeGraph:
         if category and category not in CATEGORIES:
             raise GraphError(f"unknown category {category!r}; known: {', '.join(CATEGORIES)}")
 
+        why_terms = query_terms(why or "")
         rows: list[dict[str, Any]] = []
         for e, out in [(e, True) for e in self._out.get(nid, [])] + \
                       [(e, False) for e in self._in.get(nid, [])]:
@@ -629,7 +1056,11 @@ class KnowledgeGraph:
                 continue
             if category and e.category != category:
                 continue
+            if why_terms and not why_matches(e.why, why_terms):
+                continue
             other = e.dst if out else e.src
+            if primitive and self.nodes[other].primitive != primitive:
+                continue
             rows.append({**self.nodes[other].brief(),
                          "relation": e.relation, "category": e.category,
                          "direction": "out" if out else "in", "why": e.why, **e.props})
@@ -637,6 +1068,7 @@ class KnowledgeGraph:
         return _cap(rows, limit, "neighbours")
 
     def subgraph(self, ref: str, *, radius: int = 1, relations: Sequence[str] | None = None,
+                 why: str | None = None,
                  max_nodes: int = DEFAULT_SUBGRAPH_NODES) -> dict[str, Any]:
         """The neighbourhood around a node, as an induced subgraph.
 
@@ -654,6 +1086,7 @@ class KnowledgeGraph:
         if radius < 0:
             raise GraphError("radius must be >= 0")
         allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
         if allowed and (bad := allowed - set(RELATIONS)):
             raise GraphError(f"unknown relation(s): {', '.join(sorted(bad))}")
 
@@ -665,6 +1098,8 @@ class KnowledgeGraph:
             for cur in frontier:
                 for e in self._out.get(cur, []) + self._in.get(cur, []):
                     if allowed and e.relation not in allowed:
+                        continue
+                    if why_terms and not why_matches(e.why, why_terms):
                         continue
                     other = e.dst if e.src == cur else e.src
                     if other in seen:
@@ -680,7 +1115,8 @@ class KnowledgeGraph:
                 break
             frontier = nxt
         induced = [e for e in self.edges if e.src in seen and e.dst in seen
-                   and (not allowed or e.relation in allowed)]
+                   and (not allowed or e.relation in allowed)
+                   and (not why_terms or why_matches(e.why, why_terms))]
         return {
             "center": nid,
             "radius": radius,
@@ -688,18 +1124,23 @@ class KnowledgeGraph:
             "edges": [e.as_dict() for e in induced],
             "truncated": truncated,
             "closure": "all nodes within radius over the permitted relations, plus every edge "
-                       "between them",
+                       "between them" + (" whose reason matches" if why_terms else ""),
             **({"note": f"stopped at max_nodes={max_nodes}; raise it or reduce radius"}
                if truncated else {}),
         }
 
     def path(self, from_ref: str, to_ref: str, *, max_depth: int = 6,
-             relations: Sequence[str] | None = None) -> list[dict[str, Any]] | None:
+             relations: Sequence[str] | None = None,
+             why: str | None = None) -> list[dict[str, Any]] | None:
         """The shortest connecting path, as alternating nodes and the relation traversed.
 
         Edges are followed in either direction: "how are these two related" is not a question about
         edge orientation. Returns ``None`` when nothing connects them within ``max_depth`` -- which
         is a real answer about this graph, not a failure.
+
+        Each hop carries the edge's own ``why``. Every relation in this graph records why it holds
+        -- the merge refuses an edge without one -- and a route that named the relations but dropped
+        the reasons was the one call whose whole job is explanation discarding the explanation.
 
         **Shortest is rarely the explanatory route.** It returns ONE path and says nothing about the
         others, so adding an edge silently changes the answer -- which is exactly what happened when
@@ -711,6 +1152,7 @@ class KnowledgeGraph:
         if a == b:
             return [{"node": self.nodes[a].brief()}]
         allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
         prev: dict[str, tuple[str, Edge]] = {}
         seen = {a}
         q = deque([(a, 0)])
@@ -720,6 +1162,8 @@ class KnowledgeGraph:
                 continue
             for e in self._out.get(cur, []) + self._in.get(cur, []):
                 if allowed and e.relation not in allowed:
+                    continue
+                if why_terms and not why_matches(e.why, why_terms):
                     continue
                 other = e.dst if e.src == cur else e.src
                 if other in seen:
@@ -738,13 +1182,14 @@ class KnowledgeGraph:
             parent, e = prev[cur]
             chain.append({"node": self.nodes[cur].brief(),
                           "via": {"relation": e.relation, "category": e.category,
-                                  "from": e.src, "to": e.dst}})
+                                  "why": e.why, "from": e.src, "to": e.dst}})
             cur = parent
         chain.append({"node": self.nodes[a].brief()})
         return list(reversed(chain))
 
     def all_paths(self, from_ref: str, to_ref: str, *, max_depth: int = 4,
                   relations: Sequence[str] | None = None,
+                  why: str | None = None,
                   sibling_hops: bool = False,
                   limit: int | None = DEFAULT_LIMIT,
                   max_steps: int = 200_000) -> Result:
@@ -784,6 +1229,7 @@ class KnowledgeGraph:
         if a == b:
             return Result([[{"node": self.nodes[a].brief()}]], 1)
         allowed = set(relations) if relations else None
+        why_terms = query_terms(why or "")
 
         found: list[list[dict[str, Any]]] = []
         steps = 0
@@ -799,6 +1245,8 @@ class KnowledgeGraph:
                     return
                 if allowed and e.relation not in allowed:
                     continue
+                if why_terms and not why_matches(e.why, why_terms):
+                    continue
                 other = e.dst if e.src == cur else e.src
                 if other in on_path:
                     continue
@@ -813,7 +1261,7 @@ class KnowledgeGraph:
                     return
                 step = {"node": self.nodes[other].brief(),
                         "via": {"relation": e.relation, "category": e.category,
-                                "from": e.src, "to": e.dst}}
+                                "why": e.why, "from": e.src, "to": e.dst}}
                 if other == b:
                     found.append(acc + [step])
                     continue          # a simple path ends at the target; do not walk through it

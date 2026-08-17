@@ -274,18 +274,19 @@ def search_index() -> list[dict]:
     `tests/test_viz.py` asserts the two agree on real queries, so a change to one that is not
     mirrored in the other fails.
     """
-    from ..graph import SEARCH_TIERS, KnowledgeGraph, _flatten
+    from ..graph import KnowledgeGraph
 
     kg = KnowledgeGraph.load()
     rows = []
     for node in kg.nodes.values():
-        source = {"name": node.name, "id": node.id, "summary": node.summary, **node.props}
         rows.append({
             "id": node.id,
             "name": node.name,
             "summary": (node.summary or "")[:140],
-            # One lowercased string per tier. Tier order IS rank order.
-            "t": [" ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS],
+            # The graph's own haystacks rather than a second call to `haystacks()`: they include
+            # the reasons on a node's edges, and rebuilding the source dict here left the page
+            # searching a corpus the library had already moved past.
+            "t": list(kg._haystacks[node.id]),
         })
     rows.sort(key=lambda r: r["id"])
     return rows
@@ -401,7 +402,7 @@ FACETS = """
                      + 'Procedure, the darker blue is has-role inside descriptive. '
                      + 'Solid arrow = ordering relation (DAG). Dashed = free / fringe. '
                      + 'Green ring = selected. Yellow ring = deprecated; ratified is unmarked, '
-                     + 'because 301 of 303 nodes are.';
+                     + 'because nearly every node is.';
     }
   });
 })();
@@ -434,27 +435,70 @@ SEARCH_UI = """
 <script>
 (function(){
   const IDX = __INDEX__;
-  const WHY = ['name','abbrev','summary','detail'];   // parallel to SEARCH_TIERS
+  const WHY = ['name','abbrev','summary','detail','other'];  // parallel to haystacks()
   const LIMIT = 40;
 
   const bar=document.getElementById('brandbar');
   const wrap=document.createElement('span'); wrap.id='searchwrap';
   const box=document.createElement('input');
   box.id='search'; box.type='search'; box.autocomplete='off';
-  box.placeholder='Search 303 nodes \u2014 name, formula, outputs\u2026';
+  // Counted from the index rather than written down: the last hard-coded number here was
+  // three chapters out of date and read as a fact about the page a reader was looking at.
+  box.placeholder=`Search ${IDX.length} nodes \u2014 name, formula, outputs\u2026`;
   const out=document.createElement('div'); out.id='results';
   wrap.append(box,out); bar.insertBefore(wrap, document.getElementById('themesel'));
 
   let hits=[], cur=-1;
 
+  // Terms, plural/singular variants and the AND across them -- the same rules as query_terms(),
+  // _variants() and rank_of() in graph.py. The page and kg.find() must answer identically.
+  // Mirrors FUNCTION_WORDS and query_terms() in graph.py; the page must rank as find() does.
+  const FUNCTION = new Set('also am an any are as at be been being both but by can could did do does doing done each either every for from had has have i if in into is it its may me might must my neither no not of on or our shall should so some such than that the their them then there these they this those through to too us was we were what when where whether which while who whom why will with within would you your'.split(' '));
+  function terms(q){
+    const w=q.toLowerCase().split(/[^a-z0-9]+/).filter(t=>t.length>=2);
+    const kept=w.filter(t=>!FUNCTION.has(t));
+    return kept.length?kept:w;
+  }
+  function variants(t){
+    if(t.length<4) return [t];
+    if(t.endsWith('ies')) return [t, t.slice(0,-3)+'y'];
+    if(t.endsWith('es')) return [t, t.slice(0,-2), t.slice(0,-1)];
+    if(t.endsWith('s')) return [t, t.slice(0,-1)];
+    return [t, t+'s', t+'es'];
+  }
+  const STOP_SHARE = 0.4;
   function rank(q){
-    const res=[];
-    for(const r of IDX){
-      const tier=r.t.findIndex(h=>h.includes(q));
-      if(tier>=0) res.push({r,tier});
+    let ts=terms(q);
+    if(!ts.length) return Object.assign([], {total:0});
+    // Where each term hit, per node -- then the same two rules find() applies: a term most of the
+    // graph carries is dropped from scoring, and when nothing carries every term the best partial
+    // match answers instead of nothing at all.
+    const hits=IDX.map(r=>{
+      const h={};
+      for(const t of ts){
+        const vs=variants(t);
+        const tier=r.t.findIndex(x=>vs.some(v=>x.includes(v)));
+        if(tier>=0) h[t]=tier;
+      }
+      return {r,h};
+    });
+    if(ts.length>1){
+      const common=ts.filter(t=>hits.filter(x=>t in x.h).length > STOP_SHARE*IDX.length);
+      if(common.length && common.length<ts.length){
+        ts=ts.filter(t=>!common.includes(t));
+        for(const x of hits) for(const t of common) delete x.h[t];
+      }
     }
-    // rank, then id -- identical to find()'s sort key, so the two agree on ordering.
-    res.sort((a,b)=> a.tier-b.tier || (a.r.id<b.r.id?-1:a.r.id>b.r.id?1:0));
+    const counts=hits.map(x=>Object.keys(x.h).length);
+    const want = counts.includes(ts.length) ? ts.length : Math.max(...counts, 0);
+    const res=[];
+    if(want) for(const x of hits){
+      const got=Object.values(x.h);
+      if(got.length!==want) continue;
+      res.push({r:x.r, missing:ts.length-got.length, tier:Math.max(...got, 0)});
+    }
+    // missing, then tier, then id -- identical to find()'s sort key, so the two agree on ordering.
+    res.sort((a,b)=> a.missing-b.missing || a.tier-b.tier || (a.r.id<b.r.id?-1:a.r.id>b.r.id?1:0));
     const shown=res.slice(0,LIMIT);
     shown.total=res.length;                 // the list is capped; the count must not be
     return shown;
@@ -531,6 +575,7 @@ BRAND = {
     "ember":      "#ff4713",
     "deep_teal":  "#2b7f99",     # shade of teal
     "sun":        "#ffc266",     # tint of orange
+    "bark":       "#8c570d",     # shade of orange
 }
 
 #: The viewer ships a general-purpose categorical palette -- #4e79a7, #59a14f, #e15759 -- which is
@@ -543,6 +588,11 @@ PRIMITIVE_COLOR = {
     "Property":  BRAND["sky"],
     "Object":    BRAND["ember"],
     "Schema":    BRAND["deep_teal"],
+    # Knowledge ABOUT the concepts rather than more concepts, so both take the concept hue: a Fact
+    # states what is true of one, a Judgment what to do about it. A fifth and sixth hue would have
+    # said they are unrelated to what they describe, which is the opposite of how they are read.
+    "Fact":      BRAND["sun"],
+    "Judgment":  BRAND["bark"],
 }
 
 CATEGORY_COLOR = {
@@ -572,13 +622,17 @@ def _shade(hex_color: str, amount: float) -> str:
 KIND_COLOR = {
     "signal":                PRIMITIVE_COLOR["Procedure"],
     "indicator":             _shade(PRIMITIVE_COLOR["Procedure"], -0.35),
+    "formula":               _shade(PRIMITIVE_COLOR["Procedure"], 0.4),
     "class":                 PRIMITIVE_COLOR["Concept"],
     "entity type":           _shade(PRIMITIVE_COLOR["Concept"], -0.35),
     "domain":                _shade(PRIMITIVE_COLOR["Concept"], 0.35),
     "role value":            PRIMITIVE_COLOR["Property"],
     "role axis":             _shade(PRIMITIVE_COLOR["Property"], -0.35),
+    "quantity":              _shade(PRIMITIVE_COLOR["Property"], 0.4),
     "root:knowledge-graph":  PRIMITIVE_COLOR["Object"],
     "schema":                PRIMITIVE_COLOR["Schema"],
+    "fact":                  PRIMITIVE_COLOR["Fact"],
+    "judgment":              PRIMITIVE_COLOR["Judgment"],
 }
 
 #: Relation -> colour, each a shade of its category. Deliberately NOT dash: `viz.py` already spends
@@ -833,6 +887,17 @@ PROPERTY_PANEL = r"""
   };
 
   // 64 nodes carry these as a list and 7 as a paragraph. Same field, so it renders the same way.
+  // Any value at all, rendered as rows rather than serialised. Recurses, so a property this file
+  // has never seen -- `chapter_variants`, whatever comes next -- reads as nested labels instead of
+  // arriving as `{"a":{"b":1}}`.
+  const DEEP = v => {
+    if(v == null) return '';
+    if(Array.isArray(v)) return v.map(x => `<div>${DEEP(x)}</div>`).join('');
+    if(typeof v === 'object') return Object.entries(v)
+      .map(([k, x]) => `<div style="margin-left:8px"><b>${E(k)}</b>: ${DEEP(x)}</div>`).join('');
+    return E(String(v));
+  };
+
   const BULLETS = v => Array.isArray(v)
     ? '<ul class="kbl">' + v.map(x => `<li>${E(x)}</li>`).join('') + '</ul>'
     : (v ? `<div class="kbd">${E(v)}</div>` : '');
@@ -892,11 +957,12 @@ PROPERTY_PANEL = r"""
     if(cn.length) x += `<div class="kbm">known as ${cn.join(' · ')}</div>`;
     if(p.usage_example) x += '<div class="kbm" style="margin-top:6px">usage</div>'
       + CODE(p.usage_example);
-    // Anything this file has never heard of, verbatim. The panel hides nothing.
+    // Anything this file has never heard of, verbatim. The panel hides nothing -- and `verbatim`
+    // means readable: `JSON.stringify` on a nested value put `{"formula":"TR = max(..."}` in front
+    // of a reader, which is the wall of braces this panel exists to have removed.
     for(const [k, v] of Object.entries(p)){
       if(KNOWN.includes(k) || v == null) continue;
-      x += `<div class="kbm"><b>${E(k)}</b>: `
-        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+      x += `<div class="kbm"><b>${E(k)}</b>: ${DEEP(v)}</div>`;
     }
     // ONE name for this section on every node. It used to render flat, as "epistemic status", when
     // the node had nothing else -- a special case I invented to avoid a disclosure over a single
@@ -923,8 +989,7 @@ PROPERTY_PANEL = r"""
     let rest = '';
     for(const [k, v] of Object.entries(p)){
       if(['because','state','note','why','inputs'].includes(k) || v == null) continue;
-      rest += `<div class="kbm"><b>${E(k)}</b>: `
-        + E(typeof v === 'object' ? JSON.stringify(v) : v) + '</div>';
+      rest += `<div class="kbm"><b>${E(k)}</b>: ${DEEP(v)}</div>`;
     }
     return h + (rest ? sec('other properties', rest) : '');
   };
@@ -1674,9 +1739,18 @@ KIND_BY_PREFIX = {
     "concept:": "entity type",
     "property:role-": "role value",
     "property:role": "role axis",
+    # A measurable quantity a thing has -- a spread, a basis, a margin ratio. Distinct from the role
+    # axis, which is the only other Property in the graph and is not a quantity at all.
+    "property:": "quantity",
     "procedure:indicator-": "indicator",
     "procedure:signal-": "signal",
+    # A computation the knowledge base states but the library does not implement -- a formula with
+    # typed inputs and outputs and no code behind it. Distinct from `indicator` on purpose: the
+    # difference between "you can call this" and "this is written down" is the whole point.
+    "procedure:": "formula",
     "schema:": "schema",
+    "fact:": "fact",
+    "judgment:": "judgment",
     "object:": "root:knowledge-graph",
 }
 

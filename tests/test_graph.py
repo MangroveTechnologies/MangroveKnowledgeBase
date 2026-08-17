@@ -4,10 +4,12 @@ These run against the real committed ontology rather than fixtures. A hand-writt
 pass while the shipped graph was broken, and the shape of the real graph -- disjoint axis
 populations, hubs of degree 200+ -- is exactly what the API has to cope with.
 """
+import re
+
 import pytest
 
-from mangrove_kb.graph import (BACKBONE, RELATIONS, ROLE_RELATION, SEARCH_TIERS, GraphError,
-                               KnowledgeGraph, NodeNotFound, _flatten, _is_bounded)
+from mangrove_kb.graph import (BACKBONE, FUNCTION_WORDS, RELATIONS, ROLE_RELATION, SEARCH_TIERS,
+                               GraphError, KnowledgeGraph, NodeNotFound, _flatten, _is_bounded)
 
 
 @pytest.fixture(scope="module")
@@ -30,11 +32,14 @@ def test_stats_enumerates_every_filter_value(kg):
         assert kg.find(role=role, limit=1) is not None
     for cls in s["classes"]:
         assert kg.find(kind=cls, limit=1) is not None
-    assert len(s["classes"]) == 6, (
-        "classes is the CHARACTER vocabulary -- the six divisions of technical analysis. "
+    assert len(s["classes"]) == 7, (
+        "classes is the CHARACTER vocabulary -- the divisions of technical analysis. "
         "It once returned every backbone target, which swept in concept:indicator (71 "
         "results), concept:signal (218), concept:technical-analysis (295 of 303) and "
-        "property:role (the role values), advertising filters that act as no-ops.")
+        "property:role (the role values), advertising filters that act as no-ops. Six are "
+        "measured by a computation; concept:chart-pattern is knowledge only -- multi-bar "
+        "formations need swing points, which nothing in the library produces -- so it is "
+        "deliberately memberless rather than missing.")
     assert set(s["relations"]) <= set(RELATIONS), "graph uses a relation the library cannot classify"
 
 
@@ -125,7 +130,7 @@ def test_derivation_never_runs_over_roles(kg):
     """
     classes = {n["id"] for n in kg.neighbors("concept:technical-analysis", relation="kind-of",
                                              direction="in", limit=None).items}
-    assert len(classes) == 6, f"expected the six character classes, got {sorted(classes)}"
+    assert len(classes) == 7, f"expected the seven character classes, got {sorted(classes)}"
     for role in kg.roles():
         bearers = set(kg.bearers(role))
         for cls in classes:
@@ -238,7 +243,7 @@ def test_all_paths_distinguishes_its_two_truncated_states(kg):
     """"Showing 10 of 47" is a claim that 47 exist. After an early stop you cannot make it."""
     complete = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
                             max_depth=4, sibling_hops=True, limit=3)
-    assert complete.truncated and "showing 3 of 198" in complete.note
+    assert complete.truncated and "showing 3 of 220" in complete.note
     assert "stopped" not in complete.note, "a finished search must not hedge"
 
     # The step bound is not decorative: the same query one hop deeper trips the default.
@@ -294,13 +299,15 @@ def test_find_stays_deterministic_within_a_rank(kg):
     assert a == [r["id"] for r in kg.find("cross", limit=None)]
 
     def tier(node_id):
-        """Which SEARCH_TIERS band this id matched in -- recomputed independently of find()."""
-        source = {"name": kg.nodes[node_id].name, "id": node_id,
-                  "summary": kg.nodes[node_id].summary, **kg.nodes[node_id].props}
-        for i, fields in enumerate(SEARCH_TIERS):
-            if "cross" in " ".join(_flatten(source.get(f)) for f in fields).lower():
-                return i
-        raise AssertionError(f"{node_id} matched in find() but in no tier")
+        """The band this id matched in, rebuilt from the node's own fields rather than read out of
+        find(). Uses the library's corpus builder and matcher -- a second copy of the tokenising,
+        the plural folding and the URL stripping would be testing a different search."""
+        from mangrove_kb.graph import query_terms, rank_of
+        # The graph's own haystack, not a fresh one from the node's fields: the corpus includes the
+        # reasons on a node's edges, and a node can match on those alone.
+        rank = rank_of(kg._haystacks[node_id], query_terms("cross"))
+        assert rank is not None, f"{node_id} matched in find() but in no tier"
+        return rank
 
     assert a == sorted(a, key=lambda i: (tier(i), i))
     assert len(set(map(tier, a))) > 1, "expected this query to hit more than one tier"
@@ -317,9 +324,20 @@ def test_search_reads_the_authored_detail_not_only_the_headline(kg):
     """
     for term in ("mean reversion", "crossover", "overbought"):
         found = {r["id"] for r in kg.find(term, limit=None)}
+        # Normalised the way the search reads text, not by raw substring: chapter 4 states a rule
+        # as `mean_reversion_signal(price)`, which mentions mean reversion in every sense that
+        # matters and contains no space. A cruder check here reports the match as a false positive.
+        def plain(text: str) -> str:
+            return re.sub(r"[^a-z0-9]+", " ", text.lower())
+        # Including what a node's edges say about it -- a wired statement is text about that node,
+        # and the corpus has read it since the chapters were wired.
+        reasons = {}
+        for e in kg.edges:
+            reasons.setdefault(e.src, []).append(e.why or "")
         mentioned = {n.id for n in kg.nodes.values()
-                     if term in _flatten({"name": n.name, "id": n.id,
-                                          "summary": n.summary, **n.props}).lower()}
+                     if plain(term) in plain(_flatten({"name": n.name, "id": n.id,
+                                                       "summary": n.summary, **n.props,
+                                                       "_edges": reasons.get(n.id, [])}))}
         assert mentioned, f"expected {term!r} somewhere in the graph"
         assert found == mentioned, f"{term!r}: {len(mentioned - found)} nodes mention it but do not match"
 
@@ -392,3 +410,116 @@ def test_outputs_finds_a_producer_by_output_name(kg):
     rows = kg.outputs("histogram", limit=None)
     assert {r["id"] for r in rows} == {"procedure:indicator-macd"}
     assert all("histogram" in r["output"] for r in rows)
+
+
+# --- asking a question, rather than matching its words -------------------------------------------
+
+def test_a_query_falls_back_to_its_best_subset_only_when_nothing_carries_all_of_it(kg):
+    """A sentence is a query too, and returning nothing leaves an agent with nowhere to walk from.
+
+    The fallback must not loosen a query that already works: `mean reversion` has nodes carrying
+    both words, so nodes carrying one of them stay out.
+    """
+    both = kg.find("mean reversion", limit=None)
+    assert both.total == 28, "a query that fully matches must not be widened"
+    for row in both.items:
+        hay = " ".join(kg._haystacks[row["id"]])
+        assert "mean" in hay and "reversion" in hay
+
+    question = kg.find("why do breakouts fail", limit=None)
+    assert question.total, "a question that carries no full match must still seed a traversal"
+    for row in question.items:
+        hay = " ".join(kg._haystacks[row["id"]])
+        assert "breakout" in hay and "fail" in hay, "the fallback kept a node matching neither term"
+
+
+def test_a_term_most_of_the_graph_carries_is_dropped_from_scoring(kg):
+    """`signal` is in 282 of 498 nodes: it says nothing about which one is meant.
+
+    Derived from this corpus rather than an English stop-word list -- "the" never appears in a node
+    name, while "signal", "price" and "trading" are stop words here and nowhere else.
+    """
+    assert kg._document_frequency("signal") > 0.4 * len(kg.nodes)
+    assert [r["id"] for r in kg.find("signal divergence", limit=None)] == \
+           [r["id"] for r in kg.find("divergence", limit=None)]
+
+
+def test_frequency_is_measured_over_the_graph_not_the_filtered_pool(kg):
+    """Otherwise `find(q)` and `find(q, under=...)` answer with different vocabularies, and the
+    scoped result stops being a subset of the open one -- which is what `under=` promises."""
+    scoped = {r["id"] for r in kg.find("volume profile", under="price action", limit=None)}
+    everywhere = {r["id"] for r in kg.find("volume profile", limit=None)}
+    assert scoped and scoped <= everywhere
+
+
+def test_ask_returns_the_seed_and_what_it_reaches_with_the_reason(kg):
+    r = kg.ask("what quantifies liquidity", hops=1, limit=None)
+    assert r.items, "a question that seeds should reach something"
+    ids = [x["id"] for x in r.items]
+    assert len(ids) == len(set(ids)), "a node reached twice must appear once"
+    for item in r.items:
+        reached = item["reached"]
+        assert reached["seed"] in ids and reached["hops"] in (0, 1)
+        if reached["hops"]:
+            assert reached["why"].strip(), "an edge is only an answer if it says why it holds"
+            assert reached["relation"] in RELATIONS
+    assert ids == [x["id"] for x in kg.ask("what quantifies liquidity", hops=1, limit=None).items]
+
+
+def test_ask_reaches_what_search_alone_cannot(kg):
+    """The whole point: the words of a question rarely appear in the node that answers it."""
+    words = {r["id"] for r in kg.find("stops beyond obvious levels", limit=None)}
+    reached = {x["id"] for x in kg.ask("stops beyond obvious levels", hops=1, limit=None)}
+    assert reached > words, "expanding over edges must reach more than the text match did"
+
+
+def test_ask_says_nothing_rather_than_guessing(kg):
+    assert kg.ask("zzzzqqq", limit=None).total == 0
+
+
+def test_every_walk_can_filter_on_the_reason_not_only_the_relation(kg):
+    """An edge is not only its relation: six `about` edges reach liquidity and they say two
+    different things, and the difference is written in the `why` and nowhere else."""
+    quantifies = {e["id"] for e in kg.neighbors("concept:liquidity", why="quantifies", limit=None)}
+    principles = {e["id"] for e in kg.neighbors("concept:liquidity", why="principle", limit=None)}
+    everything = {e["id"] for e in kg.neighbors("concept:liquidity", relation="about", limit=None)}
+    assert quantifies and principles
+    assert not (quantifies & principles), "the two readings of `about` must not overlap"
+    assert (quantifies | principles) <= everything
+
+    narrow = kg.subgraph("concept:liquidity", radius=1, why="quantifies")
+    wide = kg.subgraph("concept:liquidity", radius=1)
+    assert len(narrow["nodes"]) < len(wide["nodes"])
+    assert all("quantif" in e["why"] for e in narrow["edges"]), \
+        "an induced edge must satisfy the same filter as a traversed one"
+
+    hops = kg.path("concept:liquidity", "concept:stop-hunt", why="principle")
+    assert hops and all("principle" in h["via"]["why"] for h in hops[1:])
+    assert kg.path("concept:liquidity", "concept:stop-hunt", why="quantifies") is None, \
+        "a filter that excludes every route must say so, not fall back to another one"
+
+
+def test_a_concept_lifted_from_core_principles_reaches_its_subject(kg):
+    """`part-of` the chapter is scope; `about` the subject is what the chapter actually claims.
+
+    Without the second edge a stop hunt was part of price action in general, and the route from
+    liquidity to the sweep that empties it ran up to the chapter node and back down.
+    """
+    for nid in ("concept:liquidity-pool", "concept:stop-hunt", "concept:liquidity-grab"):
+        out = {e["id"]: e["relation"] for e in kg.neighbors(nid, direction="out", limit=None)}
+        assert out.get("concept:liquidity") == "about", f"{nid} does not reach its subject"
+        assert out.get("concept:price-action") == "part-of", f"{nid} lost its chapter scope"
+    assert len(kg.path("concept:liquidity", "concept:liquidity-grab")) == 2
+
+
+def test_function_words_are_dropped_but_a_query_of_them_still_asks(kg):
+    """Frequency cannot catch them: `why` is in 26 nodes of 498 because our own prose says
+    "which is why", so it scored as though it discriminated and ranked two nodes that merely say
+    it above the one that answers the question."""
+    from mangrove_kb.graph import query_terms
+
+    assert query_terms("why do breakouts fail") == ["breakouts", "fail"]
+    assert query_terms("what") == ["what"], "a query of nothing but function words still asks"
+    assert "up" not in FUNCTION_WORDS and "down" not in FUNCTION_WORDS, \
+        "a direction is domain vocabulary here, not a function word"
+    assert kg.find("why do breakouts fail", limit=None).total

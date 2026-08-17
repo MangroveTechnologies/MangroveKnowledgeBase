@@ -4,11 +4,47 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
-## [2.0.0] - Unreleased
+## [3.0.0] - Unreleased
+
+**The knowledge base is in the graph, and the graph answers questions.** All eight knowledge-base
+chapters are ingested as nodes and edges beside the code-derived ones -- market foundations,
+instruments and mechanics, core trading concepts, strategy design, risk management, indicators,
+chart patterns, quantitative analysis. **303 -> 714 nodes, 1049 -> 2342 edges.**
+
+The merge is an outer join with dedupe, never a choice between two sources: where a chapter and the
+library describe one thing they become one node, where their wording differs both are kept, and the
+library keeps ownership of classification -- a chapter enriches a class, it never redefines one.
+
+### `ask()` searches by meaning, over two indices
+
+`ask()` now seeds from latent semantic analysis over this corpus AND a pretrained sentence encoder,
+fused by reciprocal rank, then walks a hop along the edges. The two fail on different questions: LSA
+knows what this corpus puts together and cannot bridge a paraphrase it never states, while the
+encoder knows English and not our vocabulary. Measured on twenty-five questions phrased the way a
+trader asks them: `find()` answers 5, LSA alone 13, the encoder alone 15, the pair **18**.
+
+Every result carries `reached` -- which seed, how far, along which relation, and that edge's own
+reason -- so an answer arrives with its grounds rather than a relevance score.
+
+### Breaking
+
+- **`sentence-transformers` is now a required dependency**, and brings torch. The graph and both
+  indices ship in the wheel, but a query has to be encoded by the same model that built the vectors,
+  so it downloads once on first `ask()`. Everything else -- loading the graph, `find()`, every
+  traversal, the viewer -- works offline and never loads it.
+- **`kb_server/` is deleted.** The FastAPI + FastMCP server answered from SQLite FTS5 over eleven
+  markdown documents, a glossary registry and a backlink table; the graph answers all of it. Its
+  Docker image workflow (`build-and-push.yaml`) is deleted with it. Both remain in git history.
+- **`ask()` returns nothing for a question containing no word the corpus uses.** A dense index
+  always returns something, and `ask("zzzzqqq")` previously came back with the seven nodes nearest
+  to gibberish. A similarity floor cannot separate the two -- real questions run down to cosine 0.26
+  where nonsense reaches 0.28 -- so the guard is the vocabulary.
+
+## [2.0.0] - 2026-08-11
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 303 nodes, 1049 edges, in
+carries a formula stating the predicate it computes -- 714 nodes, 2342 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
@@ -63,12 +99,66 @@ signals to 7. Files now: `averaging` 55, `momentum` 56, `oscillator` 30, `volati
   on-chain window arithmetic counts observations rather than bars -- documented in
   [#109](https://github.com/MangroveTechnologies/MangroveKnowledgeBase/issues/109), not yet fixed.
 
+### The knowledge base is in the graph
+
+**All eight knowledge-base chapters are now nodes and edges beside the code-derived ones**: market
+foundations, instruments and market mechanics, core trading concepts, strategy design, risk
+management, indicators, chart patterns and quantitative analysis.
+The merge is an outer join -- where a chapter and the library define the same thing, the node keeps
+both wordings rather than one replacing the other.
+
+Strategy design adds trading styles, the five strategy archetypes with their win rate, skew and
+tail risk, the trade plan, the four signal types, entry and exit rules, regime detection, data
+quality, backtesting, walk-forward optimisation and the validation biases. Its rules connect to the
+library they describe: an ATR-based stop `uses` the ATR indicator, the chapter's ADX regime rule
+merged into the one chapter 3 already stated, and the twelve signals the chapter names as examples
+point at the real signal nodes.
+
+Risk management adds the seven dimensions risk is measured along, trading rules with their default
+limits, position sizing (fixed-fractional, volatility-adjusted, Kelly), drawdown controls and the
+recovery arithmetic, structure-based and break-even stops, portfolio risk with VaR and expected
+shortfall, capital efficiency, expectancy and the break-even win rate, risk of ruin, and scenario
+analysis. Where it states a rule chapter 4 already stated -- the fixed stop, the ATR stop, both
+trailing variants, both targets -- the two merge onto one node instead of duplicating, and its
+long argument for why win rate is not risk lands on the one-line claim chapter 3 makes.
+
+The indicators chapter is mostly an enrichment: 42 of the 50 indicators it documents already exist
+as code-derived nodes, and what it adds to them is the reading -- how to interpret the output and
+what to trade on it -- which no docstring carries. Where the graph's summary was a docstring rather
+than a definition, the chapter's definition replaces it and the docstring is kept as
+`source_wording`; a summary that somebody wrote deliberately is never replaced. Its own categories
+are not imposed on the library's: it files RSI under momentum where the library makes it an
+oscillator, so its sections group indicators for a reader without classifying them.
+
+Eight more indicators enter as knowledge without an implementation -- market breadth, VIX, standard
+deviation and Parabolic SAR among them.
+
+Quantitative analysis is where the statistical case for the rest of it lives: seasonality and how to
+test one, GARCH and EGARCH, the z-score and half-life behind mean reversion, pairs trading,
+autocorrelation, time-series and cross-sectional momentum, the ML pipeline and how it overfits, and
+carry -- which chapter 5 rates as an archetype and chapter 4's table leaves out, so it joins the
+five as the sixth.
+
+Chart patterns gives `concept:chart-pattern` the members it was created empty to wait for: head and
+shoulders, double and triple tops, triangles, flags and pennants, wedges, channels and cup and
+handle -- formations of unknown length, drawn from swing points, which no computation in the library
+produces. Its candlestick half folds instead: every formation the library detects is one node
+holding both the shape and the signal that finds it, and the paired blocks split along the line the
+chapter already draws, because the library holds a signal per side where the chapter writes one
+section for both.
+
+Every principle and practice a chapter states now sits on the edge it explains rather than in a
+list -- the builder resolves the ones that name their node and reports the rest.
+
 ### Known gaps
+
+`concept:position-trading` carries one edge: the chapter names it in a comparison table and says
+nothing else about it. The `quantitative-analysis` anchor waits on chapter 8.
 
 216 of 247 signals are modelled. The 20 `onchain` / `defi_pro` signals read provider feeds rather
 than indicator outputs and have no class; 11 read a verdict and never will. All 31 still evaluate.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-04-19
 
 Comprehensive expansion to 99 indicators and 223 signals. This release adds 29 standard
 indicators (Priority A from the v0.4.0 gap analysis plus four signal-pattern indicators)

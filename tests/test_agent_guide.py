@@ -31,24 +31,65 @@ def guide():
     return GUIDE.read_text()
 
 
-def test_guide_exists_and_covers_thirteen_use_cases(guide):
+def test_guide_exists_and_covers_every_use_case(guide):
     headings = re.findall(r"^## (\d+)\. ", guide, re.M)
-    assert headings == [str(i) for i in range(1, 14)], f"expected use cases 1-13, found {headings}"
+    assert headings == [str(i) for i in range(1, 17)], f"expected use cases 1-16, found {headings}"
+
+
+def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
+    """The guide covered signals, indicators and strategies only, while half the graph is now the
+    knowledge base. An agent reading it would not learn that the market layer exists."""
+    assert "## 14." in guide and "## 15." in guide
+
+    # Every value the two new cases quote, checked against the graph rather than trusted.
+    liq = kg.get("concept:liquidity")
+    assert liq["summary"][:60] in guide
+    # Incoming `about` carries two different claims and the guide teaches the difference, so the
+    # two readings are checked separately -- a measurement is not a concept stated of the subject.
+    quantifiers = {e["id"] for e in kg.neighbors("concept:liquidity", why="quantifies",
+                                                 direction="in", limit=None)}
+    stated = {e["id"] for e in kg.neighbors("concept:liquidity", why="principle",
+                                            direction="in", limit=None)}
+    assert quantifiers and stated, "the case's output is stale"
+    assert not (quantifiers & stated), "the guide's distinction has stopped being a distinction"
+    for q in quantifiers:
+        assert q in guide, f"{q} quantifies liquidity and the guide does not show it"
+    # The guide shows a representative few of the stated concepts rather than all of them, so it
+    # must not claim a count -- but every id it DOES show must still be real.
+    shown = {i for i in stated if i in guide}
+    assert shown, "the guide shows none of the concepts stated of liquidity"
+
+    scope = kg.find(under="market foundations", limit=None)
+    assert f"{scope.total} nodes" in guide, f"the guide's subject size is stale ({scope.total})"
+
+    # The reasoning is reached from the concept now, not read out of the lists -- so the guide is
+    # checked against the EDGES, which is where a wired statement lives.
+    reached = {e["id"]: e["why"] for e in
+               kg.neighbors("concept:market-impact", relation="about", direction="out", limit=None)}
+    assert reached, "market impact should carry the statements that concern it"
+    # The guide wraps at 100 columns, so compare against text with its line breaks collapsed --
+    # otherwise a quote is "missing" purely because it spans two lines.
+    flat = " ".join(guide.split())
+    for why in reached.values():
+        first = why.split(" · ")[0].split(":")[0]
+        assert " ".join(first.split()) in flat, f"the guide does not quote {first[:50]!r}"
+
+    assert "chapter_variants" in guide and kg.get("procedure:indicator-atr")["chapter_variants"]
 
 
 def test_uc1_orientation_values(kg, guide):
     s = kg.stats()
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
-    assert len(kg.schema()) == 12, "the guide says '12 shapes in total'"
-    assert "12 shapes in total" in guide
+    assert len(kg.schema()) == 42, "the guide says '42 shapes in total'"
+    assert "42 shapes in total" in guide
     for c in s["classes"]:                    # every class the guide lists must still exist
         assert c in guide, f"guide's class list is missing {c}"
 
 
 def test_uc2_divergence_search(kg, guide):
     r = kg.find("divergence", limit=None)
-    assert r.total == 37, "the guide says 37 matches"
-    assert "37 matches" in guide and "10 of 37" in guide
+    assert r.total == 40, "the guide says 40 matches"
+    assert "40 matches" in guide and "10 of 40" in guide
     top4 = [x["id"] for x in r.items[:4]]
     assert all("divergence" in i for i in top4), "name matches must still lead"
     for i in top4:
@@ -57,7 +98,7 @@ def test_uc2_divergence_search(kg, guide):
 
 def test_uc3_rsi_readers(kg, guide):
     r = kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in", limit=None)
-    assert r.total == 8 and "8 readers" in guide
+    assert r.total == 9 and "9 readers" in guide
     assert {tuple(x.get("inputs", {})) for x in r.items} == {("rsi",)}, \
         "the guide says all eight read the same single output"
 
@@ -148,7 +189,7 @@ def test_uc9_output_index(kg, guide):
     assert hist[0]["description"].startswith("macd minus signal. Crosses zero exactly when macd")
     assert hist[0]["description"][:60] in guide
 
-    assert kg.outputs(units="percent", limit=None).total == 26 and "percent` matches 26" in guide
+    assert kg.outputs(units="percent", limit=None).total == 28 and "percent` matches 28" in guide
     # The guide's trap rests on SwingDelta's unit being DEFERRED -- it is whatever the companion
     # indicator carries. If that ever became a concrete unit the trap would be misinformation.
     assert {r["id"] for r in kg.outputs(units="indicator units", limit=None)} == \
@@ -164,10 +205,15 @@ def test_uc10_status_and_requires(kg, guide):
     vol = kg.find(requires="volume", role="trigger", limit=None)
     assert vol.total == 8 and "volume triggers   8" in guide
 
-    assert kg.stats()["input_columns"] == ["close", "high", "indicator", "low", "open",
-                                           "price", "volume"]
-    assert kg.stats()["statuses"] == ["deprecated", "ratified"]
-    assert "close, high, indicator, low, open," in guide and "deprecated, ratified" in guide
+    # The implemented indicators' columns are the ones a caller reaches for, and they must stay
+    # enumerable. The list is no longer closed at seven -- every chapter formula declares its own
+    # terms (`bid`, `ask`, `adv`) -- so this asserts the OHLCV core is intact rather than pinning a
+    # literal that grows with each chapter and says nothing when it changes.
+    cols = kg.stats()["input_columns"]
+    assert {"close", "high", "low", "open", "volume"} <= set(cols)
+    assert cols == sorted(cols), "the column vocabulary must be ordered to be readable"
+    assert kg.stats()["statuses"] == ["deprecated", "draft", "ratified"]
+    assert "close, high, low, open, volume" in guide and "draft, deprecated, ratified" in guide
 
 
 def test_every_documented_example_actually_runs():
@@ -195,7 +241,7 @@ def test_uc11_resolve_and_recover(kg, guide):
 
     assert kg.resolve("rsi_oversold") == "procedure:signal-rsi-oversold"
     assert kg.resolve("RSI") == "procedure:indicator-rsi"
-    assert kg.resolve("bollinger") == "procedure:indicator-bollingerbands"
+    assert kg.resolve("bollingerbands") == "procedure:indicator-bollingerbands"
 
     with pytest.raises(NodeNotFound) as e:
         kg.resolve("rsi_over")

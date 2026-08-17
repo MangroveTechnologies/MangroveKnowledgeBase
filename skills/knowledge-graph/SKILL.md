@@ -1,22 +1,32 @@
 ---
 name: knowledge-graph
 description: >-
-  Query the mangrove-kb knowledge graph — every indicator and signal in the library, what each
-  computes, what it consumes and produces, which signals read which of its outputs, and what part
-  each plays in a strategy. Reach for this before grepping the source or guessing at names: "which
-  indicators produce a bounded oscillator", "what reads RSI", "what would break if I change this
-  output", "is there already a signal for X", "what does this signal actually need". Uses
-  mangrove_kb.graph (stats · find · get · outputs · neighbors · subgraph · path · all_paths).
+  Query the mangrove-kb knowledge graph — every indicator and signal in the library (what each
+  computes, what it consumes and produces, which signals read which of its outputs, what part each
+  plays in a strategy) joined to the trading knowledge base (market structure, instruments, risk,
+  chart patterns, quantitative method). Reach for this before grepping the source, guessing at
+  names, or answering a trading question from memory: "which indicators produce a bounded
+  oscillator", "what reads RSI", "what would break if I change this output", "is there already a
+  signal for X", "how far should the stop go", "what are the odds I wipe out the account". Uses
+  mangrove_kb.graph (stats · find · ask · get · outputs · neighbors · subgraph · path · all_paths).
 ---
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of itself: **303 nodes, 1049 edges** covering 71 indicators and
-218 signals. It is generated from the source, so it is exact — not extracted from prose, not
-approximate, no ranking model in the way. Every answer is a fact about the code as it is.
+`mangrove_kb` ships a knowledge graph of **714 nodes, 2342 edges** with two halves on one schema:
+
+- **The library, compiled from its own source** — 71 indicators and 218 signals. Exact, not
+  extracted: every answer here is a fact about the code as it is.
+- **The trading knowledge base, ingested from its chapters** — market foundations, instruments and
+  mechanics, core concepts, strategy design, risk management, indicators, chart patterns,
+  quantitative analysis. Authored prose, so it answers *why* and *when* rather than *what signature*.
+
+They are joined, and that is the point: `procedure:atr-based-stop` is a rule a chapter states, and it
+`uses` an indicator the code defines, so one query crosses from advice to implementation.
 
 It answers things grep cannot: *what reads this indicator's third output*, *which signals produce a
-bounded value*, *every way this signal connects to that class, and which of them is the reason*.
+bounded value*, *every way this signal connects to that class, and which of them is the reason*, and
+— because half of it is prose — *what should I do when the market goes quiet*.
 
 ```python
 from mangrove_kb.graph import KnowledgeGraph
@@ -24,8 +34,22 @@ kg = KnowledgeGraph.load()
 ```
 
 This file is the reference for **which call**. [`GUIDE.md`](GUIDE.md), beside it, is the reference for
-**what a whole job looks like** — thirteen tasks end to end, with real output and the trap in each,
+**what a whole job looks like** — sixteen tasks end to end, with real output and the trap in each,
 from "the user said a name, not an id" through to running what you found.
+
+## Contents
+
+Read the section you need; each one links on to the others that bear on it.
+
+| section | |
+|---|---|
+| [Start here](#start-here) | The four calls that answer most questions, and the order to make them in. |
+| [The two axes](#the-two-axes-the-thing-to-understand) | Why `kind` and `role` are separate parameters, and why conflating them returns the wrong thing. |
+| [Two halves, one retrieval surface](#two-halves-one-retrieval-surface) | The graph holds code-derived computations and knowledge-base concepts; one set of calls reaches both. |
+| [Which call](#which-call) | A question-to-method table — the fastest way in when you know what you are asking. |
+| [The typed detail is the point](#the-typed-detail-is-the-point) | What `get()` returns, which fields exist on which kind of node, and the data carried on edges. |
+| [Rules of use](#rules-of-use) | Caps, truncation, guessed values, and the failure modes that make an answer look complete when it is not. |
+| [Worked examples](#worked-examples) | An index into `GUIDE.md`, where each job is shown end to end. |
 
 ## Start here
 
@@ -43,6 +67,8 @@ none".
 `kg.schema()` goes further: the list of `(subject, relation, object)` shapes that **actually occur**,
 so you can plan a traversal against what exists rather than discovering emptiness one query at a
 time.
+
+**See also:** [SKILL · which call](SKILL.md#which-call) · [§1 orient yourself](GUIDE.md#1-orient-yourself-in-a-library-you-have-never-seen)
 
 ## The two axes — the thing to understand
 
@@ -84,7 +110,38 @@ kg.find(kind="oscillator")                   # everything in the oscillator clas
 kg.find(role="filter")                       # signals playing the filter part
 ```
 
+**See also:** [§4 compose from both axes](GUIDE.md#4-compose-a-strategy-from-both-axes) · [§8 why it is classified that way](GUIDE.md#8-explain-why-something-is-classified-the-way-it-is)
+
+## Two halves, one retrieval surface
+
+The graph holds two kinds of thing and they are queried identically.
+
+**Read off the code** -- 71 indicators and 218 signals, exact, with typed inputs and outputs.
+**Read off the knowledge base** -- the concepts a market is made of (orders, participants, venues,
+liquidity, spread), the formulas the chapters state, and two nodes per subject holding what is
+true of it (`Fact`) and what to do about it (`Judgment`).
+
+`find(under=…)` is the call that spans them: it walks containment (`part-of` alongside `kind-of`
+and `instance-of`) and is primitive-blind, so `find(under="market foundations")` returns Concepts,
+Procedures, the Fact and the Judgment together. Intersect it with anything -- `primitive="Fact"`,
+`role=`, a text query.
+
+Two sub-kinds are worth knowing apart. A `procedure:indicator-*` is callable; a bare `procedure:*`
+is a **formula** the knowledge base states and nothing implements.
+
+The same split shows up between a node's content and its members. `concept:chart-pattern` answers
+*what is a chart pattern* in full -- `find("head and shoulders")` returns it, and it names the
+formations and what completes them. What it has no members: nothing implements them, because a
+multi-bar formation needs swing points no computation here produces. Read the node for the
+knowledge; `find(kind="chart-pattern")` is empty because there is no code, not because there is
+nothing to know.
+
+**See also:** [§14 pull what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject) · [§15 the reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice)
+
 ## Which call
+
+Diagrams of the machinery behind these calls -- the search corpus, `find()`, `ask()`, both search
+indices and how they are fused -- are in [`docs/architecture/`](../../docs/architecture/README.md).
 
 | question | call |
 |---|---|
@@ -92,6 +149,7 @@ kg.find(role="filter")                       # signals playing the filter part
 | what is in here at all? | `stats()` — always first |
 | what shapes can I even ask for? | `schema()` |
 | is there already a signal/indicator for X? | `find("keyword")` |
+| why does X happen? — a question, not a keyword | `ask("why do breakouts fail")` — meaning, then one hop |
 | everything of a class, or in a role, or both | `find(kind=…, role=…)` |
 | what needs a volume column? what is retired? | `find(requires=…)`, `find(status=…)` |
 | what does this thing compute — formula, params, outputs? | `get(id)` |
@@ -101,6 +159,9 @@ kg.find(role="filter")                       # signals playing the filter part
 | what does this signal depend on? | `neighbors(id, relation="uses", direction="out")` |
 | what breaks if I change this? | `neighbors(id, direction="in")`, then widen with `subgraph` |
 | the neighbourhood around something | `subgraph(id, radius=1)` |
+| everything belonging to a subject, whatever kind | `find(under="market foundations")` |
+| what is CLAIMED about a subject, and what to DO | `find(under=…, primitive="Fact")` · `primitive="Judgment"` |
+| the reasoning behind a piece of advice | `neighbors(id, relation="about", direction="in")` — the edge carries the `why` |
 | how are these two related? | `path(a, b)` — one shortest route |
 | every way these two connect, and why | `all_paths(a, b)` — all routes, shortest first |
 | now actually run what I found | `RuleRegistry.evaluate({"name": node["name"], ...}, df)` |
@@ -109,12 +170,30 @@ kg.find(role="filter")                       # signals playing the filter part
 without naming each one — useful when you want "how is this classified" regardless of which
 structural relation carries it.
 
+`ask()` seeds on **meaning** rather than words and then follows the edges, because the words of a
+question are rarely in the node that answers it: *"why do breakouts fail"* lands on `liquidity`, whose use
+cases say exactly that, while the answer is the sweep one hop further on. Every result carries
+`reached` — which seed, how many hops, which relation, and that edge's own `why`. Use `find()`
+when the query is a term and `ask()` when it is a sentence.
+
+It seeds from **two** indices and fuses them: LSA over this corpus, which knows that *"a breakout
+that fails"* belongs near *"read as a loss"*, and a pretrained sentence encoder, which knows that
+*"the odds I wipe out the account"* is `risk of ruin` — a paraphrase no amount of co-occurrence in
+714 documents would teach. Measured on twenty-five questions phrased the way a trader asks them:
+`find()` answers 5, LSA alone 13, the encoder alone 15, the fused pair **18**. Expect roughly one
+question in four to still need a second phrasing or a `find()` on a term you can guess.
+
+The first `ask()` in a process loads the encoder (~4 s, and downloads the model once on a fresh
+machine); later calls are ~50 ms. `find()` never pays this.
+
 `outputs()` is the one call that indexes **values rather than nodes**: a row is a single output, so
 an indicator with three outputs contributes three rows, and every row names its producer. It answers
 the questions `get()` can only answer one node at a time — *which computations emit a percentage*,
 *which are bounded and therefore belong on a shared axis*, *what produces the thing called
 `histogram`* (which `get()` and `resolve()` cannot answer at all, since `histogram` is nobody's node
 name). It intersects with the type axis: `outputs(bounded=True, kind="oscillator")`.
+
+**See also:** [SKILL · worked examples](SKILL.md#worked-examples) · [SKILL · rules of use](SKILL.md#rules-of-use)
 
 ## The typed detail is the point
 
@@ -126,8 +205,12 @@ kg.get("procedure:indicator-rsi")["outputs"]
 #          'canonical_name': 'Relative Strength Index', 'description': ...}}
 ```
 
-Every node carries `formula`, `inputs`, `params`, `outputs`, `warmup_bars`, `reference`,
-`usage_example`. Outputs carry `units` and `range`, which is what makes *"can I compare these two
+Every **signal and indicator** node carries `formula`, `inputs`, `params`, `outputs`,
+`warmup_bars`, `reference`, `usage_example` -- they are lifted from the code. Doc-derived nodes
+carry what their chapter states instead: a summary, an `explanation`, `applications`, `examples`,
+and for a chapter formula a `formula` with typed `inputs` and `outputs` but no `warmup_bars` or
+`usage_example`, because there is no implementation behind it. Read `get()` rather than assuming a
+field is there. Outputs carry `units` and `range`, which is what makes *"can I compare these two
 directly"* a question with an exact answer — reach for `outputs()` when you want it across the whole
 library rather than for one node.
 
@@ -143,6 +226,8 @@ kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")
 
 That is a fact about the connection, not about either end — which matters for signals that read two
 indicators.
+
+**See also:** [§5 what a signal needs](GUIDE.md#5-find-out-what-a-signal-needs-to-run) · [§6 comparability](GUIDE.md#6-decide-whether-two-outputs-are-comparable) · [§9 the value index](GUIDE.md#9-ask-about-the-values-not-the-nodes)
 
 ## Rules of use
 
@@ -173,75 +258,24 @@ indicators.
   bearing the `trigger` role, says nothing about whether it works on your data. It is a map of the
   library, not a recommendation.
 
+**See also:** [§2 truncation in practice](GUIDE.md#2-check-whether-something-already-exists-before-building-it) · [§10 enumerable vocabularies](GUIDE.md#10-filter-by-what-something-needs-and-whether-it-is-still-current)
+
 ## Worked examples
 
-**"Is there already something that does X?"**
+Each of these is a whole job -- the calls, the output, and the trap -- in
+[`GUIDE.md`](GUIDE.md). They are not restated here; this file is the reference for *which call*.
 
-```python
-kg.find("divergence")                       # every authored field, ranked by where it hit
-kg.find(kind="volatility", role="trigger")  # by what it is and how it is used
-```
+| you want to | GUIDE |
+|---|---|
+| orient yourself in the library | §1 |
+| check something does not already exist | §2 |
+| work out what a change breaks | §3 |
+| compose a strategy from both axes | §4 |
+| find what a signal needs to run | §5 |
+| decide whether two outputs are comparable | §6 |
+| explain why something is classified as it is | §8 |
+| ask about values rather than nodes | §9 |
+| run what you found against real data | §12–13 |
+| pull what the knowledge base says about a subject | §14 |
+| find the reasoning behind a piece of advice | §15 |
 
-**"What breaks if I change RSI's output?"**
-
-```python
-readers = kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in", limit=None)
-[r["id"] for r in readers]        # every signal that reads it — and `inputs` says which output
-```
-
-**"What does this signal actually need to run?"**
-
-```python
-sig = kg.get("procedure:signal-rsi-oversold")
-sig["params"]                         # {'window': {...}, 'threshold': {...}} — its knobs, with ranges
-sig["warmup_bars"]                    # 'window' — an EXPRESSION in those params, evaluate it yourself
-kg.neighbors(sig["id"], relation="uses", direction="out")          # the indicators beneath it
-```
-
-**"Take what I found and run it."**
-
-```python
-from mangrove_kb import RuleRegistry, sample_ohlcv
-from mangrove_kb.signals import momentum            # import the class module to register it
-
-node = kg.get("procedure:signal-adosc-cross-down")
-RuleRegistry.evaluate({"name": node["name"], "params": {"fast": 3, "slow": 10}}, sample_ohlcv())
-```
-
-A node's `name` **is** the registered signal name — that is the join between the graph and the code,
-and it is what makes this a map of a runnable library rather than an encyclopedia.
-
-**"How is this signal connected to that class?"**
-
-```python
-kg.path("procedure:signal-adosc-bearish", "concept:momentum")
-# the claim: one hop, --about--> momentum
-
-kg.path("procedure:signal-adosc-bearish", "concept:momentum",
-        relations=["uses", "instance-of"])
-# the reason: --uses--> ADOSC --instance-of--> momentum
-```
-
-`path` returns the **shortest** route, so it takes the `about` shortcut unless you constrain it.
-`all_paths` gives you both at once, shortest first, and is the better default when you do not already
-know the shape of the answer:
-
-```python
-kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum")
-# 2 paths: the `about` claim, then the `uses` -> `instance-of` reason
-```
-
-It excludes routes through a shared parent by default — `X --instance-of--> Signal <--instance-of-- Y`
-says "both are signals" and, with that hub at degree 218, those detours outnumber the real answers
-9,638 to 2 at `max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer.
-
-**"What can I plot on one panel, and what can I run without a volume feed?"**
-
-```python
-kg.outputs(bounded=True, kind="oscillator", limit=None)   # 48 outputs, each with units and range
-kg.outputs("histogram")                                   # who produces one — MACD, and only MACD
-
-ids = lambda r: {x["id"] for x in r}                      # rows are dicts; key on the id
-ids(kg.find(role="trigger", limit=None)) - ids(kg.find(requires="volume", role="trigger", limit=None))
-kg.find(status="deprecated", limit=None)                  # 2 — exclude these from anything new
-```

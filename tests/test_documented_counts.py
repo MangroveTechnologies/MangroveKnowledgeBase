@@ -85,7 +85,7 @@ CLAIMS = [
     ("CHANGELOG.md",                   r"-- [\d,]+ nodes, (\d+) edges, in", "edges"),
     ("skills/knowledge-graph/SKILL.md", r"\*\*(\d+) nodes, [\d,]+ edges\*\*", "nodes"),
     ("skills/knowledge-graph/SKILL.md", r"\*\*[\d,]+ nodes, (\d+) edges\*\*", "edges"),
-    ("skills/knowledge-graph/SKILL.md", r"covering (\d+) indicators",        "indicators"),
+    ("skills/knowledge-graph/SKILL.md", r"— (\d+) indicators and",            "indicators"),
     ("skills/knowledge-graph/SKILL.md", r"and\s+(\d+) signals",              "signals"),
     ("skills/knowledge-graph/SKILL.md", r"All (\d+) signals carry an",       "signals"),
     ("mangrove_kb/graph.py",           r"\((\d+) of [\d,]+ nodes carry both\)", "signals"),

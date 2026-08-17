@@ -11,6 +11,10 @@ authored outside it:
 * ``skills/knowledge-graph/`` -- the skill and agent guide. Same reasoning: they are documentation
   first and package data second.
 
+``skills/knowledge-ingest/`` is deliberately NOT bundled. It documents how the graph is grown from
+knowledge-base chapters that live in another repository, using a builder that ships with this source
+tree and not with the wheel; someone who installed the package could follow none of it.
+
 So the source tree keeps one canonical copy of each, and the build copies them into the wheel. There
 is never a second committed copy to drift.
 

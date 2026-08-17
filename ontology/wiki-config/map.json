@@ -1,0 +1,10 @@
+{
+  "_doc": "Section heading -> relation. Keys are matched as substrings of the lowercased `##` heading, first match wins, so the more specific keys come first. Headings that match nothing (Summary, Explanation) yield no relation: links belong in a typed section, never in prose. The adapter asserts that no untyped edge was produced.",
+  "instance of": "instance-of",
+  "kind of": "kind-of",
+  "part of": "part-of",
+  "has role": "has-role",
+  "supersedes": "supersedes",
+  "uses": "uses",
+  "about": "about"
+}

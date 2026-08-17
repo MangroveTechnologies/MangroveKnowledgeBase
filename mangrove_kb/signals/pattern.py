@@ -16,8 +16,6 @@ This module contains signal functions based on candlestick pattern indicators:
 Each signal is registered with RuleRegistry and returns a boolean.
 TRIGGER signals detect the pattern on the current (last) bar.
 FILTER signals check for patterns within a recent window.
-
-Detection logic references: see findings/chart-patterns-plan.md Section 5.
 """
 
 import logging

@@ -6,8 +6,8 @@
   <a href="https://pypi.org/project/mangrove-kb/"><img src="https://img.shields.io/pypi/v/mangrove-kb.svg?color=42a7c6&logo=pypi&logoColor=white" alt="PyPI version"></a>
   <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-ff9e18.svg" alt="License: PolyForm Noncommercial 1.0.0">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.10+">
-  <img src="https://img.shields.io/badge/deps-numpy%20%2B%20pandas-2ec27e.svg" alt="Dependencies: numpy + pandas">
-  <img src="https://img.shields.io/badge/graph-303%20nodes%20%C2%B7%201049%20edges-42a7c6.svg" alt="Graph: 303 nodes, 1049 edges">
+  <img src="https://img.shields.io/badge/graph%20%2B%20indices-in%20the%20wheel-2ec27e.svg" alt="Graph and both search indices ship in the wheel">
+  <img src="https://img.shields.io/badge/graph-714%20nodes%20%C2%B7%202342%20edges-42a7c6.svg" alt="Graph: 714 nodes, 2342 edges">
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
 
@@ -20,9 +20,19 @@
 every one with a machine-readable docstring — formula, inputs, parameters with ranges and defaults,
 typed outputs with units, and warmup.
 
-And a **knowledge graph built from that source** — 303 nodes and 1049 edges saying what each
-computation is, what it measures, what it reads, and what part it plays. It is generated from the
-code, so it is exact: not extracted from prose, not approximate, no ranking model in the way.
+How it is built, stored and searched is drawn in [`docs/architecture/`](docs/architecture/README.md) — provenance, the node and
+edge schema, the search corpus, `find()`, `ask()`, both search indices and how they are
+fused, and the three traversals that are easy to confuse.
+
+And a **knowledge graph** — 714 nodes and 2342 edges, with two halves on one schema. One is compiled
+from the source above: what each computation is, what it measures, what it reads, and what part it
+plays. That half is exact, because it is read from the code rather than extracted from prose. The
+other is the trading knowledge base — market structure, instruments, risk, chart patterns,
+quantitative method — ingested from its eight chapters as nodes and edges beside them.
+
+The join is what makes either half worth querying: `procedure:atr-based-stop` is a rule the risk
+chapter states, and it `uses` an indicator the code defines, so one query crosses from *why* to
+*what it computes*.
 
 The point is the second thing. A library of 249 functions is only useful if you can find the right
 one, and `grep` cannot answer *"which indicators produce a bounded oscillator"*, *"what reads RSI's
@@ -68,8 +78,12 @@ its edges. [What each part does](#the-viewer).*
 pip install mangrove-kb
 ```
 
-Python 3.10+; `numpy` and `pandas` are the only runtime dependencies. The graph, the agent skill and
-the viewer all ship **inside the wheel** — there is nothing else to fetch.
+Python 3.10+. The graph, both search indices, the agent skill and the viewer all ship **inside the
+wheel**, so `KnowledgeGraph.load()` needs no network and no configuration.
+
+One exception, and it is the only one: `ask()` encodes your question with a sentence model, so it
+loads `sentence-transformers` and downloads that model once on first call. Everything else — loading
+the graph, `find()`, every traversal, the viewer — works offline and never touches it.
 
 ---
 
@@ -85,7 +99,15 @@ kg.stats()                                   # counts + every value a filter wil
 kg.find("divergence")                        # search name, abbreviation, summary, authored detail
 kg.find(kind="momentum", role="trigger")     # by what it measures AND the part it plays
 kg.get("rsi_oversold")                       # formula, params, typed outputs, warmup
+
+kg.ask("how far away from my entry should the stop go")   # a QUESTION, not a term
 ```
+
+`find()` matches the words you use. `ask()` matches what you *mean* — it seeds from two indices, one
+built from this corpus and one from a pretrained sentence model, fuses them by reciprocal rank, and
+walks a hop along the edges. Every row carries `reached`: which seed it came from, how far, along
+which relation, and that edge's own reason. Measured on twenty-five questions phrased the way a
+trader asks them, `find()` answers 5 and `ask()` answers 18.
 
 `stats()` first, always. It returns the **complete vocabulary** every other call accepts — relations,
 classes, roles, statuses, input columns, output units — so you never have to guess a name. Filters
@@ -149,14 +171,14 @@ fetching anything:
 | | what it is |
 |---|---|
 | [`SKILL.md`](skills/knowledge-graph/SKILL.md) | the reference for **which call** — the two axes, the rules of use, and a question→call table |
-| [`GUIDE.md`](skills/knowledge-graph/GUIDE.md) | the reference for **what a whole job looks like** — thirteen tasks end to end, with real output and the trap in each |
+| [`GUIDE.md`](skills/knowledge-graph/GUIDE.md) | the reference for **what a whole job looks like** — sixteen tasks end to end, with real output and the trap in each |
 
 Both are executable documentation: every example in them is re-run by the test suite against the
 committed graph, so an example that drifts fails the build rather than misleading a reader.
 
 ### The tools
 
-`mangrove_kb.graph.KnowledgeGraph` is the whole query surface — eight calls:
+`mangrove_kb.graph.KnowledgeGraph` is the whole query surface:
 
 | question | call |
 |---|---|
@@ -164,8 +186,11 @@ committed graph, so an example that drifts fails the build rather than misleadin
 | what shapes can I even ask for? | `schema()` — the 12 `(subject, relation, object)` triples that actually occur |
 | the user gave me a name, not an id | `resolve("rsi_oversold")`, or `get()`, which resolves too |
 | is there already a signal for X? | `find("keyword")` — ranked by *where* it matched |
+| a question in ordinary words, not a term | `ask("how far should the stop go")` — meaning over two indices, then a hop |
 | everything of a class, or in a role, or both | `find(kind=…, role=…)` |
 | what needs volume? what is retired? | `find(requires=…)`, `find(status=…)` |
+| everything under a subject, whatever kind | `find(under="risk management")` — Concepts, Procedures, Facts and Judgments together |
+| what is *claimed*, and what to *do* about it | `find(primitive="Fact")`, `find(primitive="Judgment")` |
 | what does this compute — formula, params, outputs? | `get(id)` |
 | which values are bounded / in these units? | `outputs(bounded=True, units=…)` |
 | what produces an output called X? | `outputs("X")` |
@@ -227,7 +252,7 @@ detail one click away.
 | Pane | Where | What it holds |
 | --- | --- | --- |
 | Rail | left | filters, by kind of node and kind of edge |
-| Map | middle | 303 nodes, 1049 edges |
+| Map | middle | 714 nodes, 2342 edges |
 | Panel | right | everything the library records about whatever you clicked |
 
 ### The inspector — what a node actually carries
@@ -285,10 +310,10 @@ an instance of the family; a signal emits a boolean, so it is *about* the family
 ### The Action panel — trim the graph to the question
 
 <p align="center">
-  <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 13 of 303'" width="100%">
+  <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 17 of 714'" width="100%">
 </p>
 
-303 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
+714 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
 selected node, and the choices combine — `neighbors` + `ancestors` gives you both:
 
 | | Keeps |
@@ -312,21 +337,21 @@ thing that connected them is the thing you hid.
 
 ### The rail — two-level filters
 
-<img src="assets/viewer-facets.png" alt="The filter rail: Procedure splits into signal and indicator, Concept into class, entity type and domain" width="260" align="right">
+<img src="assets/viewer-facets.png" alt="The filter rail: Procedure splits into signal, formula and indicator; Concept into entity type, class and domain; and the knowledge half as Fact and Judgment" width="260" align="right">
 
 Nodes group by **ontology primitive**, edges by **relation category**, and each splits into the
 derived kind beneath it — so `signal` and `indicator` are separable inside `Procedure`, and `about`
 is separable from `has-role` inside `descriptive`.
 
-Sub-kinds are **shades of their parent's hue**, never new colours: all 289 of those dots are
-procedures, and the darker teal is the 71 indicators among them.
+Sub-kinds are **shades of their parent's hue**, never new colours: every dot in that group is a
+procedure, and the darker teal is the 71 indicators among them.
 
 Parent and child are **AND-ed**. Unticking `Procedure` hides every procedure whatever the children
 say, and the children grey out to show why — so the canvas can never empty for a reason that is not
 visible in the rail.
 
 **Density** spreads or tightens the layout. **Labels** switches between always / never / on hover /
-on zoom — at 303 nodes, off is often clearer than on.
+on zoom — at 714 nodes, off is often clearer than on.
 
 <br clear="right">
 
@@ -357,7 +382,7 @@ either view, **double-click a node to hide or show what hangs off it**, which is
 with 218 signals attached readable.
 
 A **green ring** marks the selected node; a **yellow ring** marks a deprecated one — it still runs,
-it just has a canonical replacement. Nothing else is ringed: 301 of 303 nodes are `ratified`, so
+it just has a canonical replacement. Nothing else is ringed: 308 of 714 nodes are `ratified`, so
 marking that would be decoration rather than information.
 
 Light, dark and follow-the-system are top right, and the choice is remembered.
@@ -366,8 +391,26 @@ Light, dark and follow-the-system are top right, and the choice is remembered.
 
 ## What is in the graph, and what is not
 
-Of **249 registered signals**, **218 are modelled** in the graph, along with 71 of the 80 indicator
-classes. The gap is deliberate:
+**The knowledge half.** All eight knowledge-base chapters are in the graph as nodes and edges, not
+as documents: 202 Concepts (what a market is made of), 397 Procedures (of which the bare
+`procedure:*` ones are formulas a chapter states and nothing implements), 74 Properties, and — the
+two worth knowing about — **23 Facts and 16 Judgments**. A `Fact` holds what is *true* of a subject,
+a `Judgment` what to *do* about it. They are separate primitives because they answer to different
+standards: a Fact is settled by measurement, a Judgment by argument.
+
+```python
+kg.find(under="risk management", limit=None)            # 74 nodes, every primitive
+kg.find(under="risk management", primitive="Judgment")  # 5 -- what to actually do
+kg.neighbors("concept:market-impact", relation="about", direction="in")
+# fact:square-root-market-impact-rule · procedure:almgren-chriss-market-impact-model
+```
+
+A statement lives in exactly one place. Until it concerns a particular node it sits in a Fact or
+Judgment; once it earns an `about` edge it moves onto that edge as its `why` — so the reason an
+answer is an answer travels with the connection, not in a list somewhere else.
+
+**The library half.** Of **249 registered signals**, **218 are modelled** in the graph, along with
+71 of the 80 indicator classes. That gap is deliberate:
 
 - **Signals with no indicator beneath them** — a signal reading raw price with no measurement in
   between has no class to derive, and would sit in the graph as an unclassifiable node.
@@ -405,7 +448,6 @@ MangroveKnowledgeBase/
 │   └── signal-indicator-ontology.json       ← the ontology of record
 ├── skills/knowledge-graph/       ← the agent skill and its guide (source of truth)
 ├── knowledge-base/               ← 11 trading-education documents
-├── kb_server/                    ← REST + MCP server over the library
 ├── notebooks/                    ← signal explorer + validation
 ├── data/                         ← 7 sample OHLCV datasets
 └── tests/                        ← the suite

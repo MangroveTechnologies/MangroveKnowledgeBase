@@ -978,7 +978,7 @@ def _atr_trailing_stop_direction(df: pd.DataFrame, window: int, multiplier: floa
 
 @RuleRegistry.register("atr_trailing_stop_long")
 @deprecated_signal(
-    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1 "
     "short); this signal reads that verdict, so it is not in the ontology graph"
 )
 def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
@@ -1004,7 +1004,7 @@ def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float
 
 @RuleRegistry.register("atr_trailing_stop_short")
 @deprecated_signal(
-    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1 "
     "short); this signal reads that verdict, so it is not in the ontology graph"
 )
 def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
@@ -1030,7 +1030,7 @@ def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: floa
 
 @RuleRegistry.register("atr_trailing_stop_flip_up")
 @deprecated_signal(
-    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1 "
     "short); this signal reads that verdict, so it is not in the ontology graph"
 )
 def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
@@ -1061,7 +1061,7 @@ def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: fl
 
 @RuleRegistry.register("atr_trailing_stop_flip_down")
 @deprecated_signal(
-    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1"
+    "ATRTrailingStop carries its stop level forward and emits `direction` (+1 long / -1 "
     "short); this signal reads that verdict, so it is not in the ontology graph"
 )
 def atr_trailing_stop_flip_down(df: pd.DataFrame, window: int = 14, multiplier: float = 3.0) -> bool:
