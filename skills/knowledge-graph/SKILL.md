@@ -140,8 +140,8 @@ nothing to know.
 
 ## Which call
 
-Diagrams of the machinery behind these calls -- the search corpus, `find()`, `ask()` and the
-semantic index -- are in [`docs/architecture/`](../../docs/architecture/README.md).
+Diagrams of the machinery behind these calls -- the search corpus, `find()`, `ask()`, both search
+indices and how they are fused -- are in [`docs/architecture/`](../../docs/architecture/README.md).
 
 | question | call |
 |---|---|
@@ -160,6 +160,8 @@ semantic index -- are in [`docs/architecture/`](../../docs/architecture/README.m
 | what breaks if I change this? | `neighbors(id, direction="in")`, then widen with `subgraph` |
 | the neighbourhood around something | `subgraph(id, radius=1)` |
 | everything belonging to a subject, whatever kind | `find(under="market foundations")` |
+| what is CLAIMED about a subject, and what to DO | `find(under=…, primitive="Fact")` · `primitive="Judgment"` |
+| the reasoning behind a piece of advice | `neighbors(id, relation="about", direction="in")` — the edge carries the `why` |
 | how are these two related? | `path(a, b)` — one shortest route |
 | every way these two connect, and why | `all_paths(a, b)` — all routes, shortest first |
 | now actually run what I found | `RuleRegistry.evaluate({"name": node["name"], ...}, df)` |

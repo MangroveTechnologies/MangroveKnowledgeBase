@@ -53,15 +53,21 @@ result = BollingerBands.compute(
 upper, middle, lower = result["hband"], result["mavg"], result["lband"]
 ```
 
-### Available Indicators (70)
+### Available Indicators
 
-| Category | Count | Examples |
-|----------|-------|---------|
-| Momentum | 13 | RSI, Stochastic, TSI, UltimateOscillator, KAMA, ROC, AwesomeOscillator, StochasticRSI, PPO, PVO |
-| Trend | 16 | SMA, EMA, WMA, DEMA, TEMA, MACD, ADX, Aroon, TRIX, MassIndex, Ichimoku, KST, DPO, CCI, Vortex, PSAR, STC |
-| Volume | 10 | ADI, OBV, CMF, ForceIndex, EOM, VPT, NVI, MFI, VWAP, DailyReturn, CumulativeReturn |
-| Volatility | 4 | BollingerBands, ATR, KeltnerChannel, DonchianChannel, UlcerIndex |
-| Patterns | 27 | Doji, Hammer, ShootingStar, Engulfing, Harami, MorningStar, EveningStar, PiercingLine, ThreeWhiteSoldiers, NR7, InsideBar, and more |
+**80 classes**, 71 of them modelled in the graph by what they measure:
+
+| Class | Indicators | Signals reading them |
+|----------|---------|--------|
+| Momentum | 22 | 56 |
+| Averaging | 18 | 55 |
+| Oscillator | 12 | 34 |
+| Volatility | 11 | 27 |
+| Flow | 5 | 10 |
+| Pattern | 3 | 40 |
+
+The nine unmodelled classes are stateful policy rules -- SuperTrend, PSAR, ChandelierExit and the
+like -- whose outputs are verdicts rather than measurements. `kg.stats()["classes"]` is the live list.
 
 ## Signals
 
@@ -102,16 +108,17 @@ is_oversold = RuleRegistry.evaluate(rule, df)
 print(f"Available signals: {len(RuleRegistry._registry)}")
 ```
 
-### Signal Categories (223 total)
+### Signal Categories
 
-| Category | TRIGGER | FILTER | Total |
-|----------|---------|--------|-------|
-| Momentum | 18 | 24 | 42 |
-| Trend | 43 | 45 | 88 |
-| Volume | 6 | 27 | 33 |
-| Volatility | 9 | 11 | 20 |
-| Patterns | 32 | 8 | 40 |
-| **Total** | **108** | **115** | **223** |
+**249 registered**, 218 modelled in the graph. Every signal carries two independent labels: the
+class it is *about* (above) and the **role** it plays -- `trigger` (an event) or `filter` (an ongoing
+state). They are different questions, so the graph keeps them apart:
+
+```python
+from mangrove_kb.graph import KnowledgeGraph
+
+KnowledgeGraph.load().find(kind="momentum", role="trigger")   # momentum-class signals, used as triggers
+```
 
 ## Signal Metadata
 
@@ -130,27 +137,30 @@ print(sig["requires"])    # ["close"]
 print(sig["params"])      # {"window": {"type": "int", "min": 2, "max": 100, "default": 14}, ...}
 ```
 
-## Pattern Signals
+## Candlesticks
 
-27 pattern indicator classes detect candlestick and multi-bar patterns:
+Candlestick **detection** lives in the signal functions; the indicator classes supply the geometry
+those signals read.
 
 ```python
-from mangrove_kb.indicators import Hammer, BullishEngulfing, MorningStar, NR7
+from mangrove_kb.indicators import CandleGeometry
+from mangrove_kb.signals.pattern import hammer_trigger, bullish_engulfing_trigger
+from mangrove_kb import sample_ohlcv
 
-# Hammer detection (returns 1 where detected, 0 otherwise)
-result = Hammer.compute(
-    data={"open": df["open"], "high": df["high"], "low": df["low"], "close": df["close"]},
-    params={"wick_ratio": 2.0, "upper_wick_max": 0.1},
-)
-hammers = result["hammer"]  # pd.Series of 0/1
+df = sample_ohlcv()
 
-# NR7 (Narrowest Range of 7 bars)
-result = NR7.compute(
-    data={"high": df["high"], "low": df["low"]},
-    params={"window": 7},
-)
-nr7_bars = result["nr7"]
+# Geometry: the measurements a candlestick rule is written against
+g = CandleGeometry.compute(data={k: df[k] for k in ("open", "high", "low", "close")}, params={})
+g["body"], g["upper_wick"], g["lower_wick"], g["body_ratio"]
+
+# Detection: a boolean for the current bar
+hammer_trigger(df)                # True when the last bar is a hammer
+bullish_engulfing_trigger(df)     # ...or engulfs the previous one
 ```
+
+`CandleRaw`, `CandleGeometry` and `CandleRelation` are the three classes: raw OHLC, single-bar
+geometry, and bar-to-bar relations. Ask the graph which signals read them --
+`kg.neighbors("procedure:indicator-candlegeometry", relation="uses", direction="in")`.
 
 ## Ask the library about itself
 
@@ -178,6 +188,9 @@ kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # wha
 kg.path("procedure:signal-adosc-bearish", "concept:momentum")   # why is it classed so
 
 kg.ask("how far away from my entry should the stop go")   # a QUESTION, not a term
+
+kg.find(under="risk management", limit=None)             # 74 nodes, every primitive
+kg.find(under="risk management", primitive="Judgment")   # 5 -- what to actually do about it
 ```
 
 `find()` matches the words you use; `ask()` matches what you mean, then walks one hop along the

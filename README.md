@@ -178,7 +178,7 @@ committed graph, so an example that drifts fails the build rather than misleadin
 
 ### The tools
 
-`mangrove_kb.graph.KnowledgeGraph` is the whole query surface — eight calls:
+`mangrove_kb.graph.KnowledgeGraph` is the whole query surface:
 
 | question | call |
 |---|---|
@@ -186,8 +186,11 @@ committed graph, so an example that drifts fails the build rather than misleadin
 | what shapes can I even ask for? | `schema()` — the 12 `(subject, relation, object)` triples that actually occur |
 | the user gave me a name, not an id | `resolve("rsi_oversold")`, or `get()`, which resolves too |
 | is there already a signal for X? | `find("keyword")` — ranked by *where* it matched |
+| a question in ordinary words, not a term | `ask("how far should the stop go")` — meaning over two indices, then a hop |
 | everything of a class, or in a role, or both | `find(kind=…, role=…)` |
 | what needs volume? what is retired? | `find(requires=…)`, `find(status=…)` |
+| everything under a subject, whatever kind | `find(under="risk management")` — Concepts, Procedures, Facts and Judgments together |
+| what is *claimed*, and what to *do* about it | `find(primitive="Fact")`, `find(primitive="Judgment")` |
 | what does this compute — formula, params, outputs? | `get(id)` |
 | which values are bounded / in these units? | `outputs(bounded=True, units=…)` |
 | what produces an output called X? | `outputs("X")` |
@@ -388,8 +391,26 @@ Light, dark and follow-the-system are top right, and the choice is remembered.
 
 ## What is in the graph, and what is not
 
-Of **249 registered signals**, **218 are modelled** in the graph, along with 71 of the 80 indicator
-classes. The gap is deliberate:
+**The knowledge half.** All eight knowledge-base chapters are in the graph as nodes and edges, not
+as documents: 202 Concepts (what a market is made of), 397 Procedures (of which the bare
+`procedure:*` ones are formulas a chapter states and nothing implements), 74 Properties, and — the
+two worth knowing about — **23 Facts and 16 Judgments**. A `Fact` holds what is *true* of a subject,
+a `Judgment` what to *do* about it. They are separate primitives because they answer to different
+standards: a Fact is settled by measurement, a Judgment by argument.
+
+```python
+kg.find(under="risk management", limit=None)            # 74 nodes, every primitive
+kg.find(under="risk management", primitive="Judgment")  # 5 -- what to actually do
+kg.neighbors("concept:market-impact", relation="about", direction="in")
+# fact:square-root-market-impact-rule · procedure:almgren-chriss-market-impact-model
+```
+
+A statement lives in exactly one place. Until it concerns a particular node it sits in a Fact or
+Judgment; once it earns an `about` edge it moves onto that edge as its `why` — so the reason an
+answer is an answer travels with the connection, not in a list somewhere else.
+
+**The library half.** Of **249 registered signals**, **218 are modelled** in the graph, along with
+71 of the 80 indicator classes. That gap is deliberate:
 
 - **Signals with no indicator beneath them** — a signal reading raw price with no measurement in
   between has no class to derive, and would sit in the graph as an unclassifiable node.
