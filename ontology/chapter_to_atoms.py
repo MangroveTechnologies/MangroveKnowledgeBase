@@ -2070,6 +2070,113 @@ DEFINITION = {
 #: summary and the example moves to `examples`. The explanation has no counterpart in the source at
 #: all -- the chapter never says WHY an iceberg order costs queue position -- so it is always added.
 AUTHORED: dict[str, tuple[str, str]] = {
+    'concept:head-and-shoulders': (
+        'Three peaks with the middle one highest, their intervening lows forming a neckline the '
+        'pattern completes by closing below.',
+        'A distribution pattern: the failure of the third rally to reach the second is the tell, '
+        'and the neckline is where that reading is confirmed or refuted. The measured move -- head '
+        'to neckline, projected down from the break -- is the target the chapter gives it.'),
+    'concept:inverse-head-and-shoulders': (
+        'The same three-trough shape inverted, completing on a close above the neckline that joins '
+        'its intervening highs.',
+        'Accumulation rather than distribution, and read the same way: the third decline failing to '
+        'reach the second is what makes it a base rather than a pause.'),
+    'concept:double-top-double-bottom': (
+        'Two tests of nearly the same level with a retracement between them, completing on a close '
+        'beyond that retracement.',
+        'The second test failing to exceed the first is the whole signal -- the level held twice, so '
+        'the move that made it is spent. The valley or peak between the tests is both the trigger '
+        'and the measuring stick for the target.'),
+    'concept:triple-top-triple-bottom': (
+        'The same shape with three tests of the level rather than two.',
+        'The chapter rates it more reliable for the obvious reason -- one more rejection at the same '
+        'price -- and trades it identically.'),
+    'concept:triangle': (
+        'Converging boundaries drawn across the highs and the lows, completing on a close beyond '
+        'either of them.',
+        'Which boundary is flat decides the reading: a flat top with rising lows is buyers paying '
+        'up into a fixed offer, a flat bottom with falling highs is the reverse, and two sloping '
+        'lines say only that range is contracting. The chapter puts the first two at seventy per '
+        'cent in their stated direction and the symmetrical case at a coin toss.'),
+    'concept:flags-and-pennants': (
+        'A brief consolidation against the direction of a sharp move, resolving in the direction of '
+        'the move that preceded it.',
+        'Continuation rather than reversal, and the pole is the measuring stick: its length '
+        'projected from the break is the target. A flag drifts in a parallel channel, a pennant '
+        'contracts to a point, and both are short by definition -- one that outlasts the move that '
+        'made it has stopped being a pause.'),
+    'concept:wedge': (
+        'Two converging boundaries sloping the same way, read against their slope rather than with '
+        'it.',
+        'The counter-intuitive one: a rising wedge is bearish and a falling wedge bullish, whichever '
+        'trend they appear in, because the converging slope says each push is shorter than the last.'),
+    'concept:channel': (
+        'Parallel boundaries containing price, traded from edge to edge until one of them breaks.',
+        'The break is the event: while it holds, the channel is a range with a slope, and the edges '
+        'are [[Dynamic Level]]s. Ascending, descending and horizontal differ only in that slope.'),
+    'concept:cup-and-handle': (
+        'A rounded base followed by a shallow drift, completing on a close above the rim.',
+        'The shape is the argument -- a U rather than a V says the base was built rather than '
+        'spiked, and a handle deeper than half the cup says the base did not hold. Continuation, '
+        'and the cup depth is the target.'),
+    'concept:entry-timing-option': (
+        'The three moments a completed pattern can be entered on: the break itself, the close '
+        'beyond it, or the retest of it.',
+        'They trade certainty against price. Entering intrabar gets the tightest stop and the most '
+        'failures; waiting for the retest confirms the boundary reversed roles and misses the moves '
+        'that never come back.'),
+    # Eight blocks whose content is a python function with no docstring, so there is no sentence
+    # in the chapter saying what they are.
+    'procedure:bollinger-band-mean-reversion': (
+        'Buys below the lower band and sells above the upper, closing as price returns to the middle.',
+        'The bands are a z-score in price units, so this is the [[Z-Score]] rule with a moving '
+        'standard deviation: two deviations out, and back to the mean. It fails exactly where '
+        '[[Mean Reversion]] fails -- when the band is being walked rather than tested.'),
+    'procedure:rsi-mean-reversion': (
+        'Buys oversold and sells overbought on RSI, exiting as it returns to the midpoint.',
+        'The same trade as the band version with a bounded oscillator in place of a distance: '
+        'thirty and seventy rather than two deviations, and fifty as the exit. Chapter 6 states the '
+        'caution that matters here -- in a strong trend RSI shifts its range and stays extreme.'),
+    'procedure:breakout-confirmation-filter': (
+        'Requires volume above its average, or momentum in the breakout direction, before a break '
+        'counts.',
+        'The chapter puts breakout failure at fifty to sixty per cent, and both filters attack the '
+        'same failure: a level given up without participation behind it. The cost is the breaks '
+        'that run without waiting.'),
+    'procedure:statistical-testing-for-seasonality': (
+        'Compares returns inside a calendar period against returns outside it, and reports whether '
+        'the difference could be chance.',
+        'A two-sample t-test, which is what separates a seasonal effect from a story about one. '
+        'The chapter is explicit that well-published effects decay, so the test is worth rerunning '
+        'rather than citing.'),
+    'procedure:feature-engineering-for-trading': (
+        'Turns raw bars into the inputs a model reads: returns, distance from a moving average, '
+        'volatility and range over several lookbacks.',
+        'The chapter puts this above model choice, and the features are mostly the library\'s own '
+        'indicators computed at several horizons. Every one of them is a lookback decision, which '
+        'is where [[Overfitting]] enters before any model is fitted.'),
+    'procedure:classification-model': (
+        'Predicts the direction of the next period from those features, validated on time-ordered '
+        'splits rather than shuffled ones.',
+        'The split is the whole discipline: shuffling puts tomorrow in the training set, which is '
+        '[[Look-Ahead Bias]] with a respectable name.'),
+    'procedure:neural-network-pattern': (
+        'Reads a window of bars as a sequence rather than a row of features, learning order-dependent '
+        'structure.',
+        'The trade-off the chapter states plainly: more capacity to find structure, and less ability '
+        'to say what was found. Its value depends on there being sequential structure to learn, '
+        'which is what [[Autocorrelation]] measures directly and cheaply.'),
+    'procedure:garch-family-model': (
+        'Models tomorrow\'s variance as a weighted sum of a long-run level, the most recent shock, '
+        'and today\'s variance.',
+        'The two weights are the whole model: how hard a shock hits, and how slowly it decays. Their '
+        'sum approaching one is persistence -- which is [[Volatility Clustering]] measured rather '
+        'than observed -- and must stay below one for the process to have a long-run level at all.'),
+    'procedure:egarch': (
+        'The same model on the logarithm of variance, with a term that lets a fall move volatility '
+        'differently from a rise.',
+        'The asymmetry is the point: the leverage effect is real and symmetric GARCH cannot express '
+        'it. Working in logs also removes the need to constrain the parameters positive.'),
     'procedure:support-resistance-detection': (
         'Collects every swing high and low over a window and clusters the ones that fall within a '
         'tolerance of each other into levels.',

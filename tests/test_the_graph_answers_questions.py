@@ -36,7 +36,9 @@ RAW = Path(__file__).resolve().parent.parent / "ontology" / "raw"
 KNOWN_HEADING_MISSES = 2
 
 #: Measured 2026-08-17, over the 25 paraphrased questions below, with `ask(hops=1)`.
-PARAPHRASE_FLOOR = 11
+#: Was 11 until nineteen authored summaries -- deleted by an edit that removed a range
+#: between two keys -- were restored. Two of those nodes are answers to questions here.
+PARAPHRASE_FLOOR = 13
 
 #: A trader's phrasing, and any node that would be a fair answer. Written to avoid the node's own
 #: words wherever the question can be asked without them.

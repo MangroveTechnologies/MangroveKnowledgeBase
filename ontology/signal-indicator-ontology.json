@@ -24206,7 +24206,7 @@
    "id": "concept:head-and-shoulders",
    "title": "head and shoulders",
    "kind": "Concept",
-   "summary": "Left Shoulder: Rally and decline",
+   "summary": "Three peaks with the middle one highest, their intervening lows forming a neckline the pattern completes by closing below.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24214,34 +24214,38 @@
      "chart-patterns"
     ],
     "formula": "Head > Left_Shoulder > Neckline\nHead > Right_Shoulder > Neckline\nRight_Shoulder approximately equals Left_Shoulder height\nBoth shoulders retrace to approximately same neckline level",
-    "explanation": "Head: Higher rally and decline to similar level (neckline) Right Shoulder: Lower rally and decline Neckline: Connect the lows after each shoulder Entry: Break below neckline Stop: Above right shoulder Target: Measured move (head to neckline distance projected down) ",
+    "explanation": "A distribution pattern: the failure of the third rally to reach the second is the tell, and the neckline is where that reading is confirmed or refuted. The measured move -- head to neckline, projected down from the break -- is the target the chapter gives it.",
     "notes": [
-     "Interpretation: Distribution pattern; bearish reversal after uptrend."
-    ]
+     "Interpretation: Distribution pattern; bearish reversal after uptrend.",
+     "Head: Higher rally and decline to similar level (neckline) Right Shoulder: Lower rally and decline Neckline: Connect the lows after each shoulder Entry: Break below neckline Stop: Above right shoulder Target: Measured move (head to neckline distance projected down) "
+    ],
+    "source_wording": "Left Shoulder: Rally and decline"
    }
   },
   {
    "id": "concept:inverse-head-and-shoulders",
    "title": "inverse head and shoulders",
    "kind": "Concept",
-   "summary": "Mirror image of head and shoulders.",
+   "summary": "The same three-trough shape inverted, completing on a close above the neckline that joins its intervening highs.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Left Shoulder: Decline and rally Head: Lower decline and rally Right Shoulder: Higher decline and rally Neckline: Connect the highs Entry: Break above neckline Stop: Below right shoulder Target: Measured move (head to neckline distance projected up) ",
+    "explanation": "Accumulation rather than distribution, and read the same way: the third decline failing to reach the second is what makes it a base rather than a pause.",
     "notes": [
-     "Interpretation: Accumulation pattern; bullish reversal after downtrend."
-    ]
+     "Interpretation: Accumulation pattern; bullish reversal after downtrend.",
+     "Left Shoulder: Decline and rally Head: Lower decline and rally Right Shoulder: Higher decline and rally Neckline: Connect the highs Entry: Break above neckline Stop: Below right shoulder Target: Measured move (head to neckline distance projected up) "
+    ],
+    "source_wording": "Mirror image of head and shoulders."
    }
   },
   {
    "id": "concept:double-top-double-bottom",
    "title": "double top / double bottom",
    "kind": "Concept",
-   "summary": "Two peaks at approximately the same price level",
+   "summary": "Two tests of nearly the same level with a retracement between them, completing on a close beyond that retracement.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24249,14 +24253,18 @@
      "chart-patterns"
     ],
     "formula": "Double_Top:\n  |High_Peak1 - High_Peak2| < threshold\n  Valley_Low < both Peak_Highs\n  Confirmation: Close below Valley_Low",
-    "explanation": "Valley between peaks (neckline) Failure to exceed first peak indicates weakening Entry: Break below valley Target: Distance from peaks to valley projected down Two troughs at approximately the same price level Peak between troughs (neckline) Failure to break first low indicates support Entry: Break above peak Target: Distance from troughs to peak projected up "
+    "explanation": "The second test failing to exceed the first is the whole signal -- the level held twice, so the move that made it is spent. The valley or peak between the tests is both the trigger and the measuring stick for the target.",
+    "source_wording": "Two peaks at approximately the same price level",
+    "notes": [
+     "Valley between peaks (neckline) Failure to exceed first peak indicates weakening Entry: Break below valley Target: Distance from peaks to valley projected down Two troughs at approximately the same price level Peak between troughs (neckline) Failure to break first low indicates support Entry: Break above peak Target: Distance from troughs to peak projected up "
+    ]
    }
   },
   {
    "id": "concept:triple-top-triple-bottom",
    "title": "triple top / triple bottom",
    "kind": "Concept",
-   "summary": "Similar to double top/bottom but with three peaks/troughs.",
+   "summary": "The same shape with three tests of the level rather than two.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24266,14 +24274,16 @@
     "notes": [
      "Interpretation: Stronger reversal signal than double top/bottom due to additional test.",
      "Trading Application: Same as double top/bottom but often more reliable."
-    ]
+    ],
+    "source_wording": "Similar to double top/bottom but with three peaks/troughs.",
+    "explanation": "The chapter rates it more reliable for the obvious reason -- one more rejection at the same price -- and trades it identically."
    }
   },
   {
    "id": "concept:triangle",
    "title": "triangles",
    "kind": "Concept",
-   "summary": "Horizontal resistance line (flat tops)",
+   "summary": "Converging boundaries drawn across the highs and the lows, completing on a close beyond either of them.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24281,63 +24291,83 @@
      "chart-patterns"
     ],
     "formula": "Ascending_Triangle:\n  High values form horizontal line (within tolerance)\n  Low values form upward sloping line\n  Lines converging",
-    "explanation": "Rising support line (higher lows) Buyers becoming more aggressive Breakout typically upward (70% of cases) Horizontal support line (flat bottoms) Falling resistance line (lower highs) Sellers becoming more aggressive Breakout typically downward (70% of cases) Converging trend lines Lower highs and higher lows Consolidation pattern Breakout direction determines trend Entry: Breakout beyond triangle boundary Stop: Opposite side of triangle or last swing Target: Height of triangle base projected from breakout "
+    "explanation": "Which boundary is flat decides the reading: a flat top with rising lows is buyers paying up into a fixed offer, a flat bottom with falling highs is the reverse, and two sloping lines say only that range is contracting. The chapter puts the first two at seventy per cent in their stated direction and the symmetrical case at a coin toss.",
+    "source_wording": "Horizontal resistance line (flat tops)",
+    "notes": [
+     "Rising support line (higher lows) Buyers becoming more aggressive Breakout typically upward (70% of cases) Horizontal support line (flat bottoms) Falling resistance line (lower highs) Sellers becoming more aggressive Breakout typically downward (70% of cases) Converging trend lines Lower highs and higher lows Consolidation pattern Breakout direction determines trend Entry: Breakout beyond triangle boundary Stop: Opposite side of triangle or last swing Target: Height of triangle base projected from breakout "
+    ]
    }
   },
   {
    "id": "concept:flags-and-pennants",
    "title": "flags and pennants",
    "kind": "Concept",
-   "summary": "Sharp rally (flagpole)",
+   "summary": "A brief consolidation against the direction of a sharp move, resolving in the direction of the move that preceded it.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Consolidation that slopes against trend (parallel channel down) Continuation pattern Entry: Break above flag resistance Target: Flagpole length projected from breakout Sharp decline (flagpole) Consolidation that slopes against trend (parallel channel up) Continuation pattern Entry: Break below flag support Target: Flagpole length projected from breakout Similar to flag but consolidation forms symmetrical triangle Very short-term pattern (1-3 weeks typically) Strong continuation pattern "
+    "explanation": "Continuation rather than reversal, and the pole is the measuring stick: its length projected from the break is the target. A flag drifts in a parallel channel, a pennant contracts to a point, and both are short by definition -- one that outlasts the move that made it has stopped being a pause.",
+    "source_wording": "Sharp rally (flagpole)",
+    "notes": [
+     "Consolidation that slopes against trend (parallel channel down) Continuation pattern Entry: Break above flag resistance Target: Flagpole length projected from breakout Sharp decline (flagpole) Consolidation that slopes against trend (parallel channel up) Continuation pattern Entry: Break below flag support Target: Flagpole length projected from breakout Similar to flag but consolidation forms symmetrical triangle Very short-term pattern (1-3 weeks typically) Strong continuation pattern "
+    ]
    }
   },
   {
    "id": "concept:wedge",
    "title": "wedges",
    "kind": "Concept",
-   "summary": "Both support and resistance lines slope upward",
+   "summary": "Two converging boundaries sloping the same way, read against their slope rather than with it.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Resistance line has gentler slope Lines converge Typically bearish regardless of trend context Breakout usually downward Both support and resistance lines slope downward Support line has gentler slope Lines converge Typically bullish regardless of trend context Breakout usually upward "
+    "explanation": "The counter-intuitive one: a rising wedge is bearish and a falling wedge bullish, whichever trend they appear in, because the converging slope says each push is shorter than the last.",
+    "source_wording": "Both support and resistance lines slope upward",
+    "notes": [
+     "Resistance line has gentler slope Lines converge Typically bearish regardless of trend context Breakout usually downward Both support and resistance lines slope downward Support line has gentler slope Lines converge Typically bullish regardless of trend context Breakout usually upward "
+    ]
    }
   },
   {
    "id": "concept:channel",
    "title": "channels",
    "kind": "Concept",
-   "summary": "Parallel upward sloping lines containing price",
+   "summary": "Parallel boundaries containing price, traded from edge to edge until one of them breaks.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Buy at lower channel line Sell at upper channel line Channel break can signal acceleration or reversal Parallel downward sloping lines containing price Sell at upper channel line Cover at lower channel line Channel break can signal acceleration or reversal Horizontal parallel lines containing price Range-bound trading Breakout direction determines next trend "
+    "explanation": "The break is the event: while it holds, the channel is a range with a slope, and the edges are [[Dynamic Level]]s. Ascending, descending and horizontal differ only in that slope.",
+    "source_wording": "Parallel upward sloping lines containing price",
+    "notes": [
+     "Buy at lower channel line Sell at upper channel line Channel break can signal acceleration or reversal Parallel downward sloping lines containing price Sell at upper channel line Cover at lower channel line Channel break can signal acceleration or reversal Horizontal parallel lines containing price Range-bound trading Breakout direction determines next trend "
+    ]
    }
   },
   {
    "id": "concept:cup-and-handle",
    "title": "cup and handle",
    "kind": "Concept",
-   "summary": "Cup: Rounded bottom formation (U-shape, not V)",
+   "summary": "A rounded base followed by a shallow drift, completing on a close above the rim.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Handle: Small consolidation after cup (slight downward drift) Bullish continuation pattern Entry: Break above handle resistance / cup rim Stop: Below handle low Target: Depth of cup projected from breakout "
+    "explanation": "The shape is the argument -- a U rather than a V says the base was built rather than spiked, and a handle deeper than half the cup says the base did not hold. Continuation, and the cup depth is the target.",
+    "source_wording": "Cup: Rounded bottom formation (U-shape, not V)",
+    "notes": [
+     "Handle: Small consolidation after cup (slight downward drift) Bullish continuation pattern Entry: Break above handle resistance / cup rim Stop: Below handle low Target: Depth of cup projected from breakout "
+    ]
    }
   },
   {
@@ -24543,14 +24573,18 @@
    "id": "concept:entry-timing-option",
    "title": "entry timing options",
    "kind": "Concept",
-   "summary": "Enter on intrabar break of pattern boundary",
+   "summary": "The three moments a completed pattern can be entered on: the break itself, the close beyond it, or the retest of it.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Tighter stop, larger potential move capture Higher failure rate Enter on close beyond pattern boundary Balanced approach Moderate failure rate Enter on retest of broken boundary Confirmation of role reversal May miss some moves but better R:R "
+    "explanation": "They trade certainty against price. Entering intrabar gets the tightest stop and the most failures; waiting for the retest confirms the boundary reversed roles and misses the moves that never come back.",
+    "source_wording": "Enter on intrabar break of pattern boundary",
+    "notes": [
+     "Tighter stop, larger potential move capture Higher failure rate Enter on close beyond pattern boundary Balanced approach Moderate failure rate Enter on retest of broken boundary Confirmation of role reversal May miss some moves but better R:R "
+    ]
    }
   },
   {
@@ -24648,14 +24682,15 @@
    "id": "procedure:statistical-testing-for-seasonality",
    "title": "statistical testing for seasonality",
    "kind": "Procedure",
-   "summary": "",
+   "summary": "Compares returns inside a calendar period against returns outside it, and reports whether the difference could be chance.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "from scipy import stats\n\ndef test_seasonal_effect(returns, is_seasonal):\n    seasonal_returns = returns[is_seasonal]\n    non_seasonal_returns = returns[~is_seasonal]\n    \n    t_stat, p_value = stats.ttest_ind(seasonal_returns, non_seasonal_returns)\n    \n    return {\n        'seasonal_mean': seasonal_returns.mean(),\n        'non_seasonal_mean': non_seasonal_returns.mean(),\n        't_statistic': t_stat,\n        'p_value': p_value,\n        'significant': p_value < 0.05\n    }"
+    "formula": "from scipy import stats\n\ndef test_seasonal_effect(returns, is_seasonal):\n    seasonal_returns = returns[is_seasonal]\n    non_seasonal_returns = returns[~is_seasonal]\n    \n    t_stat, p_value = stats.ttest_ind(seasonal_returns, non_seasonal_returns)\n    \n    return {\n        'seasonal_mean': seasonal_returns.mean(),\n        'non_seasonal_mean': non_seasonal_returns.mean(),\n        't_statistic': t_stat,\n        'p_value': p_value,\n        'significant': p_value < 0.05\n    }",
+    "explanation": "A two-sample t-test, which is what separates a seasonal effect from a story about one. The chapter is explicit that well-published effects decay, so the test is worth rerunning rather than citing."
    }
   },
   {
@@ -24682,7 +24717,7 @@
    "id": "procedure:garch-family-model",
    "title": "garch family models",
    "kind": "Procedure",
-   "summary": "Where:",
+   "summary": "Models tomorrow's variance as a weighted sum of a long-run level, the most recent shock, and today's variance.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
@@ -24690,24 +24725,28 @@
      "quantitative-analysis"
     ],
     "formula": "sigma_t^2 = omega + alpha * epsilon_(t-1)^2 + beta * sigma_(t-1)^2\nfrom arch import arch_model\n\n# Fit GARCH(1,1)\nmodel = arch_model(returns, vol='Garch', p=1, q=1)\nresults = model.fit()\n\n# Forecast volatility\nforecast = results.forecast(horizon=5)\npredicted_vol = np.sqrt(forecast.variance.values[-1])",
-    "explanation": "sigma_t^2 = Conditional variance at time t omega = Long-run variance weight alpha = Reaction to recent shock (typically 0.05-0.15) beta = Persistence parameter (typically 0.80-0.95) alpha + beta < 1 for stationarity ",
+    "explanation": "The two weights are the whole model: how hard a shock hits, and how slowly it decays. Their sum approaching one is persistence -- which is [[Volatility Clustering]] measured rather than observed -- and must stay below one for the process to have a long-run level at all.",
     "notes": [
-     "Key Insight: alpha + beta close to 1 means high persistence (volatility shocks take long to decay)."
-    ]
+     "Key Insight: alpha + beta close to 1 means high persistence (volatility shocks take long to decay).",
+     "sigma_t^2 = Conditional variance at time t omega = Long-run variance weight alpha = Reaction to recent shock (typically 0.05-0.15) beta = Persistence parameter (typically 0.80-0.95) alpha + beta < 1 for stationarity "
+    ],
+    "source_wording": "Where:"
    }
   },
   {
    "id": "procedure:egarch",
    "title": "egarch",
    "kind": "Procedure",
-   "summary": "Key Feature: Captures asymmetry - gamma parameter allows negative returns to impact volatility differently than positive returns (leverage effect).",
+   "summary": "The same model on the logarithm of variance, with a term that lets a fall move volatility differently from a rise.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "log(sigma_t^2) = omega + alpha * (|z_(t-1)| - E|z|) + gamma * z_(t-1) + beta * log(sigma_(t-1)^2)"
+    "formula": "log(sigma_t^2) = omega + alpha * (|z_(t-1)| - E|z|) + gamma * z_(t-1) + beta * log(sigma_(t-1)^2)",
+    "source_wording": "Key Feature: Captures asymmetry - gamma parameter allows negative returns to impact volatility differently than positive returns (leverage effect).",
+    "explanation": "The asymmetry is the point: the leverage effect is real and symmetric GARCH cannot express it. Working in logs also removes the need to constrain the parameters positive."
    }
   },
   {
@@ -24793,28 +24832,30 @@
    "id": "procedure:bollinger-band-mean-reversion",
    "title": "bollinger band mean reversion",
    "kind": "Procedure",
-   "summary": "",
+   "summary": "Buys below the lower band and sells above the upper, closing as price returns to the middle.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def bollinger_mean_reversion(close, window=20, num_std=2):\n    middle = close.rolling(window).mean()\n    std = close.rolling(window).std()\n    upper = middle + (num_std * std)\n    lower = middle - (num_std * std)\n    \n    signals = pd.Series(0, index=close.index)\n    signals[close < lower] = 1   # Long when below lower band\n    signals[close > upper] = -1  # Short when above upper band\n    signals[close.between(middle - std, middle + std)] = 0  # Exit near middle\n    \n    return signals"
+    "formula": "def bollinger_mean_reversion(close, window=20, num_std=2):\n    middle = close.rolling(window).mean()\n    std = close.rolling(window).std()\n    upper = middle + (num_std * std)\n    lower = middle - (num_std * std)\n    \n    signals = pd.Series(0, index=close.index)\n    signals[close < lower] = 1   # Long when below lower band\n    signals[close > upper] = -1  # Short when above upper band\n    signals[close.between(middle - std, middle + std)] = 0  # Exit near middle\n    \n    return signals",
+    "explanation": "The bands are a z-score in price units, so this is the [[Z-Score]] rule with a moving standard deviation: two deviations out, and back to the mean. It fails exactly where [[Mean Reversion]] fails -- when the band is being walked rather than tested."
    }
   },
   {
    "id": "procedure:rsi-mean-reversion",
    "title": "rsi mean reversion",
    "kind": "Procedure",
-   "summary": "",
+   "summary": "Buys oversold and sells overbought on RSI, exiting as it returns to the midpoint.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def rsi_mean_reversion(rsi, oversold=30, overbought=70, exit=50):\n    signals = pd.Series(0, index=rsi.index)\n    signals[rsi < oversold] = 1   # Long when oversold\n    signals[rsi > overbought] = -1  # Short when overbought\n    \n    # Exit conditions\n    # Long exit: RSI crosses above exit threshold\n    # Short exit: RSI crosses below exit threshold\n    \n    return signals"
+    "formula": "def rsi_mean_reversion(rsi, oversold=30, overbought=70, exit=50):\n    signals = pd.Series(0, index=rsi.index)\n    signals[rsi < oversold] = 1   # Long when oversold\n    signals[rsi > overbought] = -1  # Short when overbought\n    \n    # Exit conditions\n    # Long exit: RSI crosses above exit threshold\n    # Short exit: RSI crosses below exit threshold\n    \n    return signals",
+    "explanation": "The same trade as the band version with a bounded oscillator in place of a distance: thirty and seventy rather than two deviations, and fifty as the exit. Chapter 6 states the caution that matters here -- in a strong trend RSI shifts its range and stays extreme."
    }
   },
   {
@@ -24865,14 +24906,15 @@
    "id": "procedure:breakout-confirmation-filter",
    "title": "breakout confirmation filters",
    "kind": "Procedure",
-   "summary": "",
+   "summary": "Requires volume above its average, or momentum in the breakout direction, before a break counts.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def volume_confirmed_breakout(price_breakout, volume, avg_volume_period=20, threshold=1.5):\n    avg_volume = volume.rolling(avg_volume_period).mean()\n    volume_confirmation = volume > (threshold * avg_volume)\n    \n    confirmed_breakout = price_breakout & volume_confirmation\n    return confirmed_breakout\ndef momentum_confirmed_breakout(price_breakout, rsi, rsi_threshold=50):\n    # Bullish breakout confirmed by RSI > 50\n    # Bearish breakout confirmed by RSI < 50\n    bullish_confirmed = price_breakout & (price_breakout > 0) & (rsi > rsi_threshold)\n    bearish_confirmed = price_breakout & (price_breakout < 0) & (rsi < rsi_threshold)\n    \n    return bullish_confirmed, bearish_confirmed"
+    "formula": "def volume_confirmed_breakout(price_breakout, volume, avg_volume_period=20, threshold=1.5):\n    avg_volume = volume.rolling(avg_volume_period).mean()\n    volume_confirmation = volume > (threshold * avg_volume)\n    \n    confirmed_breakout = price_breakout & volume_confirmation\n    return confirmed_breakout\ndef momentum_confirmed_breakout(price_breakout, rsi, rsi_threshold=50):\n    # Bullish breakout confirmed by RSI > 50\n    # Bearish breakout confirmed by RSI < 50\n    bullish_confirmed = price_breakout & (price_breakout > 0) & (rsi > rsi_threshold)\n    bearish_confirmed = price_breakout & (price_breakout < 0) & (rsi < rsi_threshold)\n    \n    return bullish_confirmed, bearish_confirmed",
+    "explanation": "The chapter puts breakout failure at fifty to sixty per cent, and both filters attack the same failure: a level given up without participation behind it. The cost is the breaks that run without waiting."
    }
   },
   {
@@ -25001,42 +25043,46 @@
    "id": "procedure:feature-engineering-for-trading",
    "title": "feature engineering for trading",
    "kind": "Procedure",
-   "summary": "",
+   "summary": "Turns raw bars into the inputs a model reads: returns, distance from a moving average, volatility and range over several lookbacks.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "def create_price_features(df, periods=[5, 10, 20, 50]):\n    features = pd.DataFrame(index=df.index)\n    \n    for p in periods:\n        # Returns\n        features[f'return_{p}d'] = df['close'].pct_change(p)\n        \n        # Moving average distance\n        features[f'ma_dist_{p}d'] = df['close'] / df['close'].rolling(p).mean() - 1\n        \n        # Volatility\n        features[f'vol_{p}d'] = df['close'].pct_change().rolling(p).std()\n        \n        # Range\n        features[f'range_{p}d'] = (df['high'].rolling(p).max() - df['low'].rolling(p).min()) / df['close']\n    \n    return features\ndef create_indicator_features(df):\n    features = pd.DataFrame(index=df.index)\n    \n    # RSI\n    features['rsi_14'] = calculate_rsi(df['close'], 14)\n    \n    # MACD\n    features['macd'], features['macd_signal'], features['macd_hist'] = calculate_macd(df['close'])\n    \n    # Bollinger %B\n    features['bb_pct_b'] = calculate_bollinger_pct_b(df['close'])\n    \n    # ADX\n    features['adx'] = calculate_adx(df['high'], df['low'], df['close'])\n    \n    return features"
+    "formula": "def create_price_features(df, periods=[5, 10, 20, 50]):\n    features = pd.DataFrame(index=df.index)\n    \n    for p in periods:\n        # Returns\n        features[f'return_{p}d'] = df['close'].pct_change(p)\n        \n        # Moving average distance\n        features[f'ma_dist_{p}d'] = df['close'] / df['close'].rolling(p).mean() - 1\n        \n        # Volatility\n        features[f'vol_{p}d'] = df['close'].pct_change().rolling(p).std()\n        \n        # Range\n        features[f'range_{p}d'] = (df['high'].rolling(p).max() - df['low'].rolling(p).min()) / df['close']\n    \n    return features\ndef create_indicator_features(df):\n    features = pd.DataFrame(index=df.index)\n    \n    # RSI\n    features['rsi_14'] = calculate_rsi(df['close'], 14)\n    \n    # MACD\n    features['macd'], features['macd_signal'], features['macd_hist'] = calculate_macd(df['close'])\n    \n    # Bollinger %B\n    features['bb_pct_b'] = calculate_bollinger_pct_b(df['close'])\n    \n    # ADX\n    features['adx'] = calculate_adx(df['high'], df['low'], df['close'])\n    \n    return features",
+    "explanation": "The chapter puts this above model choice, and the features are mostly the library's own indicators computed at several horizons. Every one of them is a lookback decision, which is where [[Overfitting]] enters before any model is fitted."
    }
   },
   {
    "id": "procedure:classification-model",
    "title": "classification models",
    "kind": "Procedure",
-   "summary": "Predict next-period return direction",
+   "summary": "Predicts the direction of the next period from those features, validated on time-ordered splits rather than shuffled ones.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "from sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import TimeSeriesSplit\n\ndef train_direction_classifier(features, returns, n_splits=5):\n    \"\"\"\n    Predict next-period return direction\n    \"\"\"\n    # Create target: 1 if positive return, 0 if negative\n    target = (returns.shift(-1) > 0).astype(int)\n    \n    # Align features and target\n    aligned = pd.concat([features, target], axis=1).dropna()\n    X = aligned.iloc[:, :-1]\n    y = aligned.iloc[:, -1]\n    \n    # Time series cross-validation\n    tscv = TimeSeriesSplit(n_splits=n_splits)\n    \n    scores = []\n    for train_idx, test_idx in tscv.split(X):\n        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]\n        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]\n        \n        model = RandomForestClassifier(n_estimators=100, max_depth=5)\n        model.fit(X_train, y_train)\n        \n        score = model.score(X_test, y_test)\n        scores.append(score)\n    \n    return np.mean(scores), model"
+    "formula": "from sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import TimeSeriesSplit\n\ndef train_direction_classifier(features, returns, n_splits=5):\n    \"\"\"\n    Predict next-period return direction\n    \"\"\"\n    # Create target: 1 if positive return, 0 if negative\n    target = (returns.shift(-1) > 0).astype(int)\n    \n    # Align features and target\n    aligned = pd.concat([features, target], axis=1).dropna()\n    X = aligned.iloc[:, :-1]\n    y = aligned.iloc[:, -1]\n    \n    # Time series cross-validation\n    tscv = TimeSeriesSplit(n_splits=n_splits)\n    \n    scores = []\n    for train_idx, test_idx in tscv.split(X):\n        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]\n        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]\n        \n        model = RandomForestClassifier(n_estimators=100, max_depth=5)\n        model.fit(X_train, y_train)\n        \n        score = model.score(X_test, y_test)\n        scores.append(score)\n    \n    return np.mean(scores), model",
+    "source_wording": "Predict next-period return direction",
+    "explanation": "The split is the whole discipline: shuffling puts tomorrow in the training set, which is [[Look-Ahead Bias]] with a respectable name."
    }
   },
   {
    "id": "procedure:neural-network-pattern",
    "title": "neural network patterns",
    "kind": "Procedure",
-   "summary": "",
+   "summary": "Reads a window of bars as a sequence rather than a row of features, learning order-dependent structure.",
    "epistemic": "observed",
    "status": "draft",
    "props": {
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "formula": "import tensorflow as tf\nfrom tensorflow.keras.models import Sequential\nfrom tensorflow.keras.layers import LSTM, Dense, Dropout\n\ndef build_lstm_model(sequence_length, n_features):\n    model = Sequential([\n        LSTM(50, return_sequences=True, input_shape=(sequence_length, n_features)),\n        Dropout(0.2),\n        LSTM(50, return_sequences=False),\n        Dropout(0.2),\n        Dense(25, activation='relu'),\n        Dense(1, activation='sigmoid')  # Binary classification\n    ])\n    \n    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])\n    return model"
+    "formula": "import tensorflow as tf\nfrom tensorflow.keras.models import Sequential\nfrom tensorflow.keras.layers import LSTM, Dense, Dropout\n\ndef build_lstm_model(sequence_length, n_features):\n    model = Sequential([\n        LSTM(50, return_sequences=True, input_shape=(sequence_length, n_features)),\n        Dropout(0.2),\n        LSTM(50, return_sequences=False),\n        Dropout(0.2),\n        Dense(25, activation='relu'),\n        Dense(1, activation='sigmoid')  # Binary classification\n    ])\n    \n    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])\n    return model",
+    "explanation": "The trade-off the chapter states plainly: more capacity to find structure, and less ability to say what was found. Its value depends on there being sequential structure to learn, which is what [[Autocorrelation]] measures directly and cheaply."
    }
   },
   {
