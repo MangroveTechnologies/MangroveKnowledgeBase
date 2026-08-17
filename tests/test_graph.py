@@ -302,10 +302,10 @@ def test_find_stays_deterministic_within_a_rank(kg):
         """The band this id matched in, rebuilt from the node's own fields rather than read out of
         find(). Uses the library's corpus builder and matcher -- a second copy of the tokenising,
         the plural folding and the URL stripping would be testing a different search."""
-        from mangrove_kb.graph import haystacks, query_terms, rank_of
-        n = kg.nodes[node_id]
-        hay = haystacks({"name": n.name, "id": node_id, "summary": n.summary, **n.props})
-        rank = rank_of(hay, query_terms("cross"))
+        from mangrove_kb.graph import query_terms, rank_of
+        # The graph's own haystack, not a fresh one from the node's fields: the corpus includes the
+        # reasons on a node's edges, and a node can match on those alone.
+        rank = rank_of(kg._haystacks[node_id], query_terms("cross"))
         assert rank is not None, f"{node_id} matched in find() but in no tier"
         return rank
 
@@ -329,9 +329,15 @@ def test_search_reads_the_authored_detail_not_only_the_headline(kg):
         # matters and contains no space. A cruder check here reports the match as a false positive.
         def plain(text: str) -> str:
             return re.sub(r"[^a-z0-9]+", " ", text.lower())
+        # Including what a node's edges say about it -- a wired statement is text about that node,
+        # and the corpus has read it since the chapters were wired.
+        reasons = {}
+        for e in kg.edges:
+            reasons.setdefault(e.src, []).append(e.why or "")
         mentioned = {n.id for n in kg.nodes.values()
                      if plain(term) in plain(_flatten({"name": n.name, "id": n.id,
-                                                       "summary": n.summary, **n.props}))}
+                                                       "summary": n.summary, **n.props,
+                                                       "_edges": reasons.get(n.id, [])}))}
         assert mentioned, f"expected {term!r} somewhere in the graph"
         assert found == mentioned, f"{term!r}: {len(mentioned - found)} nodes mention it but do not match"
 
@@ -415,7 +421,7 @@ def test_a_query_falls_back_to_its_best_subset_only_when_nothing_carries_all_of_
     both words, so nodes carrying one of them stay out.
     """
     both = kg.find("mean reversion", limit=None)
-    assert both.total == 24, "a query that fully matches must not be widened"
+    assert both.total == 28, "a query that fully matches must not be widened"
     for row in both.items:
         hay = " ".join(kg._haystacks[row["id"]])
         assert "mean" in hay and "reversion" in hay

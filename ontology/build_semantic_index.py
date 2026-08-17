@@ -57,7 +57,9 @@ def documents(kg: KnowledgeGraph) -> tuple[list[str], list[str]]:
     docs = []
     for nid in ids:
         n = kg.nodes[nid]
-        hay = haystacks({"name": n.name, "id": nid, "summary": n.summary, **n.props})
+        # The same corpus `find` reads, edge reasons included: a wired statement is text about the
+        # node it hangs off, and leaving it out indexed the graph as it was before it was wired.
+        hay = kg._haystacks[nid]
         docs.append(" ".join(" ".join([text] * weight)
                              for text, weight in zip(hay, TIER_WEIGHTS) if text))
     return ids, docs

@@ -274,19 +274,19 @@ def search_index() -> list[dict]:
     `tests/test_viz.py` asserts the two agree on real queries, so a change to one that is not
     mirrored in the other fails.
     """
-    from ..graph import KnowledgeGraph, haystacks
+    from ..graph import KnowledgeGraph
 
     kg = KnowledgeGraph.load()
     rows = []
     for node in kg.nodes.values():
-        source = {"name": node.name, "id": node.id, "summary": node.summary, **node.props}
         rows.append({
             "id": node.id,
             "name": node.name,
             "summary": (node.summary or "")[:140],
-            # One lowercased string per tier, built by the query layer itself. Tier order
-            # IS rank order.
-            "t": list(haystacks(source)),
+            # The graph's own haystacks rather than a second call to `haystacks()`: they include
+            # the reasons on a node's edges, and rebuilding the source dict here left the page
+            # searching a corpus the library had already moved past.
+            "t": list(kg._haystacks[node.id]),
         })
     rows.sort(key=lambda r: r["id"])
     return rows

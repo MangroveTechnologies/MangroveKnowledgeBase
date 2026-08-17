@@ -88,8 +88,8 @@ def test_uc1_orientation_values(kg, guide):
 
 def test_uc2_divergence_search(kg, guide):
     r = kg.find("divergence", limit=None)
-    assert r.total == 38, "the guide says 38 matches"
-    assert "38 matches" in guide and "10 of 38" in guide
+    assert r.total == 40, "the guide says 40 matches"
+    assert "40 matches" in guide and "10 of 40" in guide
     top4 = [x["id"] for x in r.items[:4]]
     assert all("divergence" in i for i in top4), "name matches must still lead"
     for i in top4:

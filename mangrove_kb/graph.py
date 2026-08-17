@@ -428,8 +428,16 @@ class KnowledgeGraph:
         self._df: dict[str, int] = {}          # term -> how many nodes carry it; filled on demand
         self._semantic: Any = _UNSET           # the semantic index, loaded on first use
         for n in self.nodes.values():
+            # A wired statement lives on the edge it explains, not in a list on the node -- which
+            # took roughly a hundred thousand characters of the knowledge base out of the search
+            # corpus the moment the chapters were wired. `find("keep risk per trade below")` came
+            # back with `concept:option` while that exact sentence sat on an edge out of
+            # `property:max-risk-per-trade`. The reasons on a node's own edges are things said
+            # about that node, so they are part of what it can be found by.
+            reasons = " ".join(e.why for e in self._out.get(n.id, ()) if e.why)
             self._haystacks[n.id] = haystacks(
-                {"name": n.name, "id": n.id, "summary": n.summary, **n.props})
+                {"name": n.name, "id": n.id, "summary": n.summary, **n.props,
+                 "_edge_reasons": reasons})
 
     # --- loading ---------------------------------------------------------------------------------
 
