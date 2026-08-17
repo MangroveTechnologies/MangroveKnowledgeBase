@@ -310,7 +310,7 @@ an instance of the family; a signal emits a boolean, so it is *about* the family
 ### The Action panel — trim the graph to the question
 
 <p align="center">
-  <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 13 of 303'" width="100%">
+  <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 17 of 714'" width="100%">
 </p>
 
 714 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
@@ -337,7 +337,7 @@ thing that connected them is the thing you hid.
 
 ### The rail — two-level filters
 
-<img src="assets/viewer-facets.png" alt="The filter rail: Procedure splits into signal and indicator, Concept into class, entity type and domain" width="260" align="right">
+<img src="assets/viewer-facets.png" alt="The filter rail: Procedure splits into signal, formula and indicator; Concept into entity type, class and domain; and the knowledge half as Fact and Judgment" width="260" align="right">
 
 Nodes group by **ontology primitive**, edges by **relation category**, and each splits into the
 derived kind beneath it — so `signal` and `indicator` are separable inside `Procedure`, and `about`
