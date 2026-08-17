@@ -45,7 +45,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 678, 2192
+s["nodes"], s["edges"]          # 715, 2329
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -54,7 +54,7 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  678 2192
+nodes, edges  715 2329
 primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
 relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
@@ -76,7 +76,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (374 of 678) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (375 of 715) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -158,7 +158,8 @@ for r in readers:
 ```
 
 ```
-8 readers
+9 readers
+  procedure:rsi-mean-reversion             {'rsi': {'type': 'series'}}
   procedure:signal-rsi-bearish-divergence  {'rsi': {'type': 'series'}}
   procedure:signal-rsi-bullish-divergence  {'rsi': {'type': 'series'}}
   procedure:signal-rsi-cross-down          {'rsi': {'type': 'series'}}
@@ -166,8 +167,9 @@ for r in readers:
   ...
 ```
 
-All eight read the same single output, so a change to `rsi` touches all of them and a change to
-anything else touches none.
+All nine read the same single output, so a change to `rsi` touches all of them and a change to
+anything else touches none. Eight are signals the library ships; the ninth is a strategy chapter 8
+describes, which the same question reaches because it declares what it reads the same way.
 
 The `inputs` on the edge is the point: a reader that only takes `rsi` is unaffected by a change to a
 second output, and the graph tells you which is which without opening a file.
@@ -296,7 +298,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 678 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 715 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -668,7 +670,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 136 nodes
+kg.find(under="market foundations", limit=None)                 # 137 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```

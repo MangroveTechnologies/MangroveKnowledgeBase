@@ -80,6 +80,14 @@ and what came out, per kind of content, before saying anything about fidelity.
 statements: materially different wordings sit side by side (`source_wording`, `chapter_variants`),
 near-identical ones collapse. Choosing between them destroys information no reviewer asked to lose.
 
+**Two sources describing one thing is ONE node.** Not two joined by an edge -- that is the same
+choice the outer join exists to refuse, made in a different place. Chapter 7 describes the
+formations the library already detects, and the first draft made `concept:doji` beside
+`procedure:signal-doji-trigger`; folded, the node holds the shape and the predicate that finds it,
+and the chapter cost 28 new nodes instead of 43. If the two sources cut the thing differently --
+one section for hammer and hanging man where the library has a signal each -- split along the line
+the source itself draws, and give both sides what they share.
+
 **Verify a merge is additive.** No atom removed, no atom modified except declared folds, no edge
 removed. A fold that quietly replaced a code-derived summary, or a `reference_chapter` that replaced
 rather than unioned, is invisible in the totals — the node count is identical either way.
@@ -159,6 +167,15 @@ chapter's definition replaces a **code-derived** summary and the builder's is ke
 which an asset can be bought or sold without materially moving its price"* — with a wordier
 paragraph, and stripped a `[[ADX]]` link out of another. The record already says which atoms a
 chapter or a wiki page wrote: `meta.derived_atom_ids`.
+
+**One chapter can define one node twice.** Chapter 2 gives position P/L an FX formula and a futures
+formula; chapter 8 states a volatility breakout in §8.2 and again in §8.4. Both merge paths kept
+whichever arrived first and dropped the other without a word — the fold path and the plain-atom path
+each needed the same rule, and the second was found only because the parity count listed twenty-four
+lines of python that were nowhere in the record. Keep the fuller text, put the other in `notes`.
+
+**Bookkeeping keys are not content.** `_section` survived into that same rule and filed two section
+numbers as rival wordings, so a node came out with `notes: ["2.8"]`.
 
 **Replay the whole pipeline, not the stage you changed.** The determinism test rebuilt the
 code-derived half and stopped, so four of the five stages were verified only by whoever last ran

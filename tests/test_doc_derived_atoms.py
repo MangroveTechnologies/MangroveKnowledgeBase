@@ -159,22 +159,23 @@ def test_the_graph_carries_no_document_numbering(kg):
         assert not numbered.search(edge.why), f"{edge.src} -> {edge.dst}: why is numbered ({edge.why!r})"
 
 
-def test_a_chapter_with_no_declarations_refuses_to_build():
-    """Building one without them emitted a graph with no taxonomy and said nothing about it."""
+def test_a_chapter_with_no_declarations_refuses_to_build(tmp_path):
+    """Building one without them emitted a graph with no taxonomy and said nothing about it.
+
+    All eight chapters are declared now, so the undeclared chapter is written here rather than
+    borrowed from `knowledge-base/` -- the point is the refusal, not which file triggers it.
+    """
     import subprocess
     import sys
     from pathlib import Path
 
     repo = Path(__file__).resolve().parent.parent
-    # Any chapter with no entry in CHAPTERS. This one moves as chapters are ingested: it was 03
-    # until 03 was declared, and the point of the test is the refusal, not the chapter.
-    src = repo / "knowledge-base" / "08-quantitative-analysis.md"
-    if not src.is_file():
-        import pytest
-        pytest.skip("no undeclared chapter source in this checkout")
+    src = tmp_path / "99-undeclared.md"
+    src.write_text("# 99. Undeclared\n\nIntro.\n\n---\n\n## 99.1 A Section\n\n"
+                   "### Definition\n\nA thing.\n", encoding="utf-8")
     r = subprocess.run(
         [sys.executable, str(repo / "ontology" / "chapter_to_atoms.py"), str(src),
-         "--chapter-id", "quantitative-analysis", "--parent", "concept:quantitative-analysis",
+         "--chapter-id", "undeclared", "--parent", "concept:technical-analysis",
          "--ontology", str(repo / "ontology" / "signal-indicator-ontology.json"), "--table"],
         capture_output=True, text=True, timeout=120)
     assert r.returncode != 0, "an undeclared chapter built anyway"

@@ -8,7 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 678 nodes, 2192 edges, in
+carries a formula stating the predicate it computes -- 715 nodes, 2329 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
@@ -65,9 +65,9 @@ signals to 7. Files now: `averaging` 55, `momentum` 56, `oscillator` 30, `volati
 
 ### The knowledge base is in the graph
 
-Seven of the eight knowledge-base chapters are now nodes and edges beside the code-derived ones:
-market foundations, instruments and market mechanics, core trading concepts, strategy design, risk
-management, indicators and chart patterns.
+**All eight knowledge-base chapters are now nodes and edges beside the code-derived ones**: market
+foundations, instruments and market mechanics, core trading concepts, strategy design, risk
+management, indicators, chart patterns and quantitative analysis.
 The merge is an outer join -- where a chapter and the library define the same thing, the node keeps
 both wordings rather than one replacing the other.
 
@@ -96,6 +96,12 @@ oscillator, so its sections group indicators for a reader without classifying th
 
 Eight more indicators enter as knowledge without an implementation -- market breadth, VIX, standard
 deviation and Parabolic SAR among them.
+
+Quantitative analysis is where the statistical case for the rest of it lives: seasonality and how to
+test one, GARCH and EGARCH, the z-score and half-life behind mean reversion, pairs trading,
+autocorrelation, time-series and cross-sectional momentum, the ML pipeline and how it overfits, and
+carry -- which chapter 5 rates as an archetype and chapter 4's table leaves out, so it joins the
+five as the sixth.
 
 Chart patterns gives `concept:chart-pattern` the members it was created empty to wait for: head and
 shoulders, double and triple tops, triangles, flags and pennants, wedges, channels and cup and

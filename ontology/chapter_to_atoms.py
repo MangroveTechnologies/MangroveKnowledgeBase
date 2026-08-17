@@ -1783,6 +1783,173 @@ CHAPTERS: dict[str, dict] = {
             "Don't chase if completion criteria": "concept:pattern-completion",
         },
     },
+    "quantitative-analysis": {
+        # §8.3 and §8.4 head a definition `**Concept:**`, §8.7 heads it `**Logic:**`.
+        "definition_labels": ("Definition", "Concept", "Logic"),
+        # The same shape as chapter 4: named recipes under `###` headings, stated as python. No new
+        # capability -- the first chapter that needed none.
+        "taxonomy": set(),
+        "blocks_as_nodes": {
+            "Seasonality & Time-of-Day Effects": {
+                "Intraday Patterns": "Fact", "Day-of-Week Effects": "Fact",
+                "Monthly / Calendar Effects": "Fact",
+                "Statistical Testing for Seasonality": "Procedure"},
+            "Volatility Clustering": {
+                "GARCH Family Models": "Procedure", "EGARCH (Exponential GARCH)": "Procedure",
+                "Realized Volatility": "Property", "Volatility Regime Detection": "Procedure"},
+            "Mean Reversion Signals": {
+                "Z-Score Methodology": "Property", "Pairs Trading": "Procedure",
+                "Bollinger Band Mean Reversion": "Procedure", "RSI Mean Reversion": "Procedure",
+                "Half-Life of Mean Reversion": "Property"},
+            "Breakout Signals": {
+                "Donchian Channel Breakout": "Procedure", "Volatility Breakout": "Procedure",
+                "Bollinger Band Breakout": "Procedure",
+                "Breakout Confirmation Filters": "Procedure"},
+            "Autocorrelation & Momentum Persistence": {
+                "Autocorrelation Analysis": "Procedure", "Time-Series Momentum": "Procedure",
+                "Cross-Sectional Momentum": "Procedure",
+                "Momentum Decay and Lookback Selection": "Procedure",
+                "Momentum Crashes": "Fact"},
+            "Machine-Learned Patterns": {
+                "Feature Engineering for Trading": "Procedure",
+                "Classification Models": "Procedure", "Neural Network Patterns": "Procedure",
+                "Avoiding Overfitting": "Procedure"},
+            "Cross-Sectional vs Time-Series Patterns": {
+                "Time-Series Momentum (TSMOM)": "Procedure",
+                "Cross-Sectional Momentum (XSMOM)": "Procedure",
+                "Combining Approaches": "Procedure"},
+            "Carry Strategies": {
+                "FX Carry Trade": "Procedure", "Futures Roll Yield": "Procedure",
+                "Volatility Risk Premium": "Property"},
+        },
+        # §8.2 states two recipes under one heading.
+        "labelled_nodes": {"Trading Applications": {"Volatility Targeting": "Procedure",
+                                                    "Volatility Breakout": "Procedure"}},
+        "rename": {
+            # Two sections are the archetypes chapter 4 already defines, argued statistically.
+            "Mean Reversion Signals": "concept:mean-reversion",
+            "Breakout Signals": "concept:breakout-strategy",
+            # The same rule under another heading, and the same two momentum recipes stated twice.
+            "Volatility Regime Detection": "procedure:hmm-regime-detection",
+            "Avoiding Overfitting": "concept:overfitting",
+            "Time-Series Momentum (TSMOM)": "procedure:time-series-momentum",
+            "Cross-Sectional Momentum (XSMOM)": "procedure:cross-sectional-momentum",
+            # Headings that name a section rather than a thing.
+            "Seasonality & Time-of-Day Effects": "concept:seasonality",
+            "Autocorrelation & Momentum Persistence": "concept:autocorrelation",
+            "Machine-Learned Patterns": "concept:machine-learned-pattern",
+            "Cross-Sectional vs Time-Series Patterns": "concept:cross-sectional-and-time-series",
+            "Carry Strategies": "concept:carry",
+            "EGARCH (Exponential GARCH)": "procedure:egarch",
+            "Z-Score Methodology": "property:z-score",
+            "Half-Life of Mean Reversion": "property:mean-reversion-half-life",
+        },
+        "retitle": {"Seasonality & Time-of-Day Effects": "seasonality",
+                    "Autocorrelation & Momentum Persistence": "autocorrelation",
+                    "Cross-Sectional vs Time-Series Patterns": "cross-sectional and time-series",
+                    "Carry Strategies": "carry", "EGARCH (Exponential GARCH)": "EGARCH",
+                    "Z-Score Methodology": "z-score",
+                    "Half-Life of Mean Reversion": "mean-reversion half-life"},
+        # Carry is the fifth archetype chapter 5 rates and chapter 4's table leaves out.
+        "edges": [
+            ("concept:carry", "kind-of", "concept:strategy-archetype",
+             "seventy to eighty per cent right, negative skew: the profile chapter 5 gives it"),
+            ("concept:volatility-clustering", "about", "concept:volatility",
+             "the persistence that makes it forecastable at all"),
+            ("procedure:donchian-channel-breakout", "uses", "procedure:indicator-donchianchannel",
+             "the channel whose break it trades",
+             {"inputs": {"hband": {"type": "series"}, "lband": {"type": "series"}}}),
+            ("procedure:bollinger-band-breakout", "about", "procedure:signal-bb-squeeze",
+             "the compression it waits for before the break counts"),
+            ("procedure:rsi-mean-reversion", "uses", "procedure:indicator-rsi",
+             "the oscillator whose extremes it fades", {"inputs": {"rsi": {"type": "series"}}}),
+            ("procedure:bollinger-band-mean-reversion", "uses", "procedure:indicator-bollingerbands",
+             "the bands it fades back to the middle of",
+             {"inputs": {"mavg": {"type": "series"}, "hband": {"type": "series"},
+                         "lband": {"type": "series"}}}),
+            ("property:z-score", "about", "concept:mean-reversion",
+             "how far from the mean counts as far enough"),
+        ],
+        "wired": {
+            # --- §8.1 seasonality --------------------------------------------------------------
+            "Structural Causes": "concept:seasonality",
+            "Decay Risk": "concept:seasonality",
+            "Statistical Significance: Effects must be tested":
+                "procedure:statistical-testing-for-seasonality",
+            "Test effects on out-of-sample data": "concept:backtesting",
+            "Monitor for decay of effects": "concept:seasonality",
+            "Use as filter/overlay": "concept:seasonality",
+            "Be aware that well-publicized effects": "concept:seasonality",
+            # --- §8.2 volatility clustering ----------------------------------------------------
+            "Persistence: Today's volatility": "concept:volatility-clustering",
+            "Asymmetry: Negative returns": "procedure:egarch",
+            "Regime Structure": "procedure:hmm-regime-detection",
+            "Forecastability": "concept:volatility-clustering",
+            "Use rolling windows appropriate": "property:realized-volatility",
+            "Account for volatility asymmetry": "procedure:egarch",
+            "Test regime models out-of-sample": "procedure:hmm-regime-detection",
+            "Remember volatility forecasts are imperfect": "procedure:garch-family-model",
+            # --- §8.3 mean reversion -----------------------------------------------------------
+            "Equilibrium: Prices fluctuate": "concept:mean-reversion",
+            "Deviation Thresholds": "property:z-score",
+            "Risk of Trend": "concept:mean-reversion",
+            "Pairs/Spreads": "procedure:pairs-trading",
+            "Set maximum holding periods": "property:mean-reversion-half-life",
+            "Size positions inversely to deviation": "concept:position-sizing",
+            # --- §8.4 breakouts ----------------------------------------------------------------
+            "Range Expansion": "concept:compression",
+            "Momentum Persistence: True breakouts": "concept:breakout-strategy",
+            "False Breakouts: Many breakouts fail": "concept:false-breakout",
+            "Time Element: Breakouts are more reliable": "concept:breakout-strategy",
+            "Trade breakouts in direction of higher timeframe": "concept:pattern-context",
+            "Use volume/momentum confirmation": "procedure:breakout-confirmation-filter",
+            "Accept that 50-60% of breakouts may fail": "concept:pattern-reliability",
+            "Use tight initial stops": "concept:stop-and-target-engineering",
+            "Consider pyramiding": "concept:breakout-strategy",
+            "Avoid breakouts in choppy": "concept:ranging-market",
+            # --- §8.5 autocorrelation and momentum ----------------------------------------------
+            "Momentum Effect": "concept:autocorrelation",
+            "Reversal Effect": "concept:autocorrelation",
+            "Time-Varying": "concept:autocorrelation",
+            "Cross-Sectional vs. Time-Series": "concept:cross-sectional-and-time-series",
+            "Risk-Adjusted: Raw momentum": "procedure:time-series-momentum",
+            "Use volatility-adjusted momentum": "procedure:time-series-momentum",
+            "Combine time-series and cross-sectional": "procedure:combining-approach",
+            "Be aware of momentum crash risk": "fact:momentum-crash",
+            "Consider reducing momentum exposure": "fact:momentum-crash",
+            "Test multiple lookback periods": "procedure:momentum-decay-and-lookback-selection",
+            # --- §8.6 machine learning ----------------------------------------------------------
+            "Data-Driven Discovery": "concept:machine-learned-pattern",
+            "Overfitting Risk": "concept:overfitting",
+            "Feature Engineering: Input features": "procedure:feature-engineering-for-trading",
+            "Interpretability Trade-off": "procedure:neural-network-pattern",
+            "Out-of-Sample Validation": "concept:strategy-validation",
+            "Use walk-forward validation": "concept:walk-forward-optimization",
+            "Keep models simple": "concept:overfitting",
+            "Feature engineering matters more": "procedure:feature-engineering-for-trading",
+            "Require statistical significance across multiple":
+                "procedure:multiple-testing-correction",
+            "Monitor model performance and retrain": "concept:machine-learned-pattern",
+            "Be skeptical of high backtest performance": "concept:backtesting",
+            # --- §8.7 cross-sectional vs time-series ---------------------------------------------
+            "Cross-Sectional: Ranking": "procedure:cross-sectional-momentum",
+            "Time-Series: Trend and momentum": "procedure:time-series-momentum",
+            "Diversification: Combining both": "procedure:combining-approach",
+            "Market Neutrality": "procedure:cross-sectional-momentum",
+            "Capacity: Time-series": "concept:cross-sectional-and-time-series",
+            # --- §8.8 carry -----------------------------------------------------------------------
+            "Yield Differential": "procedure:fx-carry-trade",
+            "Roll Yield: Profit from futures curve": "procedure:futures-roll-yield",
+            "Time Premium": "property:volatility-risk-premium",
+            "Structural Premium": "concept:carry",
+            "Understand that carry strategies have crash risk": "concept:carry",
+            "Diversify across multiple carry sources": "concept:carry",
+            "Use position limits and stop-losses": "concept:stop-and-target-engineering",
+            "Monitor macro conditions": "concept:carry",
+            "Size positions based on expected carry": "concept:position-sizing",
+            "Combine carry with momentum": "concept:carry",
+        },
+    },
 }
 
 #: Blocks inside a taxonomy section that are still NOT kinds: "Regime Shift Triggers" lists causes
@@ -1915,6 +2082,58 @@ AUTHORED: dict[str, tuple[str, str]] = {
         'They trade certainty against price. Entering intrabar gets the tightest stop and the most '
         'failures; waiting for the retest confirms the boundary reversed roles and misses the moves '
         'that never come back.'),
+    # Eight blocks whose content is a python function with no docstring, so there is no sentence
+    # in the chapter saying what they are.
+    'procedure:bollinger-band-mean-reversion': (
+        'Buys below the lower band and sells above the upper, closing as price returns to the middle.',
+        'The bands are a z-score in price units, so this is the [[Z-Score]] rule with a moving '
+        'standard deviation: two deviations out, and back to the mean. It fails exactly where '
+        '[[Mean Reversion]] fails -- when the band is being walked rather than tested.'),
+    'procedure:rsi-mean-reversion': (
+        'Buys oversold and sells overbought on RSI, exiting as it returns to the midpoint.',
+        'The same trade as the band version with a bounded oscillator in place of a distance: '
+        'thirty and seventy rather than two deviations, and fifty as the exit. Chapter 6 states the '
+        'caution that matters here -- in a strong trend RSI shifts its range and stays extreme.'),
+    'procedure:breakout-confirmation-filter': (
+        'Requires volume above its average, or momentum in the breakout direction, before a break '
+        'counts.',
+        'The chapter puts breakout failure at fifty to sixty per cent, and both filters attack the '
+        'same failure: a level given up without participation behind it. The cost is the breaks '
+        'that run without waiting.'),
+    'procedure:statistical-testing-for-seasonality': (
+        'Compares returns inside a calendar period against returns outside it, and reports whether '
+        'the difference could be chance.',
+        'A two-sample t-test, which is what separates a seasonal effect from a story about one. '
+        'The chapter is explicit that well-published effects decay, so the test is worth rerunning '
+        'rather than citing.'),
+    'procedure:feature-engineering-for-trading': (
+        'Turns raw bars into the inputs a model reads: returns, distance from a moving average, '
+        'volatility and range over several lookbacks.',
+        'The chapter puts this above model choice, and the features are mostly the library\'s own '
+        'indicators computed at several horizons. Every one of them is a lookback decision, which '
+        'is where [[Overfitting]] enters before any model is fitted.'),
+    'procedure:classification-model': (
+        'Predicts the direction of the next period from those features, validated on time-ordered '
+        'splits rather than shuffled ones.',
+        'The split is the whole discipline: shuffling puts tomorrow in the training set, which is '
+        '[[Look-Ahead Bias]] with a respectable name.'),
+    'procedure:neural-network-pattern': (
+        'Reads a window of bars as a sequence rather than a row of features, learning order-dependent '
+        'structure.',
+        'The trade-off the chapter states plainly: more capacity to find structure, and less ability '
+        'to say what was found. Its value depends on there being sequential structure to learn, '
+        'which is what [[Autocorrelation]] measures directly and cheaply.'),
+    'procedure:garch-family-model': (
+        'Models tomorrow\'s variance as a weighted sum of a long-run level, the most recent shock, '
+        'and today\'s variance.',
+        'The two weights are the whole model: how hard a shock hits, and how slowly it decays. Their '
+        'sum approaching one is persistence -- which is [[Volatility Clustering]] measured rather '
+        'than observed -- and must stay below one for the process to have a long-run level at all.'),
+    'procedure:egarch': (
+        'The same model on the logarithm of variance, with a term that lets a fall move volatility '
+        'differently from a rise.',
+        'The asymmetry is the point: the leverage effect is real and symmetric GARCH cannot express '
+        'it. Working in logs also removes the need to constrain the parameters positive.'),
     'procedure:support-resistance-detection': (
         'Collects every swing high and low over a window and clusters the ones that fall within a '
         'tolerance of each other into levels.',
@@ -3150,6 +3369,9 @@ def singular(word: str) -> str:
         return word[:-3] + "y"
     if word.endswith("ses") or word.endswith("xes") or word.endswith("ches"):
         return word[:-2]
+    # A sibilant plural drops "es", not just the "s": "crashes" is one crash, not one "crashe".
+    if word.endswith(("ches", "shes", "sses", "xes", "zes")) and len(word) > 4:
+        return word[:-2]
     if word.endswith("s") and not word.endswith("ss") and len(word) > 3:
         return word[:-1]
     return word
@@ -3645,12 +3867,23 @@ def build(path: Path, chapter: str, parent: str,
         if len(summary) > len(cur["summary"]):
             cur["summary"] = summary
         for k, v in props.items():
-            if not v:
+            # `_section` and `_generated` are bookkeeping, stripped before the atom ships. Left in,
+            # the rule below read two section numbers as two wordings and filed one as a note.
+            if not v or k.startswith("_"):
                 continue
             if isinstance(v, list) and isinstance(cur["props"].get(k), list):
                 cur["props"][k] += [x for x in v if x not in cur["props"][k]]
             elif k not in cur["props"]:
                 cur["props"][k] = v
+            elif not _same_text(cur["props"][k], v):
+                # The same rule the fold path uses. §8.2 and §8.4 both define a volatility
+                # breakout, and keeping only the first dropped the other's python entirely.
+                keep, other = ((v, cur["props"][k]) if len(str(v)) > len(str(cur["props"][k]))
+                               else (cur["props"][k], v))
+                cur["props"][k] = keep
+                notes = cur["props"].setdefault("notes", [])
+                if other not in notes:
+                    notes.append(other)
         cur["props"].setdefault("merged_from", []).append(props.get("_section", ""))
         return nid
 
@@ -4153,11 +4386,19 @@ def build(path: Path, chapter: str, parent: str,
             if (src := named.get(token.strip().lower())) and src != nid:
                 rel(src, "about", nid, f"the chapter's example of {a['title']}")
 
-    for src, relation, dst, why in decl.get("edges", []):
+    for declared_edge in decl.get("edges", []):
+        # A fifth element carries the edge's own props. `uses` names which output it reads --
+        # `inputs` on an edge, the same key and shape as `inputs` on a node -- and the agent guide
+        # documents reading it, so an edge without it breaks a worked example.
+        src, relation, dst, why, *rest = declared_edge
         for end in (src, dst):
             if end not in atoms and end not in existing:
                 raise ValueError(f"authored edge endpoint {end!r} is not a node")
         rel(src, relation, dst, why)
+        if rest:
+            edge = next(r for r in rels if r["from_id"] == src and r["rel"] == relation
+                        and r["to_id"] == dst)
+            edge.update(rest[0])
 
     unused = {k for k in decl["wired"] if not any(k in l for l in principles + practices)}
     if unused:

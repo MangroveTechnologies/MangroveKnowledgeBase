@@ -18016,7 +18016,24 @@
     "reference_chapter": [
      "quantitative-analysis"
     ],
-    "explanation": "Seasonality and time-of-day effects, volatility clustering, mean reversion, breakout behaviour, autocorrelation and momentum persistence, machine-learned patterns, cross-sectional versus time-series effects, and carry. Where technical analysis classifies a computation by what it measures, this subject area is about the properties of the series being measured -- the evidence that a given class of computation has anything to find."
+    "explanation": "Seasonality and time-of-day effects, volatility clustering, mean reversion, breakout behaviour, autocorrelation and momentum persistence, machine-learned patterns, cross-sectional versus time-series effects, and carry. Where technical analysis classifies a computation by what it measures, this subject area is about the properties of the series being measured -- the evidence that a given class of computation has anything to find.",
+    "applications": [
+     "Seasonality: Exploit predictable calendar-based effects",
+     "Volatility Clustering: Forecast and adapt to volatility regimes",
+     "Mean Reversion: Trade deviations from equilibrium",
+     "Breakouts: Capture trend initiations and continuations",
+     "Momentum: Ride persistent price trends",
+     "Machine Learning: Discover complex, non-linear patterns",
+     "Cross-Sectional: Exploit relative value differences",
+     "Carry: Harvest structural yield premiums"
+    ],
+    "notes": [
+     "Quantitative patterns provide systematic, data-driven approaches to trading:",
+     "Successful quant trading requires rigorous statistical testing, out-of-sample validation, and realistic accounting for transaction costs and market impact."
+    ],
+    "chapter_variants": {
+     "explanation": "This document covers quantitative patterns and statistical phenomena exploited in systematic trading strategies, including seasonality effects, volatility dynamics, mean reversion signals, and machine learning approaches."
+    }
    }
   },
   {
@@ -18201,6 +18218,9 @@
      "market-foundations"
     ],
     "formula": "Effective Spread = 2 * |Trade Price - Midpoint Price|",
+    "notes": [
+     "Effective Spread = 2 * |Trade Price - Midpoint|"
+    ],
     "source_wording": "The quantity effective spread (measures actual execution cost).",
     "explanation": "It measures the cost that was really incurred rather than the one advertised, and it differs from [[Quoted Spread]] whenever a trade fills inside the quote or walks through it. It is the honest input to a [[Transaction Costs]] calculation.",
     "inputs": {
@@ -18273,6 +18293,9 @@
      "market-foundations"
     ],
     "formula": "Quoted Spread = Ask Price - Bid Price\nRelative Spread = (Ask - Bid) / Midpoint * 100%",
+    "notes": [
+     "Quoted Spread = Ask - Bid"
+    ],
     "source_wording": "The quantity quoted spread.",
     "explanation": "It is the headline number and the one that overstates what a patient trader pays, since a limit order need not cross it at all. Expressed as a fraction of the midpoint it becomes comparable across instruments at different price levels.",
     "inputs": {
@@ -19637,6 +19660,9 @@
      "instruments-market-mechanics"
     ],
     "formula": "Futures Price = Spot Price * e^((r - y) * T)",
+    "notes": [
+     "F = S * e^((r - y) * T)"
+    ],
     "source_wording": "The identity cost of carry relationship.",
     "explanation": "It is an arbitrage identity rather than a forecast: if the future strays from it, the trade is to buy one leg, sell the other and hold to expiration. It explains contango and backwardation as facts about rates, storage and convenience yield rather than as opinions about direction, and it is the same identity \u00a72.2 restates as F = S * e^((r - y) * T)."
    }
@@ -19743,6 +19769,9 @@
      "instruments-market-mechanics"
     ],
     "formula": "Notional Value = Contract Multiplier * Current Price * Number of Contracts",
+    "notes": [
+     "Notional = Price * Multiplier * Number of Contracts"
+    ],
     "source_wording": "The quantity contract value.",
     "explanation": "It is the exposure, as distinct from the margin posted against it, and the two are confused at the trader's expense -- risk is a share of notional while capital is a share of margin. Every position calculation starts here."
    }
@@ -20209,7 +20238,10 @@
     "reference_chapter": [
      "instruments-market-mechanics"
     ],
-    "formula": "P/L = (Exit Price - Entry Price) * Lot Size * Pip Value",
+    "formula": "P/L = (Exit Price - Entry Price) / Tick Size * Tick Value * Contracts",
+    "notes": [
+     "P/L = (Exit Price - Entry Price) * Lot Size * Pip Value"
+    ],
     "source_wording": "The quantity position profit/loss.",
     "explanation": "The two conventions in the chapter are the same arithmetic in different units -- FX values the move in pips times pip value, futures in ticks times [[Tick Value]] times contracts -- and both reduce to price distance times value per unit times size."
    }
@@ -21977,9 +22009,12 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "quantitative-analysis"
     ],
-    "explanation": "Prevention: Use simple models, walk-forward optimization "
+    "explanation": "Prevention: Use simple models, walk-forward optimization ",
+    "formula": "def walk_forward_validation(features, target, model_class, window=252, step=21):\n    \"\"\"\n    Walk-forward validation to avoid look-ahead bias\n    \"\"\"\n    results = []\n    \n    for i in range(window, len(features) - step, step):\n        # Train on historical window\n        X_train = features.iloc[i-window:i]\n        y_train = target.iloc[i-window:i]\n        \n        # Test on next step\n        X_test = features.iloc[i:i+step]\n        y_test = target.iloc[i:i+step]\n        \n        model = model_class()\n        model.fit(X_train, y_train)\n        \n        predictions = model.predict(X_test)\n        results.append({\n            'start': features.index[i],\n            'accuracy': (predictions == y_test).mean(),\n            'predictions': predictions\n        })\n    \n    return pd.DataFrame(results)\ndef analyze_feature_importance(model, feature_names):\n    \"\"\"\n    Understand which features drive predictions\n    \"\"\"\n    importance = pd.DataFrame({\n        'feature': feature_names,\n        'importance': model.feature_importances_\n    }).sort_values('importance', ascending=False)\n    \n    return importance",
+    "source_wording": "Walk-forward validation to avoid look-ahead bias"
    }
   },
   {
@@ -22123,7 +22158,8 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "quantitative-analysis"
     ],
     "explanation": "Often marks **trend initiation** Combines momentum entry with trend potential Accepts false breakouts as cost of discovery Win Rate: 40-50% Skew: POSITIVE (breakouts that work tend to run) Tail Risk: MODERATE - false breakouts are common Drawdowns: Choppy markets produce many false signals Range breakouts Volatility squeeze breakouts (Bollinger Band squeeze) Opening range breakouts ",
     "caution": "*Is a new move beginning?* Usage Note: Breakouts bridge momentum (entry timing) and trend (regime establishment). They work best when combined with regime filters.",
@@ -22132,7 +22168,15 @@
     "tail_risk": "Moderate",
     "best_regime": "After compression",
     "contraindicated_when": "Low volatility / no compression",
-    "why_it_fails": "False breakouts dominate"
+    "why_it_fails": "False breakouts dominate",
+    "applications": [
+     "Trend-following entry signals",
+     "Volatility breakout strategies",
+     "Channel breakout systems",
+     "News/event trading",
+     "Swing trading entries"
+    ],
+    "source_wording": "Breakout signals identify when price moves beyond a defined range or threshold, indicating potential start of a new trend or acceleration of existing trend. They are the foundation of trend-following strategies."
    }
   },
   {
@@ -22165,7 +22209,8 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "quantitative-analysis"
     ],
     "explanation": "Buy oversold conditions Sell overbought conditions Exit near perceived mean Win Rate: 60-70% (high) Skew: NEGATIVE (occasional large losses) Tail Risk: HIGH - can fail catastrophically during trend emergence Drawdowns: Single large losses can wipe out many small wins High win rate is psychologically seductive Performs best in range-bound regimes **DANGEROUS** in trending markets Negative skew means tail losses are disproportionately large RSI mean reversion Bollinger Band reversion Pairs trading Statistical arbitrage ",
     "caution": "*Has price extended too far from fair value?* CRITICAL WARNING: DO NOT describe mean reversion as \"lower risk\" or \"safer.\" High win rate does NOT equal low risk. The negative skew means losses, when they occur, are disproportionately large. Mean reversion strategies can and do blow up when trends emerge. \"The trend is your friend\" exists because fighting trends is dangerous.",
@@ -22174,7 +22219,15 @@
     "tail_risk": "High",
     "best_regime": "Range-bound only",
     "contraindicated_when": "Strong directional trends",
-    "why_it_fails": "Will blow up"
+    "why_it_fails": "Will blow up",
+    "applications": [
+     "Statistical arbitrage pairs trading",
+     "RSI/Bollinger Band reversal trades",
+     "ETF premium/discount arbitrage",
+     "Cross-sectional equity strategies",
+     "Funding rate arbitrage in crypto"
+    ],
+    "source_wording": "Mean reversion is the tendency for prices to return to an average level over time. Mean reversion strategies profit by identifying temporary deviations from fair value and trading on the expectation that prices will revert."
    }
   },
   {
@@ -22678,9 +22731,15 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "strategy-design"
+     "strategy-design",
+     "quantitative-analysis"
     ],
-    "formula": "from hmmlearn import hmm\n\ndef hmm_regime_detection(returns, n_states=2):\n    \"\"\"\n    HMM-based regime detection\n    \"\"\"\n    model = hmm.GaussianHMM(n_components=n_states, covariance_type=\"diag\")\n    model.fit(returns.values.reshape(-1, 1))\n    \n    regime = model.predict(returns.values.reshape(-1, 1))\n    return regime"
+    "formula": "from hmmlearn import hmm\n\ndef hmm_regime_detection(returns, n_states=2):\n    \"\"\"\n    HMM-based regime detection\n    \"\"\"\n    model = hmm.GaussianHMM(n_components=n_states, covariance_type=\"diag\")\n    model.fit(returns.values.reshape(-1, 1))\n    \n    regime = model.predict(returns.values.reshape(-1, 1))\n    return regime",
+    "explanation": "State 1: High volatility regime (stressed market) Transition probabilities indicate regime persistence ",
+    "source_wording": "State 0: Low volatility regime (calm market)",
+    "chapter_variants": {
+     "formula": "from hmmlearn import hmm\n\n# Fit 2-state HMM to volatility\nmodel = hmm.GaussianHMM(n_components=2, covariance_type=\"diag\")\nmodel.fit(volatility_data.reshape(-1, 1))\n\n# Predict regime\nregime = model.predict(volatility_data.reshape(-1, 1))"
+    }
    }
   },
   {
@@ -24572,6 +24631,594 @@
    "props": {
     "reference_chapter": [
      "chart-patterns"
+    ],
+    "practices": []
+   }
+  },
+  {
+   "id": "concept:seasonality",
+   "title": "seasonality",
+   "kind": "Concept",
+   "summary": "Seasonality refers to predictable, recurring patterns in asset prices or market behavior based on calendar time (time of day, day of week, month of year). These patterns arise from structural factors, fund flows, and behavioral tendencies that repeat cyclically.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "applications": [
+     "Timing entries and exits to exploit intraday patterns",
+     "Avoiding low-probability trading periods",
+     "Calendar-based strategy overlays",
+     "Volatility scheduling for execution algorithms",
+     "Month-end and quarter-end rebalancing trades"
+    ]
+   }
+  },
+  {
+   "id": "fact:intraday-pattern",
+   "title": "intraday patterns",
+   "kind": "Fact",
+   "summary": "First 30-60 minutes: High volatility, gap filling, price discovery",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def calculate_intraday_return(data, start_time, end_time):\n    # Filter data for time window\n    window_data = data.between_time(start_time, end_time)\n    # Calculate return for each day\n    returns = window_data.groupby(window_data.index.date)['close'].apply(\n        lambda x: (x.iloc[-1] / x.iloc[0] - 1) if len(x) > 1 else 0\n    )\n    return returns.mean(), returns.std()",
+    "explanation": "Amateur hour: Retail orders cluster at open Institutional orders distributed throughout day Reduced liquidity (11:30 AM - 1:30 PM ET in US markets) Lower volume, wider spreads Choppy, mean-reverting price action Often poor time for trend trades Last hour (3-4 PM ET): Increased volume and volatility MOC (Market on Close) orders create directional pressure Trend day confirmation or reversal often occurs Best liquidity of the day "
+   }
+  },
+  {
+   "id": "fact:day-of-week-effect",
+   "title": "day-of-week effects",
+   "kind": "Fact",
+   "summary": "Historically negative returns on Mondays (less pronounced now)",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "explanation": "Weekend news digestion Reduced institutional participation Positive returns on Fridays (position squaring) Some studies show Tuesday strength After large Monday moves, Tuesday often reverses Contrarian opportunity after weekend gap "
+   }
+  },
+  {
+   "id": "fact:monthly-calendar-effect",
+   "title": "monthly / calendar effects",
+   "kind": "Fact",
+   "summary": "Last trading day and first 4 days: Positive bias",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "explanation": "Pension fund flows, payroll investing One of the most persistent calendar anomalies Small-cap stocks historically outperform in January Tax-loss selling reversal Less pronounced in recent decades May-October period historically weaker than November-April \"Sell in May and go away\" Works some years, not others Last week of quarter: Fund rebalancing flows Window dressing by fund managers Increased volatility around month/quarter end Third Friday of each month (monthly options) Gamma exposure affects price dynamics Pin risk around popular strikes "
+   }
+  },
+  {
+   "id": "procedure:statistical-testing-for-seasonality",
+   "title": "statistical testing for seasonality",
+   "kind": "Procedure",
+   "summary": "Compares returns inside a calendar period against returns outside it, and reports whether the difference could be chance.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "from scipy import stats\n\ndef test_seasonal_effect(returns, is_seasonal):\n    seasonal_returns = returns[is_seasonal]\n    non_seasonal_returns = returns[~is_seasonal]\n    \n    t_stat, p_value = stats.ttest_ind(seasonal_returns, non_seasonal_returns)\n    \n    return {\n        'seasonal_mean': seasonal_returns.mean(),\n        'non_seasonal_mean': non_seasonal_returns.mean(),\n        't_statistic': t_stat,\n        'p_value': p_value,\n        'significant': p_value < 0.05\n    }",
+    "explanation": "A two-sample t-test, which is what separates a seasonal effect from a story about one. The chapter is explicit that well-published effects decay, so the test is worth rerunning rather than citing."
+   }
+  },
+  {
+   "id": "concept:volatility-clustering",
+   "title": "volatility clustering",
+   "kind": "Concept",
+   "summary": "Volatility clustering is the empirically observed phenomenon where large price changes tend to be followed by large price changes (of either sign), and small price changes tend to be followed by small price changes. This creates persistence in volatility that can be modeled and exploited.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "applications": [
+     "Volatility forecasting for risk management",
+     "Options pricing and trading",
+     "Dynamic position sizing",
+     "Regime detection for strategy switching",
+     "Stop-loss optimization"
+    ]
+   }
+  },
+  {
+   "id": "procedure:garch-family-model",
+   "title": "garch family models",
+   "kind": "Procedure",
+   "summary": "Models tomorrow's variance as a weighted sum of a long-run level, the most recent shock, and today's variance.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "sigma_t^2 = omega + alpha * epsilon_(t-1)^2 + beta * sigma_(t-1)^2\nfrom arch import arch_model\n\n# Fit GARCH(1,1)\nmodel = arch_model(returns, vol='Garch', p=1, q=1)\nresults = model.fit()\n\n# Forecast volatility\nforecast = results.forecast(horizon=5)\npredicted_vol = np.sqrt(forecast.variance.values[-1])",
+    "explanation": "The two weights are the whole model: how hard a shock hits, and how slowly it decays. Their sum approaching one is persistence -- which is [[Volatility Clustering]] measured rather than observed -- and must stay below one for the process to have a long-run level at all.",
+    "notes": [
+     "Key Insight: alpha + beta close to 1 means high persistence (volatility shocks take long to decay).",
+     "sigma_t^2 = Conditional variance at time t omega = Long-run variance weight alpha = Reaction to recent shock (typically 0.05-0.15) beta = Persistence parameter (typically 0.80-0.95) alpha + beta < 1 for stationarity "
+    ],
+    "source_wording": "Where:"
+   }
+  },
+  {
+   "id": "procedure:egarch",
+   "title": "egarch",
+   "kind": "Procedure",
+   "summary": "The same model on the logarithm of variance, with a term that lets a fall move volatility differently from a rise.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "log(sigma_t^2) = omega + alpha * (|z_(t-1)| - E|z|) + gamma * z_(t-1) + beta * log(sigma_(t-1)^2)",
+    "source_wording": "Key Feature: Captures asymmetry - gamma parameter allows negative returns to impact volatility differently than positive returns (leverage effect).",
+    "explanation": "The asymmetry is the point: the leverage effect is real and symmetric GARCH cannot express it. Working in logs also removes the need to constrain the parameters positive."
+   }
+  },
+  {
+   "id": "property:realized-volatility",
+   "title": "realized volatility",
+   "kind": "Property",
+   "summary": "Volatility calculated from high-frequency intraday returns.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "RV_t = sqrt(sum(r_i^2)) for all intraday returns r_i\n\n# With 5-minute returns\nRV = sqrt(sum of squared 5-minute returns * 252) for annualized",
+    "notes": [
+     "Advantage: More accurate than daily close-to-close volatility."
+    ]
+   }
+  },
+  {
+   "id": "procedure:volatility-targeting",
+   "title": "volatility targeting",
+   "kind": "Procedure",
+   "summary": "Adjust position to maintain target volatility",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def volatility_target_position(target_vol, current_vol, base_position):\n    \"\"\"Adjust position to maintain target volatility\"\"\"\n    return base_position * (target_vol / current_vol)"
+   }
+  },
+  {
+   "id": "procedure:volatility-breakout",
+   "title": "volatility breakout",
+   "kind": "Procedure",
+   "summary": "Enter when price moves by more than a volatility threshold from a reference point.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def atr_breakout(close, atr, multiplier=2.0):\n    reference = close.shift(1)  # Previous close\n    threshold = atr * multiplier\n    \n    signals = pd.Series(0, index=close.index)\n    signals[close > reference + threshold] = 1   # Bullish breakout\n    signals[close < reference - threshold] = -1  # Bearish breakout\n    \n    return signals\ndef opening_range_breakout(data, orb_minutes=30):\n    \"\"\"Trade breakout of first N minutes range\"\"\"\n    # Calculate opening range high/low\n    # Go long if price breaks above OR high\n    # Go short if price breaks below OR low\n    pass",
+    "notes": [
+     "Signal when current range exceeds ATR by threshold",
+     "def volatility_breakout_signal(current_range, atr, threshold=1.5):\n    \"\"\"Signal when current range exceeds ATR by threshold\"\"\"\n    return current_range > (threshold * atr)"
+    ]
+   }
+  },
+  {
+   "id": "property:z-score",
+   "title": "z-score",
+   "kind": "Property",
+   "summary": "Standard deviation distance from mean.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "Z-Score = (Price - Moving_Average) / Standard_Deviation\ndef calculate_zscore(series, window=20):\n    mean = series.rolling(window).mean()\n    std = series.rolling(window).std()\n    zscore = (series - mean) / std\n    return zscore\n\ndef mean_reversion_signals(zscore, entry_threshold=2, exit_threshold=0):\n    signals = pd.Series(0, index=zscore.index)\n    signals[zscore < -entry_threshold] = 1  # Long\n    signals[zscore > entry_threshold] = -1  # Short\n    signals[abs(zscore) < exit_threshold] = 0  # Exit\n    return signals",
+    "explanation": "Z < -2: Oversold, potential long Z > +2: Overbought, potential short Z crosses 0: Exit signal "
+   }
+  },
+  {
+   "id": "procedure:pairs-trading",
+   "title": "pairs trading",
+   "kind": "Procedure",
+   "summary": "Trade two correlated securities, going long the underperformer and short the outperformer, betting on convergence.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "from statsmodels.tsa.stattools import coint\n\ndef test_cointegration(series1, series2):\n    score, pvalue, _ = coint(series1, series2)\n    return pvalue < 0.05  # Cointegrated if p-value < 0.05\nfrom statsmodels.regression.linear_model import OLS\n\n# Find hedge ratio\nmodel = OLS(series1, series2).fit()\nhedge_ratio = model.params[0]\n\n# Calculate spread\nspread = series1 - hedge_ratio * series2",
+    "explanation": "Calculate z-score of spread Long spread when z < -2 (buy series1, sell series2) Short spread when z > +2 (sell series1, buy series2) Exit when z approaches 0 "
+   }
+  },
+  {
+   "id": "procedure:bollinger-band-mean-reversion",
+   "title": "bollinger band mean reversion",
+   "kind": "Procedure",
+   "summary": "Buys below the lower band and sells above the upper, closing as price returns to the middle.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def bollinger_mean_reversion(close, window=20, num_std=2):\n    middle = close.rolling(window).mean()\n    std = close.rolling(window).std()\n    upper = middle + (num_std * std)\n    lower = middle - (num_std * std)\n    \n    signals = pd.Series(0, index=close.index)\n    signals[close < lower] = 1   # Long when below lower band\n    signals[close > upper] = -1  # Short when above upper band\n    signals[close.between(middle - std, middle + std)] = 0  # Exit near middle\n    \n    return signals",
+    "explanation": "The bands are a z-score in price units, so this is the [[Z-Score]] rule with a moving standard deviation: two deviations out, and back to the mean. It fails exactly where [[Mean Reversion]] fails -- when the band is being walked rather than tested."
+   }
+  },
+  {
+   "id": "procedure:rsi-mean-reversion",
+   "title": "rsi mean reversion",
+   "kind": "Procedure",
+   "summary": "Buys oversold and sells overbought on RSI, exiting as it returns to the midpoint.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def rsi_mean_reversion(rsi, oversold=30, overbought=70, exit=50):\n    signals = pd.Series(0, index=rsi.index)\n    signals[rsi < oversold] = 1   # Long when oversold\n    signals[rsi > overbought] = -1  # Short when overbought\n    \n    # Exit conditions\n    # Long exit: RSI crosses above exit threshold\n    # Short exit: RSI crosses below exit threshold\n    \n    return signals",
+    "explanation": "The same trade as the band version with a bounded oscillator in place of a distance: thirty and seventy rather than two deviations, and fifty as the exit. Chapter 6 states the caution that matters here -- in a strong trend RSI shifts its range and stays extreme."
+   }
+  },
+  {
+   "id": "property:mean-reversion-half-life",
+   "title": "mean-reversion half-life",
+   "kind": "Property",
+   "summary": "Time for deviation to decay by half.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def calculate_half_life(spread):\n    spread_lag = spread.shift(1)\n    spread_diff = spread - spread_lag\n    \n    # Regress: spread_diff = beta * spread_lag + error\n    spread_lag = spread_lag.dropna()\n    spread_diff = spread_diff.dropna()\n    \n    model = OLS(spread_diff, spread_lag).fit()\n    half_life = -np.log(2) / model.params[0]\n    \n    return half_life",
+    "explanation": "Half-life < 5 days: Fast mean reversion, good for short-term trading Half-life 5-30 days: Moderate, suitable for swing trading Half-life > 30 days: Slow, may be trending or structural "
+   }
+  },
+  {
+   "id": "procedure:donchian-channel-breakout",
+   "title": "donchian channel breakout",
+   "kind": "Procedure",
+   "summary": "Breakout of N-period high or low.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "Upper Channel = Highest High over N periods\nLower Channel = Lowest Low over N periods\ndef donchian_breakout(high, low, close, entry_period=20, exit_period=10):\n    upper = high.rolling(entry_period).max()\n    lower = low.rolling(entry_period).min()\n    \n    exit_upper = high.rolling(exit_period).max()\n    exit_lower = low.rolling(exit_period).min()\n    \n    signals = pd.Series(0, index=close.index)\n    signals[close > upper.shift(1)] = 1   # Long breakout\n    signals[close < lower.shift(1)] = -1  # Short breakout\n    \n    # Exit signals\n    exit_long = close < exit_lower.shift(1)\n    exit_short = close > exit_upper.shift(1)\n    \n    return signals, exit_long, exit_short",
+    "explanation": "Entry: 20-period (Turtle system) Exit: 10-period Variations: 55-period for longer-term "
+   }
+  },
+  {
+   "id": "procedure:bollinger-band-breakout",
+   "title": "bollinger band breakout",
+   "kind": "Procedure",
+   "summary": "Breakout when price closes outside bands after squeeze.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def bollinger_squeeze(close, bb_period=20, keltner_period=20, bb_std=2, kelt_mult=1.5):\n    # Bollinger Bands\n    bb_middle = close.rolling(bb_period).mean()\n    bb_std_val = close.rolling(bb_period).std()\n    bb_upper = bb_middle + bb_std * bb_std_val\n    bb_lower = bb_middle - bb_std * bb_std_val\n    \n    # Keltner Channels (for squeeze detection)\n    # ATR calculation needed\n    # ...\n    \n    # Squeeze: BB inside Keltner\n    squeeze = (bb_upper < kelt_upper) & (bb_lower > kelt_lower)\n    \n    # Breakout: Price closes outside BB after squeeze\n    breakout_up = (close > bb_upper) & squeeze.shift(1)\n    breakout_down = (close < bb_lower) & squeeze.shift(1)\n    \n    return squeeze, breakout_up, breakout_down"
+   }
+  },
+  {
+   "id": "procedure:breakout-confirmation-filter",
+   "title": "breakout confirmation filters",
+   "kind": "Procedure",
+   "summary": "Requires volume above its average, or momentum in the breakout direction, before a break counts.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def volume_confirmed_breakout(price_breakout, volume, avg_volume_period=20, threshold=1.5):\n    avg_volume = volume.rolling(avg_volume_period).mean()\n    volume_confirmation = volume > (threshold * avg_volume)\n    \n    confirmed_breakout = price_breakout & volume_confirmation\n    return confirmed_breakout\ndef momentum_confirmed_breakout(price_breakout, rsi, rsi_threshold=50):\n    # Bullish breakout confirmed by RSI > 50\n    # Bearish breakout confirmed by RSI < 50\n    bullish_confirmed = price_breakout & (price_breakout > 0) & (rsi > rsi_threshold)\n    bearish_confirmed = price_breakout & (price_breakout < 0) & (rsi < rsi_threshold)\n    \n    return bullish_confirmed, bearish_confirmed",
+    "explanation": "The chapter puts breakout failure at fifty to sixty per cent, and both filters attack the same failure: a level given up without participation behind it. The cost is the breaks that run without waiting."
+   }
+  },
+  {
+   "id": "concept:autocorrelation",
+   "title": "autocorrelation",
+   "kind": "Concept",
+   "summary": "Autocorrelation measures the correlation of a time series with its own lagged values. Positive autocorrelation in returns indicates momentum (trending behavior), while negative autocorrelation indicates mean reversion.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "applications": [
+     "Momentum factor construction",
+     "Trend-following signal generation",
+     "Market regime classification",
+     "Strategy selection (trend vs. mean reversion)",
+     "Lookback period optimization"
+    ]
+   }
+  },
+  {
+   "id": "procedure:autocorrelation-analysis",
+   "title": "autocorrelation analysis",
+   "kind": "Procedure",
+   "summary": "Calculate autocorrelation for multiple lags",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "Autocorrelation(k) = Corr(r_t, r_(t-k))\ndef autocorrelation_analysis(returns, max_lag=20):\n    \"\"\"Calculate autocorrelation for multiple lags\"\"\"\n    from statsmodels.tsa.stattools import acf\n    \n    ac_values = acf(returns.dropna(), nlags=max_lag)\n    \n    return pd.Series(ac_values, index=range(max_lag + 1))",
+    "explanation": "Positive lag-1 autocorrelation: Trend/momentum Negative lag-1 autocorrelation: Mean reversion Significant at longer lags: Longer-term patterns "
+   }
+  },
+  {
+   "id": "procedure:time-series-momentum",
+   "title": "time-series momentum",
+   "kind": "Procedure",
+   "summary": "Go long assets with positive past returns, short assets with negative past returns.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def time_series_momentum(returns, lookback=252):\n    \"\"\"\n    Calculate time-series momentum signal\n    Signal: Sign of cumulative return over lookback\n    \"\"\"\n    cumulative_return = returns.rolling(lookback).sum()\n    signal = np.sign(cumulative_return)\n    return signal\ndef volatility_adjusted_momentum(returns, lookback=252, vol_lookback=60):\n    \"\"\"\n    Return / Volatility scaling\n    \"\"\"\n    cumulative_return = returns.rolling(lookback).sum()\n    volatility = returns.rolling(vol_lookback).std() * np.sqrt(252)\n    \n    signal = cumulative_return / volatility\n    return signal",
+    "notes": [
+     "Go long assets that have risen over lookback period, short those that have fallen.",
+     "def time_series_momentum_signal(returns, lookback=252):\n    \"\"\"\n    Binary signal based on sign of cumulative return\n    \"\"\"\n    cumulative = returns.rolling(lookback).sum()\n    return np.sign(cumulative)\n\ndef scaled_tsmom(returns, lookback=252, vol_target=0.15, vol_lookback=60):\n    \"\"\"\n    Volatility-targeted TSMOM\n    \"\"\"\n    signal = np.sign(returns.rolling(lookback).sum())\n    realized_vol = returns.rolling(vol_lookback).std() * np.sqrt(252)\n    position = signal * (vol_target / realized_vol)\n    return position.clip(-2, 2)  # Cap leverage"
+    ]
+   }
+  },
+  {
+   "id": "procedure:cross-sectional-momentum",
+   "title": "cross-sectional momentum",
+   "kind": "Procedure",
+   "summary": "Go long top-performing assets, short bottom-performing assets based on relative ranking.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def cross_sectional_momentum_signal(returns_df, lookback=252, long_pct=0.2, short_pct=0.2):\n    \"\"\"\n    Rank-based long/short portfolio\n    \"\"\"\n    # Calculate lookback returns\n    cumulative = returns_df.rolling(lookback).sum()\n    \n    # Rank within universe (0 to 1)\n    ranks = cumulative.rank(axis=1, pct=True)\n    \n    # Long top quintile, short bottom quintile\n    signals = pd.DataFrame(0.0, index=returns_df.index, columns=returns_df.columns)\n    signals[ranks > (1 - long_pct)] = 1 / (long_pct * len(returns_df.columns))\n    signals[ranks < short_pct] = -1 / (short_pct * len(returns_df.columns))\n    \n    return signals",
+    "notes": [
+     "Rank assets by past performance, go long top performers, short bottom performers.",
+     "def cross_sectional_momentum(returns_df, lookback=252, top_pct=0.2, bottom_pct=0.2):\n    \"\"\"\n    Cross-sectional momentum for universe of assets\n    \"\"\"\n    # Calculate lookback returns for each asset\n    lookback_returns = returns_df.rolling(lookback).sum()\n    \n    # Rank assets\n    ranks = lookback_returns.rank(axis=1, pct=True)\n    \n    # Long top performers, short bottom performers\n    long_signals = (ranks > (1 - top_pct)).astype(int)\n    short_signals = (ranks < bottom_pct).astype(int) * -1\n    \n    signals = long_signals + short_signals\n    return signals"
+    ]
+   }
+  },
+  {
+   "id": "procedure:momentum-decay-and-lookback-selection",
+   "title": "momentum decay and lookback selection",
+   "kind": "Procedure",
+   "summary": "Test different lookback periods for momentum",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def test_momentum_lookbacks(returns, lookbacks=[21, 63, 126, 252]):\n    \"\"\"\n    Test different lookback periods for momentum\n    \"\"\"\n    results = {}\n    for lb in lookbacks:\n        signal = np.sign(returns.rolling(lb).sum())\n        strategy_returns = signal.shift(1) * returns\n        \n        results[lb] = {\n            'return': strategy_returns.mean() * 252,\n            'sharpe': strategy_returns.mean() / strategy_returns.std() * np.sqrt(252),\n            'win_rate': (strategy_returns > 0).mean()\n        }\n    \n    return pd.DataFrame(results).T"
+   }
+  },
+  {
+   "id": "fact:momentum-crash",
+   "title": "momentum crashes",
+   "kind": "Fact",
+   "summary": "Detect conditions that precede momentum crashes",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def momentum_crash_indicator(market_returns, lookback=60):\n    \"\"\"\n    Detect conditions that precede momentum crashes\n    High market volatility + recent market decline\n    \"\"\"\n    volatility = market_returns.rolling(lookback).std() * np.sqrt(252)\n    cumulative = market_returns.rolling(lookback).sum()\n    \n    # High crash risk: High volatility AND recent decline\n    crash_risk = (volatility > volatility.quantile(0.8)) & (cumulative < 0)\n    return crash_risk",
+    "notes": [
+     "Phenomenon: Momentum strategies can experience severe drawdowns during market reversals (momentum crashes)."
+    ]
+   }
+  },
+  {
+   "id": "concept:machine-learned-pattern",
+   "title": "machine-learned patterns",
+   "kind": "Concept",
+   "summary": "Machine learning patterns are price or feature formations discovered through algorithmic analysis rather than human observation. ML models can identify complex, non-linear relationships that may not be visible to traditional technical analysis.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "applications": [
+     "Feature-based return prediction",
+     "Regime classification",
+     "Pattern recognition enhancement",
+     "Alternative data signal extraction",
+     "Risk model calibration"
+    ]
+   }
+  },
+  {
+   "id": "procedure:feature-engineering-for-trading",
+   "title": "feature engineering for trading",
+   "kind": "Procedure",
+   "summary": "Turns raw bars into the inputs a model reads: returns, distance from a moving average, volatility and range over several lookbacks.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def create_price_features(df, periods=[5, 10, 20, 50]):\n    features = pd.DataFrame(index=df.index)\n    \n    for p in periods:\n        # Returns\n        features[f'return_{p}d'] = df['close'].pct_change(p)\n        \n        # Moving average distance\n        features[f'ma_dist_{p}d'] = df['close'] / df['close'].rolling(p).mean() - 1\n        \n        # Volatility\n        features[f'vol_{p}d'] = df['close'].pct_change().rolling(p).std()\n        \n        # Range\n        features[f'range_{p}d'] = (df['high'].rolling(p).max() - df['low'].rolling(p).min()) / df['close']\n    \n    return features\ndef create_indicator_features(df):\n    features = pd.DataFrame(index=df.index)\n    \n    # RSI\n    features['rsi_14'] = calculate_rsi(df['close'], 14)\n    \n    # MACD\n    features['macd'], features['macd_signal'], features['macd_hist'] = calculate_macd(df['close'])\n    \n    # Bollinger %B\n    features['bb_pct_b'] = calculate_bollinger_pct_b(df['close'])\n    \n    # ADX\n    features['adx'] = calculate_adx(df['high'], df['low'], df['close'])\n    \n    return features",
+    "explanation": "The chapter puts this above model choice, and the features are mostly the library's own indicators computed at several horizons. Every one of them is a lookback decision, which is where [[Overfitting]] enters before any model is fitted."
+   }
+  },
+  {
+   "id": "procedure:classification-model",
+   "title": "classification models",
+   "kind": "Procedure",
+   "summary": "Predicts the direction of the next period from those features, validated on time-ordered splits rather than shuffled ones.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "from sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import TimeSeriesSplit\n\ndef train_direction_classifier(features, returns, n_splits=5):\n    \"\"\"\n    Predict next-period return direction\n    \"\"\"\n    # Create target: 1 if positive return, 0 if negative\n    target = (returns.shift(-1) > 0).astype(int)\n    \n    # Align features and target\n    aligned = pd.concat([features, target], axis=1).dropna()\n    X = aligned.iloc[:, :-1]\n    y = aligned.iloc[:, -1]\n    \n    # Time series cross-validation\n    tscv = TimeSeriesSplit(n_splits=n_splits)\n    \n    scores = []\n    for train_idx, test_idx in tscv.split(X):\n        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]\n        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]\n        \n        model = RandomForestClassifier(n_estimators=100, max_depth=5)\n        model.fit(X_train, y_train)\n        \n        score = model.score(X_test, y_test)\n        scores.append(score)\n    \n    return np.mean(scores), model",
+    "source_wording": "Predict next-period return direction",
+    "explanation": "The split is the whole discipline: shuffling puts tomorrow in the training set, which is [[Look-Ahead Bias]] with a respectable name."
+   }
+  },
+  {
+   "id": "procedure:neural-network-pattern",
+   "title": "neural network patterns",
+   "kind": "Procedure",
+   "summary": "Reads a window of bars as a sequence rather than a row of features, learning order-dependent structure.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "import tensorflow as tf\nfrom tensorflow.keras.models import Sequential\nfrom tensorflow.keras.layers import LSTM, Dense, Dropout\n\ndef build_lstm_model(sequence_length, n_features):\n    model = Sequential([\n        LSTM(50, return_sequences=True, input_shape=(sequence_length, n_features)),\n        Dropout(0.2),\n        LSTM(50, return_sequences=False),\n        Dropout(0.2),\n        Dense(25, activation='relu'),\n        Dense(1, activation='sigmoid')  # Binary classification\n    ])\n    \n    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])\n    return model",
+    "explanation": "The trade-off the chapter states plainly: more capacity to find structure, and less ability to say what was found. Its value depends on there being sequential structure to learn, which is what [[Autocorrelation]] measures directly and cheaply."
+   }
+  },
+  {
+   "id": "concept:cross-sectional-and-time-series",
+   "title": "cross-sectional and time-series",
+   "kind": "Concept",
+   "summary": "Cross-sectional patterns compare assets relative to each other at a point in time (relative value), while time-series patterns analyze individual assets over time (absolute value). Both frameworks offer distinct trading opportunities.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "comparison": "| Aspect | Time-Series | Cross-Sectional | |--------|-------------|-----------------| | Signal | Individual asset trend | Relative ranking | | Market Exposure | Net long/short varies | Can be market neutral | | Capacity | Higher | Lower | | Diversification | Across time | Across assets | | Crash Risk | Vulnerable in reversals | More stable | | Implementation | Simpler | Requires universe | ---"
+   }
+  },
+  {
+   "id": "procedure:combining-approach",
+   "title": "combining approaches",
+   "kind": "Procedure",
+   "summary": "Combine time-series and cross-sectional momentum",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def dual_momentum(returns_df, lookback=252):\n    \"\"\"\n    Combine time-series and cross-sectional momentum\n    \"\"\"\n    # Time-series filter: Only trade assets with positive absolute momentum\n    ts_signal = (returns_df.rolling(lookback).sum() > 0).astype(int)\n    \n    # Cross-sectional ranking among those with positive momentum\n    positive_only = returns_df.where(ts_signal == 1)\n    ranks = positive_only.rolling(lookback).sum().rank(axis=1, pct=True)\n    \n    # Go long only top-ranked assets that also have positive momentum\n    signals = ts_signal * (ranks > 0.8).astype(int)\n    \n    return signals"
+   }
+  },
+  {
+   "id": "concept:carry",
+   "title": "carry",
+   "kind": "Concept",
+   "summary": "Carry strategies aim to profit from holding positions that benefit from differences in yield, interest rates, or roll yield. Unlike momentum or mean reversion, carry generates returns from the passage of time and structural premiums, not price movement.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "applications": [
+     "FX carry trades",
+     "Futures roll yield capture",
+     "Options premium selling",
+     "Fixed income carry",
+     "Volatility risk premium harvesting"
+    ]
+   }
+  },
+  {
+   "id": "procedure:fx-carry-trade",
+   "title": "fx carry trade",
+   "kind": "Procedure",
+   "summary": "Borrow low-yielding currency, invest in high-yielding currency.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def fx_carry_signal(interest_rates_df):\n    \"\"\"\n    Rank currencies by interest rate for carry trade\n    \"\"\"\n    # Higher rate = long, lower rate = short\n    ranks = interest_rates_df.rank(axis=1, pct=True)\n    \n    signals = pd.DataFrame(0.0, index=interest_rates_df.index, \n                          columns=interest_rates_df.columns)\n    signals[ranks > 0.8] = 1  # Long high yielders\n    signals[ranks < 0.2] = -1  # Short low yielders\n    \n    return signals\n\ndef calculate_carry_return(fx_return, rate_differential, holding_period=1/252):\n    \"\"\"\n    Total return = FX return + Interest differential\n    \"\"\"\n    return fx_return + (rate_differential * holding_period)"
+   }
+  },
+  {
+   "id": "procedure:futures-roll-yield",
+   "title": "futures roll yield",
+   "kind": "Procedure",
+   "summary": "Go long futures in backwardation (roll yield positive), short futures in contango (roll yield negative).",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def futures_carry_signal(front_price, back_price, days_to_roll=30):\n    \"\"\"\n    Calculate roll yield and generate carry signal\n    \"\"\"\n    # Annualized roll yield\n    roll_yield = (front_price / back_price - 1) * (365 / days_to_roll)\n    \n    # Long positive carry (backwardation), short negative carry (contango)\n    signal = np.sign(roll_yield)\n    \n    return signal, roll_yield"
+   }
+  },
+  {
+   "id": "property:volatility-risk-premium",
+   "title": "volatility risk premium",
+   "kind": "Property",
+   "summary": "Implied volatility typically exceeds realized volatility (volatility risk premium). Capture by selling options.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "formula": "def volatility_risk_premium(implied_vol, realized_vol):\n    \"\"\"\n    Calculate VRP and signal\n    \"\"\"\n    vrp = implied_vol - realized_vol\n    \n    # Signal: Sell vol when VRP is high\n    signal = -np.sign(vrp) if abs(vrp) > threshold else 0\n    \n    return vrp, signal"
+   }
+  },
+  {
+   "id": "fact:quantitative-analysis-core-principles",
+   "title": "core principles",
+   "kind": "Fact",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
+    ],
+    "principles": []
+   }
+  },
+  {
+   "id": "judgment:quantitative-analysis-best-practices",
+   "title": "best practices",
+   "kind": "Judgment",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "quantitative-analysis"
     ],
     "practices": []
    }
@@ -43677,6 +44324,1126 @@
    "why": "stated across chart-patterns",
    "from_id": "judgment:chart-pattern-best-practices",
    "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "seasonality",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under seasonality & time-of-day effects",
+   "from_id": "concept:seasonality",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "intraday patterns",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "fact:intraday-pattern",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "intraday patterns",
+   "rel": "about",
+   "to": "seasonality",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "fact:intraday-pattern",
+   "to_id": "concept:seasonality"
+  },
+  {
+   "from": "day-of-week effects",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "fact:day-of-week-effect",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "day-of-week effects",
+   "rel": "about",
+   "to": "seasonality",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "fact:day-of-week-effect",
+   "to_id": "concept:seasonality"
+  },
+  {
+   "from": "monthly / calendar effects",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "fact:monthly-calendar-effect",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "monthly / calendar effects",
+   "rel": "about",
+   "to": "seasonality",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "fact:monthly-calendar-effect",
+   "to_id": "concept:seasonality"
+  },
+  {
+   "from": "statistical testing for seasonality",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "procedure:statistical-testing-for-seasonality",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "statistical testing for seasonality",
+   "rel": "about",
+   "to": "seasonality",
+   "why": "stated under seasonality & time-of-day effects",
+   "from_id": "procedure:statistical-testing-for-seasonality",
+   "to_id": "concept:seasonality"
+  },
+  {
+   "from": "volatility clustering",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under volatility clustering",
+   "from_id": "concept:volatility-clustering",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "garch family models",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:garch-family-model",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "garch family models",
+   "rel": "about",
+   "to": "volatility clustering",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:garch-family-model",
+   "to_id": "concept:volatility-clustering"
+  },
+  {
+   "from": "egarch",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:egarch",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "egarch",
+   "rel": "about",
+   "to": "volatility clustering",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:egarch",
+   "to_id": "concept:volatility-clustering"
+  },
+  {
+   "from": "realized volatility",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under volatility clustering",
+   "from_id": "property:realized-volatility",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "realized volatility",
+   "rel": "about",
+   "to": "volatility clustering",
+   "why": "stated under volatility clustering",
+   "from_id": "property:realized-volatility",
+   "to_id": "concept:volatility-clustering"
+  },
+  {
+   "from": "hidden markov model",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:hmm-regime-detection",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "hidden markov model",
+   "rel": "about",
+   "to": "volatility clustering",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:hmm-regime-detection",
+   "to_id": "concept:volatility-clustering"
+  },
+  {
+   "from": "volatility targeting",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:volatility-targeting",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "volatility targeting",
+   "rel": "about",
+   "to": "volatility clustering",
+   "why": "stated under trading applications",
+   "from_id": "procedure:volatility-targeting",
+   "to_id": "concept:volatility-clustering"
+  },
+  {
+   "from": "volatility breakout",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under volatility clustering",
+   "from_id": "procedure:volatility-breakout",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "volatility breakout",
+   "rel": "about",
+   "to": "volatility clustering",
+   "why": "stated under trading applications",
+   "from_id": "procedure:volatility-breakout",
+   "to_id": "concept:volatility-clustering"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under mean reversion signals",
+   "from_id": "concept:mean-reversion",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "z-score",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under mean reversion signals",
+   "from_id": "property:z-score",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "z-score",
+   "rel": "about",
+   "to": "mean reversion",
+   "why": "stated under mean reversion signals",
+   "from_id": "property:z-score",
+   "to_id": "concept:mean-reversion"
+  },
+  {
+   "from": "pairs trading",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under mean reversion signals",
+   "from_id": "procedure:pairs-trading",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "pairs trading",
+   "rel": "about",
+   "to": "mean reversion",
+   "why": "stated under mean reversion signals",
+   "from_id": "procedure:pairs-trading",
+   "to_id": "concept:mean-reversion"
+  },
+  {
+   "from": "bollinger band mean reversion",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under mean reversion signals",
+   "from_id": "procedure:bollinger-band-mean-reversion",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "bollinger band mean reversion",
+   "rel": "about",
+   "to": "mean reversion",
+   "why": "stated under mean reversion signals",
+   "from_id": "procedure:bollinger-band-mean-reversion",
+   "to_id": "concept:mean-reversion"
+  },
+  {
+   "from": "rsi mean reversion",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under mean reversion signals",
+   "from_id": "procedure:rsi-mean-reversion",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "rsi mean reversion",
+   "rel": "about",
+   "to": "mean reversion",
+   "why": "stated under mean reversion signals",
+   "from_id": "procedure:rsi-mean-reversion",
+   "to_id": "concept:mean-reversion"
+  },
+  {
+   "from": "mean-reversion half-life",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under mean reversion signals",
+   "from_id": "property:mean-reversion-half-life",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "mean-reversion half-life",
+   "rel": "about",
+   "to": "mean reversion",
+   "why": "stated under mean reversion signals",
+   "from_id": "property:mean-reversion-half-life",
+   "to_id": "concept:mean-reversion"
+  },
+  {
+   "from": "breakout strategy",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under breakout signals",
+   "from_id": "concept:breakout-strategy",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "donchian channel breakout",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under breakout signals",
+   "from_id": "procedure:donchian-channel-breakout",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "donchian channel breakout",
+   "rel": "about",
+   "to": "breakout strategy",
+   "why": "stated under breakout signals",
+   "from_id": "procedure:donchian-channel-breakout",
+   "to_id": "concept:breakout-strategy"
+  },
+  {
+   "from": "volatility breakout",
+   "rel": "about",
+   "to": "breakout strategy",
+   "why": "stated under breakout signals",
+   "from_id": "procedure:volatility-breakout",
+   "to_id": "concept:breakout-strategy"
+  },
+  {
+   "from": "bollinger band breakout",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under breakout signals",
+   "from_id": "procedure:bollinger-band-breakout",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "bollinger band breakout",
+   "rel": "about",
+   "to": "breakout strategy",
+   "why": "stated under breakout signals",
+   "from_id": "procedure:bollinger-band-breakout",
+   "to_id": "concept:breakout-strategy"
+  },
+  {
+   "from": "breakout confirmation filters",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under breakout signals",
+   "from_id": "procedure:breakout-confirmation-filter",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "breakout confirmation filters",
+   "rel": "about",
+   "to": "breakout strategy",
+   "why": "stated under breakout signals",
+   "from_id": "procedure:breakout-confirmation-filter",
+   "to_id": "concept:breakout-strategy"
+  },
+  {
+   "from": "autocorrelation",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under autocorrelation & momentum persistence",
+   "from_id": "concept:autocorrelation",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "autocorrelation analysis",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:autocorrelation-analysis",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "autocorrelation analysis",
+   "rel": "about",
+   "to": "autocorrelation",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:autocorrelation-analysis",
+   "to_id": "concept:autocorrelation"
+  },
+  {
+   "from": "time-series momentum",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:time-series-momentum",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "time-series momentum",
+   "rel": "about",
+   "to": "autocorrelation",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:time-series-momentum",
+   "to_id": "concept:autocorrelation"
+  },
+  {
+   "from": "cross-sectional momentum",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:cross-sectional-momentum",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "cross-sectional momentum",
+   "rel": "about",
+   "to": "autocorrelation",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:cross-sectional-momentum",
+   "to_id": "concept:autocorrelation"
+  },
+  {
+   "from": "momentum decay and lookback selection",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:momentum-decay-and-lookback-selection",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "momentum decay and lookback selection",
+   "rel": "about",
+   "to": "autocorrelation",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "procedure:momentum-decay-and-lookback-selection",
+   "to_id": "concept:autocorrelation"
+  },
+  {
+   "from": "momentum crashes",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "fact:momentum-crash",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "momentum crashes",
+   "rel": "about",
+   "to": "autocorrelation",
+   "why": "stated under autocorrelation & momentum persistence",
+   "from_id": "fact:momentum-crash",
+   "to_id": "concept:autocorrelation"
+  },
+  {
+   "from": "machine-learned patterns",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under machine-learned patterns",
+   "from_id": "concept:machine-learned-pattern",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "feature engineering for trading",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under machine-learned patterns",
+   "from_id": "procedure:feature-engineering-for-trading",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "feature engineering for trading",
+   "rel": "about",
+   "to": "machine-learned patterns",
+   "why": "stated under machine-learned patterns",
+   "from_id": "procedure:feature-engineering-for-trading",
+   "to_id": "concept:machine-learned-pattern"
+  },
+  {
+   "from": "classification models",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under machine-learned patterns",
+   "from_id": "procedure:classification-model",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "classification models",
+   "rel": "about",
+   "to": "machine-learned patterns",
+   "why": "stated under machine-learned patterns",
+   "from_id": "procedure:classification-model",
+   "to_id": "concept:machine-learned-pattern"
+  },
+  {
+   "from": "neural network patterns",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under machine-learned patterns",
+   "from_id": "procedure:neural-network-pattern",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "neural network patterns",
+   "rel": "about",
+   "to": "machine-learned patterns",
+   "why": "stated under machine-learned patterns",
+   "from_id": "procedure:neural-network-pattern",
+   "to_id": "concept:machine-learned-pattern"
+  },
+  {
+   "from": "overfitting",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under machine-learned patterns",
+   "from_id": "concept:overfitting",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "machine-learned patterns",
+   "why": "stated under machine-learned patterns",
+   "from_id": "concept:overfitting",
+   "to_id": "concept:machine-learned-pattern"
+  },
+  {
+   "from": "cross-sectional and time-series",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under cross-sectional vs time-series patterns",
+   "from_id": "concept:cross-sectional-and-time-series",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "time-series momentum",
+   "rel": "about",
+   "to": "cross-sectional and time-series",
+   "why": "stated under cross-sectional vs time-series patterns",
+   "from_id": "procedure:time-series-momentum",
+   "to_id": "concept:cross-sectional-and-time-series"
+  },
+  {
+   "from": "cross-sectional momentum",
+   "rel": "about",
+   "to": "cross-sectional and time-series",
+   "why": "stated under cross-sectional vs time-series patterns",
+   "from_id": "procedure:cross-sectional-momentum",
+   "to_id": "concept:cross-sectional-and-time-series"
+  },
+  {
+   "from": "combining approaches",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under cross-sectional vs time-series patterns",
+   "from_id": "procedure:combining-approach",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "combining approaches",
+   "rel": "about",
+   "to": "cross-sectional and time-series",
+   "why": "stated under cross-sectional vs time-series patterns",
+   "from_id": "procedure:combining-approach",
+   "to_id": "concept:cross-sectional-and-time-series"
+  },
+  {
+   "from": "carry",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "defined under carry strategies",
+   "from_id": "concept:carry",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "fx carry trade",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under carry strategies",
+   "from_id": "procedure:fx-carry-trade",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "fx carry trade",
+   "rel": "about",
+   "to": "carry",
+   "why": "stated under carry strategies",
+   "from_id": "procedure:fx-carry-trade",
+   "to_id": "concept:carry"
+  },
+  {
+   "from": "futures roll yield",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under carry strategies",
+   "from_id": "procedure:futures-roll-yield",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "futures roll yield",
+   "rel": "about",
+   "to": "carry",
+   "why": "stated under carry strategies",
+   "from_id": "procedure:futures-roll-yield",
+   "to_id": "concept:carry"
+  },
+  {
+   "from": "volatility risk premium",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated under carry strategies",
+   "from_id": "property:volatility-risk-premium",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "volatility risk premium",
+   "rel": "about",
+   "to": "carry",
+   "why": "stated under carry strategies",
+   "from_id": "property:volatility-risk-premium",
+   "to_id": "concept:carry"
+  },
+  {
+   "from": "carry",
+   "rel": "kind-of",
+   "to": "strategy archetypes",
+   "why": "seventy to eighty per cent right, negative skew: the profile chapter 5 gives it",
+   "from_id": "concept:carry",
+   "to_id": "concept:strategy-archetype"
+  },
+  {
+   "from": "volatility clustering",
+   "rel": "about",
+   "to": "volatility",
+   "why": "the persistence that makes it forecastable at all",
+   "from_id": "concept:volatility-clustering",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "donchian channel breakout",
+   "rel": "uses",
+   "to": "DonchianChannel",
+   "why": "the channel whose break it trades",
+   "from_id": "procedure:donchian-channel-breakout",
+   "to_id": "procedure:indicator-donchianchannel",
+   "inputs": {
+    "hband": {
+     "type": "series"
+    },
+    "lband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "bollinger band breakout",
+   "rel": "about",
+   "to": "bb_squeeze",
+   "why": "the compression it waits for before the break counts",
+   "from_id": "procedure:bollinger-band-breakout",
+   "to_id": "procedure:signal-bb-squeeze"
+  },
+  {
+   "from": "rsi mean reversion",
+   "rel": "uses",
+   "to": "RSI",
+   "why": "the oscillator whose extremes it fades",
+   "from_id": "procedure:rsi-mean-reversion",
+   "to_id": "procedure:indicator-rsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "bollinger band mean reversion",
+   "rel": "uses",
+   "to": "BollingerBands",
+   "why": "the bands it fades back to the middle of",
+   "from_id": "procedure:bollinger-band-mean-reversion",
+   "to_id": "procedure:indicator-bollingerbands",
+   "inputs": {
+    "mavg": {
+     "type": "series"
+    },
+    "hband": {
+     "type": "series"
+    },
+    "lband": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "seasonality",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Structural Causes: Many seasonal effects stem from institutional behavior or market mechanics \u00b7 Decay Risk: Well-known effects may diminish as markets adapt",
+   "from_id": "concept:seasonality",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "statistical testing for seasonality",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Statistical Significance: Effects must be tested for statistical validity",
+   "from_id": "procedure:statistical-testing-for-seasonality",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Transaction Costs: Small effects may not survive after costs",
+   "from_id": "concept:transaction-cost",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Regime Dependency: Seasonality can vary across market regimes",
+   "from_id": "concept:market-regime",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "volatility clustering",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Persistence: Today's volatility is predictive of tomorrow's volatility \u00b7 Forecastability: Unlike returns, volatility is partially predictable",
+   "from_id": "concept:volatility-clustering",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Mean Reversion: Extreme volatility eventually reverts to normal levels \u00b7 Equilibrium: Prices fluctuate around an equilibrium/fair value \u00b7 Holding Period: Mean reversion typically works on shorter timeframes \u00b7 Risk of Trend: What appears to be deviation may be new trend",
+   "from_id": "concept:mean-reversion",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "egarch",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Asymmetry: Negative returns often increase volatility more than positive returns",
+   "from_id": "procedure:egarch",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "hidden markov model",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Regime Structure: Markets shift between high and low volatility states",
+   "from_id": "procedure:hmm-regime-detection",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "z-score",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Deviation Thresholds: Trade when deviation exceeds statistical threshold",
+   "from_id": "property:z-score",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "pairs trading",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Pairs/Spreads: More reliable on relative value than absolute price",
+   "from_id": "procedure:pairs-trading",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "compression",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Range Expansion: Breakouts represent volatility expansion from compression",
+   "from_id": "concept:compression",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "breakout strategy",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Momentum Persistence: True breakouts tend to continue in breakout direction \u00b7 Time Element: Breakouts are more reliable from longer consolidations",
+   "from_id": "concept:breakout-strategy",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "false breakout",
+   "rel": "about",
+   "to": "core principles",
+   "why": "False Breakouts: Many breakouts fail; filtering and confirmation reduce failures",
+   "from_id": "concept:false-breakout",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volume Confirmation: Volume should expand on valid breakouts",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "autocorrelation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Momentum Effect: Past winners tend to continue winning short-term \u00b7 Reversal Effect: Extreme past winners tend to reverse long-term \u00b7 Time-Varying: Autocorrelation structure changes over time and across assets",
+   "from_id": "concept:autocorrelation",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "cross-sectional and time-series",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Cross-Sectional vs. Time-Series: Different momentum types behave differently \u00b7 Capacity: Time-series often has more capacity than cross-sectional",
+   "from_id": "concept:cross-sectional-and-time-series",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "time-series momentum",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Risk-Adjusted: Raw momentum should be adjusted for volatility \u00b7 Time-Series: Trend and momentum in individual asset drive signals",
+   "from_id": "procedure:time-series-momentum",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "machine-learned patterns",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Data-Driven Discovery: Patterns emerge from data, not predefined rules",
+   "from_id": "concept:machine-learned-pattern",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Overfitting Risk: ML models easily overfit to historical noise",
+   "from_id": "concept:overfitting",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "feature engineering for trading",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Feature Engineering: Input features often matter more than model choice",
+   "from_id": "procedure:feature-engineering-for-trading",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "neural network patterns",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Interpretability Trade-off: Complex models may be black boxes",
+   "from_id": "procedure:neural-network-pattern",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "strategy validation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Out-of-Sample Validation: Critical for avoiding false discoveries",
+   "from_id": "concept:strategy-validation",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "cross-sectional momentum",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Cross-Sectional: Ranking and relative performance drive signals \u00b7 Market Neutrality: Cross-sectional strategies can be market neutral",
+   "from_id": "procedure:cross-sectional-momentum",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "combining approaches",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Diversification: Combining both approaches improves risk-adjusted returns",
+   "from_id": "procedure:combining-approach",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "fx carry trade",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Yield Differential: Profit from interest rate or yield differences",
+   "from_id": "procedure:fx-carry-trade",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "futures roll yield",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Roll Yield: Profit from futures curve structure (contango/backwardation)",
+   "from_id": "procedure:futures-roll-yield",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "volatility risk premium",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Time Premium: Options theta capture",
+   "from_id": "property:volatility-risk-premium",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "carry",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Structural Premium: Compensation for providing liquidity or insurance",
+   "from_id": "concept:carry",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "drawdown risk",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Negative Convexity: Carry strategies often have drawdown risk",
+   "from_id": "concept:drawdown-risk",
+   "to_id": "fact:quantitative-analysis-core-principles"
+  },
+  {
+   "from": "backtesting",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Test effects on out-of-sample data before trading \u00b7 Be skeptical of high backtest performance",
+   "from_id": "concept:backtesting",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for transaction costs and slippage \u00b7 Include transaction costs in backtest (frequent trading) \u00b7 Include transaction costs in performance evaluation",
+   "from_id": "concept:transaction-cost",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "seasonality",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor for decay of effects over time \u00b7 Use as filter/overlay, not sole strategy basis \u00b7 Be aware that well-publicized effects often diminish",
+   "from_id": "concept:seasonality",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "realized volatility",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use rolling windows appropriate to trading horizon \u00b7 Incorporate realized volatility for more accurate estimates",
+   "from_id": "property:realized-volatility",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "egarch",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for volatility asymmetry (leverage effect)",
+   "from_id": "procedure:egarch",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "hidden markov model",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Test regime models out-of-sample",
+   "from_id": "procedure:hmm-regime-detection",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "garch family models",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Remember volatility forecasts are imperfect",
+   "from_id": "procedure:garch-family-model",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "mean reversion",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Test for cointegration/stationarity before assuming mean reversion \u00b7 Account for regime changes that can break mean reversion",
+   "from_id": "concept:mean-reversion",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "standard deviation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use appropriate lookback periods for mean and standard deviation",
+   "from_id": "property:standard-deviation",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "mean-reversion half-life",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Set maximum holding periods to limit trend risk",
+   "from_id": "property:mean-reversion-half-life",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "position sizing",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Size positions inversely to deviation magnitude \u00b7 Size positions based on expected carry, not just signal",
+   "from_id": "concept:position-sizing",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "pattern context",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Trade breakouts in direction of higher timeframe trend",
+   "from_id": "concept:pattern-context",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "breakout confirmation filters",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use volume/momentum confirmation to filter false breakouts",
+   "from_id": "procedure:breakout-confirmation-filter",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "pattern reliability",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Accept that 50-60% of breakouts may fail",
+   "from_id": "concept:pattern-reliability",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "stop-loss and take-profit engineering",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use tight initial stops and trail as position profits \u00b7 Use position limits and stop-losses for tail protection",
+   "from_id": "concept:stop-and-target-engineering",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "breakout strategy",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Consider pyramiding into winning breakouts",
+   "from_id": "concept:breakout-strategy",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "ranging market",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Avoid breakouts in choppy, range-bound markets",
+   "from_id": "concept:ranging-market",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "time-series momentum",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use volatility-adjusted momentum for more stable signals",
+   "from_id": "procedure:time-series-momentum",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "combining approaches",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine time-series and cross-sectional approaches",
+   "from_id": "procedure:combining-approach",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "momentum crashes",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Be aware of momentum crash risk during market reversals \u00b7 Consider reducing momentum exposure during high volatility",
+   "from_id": "fact:momentum-crash",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "momentum decay and lookback selection",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Test multiple lookback periods; no single optimal choice",
+   "from_id": "procedure:momentum-decay-and-lookback-selection",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "walk-forward optimization",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use walk-forward validation, never standard cross-validation",
+   "from_id": "concept:walk-forward-optimization",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Keep models simple; complex models overfit",
+   "from_id": "concept:overfitting",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "feature engineering for trading",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Feature engineering matters more than model choice",
+   "from_id": "procedure:feature-engineering-for-trading",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "multiple testing correction",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Require statistical significance across multiple time periods",
+   "from_id": "procedure:multiple-testing-correction",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "machine-learned patterns",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Monitor model performance and retrain periodically",
+   "from_id": "concept:machine-learned-pattern",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "carry",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Understand that carry strategies have crash risk (negative skew) \u00b7 Diversify across multiple carry sources \u00b7 Monitor macro conditions that can trigger carry unwinds \u00b7 Combine carry with momentum for improved risk-adjusted returns",
+   "from_id": "concept:carry",
+   "to_id": "judgment:quantitative-analysis-best-practices"
+  },
+  {
+   "from": "core principles",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated across quantitative-analysis",
+   "from_id": "fact:quantitative-analysis-core-principles",
+   "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "best practices",
+   "rel": "part-of",
+   "to": "quantitative analysis",
+   "why": "stated across quantitative-analysis",
+   "from_id": "judgment:quantitative-analysis-best-practices",
+   "to_id": "concept:quantitative-analysis"
   }
  ],
  "meta": {
@@ -43714,6 +45481,7 @@
    "concept:anchored-walk-forward",
    "concept:arbitrageur",
    "concept:auction-based-discovery",
+   "concept:autocorrelation",
    "concept:automated-market-maker",
    "concept:backtesting",
    "concept:bearish-fair-value-gap",
@@ -43724,6 +45492,7 @@
    "concept:buy-side-liquidity",
    "concept:call-option",
    "concept:capital-efficiency",
+   "concept:carry",
    "concept:central-counterparty",
    "concept:centralized-exchange",
    "concept:change-of-character",
@@ -43740,6 +45509,7 @@
    "concept:contract-specification",
    "concept:correlation-risk",
    "concept:cross-market-discovery",
+   "concept:cross-sectional-and-time-series",
    "concept:crypto-settlement",
    "concept:crypto-specific-mechanics",
    "concept:cryptocurrency-spot-market",
@@ -43801,6 +45571,7 @@
    "concept:look-ahead-bias",
    "concept:low-volatility-regime",
    "concept:low-volume-node",
+   "concept:machine-learned-pattern",
    "concept:margin",
    "concept:market-breadth",
    "concept:market-efficiency",
@@ -43851,6 +45622,7 @@
    "concept:rolling-walk-forward",
    "concept:scalping",
    "concept:scenario-analysis",
+   "concept:seasonality",
    "concept:selection-bias",
    "concept:sell-side-liquidity",
    "concept:settlement",
@@ -43886,6 +45658,7 @@
    "concept:two-bar-reversal",
    "concept:value-area-high",
    "concept:value-area-low",
+   "concept:volatility-clustering",
    "concept:volatility-strategy",
    "concept:volume",
    "concept:volume-confirmation",
@@ -43897,12 +45670,17 @@
    "fact:chart-pattern-core-principles",
    "fact:constant-product-amm",
    "fact:cost-of-carry-relationship",
+   "fact:day-of-week-effect",
    "fact:indicator-core-principles",
+   "fact:intraday-pattern",
    "fact:market-foundations-core-principles",
    "fact:market-mechanics-core-principles",
+   "fact:momentum-crash",
+   "fact:monthly-calendar-effect",
    "fact:per-trade-risk-vs-strategy-risk",
    "fact:price-action-core-principles",
    "fact:put-call-parity",
+   "fact:quantitative-analysis-core-principles",
    "fact:range-shift",
    "fact:recovery-mathematics",
    "fact:regime-determines-archetype-effectiveness",
@@ -43919,6 +45697,7 @@
    "judgment:market-mechanics-best-practices",
    "judgment:oscillator-trend-line",
    "judgment:price-action-best-practices",
+   "judgment:quantitative-analysis-best-practices",
    "judgment:reducing-risk-of-ruin",
    "judgment:risk-management-best-practices",
    "judgment:scenario-action-plan",
@@ -43934,29 +45713,42 @@
    "procedure:arnaud-legoux-moving-average",
    "procedure:atr-based-stop",
    "procedure:atr-trailing-stop",
+   "procedure:autocorrelation-analysis",
    "procedure:bearish-fvg-detection",
    "procedure:black-scholes-call-price",
+   "procedure:bollinger-band-breakout",
+   "procedure:bollinger-band-mean-reversion",
    "procedure:break-even-stop",
+   "procedure:breakout-confirmation-filter",
    "procedure:breakout-entry",
    "procedure:bullish-fvg-detection",
    "procedure:calendar-filter",
    "procedure:capital-allocation-framework",
+   "procedure:classification-model",
+   "procedure:combining-approach",
    "procedure:concentration-limit",
    "procedure:correlation-adjusted-position-sizing",
    "procedure:correlation-stress-testing",
+   "procedure:cross-sectional-momentum",
    "procedure:daily-loss-limit",
    "procedure:dividend-adjustment",
+   "procedure:donchian-channel-breakout",
    "procedure:efficiency-ratio",
+   "procedure:egarch",
    "procedure:entry-indicator-based",
    "procedure:entry-pattern-based",
    "procedure:entry-statistical-based",
    "procedure:equal-level-detection",
    "procedure:exit-on-indicator",
+   "procedure:feature-engineering-for-trading",
    "procedure:fixed-fractional-position-sizing",
    "procedure:fixed-stop",
    "procedure:fixed-target",
+   "procedure:futures-roll-yield",
    "procedure:fvg-fill-status",
    "procedure:fvg-validity",
+   "procedure:fx-carry-trade",
+   "procedure:garch-family-model",
    "procedure:garch-model",
    "procedure:handling-missing-data",
    "procedure:historical-stress-test",
@@ -43973,11 +45765,14 @@
    "procedure:maximum-drawdown-limit",
    "procedure:mcclellan-oscillator",
    "procedure:mcclellan-summation-index",
+   "procedure:momentum-decay-and-lookback-selection",
    "procedure:monte-carlo-ruin-estimation",
    "procedure:multi-factor-confirmation",
    "procedure:multiple-testing-correction",
+   "procedure:neural-network-pattern",
    "procedure:opposing-signal-exit",
    "procedure:outlier-detection",
+   "procedure:pairs-trading",
    "procedure:parabolic-sar",
    "procedure:parabolic-sar-stop",
    "procedure:parameter-optimization",
@@ -43987,12 +45782,14 @@
    "procedure:regime-filter",
    "procedure:returns-t-test",
    "procedure:risk-multiple-target",
+   "procedure:rsi-mean-reversion",
    "procedure:scale-out",
    "procedure:session-filter",
    "procedure:simple-trailing-stop",
    "procedure:slippage-modeling",
    "procedure:sniper-liquidity-seeking",
    "procedure:split-adjustment",
+   "procedure:statistical-testing-for-seasonality",
    "procedure:strategy-risk-assessment",
    "procedure:structure-based-stop",
    "procedure:structure-break-detection",
@@ -44003,6 +45800,7 @@
    "procedure:time-based-drawdown-recovery",
    "procedure:time-based-exit",
    "procedure:time-period-stability",
+   "procedure:time-series-momentum",
    "procedure:timeframe-confirmation",
    "procedure:transaction-cost-model",
    "procedure:trend-classification",
@@ -44012,8 +45810,10 @@
    "procedure:value-area-calculation",
    "procedure:variable-index-dynamic-average",
    "procedure:volatility-adjusted-position-sizing",
+   "procedure:volatility-breakout",
    "procedure:volatility-filter",
    "procedure:volatility-percentile-regime",
+   "procedure:volatility-targeting",
    "procedure:volume-profile",
    "procedure:vwap",
    "procedure:zone-identification",
@@ -44048,6 +45848,7 @@
    "property:max-open-trade",
    "property:max-risk-per-trade",
    "property:max-weekly-loss",
+   "property:mean-reversion-half-life",
    "property:netting-benefit",
    "property:notional-value",
    "property:order-flow-delta",
@@ -44064,6 +45865,7 @@
    "property:quoted-spread",
    "property:range-ratio",
    "property:realized-spread",
+   "property:realized-volatility",
    "property:relative-spread",
    "property:relative-volume",
    "property:return-amplification",
@@ -44081,7 +45883,9 @@
    "property:value-at-risk",
    "property:volatility-index",
    "property:volatility-ratio",
+   "property:volatility-risk-premium",
    "property:volume-profile-metric",
+   "property:z-score",
    "property:zone-freshness",
    "property:zone-overlap"
   ],
@@ -44137,6 +45941,16 @@
     "concept:price-discovery"
    ],
    [
+    "concept:autocorrelation",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:autocorrelation",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "concept:automated-market-maker",
     "kind-of",
     "concept:crypto-specific-mechanics"
@@ -44165,6 +45979,11 @@
     "concept:backtesting",
     "about",
     "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:backtesting",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "concept:backtesting",
@@ -44228,8 +46047,23 @@
    ],
    [
     "concept:breakout-strategy",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:breakout-strategy",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "concept:breakout-strategy",
     "kind-of",
     "concept:strategy-archetype"
+   ],
+   [
+    "concept:breakout-strategy",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "concept:breakout-strategy",
@@ -44280,6 +46114,26 @@
     "concept:capital-efficiency",
     "part-of",
     "concept:risk-management"
+   ],
+   [
+    "concept:carry",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:carry",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "concept:carry",
+    "kind-of",
+    "concept:strategy-archetype"
+   ],
+   [
+    "concept:carry",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "concept:central-counterparty",
@@ -44414,6 +46268,11 @@
    [
     "concept:compression",
     "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:compression",
+    "about",
     "judgment:indicator-best-practices"
    ],
    [
@@ -44520,6 +46379,16 @@
     "concept:cross-market-discovery",
     "uses",
     "property:information-share"
+   ],
+   [
+    "concept:cross-sectional-and-time-series",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:cross-sectional-and-time-series",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "concept:crypto-settlement",
@@ -44708,6 +46577,11 @@
    ],
    [
     "concept:drawdown-risk",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:drawdown-risk",
     "kind-of",
     "concept:risk-dimension"
    ],
@@ -44885,6 +46759,11 @@
     "concept:false-breakout",
     "about",
     "concept:pattern-reliability"
+   ],
+   [
+    "concept:false-breakout",
+    "about",
+    "fact:quantitative-analysis-core-principles"
    ],
    [
     "concept:false-breakout",
@@ -45337,6 +47216,21 @@
     "concept:volume-profile"
    ],
    [
+    "concept:machine-learned-pattern",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:machine-learned-pattern",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "concept:machine-learned-pattern",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "concept:margin",
     "about",
     "fact:market-mechanics-core-principles"
@@ -45479,6 +47373,11 @@
    [
     "concept:market-regime",
     "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:market-regime",
+    "about",
     "fact:strategy-design-core-principles"
    ],
    [
@@ -45539,7 +47438,17 @@
    [
     "concept:mean-reversion",
     "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
     "fact:win-rate-is-not-risk"
+   ],
+   [
+    "concept:mean-reversion",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "concept:mean-reversion",
@@ -45550,6 +47459,11 @@
     "concept:mean-reversion",
     "kind-of",
     "concept:strategy-archetype"
+   ],
+   [
+    "concept:mean-reversion",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "concept:mean-reversion",
@@ -45684,12 +47598,22 @@
    [
     "concept:overfitting",
     "about",
+    "concept:machine-learned-pattern"
+   ],
+   [
+    "concept:overfitting",
+    "about",
     "concept:strategy-validation"
    ],
    [
     "concept:overfitting",
     "about",
     "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:overfitting",
+    "about",
+    "fact:quantitative-analysis-core-principles"
    ],
    [
     "concept:overfitting",
@@ -45704,7 +47628,17 @@
    [
     "concept:overfitting",
     "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "concept:overfitting",
+    "about",
     "judgment:strategy-design-best-practices"
+   ],
+   [
+    "concept:overfitting",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "concept:overfitting",
@@ -45748,6 +47682,11 @@
    ],
    [
     "concept:pattern-context",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "concept:pattern-context",
     "part-of",
     "concept:chart-pattern"
    ],
@@ -45770,6 +47709,11 @@
     "concept:pattern-reliability",
     "about",
     "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:pattern-reliability",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "concept:pattern-reliability",
@@ -45855,6 +47799,11 @@
     "concept:position-sizing",
     "about",
     "judgment:indicator-best-practices"
+   ],
+   [
+    "concept:position-sizing",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "concept:position-sizing",
@@ -45970,6 +47919,11 @@
     "concept:ranging-market",
     "about",
     "judgment:price-action-best-practices"
+   ],
+   [
+    "concept:ranging-market",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "concept:ranging-market",
@@ -46122,6 +48076,21 @@
     "concept:risk-management"
    ],
    [
+    "concept:seasonality",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:seasonality",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "concept:seasonality",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "concept:selection-bias",
     "about",
     "concept:strategy-validation"
@@ -46229,6 +48198,11 @@
    [
     "concept:stop-and-target-engineering",
     "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "concept:stop-and-target-engineering",
+    "about",
     "judgment:risk-management-best-practices"
    ],
    [
@@ -46320,6 +48294,11 @@
     "concept:strategy-skew",
     "kind-of",
     "concept:risk-dimension"
+   ],
+   [
+    "concept:strategy-validation",
+    "about",
+    "fact:quantitative-analysis-core-principles"
    ],
    [
     "concept:strategy-validation",
@@ -46539,12 +48518,22 @@
    [
     "concept:transaction-cost",
     "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:transaction-cost",
+    "about",
     "judgment:chart-pattern-best-practices"
    ],
    [
     "concept:transaction-cost",
     "about",
     "judgment:market-foundations-best-practices"
+   ],
+   [
+    "concept:transaction-cost",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "concept:transaction-cost",
@@ -46687,6 +48676,21 @@
     "concept:market-foundations"
    ],
    [
+    "concept:volatility-clustering",
+    "about",
+    "concept:volatility"
+   ],
+   [
+    "concept:volatility-clustering",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:volatility-clustering",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "concept:volatility-strategy",
     "about",
     "concept:high-volatility-regime"
@@ -46754,6 +48758,11 @@
    [
     "concept:volume-confirmation",
     "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "concept:volume-confirmation",
+    "about",
     "judgment:chart-pattern-best-practices"
    ],
    [
@@ -46795,6 +48804,11 @@
     "concept:walk-forward-optimization",
     "about",
     "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:walk-forward-optimization",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "concept:walk-forward-optimization",
@@ -46857,9 +48871,29 @@
     "judgment:market-mechanics-best-practices"
    ],
    [
+    "fact:day-of-week-effect",
+    "about",
+    "concept:seasonality"
+   ],
+   [
+    "fact:day-of-week-effect",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "fact:indicator-core-principles",
     "part-of",
     "concept:indicator"
+   ],
+   [
+    "fact:intraday-pattern",
+    "about",
+    "concept:seasonality"
+   ],
+   [
+    "fact:intraday-pattern",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "fact:market-foundations-core-principles",
@@ -46870,6 +48904,31 @@
     "fact:market-mechanics-core-principles",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "fact:momentum-crash",
+    "about",
+    "concept:autocorrelation"
+   ],
+   [
+    "fact:momentum-crash",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "fact:momentum-crash",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
+    "fact:monthly-calendar-effect",
+    "about",
+    "concept:seasonality"
+   ],
+   [
+    "fact:monthly-calendar-effect",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "fact:per-trade-risk-vs-strategy-risk",
@@ -46900,6 +48959,11 @@
     "fact:put-call-parity",
     "about",
     "concept:put-option"
+   ],
+   [
+    "fact:quantitative-analysis-core-principles",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "fact:range-shift",
@@ -47045,6 +49109,11 @@
     "judgment:price-action-best-practices",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "judgment:quantitative-analysis-best-practices",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "judgment:reducing-risk-of-ruin",
@@ -47287,6 +49356,16 @@
     "procedure:indicator-atr"
    ],
    [
+    "procedure:autocorrelation-analysis",
+    "about",
+    "concept:autocorrelation"
+   ],
+   [
+    "procedure:autocorrelation-analysis",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "procedure:bearish-fvg-detection",
     "about",
     "concept:bearish-fair-value-gap"
@@ -47302,6 +49381,36 @@
     "concept:option"
    ],
    [
+    "procedure:bollinger-band-breakout",
+    "about",
+    "concept:breakout-strategy"
+   ],
+   [
+    "procedure:bollinger-band-breakout",
+    "about",
+    "procedure:signal-bb-squeeze"
+   ],
+   [
+    "procedure:bollinger-band-breakout",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
+    "procedure:bollinger-band-mean-reversion",
+    "about",
+    "concept:mean-reversion"
+   ],
+   [
+    "procedure:bollinger-band-mean-reversion",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
+    "procedure:bollinger-band-mean-reversion",
+    "uses",
+    "procedure:indicator-bollingerbands"
+   ],
+   [
     "procedure:break-even-stop",
     "about",
     "concept:stop-and-target-engineering"
@@ -47315,6 +49424,21 @@
     "procedure:break-even-stop",
     "part-of",
     "concept:risk-management"
+   ],
+   [
+    "procedure:breakout-confirmation-filter",
+    "about",
+    "concept:breakout-strategy"
+   ],
+   [
+    "procedure:breakout-confirmation-filter",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:breakout-confirmation-filter",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:breakout-entry",
@@ -47365,6 +49489,36 @@
     "procedure:capital-allocation-framework",
     "part-of",
     "concept:risk-management"
+   ],
+   [
+    "procedure:classification-model",
+    "about",
+    "concept:machine-learned-pattern"
+   ],
+   [
+    "procedure:classification-model",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
+    "procedure:combining-approach",
+    "about",
+    "concept:cross-sectional-and-time-series"
+   ],
+   [
+    "procedure:combining-approach",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:combining-approach",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:combining-approach",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:concentration-limit",
@@ -47427,6 +49581,26 @@
     "concept:risk-management"
    ],
    [
+    "procedure:cross-sectional-momentum",
+    "about",
+    "concept:autocorrelation"
+   ],
+   [
+    "procedure:cross-sectional-momentum",
+    "about",
+    "concept:cross-sectional-and-time-series"
+   ],
+   [
+    "procedure:cross-sectional-momentum",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:cross-sectional-momentum",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "procedure:daily-loss-limit",
     "about",
     "concept:drawdown-control"
@@ -47452,6 +49626,21 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:donchian-channel-breakout",
+    "about",
+    "concept:breakout-strategy"
+   ],
+   [
+    "procedure:donchian-channel-breakout",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
+    "procedure:donchian-channel-breakout",
+    "uses",
+    "procedure:indicator-donchianchannel"
+   ],
+   [
     "procedure:efficiency-ratio",
     "about",
     "concept:regime-detection"
@@ -47460,6 +49649,26 @@
     "procedure:efficiency-ratio",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:egarch",
+    "about",
+    "concept:volatility-clustering"
+   ],
+   [
+    "procedure:egarch",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:egarch",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:egarch",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:entry-indicator-based",
@@ -47510,6 +49719,26 @@
     "procedure:exit-on-indicator",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:feature-engineering-for-trading",
+    "about",
+    "concept:machine-learned-pattern"
+   ],
+   [
+    "procedure:feature-engineering-for-trading",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:feature-engineering-for-trading",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:feature-engineering-for-trading",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:fixed-fractional-position-sizing",
@@ -47567,6 +49796,21 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:futures-roll-yield",
+    "about",
+    "concept:carry"
+   ],
+   [
+    "procedure:futures-roll-yield",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:futures-roll-yield",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "procedure:fvg-fill-status",
     "about",
     "concept:fair-value-gap"
@@ -47600,6 +49844,36 @@
     "procedure:fvg-validity",
     "uses",
     "procedure:indicator-atr"
+   ],
+   [
+    "procedure:fx-carry-trade",
+    "about",
+    "concept:carry"
+   ],
+   [
+    "procedure:fx-carry-trade",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:fx-carry-trade",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
+    "procedure:garch-family-model",
+    "about",
+    "concept:volatility-clustering"
+   ],
+   [
+    "procedure:garch-family-model",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:garch-family-model",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:garch-model",
@@ -47640,6 +49914,26 @@
     "procedure:hmm-regime-detection",
     "about",
     "concept:regime-detection"
+   ],
+   [
+    "procedure:hmm-regime-detection",
+    "about",
+    "concept:volatility-clustering"
+   ],
+   [
+    "procedure:hmm-regime-detection",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:hmm-regime-detection",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:hmm-regime-detection",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:hmm-regime-detection",
@@ -48097,6 +50391,21 @@
     "procedure:mcclellan-oscillator"
    ],
    [
+    "procedure:momentum-decay-and-lookback-selection",
+    "about",
+    "concept:autocorrelation"
+   ],
+   [
+    "procedure:momentum-decay-and-lookback-selection",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:momentum-decay-and-lookback-selection",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "procedure:monte-carlo-ruin-estimation",
     "about",
     "concept:risk-of-ruin"
@@ -48139,12 +50448,32 @@
    [
     "procedure:multiple-testing-correction",
     "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:multiple-testing-correction",
+    "about",
     "judgment:strategy-design-best-practices"
    ],
    [
     "procedure:multiple-testing-correction",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:neural-network-pattern",
+    "about",
+    "concept:machine-learned-pattern"
+   ],
+   [
+    "procedure:neural-network-pattern",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:neural-network-pattern",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:opposing-signal-exit",
@@ -48170,6 +50499,21 @@
     "procedure:outlier-detection",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:pairs-trading",
+    "about",
+    "concept:mean-reversion"
+   ],
+   [
+    "procedure:pairs-trading",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:pairs-trading",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:parabolic-sar",
@@ -48305,6 +50649,21 @@
     "procedure:risk-multiple-target",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:rsi-mean-reversion",
+    "about",
+    "concept:mean-reversion"
+   ],
+   [
+    "procedure:rsi-mean-reversion",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
+    "procedure:rsi-mean-reversion",
+    "uses",
+    "procedure:indicator-rsi"
    ],
    [
     "procedure:scale-out",
@@ -48612,6 +50971,21 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:statistical-testing-for-seasonality",
+    "about",
+    "concept:seasonality"
+   ],
+   [
+    "procedure:statistical-testing-for-seasonality",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:statistical-testing-for-seasonality",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "procedure:strategy-risk-assessment",
     "about",
     "concept:risk-dimension"
@@ -48772,6 +51146,31 @@
     "concept:strategy-design"
    ],
    [
+    "procedure:time-series-momentum",
+    "about",
+    "concept:autocorrelation"
+   ],
+   [
+    "procedure:time-series-momentum",
+    "about",
+    "concept:cross-sectional-and-time-series"
+   ],
+   [
+    "procedure:time-series-momentum",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "procedure:time-series-momentum",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "procedure:time-series-momentum",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "procedure:timeframe-confirmation",
     "about",
     "concept:entry-logic"
@@ -48877,6 +51276,21 @@
     "concept:risk-management"
    ],
    [
+    "procedure:volatility-breakout",
+    "about",
+    "concept:breakout-strategy"
+   ],
+   [
+    "procedure:volatility-breakout",
+    "about",
+    "concept:volatility-clustering"
+   ],
+   [
+    "procedure:volatility-breakout",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "procedure:volatility-filter",
     "about",
     "concept:entry-logic"
@@ -48895,6 +51309,16 @@
     "procedure:volatility-percentile-regime",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "procedure:volatility-targeting",
+    "about",
+    "concept:volatility-clustering"
+   ],
+   [
+    "procedure:volatility-targeting",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "procedure:volume-profile",
@@ -49327,6 +51751,21 @@
     "concept:trading-rule"
    ],
    [
+    "property:mean-reversion-half-life",
+    "about",
+    "concept:mean-reversion"
+   ],
+   [
+    "property:mean-reversion-half-life",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "property:mean-reversion-half-life",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "property:netting-benefit",
     "about",
     "concept:central-counterparty"
@@ -49522,6 +51961,21 @@
     "property:effective-spread"
    ],
    [
+    "property:realized-volatility",
+    "about",
+    "concept:volatility-clustering"
+   ],
+   [
+    "property:realized-volatility",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
+   ],
+   [
+    "property:realized-volatility",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "property:relative-spread",
     "about",
     "concept:bid-ask-spread"
@@ -49605,6 +52059,11 @@
     "property:standard-deviation",
     "about",
     "concept:volatility"
+   ],
+   [
+    "property:standard-deviation",
+    "about",
+    "judgment:quantitative-analysis-best-practices"
    ],
    [
     "property:standard-deviation",
@@ -49747,6 +52206,21 @@
     "property:historical-volatility"
    ],
    [
+    "property:volatility-risk-premium",
+    "about",
+    "concept:carry"
+   ],
+   [
+    "property:volatility-risk-premium",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "property:volatility-risk-premium",
+    "part-of",
+    "concept:quantitative-analysis"
+   ],
+   [
     "property:volume-profile-metric",
     "about",
     "concept:ranging-market"
@@ -49760,6 +52234,21 @@
     "property:volume-profile-metric",
     "about",
     "judgment:price-action-best-practices"
+   ],
+   [
+    "property:z-score",
+    "about",
+    "concept:mean-reversion"
+   ],
+   [
+    "property:z-score",
+    "about",
+    "fact:quantitative-analysis-core-principles"
+   ],
+   [
+    "property:z-score",
+    "part-of",
+    "concept:quantitative-analysis"
    ],
    [
     "property:zone-freshness",
@@ -49816,6 +52305,7 @@
   ],
   "folded_atom_ids": [
    "concept:averaging",
+   "concept:breakout-strategy",
    "concept:chart-pattern",
    "concept:flow",
    "concept:indicator",
@@ -49823,10 +52313,13 @@
    "concept:market-foundations",
    "concept:market-mechanics",
    "concept:market-regime",
+   "concept:mean-reversion",
    "concept:momentum",
    "concept:oscillator",
+   "concept:overfitting",
    "concept:pattern",
    "concept:price-action",
+   "concept:quantitative-analysis",
    "concept:risk-management",
    "concept:strategy-design",
    "concept:volatility",
@@ -49836,6 +52329,7 @@
    "procedure:atr-trailing-stop",
    "procedure:fixed-stop",
    "procedure:fixed-target",
+   "procedure:hmm-regime-detection",
    "procedure:indicator-adi",
    "procedure:indicator-adx",
    "procedure:indicator-aroon",
@@ -50022,6 +52516,15 @@
    "procedure:signal-tweezer-bottoms-trigger",
    "procedure:signal-tweezer-tops-trigger",
    "procedure:swing-point-identification"
+  ],
+  "chapter_quantitative-analysis_atoms": 37,
+  "chapter_quantitative-analysis_relations": 137,
+  "chapter_quantitative-analysis_folded": [
+   "concept:breakout-strategy",
+   "concept:mean-reversion",
+   "concept:overfitting",
+   "concept:quantitative-analysis",
+   "procedure:hmm-regime-detection"
   ]
  }
 }

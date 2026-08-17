@@ -98,7 +98,7 @@ def test_uc2_divergence_search(kg, guide):
 
 def test_uc3_rsi_readers(kg, guide):
     r = kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in", limit=None)
-    assert r.total == 8 and "8 readers" in guide
+    assert r.total == 9 and "9 readers" in guide
     assert {tuple(x.get("inputs", {})) for x in r.items} == {("rsi",)}, \
         "the guide says all eight read the same single output"
 

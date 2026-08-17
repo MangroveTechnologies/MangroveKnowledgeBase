@@ -42,6 +42,7 @@ CHAPTERS = {
     "05-risk-management.md": ("risk-management", "concept:risk-management"),
     "06-indicators.md": ("indicators", "concept:indicator"),
     "07-chart-patterns.md": ("chart-patterns", "concept:chart-pattern"),
+    "08-quantitative-analysis.md": ("quantitative-analysis", "concept:quantitative-analysis"),
 }
 
 

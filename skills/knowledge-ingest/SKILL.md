@@ -86,6 +86,9 @@ dropped something:
 | numbered headings (`### 6.1.1 Simple Moving Average`) | §6.1.1 | stripped before the id is made |
 | an unnumbered `## ` section | §6.0 | kept as prose on the chapter |
 | a section whose categories contradict the library's | §6.1 | `sections_group_only` |
+| `#### ` sub-blocks that are things, not fields | §7.1 | `sub_block_nodes` |
+| one block describing a bullish and a bearish form | §7.1 | a dict value in `sub_block_nodes`, splitting it |
+| a source whose summaries are better than the chapter's | §7.1 | `keep_summaries` |
 
 Blocks matching no rule are kept on the section's subject under their own name rather than dropped,
 and a section with no `### Definition` must declare what its blocks are or the build refuses. Whatever a section says **before** its first

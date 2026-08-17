@@ -174,6 +174,45 @@ and is authoritative there, and the signal cross-link is one sentence forty-one 
 Where a sub-block is a fence followed by prose — `#### Formula` then *"Where `n` is the lookback
 period"* — both halves are kept. Taking the code alone dropped every such sentence.
 
+### `sub_block_nodes` — `#### ` headings that are THINGS
+
+```python
+"sub_block_nodes": {
+    "Single Candlestick Patterns": {
+        "Doji": "Procedure",
+        "Hammer / Hanging Man": {"Hammer (Bullish)": "Procedure",
+                                 "Hanging Man (Bearish)": "Procedure"}},
+},
+```
+
+The other reading of a fourth-level heading. `sub_blocks` maps `#### ` to props, for a chapter that
+gives each thing a scaffold; this maps `#### ` to nodes, for a chapter that groups its things under
+an `###` and gives each one a heading of its own.
+
+**A value may be a dict**, which splits the block into one node per side. Chapter 7 writes one
+section for hammer and hanging man, tweezer tops and bottoms, three inside up and down; the library
+holds a signal for each side. Everything not under a side's own label — the shape they share, the
+detection logic that finds either — goes to both. A declared side the block does not state raises.
+
+Both label shapes are split on: `**Hammer (Bullish):**` alone on a line with bullets under it, and
+`**Tweezer Top:** matching highs after uptrend` all on one line. Reading only the first left
+marubozu and tweezers unsplittable.
+
+### `keep_summaries` — do not improve the summaries here
+
+```python
+"keep_summaries": True,
+```
+
+Turns off the substitution described under [`rename`](#rename--the-id-a-term-should-have): the
+chapter's definition is kept as `source_wording` and the node's summary stands.
+
+Which source is better is a judgement per chapter, so it is declared per chapter. Chapter 6's
+docstrings are library prose and its definitions are real definitions, so it substitutes. Chapter
+7's docstrings say which SIDE they detect — "a tweezer bottoms pattern … two consecutive candles
+with approximately equal lows" — and the chapter describes the shape once for both, so substituting
+made both signals read identically.
+
 ### `sections_group_only` — the section groups, it does not classify
 
 ```python
@@ -210,7 +249,10 @@ Raises if a row names no node, so a reworded table fails loudly.
            "displays partial size to reduce it")],
 ```
 
-`(src, relation, dst, why)`. Both endpoints must already exist or the build raises. Use for:
+`(src, relation, dst, why)`, or `(src, relation, dst, why, props)`. Both endpoints must already
+exist or the build raises. The fifth element carries the edge's own props: a `uses` edge names which
+output it reads as `inputs`, the same key and shape the node uses, and the agent guide documents
+reading it — an edge without it breaks a worked example rather than merely lacking detail. Use for:
 
 - a quantity computed from another quantity (annualized basis from basis),
 - a rule and the thing it detects (structure-break detection and break of structure),
