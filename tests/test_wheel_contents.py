@@ -145,3 +145,24 @@ def test_the_viewer_runs_from_the_wheel_alone(wheel, tmp_path):
     assert proc.returncode == 0, f"the viewer does not run from a wheel install:\n{proc.stderr[-1500:]}"
     assert "data:image/svg" in proc.stdout, "the wordmark did not embed -- the SVG is missing"
     assert len(proc.stdout) > 1_000_000, "the page is too small to contain the vendored 3D library"
+
+
+def test_no_dependency_is_a_direct_url_reference(wheel):
+    """PyPI refuses any distribution whose metadata carries a direct reference, in ANY extra.
+
+    A commit pin can only be written one way -- `name @ git+https://...` -- and declaring one in the
+    `dev` extra made the package unpublishable while every test still passed: CI installs the
+    package but never uploads it, so nothing exercised the step that fails. The v3.0.0 release ran
+    the whole suite, tagged, built, and died on `400 Can't have direct dependency: wiki-to-graph`
+    with the tag already pushed.
+
+    This is the upload rule brought forward to where it can be seen, since twine's local `check`
+    does not enforce it -- only the server does.
+    """
+    metadata = wheel.read(next(n for n in wheel.namelist() if n.endswith(".dist-info/METADATA")))
+    direct = [line for line in metadata.decode().splitlines()
+              if line.startswith("Requires-Dist:") and " @ " in line]
+    assert not direct, (
+        "PyPI will reject this distribution -- these dependencies are direct references:\n  "
+        + "\n  ".join(direct)
+        + "\nPin a released version, or install the tool alongside and document it instead.")
