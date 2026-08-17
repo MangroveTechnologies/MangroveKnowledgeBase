@@ -8,7 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 650 nodes, 2064 edges, in
+carries a formula stating the predicate it computes -- 678 nodes, 2192 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
@@ -65,9 +65,9 @@ signals to 7. Files now: `averaging` 55, `momentum` 56, `oscillator` 30, `volati
 
 ### The knowledge base is in the graph
 
-Six of the eight knowledge-base chapters are now nodes and edges beside the code-derived ones:
+Seven of the eight knowledge-base chapters are now nodes and edges beside the code-derived ones:
 market foundations, instruments and market mechanics, core trading concepts, strategy design, risk
-management and indicators.
+management, indicators and chart patterns.
 The merge is an outer join -- where a chapter and the library define the same thing, the node keeps
 both wordings rather than one replacing the other.
 
@@ -96,6 +96,14 @@ oscillator, so its sections group indicators for a reader without classifying th
 
 Eight more indicators enter as knowledge without an implementation -- market breadth, VIX, standard
 deviation and Parabolic SAR among them.
+
+Chart patterns gives `concept:chart-pattern` the members it was created empty to wait for: head and
+shoulders, double and triple tops, triangles, flags and pennants, wedges, channels and cup and
+handle -- formations of unknown length, drawn from swing points, which no computation in the library
+produces. Its candlestick half folds instead: every formation the library detects is one node
+holding both the shape and the signal that finds it, and the paired blocks split along the line the
+chapter already draws, because the library holds a signal per side where the chapter writes one
+section for both.
 
 Every principle and practice a chapter states now sits on the edge it explains rather than in a
 list -- the builder resolves the ones that name their node and reports the rest.

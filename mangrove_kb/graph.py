@@ -6,7 +6,7 @@ part each signal plays in a strategy. It is generated from the source, so it is 
 extracted -- there is no text-mining noise to rank around.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (218 of 650 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (218 of 678 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively

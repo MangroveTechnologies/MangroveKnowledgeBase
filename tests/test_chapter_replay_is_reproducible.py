@@ -41,6 +41,7 @@ CHAPTERS = {
     "04-strategy-design.md": ("strategy-design", "concept:strategy-design"),
     "05-risk-management.md": ("risk-management", "concept:risk-management"),
     "06-indicators.md": ("indicators", "concept:indicator"),
+    "07-chart-patterns.md": ("chart-patterns", "concept:chart-pattern"),
 }
 
 

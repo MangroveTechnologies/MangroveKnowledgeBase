@@ -203,7 +203,15 @@
    "props": {
     "reference_chapter": [
      "chart-patterns"
-    ]
+    ],
+    "applications": [
+     "Identifying potential reversal points",
+     "Confirming trend continuation",
+     "Timing entries and exits",
+     "Reading short-term sentiment shifts",
+     "Filtering trade signals"
+    ],
+    "source_wording": "Candlestick patterns are formations created by one or more candlesticks that provide visual insight into market sentiment and potential price direction. Originating from Japanese rice traders in the 18th century, they remain one of the most widely used technical analysis tools."
    }
   },
   {
@@ -7154,6 +7162,14 @@
       "canonical_name": "none",
       "description": "True if bearish engulfing detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " First candle: bullish Second candle: bearish that engulfs first Appears at resistance / after uptrend Strong reversal signal",
+    "source_wording": "Second candle completely engulfs the body of the first candle.",
+    "chapter_variants": {
+     "formula": "Bullish_Engulfing:\n  Close[1] < Open[1]  // First candle bearish\n  Close[0] > Open[0]  // Second candle bullish\n  Open[0] < Close[1]  // Opens below first close\n  Close[0] > Open[1]  // Closes above first open"
     }
    }
   },
@@ -7193,7 +7209,15 @@
       "canonical_name": "none",
       "description": "True if bearish harami detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " Large bullish candle followed by small bearish candle inside Potential bearish reversal",
+    "notes": [
+     "Decreasing momentum; potential trend change. Less strong than engulfing."
+    ],
+    "source_wording": "Second candle's body is completely contained within the first candle's body."
    }
   },
   {
@@ -7537,6 +7561,14 @@
       "canonical_name": "none",
       "description": "True if bullish engulfing detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " First candle: bearish (red/black) Second candle: bullish (green/white) that engulfs first Appears at support / after downtrend Strong reversal signal",
+    "source_wording": "Second candle completely engulfs the body of the first candle.",
+    "chapter_variants": {
+     "formula": "Bullish_Engulfing:\n  Close[1] < Open[1]  // First candle bearish\n  Close[0] > Open[0]  // Second candle bullish\n  Open[0] < Close[1]  // Opens below first close\n  Close[0] > Open[1]  // Closes above first open"
     }
    }
   },
@@ -7576,7 +7608,15 @@
       "canonical_name": "none",
       "description": "True if bullish harami detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " Large bearish candle followed by small bullish candle inside Potential bullish reversal",
+    "notes": [
+     "Decreasing momentum; potential trend change. Less strong than engulfing."
+    ],
+    "source_wording": "Second candle's body is completely contained within the first candle's body."
    }
   },
   {
@@ -8723,7 +8763,12 @@
       "canonical_name": "none",
       "description": "True if dark cloud cover detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Second candle: opens above first's high (classic) or above first's close (relaxed), closes below midpoint of first Bearish reversal at resistance Note: Same gap consideration as Piercing Line. Use `require_gap=False` for 24/7 markets. ",
+    "source_wording": "First candle: bullish"
    }
   },
   {
@@ -8980,6 +9025,17 @@
       "canonical_name": "none",
       "description": "True if doji detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "**Standard Doji**: Equal upper and lower wicks **Long-Legged Doji**: Very long upper and lower wicks **Dragonfly Doji**: Long lower wick, no upper wick (bullish at support) **Gravestone Doji**: Long upper wick, no lower wick (bearish at resistance) ",
+    "notes": [
+     "Interpretation: Indecision between buyers and sellers. At trend extremes, signals potential reversal."
+    ],
+    "source_wording": "Open and close at nearly the same price, forming a cross or plus sign.",
+    "chapter_variants": {
+     "formula": "Doji = |Close - Open| <= (High - Low) * 0.1"
     }
    }
   },
@@ -9556,7 +9612,16 @@
       "canonical_name": "none",
       "description": "True if evening star detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "1. Large bullish candle",
+     "2. Small-bodied candle (star) that gaps up",
+     "3. Large bearish candle that closes below midpoint of first candle"
+    ],
+    "source_wording": "Strong reversal patterns. More significant with gap between star and surrounding candles."
    }
   },
   {
@@ -9788,6 +9853,14 @@
       "canonical_name": "none",
       "description": "True if hammer detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " Appears after a downtrend Long lower wick shows rejection of lower prices Bullish reversal signal",
+    "source_wording": "Small body at upper end, long lower wick (2x+ body length), little or no upper wick.",
+    "chapter_variants": {
+     "formula": "Lower_Wick >= 2 * Body\nUpper_Wick <= Body * 0.1\nBody in upper 25% of range"
     }
    }
   },
@@ -9850,6 +9923,14 @@
       "canonical_name": "none",
       "description": "True if hanging man detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " Appears after an uptrend Same structure as hammer but bearish context Warning of potential top",
+    "source_wording": "Small body at upper end, long lower wick (2x+ body length), little or no upper wick.",
+    "chapter_variants": {
+     "formula": "Lower_Wick >= 2 * Body\nUpper_Wick <= Body * 0.1\nBody in upper 25% of range"
     }
    }
   },
@@ -10328,6 +10409,14 @@
       "canonical_name": "none",
       "description": "True if inside bar detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Consolidation / pause in trend Decreasing volatility Breakout expected in either direction Often traded as breakout setup Entry: Break of inside bar high (long) or low (short) Stop: Opposite side of inside bar Target: Measured move or next support/resistance ",
+    "source_wording": "A bar whose entire range (high to low) is contained within the previous bar's range.",
+    "chapter_variants": {
+     "formula": "Inside_Bar:\n  High[0] < High[1]\n  Low[0] > Low[1]"
     }
    }
   },
@@ -10390,6 +10479,14 @@
       "canonical_name": "none",
       "description": "True if inverted hammer detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " Appears after a downtrend Shows buying attempt; needs confirmation Less reliable than hammer",
+    "source_wording": "Small body at lower end, long upper wick (2x+ body length), little or no lower wick.",
+    "chapter_variants": {
+     "formula": "Upper_Wick >= 2 * Body\nLower_Wick <= Body * 0.1\nBody in lower 25% of range"
     }
    }
   },
@@ -12481,6 +12578,17 @@
       "canonical_name": "none",
       "description": "True if bearish marubozu detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "Extreme conviction in direction. Often signals continuation.",
+     "Opens at high, closes at low. Strong selling pressure."
+    ],
+    "source_wording": "Full body candle with no wicks (or very small wicks).",
+    "chapter_variants": {
+     "formula": "Upper_Wick <= Range * 0.05\nLower_Wick <= Range * 0.05"
     }
    }
   },
@@ -12536,6 +12644,17 @@
       "canonical_name": "none",
       "description": "True if bullish marubozu detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "Extreme conviction in direction. Often signals continuation.",
+     "Opens at low, closes at high. Strong buying pressure."
+    ],
+    "source_wording": "Full body candle with no wicks (or very small wicks).",
+    "chapter_variants": {
+     "formula": "Upper_Wick <= Range * 0.05\nLower_Wick <= Range * 0.05"
     }
    }
   },
@@ -12955,7 +13074,16 @@
       "canonical_name": "none",
       "description": "True if morning star detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "1. Large bearish candle",
+     "2. Small-bodied candle (star) that gaps down",
+     "3. Large bullish candle that closes above midpoint of first candle"
+    ],
+    "source_wording": "Strong reversal patterns. More significant with gap between star and surrounding candles."
    }
   },
   {
@@ -13232,6 +13360,14 @@
       "canonical_name": "none",
       "description": "True if narrow range detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "NR7: Narrowest range of the last 7 bars Volatility compression Breakout imminent Direction unknown until breakout Trade breakout of NR bar's range Often combined with trend filter for direction bias ",
+    "source_wording": "NR4: Narrowest range of the last 4 bars",
+    "chapter_variants": {
+     "formula": "NR7:\n  Range[0] < min(Range[1], Range[2], ..., Range[6])"
     }
    }
   },
@@ -13459,6 +13595,14 @@
       "canonical_name": "none",
       "description": "True if outside bar detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Increased volatility Potential reversal or strong continuation Direction often determined by close Bullish: Close near high, at support Bearish: Close near low, at resistance ",
+    "source_wording": "A bar whose range completely engulfs the previous bar's range.",
+    "chapter_variants": {
+     "formula": "Outside_Bar:\n  High[0] > High[1]\n  Low[0] < Low[1]"
     }
    }
   },
@@ -13521,7 +13665,12 @@
       "canonical_name": "none",
       "description": "True if piercing line detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Second candle: opens below first's low (classic) or below first's close (relaxed), closes above midpoint of first Bullish reversal at support Note: The classic definition requires a gap (open below previous low), which is rare in 24/7 crypto/forex markets. The `require_gap` parameter controls this -- set to `False` for crypto.",
+    "source_wording": "First candle: bearish"
    }
   },
   {
@@ -14542,6 +14691,14 @@
       "canonical_name": "none",
       "description": "True if shooting star detected on current bar, False otherwise"
      }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": " Appears after an uptrend Long upper wick shows rejection of higher prices Bearish reversal signal",
+    "source_wording": "Small body at lower end, long upper wick (2x+ body length), little or no lower wick.",
+    "chapter_variants": {
+     "formula": "Upper_Wick >= 2 * Body\nLower_Wick <= Body * 0.1\nBody in lower 25% of range"
     }
    }
   },
@@ -14861,7 +15018,14 @@
       "canonical_name": "none",
       "description": "True if spinning top detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "Interpretation: Indecision, similar to doji but with a small body. Less significant than doji."
+    ],
+    "source_wording": "Small body with upper and lower wicks of similar length."
    }
   },
   {
@@ -15729,7 +15893,12 @@
       "canonical_name": "none",
       "description": "True if three black crows detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Each opens within previous body, closes near low Strong bearish momentum / reversal ",
+    "source_wording": "Three consecutive bearish candles"
    }
   },
   {
@@ -15768,7 +15937,15 @@
       "canonical_name": "none",
       "description": "True if three inside down detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "2. Bearish candle that forms inside bar",
+     "3. Bearish candle that closes below first candle's low"
+    ],
+    "source_wording": "1. Bullish candle"
    }
   },
   {
@@ -15807,7 +15984,15 @@
       "canonical_name": "none",
       "description": "True if three inside up detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "2. Bullish candle that forms inside bar",
+     "3. Bullish candle that closes above first candle's high"
+    ],
+    "source_wording": "1. Bearish candle"
    }
   },
   {
@@ -15862,7 +16047,12 @@
       "canonical_name": "none",
       "description": "True if three white soldiers detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Each opens within previous body, closes near high Strong bullish momentum / reversal",
+    "source_wording": "Three consecutive bullish candles"
    }
   },
   {
@@ -16468,7 +16658,15 @@
       "canonical_name": "none",
       "description": "True if tweezer bottoms detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "Price rejection at same level twice indicates strong support/resistance.",
+     "Matching lows after downtrend - bullish reversal"
+    ],
+    "source_wording": "Two or more candles with matching highs (tops) or lows (bottoms)."
    }
   },
   {
@@ -16523,7 +16721,15 @@
       "canonical_name": "none",
       "description": "True if tweezer tops detected on current bar, False otherwise"
      }
-    }
+    },
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "Price rejection at same level twice indicates strong support/resistance.",
+     "Matching highs after uptrend - bearish reversal"
+    ],
+    "source_wording": "Two or more candles with matching highs (tops) or lows (bottoms)."
    }
   },
   {
@@ -17679,7 +17885,23 @@
     "reference_chapter": [
      "chart-patterns"
     ],
-    "explanation": "Multi-bar formations: head and shoulders, double tops and bottoms, triangles, wedges, flags and pennants, cup and handle, and the necklines and completion criteria that define them. Also pattern reliability and failure modes, and the context a formation requires to mean anything. Sibling of the existing pattern class, not a parent of it and not the same thing. That class holds candlestick geometry -- shapes computable from one bar or a small fixed number of them, which is why 41 signals implement it. A chart pattern needs a swing structure of unknown length, and no computation in the library produces swing points, so this class carries no procedures. It is the first class in the graph that is knowledge without an implementation."
+    "explanation": "Multi-bar formations: head and shoulders, double tops and bottoms, triangles, wedges, flags and pennants, cup and handle, and the necklines and completion criteria that define them. Also pattern reliability and failure modes, and the context a formation requires to mean anything. Sibling of the existing pattern class, not a parent of it and not the same thing. That class holds candlestick geometry -- shapes computable from one bar or a small fixed number of them, which is why 41 signals implement it. A chart pattern needs a swing structure of unknown length, and no computation in the library produces swing points, so this class carries no procedures. It is the first class in the graph that is knowledge without an implementation.",
+    "source_wording": "Chart patterns are recognizable price formations that develop over multiple bars or candles, representing periods of consolidation, accumulation, distribution, or continuation. They provide structure for entries, stops, and targets.",
+    "applications": [
+     "Context is King: Patterns mean nothing without proper context",
+     "Confirmation Required: Wait for patterns to complete and confirm",
+     "Manage Failures: Plan for pattern failures; they create opportunities",
+     "Combine Methods: Use patterns with indicators, volume, and structure",
+     "Keep Statistics: Track your success rate with different patterns",
+     "Specialize: Master a few patterns rather than superficially knowing many"
+    ],
+    "notes": [
+     "Technical pattern recognition is both an art and a science. Key takeaways:",
+     "Pattern trading success comes from disciplined application of well-defined criteria, not from memorizing hundreds of formations."
+    ],
+    "chapter_variants": {
+     "explanation": "This document provides a comprehensive reference for technical chart patterns used in trading, including candlestick patterns, multi-bar formations, and classical chart patterns. Pattern recognition is a core skill for discretionary and systematic traders alike."
+    }
    }
   },
   {
@@ -20377,11 +20599,15 @@
    "status": "draft",
    "props": {
     "reference_chapter": [
-     "core-trading-concepts"
+     "core-trading-concepts",
+     "chart-patterns"
     ],
     "formula": "Swing High: High[i] > High[i-1] AND High[i] > High[i+1]\nSwing Low: Low[i] < Low[i-1] AND Low[i] < Low[i+1]",
     "source_wording": "Computes swing point identification.",
-    "explanation": "It is the primitive the rest of the chapter is built on: structure, liquidity pools and zones are all defined in terms of swings, so the lookback chosen here sets what everything downstream calls a trend."
+    "explanation": "It is the primitive the rest of the chapter is built on: structure, liquidity pools and zones are all defined in terms of swings, so the lookback chosen here sets what everything downstream calls a trend.",
+    "chapter_variants": {
+     "formula": "def is_swing_high(data, i, lookback=5):\n    if i < lookback or i >= len(data) - lookback:\n        return False\n    high = data['high'][i]\n    for j in range(i - lookback, i + lookback + 1):\n        if j != i and data['high'][j] >= high:\n            return False\n    return True\n\ndef is_swing_low(data, i, lookback=5):\n    if i < lookback or i >= len(data) - lookback:\n        return False\n    low = data['low'][i]\n    for j in range(i - lookback, i + lookback + 1):\n        if j != i and data['low'][j] <= low:\n            return False\n    return True"
+    }
    }
   },
   {
@@ -23892,6 +24118,460 @@
    "props": {
     "reference_chapter": [
      "indicators"
+    ],
+    "practices": []
+   }
+  },
+  {
+   "id": "concept:multi-bar-pattern",
+   "title": "multi-bar patterns",
+   "kind": "Concept",
+   "summary": "Multi-bar patterns are price formations spanning multiple candlesticks that reveal consolidation, momentum shifts, and potential breakout setups beyond traditional candlestick patterns.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ]
+   }
+  },
+  {
+   "id": "concept:pin-bar",
+   "title": "pin bar",
+   "kind": "Concept",
+   "summary": "A bar with a long wick (tail) representing rejection of a price level, with a small body opposite the wick.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Long lower wick (2x+ body) Small body in upper portion Close above midpoint of range Found at support Long upper wick (2x+ body) Small body in lower portion Close below midpoint of range Found at resistance Entry: Break of pin bar in direction of signal Stop: Beyond the wick High probability at key levels with trend "
+   }
+  },
+  {
+   "id": "concept:two-bar-reversal",
+   "title": "two-bar reversal",
+   "kind": "Concept",
+   "summary": "Two consecutive bars forming a reversal pattern at an extreme.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "First bar: Strong bearish close (close in lower portion of range) Second bar: Strong bullish close (close in upper portion of range), closes above first bar's open Combined forms a hammer-like structure The `close_proximity` parameter (default 0.25) controls how close the close must be to the extreme -- 0.25 means within 25% of the bar's range First bar: Strong bullish close (close in upper portion of range) Second bar: Strong bearish close (close in lower portion of range), closes below first bar's open Combined forms a shooting star-like structure "
+   }
+  },
+  {
+   "id": "concept:head-and-shoulders",
+   "title": "head and shoulders",
+   "kind": "Concept",
+   "summary": "Three peaks with the middle one highest, their intervening lows forming a neckline the pattern completes by closing below.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "formula": "Head > Left_Shoulder > Neckline\nHead > Right_Shoulder > Neckline\nRight_Shoulder approximately equals Left_Shoulder height\nBoth shoulders retrace to approximately same neckline level",
+    "explanation": "A distribution pattern: the failure of the third rally to reach the second is the tell, and the neckline is where that reading is confirmed or refuted. The measured move -- head to neckline, projected down from the break -- is the target the chapter gives it.",
+    "notes": [
+     "Interpretation: Distribution pattern; bearish reversal after uptrend.",
+     "Head: Higher rally and decline to similar level (neckline) Right Shoulder: Lower rally and decline Neckline: Connect the lows after each shoulder Entry: Break below neckline Stop: Above right shoulder Target: Measured move (head to neckline distance projected down) "
+    ],
+    "source_wording": "Left Shoulder: Rally and decline"
+   }
+  },
+  {
+   "id": "concept:inverse-head-and-shoulders",
+   "title": "inverse head and shoulders",
+   "kind": "Concept",
+   "summary": "The same three-trough shape inverted, completing on a close above the neckline that joins its intervening highs.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Accumulation rather than distribution, and read the same way: the third decline failing to reach the second is what makes it a base rather than a pause.",
+    "notes": [
+     "Interpretation: Accumulation pattern; bullish reversal after downtrend.",
+     "Left Shoulder: Decline and rally Head: Lower decline and rally Right Shoulder: Higher decline and rally Neckline: Connect the highs Entry: Break above neckline Stop: Below right shoulder Target: Measured move (head to neckline distance projected up) "
+    ],
+    "source_wording": "Mirror image of head and shoulders."
+   }
+  },
+  {
+   "id": "concept:double-top-double-bottom",
+   "title": "double top / double bottom",
+   "kind": "Concept",
+   "summary": "Two tests of nearly the same level with a retracement between them, completing on a close beyond that retracement.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "formula": "Double_Top:\n  |High_Peak1 - High_Peak2| < threshold\n  Valley_Low < both Peak_Highs\n  Confirmation: Close below Valley_Low",
+    "explanation": "The second test failing to exceed the first is the whole signal -- the level held twice, so the move that made it is spent. The valley or peak between the tests is both the trigger and the measuring stick for the target.",
+    "source_wording": "Two peaks at approximately the same price level",
+    "notes": [
+     "Valley between peaks (neckline) Failure to exceed first peak indicates weakening Entry: Break below valley Target: Distance from peaks to valley projected down Two troughs at approximately the same price level Peak between troughs (neckline) Failure to break first low indicates support Entry: Break above peak Target: Distance from troughs to peak projected up "
+    ]
+   }
+  },
+  {
+   "id": "concept:triple-top-triple-bottom",
+   "title": "triple top / triple bottom",
+   "kind": "Concept",
+   "summary": "The same shape with three tests of the level rather than two.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "Interpretation: Stronger reversal signal than double top/bottom due to additional test.",
+     "Trading Application: Same as double top/bottom but often more reliable."
+    ],
+    "source_wording": "Similar to double top/bottom but with three peaks/troughs.",
+    "explanation": "The chapter rates it more reliable for the obvious reason -- one more rejection at the same price -- and trades it identically."
+   }
+  },
+  {
+   "id": "concept:triangle",
+   "title": "triangles",
+   "kind": "Concept",
+   "summary": "Converging boundaries drawn across the highs and the lows, completing on a close beyond either of them.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "formula": "Ascending_Triangle:\n  High values form horizontal line (within tolerance)\n  Low values form upward sloping line\n  Lines converging",
+    "explanation": "Which boundary is flat decides the reading: a flat top with rising lows is buyers paying up into a fixed offer, a flat bottom with falling highs is the reverse, and two sloping lines say only that range is contracting. The chapter puts the first two at seventy per cent in their stated direction and the symmetrical case at a coin toss.",
+    "source_wording": "Horizontal resistance line (flat tops)",
+    "notes": [
+     "Rising support line (higher lows) Buyers becoming more aggressive Breakout typically upward (70% of cases) Horizontal support line (flat bottoms) Falling resistance line (lower highs) Sellers becoming more aggressive Breakout typically downward (70% of cases) Converging trend lines Lower highs and higher lows Consolidation pattern Breakout direction determines trend Entry: Breakout beyond triangle boundary Stop: Opposite side of triangle or last swing Target: Height of triangle base projected from breakout "
+    ]
+   }
+  },
+  {
+   "id": "concept:flags-and-pennants",
+   "title": "flags and pennants",
+   "kind": "Concept",
+   "summary": "A brief consolidation against the direction of a sharp move, resolving in the direction of the move that preceded it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Continuation rather than reversal, and the pole is the measuring stick: its length projected from the break is the target. A flag drifts in a parallel channel, a pennant contracts to a point, and both are short by definition -- one that outlasts the move that made it has stopped being a pause.",
+    "source_wording": "Sharp rally (flagpole)",
+    "notes": [
+     "Consolidation that slopes against trend (parallel channel down) Continuation pattern Entry: Break above flag resistance Target: Flagpole length projected from breakout Sharp decline (flagpole) Consolidation that slopes against trend (parallel channel up) Continuation pattern Entry: Break below flag support Target: Flagpole length projected from breakout Similar to flag but consolidation forms symmetrical triangle Very short-term pattern (1-3 weeks typically) Strong continuation pattern "
+    ]
+   }
+  },
+  {
+   "id": "concept:wedge",
+   "title": "wedges",
+   "kind": "Concept",
+   "summary": "Two converging boundaries sloping the same way, read against their slope rather than with it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "The counter-intuitive one: a rising wedge is bearish and a falling wedge bullish, whichever trend they appear in, because the converging slope says each push is shorter than the last.",
+    "source_wording": "Both support and resistance lines slope upward",
+    "notes": [
+     "Resistance line has gentler slope Lines converge Typically bearish regardless of trend context Breakout usually downward Both support and resistance lines slope downward Support line has gentler slope Lines converge Typically bullish regardless of trend context Breakout usually upward "
+    ]
+   }
+  },
+  {
+   "id": "concept:channel",
+   "title": "channels",
+   "kind": "Concept",
+   "summary": "Parallel boundaries containing price, traded from edge to edge until one of them breaks.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "The break is the event: while it holds, the channel is a range with a slope, and the edges are [[Dynamic Level]]s. Ascending, descending and horizontal differ only in that slope.",
+    "source_wording": "Parallel upward sloping lines containing price",
+    "notes": [
+     "Buy at lower channel line Sell at upper channel line Channel break can signal acceleration or reversal Parallel downward sloping lines containing price Sell at upper channel line Cover at lower channel line Channel break can signal acceleration or reversal Horizontal parallel lines containing price Range-bound trading Breakout direction determines next trend "
+    ]
+   }
+  },
+  {
+   "id": "concept:cup-and-handle",
+   "title": "cup and handle",
+   "kind": "Concept",
+   "summary": "A rounded base followed by a shallow drift, completing on a close above the rim.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "The shape is the argument -- a U rather than a V says the base was built rather than spiked, and a handle deeper than half the cup says the base did not hold. Continuation, and the cup depth is the target.",
+    "source_wording": "Cup: Rounded bottom formation (U-shape, not V)",
+    "notes": [
+     "Handle: Small consolidation after cup (slight downward drift) Bullish continuation pattern Entry: Break above handle resistance / cup rim Stop: Below handle low Target: Depth of cup projected from breakout "
+    ]
+   }
+  },
+  {
+   "id": "concept:algorithmic-pattern-detection",
+   "title": "algorithmic pattern detection",
+   "kind": "Concept",
+   "summary": "Algorithmic patterns are price formations that can be systematically detected and traded through programmatic rules, suitable for automated trading systems.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ]
+   }
+  },
+  {
+   "id": "procedure:trend-line-detection",
+   "title": "trend line detection",
+   "kind": "Procedure",
+   "summary": "Connects swing points into a line, keeps it if enough of them lie close enough to it, and projects it forward as support or resistance.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "notes": [
+     "2. Connect swing points with lines",
+     "3. Validate: Minimum touches (typically 3+)",
+     "4. Validate: Points approximately collinear (R-squared threshold)",
+     "5. Project line forward for support/resistance"
+    ],
+    "source_wording": "1. Identify swing points (highs and lows)",
+    "explanation": "Two validations do the work -- a minimum number of touches, and how nearly collinear they are -- and both are thresholds someone chooses. Nothing in the library produces the swing points it starts from except [[Swing Point Identification]]."
+   }
+  },
+  {
+   "id": "procedure:support-resistance-detection",
+   "title": "support/resistance level detection",
+   "kind": "Procedure",
+   "summary": "Collects every swing high and low over a window and clusters the ones that fall within a tolerance of each other into levels.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "formula": "def find_sr_levels(data, window=20, threshold=0.02):\n    levels = []\n    for i in range(window, len(data) - window):\n        if is_swing_high(data, i, window):\n            levels.append(('resistance', data['high'][i]))\n        if is_swing_low(data, i, window):\n            levels.append(('support', data['low'][i]))\n    \n    # Cluster nearby levels\n    clustered = cluster_levels(levels, threshold)\n    return clustered",
+    "explanation": "The clustering is the whole method: a level is not one touch but several at nearly the same price, which is what [[Equal Highs And Lows]] describes and what makes the level worth drawing. Depends on [[Swing Point Identification]], so its lookback decides how many levels come back."
+   }
+  },
+  {
+   "id": "concept:pattern-recognition-library",
+   "title": "pattern recognition libraries",
+   "kind": "Concept",
+   "summary": "CDL2CROWS, CDL3BLACKCROWS, CDL3INSIDE, CDL3LINESTRIKE",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "formula": "import talib\n\n# Returns: 100 (bullish), -100 (bearish), 0 (no pattern)\npattern = talib.CDLENGULFING(open, high, low, close)",
+    "explanation": "CDL3OUTSIDE, CDL3STARSINSOUTH, CDL3WHITESOLDIERS CDLABANDONEDBABY, CDLADVANCEBLOCK, CDLBELTHOLD CDLBREAKAWAY, CDLCLOSINGMARUBOZU, CDLCONCEALBABYSWALL CDLCOUNTERATTACK, CDLDARKCLOUDCOVER, CDLDOJI CDLDOJISTAR, CDLDRAGONFLYDOJI, CDLENGULFING CDLEVENINGDOJISTAR, CDLEVENINGSTAR, CDLGAPSIDESIDEWHITE CDLGRAVESTONEDOJI, CDLHAMMER, CDLHANGINGMAN CDLHARAMI, CDLHARAMICROSS, CDLHIGHWAVE CDLHIKKAKE, CDLHIKKAKEMOD, CDLHOMINGPIGEON CDLIDENTICAL3CROWS, CDLINNECK, CDLINVERTEDHAMMER CDLKICKING, CDLKICKINGBYLENGTH, CDLLADDERBOTTOM CDLLONGLEGGEDDOJI, CDLLONGLINE, CDLMARUBOZU CDLMATCHINGLOW, CDLMATHOLD, CDLMORNINGDOJISTAR CDLMORNINGSTAR, CDLONNECK, CDLPIERCING CDLRICKSHAWMAN, CDLRISEFALL3METHODS, CDLSEPARATINGLINES CDLSHOOTINGSTAR, CDLSHORTLINE, CDLSPINNINGTOP CDLSTALLEDPATTERN, CDLSTICKSANDWICH, CDLTAKURI CDLTASUKIGAP, CDLTHRUSTING, CDLTRISTAR CDLUNIQUE3RIVER, CDLUPSIDEGAP2CROWS, CDLXSIDEGAP3METHODS "
+   }
+  },
+  {
+   "id": "concept:pattern-reliability",
+   "title": "pattern reliability",
+   "kind": "Concept",
+   "summary": "Pattern reliability refers to the historical success rate of patterns in predicting subsequent price movement. Failure modes are the ways patterns fail to produce expected outcomes and the trading implications of those failures.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "reliability_statistic": "| Pattern | Direction | Reliability | Notes | |---------|-----------|-------------|-------| | Head & Shoulders | Reversal | 70-75% | Higher with volume confirmation | | Double Top/Bottom | Reversal | 65-70% | Second test often doesn't reach exact level | | Ascending Triangle | Bullish | 70% | Can break down | | Descending Triangle | Bearish | 70% | Can break up | | Symmetrical Triangle | Neutral | 50-55% | Direction unpredictable | | Bull Flag | Bullish | 65-70% | Best after strong pole | | Bear Flag | Bearish | 65-70% | Best after strong pole | | Engulfing (Bullish) | Bullish | 60-65% | Context dependent | | Engulfing (Bearish) | Bearish | 60-65% | Context dependent | | Hammer | Bullish | 60% | Needs confirmation | | Shooting Star | Bearish | 60% | Needs confirmation | ---"
+   }
+  },
+  {
+   "id": "judgment:trading-failed-pattern",
+   "title": "trading failed patterns",
+   "kind": "Judgment",
+   "summary": "Principle: A failed pattern often leads to a strong move in the opposite direction.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Bull flag forms after rally Price breaks above flag (expected bullish breakout) Price quickly reverses, breaks below flag This is bearish - enter short below flag Target: Distance of flagpole projected down ",
+    "notes": [
+     "1. Pattern completes and breaks out",
+     "2. Breakout fails (price reverses back into pattern)",
+     "3. Enter in direction opposite to failed breakout",
+     "4. Stop beyond the false breakout extreme",
+     "5. Target: Opposite side of pattern or larger"
+    ]
+   }
+  },
+  {
+   "id": "concept:false-breakout",
+   "title": "false breakout",
+   "kind": "Concept",
+   "summary": "Pattern completes, price breaks out",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Price quickly reverses back into pattern Often leads to move in opposite direction Mitigation: Wait for confirmation, use close-based breakouts"
+   }
+  },
+  {
+   "id": "concept:premature-entry",
+   "title": "premature entry",
+   "kind": "Concept",
+   "summary": "Entering before pattern completes",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Pattern morphs into different formation Mitigation: Wait for completion and confirmation"
+   }
+  },
+  {
+   "id": "concept:late-entry",
+   "title": "late entry",
+   "kind": "Concept",
+   "summary": "Entering long after breakout",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Miss optimal risk/reward Chasing leads to poor entries Mitigation: Define entry rules; accept missed trades"
+   }
+  },
+  {
+   "id": "concept:wrong-context",
+   "title": "wrong context",
+   "kind": "Concept",
+   "summary": "Pattern appears in wrong market context",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "E.g., bullish pattern in strong downtrend Mitigation: Align patterns with higher timeframe trend "
+   }
+  },
+  {
+   "id": "concept:pattern-context",
+   "title": "pattern context",
+   "kind": "Concept",
+   "summary": "Pattern context refers to the market conditions and technical environment that must be present for a pattern to be valid and tradeable. Context determines whether a pattern is high probability or should be avoided.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "contextual_requirements_by_pattern_type": "**Reversal Patterns (Head & Shoulders, Double Top/Bottom, etc.):** - MUST appear after established trend - MUST be at significant support/resistance level - SHOULD have increasing volume on reversal - SHOULD align with higher timeframe levels - AVOID in middle of trend with no prior structure **Continuation Patterns (Flags, Pennants, Triangles):** - MUST appear within established trend - MUST be preceded by impulse move - SHOULD show decreasing volume during formation - SHOULD break in trend direction - AVOID if pattern is larger than preceding move **Candlestick Reversal Patterns:** - MUST be at support (bullish) or resistance (bearish) - MUST be at extreme of move (not middle) - SHOULD have prior trend to reverse - SHOULD be confirmed by next candle - AVOID isolated patterns in middle of range ---",
+    "location_based_context": "**At Support:** - Bullish reversal patterns are valid - Bearish patterns are counter-contextual - Failed breaks below support are bullish **At Resistance:** - Bearish reversal patterns are valid - Bullish patterns are counter-contextual - Failed breaks above resistance are bearish **In No Man's Land (Middle of Range):** - Most patterns have reduced reliability - Wait for price to reach extremes - Continuation patterns require clear prior trend ---",
+    "timeframe_context": "**Higher Timeframe Bullish:** - Trade bullish patterns on lower timeframe - Be cautious with bearish patterns - Expect pullbacks to find support **Higher Timeframe Bearish:** - Trade bearish patterns on lower timeframe - Be cautious with bullish patterns - Expect rallies to find resistance **Higher Timeframe Ranging:** - Trade both directions at range extremes - Expect failed breakouts - Reduce position size ---"
+   }
+  },
+  {
+   "id": "concept:pattern-completion",
+   "title": "pattern completion",
+   "kind": "Concept",
+   "summary": "Pattern completion criteria are the specific conditions that must be met for a pattern to be considered complete and tradeable. Premature trading of incomplete patterns is a common source of losses.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "completion_criteria_by_pattern": "**Head and Shoulders:** - Completion: Close below neckline - Confirmation: Volume increase on break - Aggressive: Break of neckline intrabar - Conservative: Close below neckline AND follow-through **Double Top/Bottom:** - Completion: Close beyond neckline (valley/peak) - Confirmation: Retest of neckline holds - Minimum depth: At least 10% from peak to valley **Triangles:** - Completion: Close beyond triangle boundary - Timing: Preferably in last third of triangle (before apex) - Volume: Expansion on breakout - Note: Breakout within 2/3 of pattern length is ideal **Flags/Pennants:** - Completion: Break beyond flag/pennant boundary - Volume: Decrease during flag, increase on break - Time: Flag should be brief (5-15 bars typically) **Cup and Handle:** - Completion: Break above cup rim / handle high - Handle depth: Less than 50% of cup depth - Cup shape: U-shaped, not V-shaped ---"
+   }
+  },
+  {
+   "id": "judgment:breakout-quality-assessment",
+   "title": "breakout quality assessment",
+   "kind": "Judgment",
+   "summary": "Full candle close beyond pattern boundary",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "Volume significantly above average Momentum (large-bodied candle) Follow-through on next bar Wick beyond boundary but close inside Below-average volume Small-bodied or doji candle No follow-through "
+   }
+  },
+  {
+   "id": "concept:entry-timing-option",
+   "title": "entry timing options",
+   "kind": "Concept",
+   "summary": "The three moments a completed pattern can be entered on: the break itself, the close beyond it, or the retest of it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "explanation": "They trade certainty against price. Entering intrabar gets the tightest stop and the most failures; waiting for the retest confirms the boundary reversed roles and misses the moves that never come back.",
+    "source_wording": "Enter on intrabar break of pattern boundary",
+    "notes": [
+     "Tighter stop, larger potential move capture Higher failure rate Enter on close beyond pattern boundary Balanced approach Moderate failure rate Enter on retest of broken boundary Confirmation of role reversal May miss some moves but better R:R "
+    ]
+   }
+  },
+  {
+   "id": "fact:chart-pattern-core-principles",
+   "title": "core principles",
+   "kind": "Fact",
+   "summary": "Things that are true of this market whether or not anyone acts on them. A strategy does not get to disagree with one: it either accounts for it or pays for it.",
+   "epistemic": "observed",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
+    ],
+    "principles": []
+   }
+  },
+  {
+   "id": "judgment:chart-pattern-best-practices",
+   "title": "best practices",
+   "kind": "Judgment",
+   "summary": "Things we follow because someone has already paid to learn them. Each is a default rather than a rule -- departing from one is often right, but it should be a decision with a reason.",
+   "epistemic": "inferred",
+   "status": "draft",
+   "props": {
+    "reference_chapter": [
+     "chart-patterns"
     ],
     "practices": []
    }
@@ -41973,6 +42653,1030 @@
    "why": "stated across indicators",
    "from_id": "judgment:indicator-best-practices",
    "to_id": "concept:indicator"
+  },
+  {
+   "from": "pattern",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "defined under candlestick patterns",
+   "from_id": "concept:pattern",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "doji_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-doji-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "hammer_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-hammer-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "hanging_man_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-hanging-man-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "inverted_hammer_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-inverted-hammer-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "shooting_star_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-shooting-star-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "marubozu_bullish_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-marubozu-bullish-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "marubozu_bearish_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-marubozu-bearish-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "spinning_top_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-spinning-top-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "bullish_engulfing_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-bullish-engulfing-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "bearish_engulfing_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-bearish-engulfing-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "bullish_harami_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-bullish-harami-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "bearish_harami_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-bearish-harami-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "piercing_line_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-piercing-line-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "dark_cloud_cover_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-dark-cloud-cover-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "tweezer_tops_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-tweezer-tops-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "tweezer_bottoms_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-tweezer-bottoms-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "morning_star_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-morning-star-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "evening_star_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-evening-star-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "three_white_soldiers_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-three-white-soldiers-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "three_black_crows_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-three-black-crows-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "three_inside_up_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-three-inside-up-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "three_inside_down_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under candlestick patterns",
+   "from_id": "procedure:signal-three-inside-down-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "multi-bar patterns",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "defined under multi-bar patterns",
+   "from_id": "concept:multi-bar-pattern",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "inside_bar_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under multi-bar patterns",
+   "from_id": "procedure:signal-inside-bar-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "inside_bar_trigger",
+   "rel": "about",
+   "to": "multi-bar patterns",
+   "why": "stated under multi-bar patterns",
+   "from_id": "procedure:signal-inside-bar-trigger",
+   "to_id": "concept:multi-bar-pattern"
+  },
+  {
+   "from": "outside_bar_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under multi-bar patterns",
+   "from_id": "procedure:signal-outside-bar-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "outside_bar_trigger",
+   "rel": "about",
+   "to": "multi-bar patterns",
+   "why": "stated under multi-bar patterns",
+   "from_id": "procedure:signal-outside-bar-trigger",
+   "to_id": "concept:multi-bar-pattern"
+  },
+  {
+   "from": "pin bar",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under multi-bar patterns",
+   "from_id": "concept:pin-bar",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "pin bar",
+   "rel": "about",
+   "to": "multi-bar patterns",
+   "why": "stated under multi-bar patterns",
+   "from_id": "concept:pin-bar",
+   "to_id": "concept:multi-bar-pattern"
+  },
+  {
+   "from": "two-bar reversal",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under multi-bar patterns",
+   "from_id": "concept:two-bar-reversal",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "two-bar reversal",
+   "rel": "about",
+   "to": "multi-bar patterns",
+   "why": "stated under multi-bar patterns",
+   "from_id": "concept:two-bar-reversal",
+   "to_id": "concept:multi-bar-pattern"
+  },
+  {
+   "from": "nr7_trigger",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under multi-bar patterns",
+   "from_id": "procedure:signal-nr7-trigger",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "nr7_trigger",
+   "rel": "about",
+   "to": "multi-bar patterns",
+   "why": "stated under multi-bar patterns",
+   "from_id": "procedure:signal-nr7-trigger",
+   "to_id": "concept:multi-bar-pattern"
+  },
+  {
+   "from": "head and shoulders",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:head-and-shoulders",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "head and shoulders",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:head-and-shoulders",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "inverse head and shoulders",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:inverse-head-and-shoulders",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "inverse head and shoulders",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:inverse-head-and-shoulders",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "double top / double bottom",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:double-top-double-bottom",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "double top / double bottom",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:double-top-double-bottom",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "triple top / triple bottom",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:triple-top-triple-bottom",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "triple top / triple bottom",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:triple-top-triple-bottom",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "triangles",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:triangle",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "triangles",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:triangle",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "flags and pennants",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:flags-and-pennants",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "flags and pennants",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:flags-and-pennants",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "wedges",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:wedge",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "wedges",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:wedge",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "channels",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:channel",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "channels",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:channel",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "cup and handle",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:cup-and-handle",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "cup and handle",
+   "rel": "about",
+   "to": "chart pattern",
+   "why": "stated under chart patterns",
+   "from_id": "concept:cup-and-handle",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "algorithmic pattern detection",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "defined under algorithmic / programmatic patterns",
+   "from_id": "concept:algorithmic-pattern-detection",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "swing point identification",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "procedure:swing-point-identification",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "swing point identification",
+   "rel": "about",
+   "to": "algorithmic pattern detection",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "procedure:swing-point-identification",
+   "to_id": "concept:algorithmic-pattern-detection"
+  },
+  {
+   "from": "trend line detection",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "procedure:trend-line-detection",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "trend line detection",
+   "rel": "about",
+   "to": "algorithmic pattern detection",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "procedure:trend-line-detection",
+   "to_id": "concept:algorithmic-pattern-detection"
+  },
+  {
+   "from": "support/resistance level detection",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "procedure:support-resistance-detection",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "support/resistance level detection",
+   "rel": "about",
+   "to": "algorithmic pattern detection",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "procedure:support-resistance-detection",
+   "to_id": "concept:algorithmic-pattern-detection"
+  },
+  {
+   "from": "pattern recognition libraries",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "concept:pattern-recognition-library",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "pattern recognition libraries",
+   "rel": "about",
+   "to": "algorithmic pattern detection",
+   "why": "stated under algorithmic / programmatic patterns",
+   "from_id": "concept:pattern-recognition-library",
+   "to_id": "concept:algorithmic-pattern-detection"
+  },
+  {
+   "from": "pattern reliability",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "defined under pattern reliability & failure modes",
+   "from_id": "concept:pattern-reliability",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "trading failed patterns",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under pattern reliability & failure modes",
+   "from_id": "judgment:trading-failed-pattern",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "trading failed patterns",
+   "rel": "about",
+   "to": "pattern reliability",
+   "why": "stated under pattern reliability & failure modes",
+   "from_id": "judgment:trading-failed-pattern",
+   "to_id": "concept:pattern-reliability"
+  },
+  {
+   "from": "false breakout",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under pattern reliability & failure modes",
+   "from_id": "concept:false-breakout",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "false breakout",
+   "rel": "about",
+   "to": "pattern reliability",
+   "why": "stated under common failure modes",
+   "from_id": "concept:false-breakout",
+   "to_id": "concept:pattern-reliability"
+  },
+  {
+   "from": "premature entry",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under pattern reliability & failure modes",
+   "from_id": "concept:premature-entry",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "premature entry",
+   "rel": "about",
+   "to": "pattern reliability",
+   "why": "stated under common failure modes",
+   "from_id": "concept:premature-entry",
+   "to_id": "concept:pattern-reliability"
+  },
+  {
+   "from": "late entry",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under pattern reliability & failure modes",
+   "from_id": "concept:late-entry",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "late entry",
+   "rel": "about",
+   "to": "pattern reliability",
+   "why": "stated under common failure modes",
+   "from_id": "concept:late-entry",
+   "to_id": "concept:pattern-reliability"
+  },
+  {
+   "from": "wrong context",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under pattern reliability & failure modes",
+   "from_id": "concept:wrong-context",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "wrong context",
+   "rel": "about",
+   "to": "pattern reliability",
+   "why": "stated under common failure modes",
+   "from_id": "concept:wrong-context",
+   "to_id": "concept:pattern-reliability"
+  },
+  {
+   "from": "pattern context",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "defined under pattern context requirements",
+   "from_id": "concept:pattern-context",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "pattern completion",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "defined under pattern completion criteria",
+   "from_id": "concept:pattern-completion",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "breakout quality assessment",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under pattern completion criteria",
+   "from_id": "judgment:breakout-quality-assessment",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "breakout quality assessment",
+   "rel": "about",
+   "to": "pattern completion",
+   "why": "stated under pattern completion criteria",
+   "from_id": "judgment:breakout-quality-assessment",
+   "to_id": "concept:pattern-completion"
+  },
+  {
+   "from": "entry timing options",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated under pattern completion criteria",
+   "from_id": "concept:entry-timing-option",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "entry timing options",
+   "rel": "about",
+   "to": "pattern completion",
+   "why": "stated under pattern completion criteria",
+   "from_id": "concept:entry-timing-option",
+   "to_id": "concept:pattern-completion"
+  },
+  {
+   "from": "head and shoulders",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "three peaks and a neckline, drawn across swings",
+   "from_id": "concept:head-and-shoulders",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "inverse head and shoulders",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "the same shape inverted",
+   "from_id": "concept:inverse-head-and-shoulders",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "double top / double bottom",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "two tests of a level with a retracement between",
+   "from_id": "concept:double-top-double-bottom",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "triple top / triple bottom",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "the same, tested three times",
+   "from_id": "concept:triple-top-triple-bottom",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "triangles",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "converging boundaries across the highs and lows",
+   "from_id": "concept:triangle",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "flags and pennants",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "a consolidation against the move that preceded it",
+   "from_id": "concept:flags-and-pennants",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "wedges",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "converging boundaries sloping the same way",
+   "from_id": "concept:wedge",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "channels",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "parallel boundaries containing price",
+   "from_id": "concept:channel",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "cup and handle",
+   "rel": "kind-of",
+   "to": "chart pattern",
+   "why": "a rounded base and a shallow drift off its rim",
+   "from_id": "concept:cup-and-handle",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "pin bar",
+   "rel": "kind-of",
+   "to": "pattern",
+   "why": "one bar, read from where its body sits in its range",
+   "from_id": "concept:pin-bar",
+   "to_id": "concept:pattern"
+  },
+  {
+   "from": "two-bar reversal",
+   "rel": "kind-of",
+   "to": "pattern",
+   "why": "two bars, read as one shape",
+   "from_id": "concept:two-bar-reversal",
+   "to_id": "concept:pattern"
+  },
+  {
+   "from": "chart pattern",
+   "rel": "about",
+   "to": "swing point identification",
+   "why": "the swings a formation of unknown length is drawn from",
+   "from_id": "concept:chart-pattern",
+   "to_id": "procedure:swing-point-identification"
+  },
+  {
+   "from": "pattern",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Psychology Reflection: Candlesticks show the battle between buyers and sellers",
+   "from_id": "concept:pattern",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "pattern context",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Context Dependency: Patterns mean different things in different contexts \u00b7 Timeframe Relevance: Higher timeframe patterns carry more weight \u00b7 Context Affects Success: Same pattern works differently in different contexts \u00b7 Trend Alignment: Patterns aligned with trend are more reliable \u00b7 Timeframe Hierarchy: Higher timeframe context overrides lower",
+   "from_id": "concept:pattern-context",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "price action",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Confirmation Required: Most patterns require confirmation from subsequent price action \u00b7 Price Action Quality: Breakout bar characteristics matter",
+   "from_id": "concept:price-action",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "support and resistance",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Location Matters: Patterns at key levels (support/resistance) are more significant \u00b7 Location: Patterns at key levels have higher significance",
+   "from_id": "concept:support-and-resistance",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "multi-bar patterns",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Consolidation: Multiple bars often indicate pauses before continuation or reversal \u00b7 Breakout Direction: Often (but not always) continues prior trend",
+   "from_id": "concept:multi-bar-pattern",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "compression",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Energy Building: Tight consolidations store energy for subsequent moves",
+   "from_id": "concept:compression",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volume Significance: Volume patterns within consolidations provide clues \u00b7 Volume Confirmation: Breakout volume should exceed average",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "chart pattern",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Psychology Mapping: Patterns reflect collective trader psychology \u00b7 Measured Moves: Most patterns have target projections \u00b7 Time Proportionality: Pattern duration often relates to subsequent move duration",
+   "from_id": "concept:chart-pattern",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "pattern reliability",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Failure Mode: Failed patterns often lead to strong moves opposite \u00b7 No Pattern is 100%: All patterns have failure rates \u00b7 Sample Size: Published statistics vary; test on your markets",
+   "from_id": "concept:pattern-reliability",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "volume profile",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Volume Profile: Volume typically decreases during formation, expands on breakout",
+   "from_id": "concept:volume-profile",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "algorithmic pattern detection",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Objective Definition: Patterns must have precise, programmable criteria \u00b7 False Positives: Algorithms may detect patterns humans would ignore",
+   "from_id": "concept:algorithmic-pattern-detection",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "parameter sensitivity",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Parameter Sensitivity: Results depend heavily on detection parameters",
+   "from_id": "procedure:parameter-sensitivity",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "backtesting",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Backtestable: Patterns should be testable on historical data",
+   "from_id": "concept:backtesting",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Optimization Risk: Over-optimization leads to curve fitting",
+   "from_id": "concept:overfitting",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "trading failed patterns",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Failed Patterns Signal: A failed pattern often leads to strong move opposite",
+   "from_id": "judgment:trading-failed-pattern",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "pattern completion",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Confirmation Matters: Unconfirmed patterns have lower reliability \u00b7 Completion Before Entry: Don't anticipate; wait for completion \u00b7 Clear Trigger: Define exact completion trigger in advance \u00b7 Time Element: Some patterns have time-based components",
+   "from_id": "concept:pattern-completion",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "market regimes",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Market Regime: Patterns behave differently in trends vs. ranges",
+   "from_id": "concept:market-regime",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "confluence",
+   "rel": "about",
+   "to": "core principles",
+   "why": "Confluence: Multiple supporting factors increase probability",
+   "from_id": "concept:confluence",
+   "to_id": "fact:chart-pattern-core-principles"
+  },
+  {
+   "from": "pattern context",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Always consider the preceding trend and context \u00b7 Higher timeframe patterns are more reliable \u00b7 Combine with trend direction for higher probability \u00b7 Identify patterns in context of larger trend \u00b7 Always check higher timeframe before trading patterns \u00b7 Ensure pattern direction aligns with dominant trend \u00b7 Document context requirements for patterns you trade",
+   "from_id": "concept:pattern-context",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "support and resistance",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Look for patterns at key support/resistance levels \u00b7 Use at key support/resistance levels \u00b7 Identify key levels and only trade patterns at those levels",
+   "from_id": "concept:support-and-resistance",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "pattern completion",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Require confirmation before acting (next candle) \u00b7 Wait for confirmation break before entry \u00b7 Wait for pattern completion and confirmation \u00b7 Use confirmation (close beyond level, volume, follow-through) \u00b7 Define completion criteria before pattern appears \u00b7 Use close-based triggers for most patterns \u00b7 Don't chase if completion criteria weren't met at proper time",
+   "from_id": "concept:pattern-completion",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "volume confirmation",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine with volume analysis for confirmation \u00b7 Volume should confirm pattern (decrease during formation, increase on breakout) \u00b7 Require volume confirmation for breakouts",
+   "from_id": "concept:volume-confirmation",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "confluence",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Don't trade patterns in isolation; use confluence \u00b7 Require confluence of at least 2-3 supporting factors",
+   "from_id": "concept:confluence",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "stop-loss and take-profit engineering",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Size stops based on pattern structure \u00b7 Always define invalidation level before entry",
+   "from_id": "concept:stop-and-target-engineering",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "inside_bar_trigger",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Note that inside bars after strong moves often continue",
+   "from_id": "procedure:signal-inside-bar-trigger",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "reward-to-risk ratio",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Calculate risk/reward before entering",
+   "from_id": "concept:risk-reward-ratio",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "pattern reliability",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Recognize that 30-40% of breakouts fail; manage risk accordingly \u00b7 Accept that 30-40% of patterns fail \u00b7 Track your own statistics for patterns you trade",
+   "from_id": "concept:pattern-reliability",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "trading failed patterns",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Failed patterns provide trading opportunities in opposite direction \u00b7 Have plan for failed patterns (reverse, stand aside, reassess)",
+   "from_id": "judgment:trading-failed-pattern",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "algorithmic pattern detection",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Start with simple, well-defined patterns",
+   "from_id": "concept:algorithmic-pattern-detection",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "confirmation signal",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Use multiple confirmation filters",
+   "from_id": "concept:confirmation-signal",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "backtesting",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Backtest extensively with out-of-sample data",
+   "from_id": "concept:backtesting",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "transaction costs",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Account for transaction costs and slippage",
+   "from_id": "concept:transaction-cost",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "overfitting",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Avoid over-optimization of pattern parameters",
+   "from_id": "concept:overfitting",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "filter signal",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Combine pattern detection with other filters (trend, volume)",
+   "from_id": "concept:filter-signal",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "position sizing",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Never risk more than planned regardless of pattern \"quality\"",
+   "from_id": "concept:position-sizing",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "entry timing options",
+   "rel": "about",
+   "to": "best practices",
+   "why": "Have rules for each entry timing option",
+   "from_id": "concept:entry-timing-option",
+   "to_id": "judgment:chart-pattern-best-practices"
+  },
+  {
+   "from": "core principles",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated across chart-patterns",
+   "from_id": "fact:chart-pattern-core-principles",
+   "to_id": "concept:chart-pattern"
+  },
+  {
+   "from": "best practices",
+   "rel": "part-of",
+   "to": "chart pattern",
+   "why": "stated across chart-patterns",
+   "from_id": "judgment:chart-pattern-best-practices",
+   "to_id": "concept:chart-pattern"
   }
  ],
  "meta": {
@@ -42006,6 +43710,7 @@
   ],
   "derived_atom_ids": [
    "concept:accumulation-pattern",
+   "concept:algorithmic-pattern-detection",
    "concept:anchored-walk-forward",
    "concept:arbitrageur",
    "concept:auction-based-discovery",
@@ -42022,6 +43727,7 @@
    "concept:central-counterparty",
    "concept:centralized-exchange",
    "concept:change-of-character",
+   "concept:channel",
    "concept:chart-pattern",
    "concept:clearing",
    "concept:climactic-volume",
@@ -42037,6 +43743,7 @@
    "concept:crypto-settlement",
    "concept:crypto-specific-mechanics",
    "concept:cryptocurrency-spot-market",
+   "concept:cup-and-handle",
    "concept:dark-pool",
    "concept:data-quality",
    "concept:data-snooping-bias",
@@ -42044,12 +43751,14 @@
    "concept:decentralized-exchange",
    "concept:demand-zone",
    "concept:distribution-pattern",
+   "concept:double-top-double-bottom",
    "concept:drawdown-control",
    "concept:drawdown-risk",
    "concept:dynamic-level",
    "concept:electronic-communication-network",
    "concept:entry-logic",
    "concept:entry-signal",
+   "concept:entry-timing-option",
    "concept:equal-highs-and-lows",
    "concept:equity-settlement",
    "concept:equity-spot-market",
@@ -42059,12 +43768,15 @@
    "concept:expansion",
    "concept:failure-swing",
    "concept:fair-value-gap",
+   "concept:false-breakout",
    "concept:filter-signal",
+   "concept:flags-and-pennants",
    "concept:forex-spot-market",
    "concept:futures",
    "concept:futures-settlement",
    "concept:fx",
    "concept:greeks",
+   "concept:head-and-shoulders",
    "concept:hedge-fund",
    "concept:hidden-divergence",
    "concept:high-frequency-trader",
@@ -42076,6 +43788,8 @@
    "concept:information-leakage",
    "concept:institutional-investor",
    "concept:internalization",
+   "concept:inverse-head-and-shoulders",
+   "concept:late-entry",
    "concept:leverage",
    "concept:limit-order",
    "concept:liquidation-engine",
@@ -42101,18 +43815,25 @@
    "concept:market-structure",
    "concept:mean-reversion",
    "concept:momentum-strategy",
+   "concept:multi-bar-pattern",
    "concept:multi-timeframe-analysis",
    "concept:option",
    "concept:order-flow",
    "concept:order-type",
    "concept:over-the-counter-market",
    "concept:overfitting",
+   "concept:pattern-completion",
+   "concept:pattern-context",
+   "concept:pattern-recognition-library",
+   "concept:pattern-reliability",
    "concept:per-trade-risk",
    "concept:perpetual-swap",
+   "concept:pin-bar",
    "concept:point-of-control",
    "concept:portfolio-risk",
    "concept:position-sizing",
    "concept:position-trading",
+   "concept:premature-entry",
    "concept:price-action",
    "concept:price-discovery",
    "concept:proprietary-trading-firm",
@@ -42160,6 +43881,9 @@
    "concept:transaction-cost",
    "concept:trend-following",
    "concept:trending-market",
+   "concept:triangle",
+   "concept:triple-top-triple-bottom",
+   "concept:two-bar-reversal",
    "concept:value-area-high",
    "concept:value-area-low",
    "concept:volatility-strategy",
@@ -42168,6 +43892,9 @@
    "concept:volume-divergence",
    "concept:volume-profile",
    "concept:walk-forward-optimization",
+   "concept:wedge",
+   "concept:wrong-context",
+   "fact:chart-pattern-core-principles",
    "fact:constant-product-amm",
    "fact:cost-of-carry-relationship",
    "fact:indicator-core-principles",
@@ -42185,6 +43912,8 @@
    "fact:strategy-design-core-principles",
    "fact:timeframe-ratio",
    "fact:win-rate-is-not-risk",
+   "judgment:breakout-quality-assessment",
+   "judgment:chart-pattern-best-practices",
    "judgment:indicator-best-practices",
    "judgment:market-foundations-best-practices",
    "judgment:market-mechanics-best-practices",
@@ -42195,6 +43924,7 @@
    "judgment:scenario-action-plan",
    "judgment:setting-realistic-target",
    "judgment:strategy-design-best-practices",
+   "judgment:trading-failed-pattern",
    "judgment:trailing-behavior-after-target",
    "judgment:trend-is-your-friend",
    "procedure:advance-decline-line",
@@ -42266,6 +43996,7 @@
    "procedure:strategy-risk-assessment",
    "procedure:structure-based-stop",
    "procedure:structure-break-detection",
+   "procedure:support-resistance-detection",
    "procedure:survivorship-bias-prevention",
    "procedure:swing-point-identification",
    "procedure:tail-risk-analysis",
@@ -42275,6 +44006,7 @@
    "procedure:timeframe-confirmation",
    "procedure:transaction-cost-model",
    "procedure:trend-classification",
+   "procedure:trend-line-detection",
    "procedure:twap",
    "procedure:universe-stability",
    "procedure:value-area-calculation",
@@ -42360,6 +44092,21 @@
     "concept:volume"
    ],
    [
+    "concept:algorithmic-pattern-detection",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:algorithmic-pattern-detection",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:algorithmic-pattern-detection",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "concept:anchored-walk-forward",
     "about",
     "concept:walk-forward-optimization"
@@ -42407,7 +44154,17 @@
    [
     "concept:backtesting",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:backtesting",
+    "about",
     "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:backtesting",
+    "about",
+    "judgment:chart-pattern-best-practices"
    ],
    [
     "concept:backtesting",
@@ -42565,9 +44322,34 @@
     "concept:price-action"
    ],
    [
+    "concept:channel",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:channel",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:channel",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "concept:chart-pattern",
     "about",
     "concept:pattern"
+   ],
+   [
+    "concept:chart-pattern",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:chart-pattern",
+    "about",
+    "procedure:swing-point-identification"
    ],
    [
     "concept:chart-pattern",
@@ -42617,6 +44399,11 @@
    [
     "concept:compression",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:compression",
+    "about",
     "fact:indicator-core-principles"
    ],
    [
@@ -42652,6 +44439,11 @@
    [
     "concept:confirmation-signal",
     "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:confirmation-signal",
+    "about",
     "judgment:strategy-design-best-practices"
    ],
    [
@@ -42662,7 +44454,17 @@
    [
     "concept:confluence",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:confluence",
+    "about",
     "fact:price-action-core-principles"
+   ],
+   [
+    "concept:confluence",
+    "about",
+    "judgment:chart-pattern-best-practices"
    ],
    [
     "concept:confluence",
@@ -42760,6 +44562,21 @@
     "concept:spot-market"
    ],
    [
+    "concept:cup-and-handle",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:cup-and-handle",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:cup-and-handle",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "concept:dark-pool",
     "about",
     "concept:information-leakage"
@@ -42855,6 +44672,21 @@
     "concept:volume"
    ],
    [
+    "concept:double-top-double-bottom",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:double-top-double-bottom",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:double-top-double-bottom",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "concept:drawdown-control",
     "about",
     "fact:risk-management-core-principles"
@@ -42918,6 +44750,21 @@
     "concept:entry-signal",
     "kind-of",
     "concept:signal-type"
+   ],
+   [
+    "concept:entry-timing-option",
+    "about",
+    "concept:pattern-completion"
+   ],
+   [
+    "concept:entry-timing-option",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:entry-timing-option",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "concept:equal-highs-and-lows",
@@ -43035,14 +44882,44 @@
     "concept:price-action"
    ],
    [
+    "concept:false-breakout",
+    "about",
+    "concept:pattern-reliability"
+   ],
+   [
+    "concept:false-breakout",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "concept:filter-signal",
     "about",
     "fact:strategy-design-core-principles"
    ],
    [
     "concept:filter-signal",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:filter-signal",
     "kind-of",
     "concept:signal-type"
+   ],
+   [
+    "concept:flags-and-pennants",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:flags-and-pennants",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:flags-and-pennants",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "concept:flow",
@@ -43118,6 +44995,21 @@
     "concept:greeks",
     "uses",
     "procedure:black-scholes-call-price"
+   ],
+   [
+    "concept:head-and-shoulders",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:head-and-shoulders",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:head-and-shoulders",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "concept:hedge-fund",
@@ -43258,6 +45150,31 @@
     "concept:internalization",
     "kind-of",
     "concept:trading-venue"
+   ],
+   [
+    "concept:inverse-head-and-shoulders",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:inverse-head-and-shoulders",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:inverse-head-and-shoulders",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:late-entry",
+    "about",
+    "concept:pattern-reliability"
+   ],
+   [
+    "concept:late-entry",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "concept:leverage",
@@ -43547,6 +45464,11 @@
    [
     "concept:market-regime",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:market-regime",
+    "about",
     "fact:market-foundations-core-principles"
    ],
    [
@@ -43665,6 +45587,16 @@
     "concept:strategy-design"
    ],
    [
+    "concept:multi-bar-pattern",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:multi-bar-pattern",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "concept:multi-timeframe-analysis",
     "about",
     "fact:price-action-core-principles"
@@ -43757,7 +45689,17 @@
    [
     "concept:overfitting",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:overfitting",
+    "about",
     "fact:strategy-design-core-principles"
+   ],
+   [
+    "concept:overfitting",
+    "about",
+    "judgment:chart-pattern-best-practices"
    ],
    [
     "concept:overfitting",
@@ -43768,6 +45710,71 @@
     "concept:overfitting",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "concept:pattern",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:pattern",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:pattern-completion",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:pattern-completion",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:pattern-completion",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:pattern-context",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:pattern-context",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:pattern-context",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:pattern-recognition-library",
+    "about",
+    "concept:algorithmic-pattern-detection"
+   ],
+   [
+    "concept:pattern-recognition-library",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:pattern-reliability",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:pattern-reliability",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:pattern-reliability",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "concept:per-trade-risk",
@@ -43783,6 +45790,21 @@
     "concept:perpetual-swap",
     "part-of",
     "concept:market-mechanics"
+   ],
+   [
+    "concept:pin-bar",
+    "about",
+    "concept:multi-bar-pattern"
+   ],
+   [
+    "concept:pin-bar",
+    "kind-of",
+    "concept:pattern"
+   ],
+   [
+    "concept:pin-bar",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "concept:point-of-control",
@@ -43827,6 +45849,11 @@
    [
     "concept:position-sizing",
     "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:position-sizing",
+    "about",
     "judgment:indicator-best-practices"
    ],
    [
@@ -43848,6 +45875,21 @@
     "concept:position-trading",
     "kind-of",
     "concept:trading-style"
+   ],
+   [
+    "concept:premature-entry",
+    "about",
+    "concept:pattern-reliability"
+   ],
+   [
+    "concept:premature-entry",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:price-action",
+    "about",
+    "fact:chart-pattern-core-principles"
    ],
    [
     "concept:price-action",
@@ -44017,6 +46059,11 @@
    [
     "concept:risk-reward-ratio",
     "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:risk-reward-ratio",
+    "about",
     "judgment:risk-management-best-practices"
    ],
    [
@@ -44177,6 +46224,11 @@
    [
     "concept:stop-and-target-engineering",
     "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:stop-and-target-engineering",
+    "about",
     "judgment:risk-management-best-practices"
    ],
    [
@@ -44312,7 +46364,17 @@
    [
     "concept:support-and-resistance",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:support-and-resistance",
+    "about",
     "fact:price-action-core-principles"
+   ],
+   [
+    "concept:support-and-resistance",
+    "about",
+    "judgment:chart-pattern-best-practices"
    ],
    [
     "concept:support-and-resistance",
@@ -44477,6 +46539,11 @@
    [
     "concept:transaction-cost",
     "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "concept:transaction-cost",
+    "about",
     "judgment:market-foundations-best-practices"
    ],
    [
@@ -44513,6 +46580,51 @@
     "concept:trending-market",
     "kind-of",
     "concept:market-regime"
+   ],
+   [
+    "concept:triangle",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:triangle",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:triangle",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:triple-top-triple-bottom",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:triple-top-triple-bottom",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:triple-top-triple-bottom",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:two-bar-reversal",
+    "about",
+    "concept:multi-bar-pattern"
+   ],
+   [
+    "concept:two-bar-reversal",
+    "kind-of",
+    "concept:pattern"
+   ],
+   [
+    "concept:two-bar-reversal",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "concept:value-area-high",
@@ -44627,12 +46739,22 @@
    [
     "concept:volume-confirmation",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "concept:volume-confirmation",
+    "about",
     "fact:indicator-core-principles"
    ],
    [
     "concept:volume-confirmation",
     "about",
     "fact:price-action-core-principles"
+   ],
+   [
+    "concept:volume-confirmation",
+    "about",
+    "judgment:chart-pattern-best-practices"
    ],
    [
     "concept:volume-confirmation",
@@ -44653,6 +46775,11 @@
     "concept:volume-divergence",
     "kind-of",
     "concept:volume"
+   ],
+   [
+    "concept:volume-profile",
+    "about",
+    "fact:chart-pattern-core-principles"
    ],
    [
     "concept:volume-profile",
@@ -44678,6 +46805,36 @@
     "concept:walk-forward-optimization",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "concept:wedge",
+    "about",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:wedge",
+    "kind-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:wedge",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "concept:wrong-context",
+    "about",
+    "concept:pattern-reliability"
+   ],
+   [
+    "concept:wrong-context",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "fact:chart-pattern-core-principles",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "fact:constant-product-amm",
@@ -44845,6 +47002,21 @@
     "concept:risk-management"
    ],
    [
+    "judgment:breakout-quality-assessment",
+    "about",
+    "concept:pattern-completion"
+   ],
+   [
+    "judgment:breakout-quality-assessment",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "judgment:chart-pattern-best-practices",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "judgment:indicator-best-practices",
     "part-of",
     "concept:indicator"
@@ -44928,6 +47100,26 @@
     "judgment:strategy-design-best-practices",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "judgment:trading-failed-pattern",
+    "about",
+    "concept:pattern-reliability"
+   ],
+   [
+    "judgment:trading-failed-pattern",
+    "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "judgment:trading-failed-pattern",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "judgment:trading-failed-pattern",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "judgment:trailing-behavior-after-target",
@@ -46022,6 +48214,11 @@
    [
     "procedure:parameter-sensitivity",
     "about",
+    "fact:chart-pattern-core-principles"
+   ],
+   [
+    "procedure:parameter-sensitivity",
+    "about",
     "judgment:strategy-design-best-practices"
    ],
    [
@@ -46150,6 +48347,71 @@
     "concept:signal-type"
    ],
    [
+    "procedure:signal-bearish-engulfing-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-bearish-harami-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-bullish-engulfing-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-bullish-harami-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-dark-cloud-cover-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-doji-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-evening-star-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-hammer-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-hanging-man-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-inside-bar-trigger",
+    "about",
+    "concept:multi-bar-pattern"
+   ],
+   [
+    "procedure:signal-inside-bar-trigger",
+    "about",
+    "judgment:chart-pattern-best-practices"
+   ],
+   [
+    "procedure:signal-inside-bar-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-inverted-hammer-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "procedure:signal-is-above-sma",
     "about",
     "concept:signal-type"
@@ -46180,9 +48442,49 @@
     "concept:signal-type"
    ],
    [
+    "procedure:signal-marubozu-bearish-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-marubozu-bullish-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-morning-star-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-nr7-trigger",
+    "about",
+    "concept:multi-bar-pattern"
+   ],
+   [
+    "procedure:signal-nr7-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "procedure:signal-obv-bullish",
     "about",
     "concept:signal-type"
+   ],
+   [
+    "procedure:signal-outside-bar-trigger",
+    "about",
+    "concept:multi-bar-pattern"
+   ],
+   [
+    "procedure:signal-outside-bar-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-piercing-line-trigger",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "procedure:signal-rsi-overbought",
@@ -46200,6 +48502,11 @@
     "concept:signal-type"
    ],
    [
+    "procedure:signal-shooting-star-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "procedure:signal-sma-cross-down",
     "about",
     "concept:signal-type"
@@ -46208,6 +48515,41 @@
     "procedure:signal-sma-cross-up",
     "about",
     "concept:signal-type"
+   ],
+   [
+    "procedure:signal-spinning-top-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-three-black-crows-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-three-inside-down-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-three-inside-up-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-three-white-soldiers-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-tweezer-bottoms-trigger",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
+    "procedure:signal-tweezer-tops-trigger",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "procedure:signal-vwap-above",
@@ -46330,6 +48672,16 @@
     "procedure:swing-point-identification"
    ],
    [
+    "procedure:support-resistance-detection",
+    "about",
+    "concept:algorithmic-pattern-detection"
+   ],
+   [
+    "procedure:support-resistance-detection",
+    "part-of",
+    "concept:chart-pattern"
+   ],
+   [
     "procedure:survivorship-bias-prevention",
     "about",
     "concept:data-quality"
@@ -46347,6 +48699,11 @@
    [
     "procedure:swing-point-identification",
     "about",
+    "concept:algorithmic-pattern-detection"
+   ],
+   [
+    "procedure:swing-point-identification",
+    "about",
     "concept:market-structure"
    ],
    [
@@ -46358,6 +48715,11 @@
     "procedure:swing-point-identification",
     "about",
     "judgment:price-action-best-practices"
+   ],
+   [
+    "procedure:swing-point-identification",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "procedure:tail-risk-analysis",
@@ -46443,6 +48805,16 @@
     "procedure:trend-classification",
     "uses",
     "procedure:swing-point-identification"
+   ],
+   [
+    "procedure:trend-line-detection",
+    "about",
+    "concept:algorithmic-pattern-detection"
+   ],
+   [
+    "procedure:trend-line-detection",
+    "part-of",
+    "concept:chart-pattern"
    ],
    [
     "procedure:twap",
@@ -47444,6 +49816,7 @@
   ],
   "folded_atom_ids": [
    "concept:averaging",
+   "concept:chart-pattern",
    "concept:flow",
    "concept:indicator",
    "concept:liquidity",
@@ -47452,6 +49825,7 @@
    "concept:market-regime",
    "concept:momentum",
    "concept:oscillator",
+   "concept:pattern",
    "concept:price-action",
    "concept:risk-management",
    "concept:strategy-design",
@@ -47505,7 +49879,33 @@
    "procedure:indicator-williamsr",
    "procedure:indicator-wma",
    "procedure:risk-multiple-target",
-   "procedure:simple-trailing-stop"
+   "procedure:signal-bearish-engulfing-trigger",
+   "procedure:signal-bearish-harami-trigger",
+   "procedure:signal-bullish-engulfing-trigger",
+   "procedure:signal-bullish-harami-trigger",
+   "procedure:signal-dark-cloud-cover-trigger",
+   "procedure:signal-doji-trigger",
+   "procedure:signal-evening-star-trigger",
+   "procedure:signal-hammer-trigger",
+   "procedure:signal-hanging-man-trigger",
+   "procedure:signal-inside-bar-trigger",
+   "procedure:signal-inverted-hammer-trigger",
+   "procedure:signal-marubozu-bearish-trigger",
+   "procedure:signal-marubozu-bullish-trigger",
+   "procedure:signal-morning-star-trigger",
+   "procedure:signal-nr7-trigger",
+   "procedure:signal-outside-bar-trigger",
+   "procedure:signal-piercing-line-trigger",
+   "procedure:signal-shooting-star-trigger",
+   "procedure:signal-spinning-top-trigger",
+   "procedure:signal-three-black-crows-trigger",
+   "procedure:signal-three-inside-down-trigger",
+   "procedure:signal-three-inside-up-trigger",
+   "procedure:signal-three-white-soldiers-trigger",
+   "procedure:signal-tweezer-bottoms-trigger",
+   "procedure:signal-tweezer-tops-trigger",
+   "procedure:simple-trailing-stop",
+   "procedure:swing-point-identification"
   ],
   "chapter_instruments-market-mechanics_atoms": 57,
   "chapter_instruments-market-mechanics_relations": 135,
@@ -47590,6 +49990,38 @@
    "procedure:indicator-vwap",
    "procedure:indicator-williamsr",
    "procedure:indicator-wma"
+  ],
+  "chapter_chart-patterns_atoms": 28,
+  "chapter_chart-patterns_relations": 128,
+  "chapter_chart-patterns_folded": [
+   "concept:chart-pattern",
+   "concept:pattern",
+   "procedure:signal-bearish-engulfing-trigger",
+   "procedure:signal-bearish-harami-trigger",
+   "procedure:signal-bullish-engulfing-trigger",
+   "procedure:signal-bullish-harami-trigger",
+   "procedure:signal-dark-cloud-cover-trigger",
+   "procedure:signal-doji-trigger",
+   "procedure:signal-evening-star-trigger",
+   "procedure:signal-hammer-trigger",
+   "procedure:signal-hanging-man-trigger",
+   "procedure:signal-inside-bar-trigger",
+   "procedure:signal-inverted-hammer-trigger",
+   "procedure:signal-marubozu-bearish-trigger",
+   "procedure:signal-marubozu-bullish-trigger",
+   "procedure:signal-morning-star-trigger",
+   "procedure:signal-nr7-trigger",
+   "procedure:signal-outside-bar-trigger",
+   "procedure:signal-piercing-line-trigger",
+   "procedure:signal-shooting-star-trigger",
+   "procedure:signal-spinning-top-trigger",
+   "procedure:signal-three-black-crows-trigger",
+   "procedure:signal-three-inside-down-trigger",
+   "procedure:signal-three-inside-up-trigger",
+   "procedure:signal-three-white-soldiers-trigger",
+   "procedure:signal-tweezer-bottoms-trigger",
+   "procedure:signal-tweezer-tops-trigger",
+   "procedure:swing-point-identification"
   ]
  }
 }

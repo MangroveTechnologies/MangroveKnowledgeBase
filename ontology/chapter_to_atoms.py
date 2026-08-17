@@ -1568,6 +1568,221 @@ CHAPTERS: dict[str, dict] = {
             "Consider timeframe: Daily returns": "procedure:indicator-dailyreturn",
         },
     },
+    "chart-patterns": {
+        "taxonomy": set(),
+        # The signal docstrings here are hand-written and say which SIDE they detect -- "a tweezer
+        # bottoms pattern ... two consecutive candles with approximately equal lows". The chapter
+        # describes the shape once for both sides, so its wording is the more general of the two
+        # and is kept beside them rather than over them. (Chapter 6 is the opposite case: there the
+        # docstrings are library prose and the chapter's are definitions.)
+        "keep_summaries": True,
+        # A pattern block states what it IS under `**Structure:**`, not `**Definition:**`.
+        "definition_labels": ("Definition", "Structure"),
+        # §7.1 groups its candlesticks three ways and gives each one a `####` of its own. Each is
+        # the FORMATION -- the shape on the chart -- which is not the same thing as the signal that
+        # detects it, the way §3.7's zone is not its detection rule.
+        "sub_block_nodes": {
+            "Single Candlestick Patterns": {
+                "Doji": "Procedure",
+                "Hammer / Hanging Man": {"Hammer (Bullish)": "Procedure",
+                                         "Hanging Man (Bearish)": "Procedure"},
+                "Inverted Hammer / Shooting Star": {"Inverted Hammer (Bullish)": "Procedure",
+                                                    "Shooting Star (Bearish)": "Procedure"},
+                "Marubozu": {"Bullish Marubozu": "Procedure", "Bearish Marubozu": "Procedure"},
+                "Spinning Top": "Procedure"},
+            "Two-Candlestick Patterns": {
+                "Engulfing Pattern": {"Bullish Engulfing": "Procedure",
+                                      "Bearish Engulfing": "Procedure"},
+                "Harami (Inside Bar)": {"Bullish Harami": "Procedure",
+                                        "Bearish Harami": "Procedure"},
+                "Piercing Line / Dark Cloud Cover": {"Piercing Line (Bullish)": "Procedure",
+                                                     "Dark Cloud Cover (Bearish)": "Procedure"},
+                "Tweezer Tops / Bottoms": {"Tweezer Top": "Procedure",
+                                           "Tweezer Bottom": "Procedure"}},
+            "Three-Candlestick Patterns": {
+                "Morning Star / Evening Star": {"Morning Star (Bullish)": "Procedure",
+                                                "Evening Star (Bearish)": "Procedure"},
+                "Three White Soldiers / Three Black Crows": {
+                    "Three White Soldiers (Bullish)": "Procedure",
+                    "Three Black Crows (Bearish)": "Procedure"},
+                "Three Inside Up / Down": {"Three Inside Up (Bullish)": "Procedure",
+                                           "Three Inside Down (Bearish)": "Procedure"}},
+        },
+        "blocks_as_nodes": {
+            "Multi-Bar Patterns": {"Inside Bar": "Concept", "Outside Bar (Engulfing Bar)": "Concept",
+                                   "Pin Bar": "Concept", "Two-Bar Reversal": "Concept",
+                                   "NR4 / NR7 (Narrow Range)": "Concept"},
+            "Chart Patterns": {"Head and Shoulders": "Concept",
+                               "Inverse Head and Shoulders": "Concept",
+                               "Double Top / Double Bottom": "Concept",
+                               "Triple Top / Triple Bottom": "Concept", "Triangles": "Concept",
+                               "Flags and Pennants": "Concept", "Wedges": "Concept",
+                               "Channels": "Concept", "Cup and Handle": "Concept"},
+            "Algorithmic / Programmatic Patterns": {
+                "Swing Point Detection": "Procedure", "Trend Line Detection": "Procedure",
+                "Support/Resistance Level Detection": "Procedure",
+                "Pattern Recognition Libraries": "Concept"},
+            "Pattern Reliability & Failure Modes": {"Trading Failed Patterns": "Judgment"},
+            "Pattern Completion Criteria": {"Breakout Quality Assessment": "Judgment",
+                                            "Entry Timing Options": "Concept"},
+        },
+        "labelled_nodes": {
+            "Common Failure Modes": {"False Breakout": "Concept", "Premature Entry": "Concept",
+                                     "Late Entry": "Concept", "Wrong Context": "Concept"},
+        },
+        "rename": {
+            # Every candlestick and multi-bar form the library detects: the chapter describes the
+            # shape, the signal is how it is found, and they are one node holding both.
+            'Doji': "procedure:signal-doji-trigger",
+            'Hammer (Bullish)': "procedure:signal-hammer-trigger",
+            'Hanging Man (Bearish)': "procedure:signal-hanging-man-trigger",
+            'Inverted Hammer (Bullish)': "procedure:signal-inverted-hammer-trigger",
+            'Shooting Star (Bearish)': "procedure:signal-shooting-star-trigger",
+            'Bullish Marubozu': "procedure:signal-marubozu-bullish-trigger",
+            'Bearish Marubozu': "procedure:signal-marubozu-bearish-trigger",
+            'Spinning Top': "procedure:signal-spinning-top-trigger",
+            'Bullish Engulfing': "procedure:signal-bullish-engulfing-trigger",
+            'Bearish Engulfing': "procedure:signal-bearish-engulfing-trigger",
+            'Bullish Harami': "procedure:signal-bullish-harami-trigger",
+            'Bearish Harami': "procedure:signal-bearish-harami-trigger",
+            'Piercing Line (Bullish)': "procedure:signal-piercing-line-trigger",
+            'Dark Cloud Cover (Bearish)': "procedure:signal-dark-cloud-cover-trigger",
+            'Tweezer Top': "procedure:signal-tweezer-tops-trigger",
+            'Tweezer Bottom': "procedure:signal-tweezer-bottoms-trigger",
+            'Morning Star (Bullish)': "procedure:signal-morning-star-trigger",
+            'Evening Star (Bearish)': "procedure:signal-evening-star-trigger",
+            'Three White Soldiers (Bullish)': "procedure:signal-three-white-soldiers-trigger",
+            'Three Black Crows (Bearish)': "procedure:signal-three-black-crows-trigger",
+            'Three Inside Up (Bullish)': "procedure:signal-three-inside-up-trigger",
+            'Three Inside Down (Bearish)': "procedure:signal-three-inside-down-trigger",
+            'Inside Bar': "procedure:signal-inside-bar-trigger",
+            'Outside Bar (Engulfing Bar)': "procedure:signal-outside-bar-trigger",
+            'NR4 / NR7 (Narrow Range)': "procedure:signal-nr7-trigger",
+            # The library already detects the swing points every chart pattern is drawn from.
+            "Swing Point Detection": "procedure:swing-point-identification",
+            "Support/Resistance Level Detection": "procedure:support-resistance-detection",
+            "Chart Patterns": "concept:chart-pattern",
+            "Candlestick Patterns": "concept:pattern",
+            "Multi-Bar Patterns": "concept:multi-bar-pattern",
+            "Pattern Reliability & Failure Modes": "concept:pattern-reliability",
+            "Pattern Context Requirements": "concept:pattern-context",
+            "Pattern Completion Criteria": "concept:pattern-completion",
+            "Algorithmic / Programmatic Patterns": "concept:algorithmic-pattern-detection",
+
+        },
+        "retitle": {"Pattern Reliability & Failure Modes": "pattern reliability",
+                    "Pattern Context Requirements": "pattern context",
+                    "Pattern Completion Criteria": "pattern completion",
+                    "Algorithmic / Programmatic Patterns": "algorithmic pattern detection",
+},
+        # §7.5's table rates finer categories than the chapter defines -- three triangle rows and
+        # two flag rows against one node each -- so it is kept whole on `concept:pattern-reliability`
+        # rather than split across nodes it does not line up with.
+        # `concept:chart-pattern` was created memberless, waiting for this chapter: a formation
+        # spanning a variable number of bars, drawn from swing points. Here are its members.
+        "edges": [
+            ("concept:head-and-shoulders", "kind-of", "concept:chart-pattern",
+             "three peaks and a neckline, drawn across swings"),
+            ("concept:inverse-head-and-shoulders", "kind-of", "concept:chart-pattern",
+             "the same shape inverted"),
+            ("concept:double-top-double-bottom", "kind-of", "concept:chart-pattern",
+             "two tests of a level with a retracement between"),
+            ("concept:triple-top-triple-bottom", "kind-of", "concept:chart-pattern",
+             "the same, tested three times"),
+            ("concept:triangle", "kind-of", "concept:chart-pattern",
+             "converging boundaries across the highs and lows"),
+            ("concept:flags-and-pennants", "kind-of", "concept:chart-pattern",
+             "a consolidation against the move that preceded it"),
+            ("concept:wedge", "kind-of", "concept:chart-pattern",
+             "converging boundaries sloping the same way"),
+            ("concept:channel", "kind-of", "concept:chart-pattern",
+             "parallel boundaries containing price"),
+            ("concept:cup-and-handle", "kind-of", "concept:chart-pattern",
+             "a rounded base and a shallow drift off its rim"),
+            # Two the library does not detect but which span only a bar or two.
+            ("concept:pin-bar", "kind-of", "concept:pattern",
+             "one bar, read from where its body sits in its range"),
+            ("concept:two-bar-reversal", "kind-of", "concept:pattern",
+             "two bars, read as one shape"),
+            # Every classical pattern is drawn from swings, and the library finds those.
+            ("concept:chart-pattern", "about", "procedure:swing-point-identification",
+             "the swings a formation of unknown length is drawn from"),
+        ],
+        "wired": {
+            # --- §7.1 candlesticks -------------------------------------------------------------
+            "Psychology Reflection": "concept:pattern",
+            "Context Dependency": "concept:pattern-context",
+            "Location Matters": "concept:support-and-resistance",
+            "Timeframe Relevance": "concept:pattern-context",
+            "Always consider the preceding trend": "concept:pattern-context",
+            "Look for patterns at key support/resistance": "concept:support-and-resistance",
+            "Require confirmation before acting": "concept:pattern-completion",
+            "Higher timeframe patterns are more reliable": "concept:pattern-context",
+            "Combine with volume analysis": "concept:volume-confirmation",
+            "Don't trade patterns in isolation": "concept:confluence",
+            # --- §7.2 multi-bar ----------------------------------------------------------------
+            "Consolidation: Multiple bars": "concept:multi-bar-pattern",
+            "Energy Building": "concept:compression",
+            "Breakout Direction": "concept:multi-bar-pattern",
+            "Volume Significance": "concept:volume-confirmation",
+            "Combine with trend direction": "concept:pattern-context",
+            "Use at key support/resistance levels": "concept:support-and-resistance",
+            "Wait for confirmation break": "concept:pattern-completion",
+            "Size stops based on pattern structure": "concept:stop-and-target-engineering",
+            "Note that inside bars after strong moves": "procedure:signal-inside-bar-trigger",
+            # --- §7.3 chart patterns -----------------------------------------------------------
+            "Psychology Mapping": "concept:chart-pattern",
+            "Measured Moves": "concept:chart-pattern",
+            "Failure Mode: Failed patterns": "concept:pattern-reliability",
+            "Time Proportionality": "concept:chart-pattern",
+            "Identify patterns in context of larger trend": "concept:pattern-context",
+            "Volume should confirm pattern": "concept:volume-confirmation",
+            "Calculate risk/reward before entering": "concept:risk-reward-ratio",
+            "Recognize that 30-40% of breakouts fail": "concept:pattern-reliability",
+            "Failed patterns provide trading opportunities": "judgment:trading-failed-pattern",
+            # --- §7.4 algorithmic --------------------------------------------------------------
+            "Objective Definition": "concept:algorithmic-pattern-detection",
+            "Backtestable": "concept:backtesting",
+            "False Positives": "concept:algorithmic-pattern-detection",
+            "Optimization Risk": "concept:overfitting",
+            "Start with simple, well-defined patterns": "concept:algorithmic-pattern-detection",
+            "Use multiple confirmation filters": "concept:confirmation-signal",
+            "Backtest extensively with out-of-sample": "concept:backtesting",
+            "Avoid over-optimization": "concept:overfitting",
+            "Combine pattern detection with other filters": "concept:filter-signal",
+            # --- §7.5 reliability --------------------------------------------------------------
+            "No Pattern is 100%": "concept:pattern-reliability",
+            "Context Affects Success": "concept:pattern-context",
+            "Failed Patterns Signal": "judgment:trading-failed-pattern",
+            "Confirmation Matters": "concept:pattern-completion",
+            "Sample Size": "concept:pattern-reliability",
+            "Never risk more than planned": "concept:position-sizing",
+            "Always define invalidation level": "concept:stop-and-target-engineering",
+            "Use confirmation (close beyond level": "concept:pattern-completion",
+            "Accept that 30-40% of patterns fail": "concept:pattern-reliability",
+            "Have plan for failed patterns": "judgment:trading-failed-pattern",
+            "Track your own statistics": "concept:pattern-reliability",
+            # --- §7.6 context ------------------------------------------------------------------
+            "Trend Alignment": "concept:pattern-context",
+            "Location: Patterns at key levels": "concept:support-and-resistance",
+            "Market Regime: Patterns behave": "concept:market-regime",
+            "Timeframe Hierarchy": "concept:pattern-context",
+            "Confluence: Multiple supporting factors": "concept:confluence",
+            "Always check higher timeframe": "concept:pattern-context",
+            "Identify key levels and only trade": "concept:support-and-resistance",
+            "Ensure pattern direction aligns": "concept:pattern-context",
+            "Require confluence of at least": "concept:confluence",
+            "Document context requirements": "concept:pattern-context",
+            # --- §7.7 completion ---------------------------------------------------------------
+            "Completion Before Entry": "concept:pattern-completion",
+            "Clear Trigger": "concept:pattern-completion",
+            "Time Element": "concept:pattern-completion",
+            "Define completion criteria before": "concept:pattern-completion",
+            "Use close-based triggers": "concept:pattern-completion",
+            "Have rules for each entry timing": "concept:entry-timing-option",
+            "Don't chase if completion criteria": "concept:pattern-completion",
+        },
+    },
 }
 
 #: Blocks inside a taxonomy section that are still NOT kinds: "Regime Shift Triggers" lists causes
@@ -1642,6 +1857,77 @@ DEFINITION = {
 #: summary and the example moves to `examples`. The explanation has no counterpart in the source at
 #: all -- the chapter never says WHY an iceberg order costs queue position -- so it is always added.
 AUTHORED: dict[str, tuple[str, str]] = {
+    # The nine classical formations. Each states its `**Structure:**` as a list of components --
+    # left shoulder, head, neckline -- so the parsed summary is the first component rather than
+    # what the pattern IS.
+    'concept:head-and-shoulders': (
+        'Three peaks with the middle one highest, their intervening lows forming a neckline the '
+        'pattern completes by closing below.',
+        'A distribution pattern: the failure of the third rally to reach the second is the tell, '
+        'and the neckline is where that reading is confirmed or refuted. The measured move -- head '
+        'to neckline, projected down from the break -- is the target the chapter gives it.'),
+    'concept:inverse-head-and-shoulders': (
+        'The same three-trough shape inverted, completing on a close above the neckline that joins '
+        'its intervening highs.',
+        'Accumulation rather than distribution, and read the same way: the third decline failing to '
+        'reach the second is what makes it a base rather than a pause.'),
+    'concept:double-top-double-bottom': (
+        'Two tests of nearly the same level with a retracement between them, completing on a close '
+        'beyond that retracement.',
+        'The second test failing to exceed the first is the whole signal -- the level held twice, so '
+        'the move that made it is spent. The valley or peak between the tests is both the trigger '
+        'and the measuring stick for the target.'),
+    'concept:triple-top-triple-bottom': (
+        'The same shape with three tests of the level rather than two.',
+        'The chapter rates it more reliable for the obvious reason -- one more rejection at the same '
+        'price -- and trades it identically.'),
+    'concept:triangle': (
+        'Converging boundaries drawn across the highs and the lows, completing on a close beyond '
+        'either of them.',
+        'Which boundary is flat decides the reading: a flat top with rising lows is buyers paying '
+        'up into a fixed offer, a flat bottom with falling highs is the reverse, and two sloping '
+        'lines say only that range is contracting. The chapter puts the first two at seventy per '
+        'cent in their stated direction and the symmetrical case at a coin toss.'),
+    'concept:flags-and-pennants': (
+        'A brief consolidation against the direction of a sharp move, resolving in the direction of '
+        'the move that preceded it.',
+        'Continuation rather than reversal, and the pole is the measuring stick: its length '
+        'projected from the break is the target. A flag drifts in a parallel channel, a pennant '
+        'contracts to a point, and both are short by definition -- one that outlasts the move that '
+        'made it has stopped being a pause.'),
+    'concept:wedge': (
+        'Two converging boundaries sloping the same way, read against their slope rather than with '
+        'it.',
+        'The counter-intuitive one: a rising wedge is bearish and a falling wedge bullish, whichever '
+        'trend they appear in, because the converging slope says each push is shorter than the last.'),
+    'concept:channel': (
+        'Parallel boundaries containing price, traded from edge to edge until one of them breaks.',
+        'The break is the event: while it holds, the channel is a range with a slope, and the edges '
+        'are [[Dynamic Level]]s. Ascending, descending and horizontal differ only in that slope.'),
+    'concept:cup-and-handle': (
+        'A rounded base followed by a shallow drift, completing on a close above the rim.',
+        'The shape is the argument -- a U rather than a V says the base was built rather than '
+        'spiked, and a handle deeper than half the cup says the base did not hold. Continuation, '
+        'and the cup depth is the target.'),
+    'concept:entry-timing-option': (
+        'The three moments a completed pattern can be entered on: the break itself, the close '
+        'beyond it, or the retest of it.',
+        'They trade certainty against price. Entering intrabar gets the tightest stop and the most '
+        'failures; waiting for the retest confirms the boundary reversed roles and misses the moves '
+        'that never come back.'),
+    'procedure:support-resistance-detection': (
+        'Collects every swing high and low over a window and clusters the ones that fall within a '
+        'tolerance of each other into levels.',
+        'The clustering is the whole method: a level is not one touch but several at nearly the '
+        'same price, which is what [[Equal Highs And Lows]] describes and what makes the level '
+        'worth drawing. Depends on [[Swing Point Identification]], so its lookback decides how '
+        'many levels come back.'),
+    'procedure:trend-line-detection': (
+        'Connects swing points into a line, keeps it if enough of them lie close enough to it, and '
+        'projects it forward as support or resistance.',
+        'Two validations do the work -- a minimum number of touches, and how nearly collinear they '
+        'are -- and both are thresholds someone chooses. Nothing in the library produces the swing '
+        'points it starts from except [[Swing Point Identification]].'),
     'concept:risk-dimension': (
         'One of the separate ways a strategy can lose money, each measured differently and none of '
         'them a substitute for the others.',
@@ -2833,7 +3119,10 @@ IRREGULAR = {"mechanics": "mechanics", "analysis": "analysis", "series": "series
              # Nor is "bias": chapter 4's five named biases were becoming `look-ahead-bia`,
              # `survivorship-bia` and `selection-bia`. Nor "mathematics", which was becoming
              # `recovery-mathematic`.
-             "bias": "bias", "mathematics": "mathematics"}
+             "bias": "bias", "mathematics": "mathematics",
+             # Plural nouns that are part of a name, not a category to singularise: a head and
+             # SHOULDERS, flags and PENNANTS, three black CROWS.
+             "shoulders": "shoulders", "pennants": "pennants", "crows": "crows"}
 
 
 #: Trailing words that name the FORM of a thing rather than the thing: "Almgren-Chriss Market
@@ -2978,6 +3267,32 @@ def bullets(lines: list[str]) -> list[tuple[str, str]]:
     return out
 
 
+def label_parts(lines: list[str]) -> tuple[list[str], dict[str, list[str]]]:
+    """Split a block at every `**Label:**`, whichever shape it takes, and return what came first.
+
+    A chapter writes a two-sided pattern either way: `**Hammer (Bullish):**` on a line of its own
+    with bullets under it, or `**Tweezer Top:** matching highs after uptrend` all on one line.
+    Reading only the first shape left marubozu and tweezers unsplittable, and the library holds two
+    signals for each.
+    """
+    head: list[str] = []
+    parts: dict[str, list[str]] = {}
+    current = None
+    for line in lines:
+        stripped = line.strip()
+        if m := BLOCK_LABEL.match(stripped):
+            current = m.group(1).strip().rstrip(":")
+            parts.setdefault(current, [])
+        elif (m := INLINE_LABEL.match(stripped)) and m.group(2).strip():
+            current = m.group(1).strip().rstrip(":")
+            parts.setdefault(current, []).append(m.group(2))
+        elif current is None:
+            head.append(line)
+        else:
+            parts[current].append(line)
+    return head, parts
+
+
 def labelled_blocks(lines: list[str]) -> list[tuple[str, list[str]]]:
     """`**Label:**` followed by its bullets -- the shape of Examples and Formulas sub-blocks."""
     out, label, body = [], None, []
@@ -3096,6 +3411,7 @@ def free_block(lines: list[str], definition_labels: tuple[str, ...] = ("definiti
         out["formula"] = code
         doc = docstring_of(code)
     bullet_lines, quote, rows, prose = [], [], [], []
+    defining = False
     for raw in unfenced(lines):
         s = raw.strip()
         if not s:
@@ -3105,9 +3421,17 @@ def free_block(lines: list[str], definition_labels: tuple[str, ...] = ("definiti
             # Which label carries the definition is the chapter's choice: §3.0 writes
             # `**Definition:**`, §4.2 writes `**Core Premise:**`. Read as an ordinary label the
             # premise became the summary with its own label glued to the front of it.
-            if label.lower() in definition_labels and rest:
-                out["summary"] = rest
+            if label.lower() in definition_labels:
+                if rest:
+                    out["summary"] = rest
+                else:
+                    # `**Structure:**` on its own line, with the structure in the bullets under it.
+                    # Read as an empty label, the summary fell through to whatever came next --
+                    # head and shoulders opened with "Interpretation: distribution pattern".
+                    defining = True
+                continue
             elif rest:
+                defining = False
                 prose.append(f"{label}: {rest}")
             continue
         if s.startswith(">"):
@@ -3118,7 +3442,11 @@ def free_block(lines: list[str], definition_labels: tuple[str, ...] = ("definiti
             cells = [c.strip().replace("**", "") for c in s.strip("|").split("|")]
             rows.append(" · ".join(c for c in cells if c))
         elif s.startswith("-"):
-            bullet_lines.append(s.lstrip("- ").strip())
+            item = s.lstrip("- ").strip()
+            if defining and not out.get("summary"):
+                out["summary"] = item
+            else:
+                bullet_lines.append(item)
         else:
             prose.append(s.replace("**", ""))
     # What the block says it is, in order of how directly it says it: the label the chapter uses
@@ -3461,6 +3789,41 @@ def build(path: Path, chapter: str, parent: str,
         for label, text in per_member.items():
             deferred_uses.setdefault(f"concept:{slug(label)}", []).append(text)
 
+        # `#### ` headings that are THINGS rather than fields. Chapter 6 gives each indicator a
+        # fourth-level scaffold (`sub_blocks` maps those to props); chapter 7 groups its
+        # candlesticks under "Single Candlestick Patterns" and gives each one a `#### ` of its own.
+        for heading, names in decl.get("sub_block_nodes", {}).items():
+            if heading not in blocks:
+                continue
+            found = sub_blocks(blocks[heading])
+            if undeclared := [h for h in found if h not in names]:
+                raise ValueError(f"{heading!r} has `#### {undeclared[0]}`, which `sub_block_nodes` "
+                                 "does not name -- declare it")
+            for name, spec in names.items():
+                body = found[name]
+                # A block that describes a bullish and a bearish form of one shape is TWO things,
+                # and the library holds them as two signals -- hammer and hanging man, tweezer tops
+                # and bottoms. Split it where the chapter already splits it, and give each side the
+                # structure and detection logic they share.
+                sides = spec if isinstance(spec, dict) else {name: spec}
+                head, parts = label_parts(body)
+                if isinstance(spec, dict):
+                    if missing := [x for x in sides if x not in parts]:
+                        raise ValueError(f"`sub_block_nodes` splits {name!r} on {missing}, which "
+                                         f"it does not state -- it states {sorted(parts)}")
+                    # Everything not under a side's own label is said of both: the shape they share
+                    # and the detection logic that finds either.
+                    common = head + [l for k, v in parts.items() if k not in sides for l in v]
+                for side, primitive in sides.items():
+                    lines = common + parts[side] if isinstance(spec, dict) else body
+                    read = free_block(lines, def_labels)
+                    nid = atom(primitive, side, read.pop("summary", ""), _section=num, **read)
+                    rel(nid, "part-of", parent, f"stated under {sec['title'].lower()}")
+                    if decl.get("sections_group_only"):
+                        continue
+                    for sub in ({subject_for(side, subjects)} if subjects else set()) - {nid}:
+                        rel(nid, "about", sub, f"stated under {heading.lower()}")
+
         # Chapter 4 writes its rules as `**Label:**` sub-blocks inside a heading, where earlier
         # chapters wrote a heading per rule. Left whole, a heading holds eight named things as one
         # string: the ADX regime rule cannot fold onto the identical rule chapter 3 already states,
@@ -3607,7 +3970,8 @@ def build(path: Path, chapter: str, parent: str,
         # scenarios it is read through -- and a block that matches no rule was previously dropped
         # without a word. It is kept on the section's subject under its own name instead.
         handled = {LEAD} | set(SCAFFOLD) | set(as_nodes) | set(decl.get("tables", {})) \
-            | set(decl.get("table_properties", {})) | set(decl.get("labelled_nodes", {}))
+            | set(decl.get("table_properties", {})) | set(decl.get("labelled_nodes", {})) \
+            | set(decl.get("sub_block_nodes", {}))
         for heading, body in blocks.items():
             if heading in handled or heading.startswith("Best Practices"):
                 continue
@@ -3874,7 +4238,8 @@ def build(path: Path, chapter: str, parent: str,
                 # same name -- "momentum indicators measure the speed or velocity of price changes,
                 # helping identify overbought/oversold conditions" describes how a trader reaches
                 # for them -- and it replaced four of the seven before this stopped it.
-                if tid in CLASS_AXIS or tid in RECONCILED or tid in DOC_DERIVED or authored_here:
+                if decl.get("keep_summaries") or tid in CLASS_AXIS or tid in RECONCILED \
+                        or tid in DOC_DERIVED or authored_here:
                     # The wording here was written on purpose. The chapter's is still something it
                     # says, so it is kept beside it rather than dropped.
                     if not _same_text(v, held_summary):
