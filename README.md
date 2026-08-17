@@ -6,7 +6,7 @@
   <a href="https://pypi.org/project/mangrove-kb/"><img src="https://img.shields.io/pypi/v/mangrove-kb.svg?color=42a7c6&logo=pypi&logoColor=white" alt="PyPI version"></a>
   <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-ff9e18.svg" alt="License: PolyForm Noncommercial 1.0.0">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.10+">
-  <img src="https://img.shields.io/badge/deps-numpy%20%2B%20pandas-2ec27e.svg" alt="Dependencies: numpy + pandas">
+  <img src="https://img.shields.io/badge/graph%20%2B%20indices-in%20the%20wheel-2ec27e.svg" alt="Graph and both search indices ship in the wheel">
   <img src="https://img.shields.io/badge/graph-714%20nodes%20%C2%B7%202342%20edges-42a7c6.svg" alt="Graph: 714 nodes, 2342 edges">
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
@@ -21,12 +21,18 @@ every one with a machine-readable docstring — formula, inputs, parameters with
 typed outputs with units, and warmup.
 
 How it is built, stored and searched is drawn in [`docs/architecture/`](docs/architecture/README.md) — provenance, the node and
-edge schema, the search corpus, `find()`, `ask()`, the semantic index, and the three
-traversals that are easy to confuse.
+edge schema, the search corpus, `find()`, `ask()`, both search indices and how they are
+fused, and the three traversals that are easy to confuse.
 
-And a **knowledge graph built from that source** — 714 nodes and 2342 edges saying what each
-computation is, what it measures, what it reads, and what part it plays. It is generated from the
-code, so it is exact: not extracted from prose, not approximate, no ranking model in the way.
+And a **knowledge graph** — 714 nodes and 2342 edges, with two halves on one schema. One is compiled
+from the source above: what each computation is, what it measures, what it reads, and what part it
+plays. That half is exact, because it is read from the code rather than extracted from prose. The
+other is the trading knowledge base — market structure, instruments, risk, chart patterns,
+quantitative method — ingested from its eight chapters as nodes and edges beside them.
+
+The join is what makes either half worth querying: `procedure:atr-based-stop` is a rule the risk
+chapter states, and it `uses` an indicator the code defines, so one query crosses from *why* to
+*what it computes*.
 
 The point is the second thing. A library of 249 functions is only useful if you can find the right
 one, and `grep` cannot answer *"which indicators produce a bounded oscillator"*, *"what reads RSI's
@@ -72,8 +78,12 @@ its edges. [What each part does](#the-viewer).*
 pip install mangrove-kb
 ```
 
-Python 3.10+; `numpy` and `pandas` are the only runtime dependencies. The graph, the agent skill and
-the viewer all ship **inside the wheel** — there is nothing else to fetch.
+Python 3.10+. The graph, both search indices, the agent skill and the viewer all ship **inside the
+wheel**, so `KnowledgeGraph.load()` needs no network and no configuration.
+
+One exception, and it is the only one: `ask()` encodes your question with a sentence model, so it
+loads `sentence-transformers` and downloads that model once on first call. Everything else — loading
+the graph, `find()`, every traversal, the viewer — works offline and never touches it.
 
 ---
 
@@ -89,7 +99,15 @@ kg.stats()                                   # counts + every value a filter wil
 kg.find("divergence")                        # search name, abbreviation, summary, authored detail
 kg.find(kind="momentum", role="trigger")     # by what it measures AND the part it plays
 kg.get("rsi_oversold")                       # formula, params, typed outputs, warmup
+
+kg.ask("how far away from my entry should the stop go")   # a QUESTION, not a term
 ```
+
+`find()` matches the words you use. `ask()` matches what you *mean* — it seeds from two indices, one
+built from this corpus and one from a pretrained sentence model, fuses them by reciprocal rank, and
+walks a hop along the edges. Every row carries `reached`: which seed it came from, how far, along
+which relation, and that edge's own reason. Measured on twenty-five questions phrased the way a
+trader asks them, `find()` answers 5 and `ask()` answers 18.
 
 `stats()` first, always. It returns the **complete vocabulary** every other call accepts — relations,
 classes, roles, statuses, input columns, output units — so you never have to guess a name. Filters
@@ -153,7 +171,7 @@ fetching anything:
 | | what it is |
 |---|---|
 | [`SKILL.md`](skills/knowledge-graph/SKILL.md) | the reference for **which call** — the two axes, the rules of use, and a question→call table |
-| [`GUIDE.md`](skills/knowledge-graph/GUIDE.md) | the reference for **what a whole job looks like** — thirteen tasks end to end, with real output and the trap in each |
+| [`GUIDE.md`](skills/knowledge-graph/GUIDE.md) | the reference for **what a whole job looks like** — sixteen tasks end to end, with real output and the trap in each |
 
 Both are executable documentation: every example in them is re-run by the test suite against the
 committed graph, so an example that drifts fails the build rather than misleading a reader.
@@ -409,7 +427,7 @@ MangroveKnowledgeBase/
 │   └── signal-indicator-ontology.json       ← the ontology of record
 ├── skills/knowledge-graph/       ← the agent skill and its guide (source of truth)
 ├── knowledge-base/               ← 11 trading-education documents
-├── kb_server/                    ← REST + MCP server over the library
+├── kb_server/                    ← RETIRED. Superseded by the graph; kept for reference
 ├── notebooks/                    ← signal explorer + validation
 ├── data/                         ← 7 sample OHLCV datasets
 └── tests/                        ← the suite

@@ -85,3 +85,8 @@ audit_results/
 # is a local `npm install mermaid jsdom` away and skips without it. The install is a developer's
 # tool, not a repo asset -- thousands of vendored files that nothing here imports.
 node_modules/
+
+# The MCP server over the graph. Untracked for now: it is a CONSUMER of the installed package
+# rather than part of it, and its home is beside the agent that uses it.
+mangrove_kb_mcp.py
+mangrove_kb_mcp.md

@@ -13,10 +13,14 @@ pip install mangrove-kb
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
 - **A knowledge graph of the library itself** -- 714 nodes, 2342 edges, queryable, shipped in the package
-- **Search by words or by meaning** -- `find()` matches terms, `ask()` seeds on a semantic index
-  built from the graph and follows the edges out of what it finds
+- **Search by words or by meaning** -- `find()` matches terms; `ask()` takes a question in ordinary
+  words, seeds from two indices and follows the edges out of what it finds. On twenty-five questions
+  phrased the way a trader asks them, `find()` answers 5 and `ask()` answers 18.
 
-Dependencies: numpy, pandas. That's it.
+Dependencies: numpy, pandas, scipy, and sentence-transformers (which brings torch). The last is what
+encodes a question for `ask()`; the graph and both indices ship inside the wheel, but a query has to
+be encoded by the same model that built the vectors, so the model downloads once on first use and is
+cached thereafter. Everything except `ask()` works offline and without it being loaded.
 
 ## Indicators
 
@@ -150,9 +154,14 @@ nr7_bars = result["nr7"]
 
 ## Ask the library about itself
 
-`mangrove-kb` ships a knowledge graph of its own contents -- what each indicator computes, what it
-consumes and produces, which signals read which of its outputs, and what part each signal plays in a
-strategy. It is generated from the source, so it is exact: no ranking model, no text extraction.
+`mangrove-kb` ships a knowledge graph with two halves on one schema. One is compiled from this
+library's own source -- what each indicator computes, what it consumes and produces, which signals
+read which of its outputs, and what part each plays in a strategy -- and is exact, because it is
+read from the code rather than extracted from prose. The other is a trading knowledge base: market
+structure, instruments, risk, chart patterns, quantitative method, ingested from its chapters.
+
+They are joined, and that is the point: `procedure:atr-based-stop` is a rule the risk chapter states,
+and it `uses` an indicator the code defines -- so one query crosses from advice to implementation.
 
 ```python
 from mangrove_kb.graph import KnowledgeGraph
@@ -167,7 +176,16 @@ kg.get("procedure:indicator-rsi")["outputs"]         # typed outputs, with units
 kg.outputs(bounded=True, kind="oscillator")          # every value you could put on one axis
 kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # what would break
 kg.path("procedure:signal-adosc-bearish", "concept:momentum")   # why is it classed so
+
+kg.ask("how far away from my entry should the stop go")   # a QUESTION, not a term
 ```
+
+`find()` matches the words you use; `ask()` matches what you mean, then walks one hop along the
+edges. Every row it returns carries `reached` -- which result it came from, how many hops, along
+which relation, and that edge's own stated reason -- so an answer arrives with its grounds rather
+than a score. It is the one call that loads the encoder, and it is right about three times in four:
+when a result looks off-topic it usually is, and re-asking with a domain term, or falling back to
+`find()`, is the move.
 
 **Read these two before using it** -- they are installed alongside the package at
 `mangrove_kb/skills/knowledge-graph/`, and readable here:

@@ -15,8 +15,8 @@ this repo's docstrings and graph carry.
 # Install the pip package
 pip install -e ".[dev]"
 
-# Start the KB server (REST + MCP, exposed on port 8081 locally)
-docker compose up -d mkb-knowledge-base
+# The MCP server over the graph (stdio; needs `pip install fastmcp`)
+python mangrove_kb_mcp.py
 
 # Run all tests
 python -m pytest tests/ -q
@@ -55,10 +55,10 @@ Open-source trading signals, technical indicators, and knowledge base. Public de
 1. **Python Package** (`mangrove_kb`) -- 249 signal functions, 80 indicator classes, RuleRegistry,
    docstring parser, **and a knowledge graph of itself** (see below). Published on PyPI as
    `mangrove-kb`.
-2. **KB Server** (`kb_server/`) -- Unified server with dual protocol access (REST + MCP) on the same port. FastAPI REST API + FastMCP tools. SQLite FTS5 full-text search, 11 trading education documents, glossary, cross-references, synonym expansion. Signal/indicator metadata (free) and computation (x402 gated).
+2. **KB Server** (`kb_server/`) -- **RETIRED.** A FastAPI + FastMCP server answering from SQLite FTS5 over the markdown documents, a glossary registry and a backlink table. Its whole surface is now answered from the graph; the directory is kept for reference and nothing new should be built on it.
 3. **Knowledge Base Content** (`knowledge-base/`) -- 11 markdown documents covering market foundations through quantitative analysis
 
-MangroveAI consumes this as a pip dependency (`mangrove-kb`) and connects to the KB server over HTTP. The developer portal (admin UI) source code lives in MangroveAI, not here.
+MangroveAI consumes this as a pip dependency (`mangrove-kb`) and reads the graph in-process -- not over HTTP. The developer portal (admin UI) source code lives in MangroveAI, not here.
 
 ## Project Structure
 
@@ -93,33 +93,30 @@ scripts/audit/                 # the audits + run_all.py (CI's `audit` job)
                                # audit_results/ is GENERATED and gitignored
 ```
 
-## Server Architecture
+## Serving the graph
 
-Single process, dual protocol. Both REST and MCP call the same service layer:
+`mangrove_kb_mcp.py` is an MCP server over the graph, run as a subprocess over stdio by whatever
+client wants it. It holds no logic: every tool is a thin call onto `mangrove_kb.graph`, so there is
+one implementation of "search the knowledge base" rather than two that drift.
 
-| Protocol | Path | Transport |
-|----------|------|-----------|
-| REST API | /api/* | HTTP JSON |
-| MCP | /mcp/* | Streamable HTTP |
+It is a CONSUMER of the installed package, not part of it -- `pip install mangrove-kb fastmcp`, then
+point a client at the file. See `mangrove_kb_mcp.md` for the tool reference and client config.
 
-### Access Control
+| | old (`kb_server`, retired) | now |
+|---|---|---|
+| answers from | SQLite FTS5 over markdown | the graph |
+| transport | HTTP, mounted at `/mcp` | stdio subprocess |
+| tools | 16 | 12 |
+| payment | x402 middleware on HTTP | **none** -- stdio has no 402 to send |
 
-| Capability | Access | REST | MCP |
-|-----------|--------|------|-----|
-| Document search | Free | GET /api/search | kb_search |
-| Document retrieval | Free | GET /api/documents/{slug} | kb_get_document |
-| Glossary lookup | Free | GET /api/glossary/{term} | kb_glossary_lookup |
-| Signal metadata | Free | GET /api/signals | kb_list_signals |
-| Indicator metadata | Free | GET /api/indicators | kb_list_indicators |
-| Signal evaluation | x402 | POST /api/evaluate | evaluate_signal |
-| Indicator computation | x402 | POST /api/compute | compute_indicator |
-
-x402 payment is enforced on both HTTP and MCP via shared middleware.
+**`evaluate_signal` and `compute_indicator` are ungated here.** That is a real difference from the
+retired server, and gating has to be restored before this is served over HTTP to anyone.
 
 ## The Knowledge Graph
 
 `mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 714 nodes
-and 2342 edges, generated from the source, shipped inside the wheel.
+and 2342 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
+source, and the trading knowledge base ingested from its eight chapters.
 
 ```python
 from mangrove_kb.graph import KnowledgeGraph
