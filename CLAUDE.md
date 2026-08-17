@@ -90,7 +90,6 @@ data/                          # 7 sample OHLCV datasets
 tests/                         # pytest suite
 scripts/                       # publish.sh, generation scripts
 scripts/audit/                 # the audits + run_all.py (CI's `audit` job)
-findings/                      # planning docs
                                # audit_results/ is GENERATED and gitignored
 ```
 
