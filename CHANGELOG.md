@@ -4,7 +4,17 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
-## [3.0.0] - Unreleased
+## [3.0.1] - 2026-08-17
+
+Released as 3.0.1 rather than 3.0.0: the 3.0.0 tag was cut before PyPI rejected the upload, and a
+version number cannot be reused once a tag exists. There is no 3.0.0 on PyPI.
+
+### Fixed
+
+- `wiki-to-graph` is no longer declared in the `dev` extra. PyPI refuses any distribution whose
+  metadata carries a direct reference (`name @ git+https://...`), in any extra, so declaring the
+  commit pin made the package unpublishable. It is a build-time tool for regenerating the
+  doc-derived half of the graph; the install command is documented in `pyproject.toml` instead.
 
 **The knowledge base is in the graph, and the graph answers questions.** All eight knowledge-base
 chapters are ingested as nodes and edges beside the code-derived ones -- market foundations,
