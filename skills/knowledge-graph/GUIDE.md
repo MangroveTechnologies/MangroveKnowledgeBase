@@ -1,6 +1,6 @@
 # Agent guide: using the knowledge graph
 
-Fifteen tasks an agent actually gets asked to do with this library, and how to do each one with
+Sixteen tasks an agent actually gets asked to do with this library, and how to do each one with
 `mangrove_kb.graph`. Every call here was executed against the committed graph; the outputs are real.
 
 The skill (`SKILL.md`, beside this file) is the reference for *which call*. This is the
@@ -15,7 +15,7 @@ kg = KnowledgeGraph.load()
 
 ## Contents
 
-Fifteen jobs. Each is self-contained — jump to the one you have, and follow the links at its end
+Sixteen jobs. Each is self-contained — jump to the one you have, and follow the links at its end
 when the answer needs a second call.
 
 | | job | |
@@ -35,6 +35,7 @@ when the answer needs a second call.
 | 13 | [Compute an indicator the graph told you about](#13-compute-an-indicator-the-graph-told-you-about) | The node's `name` is the registered name — that is the join to runnable code. |
 | 14 | [Pull what the knowledge base says about a subject](#14-pull-what-the-knowledge-base-says-about-a-subject) | Everything under a subject, whatever kind of node it is, by walking containment. |
 | 15 | [Find the reasoning behind a piece of advice](#15-find-the-reasoning-behind-a-piece-of-advice) | The Judgment holds what to do, the Fact holds why, and folds hold where the two sources disagree. |
+| 16 | [Answer a question nobody phrased in our words](#16-answer-a-question-nobody-phrased-in-our-words) | Start from a sentence rather than a name, and read the route that reached the answer. |
 | — | [What this guide does not tell you](#what-this-guide-does-not-tell-you) | The graph's limits, and the questions it is the wrong tool for. |
 
 ## 1. Orient yourself in a library you have never seen
@@ -737,6 +738,49 @@ maker. Quote it as guidance, with the principle behind it.
 **See also:** [§14 the whole subject](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject) · [SKILL · two halves, one surface](SKILL.md#two-halves-one-retrieval-surface) · [§8 classification](GUIDE.md#8-explain-why-something-is-classified-the-way-it-is)
 
 ---
+
+## 16. Answer a question nobody phrased in our words
+
+**Task:** "How far away from my entry should the stop go?"
+
+Every other job here starts from something you can name — an id, a function, a class. This one starts
+from a sentence, which is what an agent is usually handed. `find()` is the wrong call: it matches
+words, and the words of a question are rarely in the node that answers it.
+
+```python
+kg.ask("how far away from my entry should the stop go", limit=4)
+```
+
+```
+procedure:atr-based-stop                     h0
+procedure:atr-trailing-stop                  h0
+procedure:fixed-stop                         h0
+concept:stop-and-target-engineering          h1  <- about from procedure:atr-based-stop
+    why: stated under stop-loss & take-profit engineering
+```
+
+Three rules and the subject they sit under, from a sentence containing none of their words. The
+fourth row is the shape to notice: `reached` says it came one hop from `atr-based-stop` along an
+`about` edge, and carries that edge's own `why`. **That is the reason the answer is an answer** — not
+a relevance score, an actual stated connection you can quote.
+
+**Read `reached` before you trust a row.** `hops: 0` means the retrieval put it there; `hops: 1` means
+the graph did, and the `why` tells you on what grounds.
+
+**Trap: it answers about three questions in four, and the failure is silent.** Measured over
+twenty-five questions phrased the way a trader asks them, `ask()` returns a fair answer in the top
+five 18 times. The other seven come back with plausible neighbours and no signal that they are wrong
+— *"what are the odds I wipe out the account"* returns the risk-limit properties rather than
+`concept:risk-of-ruin`. So when the result looks off-topic, it probably is: re-ask with a term from
+the domain (`"risk of ruin"`), or fall back to `find()` on a word you can guess. Two phrasings cost
+nothing; the graph is small and every call is local.
+
+**Trap: the first call is slow.** `ask()` seeds from two indices, one of which is a sentence encoder,
+so the first call in a process spends about four seconds loading it — and downloads it once on a
+machine that has never run it. Later calls are ~50 ms. `find()` never pays this, so do not reach for
+`ask()` when a term would do.
+
+**See also:** [§14 pull what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject) · [§15 the reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [SKILL · which call](SKILL.md#which-call)
 
 ## What this guide does not tell you
 

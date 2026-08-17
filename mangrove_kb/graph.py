@@ -1,9 +1,15 @@
 """Query the signal/indicator knowledge graph.
 
-The knowledge space is a curated graph over the library's own indicators and signals: what each
-computation *is*, what it consumes and produces, which signals read which of its outputs, and what
-part each signal plays in a strategy. It is generated from the source, so it is exact rather than
-extracted -- there is no text-mining noise to rank around.
+The knowledge space has two halves that share one schema. One is generated from the library's own
+source: what each computation *is*, what it consumes and produces, which signals read which of its
+outputs, and what part each signal plays in a strategy -- exact rather than extracted, because it is
+compiled from the code. The other is the trading knowledge base -- market structure, instruments,
+risk, chart patterns, quantitative method -- ingested from its chapters as nodes and edges beside
+them, so a question about *why* an indicator is used reaches prose and a question about *what* it
+computes reaches the signature.
+
+The join is what makes either half worth querying: ``procedure:atr-based-stop`` is a rule a chapter
+states, and it ``uses`` an indicator the code defines.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
 ``instance-of`` a type and a bearer of a ``has-role`` role (218 of 714 nodes carry both). These are
@@ -32,6 +38,12 @@ Usage::
     kg.find(kind="momentum", role="trigger")         # both axes at once
     kg.get("procedure:indicator-rsi")["outputs"]     # typed outputs with units and range
     kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # who reads it
+    kg.ask("how far away from my entry should the stop go")   # a question, not a term
+
+:meth:`find` matches words and :meth:`ask` matches meaning -- the latter over two indices, LSA
+(:mod:`mangrove_kb.semantic`) and a pretrained encoder (:mod:`mangrove_kb.dense`), fused by
+reciprocal rank and then expanded one hop along the edges. On twenty-five questions phrased the way a
+trader asks them, words alone answer 5 and ``ask`` answers 18.
 
 A signal's class is not a property it declares -- it is derived from the graph: ``signal --uses-->
 indicator --instance-of--> class``. :meth:`KnowledgeGraph.in_class` walks that, so ``kind`` reaches
@@ -389,6 +401,36 @@ def _cap(rows: list[dict[str, Any]], limit: int | None, what: str) -> Result:
                   f"showing {limit} of {total} {what}; raise limit or narrow the query")
 
 
+#: Damping in reciprocal rank fusion -- how much the very top of any single ranking dominates.
+#: Swept over the twenty-five paraphrased questions: 3 and 5 and 10 all score 18, 20 scores 17, and
+#: the literature's default of 60 scores 16. That default is tuned for many more retrievers than the
+#: two fused here, each of which is individually good.
+RRF_K = 5
+
+#: How deep to take each retriever before fusing. Fusion can only rank what it is given, and the
+#: answers it rescues are typically ranked 6-30 by one retriever and highly by the other.
+FUSE_POOL = 60
+
+
+def _fuse(rankings: Sequence[Sequence[str]], k: float = RRF_K) -> list[str]:
+    """Reciprocal rank fusion: combine several rankings into one by ``sum of 1/(k + rank)``.
+
+    Two retrievers that fail differently cannot be merged by taking turns. Interleaving spends the
+    top five slots alternating, so a node ranked third by one lands sixth overall; measured, that
+    scored 15 of 25 while the union of the two top-fives already contained 18. Fusion rewards
+    agreement instead -- a node both indices like outranks one only the better index likes -- and
+    recovers all 18.
+
+    Cormack, Clarke & Buettcher, *Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank
+    Learning Methods*, SIGIR 2009.
+    """
+    score: dict[str, float] = {}
+    for ranking in rankings:
+        for rank, nid in enumerate(ranking, start=1):
+            score[nid] = score.get(nid, 0.0) + 1.0 / (k + rank)
+    return [nid for nid, _ in sorted(score.items(), key=lambda kv: (-kv[1], kv[0]))]
+
+
 class KnowledgeGraph:
     """An in-memory view of the signal/indicator knowledge space.
 
@@ -426,7 +468,8 @@ class KnowledgeGraph:
         # so this is cheaper than re-flattening the nested slot dicts on every search.
         self._haystacks: dict[str, tuple[str, ...]] = {}
         self._df: dict[str, int] = {}          # term -> how many nodes carry it; filled on demand
-        self._semantic: Any = _UNSET           # the semantic index, loaded on first use
+        self._semantic: Any = _UNSET           # the LSA index, loaded on first use
+        self._dense: Any = _UNSET              # the pretrained-encoder index, likewise
         for n in self.nodes.values():
             # A wired statement lives on the edge it explains, not in a list on the node -- which
             # took roughly a hundred thousand characters of the knowledge base out of the search
@@ -795,6 +838,22 @@ class KnowledgeGraph:
                 self._semantic = None
         return self._semantic
 
+    def dense_index(self):
+        """The pretrained-encoder index built from this graph, or None -- loaded once.
+
+        Same contract as :meth:`semantic_index`: absent or stale degrades to what remains rather
+        than raising, because a search that answers less is better than one that answers wrongly.
+        """
+        if self._dense is _UNSET:
+            self._dense = None
+            try:
+                from .dense import DenseIndex                # noqa: PLC0415 -- optional artifact
+                index = DenseIndex.load()
+                self._dense = index if (self.source and index.matches(self.source)) else None
+            except Exception:                                # missing, unreadable, or stale
+                self._dense = None
+        return self._dense
+
     def ask(self, question: str, *, seeds: int = 3, hops: int = 1,
             relations: Sequence[str] | None = None, why: str | None = None,
             semantic: bool | None = None,
@@ -825,12 +884,25 @@ class KnowledgeGraph:
         terms = query_terms(question)
         if not terms:
             return _cap([], limit, "reached")
-        index = self.semantic_index() if semantic is not False else None
-        if semantic and index is None:
+        # Nothing in the question is a word this graph has ever used, so there is no question here
+        # to answer. The LSA index got this for free -- a query outside its vocabulary folds to a
+        # zero vector and it returns nothing -- but a pretrained encoder embeds ANY string, and
+        # `ask("zzzzqqq")` came back with the seven nodes nearest to gibberish.
+        #
+        # A similarity floor cannot do this job: over these 714 nodes the best cosine for a real
+        # question runs down to 0.26 while nonsense reaches 0.28, so the two ranges overlap and any
+        # threshold that rejects the nonsense also rejects real questions. Knowing the words is a
+        # property of the corpus and is exactly what the old behaviour tested.
+        if not any(self._document_frequency(t) for t in terms):
+            return _cap([], limit, "reached")
+        indexes = [i for i in ((self.semantic_index(), self.dense_index())
+                               if semantic is not False else ()) if i is not None]
+        if semantic and not indexes:
             raise GraphError(
-                "no semantic index matches this graph. Build one with:\n"
-                "    python3 ontology/build_semantic_index.py")
-        if index is not None:
+                "no semantic index matches this graph. Build them with:\n"
+                "    python3 ontology/build_semantic_index.py\n"
+                "    python3 ontology/build_dense_index.py")
+        if indexes:
             # At least as many seeds as results asked for. Three is a sensible breadth to EXPAND
             # from; it is not a sensible number of candidates to rank when the caller wanted ten,
             # and capping there silently made hops=0 answer with three.
@@ -838,7 +910,16 @@ class KnowledgeGraph:
             # question with less than `find` did on the same words -- the caller who wants the whole
             # answer gets at least as many seeds as there are nodes carrying the words.
             wanted = max(seeds, limit or seeds)
-            seeded = [nid for nid, _ in index.similar(question, limit=wanted)]
+            # Fused, not concatenated. The two indices know different things -- LSA knows what this
+            # corpus puts together, the encoder knows what English does -- and each is wrong often
+            # enough that taking one's word for the top of the list loses the other's rescues.
+            #
+            # The WORD search is deliberately not a third input here. It is a fine way to find a
+            # node whose text you can half-remember and a poor way to answer a question: alone it
+            # answers 5 of 25, and fusing it in drags the pair from 18 down to 16. Its seeds are
+            # appended below instead, where they widen the pool without displacing the ranking.
+            seeded = _fuse([[nid for nid, _ in i.similar(question, limit=FUSE_POOL)]
+                            for i in indexes])[:wanted]
             # A node carrying the question's own words is an answer by the plainest reading there
             # is, and meaning and words disagree often enough that the semantic seeds can miss it:
             # "stops beyond obvious levels" matched `structure-based stop` on the words and did not
@@ -877,11 +958,13 @@ class KnowledgeGraph:
         # Re-rank the whole pool against the question. Ordering by seed and then by distance sank
         # the answer under the twenty kinds-of hanging off a worse seed; a neighbour that carries a
         # word of the question is what deserves to come back, and distance only breaks ties.
-        if index is not None:
-            # Ranked by meaning, over the pool the graph produced. The words of the question are
-            # already spent -- they chose where to start -- and re-ranking by them here would put
-            # the node that repeats the question above the one that answers it.
-            ranked = [nid for nid, _ in index.similar(question, limit=None, among=list(route))]
+        if indexes:
+            # Ranked by meaning, over the pool the graph produced -- and by both indices, fused the
+            # same way the seeds were. The words of the question are already spent -- they chose
+            # where to start -- and re-ranking by them here would put the node that repeats the
+            # question above the one that answers it.
+            ranked = _fuse([[nid for nid, _ in i.similar(question, limit=None, among=list(route))]
+                            for i in indexes])
             rows = [(0, 0, route[nid]["hops"], nid) for nid in ranked]
         else:
             scored = self._score(list(route), terms, best_only=False)

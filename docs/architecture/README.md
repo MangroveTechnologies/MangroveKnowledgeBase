@@ -11,11 +11,12 @@ prose out of a diagram — the counts that are quoted anywhere are pinned by
 |---|---|---|
 | 1 | [Provenance and build](#1-provenance-and-build) | Where does a node come from, and which stage may overwrite what? |
 | 2 | [What a node and an edge are](#2-what-a-node-and-an-edge-are) | What is stored, and what does each relation mean? |
-| 3 | [One corpus, three readers](#3-one-corpus-three-readers) | What text is searched, and who else reads it? |
+| 3 | [One corpus, four readers](#3-one-corpus-four-readers) | What text is searched, and who else reads it? |
 | 4 | [find() — matching words](#4-find--matching-words) | Why did that query return that? |
 | 5 | [ask() — answering a question](#5-ask--answering-a-question) | What is a hop, and where does selection happen? |
 | 6 | [The semantic index](#6-the-semantic-index) | How is meaning represented, and why is it not a second store? |
-| 7 | [Three walks](#7-three-walks-that-are-easy-to-confuse) | What do `descendants`, `in_class` and `under` each return? |
+| 7 | [The dense index](#7-the-dense-index) | Why is there a second index, and what does it cost? |
+| 8 | [Three walks](#8-three-walks-that-are-easy-to-confuse) | What do `descendants`, `in_class` and `under` each return? |
 
 ---
 
@@ -122,11 +123,11 @@ flowchart TB
 `has-role` is kept out of the backbone deliberately: `filter` is a part some signals play, not a kind
 of signal, and returning a role where a type is expected is the classic modelling error
 (Guarino & Welty, *OntoClean*). `part-of` is structural but **not** classification — which is why
-`under()` exists beside `descendants()`; see [diagram 7](#7-three-walks-that-are-easy-to-confuse).
+`under()` exists beside `descendants()`; see [diagram 8](#8-three-walks-that-are-easy-to-confuse).
 
-## 3. One corpus, three readers
+## 3. One corpus, four readers
 
-Every searchable string is built once, by `haystacks()`, into five bands. Three different consumers
+Every searchable string is built once, by `haystacks()`, into five bands. Four different consumers
 read it, and when they disagree the search answers differently depending on where you asked.
 
 ```mermaid
@@ -143,6 +144,7 @@ flowchart TB
 
   hay --> find["find() · ranks by which band matched"]
   hay --> lsa["build_semantic_index.py<br/>bands weighted 3·2·2·1·1"]
+  hay --> dns["build_dense_index.py<br/>bands CHUNKED, not weighted"]
   hay --> idx["viewer IDX · exported into the page"]
   idx --> js["page rank() in JavaScript"]
 
@@ -186,18 +188,27 @@ flowchart TB
 
 ## 5. `ask()` — answering a question
 
-Seed, expand, re-rank. Seeding takes the nearest by meaning **and** anything carrying the question's
-own words, because the two disagree often enough to lose an answer either way round. The expansion
-takes **every** neighbour — there is no picking during the walk — and selection happens afterwards,
-over the whole pool, because judging relevance before seeing the candidates is guessing.
+Seed, expand, re-rank. Seeding fuses **two** meaning indices and then appends anything carrying the
+question's own words, because all three disagree often enough to lose an answer. The expansion takes
+**every** neighbour — there is no picking during the walk — and selection happens afterwards, over
+the whole pool, because judging relevance before seeing the candidates is guessing.
+
+The word search is appended as extra seeds rather than fused into the ranking, and that is a measured
+choice, not a stylistic one: fusing it in drags the pair from 18/25 down to 16/25, because a
+retriever that answers 5 alone contributes mostly noise to a score.
 
 ```mermaid
 flowchart TB
-  q([question]) --> sem{"semantic index<br/>present and matching?"}
-  sem -->|yes| seeds1["SemanticIndex.similar()<br/>nearest by meaning"]
+  q([question]) --> voc{"any word the<br/>corpus has ever used?"}
+  voc -->|no| none[["nothing — there is no<br/>question here to answer"]]
+  voc -->|yes| sem{"either index<br/>present and matching?"}
+  sem -->|yes| seeds1["SemanticIndex.similar()<br/>LSA · this corpus"]
+  sem -->|yes| seeds4["DenseIndex.similar()<br/>encoder · English"]
   sem -->|yes| seeds3["find()<br/>carries the words"]
   sem -->|no| seeds2["find()<br/>nearest by words"]
-  seeds1 --> frontier
+  seeds1 --> rrf
+  seeds4 --> rrf
+  rrf{{"_fuse() · reciprocal rank<br/>1/(5 + rank), summed"}} --> frontier
   seeds3 --> frontier
   seeds2 --> frontier
 
@@ -210,16 +221,25 @@ flowchart TB
   more -->|no| rerank
 
   rerank{"seeded by meaning?"}
-  rerank -->|yes| rs["rank pool by similarity<br/>to the question"]
+  rerank -->|yes| rs["rank pool by FUSED similarity<br/>both indices, restricted to the pool"]
   rerank -->|no| rl["rank pool by words<br/>missing, tier, then distance"]
   rs --> out
   rl --> out
   out[["each result carries `reached`:<br/>seed · hops · relation · that edge's why"]]
 ```
 
-Measured, right node in the top five of twenty questions: words alone 8, words + 1 hop 10,
-words + 2 hops 12, meaning + 1 hop 16. More hops is not strictly better — each round adds nodes that
-compete on the same score, so a correct answer can be diluted down the list.
+Measured on the twenty-five questions in `tests/test_the_graph_answers_questions.py`, phrased the way
+a trader asks them: `find()` alone 5, LSA + 1 hop 13, the encoder alone 15, **the fused pair + 1 hop
+18**. More hops is not strictly better — each round adds nodes that compete on the same score, so a
+correct answer can be diluted down the list, and this is visible at the margin: `hops=0` and `hops=2`
+each score 19 where the default `hops=1` scores 18. One question moving is not a reason to change the
+default, and it is a reason not to read too much into the last point of that number.
+
+**The vocabulary gate at the top is what stops a dense index from always answering.** LSA got this
+free — a query outside its vocabulary folds to a zero vector — but a pretrained encoder embeds any
+string, so `ask("zzzzqqq")` returned the seven nodes nearest to gibberish. A similarity floor cannot
+replace it: the best cosine for a real question runs down to 0.26 while nonsense reaches 0.28, so the
+ranges overlap and every threshold that rejects the nonsense also rejects real questions.
 
 ## 6. The semantic index
 
@@ -251,13 +271,59 @@ flowchart TB
   ids --> back[["back into the graph:<br/>ask() walks edges from here"]]
 ```
 
-**Why this is not a disjoint layer.** Every row is keyed by a node id; there is no passage store and
-no chunking, so a hit is always a node and the edges still do the explaining. It is built from the
+**Why this is not a disjoint layer.** Every row is keyed by a node id, so a hit is always a node and
+the edges still do the explaining; there is no passage store to return text from. It is built from the
 same text `find()` searches, and it carries the record's checksum so it cannot silently answer about
-an older graph. A pretrained sentence model was measured against it and scored lower on this corpus —
-it knows English better and this vocabulary not at all.
+an older graph.
 
-## 7. Three walks that are easy to confuse
+## 7. The dense index
+
+The second way in, and the reason `ask()` fuses: a pretrained sentence encoder
+(`all-MiniLM-L6-v2`), built by `ontology/build_dense_index.py` into `dense-index.npz`.
+
+The two indices know different things, and the split is clean. LSA knows what *this corpus* puts
+together — it is where the meaning of "basis" or "delta" in trading is decided. The encoder knows what
+*English* puts together, which is how *"what are the odds I wipe out the account"* reaches
+`concept:risk-of-ruin`, whose summary is "the probability of losing a specified percentage of
+capital": the same sentence in different words, sharing none of them. No amount of co-occurrence
+across 714 documents teaches that, because nothing in them places those phrasings together.
+
+```mermaid
+flowchart TB
+  subgraph b[Build · sentence-transformers, once per graph change]
+    n["one node"] --> c0["row 0 · name + summary"]
+    n --> cw["rows 1..n · detail in fixed-size windows,<br/>each prefixed with the node's name"]
+    c0 & cw --> enc["encode · L2-normalised"]
+    enc --> st[["vectors · several rows per node<br/>float16, keyed by node id"]]
+  end
+
+  subgraph q[Query · needs the model]
+    qq([question]) --> qe["encode the question<br/>same model, same space"]
+    qe --> cos["cosine against every row"]
+    cos --> best["a node scores as its BEST row,<br/>never its average"]
+    best --> ids[["ranked NODE IDS"]]
+  end
+
+  st --> cos
+```
+
+**Chunked, unlike the LSA index, and for a reason that does not generalise.** That builder repeats
+each band by weight (3·2·2·1·1), which is how you tell a bag-of-words model what a node is mostly
+about. This encoder truncates at 256 word-pieces, so the same document would spend its whole window
+on a triplicated name and never reach the node's detail. Hence windows — and hence a node scoring by
+its best window, because a long node answers a question when one part of it does, and averaging
+buries that part under the rest.
+
+Every row is still keyed by a node id. Chunking here is a way to read a node completely, not a
+passage store: nothing returns a fragment of text, and the edges still do the explaining.
+
+**This costs a runtime dependency and the LSA index does not.** A query has to be encoded by the same
+model that built the rows, so `sentence-transformers` is a hard dependency and the model downloads
+once on a fresh machine. The first `ask()` in a process pays ~4 s to load it and ~50 ms per call
+after; `find()` never pays it, and neither does loading the graph — the import is deferred to first
+use.
+
+## 8. Three walks that are easy to confuse
 
 Same fragment of the graph, three questions, three different answers.
 

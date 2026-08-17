@@ -1,22 +1,32 @@
 ---
 name: knowledge-graph
 description: >-
-  Query the mangrove-kb knowledge graph — every indicator and signal in the library, what each
-  computes, what it consumes and produces, which signals read which of its outputs, and what part
-  each plays in a strategy. Reach for this before grepping the source or guessing at names: "which
-  indicators produce a bounded oscillator", "what reads RSI", "what would break if I change this
-  output", "is there already a signal for X", "what does this signal actually need". Uses
+  Query the mangrove-kb knowledge graph — every indicator and signal in the library (what each
+  computes, what it consumes and produces, which signals read which of its outputs, what part each
+  plays in a strategy) joined to the trading knowledge base (market structure, instruments, risk,
+  chart patterns, quantitative method). Reach for this before grepping the source, guessing at
+  names, or answering a trading question from memory: "which indicators produce a bounded
+  oscillator", "what reads RSI", "what would break if I change this output", "is there already a
+  signal for X", "how far should the stop go", "what are the odds I wipe out the account". Uses
   mangrove_kb.graph (stats · find · ask · get · outputs · neighbors · subgraph · path · all_paths).
 ---
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of itself: **714 nodes, 2342 edges** covering 71 indicators and
-218 signals. It is generated from the source, so it is exact — not extracted from prose, not
-approximate, no ranking model in the way. Every answer is a fact about the code as it is.
+`mangrove_kb` ships a knowledge graph of **714 nodes, 2342 edges** with two halves on one schema:
+
+- **The library, compiled from its own source** — 71 indicators and 218 signals. Exact, not
+  extracted: every answer here is a fact about the code as it is.
+- **The trading knowledge base, ingested from its chapters** — market foundations, instruments and
+  mechanics, core concepts, strategy design, risk management, indicators, chart patterns,
+  quantitative analysis. Authored prose, so it answers *why* and *when* rather than *what signature*.
+
+They are joined, and that is the point: `procedure:atr-based-stop` is a rule a chapter states, and it
+`uses` an indicator the code defines, so one query crosses from advice to implementation.
 
 It answers things grep cannot: *what reads this indicator's third output*, *which signals produce a
-bounded value*, *every way this signal connects to that class, and which of them is the reason*.
+bounded value*, *every way this signal connects to that class, and which of them is the reason*, and
+— because half of it is prose — *what should I do when the market goes quiet*.
 
 ```python
 from mangrove_kb.graph import KnowledgeGraph
@@ -163,6 +173,16 @@ question are rarely in the node that answers it: *"why do breakouts fail"* lands
 cases say exactly that, while the answer is the sweep one hop further on. Every result carries
 `reached` — which seed, how many hops, which relation, and that edge's own `why`. Use `find()`
 when the query is a term and `ask()` when it is a sentence.
+
+It seeds from **two** indices and fuses them: LSA over this corpus, which knows that *"a breakout
+that fails"* belongs near *"read as a loss"*, and a pretrained sentence encoder, which knows that
+*"the odds I wipe out the account"* is `risk of ruin` — a paraphrase no amount of co-occurrence in
+714 documents would teach. Measured on twenty-five questions phrased the way a trader asks them:
+`find()` answers 5, LSA alone 13, the encoder alone 15, the fused pair **18**. Expect roughly one
+question in four to still need a second phrasing or a `find()` on a term you can guess.
+
+The first `ask()` in a process loads the encoder (~4 s, and downloads the model once on a fresh
+machine); later calls are ~50 ms. `find()` never pays this.
 
 `outputs()` is the one call that indexes **values rather than nodes**: a row is a single output, so
 an indicator with three outputs contributes three rows, and every row names its producer. It answers

@@ -1,9 +1,14 @@
-"""Search the graph by meaning, not by wording.
+"""Search the graph by what this corpus puts together.
 
 `KnowledgeGraph.find` matches the words a query uses. This matches what it is *about*: a question
 and a node are compared as directions in a 128-dimensional space built from how terms co-occur
 across the graph, so *"why do breakouts fail"* reaches the node that says a breakout is read as a
 loss, which shares no word with the question.
+
+This is one of two ways in. :mod:`mangrove_kb.dense` is the other -- a pretrained encoder, which
+knows English rather than this corpus -- and :meth:`KnowledgeGraph.ask` fuses the two by reciprocal
+rank rather than choosing between them. The division of labour is real: co-occurrence here decides
+what "basis" or "delta" means in trading, and cannot bridge a paraphrase the corpus never states.
 
 **It returns node ids and nothing else.** There is no passage store, no chunking and no second copy
 of the text: every row of the index is keyed by a node, so a hit lands in the graph and the edges
@@ -12,8 +17,8 @@ mode this design refuses.
 
 The index is a build artifact -- `ontology/build_semantic_index.py` writes it from the committed
 graph, and it carries that graph's checksum so a stale one is detectable rather than silently
-answering an older question. Building needs scikit-learn; using needs numpy, which the package
-already requires.
+answering an older question. Building needs scikit-learn; using needs numpy alone, because a query
+folds through the saved projection rather than being re-encoded by a model.
 
     from mangrove_kb.semantic import SemanticIndex
 

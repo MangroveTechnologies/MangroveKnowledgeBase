@@ -3,29 +3,37 @@
 
 The word search answers "do we already have one of these" well and answers "why does Y happen"
 badly, because the node that answers a question rarely contains the question's words. Measured on
-twenty questions phrased the way someone asks them, word search put the right node in the top five
-seven times; walking one hop from it, ten; two hops, twelve.
+the twenty-five questions in `tests/test_the_graph_answers_questions.py`, phrased the way a trader
+asks them, the word search puts the right node in the top five 5 times out of 25.
 
 This is latent semantic analysis over the graph's own text (Deerwester et al., *JASIS* 1990): a
 term-document matrix, TF-IDF weighted, reduced by truncated SVD. Terms that occur in the same
 contexts end up close, which is how a question about a breakout that *fails* reaches a node that
-says it is read as a *loss*. On the same twenty questions it scores sixteen.
+says it is read as a *loss*. On those questions it scores 13.
 
-**A pretrained sentence model was measured against it and lost**: all-MiniLM-L6-v2 scored twelve,
-and its misses were near misses -- `transaction-cost` for `effective-spread`, `trending-market` for
-`adx-trend-strength`. It knows English better and this corpus not at all, and the corpus is where
-the meaning of "basis" or "delta" is decided. It also costs a model download, a second runtime and
-a number that changes when the model does; this costs one file and numpy, which the package already
-depends on.
+**It is one of two indices, and `ask` fuses them** -- see `ontology/build_dense_index.py` for the
+other, a pretrained sentence encoder. What this one knows is what *this corpus* puts together, which
+is where the meaning of "basis" or "delta" is decided; what it cannot know is a paraphrase the
+corpus never states, and *"what are the odds I wipe out the account"* does not reach
+`concept:risk-of-ruin` however it is weighted. The encoder scores 15 alone and the fused pair scores
+18, because they fail on different questions.
+
+That comparison is only as good as the questions. An earlier run of it had this index at 16/20 and
+the encoder at 12/20, on a set written by an agent that had just read the chapters and therefore
+used the corpus's own vocabulary -- the one condition under which co-occurrence beats general English
+by construction. Re-measured on questions written to avoid node wording, the order reverses. Any
+future comparison here is worth only what its question set is worth.
 
 The output is a projection of the graph, not a second copy of it: every row is keyed by node id, so
 a hit lands on a node and the edges do the explaining from there.
 
     python3 ontology/build_semantic_index.py            # writes mangrove_kb/data/semantic-index.npz
 
-`scikit-learn` is needed to BUILD the index and never to use one. `tests/test_semantic.py` checks
-the committed index against the committed graph, so a chapter merged without rebuilding it fails CI
-rather than answering yesterday's questions.
+`scikit-learn` is needed to BUILD the index and never to use one -- the query side folds a question
+through the saved projection with numpy alone. (The dense index differs here: encoding a query needs
+its model, which is why that one carries a runtime dependency and this one does not.)
+`tests/test_semantic.py` checks the committed index against the committed graph, so a chapter merged
+without rebuilding it fails CI rather than answering yesterday's questions.
 """
 from __future__ import annotations
 

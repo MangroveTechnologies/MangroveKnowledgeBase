@@ -74,11 +74,26 @@ def test_ask_uses_the_index_when_it_matches_and_says_so_when_asked_for_it_withou
     assert semantic_first != words_only, "semantic seeding must actually change the answer"
 
     bare = KnowledgeGraph.load()
-    bare._semantic = None                       # as if no index shipped
+    # BOTH, because there are two now. Unsetting only the LSA one left the dense index seeding the
+    # call, so this read as a fallback failure when it was really a fallback that had not happened.
+    bare._semantic = bare._dense = None         # as if neither index shipped
     assert [x["id"] for x in bare.ask("why do breakouts fail", limit=5)] == words_only, \
         "without an index the call must fall back to the word search, not fail"
     with pytest.raises(GraphError, match="build_semantic_index"):
         bare.ask("why do breakouts fail", semantic=True)
+
+
+def test_either_index_alone_still_answers(kg):
+    """Neither index may become load-bearing for the other's presence.
+
+    They are built by separate commands and a rebuild of one can land without the other, so each
+    has to seed a search on its own -- degrading to a worse answer, never to an exception.
+    """
+    for missing in ("_semantic", "_dense"):
+        one = KnowledgeGraph.load()
+        setattr(one, missing, None)
+        assert one.ask("how far away from my entry should the stop go", limit=5).total > 0, \
+            f"ask() stopped working with {missing} absent"
 
 
 def test_it_answers_the_measured_questions(kg):

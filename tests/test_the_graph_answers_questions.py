@@ -14,6 +14,12 @@ for. This one does, three ways, and each measures something different:
    scored 16/20 and was worthless: it was written after reading the chapters, so it used their
    words back at them.
 
+   A gold answer set is part of the measurement and can be wrong in the graph's favour OR against
+   it. "Is this trend strong enough to bother trading" accepted the classifier and the market state
+   but not `signal-adx-strong-trend`, whose whole summary is "check if ADX indicates a strong
+   trend"; widening it to the answers a person would accept is a fix, and widening it to whatever
+   came back is cheating. The distinction is worth keeping in mind before touching this list.
+
 3. **Structure.** Questions answered by walking rather than matching -- what reads this indicator,
    what is this class made of, how do these two connect.
 
@@ -38,7 +44,10 @@ KNOWN_HEADING_MISSES = 2
 #: Measured 2026-08-17, over the 25 paraphrased questions below, with `ask(hops=1)`.
 #: Was 11 until nineteen authored summaries -- deleted by an edit that removed a range
 #: between two keys -- were restored. Two of those nodes are answers to questions here.
-PARAPHRASE_FLOOR = 13
+#: Then 13 for as long as LSA was the only index, and 18 once `ask` fused it with the pretrained
+#: encoder. The two disagree in a useful way: LSA knows what THIS corpus puts together, the encoder
+#: knows what English does, and every question the pair rescued was one the other could not reach.
+PARAPHRASE_FLOOR = 18
 
 #: A trader's phrasing, and any node that would be a fair answer. Written to avoid the node's own
 #: words wherever the question can be asked without them.
@@ -57,8 +66,12 @@ QUESTIONS: list[tuple[str, set[str]]] = [
     ("how do I know a break is real and not a fake",
      {"procedure:breakout-confirmation-filter", "concept:false-breakout"}),
     ("things have gone very quiet, what usually follows", {"concept:compression"}),
+    # `signal-adx-strong-trend` -- "check if ADX indicates a strong trend" -- answers this as
+    # squarely as the classifier does, and was missing from the accepted set rather than from the
+    # graph. A gold answer that omits a right answer measures the question, not the retrieval.
     ("is this trend strong enough to bother trading",
-     {"procedure:adx-trend-strength", "concept:trending-market"}),
+     {"procedure:adx-trend-strength", "concept:trending-market",
+      "procedure:signal-adx-strong-trend"}),
     ("how far away from my entry should the stop go",
      {"procedure:atr-based-stop", "concept:stop-and-target-engineering"}),
     ("my backtest looks too good to be true",

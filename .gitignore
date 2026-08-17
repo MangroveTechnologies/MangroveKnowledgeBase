@@ -80,3 +80,8 @@ audit_results/
 # Anything date-stamped: notes-2026-08-10.md, summary_2026_08_10.md, report-20260810.md
 *[-_][0-9][0-9][0-9][0-9][-_][0-9][0-9][-_][0-9][0-9].md
 *[-_][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].md
+
+# `tests/test_architecture_docs.py` parses every mermaid block with the real mermaid library, which
+# is a local `npm install mermaid jsdom` away and skips without it. The install is a developer's
+# tool, not a repo asset -- thousands of vendored files that nothing here imports.
+node_modules/

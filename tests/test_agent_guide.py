@@ -33,7 +33,7 @@ def guide():
 
 def test_guide_exists_and_covers_every_use_case(guide):
     headings = re.findall(r"^## (\d+)\. ", guide, re.M)
-    assert headings == [str(i) for i in range(1, 16)], f"expected use cases 1-15, found {headings}"
+    assert headings == [str(i) for i in range(1, 17)], f"expected use cases 1-16, found {headings}"
 
 
 def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):

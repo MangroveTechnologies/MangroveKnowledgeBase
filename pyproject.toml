@@ -33,6 +33,16 @@ dependencies = [
     # It was optional-and-undeclared, which meant `pip install mangrove-kb` shipped a ratified
     # indicator that four signals read and that silently produced nothing.
     "scipy>=1.11",
+    # `KnowledgeGraph.ask` searches by meaning with two indices, and this encodes the QUESTION for
+    # the second of them. Unlike scikit-learn, which builds the LSA index and is never needed to
+    # read one, there is no way to embed a query the model has not seen without the model: the node
+    # vectors ship in the wheel, the query cannot. Measured over the twenty-five paraphrased
+    # questions in `tests/test_the_graph_answers_questions.py`, LSA alone answers 13 and the fused
+    # pair answers 18.
+    #
+    # It pulls torch, and the model (~90 MB) downloads on first use and is cached by
+    # `huggingface_hub` thereafter -- so the first `ask()` on a fresh machine needs network access.
+    "sentence-transformers>=3.0",
 ]
 
 [project.optional-dependencies]
@@ -105,3 +115,8 @@ target-version = ["py310"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+markers = [
+    # Loads the sentence encoder, which downloads ~90 MB the first time. Deselect with
+    # `-m "not model"` on a machine with no network and no HuggingFace cache.
+    "model: needs the sentence-transformers model, not just the committed vectors",
+]
