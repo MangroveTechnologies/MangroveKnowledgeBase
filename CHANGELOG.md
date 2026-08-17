@@ -4,7 +4,43 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
-## [2.0.0] - Unreleased
+## [3.0.0] - Unreleased
+
+**The knowledge base is in the graph, and the graph answers questions.** All eight knowledge-base
+chapters are ingested as nodes and edges beside the code-derived ones -- market foundations,
+instruments and mechanics, core trading concepts, strategy design, risk management, indicators,
+chart patterns, quantitative analysis. **303 -> 714 nodes, 1049 -> 2342 edges.**
+
+The merge is an outer join with dedupe, never a choice between two sources: where a chapter and the
+library describe one thing they become one node, where their wording differs both are kept, and the
+library keeps ownership of classification -- a chapter enriches a class, it never redefines one.
+
+### `ask()` searches by meaning, over two indices
+
+`ask()` now seeds from latent semantic analysis over this corpus AND a pretrained sentence encoder,
+fused by reciprocal rank, then walks a hop along the edges. The two fail on different questions: LSA
+knows what this corpus puts together and cannot bridge a paraphrase it never states, while the
+encoder knows English and not our vocabulary. Measured on twenty-five questions phrased the way a
+trader asks them: `find()` answers 5, LSA alone 13, the encoder alone 15, the pair **18**.
+
+Every result carries `reached` -- which seed, how far, along which relation, and that edge's own
+reason -- so an answer arrives with its grounds rather than a relevance score.
+
+### Breaking
+
+- **`sentence-transformers` is now a required dependency**, and brings torch. The graph and both
+  indices ship in the wheel, but a query has to be encoded by the same model that built the vectors,
+  so it downloads once on first `ask()`. Everything else -- loading the graph, `find()`, every
+  traversal, the viewer -- works offline and never loads it.
+- **`kb_server/` is deleted.** The FastAPI + FastMCP server answered from SQLite FTS5 over eleven
+  markdown documents, a glossary registry and a backlink table; the graph answers all of it. Its
+  Docker image workflow (`build-and-push.yaml`) is deleted with it. Both remain in git history.
+- **`ask()` returns nothing for a question containing no word the corpus uses.** A dense index
+  always returns something, and `ask("zzzzqqq")` previously came back with the seven nodes nearest
+  to gibberish. A similarity floor cannot separate the two -- real questions run down to cosine 0.26
+  where nonsense reaches 0.28 -- so the guard is the vocabulary.
+
+## [2.0.0] - 2026-08-11
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
@@ -122,7 +158,7 @@ nothing else about it. The `quantitative-analysis` anchor waits on chapter 8.
 216 of 247 signals are modelled. The 20 `onchain` / `defi_pro` signals read provider feeds rather
 than indicator outputs and have no class; 11 read a verdict and never will. All 31 still evaluate.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-04-19
 
 Comprehensive expansion to 99 indicators and 223 signals. This release adds 29 standard
 indicators (Priority A from the v0.4.0 gap analysis plus four signal-pattern indicators)

@@ -12,7 +12,6 @@
 # What it does NOT sync (intentionally):
 #   - React source code (developer-portal stays as MangroveAI's copy)
 #   - Python signal/indicator source (mangrove_kb is the source of truth)
-#   - KB server code (kb_server/ is standalone)
 
 set -euo pipefail
 

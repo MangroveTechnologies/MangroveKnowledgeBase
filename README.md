@@ -427,7 +427,6 @@ MangroveKnowledgeBase/
 │   └── signal-indicator-ontology.json       ← the ontology of record
 ├── skills/knowledge-graph/       ← the agent skill and its guide (source of truth)
 ├── knowledge-base/               ← 11 trading-education documents
-├── kb_server/                    ← RETIRED. Superseded by the graph; kept for reference
 ├── notebooks/                    ← signal explorer + validation
 ├── data/                         ← 7 sample OHLCV datasets
 └── tests/                        ← the suite

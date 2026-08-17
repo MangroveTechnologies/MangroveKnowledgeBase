@@ -55,7 +55,7 @@ Open-source trading signals, technical indicators, and knowledge base. Public de
 1. **Python Package** (`mangrove_kb`) -- 249 signal functions, 80 indicator classes, RuleRegistry,
    docstring parser, **and a knowledge graph of itself** (see below). Published on PyPI as
    `mangrove-kb`.
-2. **KB Server** (`kb_server/`) -- **RETIRED.** A FastAPI + FastMCP server answering from SQLite FTS5 over the markdown documents, a glossary registry and a backlink table. Its whole surface is now answered from the graph; the directory is kept for reference and nothing new should be built on it.
+2. **MCP server** (`mangrove_kb_mcp.py`) -- twelve read-only tools over the graph, run over stdio by whatever client wants them. A consumer of the installed package, not part of it. (It replaced `kb_server/`, a FastAPI + FastMCP server answering from SQLite FTS5 over markdown; that directory was deleted in 3.0.0 and is in git history.)
 3. **Knowledge Base Content** (`knowledge-base/`) -- 11 markdown documents covering market foundations through quantitative analysis
 
 MangroveAI consumes this as a pip dependency (`mangrove-kb`) and reads the graph in-process -- not over HTTP. The developer portal (admin UI) source code lives in MangroveAI, not here.
@@ -64,26 +64,6 @@ MangroveAI consumes this as a pip dependency (`mangrove-kb`) and reads the graph
 
 ```
 mangrove_kb/                   # pip package: signals, indicators, registry, parser
-kb_server/                     # unified server (REST + MCP)
-  main.py                      # FastAPI + FastMCP mounted at /mcp
-  Dockerfile                   # KB server Docker image
-  services/                    # shared service layer
-    search_engine.py           # FTS5 document search
-    cross_reference.py         # glossary, backlinks
-    document_loader.py         # markdown loading
-    signal_service.py          # signal metadata + evaluation
-    indicator_service.py       # indicator metadata + computation
-  routers/
-    api.py                     # REST endpoints (free + x402 gated)
-    ui.py                      # HTML UI routes
-  mcp/
-    tools.py                   # 16 MCP tools (free + x402 gated)
-  x402/
-    middleware.py              # payment validation
-    pricing.py                 # per-tool pricing
-ontology/                      # the graph BUILDER + the graph itself (the ontology of record)
-skills/knowledge-graph/        # SKILL.md + GUIDE.md -- bundled into the wheel at build time
-assets/                        # README screenshots (not shipped)
 knowledge-base/                # 11 trading education markdown documents
 notebooks/                     # Signal explorer notebook
 data/                          # 7 sample OHLCV datasets
@@ -102,7 +82,7 @@ one implementation of "search the knowledge base" rather than two that drift.
 It is a CONSUMER of the installed package, not part of it -- `pip install mangrove-kb fastmcp`, then
 point a client at the file. See `mangrove_kb_mcp.md` for the tool reference and client config.
 
-| | old (`kb_server`, retired) | now |
+| | old (`kb_server`, deleted in 3.0.0) | now |
 |---|---|---|
 | answers from | SQLite FTS5 over markdown | the graph |
 | transport | HTTP, mounted at `/mcp` | stdio subprocess |
