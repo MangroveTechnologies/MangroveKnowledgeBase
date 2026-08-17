@@ -33,19 +33,15 @@ python scripts/audit/run_all.py --quick
 
 **Verify it works:**
 ```bash
-# Signal metadata (free)
-curl http://localhost:8081/api/signals | python3 -m json.tool | head -20
+# The graph loads from the package, with no network and no configuration
+python -c "from mangrove_kb.graph import KnowledgeGraph as K; g=K.load(); print(len(g.nodes), len(g.edges))"
 
-# Indicator metadata (free)
-curl http://localhost:8081/api/indicators | python3 -m json.tool | head -20
+# Search by words, then by meaning
+python -c "from mangrove_kb.graph import KnowledgeGraph as K; print(K.load().find('divergence', limit=3).as_dict())"
+python -c "from mangrove_kb.graph import KnowledgeGraph as K; print([r['id'] for r in K.load().ask('how far away from my entry should the stop go', limit=3)])"
 
-# Search the knowledge base (free)
-curl "http://localhost:8081/api/search?q=RSI" | python3 -m json.tool | head -20
-
-# Evaluate a signal (x402 gated -- returns 402 without payment)
-curl -X POST http://localhost:8081/api/evaluate \
-  -H "Content-Type: application/json" \
-  -d '{"name":"rsi_oversold","ohlcv":{"close":[100,101,99,98,102,103]},"params":{"window":14,"threshold":30}}'
+# Evaluate a signal on sample bars
+python -c "from mangrove_kb import RuleRegistry, sample_ohlcv; from mangrove_kb.signals import momentum; print(RuleRegistry.evaluate({'name':'rsi_oversold'}, sample_ohlcv()))"
 ```
 
 ## What This Is
@@ -162,14 +158,20 @@ silently describe the wrong code.
 
 ## Deployment
 
-KB server image is built and pushed to Artifact Registry by this repo. Cloud Run deployment is managed by MangroveAI.
+**This repo publishes a pip package. It no longer builds or pushes a container image.**
 
-| Environment | URL | Managed By |
-|------------|-----|------------|
-| Local | http://localhost:8081 | docker-compose (this repo or MangroveAI) |
-| Prod | https://kb.mangrovedeveloper.ai | MangroveAI deploy-kb-prod workflow (`mangroveai-prod`) |
+`kb_server/` and `build-and-push.yaml` were deleted in 3.0.0, so nothing here produces
+`mangrove-ai-kb` any more. The release path is: PR -> merge to main -> dispatch `release.yml` to cut
+a `vX.Y.Z` tag -> the tag publishes to PyPI.
 
-Terraform module: `MangroveAI/infra/terraform/modules/app-mangroveai-kb/`
+A Cloud Run service still answers at `https://kb.mangrovedeveloper.ai` from the last image built
+before the removal. It is frozen by construction: its source is in git history and there is no
+workflow that can rebuild it. Anything that needs changing there needs the service retired, or the
+source restored from history first.
+
+Consumers take the graph by installing the package, not by calling that host -- MangroveAI reads it
+in-process through `mangrove_kb.graph`, and an MCP client runs `mangrove_kb_mcp.py` against its own
+installed copy.
 
 ## Signal Conventions
 
