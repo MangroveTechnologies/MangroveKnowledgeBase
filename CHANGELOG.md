@@ -4,7 +4,7 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
-## [3.1.1] - Unreleased
+## [3.1.1] - 2026-08-18
 
 ### The four `apo_*` signal names resolve again
 
@@ -40,7 +40,7 @@ the suite until an alias points it at its replacement. Nothing previously compar
 against the names already in circulation, which is why half of one release's renames kept their
 aliases and half did not.
 
-## [3.1.0] - Unreleased
+## [3.1.0] - 2026-08-17
 
 ### `sentence-transformers` is an extra, not a requirement
 
