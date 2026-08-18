@@ -64,6 +64,10 @@ semantic = [
 ]
 
 dev = [
+    # The `semantic` extra, so the suite exercises the encoder path. Without it CI installs a
+    # graph with no way to embed a question, and every test that measures `ask()` fails on an
+    # ImportError rather than on anything about the graph.
+    "mangrove-kb[semantic]",
     # Builds the semantic index (`ontology/build_semantic_index.py`); never needed to read one --
     # the query side folds a question through the saved projection with numpy alone.
     "scikit-learn>=1.3",

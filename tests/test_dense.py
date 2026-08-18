@@ -11,6 +11,7 @@ the artifact do not load it; the two that do are marked so they can be deselecte
 """
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 import pytest
@@ -21,6 +22,15 @@ REPO = Path(__file__).resolve().parent.parent
 GRAPH = REPO / "ontology" / "signal-indicator-ontology.json"
 
 dense = pytest.importorskip("mangrove_kb.dense", reason="numpy is required to read the index")
+
+#: Whether the `semantic` extra is installed. The encoder is optional -- the dense vectors ship in
+#: the wheel but embedding a QUESTION needs the model -- so a plain install skips these rather than
+#: failing on an ImportError that says nothing about the graph. CI installs `[dev]`, which carries
+#: the extra, so they run there.
+HAS_ENCODER = importlib.util.find_spec("sentence_transformers") is not None
+needs_encoder = pytest.mark.skipif(not HAS_ENCODER,
+                                   reason="needs the semantic extra: pip install 'mangrove-kb[semantic]'")
+
 
 
 @pytest.fixture(scope="module")
@@ -84,6 +94,7 @@ def test_no_node_is_split_into_more_rows_than_the_builder_allows(index):
 
 
 @pytest.mark.model
+@needs_encoder
 def test_it_reaches_a_paraphrase_lsa_cannot(index):
     """The reason this index exists, as a single case.
 
@@ -96,6 +107,7 @@ def test_it_reaches_a_paraphrase_lsa_cannot(index):
 
 
 @pytest.mark.model
+@needs_encoder
 def test_a_node_is_scored_by_its_best_row_not_its_average(index):
     """Chunking is only worth its complexity if one good passage can carry a long node."""
     scores = dict(index.similar("three peaks and the middle one is the highest", limit=None))
