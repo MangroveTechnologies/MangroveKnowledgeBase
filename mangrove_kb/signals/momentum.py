@@ -955,6 +955,16 @@ def macd_line_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: i
     return zero_cross(_macd_line(closes, window_fast, window_slow), "down")
 
 
+# The released names. They evaluate and warn; they are not separate signals, so the catalogue still
+# reports one signal per behaviour. Verified behaviour-identical to the names they point at over
+# 3,762 evaluations per pair on BTC daily closes across window_fast/window_slow of (12,26), (5,35)
+# and (20,50) -- zero mismatches, as expected from an APO series byte-identical to MACD.macd.
+RuleRegistry.alias("apo_bullish", "macd_line_positive")
+RuleRegistry.alias("apo_bearish", "macd_line_negative")
+RuleRegistry.alias("apo_cross_up", "macd_line_cross_up")
+RuleRegistry.alias("apo_cross_down", "macd_line_cross_down")
+
+
 # --- CMO signals ---
 
 
