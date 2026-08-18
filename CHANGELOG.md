@@ -4,6 +4,42 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.1.1] - Unreleased
+
+### The four `apo_*` signal names resolve again
+
+2.0.0 renamed the `apo_*` signals to `macd_line_*` and removed the duplicate APO indicator. The
+`chandelier_*` and `volatility_stop_*` renames in that same release each shipped an alias; the four
+`apo_*` names did not, so every saved strategy holding one stopped resolving:
+
+```
+ValueError: Unknown rule name: apo_cross_down
+```
+
+Callers treat an unresolvable rule as a signal that did not fire, so this surfaced as strategies
+that silently never traded rather than as an error. 25 strategies were affected in production, 24 of
+them active, generating roughly 300 failures a day since 2026-08-13.
+
+```python
+RuleRegistry.alias("apo_bullish", "macd_line_positive")
+RuleRegistry.alias("apo_bearish", "macd_line_negative")
+RuleRegistry.alias("apo_cross_up", "macd_line_cross_up")
+RuleRegistry.alias("apo_cross_down", "macd_line_cross_down")
+```
+
+Verified behaviour-identical over 3,762 evaluations per pair on BTC daily closes across
+`window_fast`/`window_slow` of (12,26), (5,35) and (20,50) -- zero mismatches, as expected from an
+APO series byte-identical to `MACD.macd`. The catalogue still reports 249 registered signals; an
+alias is not a signal.
+
+### A released signal name can no longer stop resolving
+
+`tests/test_released_signal_names_still_resolve.py` freezes the union of every name registered in a
+released version from 1.3.4 onward and asserts each one still resolves. Removing a name now fails
+the suite until an alias points it at its replacement. Nothing previously compared the alias list
+against the names already in circulation, which is why half of one release's renames kept their
+aliases and half did not.
+
 ## [3.1.0] - Unreleased
 
 ### `sentence-transformers` is an extra, not a requirement
