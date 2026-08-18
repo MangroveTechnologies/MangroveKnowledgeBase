@@ -17,10 +17,35 @@ pip install mangrove-kb
   words, seeds from two indices and follows the edges out of what it finds. On twenty-five questions
   phrased the way a trader asks them, `find()` answers 5 and `ask()` answers 18.
 
-Dependencies: numpy, pandas, scipy, and sentence-transformers (which brings torch). The last is what
-encodes a question for `ask()`; the graph and both indices ship inside the wheel, but a query has to
-be encoded by the same model that built the vectors, so the model downloads once on first use and is
-cached thereafter. Everything except `ask()` works offline and without it being loaded.
+Dependencies: **numpy, pandas, scipy.** The graph and both search indices ship inside the wheel.
+
+`ask()` answers on the LSA index alone. To get the second index -- the pretrained encoder, which
+takes it from 13 of 25 to 18 -- install the extra:
+
+```bash
+pip install "mangrove-kb[semantic]"
+```
+
+**Choose CPU or GPU when you install it**, because nothing in the package can. `sentence-transformers`
+pulls torch, and pip's default torch wheel bundles the entire CUDA stack:
+
+| | installed size | `ask()` |
+|---|---|---|
+| `mangrove-kb` | 373 MB | 13/25 |
+| `mangrove-kb[semantic]` | 5,276 MB | 18/25 |
+| ...with CPU-only torch first | **1,402 MB** | 18/25 |
+
+3.4 GB of that is nvidia libraries and triton for a GPU this never uses -- the node vectors are
+precomputed and the only inference is one short question per call, ~50 ms on a CPU. For CPU:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install "mangrove-kb[semantic]"
+```
+
+There is no `torch-cpu` on PyPI and torch publishes no extra for it, so this is an install-time
+choice rather than something a dependency can declare. The model itself (~90 MB) downloads on first
+`ask()` and is cached thereafter.
 
 ## Indicators
 

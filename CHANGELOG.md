@@ -4,6 +4,33 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.1.0] - Unreleased
+
+### `sentence-transformers` is an extra, not a requirement
+
+3.0.1 required it, on the strength of a remembered figure for what torch weighs. Measured in clean
+venvs, identical except the install:
+
+| | installed | `ask()` |
+|---|---|---|
+| `mangrove-kb` | **373 MB** | 13/25 |
+| `mangrove-kb[semantic]` | **5,276 MB** | 18/25 |
+| ...with CPU-only torch installed first | **1,402 MB** | 18/25 |
+
+3.4 GB of that is nvidia CUDA libraries and triton, for a GPU nothing here uses: the node vectors
+are precomputed in the wheel and the only inference is encoding one short question per call.
+
+**CPU or GPU is an install-time choice and cannot be declared by a package.** There is no
+`torch-cpu` on PyPI, and torch publishes no extra for it -- the `+cpu` wheels carry the same version
+from a different index. Both front pages carry the two-line recipe.
+
+### Fixed
+
+- **`ask()` raised instead of degrading when the encoder was missing.** The dense vectors are a
+  numpy `.npz` and load without `sentence-transformers`, so the index reported itself present and
+  then raised `ImportError` from inside the query. `dense_index()` now checks the encoder is
+  importable, so an install without the extra answers on the LSA index instead of failing.
+
 ## [3.0.1] - 2026-08-17
 
 Released as 3.0.1 rather than 3.0.0: the 3.0.0 tag was cut before PyPI rejected the upload, and a

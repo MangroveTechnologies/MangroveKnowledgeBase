@@ -100,3 +100,29 @@ def test_a_node_is_scored_by_its_best_row_not_its_average(index):
     """Chunking is only worth its complexity if one good passage can carry a long node."""
     scores = dict(index.similar("three peaks and the middle one is the highest", limit=None))
     assert scores["concept:head-and-shoulders"] > 0.4
+
+
+def test_ask_degrades_rather_than_raising_when_the_encoder_is_absent(kg, monkeypatch):
+    """`sentence-transformers` is an extra, so most installs will not have it.
+
+    The vectors are a numpy `.npz` and load without it. So `DenseIndex.load()` succeeded, the graph
+    reported a dense index, and `ask()` then raised `ImportError` from inside the query -- a missing
+    OPTIONAL dependency breaking the call rather than lowering its quality. `ask()` has to keep
+    answering on the LSA index alone.
+    """
+    import importlib.util
+
+    from mangrove_kb.graph import KnowledgeGraph
+
+    real = importlib.util.find_spec
+
+    def blind(name, *a, **k):
+        return None if name == "sentence_transformers" else real(name, *a, **k)
+
+    monkeypatch.setattr(importlib.util, "find_spec", blind)
+    bare = KnowledgeGraph.load()
+    assert bare.dense_index() is None, "the encoder is absent; the index must not report present"
+    assert bare.semantic_index() is not None, "the LSA index needs no encoder and must survive"
+
+    answered = bare.ask("how far away from my entry should the stop go", limit=5)
+    assert answered.total > 0, "ask() stopped answering without the optional extra"
