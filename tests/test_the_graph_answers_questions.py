@@ -28,12 +28,20 @@ improves; never lower one to make a change pass.
 """
 from __future__ import annotations
 
+import importlib.util
 import re
 from pathlib import Path
 
 import pytest
 
 from mangrove_kb.graph import KnowledgeGraph
+
+#: The floors below are measured with BOTH indices. The encoder is an extra, so a plain install
+#: reaches only the LSA one and answers 13 rather than 18 -- a worse search, not a broken one, and
+#: not something to assert a floor against.
+needs_encoder = pytest.mark.skipif(
+    importlib.util.find_spec("sentence_transformers") is None,
+    reason="the paraphrase floor is measured with the semantic extra installed")
 
 RAW = Path(__file__).resolve().parent.parent / "ontology" / "raw"
 
@@ -136,6 +144,7 @@ def test_a_chapter_can_find_the_things_it_names(kg):
         f"{len(missed)} headings no longer find their node: {missed[:5]}"
 
 
+@needs_encoder
 def test_it_answers_questions_asked_in_someone_elses_words(kg):
     """The honest measure. Low, and recorded so it cannot quietly get lower."""
     hit = [q for q, want in QUESTIONS if want & {r["id"] for r in kg.ask(q, hops=1, limit=5)}]
@@ -144,6 +153,7 @@ def test_it_answers_questions_asked_in_someone_elses_words(kg):
         f"{[q for q, _ in QUESTIONS if q not in hit][:6]}")
 
 
+@needs_encoder
 def test_meaning_beats_words_on_a_question(kg):
     """`ask` must stay worth having over `find`: the whole point of the semantic index."""
     words = sum(1 for q, want in QUESTIONS if want & {r["id"] for r in kg.find(q, limit=5)})

@@ -90,9 +90,12 @@ class DenseIndex:
                 from sentence_transformers import SentenceTransformer   # noqa: PLC0415
             except ImportError as exc:                                  # pragma: no cover
                 raise ImportError(
-                    "sentence-transformers is required to search by meaning. It is a declared "
-                    "dependency, so this means a partial install:\n"
-                    "    pip install 'mangrove-kb'") from exc
+                    "sentence-transformers is required to encode a question. It is an extra:\n"
+                    "    pip install 'mangrove-kb[semantic]'\n"
+                    "Reaching this means the index was handed out without it -- "
+                    "`KnowledgeGraph.dense_index()` checks for the encoder and returns None, so "
+                    "`ask()` should have fallen back to the word index rather than arriving "
+                    "here.") from exc
             self._model = SentenceTransformer(self.built_with["model"])
         return self._model
 

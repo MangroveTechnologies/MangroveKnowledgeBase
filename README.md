@@ -81,9 +81,19 @@ pip install mangrove-kb
 Python 3.10+. The graph, both search indices, the agent skill and the viewer all ship **inside the
 wheel**, so `KnowledgeGraph.load()` needs no network and no configuration.
 
-One exception, and it is the only one: `ask()` encodes your question with a sentence model, so it
-loads `sentence-transformers` and downloads that model once on first call. Everything else — loading
-the graph, `find()`, every traversal, the viewer — works offline and never touches it.
+`ask()` works out of the box on the LSA index. Its second index — a pretrained encoder, worth 13/25
+to 18/25 — is an **extra**, because `sentence-transformers` pulls torch and pip's default torch wheel
+bundles the whole CUDA stack: `mangrove-kb` is 373 MB installed, `mangrove-kb[semantic]` is 5,276 MB,
+and 3.4 GB of that is GPU support this never uses.
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu   # 1,402 MB instead of 5,276
+pip install "mangrove-kb[semantic]"
+```
+
+CPU or GPU is chosen there and cannot be declared by the package — there is no `torch-cpu` on PyPI,
+and the `+cpu` wheels carry the same version from a different index. Without the extra, `ask()`
+answers on one index rather than two; nothing raises.
 
 ---
 

@@ -843,11 +843,22 @@ class KnowledgeGraph:
 
         Same contract as :meth:`semantic_index`: absent or stale degrades to what remains rather
         than raising, because a search that answers less is better than one that answers wrongly.
+
+        **The ENCODER is checked here, not at the first query.** The vectors are a numpy `.npz` and
+        load without it, so `sentence-transformers` being absent -- which it is unless the
+        `semantic` extra was installed -- produced an index that loaded, reported itself present,
+        and then raised `ImportError` from inside `ask()` when it tried to encode the question.
+        A missing extra has to make the search worse, not broken.
         """
         if self._dense is _UNSET:
             self._dense = None
             try:
+                import importlib.util                        # noqa: PLC0415
+
                 from .dense import DenseIndex                # noqa: PLC0415 -- optional artifact
+
+                if importlib.util.find_spec("sentence_transformers") is None:
+                    return self._dense                       # vectors without an encoder are unusable
                 index = DenseIndex.load()
                 self._dense = index if (self.source and index.matches(self.source)) else None
             except Exception:                                # missing, unreadable, or stale

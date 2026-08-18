@@ -33,20 +33,41 @@ dependencies = [
     # It was optional-and-undeclared, which meant `pip install mangrove-kb` shipped a ratified
     # indicator that four signals read and that silently produced nothing.
     "scipy>=1.11",
-    # `KnowledgeGraph.ask` searches by meaning with two indices, and this encodes the QUESTION for
-    # the second of them. Unlike scikit-learn, which builds the LSA index and is never needed to
-    # read one, there is no way to embed a query the model has not seen without the model: the node
-    # vectors ship in the wheel, the query cannot. Measured over the twenty-five paraphrased
-    # questions in `tests/test_the_graph_answers_questions.py`, LSA alone answers 13 and the fused
-    # pair answers 18.
-    #
-    # It pulls torch, and the model (~90 MB) downloads on first use and is cached by
-    # `huggingface_hub` thereafter -- so the first `ask()` on a fresh machine needs network access.
-    "sentence-transformers>=3.0",
 ]
 
 [project.optional-dependencies]
+# Searching by MEANING. `KnowledgeGraph.ask` seeds from two indices; this encodes the question for
+# the second of them. Both indices ship in the wheel, but a query has to be encoded by the same
+# model that built the vectors, and there is no way to embed a phrase the model has not seen
+# without the model.
+#
+# It is an extra rather than a requirement because of what it weighs. `sentence-transformers` pulls
+# torch, and pip's default torch wheel bundles the whole CUDA stack -- measured in clean venvs:
+#
+#     pip install mangrove-kb                    373 MB    ask() answers 13 of 25
+#     pip install mangrove-kb[semantic]        5,276 MB    ask() answers 18 of 25
+#     ...with CPU-only torch installed first   1,402 MB    ask() answers 18 of 25
+#
+# 3.4 GB of that is nvidia CUDA libraries and triton, for a GPU nothing here uses: the node vectors
+# are precomputed, and the only inference is one short question per call, ~50ms on a CPU.
+#
+# **CPU or GPU is chosen at install time, not here.** There is no `torch-cpu` on PyPI and torch
+# publishes no extra for it -- the `+cpu` wheels carry the same version from a different index -- so
+# no dependency declaration can express it. Install torch first to choose:
+#
+#     pip install torch --index-url https://download.pytorch.org/whl/cpu   # CPU
+#     pip install mangrove-kb[semantic]
+#
+# Without this extra, `ask()` still answers, seeded by the LSA index alone. Worse, never broken.
+semantic = [
+    "sentence-transformers>=3.0",
+]
+
 dev = [
+    # The `semantic` extra, so the suite exercises the encoder path. Without it CI installs a
+    # graph with no way to embed a question, and every test that measures `ask()` fails on an
+    # ImportError rather than on anything about the graph.
+    "mangrove-kb[semantic]",
     # Builds the semantic index (`ontology/build_semantic_index.py`); never needed to read one --
     # the query side folds a question through the saved projection with numpy alone.
     "scikit-learn>=1.3",
