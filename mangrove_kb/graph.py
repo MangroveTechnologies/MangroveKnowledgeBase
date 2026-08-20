@@ -431,6 +431,19 @@ def _fuse(rankings: Sequence[Sequence[str]], k: float = RRF_K) -> list[str]:
     return [nid for nid, _ in sorted(score.items(), key=lambda kv: (-kv[1], kv[0]))]
 
 
+def _canonical(ref: str) -> str:
+    """A reference in the form an id takes: lower case, underscores as hyphens.
+
+    Undoes the one transform between a node's name and its id, so `run_backtest` and
+    `run-backtest` both reach `procedure:tool-run-backtest`.
+
+    Whitespace is deliberately NOT a separator here. A phrase resolving to a node would
+    make `resolve()` a search, and the two are different promises: a phrase goes to
+    `find()`, which ranks and returns several.
+    """
+    return ref.strip().lower().replace("_", "-")
+
+
 class KnowledgeGraph:
     """An in-memory view of the signal/indicator knowledge space.
 
@@ -575,15 +588,36 @@ class KnowledgeGraph:
     # --- resolution ------------------------------------------------------------------------------
 
     def resolve(self, ref: str) -> str:
-        """Resolve an id, a name, or an unambiguous fragment to an exact node id."""
+        """Resolve an id, a name, or an unambiguous fragment to an exact node id.
+
+        Ids and names differ in one systematic way: a name keeps the separator it was
+        written with (`run_backtest`) and its id is slugified to hyphens
+        (`procedure:tool-run-backtest`). A caller who composes an id from a name it can
+        see gets `procedure:tool-run_backtest`, which is the right node spelled the way
+        its own name reads. Separators are therefore normalised before comparing, which
+        is lossless here: no id in the graph contains an underscore, so no two ids
+        collide once underscores become hyphens, and normalising names introduces no
+        ambiguity either: the graph holds the same five duplicate names whether they are
+        compared raw or normalised. A name that IS ambiguous falls through to the
+        fragment search, which reports candidates rather than choosing one. A phrase
+        still matches nothing -- that is `find()`'s job, not this one.
+        """
         if ref in self.nodes:
             return ref
         low = ref.lower().strip()
         for n in self.nodes.values():
             if n.name.lower() == low:
                 return n.id
+        canonical = _canonical(ref)
+        for n in self.nodes.values():
+            if _canonical(n.id) == canonical:
+                return n.id
+        by_name = [n.id for n in self.nodes.values() if _canonical(n.name) == canonical]
+        if len(by_name) == 1:
+            return by_name[0]
         hits = [n.id for n in self.nodes.values()
-                if low in n.id.lower() or low in n.name.lower()]
+                if low in n.id.lower() or low in n.name.lower()
+                or canonical in _canonical(n.id) or canonical in _canonical(n.name)]
         if len(hits) == 1:
             return hits[0]
         raise NodeNotFound(ref, sorted(hits)[:5])

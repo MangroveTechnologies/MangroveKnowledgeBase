@@ -172,6 +172,48 @@ def test_resolve_accepts_id_name_and_fragment(kg):
     assert kg.resolve("RSI") == "procedure:indicator-rsi"
 
 
+def test_no_id_contains_an_underscore(kg):
+    """What makes separator normalisation lossless: if an id could contain one, mapping
+    underscores to hyphens could send a caller to a different node."""
+    assert [n.id for n in kg.nodes.values() if "_" in n.id] == []
+
+
+def test_an_id_written_with_underscores_resolves(kg):
+    """A name keeps its separator and its id is slugified, so a caller composing an id
+    from a name it can see writes the underscore form. That is the same node."""
+    assert kg.resolve("procedure:indicator-rsi") == "procedure:indicator-rsi"
+    assert kg.resolve("procedure:indicator_rsi") == "procedure:indicator-rsi"
+
+
+@pytest.mark.parametrize("ref", ["rsi_oversold", "rsi-oversold", "RSI_Oversold"])
+def test_a_name_resolves_however_its_separators_are_written(kg, ref):
+    assert kg.resolve(ref) == "procedure:signal-rsi-oversold"
+
+
+def test_a_phrase_still_matches_nothing(kg):
+    """Whitespace is not a separator to normalise away. Resolving a phrase would make
+    this a search, and a search is `find()`, which ranks and returns several."""
+    with pytest.raises(NodeNotFound):
+        kg.resolve("rsi oversold")
+
+
+def test_normalising_a_name_does_not_make_an_ambiguous_one_resolve(kg):
+    """`oversold` is a fragment of several signals. Normalisation reaches a node whose
+    name differs only in its separators; it does not turn a shared substring into a
+    choice made for the caller."""
+    with pytest.raises(NodeNotFound) as e:
+        kg.resolve("oversold")
+    assert len(e.value.suggestions) > 1
+
+
+def test_normalisation_does_not_invent_a_match(kg):
+    """It undoes a known transform; it is not fuzzy matching. A reference that is not a
+    node under any spelling still raises, because resolving to a near miss would hand
+    back the wrong node with confidence."""
+    with pytest.raises(NodeNotFound):
+        kg.resolve("procedure:indicator_rsii")
+
+
 def test_unknown_node_suggests_candidates(kg):
     with pytest.raises(NodeNotFound) as e:
         kg.resolve("cross")
