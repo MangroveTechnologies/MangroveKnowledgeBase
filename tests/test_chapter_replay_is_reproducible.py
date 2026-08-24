@@ -93,6 +93,16 @@ def test_the_pipeline_reproduces_the_committed_record(tmp_path):
              "--ontology", str(current), "--merge", "--out", str(out)])
         current = out
 
+    guides_graph = tmp_path / "guides-graph.json"
+    run(["-m", "wiki_to_graph", "build", str(ONTOLOGY / "wiki-guides"), "-o", str(guides_graph),
+         "--map", str(ONTOLOGY / "wiki-config" / "map.json"),
+         "--vocab", str(ONTOLOGY / "wiki-config" / "vocab.json"),
+         "--dag-edges", "part-of,kind-of,instance-of,supersedes"])
+    guides = tmp_path / "guides.json"
+    run([str(ONTOLOGY / "wiki_to_atoms.py"), "--wiki", str(ONTOLOGY / "wiki-guides"),
+         "--graph", str(guides_graph), "--ontology", str(current), "--out", str(guides)])
+    current = guides
+
     rebuilt = json.loads(current.read_text())
     committed = json.loads(COMMITTED.read_text())
 

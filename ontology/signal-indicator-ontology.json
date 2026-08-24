@@ -2396,7 +2396,7 @@
    "id": "procedure:indicator-kama",
    "title": "KAMA",
    "kind": "Procedure",
-   "summary": "An adaptive moving average that adjusts its smoothing based on market volatility\u2014faster during trends, slower during consolidation.",
+   "summary": "An adaptive moving average that adjusts its smoothing based on market volatility—faster during trends, slower during consolidation.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -3794,7 +3794,7 @@
      "- ROC > 0: Upward momentum - ROC < 0: Downward momentum - Rising ROC: Accelerating momentum - Falling ROC: Decelerating momentum ---",
      "ROC measures the percentage price change over a specified lookback period."
     ],
-    "crypto_considerations": "- Crypto markets exhibit higher ROC volatility than traditional assets - Adjust thresholds higher for crypto (e.g., \u00b115-20% vs \u00b15-10% for stocks) - Shorter periods (6-9 bars) may work better on lower timeframes (5m, 15m) - Use in conjunction with volume to confirm momentum strength",
+    "crypto_considerations": "- Crypto markets exhibit higher ROC volatility than traditional assets - Adjust thresholds higher for crypto (e.g., ±15-20% vs ±5-10% for stocks) - Shorter periods (6-9 bars) may work better on lower timeframes (5m, 15m) - Use in conjunction with volume to confirm momentum strength",
     "chapter_variants": {
      "formula": "ROC(n) = ((Close - Close[n]) / Close[n]) * 100\nWhere `n` is the lookback period (typically 12 bars)."
     }
@@ -4707,7 +4707,7 @@
      "Positive TRIX: Bullish momentum",
      "Negative TRIX: Bearish momentum",
      "Zero line crossovers signal trend changes",
-     "Very smooth\u2014filters out most noise"
+     "Very smooth—filters out most noise"
     ],
     "applications": [
      "Trend-following momentum with heavy noise suppression, for instruments where MACD whipsaws",
@@ -19663,7 +19663,7 @@
      "F = S * e^((r - y) * T)"
     ],
     "source_wording": "The identity cost of carry relationship.",
-    "explanation": "It is an arbitrage identity rather than a forecast: if the future strays from it, the trade is to buy one leg, sell the other and hold to expiration. It explains contango and backwardation as facts about rates, storage and convenience yield rather than as opinions about direction, and it is the same identity \u00a72.2 restates as F = S * e^((r - y) * T)."
+    "explanation": "It is an arbitrage identity rather than a forecast: if the future strays from it, the trade is to buy one leg, sell the other and hold to expiration. It explains contango and backwardation as facts about rates, storage and convenience yield rather than as opinions about direction, and it is the same identity §2.2 restates as F = S * e^((r - y) * T)."
    }
   },
   {
@@ -20538,21 +20538,21 @@
     ],
     "explanation": "Frequent small wins are psychologically rewarding This masks the tail risk of occasional large losses A single large loss can wipe out months of accumulated gains",
     "comparison": [
-     "Metric \u00b7 Trend Following \u00b7 Mean Reversion",
-     "Win Rate \u00b7 30-40% (low) \u00b7 60-70% (high)",
-     "Skew \u00b7 Positive (large wins) \u00b7 Negative (large losses)",
-     "Tail Risk \u00b7 Moderate \u00b7 High",
-     "Blow-up Risk \u00b7 Low \u00b7 High"
+     "Metric · Trend Following · Mean Reversion",
+     "Win Rate · 30-40% (low) · 60-70% (high)",
+     "Skew · Positive (large wins) · Negative (large losses)",
+     "Tail Risk · Moderate · High",
+     "Blow-up Risk · Low · High"
     ],
     "caution": "CRITICAL WARNING: Do NOT suggest mean reversion or carry strategies are \"safer\" or \"lower risk\" based on win rate. Their negative skew means tail losses are disproportionately large.",
     "source_wording": "A common error is equating high win rate with low risk. This is dangerously wrong.",
     "chapter_variants": {
      "explanation": "High win rate strategies feel safer because you win frequently This masks the tail risk: when you lose, you lose big A single large loss can wipe out months of accumulated small wins",
      "comparison": [
-      "Strategy Type \u00b7 Win Rate \u00b7 Skew \u00b7 Tail Risk \u00b7 Blow-Up Risk",
-      "Trend Following \u00b7 30-40% \u00b7 Positive \u00b7 Moderate \u00b7 Low",
-      "Mean Reversion \u00b7 60-70% \u00b7 Negative \u00b7 High \u00b7 High",
-      "Carry \u00b7 70-80% \u00b7 Negative \u00b7 High \u00b7 High"
+      "Strategy Type · Win Rate · Skew · Tail Risk · Blow-Up Risk",
+      "Trend Following · 30-40% · Positive · Moderate · Low",
+      "Mean Reversion · 60-70% · Negative · High · High",
+      "Carry · 70-80% · Negative · High · High"
      ]
     }
    }
@@ -20569,13 +20569,13 @@
      "core-trading-concepts"
     ],
     "comparison": [
-     "Dimension \u00b7 Definition \u00b7 Example",
-     "Per-Trade Risk \u00b7 Capital at risk on a single trade \u00b7 Position size, stop loss",
-     "Strategy Skew \u00b7 Distribution shape of outcomes \u00b7 Positive (trend) vs. negative (MR)",
-     "Regime Risk \u00b7 Mismatch between strategy and market \u00b7 Mean reversion in a trending market",
-     "Drawdown Risk \u00b7 Maximum capital decline \u00b7 Max drawdown, recovery time",
-     "Tail Risk \u00b7 Probability and magnitude of extreme losses \u00b7 VaR, Expected Shortfall",
-     "Correlation Risk \u00b7 Positions moving together in crisis \u00b7 \"Diversification\" failing"
+     "Dimension · Definition · Example",
+     "Per-Trade Risk · Capital at risk on a single trade · Position size, stop loss",
+     "Strategy Skew · Distribution shape of outcomes · Positive (trend) vs. negative (MR)",
+     "Regime Risk · Mismatch between strategy and market · Mean reversion in a trending market",
+     "Drawdown Risk · Maximum capital decline · Max drawdown, recovery time",
+     "Tail Risk · Probability and magnitude of extreme losses · VaR, Expected Shortfall",
+     "Correlation Risk · Positions moving together in crisis · \"Diversification\" failing"
     ],
     "caution": "Critical: Reducing per-trade risk does NOT reduce strategy-level risk. A mean reversion strategy with tight stops still has negative skew.",
     "source_wording": "Risk cannot be reduced to a single number. Consider all dimensions:",
@@ -20594,11 +20594,11 @@
      "core-trading-concepts"
     ],
     "comparison": [
-     "Regime \u00b7 Works Well \u00b7 Fails",
-     "Strong Trend \u00b7 Trend following, Momentum \u00b7 Mean reversion",
-     "Range-Bound \u00b7 Mean reversion, Range trading \u00b7 Trend following",
-     "High Volatility \u00b7 Breakouts, Volatility strategies \u00b7 Carry",
-     "Low Volatility \u00b7 Carry, Mean reversion \u00b7 Breakouts"
+     "Regime · Works Well · Fails",
+     "Strong Trend · Trend following, Momentum · Mean reversion",
+     "Range-Bound · Mean reversion, Range trading · Trend following",
+     "High Volatility · Breakouts, Volatility strategies · Carry",
+     "Low Volatility · Carry, Mean reversion · Breakouts"
     ],
     "caution": "Identify the regime first, then select the archetype. Never apply a strategy blindly without regime context.",
     "source_wording": "Strategy archetypes rotate in effectiveness based on market regime.",
@@ -22878,14 +22878,14 @@
      "risk-management"
     ],
     "comparison": [
-     "Dimension \u00b7 Definition \u00b7 What It Measures \u00b7 Common Mistake",
-     "Per-Trade Risk \u00b7 Capital at risk on a single trade \u00b7 Position size, stop loss distance \u00b7 Confusing small stops with low risk",
-     "Strategy Skew \u00b7 Shape of the return distribution \u00b7 Positive (trend) vs. negative (MR) \u00b7 Assuming high win rate = low risk",
-     "Regime Risk \u00b7 Mismatch between strategy and market \u00b7 Strategy applied to wrong conditions \u00b7 Not adapting to changing markets",
-     "Drawdown Risk \u00b7 Maximum capital decline \u00b7 Peak-to-trough loss, recovery time \u00b7 Ignoring time-in-drawdown",
-     "Tail Risk \u00b7 Extreme loss probability \u00b7 VaR, Expected Shortfall \u00b7 Underestimating \"black swan\" events",
-     "Correlation Risk \u00b7 Positions moving together \u00b7 Portfolio-level diversification \u00b7 \"Diversification\" failing in crisis",
-     "Liquidity Risk \u00b7 Ability to exit positions \u00b7 Slippage, market impact \u00b7 Assuming orderly exits in stress"
+     "Dimension · Definition · What It Measures · Common Mistake",
+     "Per-Trade Risk · Capital at risk on a single trade · Position size, stop loss distance · Confusing small stops with low risk",
+     "Strategy Skew · Shape of the return distribution · Positive (trend) vs. negative (MR) · Assuming high win rate = low risk",
+     "Regime Risk · Mismatch between strategy and market · Strategy applied to wrong conditions · Not adapting to changing markets",
+     "Drawdown Risk · Maximum capital decline · Peak-to-trough loss, recovery time · Ignoring time-in-drawdown",
+     "Tail Risk · Extreme loss probability · VaR, Expected Shortfall · Underestimating \"black swan\" events",
+     "Correlation Risk · Positions moving together · Portfolio-level diversification · \"Diversification\" failing in crisis",
+     "Liquidity Risk · Ability to exit positions · Slippage, market impact · Assuming orderly exits in stress"
     ],
     "explanation": "The chapter opens here because controlling one dimension reads as controlling risk: a tight stop bounds [[Per-Trade Risk]] and leaves [[Strategy Skew]] and [[Regime Risk]] exactly where they were. Seven are named -- per-trade, skew, regime, drawdown, tail, correlation and liquidity -- and the common mistake against each is the false confidence that comes from having addressed a different one."
    }
@@ -22903,10 +22903,10 @@
     ],
     "explanation": "Mean reversion with 0.5% per-trade risk still has negative skew Many small losses can accumulate into large drawdown A regime change can cause all positions to fail simultaneously",
     "comparison": [
-     "Control \u00b7 What It Does \u00b7 What It Does NOT Do",
-     "Tight stop loss \u00b7 Limits loss on single trade \u00b7 Does not change skew or regime risk",
-     "Small position size \u00b7 Reduces dollar loss per trade \u00b7 Does not prevent strategy blow-up",
-     "Diversification \u00b7 Reduces single-asset risk \u00b7 Fails when correlations spike"
+     "Control · What It Does · What It Does NOT Do",
+     "Tight stop loss · Limits loss on single trade · Does not change skew or regime risk",
+     "Small position size · Reduces dollar loss per trade · Does not prevent strategy blow-up",
+     "Diversification · Reduces single-asset risk · Fails when correlations spike"
     ],
     "notes": [
      "Reality: Per-trade risk controls (position sizing, stop losses) do NOT change strategy-level risk."
@@ -23309,14 +23309,14 @@
      "risk-management"
     ],
     "comparison": [
-     "Drawdown \u00b7 Required Recovery",
-     "10% \u00b7 11.1%",
-     "20% \u00b7 25%",
-     "30% \u00b7 42.9%",
-     "40% \u00b7 66.7%",
-     "50% \u00b7 100%",
-     "60% \u00b7 150%",
-     "75% \u00b7 300%"
+     "Drawdown · Required Recovery",
+     "10% · 11.1%",
+     "20% · 25%",
+     "30% · 42.9%",
+     "40% · 66.7%",
+     "50% · 100%",
+     "60% · 150%",
+     "75% · 300%"
     ]
    }
   },
@@ -23674,12 +23674,12 @@
      "risk-management"
     ],
     "comparison": [
-     "R:R Ratio \u00b7 Break-Even Win Rate",
-     "0.5:1 \u00b7 66.7%",
-     "1:1 \u00b7 50%",
-     "1.5:1 \u00b7 40%",
-     "2:1 \u00b7 33.3%",
-     "3:1 \u00b7 25%"
+     "R:R Ratio · Break-Even Win Rate",
+     "0.5:1 · 66.7%",
+     "1:1 · 50%",
+     "1.5:1 · 40%",
+     "2:1 · 33.3%",
+     "3:1 · 25%"
     ],
     "notes": [
      "Toolkit: `breakeven_win_rate`."
@@ -25201,6 +25201,90 @@
      "quantitative-analysis"
     ],
     "practices": []
+   }
+  },
+  {
+   "id": "fact:direction-word-does-not-set-role",
+   "title": "direction word does not set role",
+   "kind": "Fact",
+   "summary": "Words naming a direction -- bullish, bearish -- say which way a signal points, not whether it is a trigger or a filter.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "`macd_bullish_cross` is a trigger and `obv_bullish` is a filter. Both are bullish. What separates them is that one names a crossing, which happens on a bar, and the other names a state, which persists. `rsi_bullish_divergence` is a trigger for the same reason and `adx_strong_trend` a filter, neither of which the direction word predicts."
+   }
+  },
+  {
+   "id": "judgment:do-not-take-default-values-for-filter-parameters",
+   "title": "do not take default values for filter parameters",
+   "kind": "Judgment",
+   "summary": "A filter confirms that conditions are right; it is not there to be selective. Where a filter has a parameterised threshold, its documented default is usually graded for a signal rather than a gate, and taking it unchanged is how a strategy ends up unable to fire.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "A default threshold marks a notable condition -- the value at which the indicator is saying something. That is what an event wants. A filter is asked a different question: are conditions right to act. Choose a less selective value than the default. Two thresholds, each defaulted, compound the problem: the entry needs both to hold at the moment the trigger fires."
+   }
+  },
+  {
+   "id": "fact:one-trigger-at-least-one-filter",
+   "title": "one trigger at least one filter",
+   "kind": "Fact",
+   "summary": "An entry takes exactly one TRIGGER and at least one FILTER; an exit takes at most one TRIGGER, and may not carry FILTERs without one.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "The trigger says when to act and the filter says whether the conditions are right, so an entry needs both. The counts are one entry trigger with one or two entry filters, and at most one exit trigger with up to two exit filters; an exit may be left out entirely, and the position then closes on the stop, the target, or a time-based rule from the execution config. The API's rule check is narrower than the requirement. It rejects an entry with no TRIGGER and an entry with two, and an exit carrying FILTERs without a TRIGGER, but it counts no filters at all."
+   }
+  },
+  {
+   "id": "judgment:prefer-fewer-filters",
+   "title": "prefer fewer filters",
+   "kind": "Judgment",
+   "summary": "A second filter narrows an entry further than the first; take it only when you can name the entries it removes.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "Filters compose conjunctively -- all of them must hold on the same bar the trigger fires -- so each one added cuts the set of bars that can produce a trade. One is required and a second is allowed, and the allowance is not an instruction. Use the filter that confirms the condition the entry depends on, and add the second only when you can say which entries it removes and why they deserved removing."
+   }
+  },
+  {
+   "id": "fact:signal-role-is-declared-not-inferred",
+   "title": "signal role is declared not inferred",
+   "kind": "Fact",
+   "summary": "A signal's role is read from its declared type, not deduced from its name. Naming patterns correlate with role but do not determine it.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "Event-shaped names -- crossings, breakouts, reversals, squeezes -- are usually triggers, and state-shaped names -- above, below, oversold, overbought, strong-trend -- are usually filters. The correlation is strong enough to be a useful guess and weak enough to be wrong: `ttm_squeeze_active`, `starc_lower_breakout`, `starc_upper_breakout`, `reversal_pattern_bullish` and `reversal_pattern_bearish` all read as events and all are filters. The declared type is the answer. Guessing from the name is how a strategy acquires two triggers and is rejected."
+   }
+  },
+  {
+   "id": "fact:sizing-version-is-pinned-at-creation",
+   "title": "sizing version is pinned at creation",
+   "kind": "Fact",
+   "summary": "The position-sizing version a strategy uses is fixed when the strategy is created and cannot be changed afterwards.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "The value is set at creation and is immutable thereafter; an update that tries to change it is refused, and the value is read from the strategy's own record rather than from a submitted configuration. Switching sizing math means creating a new strategy. A partial execution config supplied at creation is merged over the canonical defaults, so omitting a field keeps its default rather than dropping it -- which is why a strategy created with almost no configuration still carries the full set the sizing engine reads."
+   }
+  },
+  {
+   "id": "judgment:why-one-trigger",
+   "title": "why one trigger",
+   "kind": "Judgment",
+   "summary": "One trigger per entry keeps a strategy explainable: there is exactly one event to point at when asking why it entered.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "The single trigger buys four things. A strategy is easy to state, because it has one entry event rather than a disjunction of them. It has fewer free parameters, so there is less to curve-fit. The division of labour is legible -- the trigger says when to act, the filters say whether conditions are right. And when a backtest disappoints, the entry event is not in question, which leaves the filters and the parameters as the things to examine."
    }
   }
  ],
@@ -36021,7 +36105,7 @@
    "from": "order types",
    "rel": "about",
    "to": "core principles",
-   "why": "Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price \u00b7 Execution Certainty: Different order types offer varying degrees of fill certainty",
+   "why": "Immediacy vs. Price Control: Market orders prioritize speed; limit orders prioritize price · Execution Certainty: Different order types offer varying degrees of fill certainty",
    "from_id": "concept:order-type",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36037,7 +36121,7 @@
    "from": "market participants",
    "rel": "about",
    "to": "core principles",
-   "why": "Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage) \u00b7 Information Hierarchy: Some participants have superior information or analytical capabilities \u00b7 Time Horizon Diversity: Participants operate on different time scales from microseconds to years \u00b7 Adversarial Dynamics: Informed traders seek to profit from uninformed traders",
+   "why": "Heterogeneous Motivations: Different participants trade for different reasons (speculation, hedging, liquidity provision, arbitrage) · Information Hierarchy: Some participants have superior information or analytical capabilities · Time Horizon Diversity: Participants operate on different time scales from microseconds to years · Adversarial Dynamics: Informed traders seek to profit from uninformed traders",
    "from_id": "concept:market-participant",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36045,7 +36129,7 @@
    "from": "market makers",
    "rel": "about",
    "to": "core principles",
-   "why": "Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade \u00b7 Spread as Compensation: Market makers earn the spread as compensation for providing liquidity and bearing inventory risk",
+   "why": "Liquidity Ecosystem: Market makers and liquidity providers enable other participants to trade · Spread as Compensation: Market makers earn the spread as compensation for providing liquidity and bearing inventory risk",
    "from_id": "concept:market-maker",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36053,7 +36137,7 @@
    "from": "liquidity",
    "rel": "about",
    "to": "core principles",
-   "why": "Liquidity is Dynamic: Liquidity varies by time of day, market conditions, and asset characteristics \u00b7 Liquidity Illusion: Displayed liquidity often disappears when tested",
+   "why": "Liquidity is Dynamic: Liquidity varies by time of day, market conditions, and asset characteristics · Liquidity Illusion: Displayed liquidity often disappears when tested",
    "from_id": "concept:liquidity",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36061,7 +36145,7 @@
    "from": "market impact",
    "rel": "about",
    "to": "core principles",
-   "why": "Impact is Non-Linear: Market impact grows faster than linearly with order size \u00b7 Urgency-Cost Tradeoff: Faster execution incurs higher market impact; slower execution risks adverse price movement",
+   "why": "Impact is Non-Linear: Market impact grows faster than linearly with order size · Urgency-Cost Tradeoff: Faster execution incurs higher market impact; slower execution risks adverse price movement",
    "from_id": "concept:market-impact",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36077,7 +36161,7 @@
    "from": "volatility",
    "rel": "about",
    "to": "core principles",
-   "why": "Volatility Clustering: High volatility tends to follow high volatility; low volatility tends to follow low volatility \u00b7 Mean Reversion of Volatility: While returns are not predictable, volatility tends to revert to long-term averages \u00b7 Asymmetric Volatility: Volatility increases more on down moves than up moves (leverage effect)",
+   "why": "Volatility Clustering: High volatility tends to follow high volatility; low volatility tends to follow low volatility · Mean Reversion of Volatility: While returns are not predictable, volatility tends to revert to long-term averages · Asymmetric Volatility: Volatility increases more on down moves than up moves (leverage effect)",
    "from_id": "concept:volatility",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36085,7 +36169,7 @@
    "from": "market regimes",
    "rel": "about",
    "to": "core principles",
-   "why": "Regime Persistence: Markets tend to remain in a regime until a significant catalyst triggers a shift \u00b7 Correlation Breakdown: Asset correlations change dramatically across regimes",
+   "why": "Regime Persistence: Markets tend to remain in a regime until a significant catalyst triggers a shift · Correlation Breakdown: Asset correlations change dramatically across regimes",
    "from_id": "concept:market-regime",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36093,7 +36177,7 @@
    "from": "trading venues",
    "rel": "about",
    "to": "core principles",
-   "why": "Fragmentation: Modern markets are fragmented across multiple venues, requiring smart order routing \u00b7 Transparency Spectrum: Venues range from fully transparent (lit exchanges) to opaque (dark pools) \u00b7 Latency Competition: Execution speed varies significantly across venues \u00b7 Regulatory Frameworks: Different venues operate under different regulatory requirements",
+   "why": "Fragmentation: Modern markets are fragmented across multiple venues, requiring smart order routing · Transparency Spectrum: Venues range from fully transparent (lit exchanges) to opaque (dark pools) · Latency Competition: Execution speed varies significantly across venues · Regulatory Frameworks: Different venues operate under different regulatory requirements",
    "from_id": "concept:trading-venue",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36109,7 +36193,7 @@
    "from": "bid-ask spread dynamics",
    "rel": "about",
    "to": "core principles",
-   "why": "Information Asymmetry Cost: Spreads widen when market makers fear trading against informed participants \u00b7 Inventory Risk: Spreads reflect the risk of holding inventory that may decline in value \u00b7 Competition Effect: More market makers competing leads to tighter spreads \u00b7 Volatility Relationship: Spreads typically widen during high volatility",
+   "why": "Information Asymmetry Cost: Spreads widen when market makers fear trading against informed participants · Inventory Risk: Spreads reflect the risk of holding inventory that may decline in value · Competition Effect: More market makers competing leads to tighter spreads · Volatility Relationship: Spreads typically widen during high volatility",
    "from_id": "concept:bid-ask-spread",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36117,7 +36201,7 @@
    "from": "price discovery",
    "rel": "about",
    "to": "core principles",
-   "why": "Information Aggregation: Prices aggregate dispersed information held by many participants \u00b7 Continuous Process: Price discovery occurs continuously as new information arrives \u00b7 Order Flow Information: The sequence and size of orders reveals information \u00b7 Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously \u00b7 Speed of Incorporation: The efficiency of price discovery depends on market structure",
+   "why": "Information Aggregation: Prices aggregate dispersed information held by many participants · Continuous Process: Price discovery occurs continuously as new information arrives · Order Flow Information: The sequence and size of orders reveals information · Multiple Venues: Price discovery often occurs across multiple trading venues simultaneously · Speed of Incorporation: The efficiency of price discovery depends on market structure",
    "from_id": "concept:price-discovery",
    "to_id": "fact:market-foundations-core-principles"
   },
@@ -36125,7 +36209,7 @@
    "from": "liquidity",
    "rel": "about",
    "to": "best practices",
-   "why": "Monitor order book depth continuously to assess real-time liquidity conditions \u00b7 Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal) \u00b7 Avoid trading during illiquid periods (market open, lunch hour, holidays) \u00b7 Monitor real-time market depth before executing larger orders \u00b7 Trade during high liquidity periods for tighter spreads",
+   "why": "Monitor order book depth continuously to assess real-time liquidity conditions · Evaluate liquidity before sizing positions (participation rate < 10% of ADV ideal) · Avoid trading during illiquid periods (market open, lunch hour, holidays) · Monitor real-time market depth before executing larger orders · Trade during high liquidity periods for tighter spreads",
    "from_id": "concept:liquidity",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36133,7 +36217,7 @@
    "from": "limit order",
    "rel": "about",
    "to": "best practices",
-   "why": "Use limit orders to control execution prices when liquidity permits \u00b7 Place limit orders at realistic prices based on current market conditions \u00b7 Use limit orders to avoid paying the full spread",
+   "why": "Use limit orders to control execution prices when liquidity permits · Place limit orders at realistic prices based on current market conditions · Use limit orders to avoid paying the full spread",
    "from_id": "concept:limit-order",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36141,7 +36225,7 @@
    "from": "market impact",
    "rel": "about",
    "to": "best practices",
-   "why": "Be aware of the potential impact of large orders on market prices and plan execution accordingly \u00b7 Consider total cost of execution including fees, spread, and market impact",
+   "why": "Be aware of the potential impact of large orders on market prices and plan execution accordingly · Consider total cost of execution including fees, spread, and market impact",
    "from_id": "concept:market-impact",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36165,7 +36249,7 @@
    "from": "market order",
    "rel": "about",
    "to": "best practices",
-   "why": "Use market orders sparingly and only when immediate execution is critical \u00b7 Understand that stop orders become market orders and may fill at worse prices in fast markets",
+   "why": "Use market orders sparingly and only when immediate execution is critical · Understand that stop orders become market orders and may fill at worse prices in fast markets",
    "from_id": "concept:market-order",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36189,7 +36273,7 @@
    "from": "iceberg order",
    "rel": "about",
    "to": "best practices",
-   "why": "Use iceberg orders for large positions to reduce information leakage \u00b7 Break large orders into smaller child orders to reduce footprint",
+   "why": "Use iceberg orders for large positions to reduce information leakage · Break large orders into smaller child orders to reduce footprint",
    "from_id": "concept:iceberg-order",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36261,7 +36345,7 @@
    "from": "dark pools",
    "rel": "about",
    "to": "best practices",
-   "why": "Consider using dark pools for large orders to minimize information leakage \u00b7 Use dark pools strategically for large orders, but verify execution quality",
+   "why": "Consider using dark pools for large orders to minimize information leakage · Use dark pools strategically for large orders, but verify execution quality",
    "from_id": "concept:dark-pool",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36309,7 +36393,7 @@
    "from": "regime shifts",
    "rel": "about",
    "to": "best practices",
-   "why": "Have predefined plans for regime transitions rather than reacting emotionally \u00b7 Consider that regime shifts often occur faster than regime detection algorithms can identify",
+   "why": "Have predefined plans for regime transitions rather than reacting emotionally · Consider that regime shifts often occur faster than regime detection algorithms can identify",
    "from_id": "concept:regime-shift",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36317,7 +36401,7 @@
    "from": "trading venues",
    "rel": "about",
    "to": "best practices",
-   "why": "Use smart order routers (SOR) to access multiple venues simultaneously \u00b7 Select venues based on order characteristics (size, urgency, information sensitivity) \u00b7 Understand fee structures (maker-taker rebates can influence routing)",
+   "why": "Use smart order routers (SOR) to access multiple venues simultaneously · Select venues based on order characteristics (size, urgency, information sensitivity) · Understand fee structures (maker-taker rebates can influence routing)",
    "from_id": "concept:trading-venue",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36341,7 +36425,7 @@
    "from": "bid-ask spread dynamics",
    "rel": "about",
    "to": "best practices",
-   "why": "Always check the current spread before trading \u00b7 Factor spread costs into strategy profitability calculations \u00b7 Monitor spread changes as an indicator of market conditions \u00b7 Avoid trading when spreads are abnormally wide unless necessary",
+   "why": "Always check the current spread before trading · Factor spread costs into strategy profitability calculations · Monitor spread changes as an indicator of market conditions · Avoid trading when spreads are abnormally wide unless necessary",
    "from_id": "concept:bid-ask-spread",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -36365,7 +36449,7 @@
    "from": "price discovery",
    "rel": "about",
    "to": "best practices",
-   "why": "Understand the price discovery role of derivatives markets \u00b7 Be cautious trading immediately after major information releases \u00b7 Recognize that the first price after news is often not the right price",
+   "why": "Understand the price discovery role of derivatives markets · Be cautious trading immediately after major information releases · Recognize that the first price after news is often not the right price",
    "from_id": "concept:price-discovery",
    "to_id": "judgment:market-foundations-best-practices"
   },
@@ -37053,7 +37137,7 @@
    "from": "settlement",
    "rel": "about",
    "to": "core principles",
-   "why": "Immediate Settlement: Transactions settle within a short timeframe (T+0 to T+2 depending on asset class) \u00b7 Physical or Book-Entry Delivery: Actual ownership transfer of the underlying asset \u00b7 Delivery vs. Payment (DvP): Simultaneous exchange of securities and cash \u00b7 Settlement Cycles: T+0 (same day) to T+2 (trade date plus two days)",
+   "why": "Immediate Settlement: Transactions settle within a short timeframe (T+0 to T+2 depending on asset class) · Physical or Book-Entry Delivery: Actual ownership transfer of the underlying asset · Delivery vs. Payment (DvP): Simultaneous exchange of securities and cash · Settlement Cycles: T+0 (same day) to T+2 (trade date plus two days)",
    "from_id": "concept:settlement",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37061,7 +37145,7 @@
    "from": "spot markets",
    "rel": "about",
    "to": "core principles",
-   "why": "Price Transparency: Spot prices reflect current supply and demand equilibrium \u00b7 No Expiration: Unlike derivatives, spot positions have no expiration date \u00b7 Direct Ownership: Holder has full ownership rights including dividends, voting rights, etc.",
+   "why": "Price Transparency: Spot prices reflect current supply and demand equilibrium · No Expiration: Unlike derivatives, spot positions have no expiration date · Direct Ownership: Holder has full ownership rights including dividends, voting rights, etc.",
    "from_id": "concept:spot-market",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37069,7 +37153,7 @@
    "from": "futures",
    "rel": "about",
    "to": "core principles",
-   "why": "Leverage: Futures allow exposure to large notional values with smaller margin deposits \u00b7 Convergence: Futures prices converge to spot prices at expiration",
+   "why": "Leverage: Futures allow exposure to large notional values with smaller margin deposits · Convergence: Futures prices converge to spot prices at expiration",
    "from_id": "concept:futures",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37085,7 +37169,7 @@
    "from": "contract specifications",
    "rel": "about",
    "to": "core principles",
-   "why": "Standardization: Contract specifications (size, expiration, tick size) are standardized \u00b7 Standardization: Exchange-traded derivatives have fixed specifications \u00b7 Expiration Rules: When and how contracts expire and settle \u00b7 Trading Hours: Session times and any restrictions",
+   "why": "Standardization: Contract specifications (size, expiration, tick size) are standardized · Standardization: Exchange-traded derivatives have fixed specifications · Expiration Rules: When and how contracts expire and settle · Trading Hours: Session times and any restrictions",
    "from_id": "concept:contract-specification",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37101,7 +37185,7 @@
    "from": "options",
    "rel": "about",
    "to": "core principles",
-   "why": "Asymmetric Payoff: Limited downside (premium paid) with unlimited upside potential for buyers \u00b7 Implied Volatility: Market's expectation of future volatility embedded in option prices \u00b7 Exercise Styles: American (any time), European (expiration only)",
+   "why": "Asymmetric Payoff: Limited downside (premium paid) with unlimited upside potential for buyers · Implied Volatility: Market's expectation of future volatility embedded in option prices · Exercise Styles: American (any time), European (expiration only)",
    "from_id": "concept:option",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37109,7 +37193,7 @@
    "from": "the greeks",
    "rel": "about",
    "to": "core principles",
-   "why": "Time Decay (Theta): Option value erodes as expiration approaches \u00b7 Non-Linear Risk: Option Greeks describe sensitivity to various factors",
+   "why": "Time Decay (Theta): Option value erodes as expiration approaches · Non-Linear Risk: Option Greeks describe sensitivity to various factors",
    "from_id": "concept:greeks",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37125,7 +37209,7 @@
    "from": "margin",
    "rel": "about",
    "to": "core principles",
-   "why": "Margin Call: Warning when equity approaches maintenance margin \u00b7 Cross vs. Isolated Margin: Cross uses entire account balance; isolated limits risk per position",
+   "why": "Margin Call: Warning when equity approaches maintenance margin · Cross vs. Isolated Margin: Cross uses entire account balance; isolated limits risk per position",
    "from_id": "concept:margin",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37133,7 +37217,7 @@
    "from": "liquidation engine",
    "rel": "about",
    "to": "core principles",
-   "why": "Forced Liquidation: Automatic position closure to prevent negative equity \u00b7 Insurance Funds: Exchange reserves to cover liquidation shortfalls in volatile markets",
+   "why": "Forced Liquidation: Automatic position closure to prevent negative equity · Insurance Funds: Exchange reserves to cover liquidation shortfalls in volatile markets",
    "from_id": "concept:liquidation-engine",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37141,7 +37225,7 @@
    "from": "crypto-specific mechanics",
    "rel": "about",
    "to": "core principles",
-   "why": "24/7 Markets: No close, continuous trading globally \u00b7 Self-Custody: Users can hold assets directly without intermediaries \u00b7 Decentralization Spectrum: From fully decentralized (DEX) to centralized (CEX) \u00b7 Network Fees: Blockchain transactions incur gas/network fees",
+   "why": "24/7 Markets: No close, continuous trading globally · Self-Custody: Users can hold assets directly without intermediaries · Decentralization Spectrum: From fully decentralized (DEX) to centralized (CEX) · Network Fees: Blockchain transactions incur gas/network fees",
    "from_id": "concept:crypto-specific-mechanics",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37149,7 +37233,7 @@
    "from": "crypto settlement",
    "rel": "about",
    "to": "core principles",
-   "why": "On-Chain vs. Off-Chain: Settlement can occur on blockchain or within exchange databases \u00b7 Finality: Settlement finality depends on blockchain confirmation times",
+   "why": "On-Chain vs. Off-Chain: Settlement can occur on blockchain or within exchange databases · Finality: Settlement finality depends on blockchain confirmation times",
    "from_id": "concept:crypto-settlement",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37157,7 +37241,7 @@
    "from": "fx basics",
    "rel": "about",
    "to": "core principles",
-   "why": "Currency Pairs: Currencies traded in pairs (EUR/USD, USD/JPY), first is base, second is quote \u00b7 Lot Sizes: Standard (100,000 units), Mini (10,000), Micro (1,000) \u00b7 Interbank Market: Primary market among major banks, others access via brokers",
+   "why": "Currency Pairs: Currencies traded in pairs (EUR/USD, USD/JPY), first is base, second is quote · Lot Sizes: Standard (100,000 units), Mini (10,000), Micro (1,000) · Interbank Market: Primary market among major banks, others access via brokers",
    "from_id": "concept:fx",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37181,7 +37265,7 @@
    "from": "central counterparty (ccp)",
    "rel": "about",
    "to": "core principles",
-   "why": "Counterparty Risk Mitigation: CCPs reduce bilateral counterparty exposure \u00b7 Margin Requirements: Collateral held by CCPs to cover potential losses",
+   "why": "Counterparty Risk Mitigation: CCPs reduce bilateral counterparty exposure · Margin Requirements: Collateral held by CCPs to cover potential losses",
    "from_id": "concept:central-counterparty",
    "to_id": "fact:market-mechanics-core-principles"
   },
@@ -37213,7 +37297,7 @@
    "from": "settlement",
    "rel": "about",
    "to": "best practices",
-   "why": "Understand settlement cycles to manage cash flow and margin requirements \u00b7 Ensure sufficient funds available on settlement date \u00b7 Understand settlement conventions for each asset class \u00b7 Be aware of settlement failures and their implications \u00b7 Account for settlement timing in cash management \u00b7 Understand the difference between trade date and settlement date accounting",
+   "why": "Understand settlement cycles to manage cash flow and margin requirements · Ensure sufficient funds available on settlement date · Understand settlement conventions for each asset class · Be aware of settlement failures and their implications · Account for settlement timing in cash management · Understand the difference between trade date and settlement date accounting",
    "from_id": "concept:settlement",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37245,7 +37329,7 @@
    "from": "basis",
    "rel": "about",
    "to": "best practices",
-   "why": "Monitor spot-futures basis for arbitrage opportunities \u00b7 Use contango/backwardation information for directional signals",
+   "why": "Monitor spot-futures basis for arbitrage opportunities · Use contango/backwardation information for directional signals",
    "from_id": "property:basis",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37261,7 +37345,7 @@
    "from": "margin",
    "rel": "about",
    "to": "best practices",
-   "why": "Monitor margin requirements and maintain adequate buffer above maintenance margin \u00b7 Use isolated margin for high-risk trades to limit account exposure",
+   "why": "Monitor margin requirements and maintain adequate buffer above maintenance margin · Use isolated margin for high-risk trades to limit account exposure",
    "from_id": "concept:margin",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37285,7 +37369,7 @@
    "from": "contract specifications",
    "rel": "about",
    "to": "best practices",
-   "why": "Be aware of contract expiration dates and auto-liquidation rules \u00b7 Always verify contract specifications before trading new instruments \u00b7 Be aware of contract roll dates and procedures \u00b7 Monitor for specification changes announced by exchanges \u00b7 Use correct specifications in backtesting and risk systems",
+   "why": "Be aware of contract expiration dates and auto-liquidation rules · Always verify contract specifications before trading new instruments · Be aware of contract roll dates and procedures · Monitor for specification changes announced by exchanges · Use correct specifications in backtesting and risk systems",
    "from_id": "concept:contract-specification",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37301,7 +37385,7 @@
    "from": "options",
    "rel": "about",
    "to": "best practices",
-   "why": "Never sell naked options without understanding unlimited loss potential \u00b7 Calculate max loss before entering any options trade \u00b7 Use options for defined-risk directional bets rather than naked futures/spot",
+   "why": "Never sell naked options without understanding unlimited loss potential · Calculate max loss before entering any options trade · Use options for defined-risk directional bets rather than naked futures/spot",
    "from_id": "concept:option",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37317,7 +37401,7 @@
    "from": "the greeks",
    "rel": "about",
    "to": "best practices",
-   "why": "Understand all Greeks, especially for complex positions \u00b7 Close or roll positions well before expiration to avoid gamma risk",
+   "why": "Understand all Greeks, especially for complex positions · Close or roll positions well before expiration to avoid gamma risk",
    "from_id": "concept:greeks",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37333,7 +37417,7 @@
    "from": "leverage",
    "rel": "about",
    "to": "best practices",
-   "why": "Never use maximum available leverage \u00b7 Use appropriate position sizing given FX leverage availability",
+   "why": "Never use maximum available leverage · Use appropriate position sizing given FX leverage availability",
    "from_id": "concept:leverage",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37389,7 +37473,7 @@
    "from": "crypto-specific mechanics",
    "rel": "about",
    "to": "best practices",
-   "why": "Use hardware wallets for significant holdings \u00b7 Compare CEX and DEX execution for best prices \u00b7 Use reputable bridges for cross-chain operations",
+   "why": "Use hardware wallets for significant holdings · Compare CEX and DEX execution for best prices · Use reputable bridges for cross-chain operations",
    "from_id": "concept:crypto-specific-mechanics",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37397,7 +37481,7 @@
    "from": "decentralized exchange (dex)",
    "rel": "about",
    "to": "best practices",
-   "why": "Account for gas fees in trade profitability calculations \u00b7 Be aware of MEV (Maximal Extractable Value) risks on DEX \u00b7 Verify smart contract addresses before interacting",
+   "why": "Account for gas fees in trade profitability calculations · Be aware of MEV (Maximal Extractable Value) risks on DEX · Verify smart contract addresses before interacting",
    "from_id": "concept:decentralized-exchange",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -37421,7 +37505,7 @@
    "from": "fx basics",
    "rel": "about",
    "to": "best practices",
-   "why": "Understand the economic calendars driving FX moves \u00b7 Monitor central bank communications and interest rate expectations \u00b7 Be aware of market sessions and liquidity variations \u00b7 Consider correlation between currency pairs in portfolio construction \u00b7 Watch for intervention risk in certain currency pairs",
+   "why": "Understand the economic calendars driving FX moves · Monitor central bank communications and interest rate expectations · Be aware of market sessions and liquidity variations · Consider correlation between currency pairs in portfolio construction · Watch for intervention risk in certain currency pairs",
    "from_id": "concept:fx",
    "to_id": "judgment:market-mechanics-best-practices"
   },
@@ -38581,7 +38665,7 @@
    "from": "price action",
    "rel": "about",
    "to": "core principles",
-   "why": "Raw Data Superiority: Price itself is the most immediate and unfiltered data source \u00b7 Repetitive Patterns: Markets exhibit recurring behavioral patterns due to consistent human psychology \u00b7 Context Dependency: Price action signals must be interpreted within broader market context \u00b7 Simplicity: Fewer indicators reduce analysis paralysis and conflicting signals",
+   "why": "Raw Data Superiority: Price itself is the most immediate and unfiltered data source · Repetitive Patterns: Markets exhibit recurring behavioral patterns due to consistent human psychology · Context Dependency: Price action signals must be interpreted within broader market context · Simplicity: Fewer indicators reduce analysis paralysis and conflicting signals",
    "from_id": "concept:price-action",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38589,7 +38673,7 @@
    "from": "fair value gaps",
    "rel": "about",
    "to": "core principles",
-   "why": "Inefficient Price Delivery: Gaps represent areas where price moved too quickly \u00b7 Rebalancing Tendency: Markets often return to fill FVGs \u00b7 Magnet Effect: Unfilled FVGs act as magnets for price",
+   "why": "Inefficient Price Delivery: Gaps represent areas where price moved too quickly · Rebalancing Tendency: Markets often return to fill FVGs · Magnet Effect: Unfilled FVGs act as magnets for price",
    "from_id": "concept:fair-value-gap",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38653,7 +38737,7 @@
    "from": "trending market",
    "rel": "about",
    "to": "core principles",
-   "why": "Higher Highs, Higher Lows (HH/HL): Defines an uptrend \u00b7 Lower Highs, Lower Lows (LH/LL): Defines a downtrend \u00b7 Trend Persistence: Trends tend to continue until clear reversal signals appear",
+   "why": "Higher Highs, Higher Lows (HH/HL): Defines an uptrend · Lower Highs, Lower Lows (LH/LL): Defines a downtrend · Trend Persistence: Trends tend to continue until clear reversal signals appear",
    "from_id": "concept:trending-market",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38661,7 +38745,7 @@
    "from": "market structure",
    "rel": "about",
    "to": "core principles",
-   "why": "Structure is Fractal: Patterns repeat across all timeframes \u00b7 Nested Structure: Lower timeframe trends exist within higher timeframe moves",
+   "why": "Structure is Fractal: Patterns repeat across all timeframes · Nested Structure: Lower timeframe trends exist within higher timeframe moves",
    "from_id": "concept:market-structure",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38709,7 +38793,7 @@
    "from": "volume",
    "rel": "about",
    "to": "core principles",
-   "why": "Volume Precedes Price: Volume changes often precede price changes \u00b7 Effort vs. Result: Compare volume (effort) to price movement (result)",
+   "why": "Volume Precedes Price: Volume changes often precede price changes · Effort vs. Result: Compare volume (effort) to price movement (result)",
    "from_id": "concept:volume",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38757,7 +38841,7 @@
    "from": "confluence",
    "rel": "about",
    "to": "core principles",
-   "why": "Multiple Timeframe Confluence: Levels aligned across timeframes are stronger \u00b7 Multiple Confirmation: More confirming factors increase probability \u00b7 Independent Factors: Factors should be derived from different methodologies \u00b7 Probabilistic Thinking: Confluence increases odds but doesn't guarantee outcomes",
+   "why": "Multiple Timeframe Confluence: Levels aligned across timeframes are stronger · Multiple Confirmation: More confirming factors increase probability · Independent Factors: Factors should be derived from different methodologies · Probabilistic Thinking: Confluence increases odds but doesn't guarantee outcomes",
    "from_id": "concept:confluence",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38773,7 +38857,7 @@
    "from": "supply & demand zones",
    "rel": "about",
    "to": "core principles",
-   "why": "Origin of Move: Zones form at the base of strong impulsive moves \u00b7 Strength Indication: Stronger the move away from zone, stronger the zone",
+   "why": "Origin of Move: Zones form at the base of strong impulsive moves · Strength Indication: Stronger the move away from zone, stronger the zone",
    "from_id": "concept:supply-demand-zone",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38781,7 +38865,7 @@
    "from": "zone freshness",
    "rel": "about",
    "to": "core principles",
-   "why": "Fresh Zones: Untested zones have highest probability of reaction \u00b7 One-Time Use: Zones weaken or expire after being tested",
+   "why": "Fresh Zones: Untested zones have highest probability of reaction · One-Time Use: Zones weaken or expire after being tested",
    "from_id": "property:zone-freshness",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38797,7 +38881,7 @@
    "from": "multi-timeframe analysis",
    "rel": "about",
    "to": "core principles",
-   "why": "Higher Timeframe Dominance: Higher timeframes carry more weight \u00b7 Top-Down Approach: Analyze from higher to lower timeframes \u00b7 Context vs. Timing: Higher TF provides context; lower TF provides entry timing",
+   "why": "Higher Timeframe Dominance: Higher timeframes carry more weight · Top-Down Approach: Analyze from higher to lower timeframes · Context vs. Timing: Higher TF provides context; lower TF provides entry timing",
    "from_id": "concept:multi-timeframe-analysis",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38813,7 +38897,7 @@
    "from": "confluence score",
    "rel": "about",
    "to": "core principles",
-   "why": "Quality Over Quantity: Focus on significant factors, not minor alignments \u00b7 Hierarchy of Factors: Some factors are more significant than others",
+   "why": "Quality Over Quantity: Focus on significant factors, not minor alignments · Hierarchy of Factors: Some factors are more significant than others",
    "from_id": "property:confluence-score",
    "to_id": "fact:price-action-core-principles"
   },
@@ -38829,7 +38913,7 @@
    "from": "market structure",
    "rel": "about",
    "to": "best practices",
-   "why": "Always analyze price action in context of market structure \u00b7 Always identify structure on higher timeframe first",
+   "why": "Always analyze price action in context of market structure · Always identify structure on higher timeframe first",
    "from_id": "concept:market-structure",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38837,7 +38921,7 @@
    "from": "confluence",
    "rel": "about",
    "to": "best practices",
-   "why": "Look for confluence with key support/resistance levels \u00b7 Map all relevant factors before looking for trades \u00b7 Don't force confluence where it doesn't exist \u00b7 Note which types of confluence work best in your trading \u00b7 Document confluence levels in trade journal",
+   "why": "Look for confluence with key support/resistance levels · Map all relevant factors before looking for trades · Don't force confluence where it doesn't exist · Note which types of confluence work best in your trading · Document confluence levels in trade journal",
    "from_id": "concept:confluence",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38845,7 +38929,7 @@
    "from": "price action",
    "rel": "about",
    "to": "best practices",
-   "why": "Practice reading charts without any indicators initially \u00b7 Document recurring patterns and their outcomes \u00b7 Combine with price action for higher probability setups",
+   "why": "Practice reading charts without any indicators initially · Document recurring patterns and their outcomes · Combine with price action for higher probability setups",
    "from_id": "concept:price-action",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38853,7 +38937,7 @@
    "from": "multi-timeframe analysis",
    "rel": "about",
    "to": "best practices",
-   "why": "Use higher timeframes to establish context before lower timeframe entries \u00b7 Higher timeframe zones take precedence over lower timeframe zones \u00b7 Start analysis from higher timeframe and work down \u00b7 Use higher timeframe levels for targets and major stops \u00b7 Use lower timeframe patterns for entry triggers",
+   "why": "Use higher timeframes to establish context before lower timeframe entries · Higher timeframe zones take precedence over lower timeframe zones · Start analysis from higher timeframe and work down · Use higher timeframe levels for targets and major stops · Use lower timeframe patterns for entry triggers",
    "from_id": "concept:multi-timeframe-analysis",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38861,7 +38945,7 @@
    "from": "fair value gaps",
    "rel": "about",
    "to": "best practices",
-   "why": "Focus on FVGs created by strong impulse moves \u00b7 Higher timeframe FVGs are more significant \u00b7 Don't expect all FVGs to fill; use as targets, not certainties",
+   "why": "Focus on FVGs created by strong impulse moves · Higher timeframe FVGs are more significant · Don't expect all FVGs to fill; use as targets, not certainties",
    "from_id": "concept:fair-value-gap",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38869,7 +38953,7 @@
    "from": "supply & demand zones",
    "rel": "about",
    "to": "best practices",
-   "why": "Combine FVGs with supply/demand zones for higher probability \u00b7 Place stops beyond the zone (demand: below low, supply: above high)",
+   "why": "Combine FVGs with supply/demand zones for higher probability · Place stops beyond the zone (demand: below low, supply: above high)",
    "from_id": "concept:supply-demand-zone",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38893,7 +38977,7 @@
    "from": "point of control",
    "rel": "about",
    "to": "best practices",
-   "why": "Use prior session's VA/POC as key reference levels \u00b7 POC is better as profit target than entry point",
+   "why": "Use prior session's VA/POC as key reference levels · POC is better as profit target than entry point",
    "from_id": "concept:point-of-control",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38909,7 +38993,7 @@
    "from": "ranging market",
    "rel": "about",
    "to": "best practices",
-   "why": "Expect rotational behavior when opening inside value \u00b7 Do not apply trend-following strategies in ranges \u00b7 Expect failed breakouts from ranges (test both sides)",
+   "why": "Expect rotational behavior when opening inside value · Do not apply trend-following strategies in ranges · Expect failed breakouts from ranges (test both sides)",
    "from_id": "concept:ranging-market",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38949,7 +39033,7 @@
    "from": "support and resistance",
    "rel": "about",
    "to": "best practices",
-   "why": "Combine structure analysis with key support/resistance levels \u00b7 Identify major support/resistance from higher timeframes first",
+   "why": "Combine structure analysis with key support/resistance levels · Identify major support/resistance from higher timeframes first",
    "from_id": "concept:support-and-resistance",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38965,7 +39049,7 @@
    "from": "market regimes",
    "rel": "about",
    "to": "best practices",
-   "why": "Classify market state before selecting strategy \u00b7 Reduce position size during uncertain transitional periods",
+   "why": "Classify market state before selecting strategy · Reduce position size during uncertain transitional periods",
    "from_id": "concept:market-regime",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -38997,7 +39081,7 @@
    "from": "liquidity grab",
    "rel": "about",
    "to": "best practices",
-   "why": "Wait for liquidity sweeps before entering counter-trend trades \u00b7 Use liquidity grabs as entry signals, not exit triggers",
+   "why": "Wait for liquidity sweeps before entering counter-trend trades · Use liquidity grabs as entry signals, not exit triggers",
    "from_id": "concept:liquidity-grab",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -39173,7 +39257,7 @@
    "from": "confluence score",
    "rel": "about",
    "to": "best practices",
-   "why": "Require minimum 3 confirming factors for high-probability setups \u00b7 Weight factors by their historical reliability",
+   "why": "Require minimum 3 confirming factors for high-probability setups · Weight factors by their historical reliability",
    "from_id": "property:confluence-score",
    "to_id": "judgment:price-action-best-practices"
   },
@@ -40501,7 +40585,7 @@
    "from": "trading styles",
    "rel": "about",
    "to": "core principles",
-   "why": "Timeframe Selection: Choose style based on available time, personality, and goals \u00b7 Consistency: Stick to one primary style rather than mixing approaches \u00b7 Capital Requirements: Different styles have different capital and margin needs \u00b7 Risk Profile: Each style has characteristic risk/reward patterns \u00b7 Lifestyle Fit: Trading style must align with personal schedule and temperament",
+   "why": "Timeframe Selection: Choose style based on available time, personality, and goals · Consistency: Stick to one primary style rather than mixing approaches · Capital Requirements: Different styles have different capital and margin needs · Risk Profile: Each style has characteristic risk/reward patterns · Lifestyle Fit: Trading style must align with personal schedule and temperament",
    "from_id": "concept:trading-style",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40509,7 +40593,7 @@
    "from": "backtesting",
    "rel": "about",
    "to": "core principles",
-   "why": "Historical Simulation: Test strategy on past data \u00b7 Out-of-Sample Testing: Reserve data for validation \u00b7 Realistic Assumptions: Include costs, slippage, constraints \u00b7 Multiple Tests: Test across different periods and conditions \u00b7 Skepticism: Assume backtest overstates live performance",
+   "why": "Historical Simulation: Test strategy on past data · Out-of-Sample Testing: Reserve data for validation · Realistic Assumptions: Include costs, slippage, constraints · Multiple Tests: Test across different periods and conditions · Skepticism: Assume backtest overstates live performance",
    "from_id": "concept:backtesting",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40525,7 +40609,7 @@
    "from": "walk-forward optimization",
    "rel": "about",
    "to": "core principles",
-   "why": "Out-of-Sample Validation: Only OOS results count \u00b7 Adaptive Parameters: Parameters adjust to changing market conditions \u00b7 Realistic Performance: OOS results estimate true performance",
+   "why": "Out-of-Sample Validation: Only OOS results count · Adaptive Parameters: Parameters adjust to changing market conditions · Realistic Performance: OOS results estimate true performance",
    "from_id": "concept:walk-forward-optimization",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40541,7 +40625,7 @@
    "from": "strategy validation",
    "rel": "about",
    "to": "core principles",
-   "why": "Skepticism: Assume the strategy doesn't work until proven otherwise \u00b7 Economic Rationale: Strategy should have logical explanation \u00b7 Robustness: Results should hold across variations",
+   "why": "Skepticism: Assume the strategy doesn't work until proven otherwise · Economic Rationale: Strategy should have logical explanation · Robustness: Results should hold across variations",
    "from_id": "concept:strategy-validation",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40565,7 +40649,7 @@
    "from": "strategy archetypes",
    "rel": "about",
    "to": "core principles",
-   "why": "Behavioral Alignment: Each archetype exploits a specific market dynamic \u00b7 Regime Dependence: Archetypes rotate in effectiveness across regimes \u00b7 Style Purity: Mixing archetypes without intention creates fragile strategies \u00b7 Distinct Risk Profiles: Each archetype has characteristic skew and drawdowns \u00b7 Complementarity: Robust systems often combine multiple archetypes with clear hierarchy",
+   "why": "Behavioral Alignment: Each archetype exploits a specific market dynamic · Regime Dependence: Archetypes rotate in effectiveness across regimes · Style Purity: Mixing archetypes without intention creates fragile strategies · Distinct Risk Profiles: Each archetype has characteristic skew and drawdowns · Complementarity: Robust systems often combine multiple archetypes with clear hierarchy",
    "from_id": "concept:strategy-archetype",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40573,7 +40657,7 @@
    "from": "trade plan",
    "rel": "about",
    "to": "core principles",
-   "why": "Pre-Definition: All rules defined before trading, not during \u00b7 Specificity: Rules must be clear enough that another trader could execute them \u00b7 Completeness: Plan covers all scenarios: entry, exit, sizing, timing \u00b7 Documentation: Written down and accessible during trading \u00b7 Evolution: Reviewed and updated based on performance data",
+   "why": "Pre-Definition: All rules defined before trading, not during · Specificity: Rules must be clear enough that another trader could execute them · Completeness: Plan covers all scenarios: entry, exit, sizing, timing · Documentation: Written down and accessible during trading · Evolution: Reviewed and updated based on performance data",
    "from_id": "concept:trade-plan",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40581,7 +40665,7 @@
    "from": "entry logic",
    "rel": "about",
    "to": "core principles",
-   "why": "Objectivity: Rules should be unambiguous and programmable \u00b7 Edge Definition: Understand why the entry has expected positive return \u00b7 Timing: Entry timing affects risk/reward ratio",
+   "why": "Objectivity: Rules should be unambiguous and programmable · Edge Definition: Understand why the entry has expected positive return · Timing: Entry timing affects risk/reward ratio",
    "from_id": "concept:entry-logic",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40605,7 +40689,7 @@
    "from": "exit logic",
    "rel": "about",
    "to": "core principles",
-   "why": "Protect Capital: Exits should limit losses first, maximize gains second \u00b7 Let Winners Run: Don't exit winning trades prematurely \u00b7 Cut Losers Short: Remove losing positions quickly \u00b7 Rule-Based: Exits should be as systematic as entries \u00b7 Exit Reason: Know why you're exiting (stop, target, time, signal)",
+   "why": "Protect Capital: Exits should limit losses first, maximize gains second · Let Winners Run: Don't exit winning trades prematurely · Cut Losers Short: Remove losing positions quickly · Rule-Based: Exits should be as systematic as entries · Exit Reason: Know why you're exiting (stop, target, time, signal)",
    "from_id": "concept:exit-logic",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40637,7 +40721,7 @@
    "from": "time-based logic",
    "rel": "about",
    "to": "core principles",
-   "why": "Time Decay: Time affects option and volatility strategies \u00b7 Periodicity: Returns may cluster at specific times",
+   "why": "Time Decay: Time affects option and volatility strategies · Periodicity: Returns may cluster at specific times",
    "from_id": "concept:time-based-logic",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40645,7 +40729,7 @@
    "from": "market regimes",
    "rel": "about",
    "to": "core principles",
-   "why": "Market States: Markets cycle through distinct regimes \u00b7 Strategy Matching: Different strategies excel in different regimes",
+   "why": "Market States: Markets cycle through distinct regimes · Strategy Matching: Different strategies excel in different regimes",
    "from_id": "concept:market-regime",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40653,7 +40737,7 @@
    "from": "regime detection",
    "rel": "about",
    "to": "core principles",
-   "why": "Lag Acceptance: Regime detection has inherent lag \u00b7 Probabilistic: Regime identification is probabilistic, not certain \u00b7 Adaptation: Strategies should adapt to detected regime",
+   "why": "Lag Acceptance: Regime detection has inherent lag · Probabilistic: Regime identification is probabilistic, not certain · Adaptation: Strategies should adapt to detected regime",
    "from_id": "concept:regime-detection",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40661,7 +40745,7 @@
    "from": "data quality",
    "rel": "about",
    "to": "core principles",
-   "why": "Garbage In, Garbage Out: Strategy is only as good as its data \u00b7 Corporate Actions: Adjust for splits, dividends, mergers",
+   "why": "Garbage In, Garbage Out: Strategy is only as good as its data · Corporate Actions: Adjust for splits, dividends, mergers",
    "from_id": "concept:data-quality",
    "to_id": "fact:strategy-design-core-principles"
   },
@@ -40693,7 +40777,7 @@
    "from": "trading styles",
    "rel": "about",
    "to": "best practices",
-   "why": "Match trading style to available time and lifestyle \u00b7 Start with longer timeframes (swing) before attempting shorter (day/scalp) \u00b7 Consider psychological fit: can you hold overnight? Can you focus for hours? \u00b7 Paper trade the style before committing capital",
+   "why": "Match trading style to available time and lifestyle · Start with longer timeframes (swing) before attempting shorter (day/scalp) · Consider psychological fit: can you hold overnight? Can you focus for hours? · Paper trade the style before committing capital",
    "from_id": "concept:trading-style",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40701,7 +40785,7 @@
    "from": "transaction costs",
    "rel": "about",
    "to": "best practices",
-   "why": "Account for transaction costs relative to target profits \u00b7 Include realistic transaction costs and slippage",
+   "why": "Account for transaction costs relative to target profits · Include realistic transaction costs and slippage",
    "from_id": "procedure:transaction-cost-model",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40709,7 +40793,7 @@
    "from": "backtesting",
    "rel": "about",
    "to": "best practices",
-   "why": "Use out-of-sample data for final validation \u00b7 Be skeptical of exceptional results \u00b7 Compare to simple benchmarks \u00b7 Document all assumptions and parameters",
+   "why": "Use out-of-sample data for final validation · Be skeptical of exceptional results · Compare to simple benchmarks · Document all assumptions and parameters",
    "from_id": "concept:backtesting",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40725,7 +40809,7 @@
    "from": "walk-forward optimization",
    "rel": "about",
    "to": "best practices",
-   "why": "Use at least 2-3 years of data for optimization windows \u00b7 Test windows should be long enough for statistical significance \u00b7 Aggregate OOS results for overall performance estimate \u00b7 Be wary of strategies that require frequent reoptimization",
+   "why": "Use at least 2-3 years of data for optimization windows · Test windows should be long enough for statistical significance · Aggregate OOS results for overall performance estimate · Be wary of strategies that require frequent reoptimization",
    "from_id": "concept:walk-forward-optimization",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40733,7 +40817,7 @@
    "from": "parameter sensitivity",
    "rel": "about",
    "to": "best practices",
-   "why": "Monitor parameter stability across periods \u00b7 Test robustness to reasonable parameter perturbations",
+   "why": "Monitor parameter stability across periods · Test robustness to reasonable parameter perturbations",
    "from_id": "procedure:parameter-sensitivity",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40749,7 +40833,7 @@
    "from": "strategy validation",
    "rel": "about",
    "to": "best practices",
-   "why": "Use out-of-sample data for final validation only \u00b7 Require economic rationale, not just statistical evidence \u00b7 Be skeptical of Sharpe ratios above 2.0 without clear edge \u00b7 Paper trade before committing real capital",
+   "why": "Use out-of-sample data for final validation only · Require economic rationale, not just statistical evidence · Be skeptical of Sharpe ratios above 2.0 without clear edge · Paper trade before committing real capital",
    "from_id": "concept:strategy-validation",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40765,7 +40849,7 @@
    "from": "strategy archetypes",
    "rel": "about",
    "to": "best practices",
-   "why": "Match archetypes to current market regime \u00b7 Combine complementary archetypes with clear hierarchy \u00b7 Understand skew and tail risk for each archetype \u00b7 **Never combine conflicting archetypes without explicit priority** (e.g., momentum vs mean reversion) \u00b7 Size positions according to archetype risk profile, not just win rate",
+   "why": "Match archetypes to current market regime · Combine complementary archetypes with clear hierarchy · Understand skew and tail risk for each archetype · **Never combine conflicting archetypes without explicit priority** (e.g., momentum vs mean reversion) · Size positions according to archetype risk profile, not just win rate",
    "from_id": "concept:strategy-archetype",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40781,7 +40865,7 @@
    "from": "trade plan",
    "rel": "about",
    "to": "best practices",
-   "why": "Write your plan when not actively trading (clear head) \u00b7 Be specific: vague rules lead to inconsistent execution \u00b7 Include \"what if\" scenarios and how to handle them \u00b7 Review plan performance weekly/monthly \u00b7 Update based on data, not emotions or single trades \u00b7 Treat the plan as non-negotiable during trading hours",
+   "why": "Write your plan when not actively trading (clear head) · Be specific: vague rules lead to inconsistent execution · Include \"what if\" scenarios and how to handle them · Review plan performance weekly/monthly · Update based on data, not emotions or single trades · Treat the plan as non-negotiable during trading hours",
    "from_id": "concept:trade-plan",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40789,7 +40873,7 @@
    "from": "signal types",
    "rel": "about",
    "to": "best practices",
-   "why": "Layer signals intentionally: Filter -> Entry -> Confirmation is a common flow \u00b7 Match signal types to archetype: Trend-following needs different filters than mean reversion \u00b7 Test signal combinations: Backtest which combinations improve expectancy \u00b7 Document signal roles: Know why each signal is in your strategy",
+   "why": "Layer signals intentionally: Filter -> Entry -> Confirmation is a common flow · Match signal types to archetype: Trend-following needs different filters than mean reversion · Test signal combinations: Backtest which combinations improve expectancy · Document signal roles: Know why each signal is in your strategy",
    "from_id": "concept:signal-type",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40805,7 +40889,7 @@
    "from": "entry logic",
    "rel": "about",
    "to": "best practices",
-   "why": "Define entry criteria precisely before coding \u00b7 Test entries with various exit rules to isolate entry quality \u00b7 Track entry efficiency (how far price moves from entry in intended direction)",
+   "why": "Define entry criteria precisely before coding · Test entries with various exit rules to isolate entry quality · Track entry efficiency (how far price moves from entry in intended direction)",
    "from_id": "concept:entry-logic",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40861,7 +40945,7 @@
    "from": "exit logic",
    "rel": "about",
    "to": "best practices",
-   "why": "Don't let winners turn into losers (use break-even stops) \u00b7 Test different exit strategies with same entry to find optimal \u00b7 Document reason for each exit in trade log",
+   "why": "Don't let winners turn into losers (use break-even stops) · Test different exit strategies with same entry to find optimal · Document reason for each exit in trade log",
    "from_id": "concept:exit-logic",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40869,7 +40953,7 @@
    "from": "regime detection",
    "rel": "about",
    "to": "best practices",
-   "why": "Accept lag in regime detection; don't expect real-time accuracy \u00b7 Use multiple regime indicators for confirmation \u00b7 Have default behavior for uncertain/transitional regimes \u00b7 Backtest regime detection separately from strategy \u00b7 Consider regime detection failures in risk management",
+   "why": "Accept lag in regime detection; don't expect real-time accuracy · Use multiple regime indicators for confirmation · Have default behavior for uncertain/transitional regimes · Backtest regime detection separately from strategy · Consider regime detection failures in risk management",
    "from_id": "concept:regime-detection",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40877,7 +40961,7 @@
    "from": "data quality",
    "rel": "about",
    "to": "best practices",
-   "why": "Validate data against multiple sources \u00b7 Document data sources and any adjustments made",
+   "why": "Validate data against multiple sources · Document data sources and any adjustments made",
    "from_id": "concept:data-quality",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -40893,7 +40977,7 @@
    "from": "look-ahead bias prevention",
    "rel": "about",
    "to": "best practices",
-   "why": "Use point-in-time databases when available \u00b7 Account for reporting lags in fundamental data",
+   "why": "Use point-in-time databases when available · Account for reporting lags in fundamental data",
    "from_id": "procedure:look-ahead-bias-prevention",
    "to_id": "judgment:strategy-design-best-practices"
   },
@@ -41909,7 +41993,7 @@
    "from": "trading rules",
    "rel": "about",
    "to": "core principles",
-   "why": "Pre-Commitment: Rules must be established before trading, not during \u00b7 Non-Negotiable Limits: Certain rules (max loss, max positions) are absolute \u00b7 Consistency: Rules must be applied uniformly across all trades \u00b7 Periodic Review: Rules should be reviewed and adjusted based on performance data \u00b7 Written Documentation: All rules must be documented and accessible",
+   "why": "Pre-Commitment: Rules must be established before trading, not during · Non-Negotiable Limits: Certain rules (max loss, max positions) are absolute · Consistency: Rules must be applied uniformly across all trades · Periodic Review: Rules should be reviewed and adjusted based on performance data · Written Documentation: All rules must be documented and accessible",
    "from_id": "concept:trading-rule",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -41917,7 +42001,7 @@
    "from": "position sizing",
    "rel": "about",
    "to": "core principles",
-   "why": "Capital Preservation: Position sizes should not threaten account survival \u00b7 Risk Normalization: Equal risk per trade, not equal dollar amount \u00b7 Conviction Scaling: Option to size based on signal strength",
+   "why": "Capital Preservation: Position sizes should not threaten account survival · Risk Normalization: Equal risk per trade, not equal dollar amount · Conviction Scaling: Option to size based on signal strength",
    "from_id": "concept:position-sizing",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -41933,7 +42017,7 @@
    "from": "portfolio risk",
    "rel": "about",
    "to": "core principles",
-   "why": "Portfolio Context: Individual positions must fit portfolio constraints \u00b7 Diversification: Reduce risk through uncorrelated positions",
+   "why": "Portfolio Context: Individual positions must fit portfolio constraints · Diversification: Reduce risk through uncorrelated positions",
    "from_id": "concept:portfolio-risk",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -41941,7 +42025,7 @@
    "from": "drawdown controls",
    "rel": "about",
    "to": "core principles",
-   "why": "Survival First: Preserving capital enables recovery \u00b7 Psychological Protection: Limits prevent emotional decision-making",
+   "why": "Survival First: Preserving capital enables recovery · Psychological Protection: Limits prevent emotional decision-making",
    "from_id": "concept:drawdown-control",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -41973,7 +42057,7 @@
    "from": "stop-loss and take-profit engineering",
    "rel": "about",
    "to": "core principles",
-   "why": "Risk Definition: Stop defines the risk per trade \u00b7 Breathing Room: Stops must allow normal volatility \u00b7 Time Consistency: Stop logic should match trading timeframe \u00b7 Execution Consideration: Wide stops in illiquid markets",
+   "why": "Risk Definition: Stop defines the risk per trade · Breathing Room: Stops must allow normal volatility · Time Consistency: Stop logic should match trading timeframe · Execution Consideration: Wide stops in illiquid markets",
    "from_id": "concept:stop-and-target-engineering",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -41997,7 +42081,7 @@
    "from": "concentration limits",
    "rel": "about",
    "to": "core principles",
-   "why": "Concentration Limits: No single position dominates portfolio \u00b7 Sector/Factor Exposure: Monitor and limit exposure concentrations",
+   "why": "Concentration Limits: No single position dominates portfolio · Sector/Factor Exposure: Monitor and limit exposure concentrations",
    "from_id": "procedure:concentration-limit",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -42013,7 +42097,7 @@
    "from": "capital efficiency",
    "rel": "about",
    "to": "core principles",
-   "why": "Return on Capital: Maximize risk-adjusted returns per dollar deployed \u00b7 Cash Management: Maintain appropriate cash buffers \u00b7 Opportunity Cost: Unused capital has cost (opportunity)",
+   "why": "Return on Capital: Maximize risk-adjusted returns per dollar deployed · Cash Management: Maintain appropriate cash buffers · Opportunity Cost: Unused capital has cost (opportunity)",
    "from_id": "concept:capital-efficiency",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -42037,7 +42121,7 @@
    "from": "reward-to-risk ratio",
    "rel": "about",
    "to": "core principles",
-   "why": "Minimum Standards: Set minimum R:R thresholds for trades \u00b7 Risk-First Thinking: Define risk before considering reward",
+   "why": "Minimum Standards: Set minimum R:R thresholds for trades · Risk-First Thinking: Define risk before considering reward",
    "from_id": "concept:risk-reward-ratio",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -42069,7 +42153,7 @@
    "from": "risk of ruin",
    "rel": "about",
    "to": "core principles",
-   "why": "Survival Probability: Trading survival is prerequisite for profits \u00b7 Edge and Sizing: Ruin depends on edge size and bet size \u00b7 Compounding Effect: Small edges compounded beat large bets \u00b7 Conservative Sizing: Lower bet sizes dramatically reduce ruin probability \u00b7 Long-Term Perspective: Even small ruin probability matters over time",
+   "why": "Survival Probability: Trading survival is prerequisite for profits · Edge and Sizing: Ruin depends on edge size and bet size · Compounding Effect: Small edges compounded beat large bets · Conservative Sizing: Lower bet sizes dramatically reduce ruin probability · Long-Term Perspective: Even small ruin probability matters over time",
    "from_id": "concept:risk-of-ruin",
    "to_id": "fact:risk-management-core-principles"
   },
@@ -42117,7 +42201,7 @@
    "from": "trading rules",
    "rel": "about",
    "to": "best practices",
-   "why": "Document all rules in a trading plan before trading \u00b7 Review rules weekly and adjust based on performance metrics \u00b7 Never override rules during active trading sessions \u00b7 Use automated systems to enforce hard limits where possible \u00b7 Track rule violations and their outcomes in a trading journal",
+   "why": "Document all rules in a trading plan before trading · Review rules weekly and adjust based on performance metrics · Never override rules during active trading sessions · Use automated systems to enforce hard limits where possible · Track rule violations and their outcomes in a trading journal",
    "from_id": "concept:trading-rule",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42133,7 +42217,7 @@
    "from": "max risk per trade",
    "rel": "about",
    "to": "best practices",
-   "why": "Never risk more than 2% of account on single trade \u00b7 Keep risk per trade below 2% for sustainable trading",
+   "why": "Never risk more than 2% of account on single trade · Keep risk per trade below 2% for sustainable trading",
    "from_id": "property:max-risk-per-trade",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42165,7 +42249,7 @@
    "from": "drawdown controls",
    "rel": "about",
    "to": "best practices",
-   "why": "Reduce size during drawdowns (some prefer fixed sizing) \u00b7 Set drawdown limits before trading, not during \u00b7 Don't override limits during drawdown (emotional state)",
+   "why": "Reduce size during drawdowns (some prefer fixed sizing) · Set drawdown limits before trading, not during · Don't override limits during drawdown (emotional state)",
    "from_id": "concept:drawdown-control",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42221,7 +42305,7 @@
    "from": "structure-based stop",
    "rel": "about",
    "to": "best practices",
-   "why": "Place stops at technically meaningful levels \u00b7 Add buffer beyond obvious levels",
+   "why": "Place stops at technically meaningful levels · Add buffer beyond obvious levels",
    "from_id": "procedure:structure-based-stop",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42253,7 +42337,7 @@
    "from": "correlation stress testing",
    "rel": "about",
    "to": "best practices",
-   "why": "Monitor correlation changes, especially during stress \u00b7 Include correlation breakdown in stress scenarios",
+   "why": "Monitor correlation changes, especially during stress · Include correlation breakdown in stress scenarios",
    "from_id": "procedure:correlation-stress-testing",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42285,7 +42369,7 @@
    "from": "scenario analysis",
    "rel": "about",
    "to": "best practices",
-   "why": "Stress test portfolio for extreme scenarios \u00b7 Test against both historical and hypothetical scenarios \u00b7 Update scenarios as market conditions evolve \u00b7 Run scenarios regularly (monthly or quarterly) \u00b7 Include scenarios where multiple risks occur simultaneously",
+   "why": "Stress test portfolio for extreme scenarios · Test against both historical and hypothetical scenarios · Update scenarios as market conditions evolve · Run scenarios regularly (monthly or quarterly) · Include scenarios where multiple risks occur simultaneously",
    "from_id": "concept:scenario-analysis",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42301,7 +42385,7 @@
    "from": "margin",
    "rel": "about",
    "to": "best practices",
-   "why": "Maintain cash buffer for opportunities and margin calls \u00b7 Consider margin requirements in position sizing",
+   "why": "Maintain cash buffer for opportunities and margin calls · Consider margin requirements in position sizing",
    "from_id": "concept:margin",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42333,7 +42417,7 @@
    "from": "reward-to-risk ratio",
    "rel": "about",
    "to": "best practices",
-   "why": "Set minimum R:R requirement (typically 1.5:1 or 2:1) \u00b7 Calculate R:R before entering trade \u00b7 Track actual R:R achieved vs. planned",
+   "why": "Set minimum R:R requirement (typically 1.5:1 or 2:1) · Calculate R:R before entering trade · Track actual R:R achieved vs. planned",
    "from_id": "concept:risk-reward-ratio",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -42357,7 +42441,7 @@
    "from": "risk of ruin",
    "rel": "about",
    "to": "best practices",
-   "why": "Understand that even 1% ruin probability compounds over time \u00b7 Never risk total capital on any single strategy \u00b7 Have capital reserves outside trading account",
+   "why": "Understand that even 1% ruin probability compounds over time · Never risk total capital on any single strategy · Have capital reserves outside trading account",
    "from_id": "concept:risk-of-ruin",
    "to_id": "judgment:risk-management-best-practices"
   },
@@ -43085,7 +43169,7 @@
    "from": "oscillator",
    "rel": "about",
    "to": "core principles",
-   "why": "Overbought/Oversold: Extreme readings suggest potential reversal but not certainty \u00b7 Bounded Range: Most oscillators move between fixed values (0-100 or centered on zero) \u00b7 Overbought/Oversold: Extreme readings don't guarantee reversals \u00b7 Centerline Significance: Crossing zero or 50 often significant \u00b7 Trend Context: Interpret oscillators differently in trends vs. ranges",
+   "why": "Overbought/Oversold: Extreme readings suggest potential reversal but not certainty · Bounded Range: Most oscillators move between fixed values (0-100 or centered on zero) · Overbought/Oversold: Extreme readings don't guarantee reversals · Centerline Significance: Crossing zero or 50 often significant · Trend Context: Interpret oscillators differently in trends vs. ranges",
    "from_id": "concept:oscillator",
    "to_id": "fact:indicator-core-principles"
   },
@@ -43109,7 +43193,7 @@
    "from": "mean reversion",
    "rel": "about",
    "to": "core principles",
-   "why": "Mean Reversion: Momentum tends to return to neutral over time \u00b7 Mean Reversion: Extreme volatility tends to revert to average",
+   "why": "Mean Reversion: Momentum tends to return to neutral over time · Mean Reversion: Extreme volatility tends to revert to average",
    "from_id": "concept:mean-reversion",
    "to_id": "fact:indicator-core-principles"
   },
@@ -43125,7 +43209,7 @@
    "from": "volatility",
    "rel": "about",
    "to": "core principles",
-   "why": "Volatility Cycles: Markets alternate between high and low volatility periods \u00b7 Volatility Clustering: High volatility tends to follow high volatility",
+   "why": "Volatility Cycles: Markets alternate between high and low volatility periods · Volatility Clustering: High volatility tends to follow high volatility",
    "from_id": "concept:volatility",
    "to_id": "fact:indicator-core-principles"
   },
@@ -43157,7 +43241,7 @@
    "from": "volume",
    "rel": "about",
    "to": "core principles",
-   "why": "Volume Precedes Price: Volume changes often lead price changes \u00b7 Dry Up Warning: Decreasing volume in a move suggests weakening \u00b7 Effort vs. Result: Compare volume (effort) to price movement (result)",
+   "why": "Volume Precedes Price: Volume changes often lead price changes · Dry Up Warning: Decreasing volume in a move suggests weakening · Effort vs. Result: Compare volume (effort) to price movement (result)",
    "from_id": "concept:volume",
    "to_id": "fact:indicator-core-principles"
   },
@@ -43173,7 +43257,7 @@
    "from": "market breadth",
    "rel": "about",
    "to": "core principles",
-   "why": "Confirmation: Healthy rallies should have broad participation \u00b7 Divergence Warning: Narrow rallies (few stocks leading) are suspect \u00b7 Extremes: Extreme breadth readings often precede reversals \u00b7 Internal vs. External: Breadth reveals what indices may hide \u00b7 Cumulative Analysis: Track breadth trends over time",
+   "why": "Confirmation: Healthy rallies should have broad participation · Divergence Warning: Narrow rallies (few stocks leading) are suspect · Extremes: Extreme breadth readings often precede reversals · Internal vs. External: Breadth reveals what indices may hide · Cumulative Analysis: Track breadth trends over time",
    "from_id": "concept:market-breadth",
    "to_id": "fact:indicator-core-principles"
   },
@@ -43189,7 +43273,7 @@
    "from": "Indicator",
    "rel": "about",
    "to": "best practices",
-   "why": "Use longer-period indicators for trend direction, shorter for entry timing \u00b7 Adjust periods based on asset volatility and trading timeframe \u00b7 Remember that all trend indicators lag; price leads",
+   "why": "Use longer-period indicators for trend direction, shorter for entry timing · Adjust periods based on asset volatility and trading timeframe · Remember that all trend indicators lag; price leads",
    "from_id": "concept:indicator",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -43197,7 +43281,7 @@
    "from": "averaging",
    "rel": "about",
    "to": "best practices",
-   "why": "Don't fight the trend shown by major moving averages (50, 200) \u00b7 Match MA type to strategy requirements \u00b7 Test different variants on historical data",
+   "why": "Don't fight the trend shown by major moving averages (50, 200) · Match MA type to strategy requirements · Test different variants on historical data",
    "from_id": "concept:averaging",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -43205,7 +43289,7 @@
    "from": "oscillator",
    "rel": "about",
    "to": "best practices",
-   "why": "Combine trend indicators with oscillators for complete picture \u00b7 Don't fade strong trends based solely on overbought/oversold \u00b7 Consider trend context when interpreting readings",
+   "why": "Combine trend indicators with oscillators for complete picture · Don't fade strong trends based solely on overbought/oversold · Consider trend context when interpreting readings",
    "from_id": "concept:oscillator",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -43213,7 +43297,7 @@
    "from": "momentum",
    "rel": "about",
    "to": "best practices",
-   "why": "Don't rely solely on overbought/oversold signals in strong trends \u00b7 Combine momentum with trend indicators for confirmation \u00b7 Adjust overbought/oversold thresholds based on market conditions \u00b7 Use multiple momentum indicators for confluence",
+   "why": "Don't rely solely on overbought/oversold signals in strong trends · Combine momentum with trend indicators for confirmation · Adjust overbought/oversold thresholds based on market conditions · Use multiple momentum indicators for confluence",
    "from_id": "concept:momentum",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -43221,7 +43305,7 @@
    "from": "SwingDelta",
    "rel": "about",
    "to": "best practices",
-   "why": "Look for divergences as early warning, not immediate signals \u00b7 Use divergence as a warning, not an entry trigger",
+   "why": "Look for divergences as early warning, not immediate signals · Use divergence as a warning, not an entry trigger",
    "from_id": "procedure:indicator-swingdelta",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -43253,7 +43337,7 @@
    "from": "volatility",
    "rel": "about",
    "to": "best practices",
-   "why": "Normalize volatility when comparing different assets \u00b7 Remember that volatility is mean-reverting over time \u00b7 Adjust for asset volatility: Crypto needs wider thresholds than stocks",
+   "why": "Normalize volatility when comparing different assets · Remember that volatility is mean-reverting over time · Adjust for asset volatility: Crypto needs wider thresholds than stocks",
    "from_id": "concept:volatility",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -43269,7 +43353,7 @@
    "from": "volume",
    "rel": "about",
    "to": "best practices",
-   "why": "Watch for volume divergences as early warnings \u00b7 Note that volume patterns differ by asset class",
+   "why": "Watch for volume divergences as early warnings · Note that volume patterns differ by asset class",
    "from_id": "concept:volume",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -43293,7 +43377,7 @@
    "from": "market breadth",
    "rel": "about",
    "to": "best practices",
-   "why": "Use breadth to confirm index moves \u00b7 Watch for divergences between breadth and price \u00b7 Extreme breadth readings often precede reversals \u00b7 Breadth is most useful for equity indices \u00b7 Combine multiple breadth indicators for confirmation",
+   "why": "Use breadth to confirm index moves · Watch for divergences between breadth and price · Extreme breadth readings often precede reversals · Breadth is most useful for equity indices · Combine multiple breadth indicators for confirmation",
    "from_id": "concept:market-breadth",
    "to_id": "judgment:indicator-best-practices"
   },
@@ -44117,7 +44201,7 @@
    "from": "pattern context",
    "rel": "about",
    "to": "core principles",
-   "why": "Context Dependency: Patterns mean different things in different contexts \u00b7 Timeframe Relevance: Higher timeframe patterns carry more weight \u00b7 Context Affects Success: Same pattern works differently in different contexts \u00b7 Trend Alignment: Patterns aligned with trend are more reliable \u00b7 Timeframe Hierarchy: Higher timeframe context overrides lower",
+   "why": "Context Dependency: Patterns mean different things in different contexts · Timeframe Relevance: Higher timeframe patterns carry more weight · Context Affects Success: Same pattern works differently in different contexts · Trend Alignment: Patterns aligned with trend are more reliable · Timeframe Hierarchy: Higher timeframe context overrides lower",
    "from_id": "concept:pattern-context",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44125,7 +44209,7 @@
    "from": "price action",
    "rel": "about",
    "to": "core principles",
-   "why": "Confirmation Required: Most patterns require confirmation from subsequent price action \u00b7 Price Action Quality: Breakout bar characteristics matter",
+   "why": "Confirmation Required: Most patterns require confirmation from subsequent price action · Price Action Quality: Breakout bar characteristics matter",
    "from_id": "concept:price-action",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44133,7 +44217,7 @@
    "from": "support and resistance",
    "rel": "about",
    "to": "core principles",
-   "why": "Location Matters: Patterns at key levels (support/resistance) are more significant \u00b7 Location: Patterns at key levels have higher significance",
+   "why": "Location Matters: Patterns at key levels (support/resistance) are more significant · Location: Patterns at key levels have higher significance",
    "from_id": "concept:support-and-resistance",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44141,7 +44225,7 @@
    "from": "multi-bar patterns",
    "rel": "about",
    "to": "core principles",
-   "why": "Consolidation: Multiple bars often indicate pauses before continuation or reversal \u00b7 Breakout Direction: Often (but not always) continues prior trend",
+   "why": "Consolidation: Multiple bars often indicate pauses before continuation or reversal · Breakout Direction: Often (but not always) continues prior trend",
    "from_id": "concept:multi-bar-pattern",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44157,7 +44241,7 @@
    "from": "volume confirmation",
    "rel": "about",
    "to": "core principles",
-   "why": "Volume Significance: Volume patterns within consolidations provide clues \u00b7 Volume Confirmation: Breakout volume should exceed average",
+   "why": "Volume Significance: Volume patterns within consolidations provide clues · Volume Confirmation: Breakout volume should exceed average",
    "from_id": "concept:volume-confirmation",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44165,7 +44249,7 @@
    "from": "chart pattern",
    "rel": "about",
    "to": "core principles",
-   "why": "Psychology Mapping: Patterns reflect collective trader psychology \u00b7 Measured Moves: Most patterns have target projections \u00b7 Time Proportionality: Pattern duration often relates to subsequent move duration",
+   "why": "Psychology Mapping: Patterns reflect collective trader psychology · Measured Moves: Most patterns have target projections · Time Proportionality: Pattern duration often relates to subsequent move duration",
    "from_id": "concept:chart-pattern",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44173,7 +44257,7 @@
    "from": "pattern reliability",
    "rel": "about",
    "to": "core principles",
-   "why": "Failure Mode: Failed patterns often lead to strong moves opposite \u00b7 No Pattern is 100%: All patterns have failure rates \u00b7 Sample Size: Published statistics vary; test on your markets",
+   "why": "Failure Mode: Failed patterns often lead to strong moves opposite · No Pattern is 100%: All patterns have failure rates · Sample Size: Published statistics vary; test on your markets",
    "from_id": "concept:pattern-reliability",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44189,7 +44273,7 @@
    "from": "algorithmic pattern detection",
    "rel": "about",
    "to": "core principles",
-   "why": "Objective Definition: Patterns must have precise, programmable criteria \u00b7 False Positives: Algorithms may detect patterns humans would ignore",
+   "why": "Objective Definition: Patterns must have precise, programmable criteria · False Positives: Algorithms may detect patterns humans would ignore",
    "from_id": "concept:algorithmic-pattern-detection",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44229,7 +44313,7 @@
    "from": "pattern completion",
    "rel": "about",
    "to": "core principles",
-   "why": "Confirmation Matters: Unconfirmed patterns have lower reliability \u00b7 Completion Before Entry: Don't anticipate; wait for completion \u00b7 Clear Trigger: Define exact completion trigger in advance \u00b7 Time Element: Some patterns have time-based components",
+   "why": "Confirmation Matters: Unconfirmed patterns have lower reliability · Completion Before Entry: Don't anticipate; wait for completion · Clear Trigger: Define exact completion trigger in advance · Time Element: Some patterns have time-based components",
    "from_id": "concept:pattern-completion",
    "to_id": "fact:chart-pattern-core-principles"
   },
@@ -44253,7 +44337,7 @@
    "from": "pattern context",
    "rel": "about",
    "to": "best practices",
-   "why": "Always consider the preceding trend and context \u00b7 Higher timeframe patterns are more reliable \u00b7 Combine with trend direction for higher probability \u00b7 Identify patterns in context of larger trend \u00b7 Always check higher timeframe before trading patterns \u00b7 Ensure pattern direction aligns with dominant trend \u00b7 Document context requirements for patterns you trade",
+   "why": "Always consider the preceding trend and context · Higher timeframe patterns are more reliable · Combine with trend direction for higher probability · Identify patterns in context of larger trend · Always check higher timeframe before trading patterns · Ensure pattern direction aligns with dominant trend · Document context requirements for patterns you trade",
    "from_id": "concept:pattern-context",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -44261,7 +44345,7 @@
    "from": "support and resistance",
    "rel": "about",
    "to": "best practices",
-   "why": "Look for patterns at key support/resistance levels \u00b7 Use at key support/resistance levels \u00b7 Identify key levels and only trade patterns at those levels",
+   "why": "Look for patterns at key support/resistance levels · Use at key support/resistance levels · Identify key levels and only trade patterns at those levels",
    "from_id": "concept:support-and-resistance",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -44269,7 +44353,7 @@
    "from": "pattern completion",
    "rel": "about",
    "to": "best practices",
-   "why": "Require confirmation before acting (next candle) \u00b7 Wait for confirmation break before entry \u00b7 Wait for pattern completion and confirmation \u00b7 Use confirmation (close beyond level, volume, follow-through) \u00b7 Define completion criteria before pattern appears \u00b7 Use close-based triggers for most patterns \u00b7 Don't chase if completion criteria weren't met at proper time",
+   "why": "Require confirmation before acting (next candle) · Wait for confirmation break before entry · Wait for pattern completion and confirmation · Use confirmation (close beyond level, volume, follow-through) · Define completion criteria before pattern appears · Use close-based triggers for most patterns · Don't chase if completion criteria weren't met at proper time",
    "from_id": "concept:pattern-completion",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -44277,7 +44361,7 @@
    "from": "volume confirmation",
    "rel": "about",
    "to": "best practices",
-   "why": "Combine with volume analysis for confirmation \u00b7 Volume should confirm pattern (decrease during formation, increase on breakout) \u00b7 Require volume confirmation for breakouts",
+   "why": "Combine with volume analysis for confirmation · Volume should confirm pattern (decrease during formation, increase on breakout) · Require volume confirmation for breakouts",
    "from_id": "concept:volume-confirmation",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -44285,7 +44369,7 @@
    "from": "confluence",
    "rel": "about",
    "to": "best practices",
-   "why": "Don't trade patterns in isolation; use confluence \u00b7 Require confluence of at least 2-3 supporting factors",
+   "why": "Don't trade patterns in isolation; use confluence · Require confluence of at least 2-3 supporting factors",
    "from_id": "concept:confluence",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -44293,7 +44377,7 @@
    "from": "stop-loss and take-profit engineering",
    "rel": "about",
    "to": "best practices",
-   "why": "Size stops based on pattern structure \u00b7 Always define invalidation level before entry",
+   "why": "Size stops based on pattern structure · Always define invalidation level before entry",
    "from_id": "concept:stop-and-target-engineering",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -44317,7 +44401,7 @@
    "from": "pattern reliability",
    "rel": "about",
    "to": "best practices",
-   "why": "Recognize that 30-40% of breakouts fail; manage risk accordingly \u00b7 Accept that 30-40% of patterns fail \u00b7 Track your own statistics for patterns you trade",
+   "why": "Recognize that 30-40% of breakouts fail; manage risk accordingly · Accept that 30-40% of patterns fail · Track your own statistics for patterns you trade",
    "from_id": "concept:pattern-reliability",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -44325,7 +44409,7 @@
    "from": "trading failed patterns",
    "rel": "about",
    "to": "best practices",
-   "why": "Failed patterns provide trading opportunities in opposite direction \u00b7 Have plan for failed patterns (reverse, stand aside, reassess)",
+   "why": "Failed patterns provide trading opportunities in opposite direction · Have plan for failed patterns (reverse, stand aside, reassess)",
    "from_id": "judgment:trading-failed-pattern",
    "to_id": "judgment:chart-pattern-best-practices"
   },
@@ -45069,7 +45153,7 @@
    "from": "seasonality",
    "rel": "about",
    "to": "core principles",
-   "why": "Structural Causes: Many seasonal effects stem from institutional behavior or market mechanics \u00b7 Decay Risk: Well-known effects may diminish as markets adapt",
+   "why": "Structural Causes: Many seasonal effects stem from institutional behavior or market mechanics · Decay Risk: Well-known effects may diminish as markets adapt",
    "from_id": "concept:seasonality",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45101,7 +45185,7 @@
    "from": "volatility clustering",
    "rel": "about",
    "to": "core principles",
-   "why": "Persistence: Today's volatility is predictive of tomorrow's volatility \u00b7 Forecastability: Unlike returns, volatility is partially predictable",
+   "why": "Persistence: Today's volatility is predictive of tomorrow's volatility · Forecastability: Unlike returns, volatility is partially predictable",
    "from_id": "concept:volatility-clustering",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45109,7 +45193,7 @@
    "from": "mean reversion",
    "rel": "about",
    "to": "core principles",
-   "why": "Mean Reversion: Extreme volatility eventually reverts to normal levels \u00b7 Equilibrium: Prices fluctuate around an equilibrium/fair value \u00b7 Holding Period: Mean reversion typically works on shorter timeframes \u00b7 Risk of Trend: What appears to be deviation may be new trend",
+   "why": "Mean Reversion: Extreme volatility eventually reverts to normal levels · Equilibrium: Prices fluctuate around an equilibrium/fair value · Holding Period: Mean reversion typically works on shorter timeframes · Risk of Trend: What appears to be deviation may be new trend",
    "from_id": "concept:mean-reversion",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45157,7 +45241,7 @@
    "from": "breakout strategy",
    "rel": "about",
    "to": "core principles",
-   "why": "Momentum Persistence: True breakouts tend to continue in breakout direction \u00b7 Time Element: Breakouts are more reliable from longer consolidations",
+   "why": "Momentum Persistence: True breakouts tend to continue in breakout direction · Time Element: Breakouts are more reliable from longer consolidations",
    "from_id": "concept:breakout-strategy",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45181,7 +45265,7 @@
    "from": "autocorrelation",
    "rel": "about",
    "to": "core principles",
-   "why": "Momentum Effect: Past winners tend to continue winning short-term \u00b7 Reversal Effect: Extreme past winners tend to reverse long-term \u00b7 Time-Varying: Autocorrelation structure changes over time and across assets",
+   "why": "Momentum Effect: Past winners tend to continue winning short-term · Reversal Effect: Extreme past winners tend to reverse long-term · Time-Varying: Autocorrelation structure changes over time and across assets",
    "from_id": "concept:autocorrelation",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45189,7 +45273,7 @@
    "from": "cross-sectional and time-series",
    "rel": "about",
    "to": "core principles",
-   "why": "Cross-Sectional vs. Time-Series: Different momentum types behave differently \u00b7 Capacity: Time-series often has more capacity than cross-sectional",
+   "why": "Cross-Sectional vs. Time-Series: Different momentum types behave differently · Capacity: Time-series often has more capacity than cross-sectional",
    "from_id": "concept:cross-sectional-and-time-series",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45197,7 +45281,7 @@
    "from": "time-series momentum",
    "rel": "about",
    "to": "core principles",
-   "why": "Risk-Adjusted: Raw momentum should be adjusted for volatility \u00b7 Time-Series: Trend and momentum in individual asset drive signals",
+   "why": "Risk-Adjusted: Raw momentum should be adjusted for volatility · Time-Series: Trend and momentum in individual asset drive signals",
    "from_id": "procedure:time-series-momentum",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45245,7 +45329,7 @@
    "from": "cross-sectional momentum",
    "rel": "about",
    "to": "core principles",
-   "why": "Cross-Sectional: Ranking and relative performance drive signals \u00b7 Market Neutrality: Cross-sectional strategies can be market neutral",
+   "why": "Cross-Sectional: Ranking and relative performance drive signals · Market Neutrality: Cross-sectional strategies can be market neutral",
    "from_id": "procedure:cross-sectional-momentum",
    "to_id": "fact:quantitative-analysis-core-principles"
   },
@@ -45301,7 +45385,7 @@
    "from": "backtesting",
    "rel": "about",
    "to": "best practices",
-   "why": "Test effects on out-of-sample data before trading \u00b7 Be skeptical of high backtest performance",
+   "why": "Test effects on out-of-sample data before trading · Be skeptical of high backtest performance",
    "from_id": "concept:backtesting",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45309,7 +45393,7 @@
    "from": "transaction costs",
    "rel": "about",
    "to": "best practices",
-   "why": "Account for transaction costs and slippage \u00b7 Include transaction costs in backtest (frequent trading) \u00b7 Include transaction costs in performance evaluation",
+   "why": "Account for transaction costs and slippage · Include transaction costs in backtest (frequent trading) · Include transaction costs in performance evaluation",
    "from_id": "concept:transaction-cost",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45317,7 +45401,7 @@
    "from": "seasonality",
    "rel": "about",
    "to": "best practices",
-   "why": "Monitor for decay of effects over time \u00b7 Use as filter/overlay, not sole strategy basis \u00b7 Be aware that well-publicized effects often diminish",
+   "why": "Monitor for decay of effects over time · Use as filter/overlay, not sole strategy basis · Be aware that well-publicized effects often diminish",
    "from_id": "concept:seasonality",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45325,7 +45409,7 @@
    "from": "realized volatility",
    "rel": "about",
    "to": "best practices",
-   "why": "Use rolling windows appropriate to trading horizon \u00b7 Incorporate realized volatility for more accurate estimates",
+   "why": "Use rolling windows appropriate to trading horizon · Incorporate realized volatility for more accurate estimates",
    "from_id": "property:realized-volatility",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45357,7 +45441,7 @@
    "from": "mean reversion",
    "rel": "about",
    "to": "best practices",
-   "why": "Test for cointegration/stationarity before assuming mean reversion \u00b7 Account for regime changes that can break mean reversion",
+   "why": "Test for cointegration/stationarity before assuming mean reversion · Account for regime changes that can break mean reversion",
    "from_id": "concept:mean-reversion",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45381,7 +45465,7 @@
    "from": "position sizing",
    "rel": "about",
    "to": "best practices",
-   "why": "Size positions inversely to deviation magnitude \u00b7 Size positions based on expected carry, not just signal",
+   "why": "Size positions inversely to deviation magnitude · Size positions based on expected carry, not just signal",
    "from_id": "concept:position-sizing",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45413,7 +45497,7 @@
    "from": "stop-loss and take-profit engineering",
    "rel": "about",
    "to": "best practices",
-   "why": "Use tight initial stops and trail as position profits \u00b7 Use position limits and stop-losses for tail protection",
+   "why": "Use tight initial stops and trail as position profits · Use position limits and stop-losses for tail protection",
    "from_id": "concept:stop-and-target-engineering",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45453,7 +45537,7 @@
    "from": "momentum crashes",
    "rel": "about",
    "to": "best practices",
-   "why": "Be aware of momentum crash risk during market reversals \u00b7 Consider reducing momentum exposure during high volatility",
+   "why": "Be aware of momentum crash risk during market reversals · Consider reducing momentum exposure during high volatility",
    "from_id": "fact:momentum-crash",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45509,7 +45593,7 @@
    "from": "carry",
    "rel": "about",
    "to": "best practices",
-   "why": "Understand that carry strategies have crash risk (negative skew) \u00b7 Diversify across multiple carry sources \u00b7 Monitor macro conditions that can trigger carry unwinds \u00b7 Combine carry with momentum for improved risk-adjusted returns",
+   "why": "Understand that carry strategies have crash risk (negative skew) · Diversify across multiple carry sources · Monitor macro conditions that can trigger carry unwinds · Combine carry with momentum for improved risk-adjusted returns",
    "from_id": "concept:carry",
    "to_id": "judgment:quantitative-analysis-best-practices"
   },
@@ -45528,6 +45612,126 @@
    "why": "stated across quantitative-analysis",
    "from_id": "judgment:quantitative-analysis-best-practices",
    "to_id": "concept:quantitative-analysis"
+  },
+  {
+   "from": "direction word does not set role",
+   "rel": "about",
+   "to": "signal role is declared not inferred",
+   "why": "the general form of this trap",
+   "from_id": "fact:direction-word-does-not-set-role",
+   "to_id": "fact:signal-role-is-declared-not-inferred"
+  },
+  {
+   "from": "direction word does not set role",
+   "rel": "about",
+   "to": "signal type",
+   "why": "where the answer actually lives",
+   "from_id": "fact:direction-word-does-not-set-role",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "do not take default values for filter parameters",
+   "rel": "about",
+   "to": "role filter",
+   "why": "confirming conditions is the role a threshold should be chosen for",
+   "from_id": "judgment:do-not-take-default-values-for-filter-parameters",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "do not take default values for filter parameters",
+   "rel": "about",
+   "to": "prefer fewer filters",
+   "why": "the same failure reached by adding filters rather than by tightening one",
+   "from_id": "judgment:do-not-take-default-values-for-filter-parameters",
+   "to_id": "judgment:prefer-fewer-filters"
+  },
+  {
+   "from": "one trigger at least one filter",
+   "rel": "about",
+   "to": "signal type",
+   "why": "the count constraint is stated per role",
+   "from_id": "fact:one-trigger-at-least-one-filter",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "one trigger at least one filter",
+   "rel": "about",
+   "to": "strategy",
+   "why": "the shape a strategy's rules must take to be accepted",
+   "from_id": "fact:one-trigger-at-least-one-filter",
+   "to_id": "schema:strategy"
+  },
+  {
+   "from": "prefer fewer filters",
+   "rel": "about",
+   "to": "one trigger at least one filter",
+   "why": "the counts this judgment chooses within",
+   "from_id": "judgment:prefer-fewer-filters",
+   "to_id": "fact:one-trigger-at-least-one-filter"
+  },
+  {
+   "from": "prefer fewer filters",
+   "rel": "about",
+   "to": "role filter",
+   "why": "what a filter contributes, and what each additional one costs",
+   "from_id": "judgment:prefer-fewer-filters",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "signal role is declared not inferred",
+   "rel": "about",
+   "to": "signal type",
+   "why": "the declared classification, which is the one that governs",
+   "from_id": "fact:signal-role-is-declared-not-inferred",
+   "to_id": "concept:signal-type"
+  },
+  {
+   "from": "signal role is declared not inferred",
+   "rel": "about",
+   "to": "role trigger",
+   "why": "one of the two roles a name can only hint at",
+   "from_id": "fact:signal-role-is-declared-not-inferred",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "signal role is declared not inferred",
+   "rel": "about",
+   "to": "role filter",
+   "why": "the other",
+   "from_id": "fact:signal-role-is-declared-not-inferred",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "sizing version is pinned at creation",
+   "rel": "about",
+   "to": "strategy",
+   "why": "what the version is pinned to",
+   "from_id": "fact:sizing-version-is-pinned-at-creation",
+   "to_id": "schema:strategy"
+  },
+  {
+   "from": "sizing version is pinned at creation",
+   "rel": "about",
+   "to": "position sizing",
+   "why": "the calculation whose version is fixed at creation",
+   "from_id": "fact:sizing-version-is-pinned-at-creation",
+   "to_id": "concept:position-sizing"
+  },
+  {
+   "from": "why one trigger",
+   "rel": "about",
+   "to": "one trigger at least one filter",
+   "why": "the rule this judgment gives the reasons for",
+   "from_id": "judgment:why-one-trigger",
+   "to_id": "fact:one-trigger-at-least-one-filter"
+  },
+  {
+   "from": "why one trigger",
+   "rel": "about",
+   "to": "overfitting",
+   "why": "fewer free parameters is the argument that connects the rule to it",
+   "from_id": "judgment:why-one-trigger",
+   "to_id": "concept:overfitting"
   }
  ],
  "meta": {
@@ -45551,13 +45755,13 @@
   "indicators_missing_description": [],
   "doc_atoms": 7,
   "doc_atom_ids": [
-   "concept:chart-pattern",
-   "concept:market-foundations",
-   "concept:market-mechanics",
-   "concept:price-action",
-   "concept:quantitative-analysis",
-   "concept:risk-management",
-   "concept:strategy-design"
+   "fact:direction-word-does-not-set-role",
+   "fact:one-trigger-at-least-one-filter",
+   "fact:signal-role-is-declared-not-inferred",
+   "fact:sizing-version-is-pinned-at-creation",
+   "judgment:do-not-take-default-values-for-filter-parameters",
+   "judgment:prefer-fewer-filters",
+   "judgment:why-one-trigger"
   ],
   "derived_atom_ids": [
    "concept:accumulation-pattern",
@@ -45757,12 +45961,14 @@
    "fact:constant-product-amm",
    "fact:cost-of-carry-relationship",
    "fact:day-of-week-effect",
+   "fact:direction-word-does-not-set-role",
    "fact:indicator-core-principles",
    "fact:intraday-pattern",
    "fact:market-foundations-core-principles",
    "fact:market-mechanics-core-principles",
    "fact:momentum-crash",
    "fact:monthly-calendar-effect",
+   "fact:one-trigger-at-least-one-filter",
    "fact:per-trade-risk-vs-strategy-risk",
    "fact:price-action-core-principles",
    "fact:put-call-parity",
@@ -45772,16 +45978,20 @@
    "fact:regime-determines-archetype-effectiveness",
    "fact:risk-is-multi-dimensional",
    "fact:risk-management-core-principles",
+   "fact:signal-role-is-declared-not-inferred",
+   "fact:sizing-version-is-pinned-at-creation",
    "fact:square-root-market-impact-rule",
    "fact:strategy-design-core-principles",
    "fact:timeframe-ratio",
    "fact:win-rate-is-not-risk",
    "judgment:breakout-quality-assessment",
    "judgment:chart-pattern-best-practices",
+   "judgment:do-not-take-default-values-for-filter-parameters",
    "judgment:indicator-best-practices",
    "judgment:market-foundations-best-practices",
    "judgment:market-mechanics-best-practices",
    "judgment:oscillator-trend-line",
+   "judgment:prefer-fewer-filters",
    "judgment:price-action-best-practices",
    "judgment:quantitative-analysis-best-practices",
    "judgment:reducing-risk-of-ruin",
@@ -45792,6 +46002,7 @@
    "judgment:trading-failed-pattern",
    "judgment:trailing-behavior-after-target",
    "judgment:trend-is-your-friend",
+   "judgment:why-one-trigger",
    "procedure:advance-decline-line",
    "procedure:adx-trend-strength",
    "procedure:almgren-chriss-market-impact-model",
@@ -49029,6 +49240,16 @@
     "concept:quantitative-analysis"
    ],
    [
+    "fact:direction-word-does-not-set-role",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "fact:direction-word-does-not-set-role",
+    "about",
+    "fact:signal-role-is-declared-not-inferred"
+   ],
+   [
     "fact:indicator-core-principles",
     "part-of",
     "concept:indicator"
@@ -49077,6 +49298,16 @@
     "fact:monthly-calendar-effect",
     "part-of",
     "concept:quantitative-analysis"
+   ],
+   [
+    "fact:one-trigger-at-least-one-filter",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "fact:one-trigger-at-least-one-filter",
+    "about",
+    "schema:strategy"
    ],
    [
     "fact:per-trade-risk-vs-strategy-risk",
@@ -49169,6 +49400,31 @@
     "concept:risk-management"
    ],
    [
+    "fact:signal-role-is-declared-not-inferred",
+    "about",
+    "concept:signal-type"
+   ],
+   [
+    "fact:signal-role-is-declared-not-inferred",
+    "about",
+    "property:role-filter"
+   ],
+   [
+    "fact:signal-role-is-declared-not-inferred",
+    "about",
+    "property:role-trigger"
+   ],
+   [
+    "fact:sizing-version-is-pinned-at-creation",
+    "about",
+    "concept:position-sizing"
+   ],
+   [
+    "fact:sizing-version-is-pinned-at-creation",
+    "about",
+    "schema:strategy"
+   ],
+   [
     "fact:square-root-market-impact-rule",
     "about",
     "concept:market-impact"
@@ -49229,6 +49485,16 @@
     "concept:chart-pattern"
    ],
    [
+    "judgment:do-not-take-default-values-for-filter-parameters",
+    "about",
+    "judgment:prefer-fewer-filters"
+   ],
+   [
+    "judgment:do-not-take-default-values-for-filter-parameters",
+    "about",
+    "property:role-filter"
+   ],
+   [
     "judgment:indicator-best-practices",
     "part-of",
     "concept:indicator"
@@ -49252,6 +49518,16 @@
     "judgment:oscillator-trend-line",
     "part-of",
     "concept:indicator"
+   ],
+   [
+    "judgment:prefer-fewer-filters",
+    "about",
+    "fact:one-trigger-at-least-one-filter"
+   ],
+   [
+    "judgment:prefer-fewer-filters",
+    "about",
+    "property:role-filter"
    ],
    [
     "judgment:price-action-best-practices",
@@ -49362,6 +49638,16 @@
     "judgment:trend-is-your-friend",
     "part-of",
     "concept:price-action"
+   ],
+   [
+    "judgment:why-one-trigger",
+    "about",
+    "concept:overfitting"
+   ],
+   [
+    "judgment:why-one-trigger",
+    "about",
+    "fact:one-trigger-at-least-one-filter"
    ],
    [
     "procedure:advance-decline-line",
@@ -52439,10 +52725,14 @@
     "property:support-resistance-zone-width"
    ]
   ],
-  "doc_relations": 8,
+  "doc_relations": 15,
   "doc_anchors": [
-   "concept:technical-analysis",
-   "object:mangrove-knowledge-space"
+   "concept:overfitting",
+   "concept:position-sizing",
+   "concept:signal-type",
+   "property:role-filter",
+   "property:role-trigger",
+   "schema:strategy"
   ],
   "chapter_market-foundations_atoms": 61,
   "chapter_market-foundations_relations": 146,

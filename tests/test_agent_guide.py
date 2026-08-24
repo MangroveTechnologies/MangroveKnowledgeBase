@@ -80,16 +80,16 @@ def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
 def test_uc1_orientation_values(kg, guide):
     s = kg.stats()
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
-    assert len(kg.schema()) == 42, "the guide says '42 shapes in total'"
-    assert "42 shapes in total" in guide
+    assert len(kg.schema()) == 45, "the guide says '45 shapes in total'"
+    assert "45 shapes in total" in guide
     for c in s["classes"]:                    # every class the guide lists must still exist
         assert c in guide, f"guide's class list is missing {c}"
 
 
 def test_uc2_divergence_search(kg, guide):
     r = kg.find("divergence", limit=None)
-    assert r.total == 40, "the guide says 40 matches"
-    assert "40 matches" in guide and "10 of 40" in guide
+    assert r.total == 41, "the guide says 41 matches"
+    assert "41 matches" in guide and "10 of 41" in guide
     top4 = [x["id"] for x in r.items[:4]]
     assert all("divergence" in i for i in top4), "name matches must still lead"
     for i in top4:

@@ -186,6 +186,37 @@ is authoritative — nothing downstream may overwrite what it wrote. `wiki-to-gr
 dependency pinned to a commit** in `pyproject.toml`; the published release lacks `--vocab`, without
 which the build silently produces a graph in which every node reports degree 0.
 
+### The developer documentation
+
+`ontology/wiki-guides/` holds atoms authored from the platform's own guides, and it runs through the
+**same two stages as `ontology/wiki/`** -- `wiki_to_graph` then `wiki_to_atoms.py` -- but *after* the
+chapters rather than before, so a page may link to a node a chapter creates. There is no parser for
+it and there should not be: a guide has no scaffold, and what it contributes is claims.
+
+```bash
+python3 -m wiki_to_graph build ontology/wiki-guides -o build/guides-graph.json \
+        --map ontology/wiki-config/map.json --vocab ontology/wiki-config/vocab.json \
+        --dag-edges part-of,kind-of,instance-of,supersedes
+python3 ontology/wiki_to_atoms.py --wiki ontology/wiki-guides \
+        --graph build/guides-graph.json --ontology build/<last-chapter>.json --out build/guides.json
+```
+
+Four things learned the hard way:
+
+* **Verify the claim in code before authoring it.** The guides are not a source of truth. The
+  documented "1 TRIGGER + 1 FILTER" entry rule is not what runs -- only the trigger count is
+  enforced -- and the naming patterns presented as classification rules have five counterexamples in
+  the registry. Both would have entered the graph as facts.
+* **A page is not a node.** Provenance is a property (`reference_chapter`, `reference_source`), which
+  is why no chapter has a `document:` node and no guide should either. Lifting pages as nodes
+  produces shells that carry their own filename and nothing else.
+* **Parameters are not lifted.** They live in MangroveAI's config glossary with types, bounds and
+  their `supersedes` relations, generated from one declaration.
+* **Watch the paraphrase floor.** The 25-question benchmark is saturated at its fifth-place cutoff:
+  past seven added atoms, each further one costs a question somewhere, and which question moves is
+  not stable. Atoms that cost it are not worth adding until retrieval seeds the documentation half
+  separately.
+
 `--parent` is the chapter's subject-area node (`concept:market-foundations`,
 `concept:market-mechanics`, `concept:price-action`, …). Those six anchors are authored in
 `ontology/wiki/` and exist before any chapter lands.

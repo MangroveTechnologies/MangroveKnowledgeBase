@@ -46,7 +46,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 714, 2342
+s["nodes"], s["edges"]          # 721, 2357
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -55,7 +55,7 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  714 2342
+nodes, edges  721 2357
 primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
 relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
@@ -67,7 +67,7 @@ roles         ['property:role-filter', 'property:role-trigger']
 schema        [{'subject': 'Procedure', 'relation': 'instance-of', 'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'about',       'object': 'Concept'},
                {'subject': 'Procedure', 'relation': 'has-role',    'object': 'Property'},
-               ... 42 shapes in total]
+               ... 45 shapes in total]
 ```
 
 `schema()` is the one to read carefully. It tells you what questions are answerable *before* you ask
@@ -77,7 +77,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (375 of 714) — legal, occasionally
+`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (375 of 721) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -117,7 +117,7 @@ Text search is the wider net, for when they did *not* name an indicator, or name
 have:
 
 ```
-find("divergence") -> 40 matches, name matches first
+find("divergence") -> 41 matches, name matches first
   concept:hidden-divergence                        <- the knowledge-base concepts, also named for it
   concept:volume-divergence
   procedure:signal-rsi-bearish-divergence
@@ -141,7 +141,7 @@ first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
-shown you 10 of 40.
+shown you 10 of 41.
 
 **See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
@@ -299,7 +299,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 714 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 721 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 

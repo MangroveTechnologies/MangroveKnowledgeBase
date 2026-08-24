@@ -97,7 +97,8 @@ def read_pages(wiki_dir: Path) -> dict[str, dict]:
         if kind not in PRIMITIVE:
             raise MergeError(f"{path.name}: kind {kind!r} is not one of the nine primitives")
         pages[slug(title)] = {"title": title, "kind": kind,
-                              "chapter": meta.get("chapter"), "why": why, "file": path.name}
+                              "chapter": meta.get("chapter"), "source": meta.get("source"),
+                              "why": why, "file": path.name}
     return pages
 
 
@@ -128,6 +129,11 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
         props = {}
         if page["chapter"]:
             props["reference_chapter"] = [page["chapter"]]
+        # Where a page states what it was authored from rather than which chapter it came out of.
+        # A flat value, not a per-file trail: what matters is that the claim came from the
+        # documentation and is not derived from the library's own source.
+        if page.get("source"):
+            props["reference_source"] = page["source"]
         # The body is the node's content, not decoration: for a doc-derived node it plays the part
         # formula/params/outputs play for a computation, and `graph.SEARCH_TIERS` reads it in the
         # same tier. Dropping it would leave `find("head and shoulders")` empty on the very page

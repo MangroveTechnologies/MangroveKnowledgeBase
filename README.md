@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-ff9e18.svg" alt="License: PolyForm Noncommercial 1.0.0">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/graph%20%2B%20indices-in%20the%20wheel-2ec27e.svg" alt="Graph and both search indices ship in the wheel">
-  <img src="https://img.shields.io/badge/graph-714%20nodes%20%C2%B7%202342%20edges-42a7c6.svg" alt="Graph: 714 nodes, 2342 edges">
+  <img src="https://img.shields.io/badge/graph-721%20nodes%20%C2%B7%202357%20edges-42a7c6.svg" alt="Graph: 721 nodes, 2357 edges">
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
 
@@ -24,7 +24,7 @@ How it is built, stored and searched is drawn in [`docs/architecture/`](docs/arc
 edge schema, the search corpus, `find()`, `ask()`, both search indices and how they are
 fused, and the three traversals that are easy to confuse.
 
-And a **knowledge graph** — 714 nodes and 2342 edges, with two halves on one schema. One is compiled
+And a **knowledge graph** — 721 nodes and 2357 edges, with two halves on one schema. One is compiled
 from the source above: what each computation is, what it measures, what it reads, and what part it
 plays. That half is exact, because it is read from the code rather than extracted from prose. The
 other is the trading knowledge base — market structure, instruments, risk, chart patterns,
@@ -262,7 +262,7 @@ detail one click away.
 | Pane | Where | What it holds |
 | --- | --- | --- |
 | Rail | left | filters, by kind of node and kind of edge |
-| Map | middle | 714 nodes, 2342 edges |
+| Map | middle | 721 nodes, 2357 edges |
 | Panel | right | everything the library records about whatever you clicked |
 
 ### The inspector — what a node actually carries
@@ -323,7 +323,7 @@ an instance of the family; a signal emits a boolean, so it is *about* the family
   <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 17 of 714'" width="100%">
 </p>
 
-714 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
+721 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
 selected node, and the choices combine — `neighbors` + `ancestors` gives you both:
 
 | | Keeps |
@@ -361,7 +361,7 @@ say, and the children grey out to show why — so the canvas can never empty for
 visible in the rail.
 
 **Density** spreads or tightens the layout. **Labels** switches between always / never / on hover /
-on zoom — at 714 nodes, off is often clearer than on.
+on zoom — at 721 nodes, off is often clearer than on.
 
 <br clear="right">
 
@@ -392,7 +392,7 @@ either view, **double-click a node to hide or show what hangs off it**, which is
 with 218 signals attached readable.
 
 A **green ring** marks the selected node; a **yellow ring** marks a deprecated one — it still runs,
-it just has a canonical replacement. Nothing else is ringed: 308 of 714 nodes are `ratified`, so
+it just has a canonical replacement. Nothing else is ringed: 315 of 721 nodes are `ratified`, so
 marking that would be decoration rather than information.
 
 Light, dark and follow-the-system are top right, and the choice is remembered.

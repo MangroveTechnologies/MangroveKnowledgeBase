@@ -1,0 +1,5 @@
+---
+kind: schema
+---
+
+# strategy

@@ -13,7 +13,7 @@ description: >-
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of **714 nodes, 2342 edges** with two halves on one schema:
+`mangrove_kb` ships a knowledge graph of **721 nodes, 2357 edges** with two halves on one schema:
 
 - **The library, compiled from its own source** — 71 indicators and 218 signals. Exact, not
   extracted: every answer here is a fact about the code as it is.
