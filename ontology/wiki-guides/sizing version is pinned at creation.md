@@ -1,6 +1,6 @@
 ---
 kind: fact
-source: documentation
+source: content/docs/guides/creating-a-strategy.md
 ---
 # sizing version is pinned at creation
 

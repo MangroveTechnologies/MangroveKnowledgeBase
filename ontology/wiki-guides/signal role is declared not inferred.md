@@ -1,6 +1,6 @@
 ---
 kind: fact
-source: documentation
+source: content/docs/guides/signal-architecture.md
 ---
 # signal role is declared not inferred
 

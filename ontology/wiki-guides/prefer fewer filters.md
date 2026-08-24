@@ -1,6 +1,6 @@
 ---
 kind: judgment
-source: documentation
+source: content/docs/guides/signal-architecture.md
 ---
 # prefer fewer filters
 

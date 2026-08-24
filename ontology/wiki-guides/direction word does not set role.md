@@ -1,6 +1,6 @@
 ---
 kind: fact
-source: documentation
+source: content/docs/guides/signal-architecture.md
 ---
 # direction word does not set role
 

@@ -25211,7 +25211,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "Entry signals are evaluated only on bars where no position is open. Where one is open, the exits are evaluated instead -- signal, stop, target and time-based -- and positions, orders and trades are recorded as they happen. Nothing is scored while the walk is in progress: the metrics are computed once, after the final bar."
    }
   },
@@ -25223,7 +25223,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "sharpe_ratio, sortino_ratio, calmar_ratio, irr_annualized, irr_daily, max_drawdown, max_drawdown_duration, win_rate, total_return, total_trades, avg_daily_return, gain_to_pain_ratio, max_consecutive_wins, max_consecutive_losses, starting_balance, ending_balance and num_days. A summary that quotes four of them is a choice about what to show, not the extent of what was measured."
    }
   },
@@ -25235,7 +25235,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "`data_source=\"api\"` goes through the provider chain. `data_source=\"file\"` reads a CSV, which must carry timestamp, open, high, low, close and volume. The interval is one of 1m, 5m, 15m, 30m, 1h, 4h or 1d, and defaults to 1h."
    }
   },
@@ -25247,7 +25247,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "The request carries a start date and an end date, and a bulk request requires both. A phrase like \"the last four months\" is a convenience for whoever is choosing the window, and it is converted where that choice is made -- so the request carries the result rather than the phrasing, and the same request re-run tomorrow covers the same days instead of sliding forward."
    }
   },
@@ -25259,7 +25259,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "The two behave identically, so nothing breaks by staying on the older prefix, and nothing is gained either. New integrations use the canonical prefix, and asynchronous runs use the v2 backtests surface. Documentation that teaches the deprecated path is teaching the shape of an old deployment."
    }
   },
@@ -25271,7 +25271,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "Four strategies on the same asset and the same interval cost one upstream call, and the response reports how many unique calls were made, so the saving is visible rather than assumed. A bulk request takes either strategy ids or strategy configurations, never both, and requires both window dates."
    }
   },
@@ -25283,7 +25283,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/signal-architecture.md",
     "explanation": "`macd_bullish_cross` is a trigger and `obv_bullish` is a filter. Both are bullish. What separates them is that one names a crossing, which happens on a bar, and the other names a state, which persists. `rsi_bullish_divergence` is a trigger for the same reason and `adx_strong_trend` a filter, neither of which the direction word predicts."
    }
   },
@@ -25295,7 +25295,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/understanding-signals.md",
     "explanation": "A default threshold marks a notable condition -- the value at which the indicator is saying something. That is what an event wants. A filter is asked a different question: are conditions right to act. Choose a less selective value than the default. Two thresholds, each defaulted, compound the problem: the entry needs both to hold at the moment the trigger fires."
    }
   },
@@ -25307,7 +25307,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "With no provider pinned, the shared cost-ordered chain decides, and the internal Mangrove market data -- free, with deep ClickHouse history -- is tried first. Paid CoinAPI sits mid-chain as a fallback rather than the source anyone reaches for. Results are cached in Redis across workers and restarts, and a relative window is floored to the day, so two backtests asking the same question share one cache entry instead of refetching upstream."
    }
   },
@@ -25319,7 +25319,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/signal-architecture.md",
     "explanation": "The trigger says when to act and the filter says whether the conditions are right, so an entry needs both. The counts are one entry trigger with one or two entry filters, and at most one exit trigger with up to two exit filters; an exit may be left out entirely, and the position then closes on the stop, the target, or a time-based rule from the execution config. The API's rule check is narrower than the requirement. It rejects an entry with no TRIGGER and an entry with two, and an exit carrying FILTERs without a TRIGGER, but it counts no filters at all."
    }
   },
@@ -25331,7 +25331,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/signal-architecture.md",
     "explanation": "Filters compose conjunctively -- all of them must hold on the same bar the trigger fires -- so each one added cuts the set of bars that can produce a trade. One is required and a second is allowed, and the allowance is not an instruction. Use the filter that confirms the condition the entry depends on, and add the second only when you can say which entries it removes and why they deserved removing."
    }
   },
@@ -25343,7 +25343,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/signal-architecture.md",
     "explanation": "Event-shaped names -- crossings, breakouts, reversals, squeezes -- are usually triggers, and state-shaped names -- above, below, oversold, overbought, strong-trend -- are usually filters. The correlation is strong enough to be a useful guess and weak enough to be wrong: `ttm_squeeze_active`, `starc_lower_breakout`, `starc_upper_breakout`, `reversal_pattern_bullish` and `reversal_pattern_bearish` all read as events and all are filters. The declared type is the answer. Guessing from the name is how a strategy acquires two triggers and is rejected."
    }
   },
@@ -25355,7 +25355,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/creating-a-strategy.md",
     "explanation": "The value is set at creation and is immutable thereafter; an update that tries to change it is refused, and the value is read from the strategy's own record rather than from a submitted configuration. Switching sizing math means creating a new strategy. A partial execution config supplied at creation is merged over the canonical defaults, so omitting a field keeps its default rather than dropping it -- which is why a strategy created with almost no configuration still carries the full set the sizing engine reads."
    }
   },
@@ -25367,7 +25367,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/backtesting-guide.md",
     "explanation": "A request that cannot complete within the budget answers 503 with a retry hint and an engine-warming code, which is an honest answer rather than the opaque gateway error that a bounded read prevents. Bulk runs are therefore kept to short, warm windows; a long lookback is submitted one strategy at a time to the asynchronous surface and polled."
    }
   },
@@ -25379,7 +25379,7 @@
    "epistemic": "observed",
    "status": "ratified",
    "props": {
-    "reference_source": "documentation",
+    "reference_source": "content/docs/guides/signal-architecture.md",
     "explanation": "The single trigger buys four things. A strategy is easy to state, because it has one entry event rather than a disjunction of them. It has fewer free parameters, so there is less to curve-fit. The division of labour is legible -- the trigger says when to act, the filters say whether conditions are right. And when a backtest disappoints, the entry event is not in question, which leaves the filters and the parameters as the things to examine."
    }
   }

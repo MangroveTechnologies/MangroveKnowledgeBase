@@ -201,7 +201,7 @@ python3 ontology/wiki_to_atoms.py --wiki ontology/wiki-guides \
         --graph build/guides-graph.json --ontology build/<last-chapter>.json --out build/guides.json
 ```
 
-Five things learned the hard way:
+Six things learned the hard way:
 
 * **Verify the claim in code before authoring it, on the branch that matters.** The guides are not
   a source of truth, and neither is `main` while a long-lived branch owns the surface: the request
@@ -217,6 +217,10 @@ Five things learned the hard way:
 * **A page is not a node.** Provenance is a property (`reference_chapter`, `reference_source`), which
   is why no chapter has a `document:` node and no guide should either. Lifting pages as nodes
   produces shells that carry their own filename and nothing else.
+* **`source:` names the file, not the category.** The frontmatter key becomes `reference_source`, so
+  writing `documentation` on every page makes fifteen atoms indistinguishable and leaves no way to
+  ask which ones a changed guide affects. It takes the guide's path in the repo that owns it --
+  `content/docs/guides/signal-architecture.md` -- which is greppable against a docs PR's file list.
 * **Parameters are not lifted.** They live in MangroveAI's config glossary with types, bounds and
   their `supersedes` relations, generated from one declaration.
 * **Watch the paraphrase floor.** The 25-question benchmark is saturated at its fifth-place cutoff:
