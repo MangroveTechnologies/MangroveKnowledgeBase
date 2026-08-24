@@ -4,6 +4,24 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.0] - 2026-08-24
+
+### `find(param=...)` — which computations take a given parameter
+
+A caller tuning a strategy reasons in parameters: every signal with a lookback window, every one
+with a threshold. The graph already held each node's `params`, but the only way to that question
+was to read every node in turn, so callers kept a second copy of the parameter metadata beside the
+graph to search it.
+
+`param` is a flat node predicate like `requires`: enumerated by `stats()["params"]`, so it cannot
+be guessed wrong, and it raises rather than returning an empty result that reads as "there are
+none". It intersects with `kind`, `role`, `status` and `requires` rather than replacing any of them.
+
+```python
+kg.find(param="window_dev")                  # everything taking that parameter
+kg.find(param="window", role="trigger")      # triggers with a lookback window
+```
+
 ## [3.1.1] - 2026-08-18
 
 ### The four `apo_*` signal names resolve again
