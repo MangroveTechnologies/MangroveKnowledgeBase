@@ -80,8 +80,8 @@ def test_the_knowledge_layer_has_worked_cases_of_its_own(kg, guide):
 def test_uc1_orientation_values(kg, guide):
     s = kg.stats()
     assert s["roles"] == ["property:role-filter", "property:role-trigger"]
-    assert len(kg.schema()) == 45, "the guide says '45 shapes in total'"
-    assert "45 shapes in total" in guide
+    assert len(kg.schema()) == 46, "the guide says '46 shapes in total'"
+    assert "46 shapes in total" in guide
     for c in s["classes"]:                    # every class the guide lists must still exist
         assert c in guide, f"guide's class list is missing {c}"
 

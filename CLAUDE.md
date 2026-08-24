@@ -90,8 +90,8 @@ retired server, and gating has to be restored before this is served over HTTP to
 
 ## The Knowledge Graph
 
-`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 721 nodes
-and 2357 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
+`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 729 nodes
+and 2373 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
 source, and the trading knowledge base ingested from its eight chapters.
 
 ```python

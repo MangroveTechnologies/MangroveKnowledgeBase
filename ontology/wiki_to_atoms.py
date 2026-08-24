@@ -106,6 +106,7 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
     graph = json.loads(graph_path.read_text(encoding="utf-8"))
     onto = json.loads(onto_path.read_text(encoding="utf-8"))
     pages = read_pages(wiki_dir)
+    prefix = "doc" if wiki_dir.name == "wiki" else wiki_dir.name.replace("-", "_")
 
     existing = {a["id"]: a for a in onto["atoms"]}
     ident = {n["id"]: f'{n.get("kind") or "concept"}:{n["id"]}' for n in graph["nodes"]}
@@ -176,8 +177,12 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
               # The ids, not just the count: the determinism test needs to separate the two halves
               # exactly, and `reference_chapter` cannot do it -- code-derived nodes carry that key
               # too, because it says which chapter DOCUMENTS a node, not where the node came from.
-              "meta": {**onto["meta"], "doc_atoms": len(new_atoms),
-                       "doc_atom_ids": sorted(a["id"] for a in new_atoms),
+              # Keyed by the source directory. A second wiki must not overwrite the first's
+              # count: `doc_atoms` means what `ontology/wiki` authored, and a run over
+              # `wiki-guides` that reused the name made the two indistinguishable -- passing only
+              # because both happened to hold the same number of pages.
+              "meta": {**onto["meta"], f"{prefix}_atoms": len(new_atoms),
+                       f"{prefix}_atom_ids": sorted(a["id"] for a in new_atoms),
                        # Every atom the code builder did not produce, from EVERY derived source.
                        # The determinism test splits the record on this one key, so a second
                        # source that forgot to append would look like a builder regression.
@@ -187,7 +192,8 @@ def merge(wiki_dir: Path, graph_path: Path, onto_path: Path) -> tuple[dict, dict
                        "derived_relations": sorted(
                            {tuple(x) for x in onto["meta"].get("derived_relations", ())}
                            | {(r["from_id"], r["rel"], r["to_id"]) for r in new_rels}),
-                       "doc_relations": len(new_rels), "doc_anchors": sorted(anchors)}}
+                       f"{prefix}_relations": len(new_rels),
+                       f"{prefix}_anchors": sorted(anchors)}}
     return merged, {"new_atoms": new_atoms, "new_relations": new_rels, "anchors": anchors}
 
 

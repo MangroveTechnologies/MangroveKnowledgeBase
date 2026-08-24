@@ -117,7 +117,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 721 nodes, 2357 edges, in
+carries a formula stating the predicate it computes -- 729 nodes, 2373 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,

@@ -25204,6 +25204,78 @@
    }
   },
   {
+   "id": "procedure:backtest-execution-flow",
+   "title": "backtest execution flow",
+   "kind": "Procedure",
+   "summary": "Validate the request, load the bars, walk them once, and compute the metrics after the last one.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "Entry signals are evaluated only on bars where no position is open. Where one is open, the exits are evaluated instead -- signal, stop, target and time-based -- and positions, orders and trades are recorded as they happen. Nothing is scored while the walk is in progress: the metrics are computed once, after the final bar."
+   }
+  },
+  {
+   "id": "fact:backtest-metrics-set",
+   "title": "backtest metrics set",
+   "kind": "Fact",
+   "summary": "A backtest reports seventeen metrics, not the handful usually quoted from it.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "sharpe_ratio, sortino_ratio, calmar_ratio, irr_annualized, irr_daily, max_drawdown, max_drawdown_duration, win_rate, total_return, total_trades, avg_daily_return, gain_to_pain_ratio, max_consecutive_wins, max_consecutive_losses, starting_balance, ending_balance and num_days. A summary that quotes four of them is a choice about what to show, not the extent of what was measured."
+   }
+  },
+  {
+   "id": "fact:backtest-takes-api-or-file-data",
+   "title": "backtest takes api or file data",
+   "kind": "Fact",
+   "summary": "A backtest reads its bars either from the provider chain or from a local CSV.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "`data_source=\"api\"` goes through the provider chain. `data_source=\"file\"` reads a CSV, which must carry timestamp, open, high, low, close and volume. The interval is one of 1m, 5m, 15m, 30m, 1h, 4h or 1d, and defaults to 1h."
+   }
+  },
+  {
+   "id": "fact:backtest-window-is-two-dates",
+   "title": "backtest window is two dates",
+   "kind": "Fact",
+   "summary": "A backtest window reaches the engine as two dates; a relative span is resolved before it gets there.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "The request carries a start date and an end date, and a bulk request requires both. A phrase like \"the last four months\" is a convenience for whoever is choosing the window, and it is converted where that choice is made -- so the request carries the result rather than the phrasing, and the same request re-run tomorrow covers the same days instead of sliding forward."
+   }
+  },
+  {
+   "id": "fact:backtesting-prefix-is-deprecated",
+   "title": "backtesting prefix is deprecated",
+   "kind": "Fact",
+   "summary": "The /api/v1/backtesting/backtest routes are retained for back-compat; /api/v1/backtests is the canonical surface.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "The two behave identically, so nothing breaks by staying on the older prefix, and nothing is gained either. New integrations use the canonical prefix, and asynchronous runs use the v2 backtests surface. Documentation that teaches the deprecated path is teaching the shape of an old deployment."
+   }
+  },
+  {
+   "id": "fact:bulk-backtest-shares-market-data",
+   "title": "bulk backtest shares market data",
+   "kind": "Fact",
+   "summary": "A bulk backtest fetches each asset-and-timeframe pair once and reuses it across every strategy that shares it.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "Four strategies on the same asset and the same interval cost one upstream call, and the response reports how many unique calls were made, so the saving is visible rather than assumed. A bulk request takes either strategy ids or strategy configurations, never both, and requires both window dates."
+   }
+  },
+  {
    "id": "fact:direction-word-does-not-set-role",
    "title": "direction word does not set role",
    "kind": "Fact",
@@ -25225,6 +25297,18 @@
    "props": {
     "reference_source": "documentation",
     "explanation": "A default threshold marks a notable condition -- the value at which the indicator is saying something. That is what an event wants. A filter is asked a different question: are conditions right to act. Choose a less selective value than the default. Two thresholds, each defaulted, compound the problem: the entry needs both to hold at the moment the trigger fires."
+   }
+  },
+  {
+   "id": "fact:market-data-provider-chain",
+   "title": "market data provider chain",
+   "kind": "Fact",
+   "summary": "A backtest's bars resolve through a cost-ordered provider chain: internal Mangrove history first, then kraken_rest, binance_public, coinapi and coingecko.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "With no provider pinned, the shared cost-ordered chain decides, and the internal Mangrove market data -- free, with deep ClickHouse history -- is tried first. Paid CoinAPI sits mid-chain as a fallback rather than the source anyone reaches for. Results are cached in Redis across workers and restarts, and a relative window is floored to the day, so two backtests asking the same question share one cache entry instead of refetching upstream."
    }
   },
   {
@@ -25273,6 +25357,18 @@
    "props": {
     "reference_source": "documentation",
     "explanation": "The value is set at creation and is immutable thereafter; an update that tries to change it is refused, and the value is read from the strategy's own record rather than from a submitted configuration. Switching sizing math means creating a new strategy. A partial execution config supplied at creation is merged over the canonical defaults, so omitting a field keeps its default rather than dropping it -- which is why a strategy created with almost no configuration still carries the full set the sizing engine reads."
+   }
+  },
+  {
+   "id": "fact:sync-backtest-transport-budget",
+   "title": "sync backtest transport budget",
+   "kind": "Fact",
+   "summary": "The synchronous backtest surface rides a gateway budget of about fifteen seconds; work that will not finish inside it belongs on the async surface.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "reference_source": "documentation",
+    "explanation": "A request that cannot complete within the budget answers 503 with a retry hint and an engine-warming code, which is an honest answer rather than the opaque gateway error that a bounded read prevents. Bulk runs are therefore kept to short, warm windows; a long lookback is submitted one strategy at a time to the asynchronous surface and polled."
    }
   },
   {
@@ -45614,6 +45710,102 @@
    "to_id": "concept:quantitative-analysis"
   },
   {
+   "from": "backtest execution flow",
+   "rel": "about",
+   "to": "backtesting",
+   "why": "the flow is what running one consists of",
+   "from_id": "procedure:backtest-execution-flow",
+   "to_id": "concept:backtesting"
+  },
+  {
+   "from": "backtest execution flow",
+   "rel": "about",
+   "to": "backtest metrics set",
+   "why": "what the final step produces",
+   "from_id": "procedure:backtest-execution-flow",
+   "to_id": "fact:backtest-metrics-set"
+  },
+  {
+   "from": "backtest metrics set",
+   "rel": "about",
+   "to": "backtest execution flow",
+   "why": "the step that computes them",
+   "from_id": "fact:backtest-metrics-set",
+   "to_id": "procedure:backtest-execution-flow"
+  },
+  {
+   "from": "backtest metrics set",
+   "rel": "about",
+   "to": "drawdown risk",
+   "why": "what two of the seventeen measure",
+   "from_id": "fact:backtest-metrics-set",
+   "to_id": "concept:drawdown-risk"
+  },
+  {
+   "from": "backtest takes api or file data",
+   "rel": "about",
+   "to": "market data provider chain",
+   "why": "where the api path gets its bars",
+   "from_id": "fact:backtest-takes-api-or-file-data",
+   "to_id": "fact:market-data-provider-chain"
+  },
+  {
+   "from": "backtest takes api or file data",
+   "rel": "about",
+   "to": "backtesting",
+   "why": "what the bars are read for",
+   "from_id": "fact:backtest-takes-api-or-file-data",
+   "to_id": "concept:backtesting"
+  },
+  {
+   "from": "backtest window is two dates",
+   "rel": "about",
+   "to": "backtesting",
+   "why": "the window is the run's first parameter",
+   "from_id": "fact:backtest-window-is-two-dates",
+   "to_id": "concept:backtesting"
+  },
+  {
+   "from": "backtest window is two dates",
+   "rel": "about",
+   "to": "backtest takes api or file data",
+   "why": "the window and the source together decide which bars load",
+   "from_id": "fact:backtest-window-is-two-dates",
+   "to_id": "fact:backtest-takes-api-or-file-data"
+  },
+  {
+   "from": "backtesting prefix is deprecated",
+   "rel": "about",
+   "to": "backtesting",
+   "why": "the surface both prefixes reach",
+   "from_id": "fact:backtesting-prefix-is-deprecated",
+   "to_id": "concept:backtesting"
+  },
+  {
+   "from": "backtesting prefix is deprecated",
+   "rel": "about",
+   "to": "sync backtest transport budget",
+   "why": "why the async surface exists beside the synchronous one",
+   "from_id": "fact:backtesting-prefix-is-deprecated",
+   "to_id": "fact:sync-backtest-transport-budget"
+  },
+  {
+   "from": "bulk backtest shares market data",
+   "rel": "about",
+   "to": "backtest window is two dates",
+   "why": "the window is shared by every strategy in the batch",
+   "from_id": "fact:bulk-backtest-shares-market-data",
+   "to_id": "fact:backtest-window-is-two-dates"
+  },
+  {
+   "from": "bulk backtest shares market data",
+   "rel": "about",
+   "to": "sync backtest transport budget",
+   "why": "what limits how large a batch can usefully be",
+   "from_id": "fact:bulk-backtest-shares-market-data",
+   "to_id": "fact:sync-backtest-transport-budget"
+  },
+  {
    "from": "direction word does not set role",
    "rel": "about",
    "to": "signal role is declared not inferred",
@@ -45644,6 +45836,22 @@
    "why": "the same failure reached by adding filters rather than by tightening one",
    "from_id": "judgment:do-not-take-default-values-for-filter-parameters",
    "to_id": "judgment:prefer-fewer-filters"
+  },
+  {
+   "from": "market data provider chain",
+   "rel": "about",
+   "to": "backtest takes api or file data",
+   "why": "the chain is one of the two places bars come from",
+   "from_id": "fact:market-data-provider-chain",
+   "to_id": "fact:backtest-takes-api-or-file-data"
+  },
+  {
+   "from": "market data provider chain",
+   "rel": "about",
+   "to": "data quality",
+   "why": "what the chain's ordering trades against",
+   "from_id": "fact:market-data-provider-chain",
+   "to_id": "concept:data-quality"
   },
   {
    "from": "one trigger at least one filter",
@@ -45718,6 +45926,22 @@
    "to_id": "concept:position-sizing"
   },
   {
+   "from": "sync backtest transport budget",
+   "rel": "about",
+   "to": "bulk backtest shares market data",
+   "why": "the batch size this budget bounds",
+   "from_id": "fact:sync-backtest-transport-budget",
+   "to_id": "fact:bulk-backtest-shares-market-data"
+  },
+  {
+   "from": "sync backtest transport budget",
+   "rel": "about",
+   "to": "backtesting prefix is deprecated",
+   "why": "which prefix the surfaces are reached through",
+   "from_id": "fact:sync-backtest-transport-budget",
+   "to_id": "fact:backtesting-prefix-is-deprecated"
+  },
+  {
    "from": "why one trigger",
    "rel": "about",
    "to": "one trigger at least one filter",
@@ -45755,13 +45979,13 @@
   "indicators_missing_description": [],
   "doc_atoms": 7,
   "doc_atom_ids": [
-   "fact:direction-word-does-not-set-role",
-   "fact:one-trigger-at-least-one-filter",
-   "fact:signal-role-is-declared-not-inferred",
-   "fact:sizing-version-is-pinned-at-creation",
-   "judgment:do-not-take-default-values-for-filter-parameters",
-   "judgment:prefer-fewer-filters",
-   "judgment:why-one-trigger"
+   "concept:chart-pattern",
+   "concept:market-foundations",
+   "concept:market-mechanics",
+   "concept:price-action",
+   "concept:quantitative-analysis",
+   "concept:risk-management",
+   "concept:strategy-design"
   ],
   "derived_atom_ids": [
    "concept:accumulation-pattern",
@@ -45957,6 +46181,11 @@
    "concept:walk-forward-optimization",
    "concept:wedge",
    "concept:wrong-context",
+   "fact:backtest-metrics-set",
+   "fact:backtest-takes-api-or-file-data",
+   "fact:backtest-window-is-two-dates",
+   "fact:backtesting-prefix-is-deprecated",
+   "fact:bulk-backtest-shares-market-data",
    "fact:chart-pattern-core-principles",
    "fact:constant-product-amm",
    "fact:cost-of-carry-relationship",
@@ -45964,6 +46193,7 @@
    "fact:direction-word-does-not-set-role",
    "fact:indicator-core-principles",
    "fact:intraday-pattern",
+   "fact:market-data-provider-chain",
    "fact:market-foundations-core-principles",
    "fact:market-mechanics-core-principles",
    "fact:momentum-crash",
@@ -45982,6 +46212,7 @@
    "fact:sizing-version-is-pinned-at-creation",
    "fact:square-root-market-impact-rule",
    "fact:strategy-design-core-principles",
+   "fact:sync-backtest-transport-budget",
    "fact:timeframe-ratio",
    "fact:win-rate-is-not-risk",
    "judgment:breakout-quality-assessment",
@@ -46010,6 +46241,7 @@
    "procedure:atr-based-stop",
    "procedure:atr-trailing-stop",
    "procedure:autocorrelation-analysis",
+   "procedure:backtest-execution-flow",
    "procedure:bearish-fvg-detection",
    "procedure:black-scholes-call-price",
    "procedure:bollinger-band-breakout",
@@ -49205,6 +49437,56 @@
     "concept:chart-pattern"
    ],
    [
+    "fact:backtest-metrics-set",
+    "about",
+    "concept:drawdown-risk"
+   ],
+   [
+    "fact:backtest-metrics-set",
+    "about",
+    "procedure:backtest-execution-flow"
+   ],
+   [
+    "fact:backtest-takes-api-or-file-data",
+    "about",
+    "concept:backtesting"
+   ],
+   [
+    "fact:backtest-takes-api-or-file-data",
+    "about",
+    "fact:market-data-provider-chain"
+   ],
+   [
+    "fact:backtest-window-is-two-dates",
+    "about",
+    "concept:backtesting"
+   ],
+   [
+    "fact:backtest-window-is-two-dates",
+    "about",
+    "fact:backtest-takes-api-or-file-data"
+   ],
+   [
+    "fact:backtesting-prefix-is-deprecated",
+    "about",
+    "concept:backtesting"
+   ],
+   [
+    "fact:backtesting-prefix-is-deprecated",
+    "about",
+    "fact:sync-backtest-transport-budget"
+   ],
+   [
+    "fact:bulk-backtest-shares-market-data",
+    "about",
+    "fact:backtest-window-is-two-dates"
+   ],
+   [
+    "fact:bulk-backtest-shares-market-data",
+    "about",
+    "fact:sync-backtest-transport-budget"
+   ],
+   [
     "fact:chart-pattern-core-principles",
     "part-of",
     "concept:chart-pattern"
@@ -49263,6 +49545,16 @@
     "fact:intraday-pattern",
     "part-of",
     "concept:quantitative-analysis"
+   ],
+   [
+    "fact:market-data-provider-chain",
+    "about",
+    "concept:data-quality"
+   ],
+   [
+    "fact:market-data-provider-chain",
+    "about",
+    "fact:backtest-takes-api-or-file-data"
    ],
    [
     "fact:market-foundations-core-principles",
@@ -49438,6 +49730,16 @@
     "fact:strategy-design-core-principles",
     "part-of",
     "concept:strategy-design"
+   ],
+   [
+    "fact:sync-backtest-transport-budget",
+    "about",
+    "fact:backtesting-prefix-is-deprecated"
+   ],
+   [
+    "fact:sync-backtest-transport-budget",
+    "about",
+    "fact:bulk-backtest-shares-market-data"
    ],
    [
     "fact:timeframe-ratio",
@@ -49788,6 +50090,16 @@
     "procedure:autocorrelation-analysis",
     "part-of",
     "concept:quantitative-analysis"
+   ],
+   [
+    "procedure:backtest-execution-flow",
+    "about",
+    "concept:backtesting"
+   ],
+   [
+    "procedure:backtest-execution-flow",
+    "about",
+    "fact:backtest-metrics-set"
    ],
    [
     "procedure:bearish-fvg-detection",
@@ -52725,14 +53037,10 @@
     "property:support-resistance-zone-width"
    ]
   ],
-  "doc_relations": 15,
+  "doc_relations": 8,
   "doc_anchors": [
-   "concept:overfitting",
-   "concept:position-sizing",
-   "concept:signal-type",
-   "property:role-filter",
-   "property:role-trigger",
-   "schema:strategy"
+   "concept:technical-analysis",
+   "object:mangrove-knowledge-space"
   ],
   "chapter_market-foundations_atoms": 61,
   "chapter_market-foundations_relations": 146,
@@ -52967,6 +53275,36 @@
    "concept:overfitting",
    "concept:quantitative-analysis",
    "procedure:hmm-regime-detection"
+  ],
+  "wiki_guides_atoms": 15,
+  "wiki_guides_atom_ids": [
+   "fact:backtest-metrics-set",
+   "fact:backtest-takes-api-or-file-data",
+   "fact:backtest-window-is-two-dates",
+   "fact:backtesting-prefix-is-deprecated",
+   "fact:bulk-backtest-shares-market-data",
+   "fact:direction-word-does-not-set-role",
+   "fact:market-data-provider-chain",
+   "fact:one-trigger-at-least-one-filter",
+   "fact:signal-role-is-declared-not-inferred",
+   "fact:sizing-version-is-pinned-at-creation",
+   "fact:sync-backtest-transport-budget",
+   "judgment:do-not-take-default-values-for-filter-parameters",
+   "judgment:prefer-fewer-filters",
+   "judgment:why-one-trigger",
+   "procedure:backtest-execution-flow"
+  ],
+  "wiki_guides_relations": 31,
+  "wiki_guides_anchors": [
+   "concept:backtesting",
+   "concept:data-quality",
+   "concept:drawdown-risk",
+   "concept:overfitting",
+   "concept:position-sizing",
+   "concept:signal-type",
+   "property:role-filter",
+   "property:role-trigger",
+   "schema:strategy"
   ]
  }
 }

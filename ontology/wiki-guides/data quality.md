@@ -1,0 +1,5 @@
+---
+kind: concept
+---
+
+# data quality

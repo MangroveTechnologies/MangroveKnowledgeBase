@@ -201,12 +201,19 @@ python3 ontology/wiki_to_atoms.py --wiki ontology/wiki-guides \
         --graph build/guides-graph.json --ontology build/<last-chapter>.json --out build/guides.json
 ```
 
-Four things learned the hard way:
+Five things learned the hard way:
 
-* **Verify the claim in code before authoring it.** The guides are not a source of truth. The
-  documented "1 TRIGGER + 1 FILTER" entry rule is not what runs -- only the trigger count is
-  enforced -- and the naming patterns presented as classification rules have five counterexamples in
-  the registry. Both would have entered the graph as facts.
+* **Verify the claim in code before authoring it, on the branch that matters.** The guides are not
+  a source of truth, and neither is `main` while a long-lived branch owns the surface: the request
+  model's date window differs between `main` and `docs/michael-structure`, so a claim verified on
+  the wrong ref is verified against nothing. What the guides get wrong so far: the naming patterns
+  presented as classification rules have five counterexamples in the registry; the entry rule is
+  enforced on the trigger count alone, so a filter requirement holds as the shape a strategy takes
+  rather than as a check; the provider chain does not start where the guide says; and a section can
+  document a retired code path in full. Each would have entered the graph as a fact.
+* **A source directory owns its `meta` keys.** `wiki_to_atoms.py` writes `<source>_atoms` and
+  `<source>_atom_ids`; a second wiki reusing `doc_atoms` overwrites the first stage's count and
+  passes for as long as the two happen to hold the same number of pages.
 * **A page is not a node.** Provenance is a property (`reference_chapter`, `reference_source`), which
   is why no chapter has a `document:` node and no guide should either. Lifting pages as nodes
   produces shells that carry their own filename and nothing else.
