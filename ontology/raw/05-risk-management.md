@@ -133,7 +133,7 @@ Common failure modes:
 - Multiple small, correlated positions create one big bet.
 - "Make it back" sizing after losses (breaks survival math).
 
-Toolkit: `TradingRules`, `check_trading_rules`, `daily_loss_limit_status` in `MangroveAI.utils.risk_management_toolkit`.
+Toolkit: `TradingRules`, `check_trading_rules`, `daily_loss_limit_status` in `MangroveAI.domains.managers.risk_management_toolkit`.
 
 ### Best Practices for Trading Rules
 
@@ -177,7 +177,7 @@ Position sizing determines the amount of capital to allocate to each trade based
 **Formula:**
 Position Size = floor((Account Value x Risk Fraction) / abs(Entry Price - Stop Price))
 
-Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_fixed_fractional`.
+Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_fixed_fractional`.
 
 **Example:**
 - Account: $100,000
@@ -202,13 +202,13 @@ Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size
 Position Value = (Account Value x Target Volatility) / Asset Volatility
 Position Size = floor(Position Value / Asset Price)
 
-Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_volatility_target`.
+Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_volatility_target`.
 
 **ATR-Based Sizing:**
 Risk per Unit = ATR x ATR Multiplier
 Position Size = floor((Account Value x Risk Fraction) / Risk per Unit)
 
-Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_atr`.
+Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_atr`.
 
 ---
 
@@ -224,7 +224,7 @@ W = Win rate (probability of winning, 0-1)
 R = Win/Loss ratio (average win / average loss)
 
 **Implementation:**
-Implementation note: See `MangroveAI.utils.risk_management_toolkit.kelly_fraction` and `MangroveAI.utils.risk_management_toolkit.fractional_kelly_fraction`.
+Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.kelly_fraction` and `MangroveAI.domains.managers.risk_management_toolkit.fractional_kelly_fraction`.
 
 **Caution:** Full Kelly is very aggressive. Most practitioners use Half-Kelly or Quarter-Kelly.
 
@@ -245,7 +245,7 @@ The fundamental position sizing formula ensures consistent risk across all trade
 
 Position Size = (Account Balance x Risk per Trade) / abs(Entry Price - Stop Loss)
 
-Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_fixed_fractional`.
+Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_fixed_fractional`.
 
 **Example Calculation:**
 - Account Balance: $50,000

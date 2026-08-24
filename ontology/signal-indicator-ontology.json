@@ -23043,7 +23043,7 @@
     "reference_chapter": [
      "risk-management"
     ],
-    "implementation_framework": "Implementation should behave like a pre-trade checklist with hard stops. How to operationalize: - Convert each rule into a measurable threshold (percent of equity, counts, ratios). - Run the checks before opening a trade, not after. - Treat violations as automatic \"no trade\" outcomes. - Review and adjust thresholds on a schedule (monthly/quarterly), not during a drawdown. Common failure modes: - Risk is computed using a stop you would not actually execute. - Multiple small, correlated positions create one big bet. - \"Make it back\" sizing after losses (breaks survival math). Toolkit: `TradingRules`, `check_trading_rules`, `daily_loss_limit_status` in `MangroveAI.utils.risk_management_toolkit`."
+    "implementation_framework": "Implementation should behave like a pre-trade checklist with hard stops. How to operationalize: - Convert each rule into a measurable threshold (percent of equity, counts, ratios). - Run the checks before opening a trade, not after. - Treat violations as automatic \"no trade\" outcomes. - Review and adjust thresholds on a schedule (monthly/quarterly), not during a drawdown. Common failure modes: - Risk is computed using a stop you would not actually execute. - Multiple small, correlated positions create one big bet. - \"Make it back\" sizing after losses (breaks survival math). Toolkit: `TradingRules`, `check_trading_rules`, `daily_loss_limit_status` in `MangroveAI.domains.managers.risk_management_toolkit`."
    }
   },
   {
@@ -23212,7 +23212,7 @@
     "explanation": "Account: $100,000 Risk per trade: 1% ($1,000) Entry: $50, Stop: $48 Risk per share: $2 Position size: $1,000 / $2 = 500 shares Conservative: 0.5% per trade Moderate: 1% per trade Aggressive: 2% per trade Maximum: 5% per trade (very risky) ",
     "notes": [
      "Position Size = floor((Account Value x Risk Fraction) / abs(Entry Price - Stop Price))",
-     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_fixed_fractional`."
+     "Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_fixed_fractional`."
     ]
    }
   },
@@ -23230,10 +23230,10 @@
     "notes": [
      "Position Value = (Account Value x Target Volatility) / Asset Volatility",
      "Position Size = floor(Position Value / Asset Price)",
-     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_volatility_target`.",
+     "Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_volatility_target`.",
      "Risk per Unit = ATR x ATR Multiplier",
      "Position Size = floor((Account Value x Risk Fraction) / Risk per Unit)",
-     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_atr`."
+     "Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_atr`."
     ]
    }
   },
@@ -23253,7 +23253,7 @@
      "Where:",
      "W = Win rate (probability of winning, 0-1)",
      "R = Win/Loss ratio (average win / average loss)",
-     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.kelly_fraction` and `MangroveAI.utils.risk_management_toolkit.fractional_kelly_fraction`.",
+     "Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.kelly_fraction` and `MangroveAI.domains.managers.risk_management_toolkit.fractional_kelly_fraction`.",
      "Caution: Full Kelly is very aggressive. Most practitioners use Half-Kelly or Quarter-Kelly."
     ]
    }
@@ -23272,7 +23272,7 @@
     "explanation": "Account Balance: $50,000 Risk per Trade: 1% ($500) Entry Price: $100 Stop Loss: $95 Risk per Share: $5 Position Size: $500 / $5 = 100 shares ",
     "notes": [
      "Position Size = (Account Balance x Risk per Trade) / abs(Entry Price - Stop Loss)",
-     "Implementation note: See `MangroveAI.utils.risk_management_toolkit.position_size_fixed_fractional`.",
+     "Implementation note: See `MangroveAI.domains.managers.risk_management_toolkit.position_size_fixed_fractional`.",
      "This formula normalizes risk regardless of the stock price or stop distance, ensuring each trade risks the same percentage of capital."
     ]
    }
