@@ -198,7 +198,7 @@ committed graph, so an example that drifts fails the build rather than misleadin
 | is there already a signal for X? | `find("keyword")` — ranked by *where* it matched |
 | a question in ordinary words, not a term | `ask("how far should the stop go")` — meaning over two indices, then a hop |
 | everything of a class, or in a role, or both | `find(kind=…, role=…)` |
-| what needs volume? what is retired? | `find(requires=…)`, `find(status=…)` |
+| what needs volume? what is retired? what takes a window? | `find(requires=…)`, `find(status=…)`, `find(param=…)` |
 | everything under a subject, whatever kind | `find(under="risk management")` — Concepts, Procedures, Facts and Judgments together |
 | what is *claimed*, and what to *do* about it | `find(primitive="Fact")`, `find(primitive="Judgment")` |
 | what does this compute — formula, params, outputs? | `get(id)` |

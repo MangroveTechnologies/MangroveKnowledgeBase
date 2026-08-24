@@ -535,6 +535,7 @@ class KnowledgeGraph:
             "classes": sorted(self.classes()),
             "statuses": sorted(self.statuses()),
             "input_columns": sorted(self.input_columns()),
+            "params": sorted(self.params()),
             "units": sorted(self.units()),
             "roots": sorted(n for n in self.nodes if not self._out.get(n)),
             "mappings": {r: {k: v for k, v in spec.items() if k in ("exact", "close")}
@@ -568,6 +569,10 @@ class KnowledgeGraph:
     def input_columns(self) -> set[str]:
         """Every input column something declares -- the vocabulary ``find(requires=...)`` accepts."""
         return {c for n in self.nodes.values() for c in (n.props.get("inputs") or {})}
+
+    def params(self) -> set[str]:
+        """Every parameter something takes -- the vocabulary ``find(param=...)`` accepts."""
+        return {p for n in self.nodes.values() for p in (n.props.get("params") or {})}
 
     def units(self) -> set[str]:
         """Every unit an output is measured in -- the vocabulary ``outputs(units=...)`` accepts."""
@@ -735,9 +740,10 @@ class KnowledgeGraph:
 
     def find(self, query: str = "", *, kind: str | None = None, role: str | None = None,
              primitive: str | None = None, status: str | None = None,
-             requires: str | None = None, under: str | None = None,
+             requires: str | None = None, param: str | None = None,
+             under: str | None = None,
              limit: int | None = DEFAULT_FIND_LIMIT) -> Result:
-        """Search by text, and/or filter by class, role, status and required input.
+        """Search by text, and/or filter by class, role, status, required input and parameter.
 
         ``kind`` and ``role`` are separate parameters on purpose, and they intersect. ``kind`` is
         resolved by :meth:`in_class`, so it reaches indicators by their own ``instance-of`` edge and
@@ -762,6 +768,7 @@ class KnowledgeGraph:
 
             kg.find(status="deprecated")               # everything superseded, in one call
             kg.find(requires="volume", role="trigger") # triggers that need a volume column
+            kg.find(param="window_dev")                # everything taking that parameter
 
         The text search reads every authored field, ranked by where it hit -- see
         :data:`SEARCH_TIERS`. A name match outranks an abbreviation, which outranks the summary,
@@ -784,6 +791,9 @@ class KnowledgeGraph:
         if requires is not None and requires not in (cols := self.input_columns()):
             raise GraphError(f"nothing declares the input {requires!r}; "
                              f"declared: {', '.join(sorted(cols))}")
+        if param is not None and param not in (names := self.params()):
+            raise GraphError(f"nothing takes a parameter called {param!r}; "
+                             f"taken: {', '.join(sorted(names))}")
 
         terms = query_terms(query)
         if query.strip() and not terms:
@@ -794,7 +804,8 @@ class KnowledgeGraph:
                     if (pool is None or n.id in pool)
                     and (not primitive or n.primitive == primitive)
                     and (status is None or n.status == status)
-                    and (requires is None or requires in (n.props.get("inputs") or {}))]
+                    and (requires is None or requires in (n.props.get("inputs") or {}))
+                    and (param is None or param in (n.props.get("params") or {}))]
         if not terms:
             return _cap([n.brief() for n in sorted(eligible, key=lambda n: n.id)], limit, "matches")
 

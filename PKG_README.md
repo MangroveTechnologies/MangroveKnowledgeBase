@@ -207,6 +207,7 @@ kg.stats()                          # counts + the full vocabulary every filter 
 kg.find("divergence")                                # is there already a signal for this?
 kg.find(kind="momentum", role="trigger")             # by what it is AND how it is used
 kg.find(requires="volume", status="deprecated")      # by what it needs and whether it is current
+kg.find(param="window_dev")                          # by a parameter it takes
 kg.get("procedure:indicator-rsi")["outputs"]         # typed outputs, with units and range
 kg.outputs(bounded=True, kind="oscillator")          # every value you could put on one axis
 kg.neighbors("procedure:indicator-rsi", relation="uses", direction="in")   # what would break

@@ -406,10 +406,29 @@ def test_status_and_requires_are_enumerable_and_enforced(kg):
     # A guessed value must name the vocabulary rather than returning an empty result that reads
     # as "there are none".
     for call in (lambda: kg.find(status="retired"), lambda: kg.find(requires="vwap"),
-                 lambda: kg.outputs(units="furlongs")):
+                 lambda: kg.find(param="lookbck"), lambda: kg.outputs(units="furlongs")):
         with pytest.raises(GraphError) as e:
             call()
-        assert "known" in str(e.value) or "declared" in str(e.value)
+        assert "known" in str(e.value) or "declared" in str(e.value) or "taken" in str(e.value)
+
+
+def test_param_is_enumerable_and_enforced(kg):
+    """Which parameter a computation takes is a question the graph already holds the answer to.
+
+    Asked here because a caller tuning a strategy reasons in parameters -- every signal with a
+    lookback window, every one with a threshold -- and could otherwise only get there by reading
+    each node in turn.
+    """
+    assert "window" in kg.stats()["params"]
+
+    windowed = {r["id"] for r in kg.find(param="window", limit=None)}
+    assert windowed == {n.id for n in kg.nodes.values()
+                        if "window" in (n.props.get("params") or {})}
+    assert windowed, "the graph is expected to carry parameterised computations"
+
+    # Intersects with the other predicates rather than replacing them.
+    triggers = {r["id"] for r in kg.find(param="window", role="trigger", limit=None)}
+    assert triggers < windowed
 
 
 def test_outputs_indexes_values_not_nodes(kg):
