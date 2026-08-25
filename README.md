@@ -108,6 +108,7 @@ kg = KnowledgeGraph.load()
 kg.stats()                                   # counts + every value a filter will accept
 kg.find("divergence")                        # search name, abbreviation, summary, authored detail
 kg.find(kind="momentum", role="trigger")     # by what it measures AND the part it plays
+                                             #   each hit shows its params (default/min/max)
 kg.get("rsi_oversold")                       # formula, params, typed outputs, warmup
 
 kg.ask("how far away from my entry should the stop go")   # a QUESTION, not a term
@@ -201,7 +202,7 @@ committed graph, so an example that drifts fails the build rather than misleadin
 | what needs volume? what is retired? what takes a window? | `find(requires=…)`, `find(status=…)`, `find(param=…)` |
 | everything under a subject, whatever kind | `find(under="risk management")` — Concepts, Procedures, Facts and Judgments together |
 | what is *claimed*, and what to *do* about it | `find(primitive="Fact")`, `find(primitive="Judgment")` |
-| what does this compute — formula, params, outputs? | `get(id)` |
+| what does this compute — formula, params, outputs? | `get(id)` — searches already show each hit's `params` |
 | which values are bounded / in these units? | `outputs(bounded=True, units=…)` |
 | what produces an output called X? | `outputs("X")` |
 | what reads this indicator? what does this read? | `neighbors(id, relation="uses", direction="in"\|"out")` |
