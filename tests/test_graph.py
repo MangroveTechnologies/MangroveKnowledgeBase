@@ -431,6 +431,25 @@ def test_param_is_enumerable_and_enforced(kg):
     assert triggers < windowed
 
 
+def test_search_results_carry_the_parameters_a_computation_takes(kg):
+    """Choosing between computations IS choosing their parameter values, so a search
+    that names candidates must show what they take -- name, default, min, max -- in the
+    same pass. A caller who only sees names picks first and looks second, or picks and
+    never looks. Nodes with no parameters stay exactly as they were."""
+    rows = kg.find(role="trigger", limit=None)
+    parameterised = [r for r in rows if "params" in r]
+    assert parameterised, "the trigger search reached nothing parameterised"
+    for row in parameterised:
+        assert row["params"] == kg.get(row["id"])["params"], \
+            "the search and the full read must show one set of facts"
+        for spec in row["params"].values():
+            assert "default" in spec, f"{row['id']}: a parameter without its default"
+
+    unparameterised = [r for r in kg.find(under="market foundations", limit=None)
+                       if "params" not in r]
+    assert unparameterised, "prose nodes must not grow an empty params key"
+
+
 def test_outputs_indexes_values_not_nodes(kg):
     """A row is one output. An indicator with three outputs contributes three rows."""
     macd = [r for r in kg.outputs(limit=None) if r["id"] == "procedure:indicator-macd"]

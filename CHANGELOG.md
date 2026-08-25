@@ -4,6 +4,20 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [3.3.0] - 2026-08-24
+
+### Search results carry each computation's parameters
+
+Choosing between computations IS choosing their parameter values. `find()` (and every other
+search and traversal returning the concise projection) now shows `params` -- each parameter's
+type, default, min, max and description -- on the nodes that have any, so a caller comparing
+candidates sees what they take in the same pass that names them. Previously parameters came
+only from `get()`, one call per candidate, and nothing required that call: a caller could pick
+first and look second, or pick and never look. Nodes without parameters are unchanged, and
+measured on the signal library the addition is ~200 bytes per row.
+
+The large properties -- formula, inputs, outputs, explanation -- still come only from `get()`.
+
 ## [3.2.0] - 2026-08-24
 
 ### `find(param=...)` — which computations take a given parameter

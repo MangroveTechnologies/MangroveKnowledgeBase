@@ -297,12 +297,20 @@ class Node:
     def brief(self) -> dict[str, Any]:
         """The concise projection: enough to decide whether to fetch the whole node.
 
-        Returned by every search and traversal. Full properties -- formula, inputs, params, outputs
-        -- come only from an explicit :meth:`KnowledgeGraph.get`, because they are large and are
-        rarely what a caller scanning results needs.
+        Returned by every search and traversal. The large properties -- formula, inputs,
+        outputs, explanation -- come only from an explicit :meth:`KnowledgeGraph.get`.
+
+        ``params`` rides along, on the nodes that have any: choosing between computations
+        IS choosing their parameter values, and a search that names candidates while
+        withholding what they take makes every caller pick first and look second -- or
+        worse, pick and never look. Measured on the signal library, params add ~200 bytes
+        to a row; the split projection cost far more than that in blind choices.
         """
-        return {"id": self.id, "name": self.name, "primitive": self.primitive,
-                "summary": self.summary}
+        row = {"id": self.id, "name": self.name, "primitive": self.primitive,
+               "summary": self.summary}
+        if self.props.get("params"):
+            row["params"] = self.props["params"]
+        return row
 
     def full(self) -> dict[str, Any]:
         return {**self.brief(), "status": self.status, "epistemic": self.epistemic, **self.props}
