@@ -397,14 +397,22 @@ def _lift(cls):
 # live in the docstrings of the signals built on them (243/243 signals carry per-param prose).
 # Recorded with provenance so a lifted value is auditable back to its source signal.
 _PARAM_LINE = re.compile(r"^\s*(\w+)\s*\(([^)]*)\)\s*:\s*(.+)$")
-_RANGE = re.compile(r"Range:\s*(-?[\d.]+)\s*-\s*(-?[\d.]+)")
+# The upper bound needs the same lazy-token-plus-lookahead treatment as `_DEFAULT` below: a greedy
+# `[\d.]+` swallows the sentence period, so `Range: 0.0-100.0.` lifted its maximum as `100.0.`,
+# which `float()` rejects -- and the maximum silently became null. An integer maximum survived
+# (`float("15.")` parses), so the corruption landed exactly on the decimal-valued bounds: 91
+# parameter maxima across the signal corpus were emitted as unauthored when their docstrings
+# declare them.
+_RANGE = re.compile(r"Range:\s*(-?[\d.]+?)\s*-\s*(-?[\d.]+?)[.,]?(?=\s|$)")
 # NOTE the lazy token plus lookahead. The obvious `([^.\s]+)` is WRONG: it stops at the first dot,
 # so `Default: 0.05.` lifts as `0`. That silently corrupted 53 parameter defaults across the corpus --
 # CCI's 0.015 scaling constant became 0 (which would make CCI infinite), PiercingLine's 0.5 minimum
 # penetration became 0 (fires on anything), MAMA's 0.05 slow limit became 0. The trailing sentence
 # period or comma is consumed by the optional class, and the lookahead requires whitespace or
 # end-of-string after it, so an internal decimal point is kept while sentence punctuation is not.
-_DEFAULT = re.compile(r"Default:\s*(\S+?)[.,]?(?=\s|$)")
+# The alternation's first arm keeps a parenthesized tuple whole: `Default: (5, 8, 13)` is one
+# value, and the bare-token arm stopped at `(5` -- see `_default_value`.
+_DEFAULT = re.compile(r"Default:\s*(\([^)]*\)|\S+?)[.,]?(?=\s|$)")
 
 
 def _num(x):
@@ -423,6 +431,28 @@ def _num(x):
     if f != f or f in (float("inf"), float("-inf")):   # NaN or infinite: no integer form
         return f
     return int(f) if f == int(f) else f
+
+
+def _authored_literal(ptype, raw):
+    """A default `_num` rejects is not necessarily unauthored.
+
+    A str param authors a bare word (`Default: bullish`), and a tuple param authors a
+    parenthesized literal (`Default: (5, 8, 13, 21, 34, 55, 89, 144)`). Both came out of
+    `_num` as None and were emitted as null -- 12 authored defaults across the corpus
+    looked like nobody had chosen them. Numeric and boolean literals stay `_num`'s job;
+    this only answers for the types whose literals are not numbers. A tuple lands as a
+    list, which is the only sequence JSON has.
+    """
+    import ast
+    if ptype == "str":
+        return raw.strip().strip("'\"") or None
+    if ptype == "tuple":
+        try:
+            v = ast.literal_eval(raw)
+        except (ValueError, SyntaxError):
+            return None
+        return list(v) if isinstance(v, tuple) else None
+    return None
 
 
 def _sibling_functions(path, sigs_dir):
@@ -513,10 +543,12 @@ def _signal_param_docs():
                 pname, ptype, rest = m.group(1), m.group(2).strip(), m.group(3).strip()
                 desc = re.split(r"\s*(?:Range|Default):", rest)[0].strip().rstrip(".")
                 rng, dflt = _RANGE.search(rest), _DEFAULT.search(rest)
+                dval = (_num(dflt.group(1)) if _num(dflt.group(1)) is not None
+                        else _authored_literal(ptype, dflt.group(1))) if dflt else None
                 spec = {"description": desc or None,
                         "min": _num(rng.group(1)) if rng else None,
                         "max": _num(rng.group(2)) if rng else None,
-                        "default": _num(dflt.group(1)) if dflt else None}
+                        "default": dval}
                 for t in targets:
                     out.setdefault(t, {}).setdefault(pname, spec)
     return out
@@ -917,8 +949,10 @@ def _signal_lift(name, fn, facts):
         # `{"type": "float", "default": 5, "min": 1, "max": 20}` -- every bound an int. A consumer
         # generating a sweep from that gets integer steps on a continuous parameter.
         cast = (lambda v: None if v is None else float(v)) if ptype == "float" else (lambda v: v)
+        dval = (cast(_num(dflt.group(1))) if _num(dflt.group(1)) is not None
+                else _authored_literal(ptype, dflt.group(1))) if dflt else None
         params[pname] = {"type": ptype,
-                         "default": cast(_num(dflt.group(1))) if dflt else None,
+                         "default": dval,
                          "min": cast(_num(rng.group(1))) if rng else None,
                          "max": cast(_num(rng.group(2))) if rng else None,
                          "description": desc or None}
