@@ -4,6 +4,20 @@ All notable changes to the `mangrove-kb` package will be documented in this file
 
 This project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Signals carry user-facing labels
+
+Every signal in the graph (218) carries three new properties, authored in its docstring as
+`Friendly-Name:`, `Display-Name:` and `Short-Description:` sections:
+
+- `friendly_name` -- a plain-language name of four words or fewer ("Upside Range Breakout").
+- `display_name` -- the readable technical name ("Bollinger Band Upper Breakout").
+- `short_description` -- one plain sentence on what the signal detects.
+
+`meta.signals_missing_labels` lists any signal missing one. `friendly_name` and `short_description`
+are kept out of the search corpus, because they restate the summary; `display_name` is searchable.
+
 ## [3.3.0] - 2026-08-24
 
 ### Search results carry each computation's parameters

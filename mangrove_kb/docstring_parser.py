@@ -61,8 +61,12 @@ _INLINE_SECTIONS = ("Abbreviation", "Reference", "Warmup")
 _BLOCK_SECTIONS = ("Formula", "Inputs", "Params", "Outputs", "Interpretation", "Applications")
 #: Sections the pre-existing parser already owns; listed so the description stops at them too.
 _LEGACY_SECTIONS = ("Type", "Requires", "Disabled", "Disabled-Reason", "Args", "Returns")
+#: A signal's user-facing labels: the plain-language chip name, the readable technical name and the
+#: one-sentence plain description shown beside it. Signal-only; stored as `friendly_name`,
+#: `display_name` and `short_description`.
+_LABEL_SECTIONS = ("Friendly-Name", "Display-Name", "Short-Description")
 
-_ALL_SECTIONS = _INLINE_SECTIONS + _BLOCK_SECTIONS + _LEGACY_SECTIONS
+_ALL_SECTIONS = _INLINE_SECTIONS + _BLOCK_SECTIONS + _LEGACY_SECTIONS + _LABEL_SECTIONS
 _SECTION_START_RE = re.compile(r"^(" + "|".join(_ALL_SECTIONS) + r"):")
 
 #: Which sections each kind may carry. Enforced, not documented -- an `Interpretation:` on a signal
@@ -70,7 +74,7 @@ _SECTION_START_RE = re.compile(r"^(" + "|".join(_ALL_SECTIONS) + r"):")
 PERMITTED = {
     "Indicator": set(_INLINE_SECTIONS) | set(_BLOCK_SECTIONS) | {"Args", "Returns"},
     "Signal": {"Reference", "Warmup", "Formula", "Inputs", "Params", "Outputs", "Type", "Requires",
-               "Disabled", "Disabled-Reason", "Args", "Returns"},
+               "Disabled", "Disabled-Reason", "Args", "Returns"} | set(_LABEL_SECTIONS),
 }
 
 #: `name [units, lo..hi]` with an optional `"canonical name"`. Omitting the quoted name parses back
@@ -631,6 +635,10 @@ def parse_authored(docstring: str) -> dict:
             # Every inline value is a STRING, including a numeric-looking warmup: the graph holds
             # '0' and '1', not 0 and 1. Coercing to int here made 60 nodes differ by type alone.
             res[sec.lower()] = secs[sec][0].strip()
+
+    for sec in _LABEL_SECTIONS:
+        if sec in secs and _join_wrapped("\n".join(secs[sec])):
+            res[sec.lower().replace("-", "_")] = _join_wrapped("\n".join(secs[sec]))
 
     if "Formula" in secs:
         res["formula"] = textwrap.dedent("\n".join(secs["Formula"])).strip("\n").strip()

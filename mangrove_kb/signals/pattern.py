@@ -59,6 +59,10 @@ def doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1) -> bool:
     Check if a doji pattern is detected on the current bar. A doji forms when open and close are
     nearly equal relative to the candle's range, signaling indecision.
 
+    Friendly-Name: Indecision Bar
+    Display-Name: Doji
+    Short-Description: Price closed almost where it opened, so buyers and sellers are evenly matched.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0
 
@@ -101,6 +105,10 @@ def long_legged_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
 
     Check if a long-legged doji is detected on the current bar. A doji with both upper and lower
     wicks at least wick_threshold of the total range, indicating extreme indecision.
+
+    Friendly-Name: Extreme Indecision
+    Display-Name: Long-Legged Doji
+    Short-Description: Price swung far both ways but closed near the open, showing deep uncertainty.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0
@@ -147,6 +155,10 @@ def dragonfly_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     Check if a dragonfly doji is detected on the current bar. A doji with open/close near the high
     and a long lower shadow. Bullish signal at support.
 
+    Friendly-Name: Dip Fully Bought Back
+    Display-Name: Dragonfly Doji
+    Short-Description: Price fell sharply but recovered to close near the high, a possible bottom.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0
 
@@ -192,6 +204,10 @@ def gravestone_doji_trigger(df: pd.DataFrame, body_threshold: float = 0.1,
     Check if a gravestone doji is detected on the current bar. A doji with open/close near the low
     and a long upper shadow. Bearish signal at resistance.
 
+    Friendly-Name: Rally Fully Sold Off
+    Display-Name: Gravestone Doji
+    Short-Description: Price rose sharply but fell back to close near the low, a possible top.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0
 
@@ -236,6 +252,10 @@ def hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 
     Check if a hammer shape is detected on the current bar. Small body at upper end with long lower
     wick and minimal upper wick. Bullish reversal after downtrend.
+
+    Friendly-Name: Buyers Step In
+    Display-Name: Hammer
+    Short-Description: Sellers pushed price down but buyers drove it back up by the close.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 0
@@ -285,6 +305,10 @@ def shooting_star_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     the two fire on exactly the same bars -- verified identical across 499 bars. The distinction is
     the prior trend, which this implementation does not encode. Kept because the name is referenced
     outside this repository. Use `inverted_hammer_trigger`.
+
+    Friendly-Name: Rally Rejected
+    Display-Name: Shooting Star
+    Short-Description: Price spiked up and fell back, which can warn of a top; same test as Inverted Hammer.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
     Warmup: 0
@@ -340,6 +364,10 @@ def hanging_man_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     does not encode. Kept because the name is referenced outside this repository (MangroveOracle's
     signals_metadata.json, strategy cohort files, experiment outputs). Use `hammer_trigger`.
 
+    Friendly-Name: Possible Top Warning
+    Display-Name: Hanging Man
+    Short-Description: A hammer-shaped candle that can warn of a top after a rise; same test as Hammer.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
     Warmup: 0
 
@@ -390,6 +418,10 @@ def inverted_hammer_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     (small body, long upper wick) but interpreted as a bullish reversal when appearing after a
     downtrend.
 
+    Friendly-Name: Buyers Test Higher
+    Display-Name: Inverted Hammer
+    Short-Description: Buyers pushed price up during the bar; after a drop this can signal a bottom.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 0
 
@@ -434,6 +466,10 @@ def marubozu_bullish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
     Check if a bullish marubozu is detected on the current bar. Full-bodied bullish candle with
     minimal or no wicks. Signals strong buying conviction.
 
+    Friendly-Name: Strong Buying Bar
+    Display-Name: Bullish Marubozu
+    Short-Description: A full up bar with little or no wick, showing strong buying conviction.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0
 
@@ -475,6 +511,10 @@ def marubozu_bearish_trigger(df: pd.DataFrame, wick_tolerance: float = 0.05) -> 
 
     Check if a bearish marubozu is detected on the current bar. Full-bodied bearish candle with
     minimal or no wicks. Signals strong selling conviction.
+
+    Friendly-Name: Strong Selling Bar
+    Display-Name: Bearish Marubozu
+    Short-Description: A full down bar with little or no wick, showing strong selling conviction.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0
@@ -518,6 +558,10 @@ def spinning_top_trigger(df: pd.DataFrame, body_max: float = 0.3,
 
     Check if a spinning top is detected on the current bar. Small body with significant wicks on
     both sides, signaling indecision.
+
+    Friendly-Name: Undecided Bar
+    Display-Name: Spinning Top
+    Short-Description: A small body with wicks on both sides, showing neither side in control.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0
@@ -568,6 +612,10 @@ def bullish_engulfing_trigger(df: pd.DataFrame) -> bool:
     Check if a bullish engulfing pattern completed on the current bar. Current bullish candle's body
     completely contains the previous bearish candle's body. Strong bullish reversal.
 
+    Friendly-Name: Buyers Overwhelm Sellers
+    Display-Name: Bullish Engulfing
+    Short-Description: An up candle fully swallowed the prior down candle, a strong sign of a turn higher.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 1
 
@@ -603,6 +651,10 @@ def bearish_engulfing_trigger(df: pd.DataFrame) -> bool:
 
     Check if a bearish engulfing pattern completed on the current bar. Current bearish candle's body
     completely contains the previous bullish candle's body. Strong bearish reversal.
+
+    Friendly-Name: Sellers Overwhelm Buyers
+    Display-Name: Bearish Engulfing
+    Short-Description: A down candle fully swallowed the prior up candle, a strong sign of a turn lower.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
     Warmup: 1
@@ -640,6 +692,10 @@ def bullish_harami_trigger(df: pd.DataFrame) -> bool:
     Check if a bullish harami pattern completed on the current bar. Current small bullish candle's
     body is inside the previous large bearish candle's body. Potential bullish reversal.
 
+    Friendly-Name: Selloff Stalls
+    Display-Name: Bullish Harami
+    Short-Description: A small up candle formed inside the prior big down candle, a possible turn higher.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 1
 
@@ -675,6 +731,10 @@ def bearish_harami_trigger(df: pd.DataFrame) -> bool:
 
     Check if a bearish harami pattern completed on the current bar. Current small bearish candle's
     body is inside the previous large bullish candle's body. Potential bearish reversal.
+
+    Friendly-Name: Rally Stalls
+    Display-Name: Bearish Harami
+    Short-Description: A small down candle formed inside the prior big up candle, a possible turn lower.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
     Warmup: 1
@@ -716,6 +776,10 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
     gap: measured on 1,294 BTC daily bars, the open is below the prior low ZERO times, so
     require_gap=True yields 0 fires against 63 for the relaxed form. Set require_gap=True only for a
     market that actually closes.
+
+    Friendly-Name: Buyers Push Back
+    Display-Name: Piercing Line
+    Short-Description: After a down candle, an up candle closed above its midpoint, a possible turn higher.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 1
@@ -767,6 +831,10 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
     require_gap=True yields 0 fires against 67 for the relaxed form. Set require_gap=True only for a
     market that actually closes.
 
+    Friendly-Name: Sellers Push Back
+    Display-Name: Dark Cloud Cover
+    Short-Description: After an up candle, a down candle closed below its midpoint, a possible turn lower.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
     Warmup: 1
 
@@ -812,6 +880,10 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     Check if a tweezer tops pattern completed on the current bar. Two consecutive candles with
     approximately equal highs, first bullish and second bearish. Bearish reversal.
 
+    Friendly-Name: Double Top Bars
+    Display-Name: Tweezer Tops
+    Short-Description: Two bars hit the same high and the second closed down, a possible top.
+
     Reference: https://thepatternsite.com/TweezersTop.html
     Warmup: 1
 
@@ -854,6 +926,10 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
 
     Check if a tweezer bottoms pattern completed on the current bar. Two consecutive candles with
     approximately equal lows, first bearish and second bullish. Bullish reversal.
+
+    Friendly-Name: Double Bottom Bars
+    Display-Name: Tweezer Bottoms
+    Short-Description: Two bars hit the same low and the second closed up, a possible bottom.
 
     Reference: https://thepatternsite.com/TweezersBottom.html
     Warmup: 1
@@ -903,6 +979,10 @@ def morning_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
     Check if a morning star pattern completed on the current bar. Three-candle bullish reversal:
     bearish candle, small-bodied star, then bullish candle closing above midpoint of first.
 
+    Friendly-Name: Three-Bar Bottom
+    Display-Name: Morning Star
+    Short-Description: A down bar, a small pause, then a strong up bar: a classic sign of a bottom.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 2
 
@@ -944,6 +1024,10 @@ def evening_star_trigger(df: pd.DataFrame, body_threshold: float = 0.3) -> bool:
 
     Check if an evening star pattern completed on the current bar. Three-candle bearish reversal:
     bullish candle, small-bodied star, then bearish candle closing below midpoint of first.
+
+    Friendly-Name: Three-Bar Top
+    Display-Name: Evening Star
+    Short-Description: An up bar, a small pause, then a strong down bar: a classic sign of a top.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
     Warmup: 2
@@ -987,6 +1071,10 @@ def three_white_soldiers_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) 
     Check if three white soldiers pattern completed on the current bar. Three consecutive bullish
     candles with higher closes, each opening within the previous body. Strong bullish signal.
 
+    Friendly-Name: Three Strong Up Bars
+    Display-Name: Three White Soldiers
+    Short-Description: Three strong up bars in a row, each closing higher, a sign of heavy buying.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
     Warmup: 2
 
@@ -1028,6 +1116,10 @@ def three_black_crows_trigger(df: pd.DataFrame, min_body_ratio: float = 0.5) -> 
 
     Check if three black crows pattern completed on the current bar. Three consecutive bearish
     candles with lower closes, each opening within the previous body. Strong bearish signal.
+
+    Friendly-Name: Three Strong Down Bars
+    Display-Name: Three Black Crows
+    Short-Description: Three strong down bars in a row, each closing lower, a sign of heavy selling.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
     Warmup: 2
@@ -1071,6 +1163,10 @@ def three_inside_up_trigger(df: pd.DataFrame) -> bool:
     Check if three inside up pattern completed on the current bar. Bearish candle, bullish harami,
     then bullish close above first candle's open. Confirmed bullish reversal.
 
+    Friendly-Name: Confirmed Turn Up
+    Display-Name: Three Inside Up
+    Short-Description: A stalled selloff was followed by an up bar closing above it, confirming a turn higher.
+
     Reference: https://thepatternsite.com/ThreeInsideUp.html
     Warmup: 2
 
@@ -1106,6 +1202,10 @@ def three_inside_down_trigger(df: pd.DataFrame) -> bool:
 
     Check if three inside down pattern completed on the current bar. Bullish candle, bearish harami,
     then bearish close below first candle's open. Confirmed bearish reversal.
+
+    Friendly-Name: Confirmed Turn Down
+    Display-Name: Three Inside Down
+    Short-Description: A stalled rally was followed by a down bar closing below it, confirming a turn lower.
 
     Reference: https://thepatternsite.com/ThreeInsideDown.html
     Warmup: 2
@@ -1148,6 +1248,10 @@ def inside_bar_trigger(df: pd.DataFrame) -> bool:
     Check if an inside bar is detected on the current bar. Current bar's range is completely
     contained within the previous bar's range. Signals consolidation and potential breakout.
 
+    Friendly-Name: Market Pauses
+    Display-Name: Inside Bar
+    Short-Description: This bar stayed within the prior bar's range, a pause that often comes before a breakout.
+
     Reference: https://thepatternsite.com/InsideDays.html
     Warmup: 1
 
@@ -1183,6 +1287,10 @@ def outside_bar_trigger(df: pd.DataFrame) -> bool:
 
     Check if an outside bar is detected on the current bar. Current bar's range completely engulfs
     the previous bar's range. Signals increased volatility.
+
+    Friendly-Name: Volatility Expands
+    Display-Name: Outside Bar
+    Short-Description: This bar's range covered the entire prior bar, showing a burst of volatility.
 
     Reference: https://thepatternsite.com/OutsideDays.html
     Warmup: 1
@@ -1220,6 +1328,10 @@ def bullish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
 
     Check if a bullish pin bar is detected on the current bar. Long lower wick with body in the
     upper portion of the range. Bullish reversal at support.
+
+    Friendly-Name: Rejected From Lows
+    Display-Name: Bullish Pin Bar
+    Short-Description: Price dipped but was bought back up, leaving a long lower wick.
 
     Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
     Warmup: 0
@@ -1266,6 +1378,10 @@ def bearish_pin_bar_trigger(df: pd.DataFrame, wick_ratio: float = 2.0,
     Check if a bearish pin bar is detected on the current bar. Long upper wick with body in the
     lower portion of the range. Bearish reversal at resistance.
 
+    Friendly-Name: Rejected From Highs
+    Display-Name: Bearish Pin Bar
+    Short-Description: Price pushed up but was sold back down, leaving a long upper wick.
+
     Reference: https://www.tradingsetupsreview.com/pinocchio-bar-trade-setup-pin-bar/
     Warmup: 0
 
@@ -1311,6 +1427,10 @@ def two_bar_reversal_bullish_trigger(df: pd.DataFrame, close_proximity: float = 
     bullish bar that takes out the low then closes above the prior open. The close_proximity
     parameter controls how close the close must be to the high/low extreme.
 
+    Friendly-Name: Sharp Two-Bar Reversal Up
+    Display-Name: Bullish Two-Bar Reversal
+    Short-Description: A strong down bar was fully reversed by a strong up bar.
+
     Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
     Warmup: 1
 
@@ -1355,6 +1475,10 @@ def two_bar_reversal_bearish_trigger(df: pd.DataFrame, close_proximity: float = 
     bearish bar that takes out the high then closes below the prior open. The close_proximity
     parameter controls how close the close must be to the high/low extreme.
 
+    Friendly-Name: Sharp Two-Bar Reversal Down
+    Display-Name: Bearish Two-Bar Reversal
+    Short-Description: A strong up bar was fully reversed by a strong down bar.
+
     Reference: https://www.tradingsetupsreview.com/two-bar-reversal-pattern-trading-guide/
     Warmup: 1
 
@@ -1398,6 +1522,10 @@ def nr7_trigger(df: pd.DataFrame, window: int = 7) -> bool:
     Check if a narrow range day is detected on the current bar. Current bar has the smallest range
     within the window period. Signals volatility compression and imminent breakout. Default window=7
     for NR7; use 4 for NR4.
+
+    Friendly-Name: Quietest Bar In 7
+    Display-Name: Narrow Range 7 (NR7)
+    Short-Description: This bar had the smallest range of the last 7; a bigger move often follows.
 
     Reference: https://thepatternsite.com/nr7.html
     Warmup: window - 1
@@ -1445,6 +1573,10 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     inverted hammer, bullish engulfing, bullish harami, piercing line, morning star, dragonfly doji,
     three white soldiers, three inside up, tweezer bottoms, and bullish pin bar within the recent
     window.
+
+    Friendly-Name: Recent Buying Pattern
+    Display-Name: Recent Bullish Candle Pattern
+    Short-Description: A candle pattern that often comes before a rise appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 2
@@ -1516,6 +1648,10 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     gravestone doji, three black crows, three inside down, tweezer tops, and bearish pin bar within
     the recent window.
 
+    Friendly-Name: Recent Selling Pattern
+    Display-Name: Recent Bearish Candle Pattern
+    Short-Description: A candle pattern that often comes before a drop appeared recently.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
     Warmup: 2
 
@@ -1585,6 +1721,10 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     inverted hammer, bullish engulfing, morning star, piercing line, and dragonfly doji -- the
     classic bullish reversal patterns.
 
+    Friendly-Name: Recent Bottom Pattern
+    Display-Name: Recent Bullish Reversal Pattern
+    Short-Description: A classic candle pattern that signals a possible bottom appeared recently.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
     Warmup: 2
 
@@ -1644,6 +1784,10 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     shooting star, bearish engulfing, evening star, dark cloud cover, and gravestone doji -- the
     classic bearish reversal patterns.
 
+    Friendly-Name: Recent Top Pattern
+    Display-Name: Recent Bearish Reversal Pattern
+    Short-Description: A classic candle pattern that signals a possible top appeared recently.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
     Warmup: 2
 
@@ -1702,6 +1846,10 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     Check if a bullish continuation pattern was detected within recent window. Scans for three white
     soldiers and three inside up.
 
+    Friendly-Name: Uptrend Likely Continues
+    Display-Name: Recent Bullish Continuation Pattern
+    Short-Description: A run of strong up candles appeared recently, suggesting more upside.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
     Warmup: 2
 
@@ -1749,6 +1897,10 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     Check if a bearish continuation pattern was detected within recent window. Scans for three black
     crows and three inside down.
 
+    Friendly-Name: Downtrend Likely Continues
+    Display-Name: Recent Bearish Continuation Pattern
+    Short-Description: A run of strong down candles appeared recently, suggesting more downside.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
     Warmup: 2
 
@@ -1795,6 +1947,10 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
 
     Check if an indecision pattern was detected within recent window. Scans for doji, spinning top,
     inside bar, and NR7.
+
+    Friendly-Name: Recent Indecision
+    Display-Name: Recent Indecision Pattern
+    Short-Description: A bar showing buyers and sellers evenly matched appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 6
@@ -1847,6 +2003,10 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
 
     Check if a marubozu (strong body) was detected within recent window. Scans for both bullish and
     bearish marubozu patterns.
+
+    Friendly-Name: Recent Strong Bar
+    Display-Name: Recent Marubozu
+    Short-Description: A strong full-bodied bar, up or down, appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
     Warmup: 0

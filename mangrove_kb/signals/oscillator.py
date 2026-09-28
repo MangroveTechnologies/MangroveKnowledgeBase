@@ -37,6 +37,10 @@ def rsi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 70.0) 
     overbought conditions, suggesting the asset may be due for a pullback. In crypto markets,
     consider higher thresholds (80/20) during strong trends.
 
+    Friendly-Name: Heavily Bought Up
+    Display-Name: RSI Overbought
+    Short-Description: Buying has pushed price unusually high; a pullback may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: window
 
@@ -85,6 +89,10 @@ def rsi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 30.0) ->
     conditions, suggesting the asset may be due for a bounce. In crypto markets, consider higher
     thresholds (80/20) during strong trends.
 
+    Friendly-Name: Heavily Sold Off
+    Display-Name: RSI Oversold
+    Short-Description: Selling has pushed price unusually low; a bounce may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: window
 
@@ -132,6 +140,10 @@ def rsi_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) ->
     Check if RSI crosses above a threshold level. Returns True when RSI was at or below the
     threshold in the previous bar and is now above the threshold in the current bar. In crypto
     markets, consider higher thresholds (80/20) during strong trends.
+
+    Friendly-Name: Momentum Rises Above Level
+    Display-Name: RSI Crosses Above Level
+    Short-Description: Momentum just rose above the chosen level (50 by default).
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: window
@@ -189,6 +201,10 @@ def rsi_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     threshold in the previous bar and is now below the threshold in the current bar. In crypto
     markets, consider higher thresholds (80/20) during strong trends.
 
+    Friendly-Name: Momentum Drops Below Level
+    Display-Name: RSI Crosses Below Level
+    Short-Description: Momentum just fell below the chosen level (50 by default).
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: window
 
@@ -245,6 +261,10 @@ def stoch_overbought(
 
     Check if Stochastic %K is above the overbought threshold.
 
+    Friendly-Name: Near Recent Highs
+    Display-Name: Stochastic Overbought
+    Short-Description: Price is closing near the top of its recent range; a pullback may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full
     Warmup: window - 1
 
@@ -300,6 +320,10 @@ def stoch_oversold(
 
     Check if Stochastic %K is below the oversold threshold.
 
+    Friendly-Name: Near Recent Lows
+    Display-Name: Stochastic Oversold
+    Short-Description: Price is closing near the bottom of its recent range; a bounce may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochastic-oscillator-fast-slow-and-full
     Warmup: window - 1
 
@@ -353,6 +377,10 @@ def stochrsi_overbought(df: pd.DataFrame, window: int = 14, smooth1: int = 3, sm
 
     Check if Stochastic RSI indicates overbought condition. In crypto markets, consider adjusting
     thresholds during strong trends.
+
+    Friendly-Name: Momentum Near Its Peak
+    Display-Name: Stochastic RSI Overbought
+    Short-Description: Momentum is near the top of its recent range; a pullback may follow.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi
     Warmup: window + smooth1 + smooth2 - 1
@@ -408,6 +436,10 @@ def stochrsi_oversold(df: pd.DataFrame, window: int = 14, smooth1: int = 3, smoo
     Check if Stochastic RSI indicates oversold condition. In crypto markets, consider adjusting
     thresholds during strong trends.
 
+    Friendly-Name: Momentum Near Its Low
+    Display-Name: Stochastic RSI Oversold
+    Short-Description: Momentum is near the bottom of its recent range; a bounce may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi
     Warmup: window + smooth1 + smooth2 - 1
 
@@ -462,6 +494,10 @@ def williams_r_overbought(df: pd.DataFrame, window: int = 14, threshold: float =
     Check if Williams %R is above the overbought threshold. Williams %R ranges from -100 to 0.
     Values above -20 indicate overbought.
 
+    Friendly-Name: At Top Of Range
+    Display-Name: Williams %R Overbought
+    Short-Description: Price is closing at the very top of its recent range; a pullback may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r
     Warmup: window - 1
 
@@ -513,6 +549,10 @@ def williams_r_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -
 
     Check if Williams %R is below the oversold threshold. Williams %R ranges from -100 to 0. Values
     below -80 indicate oversold.
+
+    Friendly-Name: At Bottom Of Range
+    Display-Name: Williams %R Oversold
+    Short-Description: Price is closing at the very bottom of its recent range; a bounce may follow.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/williams-r
     Warmup: window - 1
@@ -566,6 +606,10 @@ def cmo_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     Check if Chande Momentum Oscillator is above the overbought threshold. CMO ranges from -100 to
     +100; default threshold of +50 is standard (analogous to RSI 70).
 
+    Friendly-Name: Heavily Bought Up
+    Display-Name: CMO Overbought
+    Short-Description: Buying has pushed momentum unusually high; a pullback may follow.
+
     Warmup: window
 
     Formula:
@@ -608,6 +652,10 @@ def cmo_oversold(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
 
     Check if Chande Momentum Oscillator is below the oversold threshold. Default threshold of -50 is
     standard (analogous to RSI 30).
+
+    Friendly-Name: Heavily Sold Off
+    Display-Name: CMO Oversold
+    Short-Description: Selling has pushed momentum unusually low; a bounce may follow.
 
     Warmup: window
 
@@ -652,6 +700,10 @@ def cmo_cross_up(df: pd.DataFrame, window: int = 14, threshold: float = -50.0) -
     Detect CMO crossing above the oversold threshold (bullish momentum return). Analogous to RSI
     crossing above 30.
 
+    Friendly-Name: Selloff Starts Easing
+    Display-Name: CMO Crosses Above Oversold
+    Short-Description: Momentum just recovered from an extreme low, hinting a selloff is easing.
+
     Warmup: window + 1
 
     Formula:
@@ -695,6 +747,10 @@ def cmo_cross_down(df: pd.DataFrame, window: int = 14, threshold: float = 50.0) 
     Detect CMO crossing below the overbought threshold (bearish momentum onset). Analogous to RSI
     crossing below 70.
 
+    Friendly-Name: Rally Starts Cooling
+    Display-Name: CMO Crosses Below Overbought
+    Short-Description: Momentum just dropped back from an extreme high, hinting a rally is cooling.
+
     Warmup: window + 1
 
     Formula:
@@ -737,6 +793,10 @@ def tsi_bullish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
 
     Check if True Strength Index indicates bullish momentum. TSI above zero indicates bullish
     momentum.
+
+    Friendly-Name: Steady Upward Momentum
+    Display-Name: True Strength Index Bullish
+    Short-Description: Smoothed momentum is positive, favoring further upside.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index
     Warmup: window_slow + window_fast - 1
@@ -790,6 +850,10 @@ def tsi_bearish(df: pd.DataFrame, window_slow: int = 25, window_fast: int = 13, 
     Check if True Strength Index indicates bearish momentum. TSI below zero indicates bearish
     momentum.
 
+    Friendly-Name: Steady Downward Momentum
+    Display-Name: True Strength Index Bearish
+    Short-Description: Smoothed momentum is negative, favoring further downside.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/true-strength-index
     Warmup: window_slow + window_fast - 1
 
@@ -842,6 +906,10 @@ def bop_bullish(df: pd.DataFrame) -> bool:
     Check if Balance of Power indicates buyers in control on the current bar. BOP = (close - open) /
     (high - low). Positive = buyers dominated the bar.
 
+    Friendly-Name: Buyers Won The Bar
+    Display-Name: Balance of Power Bullish
+    Short-Description: Buyers controlled this bar: it closed above where it opened.
+
     Reference: https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/
     Warmup: 0
 
@@ -883,6 +951,10 @@ def bop_bearish(df: pd.DataFrame) -> bool:
     """Signal: bop_bearish
 
     Check if Balance of Power indicates sellers in control on the current bar.
+
+    Friendly-Name: Sellers Won The Bar
+    Display-Name: Balance of Power Bearish
+    Short-Description: Sellers controlled this bar: it closed below where it opened.
 
     Reference: https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/
     Warmup: 0
@@ -926,6 +998,10 @@ def bop_cross_up(df: pd.DataFrame) -> bool:
 
     Detect Balance of Power crossing above zero (sellers -> buyers).
 
+    Friendly-Name: Buyers Take Over
+    Display-Name: Balance of Power Crosses Above Zero
+    Short-Description: Control just shifted from sellers to buyers.
+
     Reference: https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/
     Warmup: 1
 
@@ -966,6 +1042,10 @@ def bop_cross_down(df: pd.DataFrame) -> bool:
 
     Detect Balance of Power crossing below zero (buyers -> sellers).
 
+    Friendly-Name: Sellers Take Over
+    Display-Name: Balance of Power Crosses Below Zero
+    Short-Description: Control just shifted from buyers to sellers.
+
     Reference: https://www.tradingview.com/support/solutions/43000589100-balance-of-power-bop/
     Warmup: 1
 
@@ -1005,6 +1085,10 @@ def uo_overbought(df: pd.DataFrame, window_short: int = 7, window_medium: int = 
     """Signal: uo_overbought
 
     Check if Ultimate Oscillator indicates overbought condition.
+
+    Friendly-Name: Overheated On All Horizons
+    Display-Name: Ultimate Oscillator Overbought
+    Short-Description: Buying pressure is strong across short, medium and long windows; a pullback may follow.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator
     Warmup: window_long - 1
@@ -1062,6 +1146,10 @@ def uo_oversold(df: pd.DataFrame, window_short: int = 7, window_medium: int = 14
 
     Check if Ultimate Oscillator indicates oversold condition.
 
+    Friendly-Name: Exhausted On All Horizons
+    Display-Name: Ultimate Oscillator Oversold
+    Short-Description: Buying pressure is weak across short, medium and long windows; a bounce may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ultimate-oscillator
     Warmup: window_long - 1
 
@@ -1118,6 +1206,10 @@ def cmf_bearish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
 
     Check if CMF (Chaikin Money Flow) indicates selling pressure.
 
+    Friendly-Name: Selling Outweighs Buying
+    Display-Name: Chaikin Money Flow Bearish
+    Short-Description: More money has been flowing out than in over recent bars.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf
     Warmup: window - 1
 
@@ -1167,6 +1259,10 @@ def cmf_bullish(df: pd.DataFrame, window: int = 20, threshold: float = 0.0) -> b
     """Signal: cmf_bullish
 
     Check if CMF (Chaikin Money Flow) indicates buying pressure.
+
+    Friendly-Name: Buying Outweighs Selling
+    Display-Name: Chaikin Money Flow Bullish
+    Short-Description: More money has been flowing in than out over recent bars.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-money-flow-cmf
     Warmup: window - 1
@@ -1218,6 +1314,10 @@ def mfi_overbought(df: pd.DataFrame, window: int = 14, threshold: float = 80.0) 
 
     Check if MFI (Money Flow Index) indicates overbought condition.
 
+    Friendly-Name: Heavy Volume Buying
+    Display-Name: Money Flow Index Overbought
+    Short-Description: Buying volume has been unusually heavy; a pullback may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi
     Warmup: window - 1
 
@@ -1267,6 +1367,10 @@ def mfi_oversold(df: pd.DataFrame, window: int = 14, threshold: float = 20.0) ->
     """Signal: mfi_oversold
 
     Check if MFI (Money Flow Index) indicates oversold condition.
+
+    Friendly-Name: Heavy Volume Selling
+    Display-Name: Money Flow Index Oversold
+    Short-Description: Selling volume has been unusually heavy; a bounce may follow.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/money-flow-index-mfi
     Warmup: window - 1
@@ -1323,6 +1427,10 @@ def cci_overbought(df: pd.DataFrame, window: int = 20, constant: float = 0.015, 
 
     Check if CCI indicates overbought condition.
 
+    Friendly-Name: Unusually High Price
+    Display-Name: CCI Overbought
+    Short-Description: Price is well above its recent typical level; a pullback may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci
     Warmup: window - 1
 
@@ -1375,6 +1483,10 @@ def cci_oversold(df: pd.DataFrame, window: int = 20, constant: float = 0.015, th
 
     Check if CCI indicates oversold condition.
 
+    Friendly-Name: Unusually Low Price
+    Display-Name: CCI Oversold
+    Short-Description: Price is well below its recent typical level; a bounce may follow.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/commodity-channel-index-cci
     Warmup: window - 1
 
@@ -1426,6 +1538,10 @@ def stc_overbought(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 2
     """Signal: stc_overbought
 
     Check if STC indicates overbought condition.
+
+    Friendly-Name: Cycle Near Its Top
+    Display-Name: Schaff Trend Cycle Overbought
+    Short-Description: The market's trend cycle is near its top; a turn down may follow.
 
     Warmup: window_slow + cycle - 1
 
@@ -1487,6 +1603,10 @@ def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23,
     """Signal: stc_oversold
 
     Check if STC indicates oversold condition.
+
+    Friendly-Name: Cycle Near Its Bottom
+    Display-Name: Schaff Trend Cycle Oversold
+    Short-Description: The market's trend cycle is near its bottom; a turn up may follow.
 
     Warmup: window_slow + cycle - 1
 

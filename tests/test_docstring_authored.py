@@ -152,3 +152,41 @@ def test_real_source_objects_round_trip(kg):
         for name, spec in node["outputs"].items():
             for field in ("units", "range", "canonical_name", "description"):
                 assert got["outputs"][name][field] == spec[field], f"{node_id} {name}.{field}"
+
+
+def test_signal_labels_are_read_and_may_wrap():
+    doc = ("Signal: s\n\ndesc\n\nFriendly-Name: Buyers In Control\nDisplay-Name: ADX Bullish\n"
+           "Short-Description: Upward pressure is\n    stronger than downward pressure.\n\nType: FILTER\n")
+    got = parse_authored(doc)
+    assert got["friendly_name"] == "Buyers In Control"
+    assert got["display_name"] == "ADX Bullish"
+    assert got["short_description"] == "Upward pressure is stronger than downward pressure."
+    assert got["summary"] == "desc"
+
+
+def test_indicators_may_not_carry_signal_labels():
+    with pytest.raises(DocstringFormatError, match="may not have"):
+        parse_authored("Indicator: X\n\ndesc\n\nFriendly-Name: Nope\n")
+
+
+def test_labels_do_not_leak_into_the_legacy_description():
+    from mangrove_kb.docstring_parser import parse_signal_docstring
+    from mangrove_kb.signals.volatility import bb_upper_breakout
+    desc = parse_signal_docstring(bb_upper_breakout)["description"]
+    assert "Friendly-Name" not in desc and "Upside Range Breakout" not in desc
+
+
+def test_every_signal_in_the_graph_carries_its_labels():
+    """The frontend renders every signal as a chip named by `friendly_name`, with `display_name` and
+    `short_description` in its tooltip. A signal missing one renders as its raw code name."""
+    import json
+    from pathlib import Path
+    graph = json.loads((Path(__file__).resolve().parent.parent / "ontology"
+                        / "signal-indicator-ontology.json").read_text())
+    signals = [a for a in graph["atoms"] if a["id"].startswith("procedure:signal-")]
+    assert signals
+    for a in signals:
+        p = a["props"]
+        assert p["friendly_name"] and p["display_name"] and p["short_description"], a["title"]
+        assert len(p["friendly_name"].split()) <= 4, (a["title"], p["friendly_name"])
+        assert "_" not in p["friendly_name"] + p["display_name"], a["title"]
