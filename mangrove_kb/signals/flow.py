@@ -30,6 +30,10 @@ def adi_bearish(df: pd.DataFrame, window: int = 20) -> bool:
 
     Check if ADI (Accumulation/Distribution) is falling (bearish volume).
 
+    Friendly-Name: Money Flowing Out
+    Display-Name: Accumulation/Distribution Falling
+    Short-Description: Volume-weighted buying and selling shows more selling over recent bars.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line
     Warmup: window - 1
 
@@ -77,6 +81,10 @@ def adi_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     """Signal: adi_bullish
 
     Check if ADI (Accumulation/Distribution) is rising (bullish volume).
+
+    Friendly-Name: Money Flowing In
+    Display-Name: Accumulation/Distribution Rising
+    Short-Description: Volume-weighted buying and selling shows more buying over recent bars.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/accumulation-distribution-line
     Warmup: window - 1
@@ -126,6 +134,10 @@ def cumulative_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool
 
     Check if cumulative return from start is positive.
 
+    Friendly-Name: Up Since Start
+    Display-Name: Cumulative Return Positive
+    Short-Description: Price is higher now than at the start of the period.
+
     Warmup: 1
 
     Formula:
@@ -168,6 +180,10 @@ def cumulative_return_target(df: pd.DataFrame, target: float = 10.0) -> bool:
     """Signal: cumulative_return_target
 
     Check if cumulative return has reached target.
+
+    Friendly-Name: Return Target Reached
+    Display-Name: Cumulative Return Target
+    Short-Description: Price has gained at least the target return since the start of the period.
 
     Warmup: 1
 
@@ -212,6 +228,10 @@ def nvi_bearish(df: pd.DataFrame, window: int = 255) -> bool:
 
     Check if NVI (Negative Volume Index) indicates smart money selling. NVI below its moving average
     suggests smart money distribution.
+
+    Friendly-Name: Selling On Quiet Volume
+    Display-Name: Negative Volume Index Bearish
+    Short-Description: Price is slipping on lower-volume bars, often a sign of informed selling.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi
     Warmup: window - 1
@@ -260,6 +280,10 @@ def nvi_bullish(df: pd.DataFrame, window: int = 255) -> bool:
     Check if NVI (Negative Volume Index) indicates smart money buying. NVI above its moving average
     suggests smart money accumulation.
 
+    Friendly-Name: Buying On Quiet Volume
+    Display-Name: Negative Volume Index Bullish
+    Short-Description: Price is rising on lower-volume bars, often a sign of informed buying.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi
     Warmup: window - 1
 
@@ -305,6 +329,10 @@ def obv_bearish(df: pd.DataFrame, window: int = 20) -> bool:
     """Signal: obv_bearish
 
     Check if OBV is falling (bearish volume confirmation).
+
+    Friendly-Name: Volume Leaning Sell
+    Display-Name: On-Balance Volume Falling
+    Short-Description: More volume is trading on down bars than up bars lately.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/on-balance-volume-obv
     Warmup: window - 1
@@ -352,6 +380,10 @@ def obv_bullish(df: pd.DataFrame, window: int = 20) -> bool:
 
     Check if OBV is rising (bullish volume confirmation).
 
+    Friendly-Name: Volume Leaning Buy
+    Display-Name: On-Balance Volume Rising
+    Short-Description: More volume is trading on up bars than down bars lately.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/on-balance-volume-obv
     Warmup: window - 1
 
@@ -398,6 +430,10 @@ def vpt_bearish(df: pd.DataFrame, window: int = 20) -> bool:
 
     Check if VPT (Volume Price Trend) is falling.
 
+    Friendly-Name: Volume Confirms Decline
+    Display-Name: Volume Price Trend Falling
+    Short-Description: Price drops on heavy volume have outweighed the gains lately.
+
     Warmup: window - 1
 
     Formula:
@@ -442,6 +478,10 @@ def vpt_bullish(df: pd.DataFrame, window: int = 20) -> bool:
     """Signal: vpt_bullish
 
     Check if VPT (Volume Price Trend) is rising.
+
+    Friendly-Name: Volume Confirms Rise
+    Display-Name: Volume Price Trend Rising
+    Short-Description: Price gains on heavy volume have outweighed the drops lately.
 
     Warmup: window - 1
 

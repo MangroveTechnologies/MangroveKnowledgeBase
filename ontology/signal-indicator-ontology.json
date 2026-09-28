@@ -5658,6 +5658,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adi_bearish', 'params': {'window': value}}, df)",
     "formula": "adi[t] < adi[t-window+1] -- a fall over the window; the level itself is meaningless",
+    "friendly_name": "Money Flowing Out",
+    "display_name": "Accumulation/Distribution Falling",
+    "short_description": "Volume-weighted buying and selling shows more selling over recent bars.",
     "inputs": {
      "high": {
       "type": "series",
@@ -5713,6 +5716,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adi_bullish', 'params': {'window': value}}, df)",
     "formula": "adi[t] > adi[t-window+1] -- ADI is a running total whose absolute level is an artefact of where the series begins, so it is read as a rise over the window",
+    "friendly_name": "Money Flowing In",
+    "display_name": "Accumulation/Distribution Rising",
+    "short_description": "Volume-weighted buying and selling shows more buying over recent bars.",
     "inputs": {
      "high": {
       "type": "series",
@@ -5768,6 +5774,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adosc_bearish', 'params': {'fast': value, 'slow': value}}, df)",
     "formula": "adosc[t] < 0",
+    "friendly_name": "Selling Pressure Building",
+    "display_name": "Chaikin Oscillator Negative",
+    "short_description": "Recent money flow is weaker than the longer trend, showing selling pressure.",
     "inputs": {
      "high": {
       "type": "series",
@@ -5830,6 +5839,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adosc_bullish', 'params': {'fast': value, 'slow': value}}, df)",
     "formula": "adosc[t] > 0",
+    "friendly_name": "Buying Pressure Building",
+    "display_name": "Chaikin Oscillator Positive",
+    "short_description": "Recent money flow is stronger than the longer trend, showing buying pressure.",
     "inputs": {
      "high": {
       "type": "series",
@@ -5892,6 +5904,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adosc_cross_down', 'params': {'fast': value, 'slow': value}}, df)",
     "formula": "adosc[t-1] >= 0 and adosc[t] < 0",
+    "friendly_name": "Selling Pressure Starts",
+    "display_name": "Chaikin Oscillator Crosses Below Zero",
+    "short_description": "Money flow just turned from buying to selling.",
     "inputs": {
      "high": {
       "type": "series",
@@ -5954,6 +5969,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adosc_cross_up', 'params': {'fast': value, 'slow': value}}, df)",
     "formula": "adosc[t-1] <= 0 and adosc[t] > 0",
+    "friendly_name": "Buying Pressure Starts",
+    "display_name": "Chaikin Oscillator Crosses Above Zero",
+    "short_description": "Money flow just turned from selling to buying.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6016,6 +6034,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adx_bullish_di', 'params': {'window': value}}, df)",
     "formula": "adx_pos[t] > adx_neg[t]",
+    "friendly_name": "Buyers In Control",
+    "display_name": "ADX Bullish Directional Bias",
+    "short_description": "Upward pressure is currently stronger than downward pressure.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6067,6 +6088,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'adx_strong_trend', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "adx[t] > threshold -- trend STRENGTH, undirected",
+    "friendly_name": "Strong Trend",
+    "display_name": "ADX Strong Trend",
+    "short_description": "The market is trending strongly, either up or down.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6125,6 +6149,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'alligator_bearish', 'params': {'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value}}, df)",
     "formula": "lips[t] < teeth[t] < jaw[t]",
+    "friendly_name": "Steady Downtrend",
+    "display_name": "Williams Alligator Bearish Alignment",
+    "short_description": "Three trend lines are lined up pointing down, showing a strong downtrend.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6207,6 +6234,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'alligator_bullish', 'params': {'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value}}, df)",
     "formula": "lips[t] > teeth[t] > jaw[t]",
+    "friendly_name": "Steady Uptrend",
+    "display_name": "Williams Alligator Bullish Alignment",
+    "short_description": "Three trend lines are lined up pointing up, showing a strong uptrend.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6289,6 +6319,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'alligator_sleeping', 'params': {'jaw': value, 'teeth': value, 'lips': value, 'jaw_offset': value, 'teeth_offset': value, 'lips_offset': value}}, df)",
     "formula": "not (lips[t] > teeth[t] > jaw[t]) and not (lips[t] < teeth[t] < jaw[t]) -- neither alignment holds; the lines are tangled",
+    "friendly_name": "No Clear Trend",
+    "display_name": "Williams Alligator Sleeping",
+    "short_description": "Trend lines are tangled together, so the market has no clear direction.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6371,6 +6404,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'alma_cross_down', 'params': {'window_fast': value, 'window_slow': value, 'offset': value, 'sigma': value}}, df)",
     "formula": "alma(window_fast)[t-1] >= alma(window_slow)[t-1] and alma(window_fast)[t] < alma(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "ALMA Bearish Crossover",
+    "short_description": "Two smoothed price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -6435,6 +6471,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'alma_cross_up', 'params': {'window_fast': value, 'window_slow': value, 'offset': value, 'sigma': value}}, df)",
     "formula": "alma(window_fast)[t-1] <= alma(window_slow)[t-1] and alma(window_fast)[t] > alma(window_slow)[t] -- both ALMAs share offset and sigma; only the window differs",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "ALMA Bullish Crossover",
+    "short_description": "Two smoothed price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -6499,6 +6538,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ao_bearish', 'params': {'window_fast': value, 'window_slow': value, 'threshold': value}}, df)",
     "formula": "ao[t] < threshold",
+    "friendly_name": "Downward Momentum",
+    "display_name": "Awesome Oscillator Bearish",
+    "short_description": "Short-term price swings are weaker than longer-term ones, showing downward momentum.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6560,6 +6602,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ao_bullish', 'params': {'window_fast': value, 'window_slow': value, 'threshold': value}}, df)",
     "formula": "ao[t] > threshold",
+    "friendly_name": "Upward Momentum",
+    "display_name": "Awesome Oscillator Bullish",
+    "short_description": "Short-term price swings are stronger than longer-term ones, showing upward momentum.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6621,6 +6666,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ao_zero_cross', 'params': {'window_fast': value, 'window_slow': value, 'direction': value}}, df)",
     "formula": "ao[t-1] <= 0 and ao[t] > 0 when direction is bullish; ao[t-1] >= 0 and ao[t] < 0 when bearish",
+    "friendly_name": "Momentum Flips",
+    "display_name": "Awesome Oscillator Zero Cross",
+    "short_description": "Momentum just flipped direction, up or down as you choose.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6682,6 +6730,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'aroon_crossover', 'params': {'window': value, 'direction': value}}, df)",
     "formula": "direction == 'bullish': aroon_up[t-1] <= aroon_down[t-1] and aroon_up[t] > aroon_down[t]; direction == 'bearish': aroon_up[t-1] >= aroon_down[t-1] and aroon_up[t] < aroon_down[t]",
+    "friendly_name": "New Trend Emerging",
+    "display_name": "Aroon Crossover",
+    "short_description": "Recent highs just overtook recent lows, or the reverse, hinting at a new trend.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6736,6 +6787,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'aroon_down_trend', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "aroon_down[t] > threshold",
+    "friendly_name": "Making Fresh Lows",
+    "display_name": "Aroon Down Strong",
+    "short_description": "Price has set a new low very recently, a sign of a strong downtrend.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6790,6 +6844,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'aroon_up_trend', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "aroon_up[t] > threshold",
+    "friendly_name": "Making Fresh Highs",
+    "display_name": "Aroon Up Strong",
+    "short_description": "Price has set a new high very recently, a sign of a strong uptrend.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6844,6 +6901,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'atr_high_volatility', 'params': {'window': value, 'threshold_pct': value}}, df)",
     "formula": "atr[t] / close[t] * 100 > threshold_pct -- ATR normalised by price here rather than read raw, so the threshold is comparable across instruments. False when close is zero.",
+    "friendly_name": "Big Price Swings",
+    "display_name": "ATR High Volatility",
+    "short_description": "Typical bar-to-bar price swings are large relative to price.",
     "inputs": {
      "high": {
       "type": "series",
@@ -6902,6 +6962,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bb_above_upper', 'params': {'window': value, 'window_dev': value}}, df)",
     "formula": "close[t] > hband[t]",
+    "friendly_name": "Above Usual Range",
+    "display_name": "Above Bollinger Upper Band",
+    "short_description": "Price is trading above its normal range.",
     "inputs": {
      "close": {
       "type": "series",
@@ -6952,6 +7015,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bb_below_lower', 'params': {'window': value, 'window_dev': value}}, df)",
     "formula": "close[t] < lband[t]",
+    "friendly_name": "Below Usual Range",
+    "display_name": "Below Bollinger Lower Band",
+    "short_description": "Price is trading below its normal range.",
     "inputs": {
      "close": {
       "type": "series",
@@ -7002,6 +7068,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bb_lower_breakout', 'params': {'window': value, 'window_dev': value}}, df)",
     "formula": "close[t-1] >= lband[t-1] and close[t] < lband[t]",
+    "friendly_name": "Downside Range Breakout",
+    "display_name": "Bollinger Band Lower Breakout",
+    "short_description": "Price just broke below its normal trading range.",
     "inputs": {
      "close": {
       "type": "series",
@@ -7052,6 +7121,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bb_squeeze', 'params': {'window': value, 'window_dev': value, 'threshold': value}}, df)",
     "formula": "wband[t-1] >= threshold and wband[t] < threshold",
+    "friendly_name": "Market Goes Quiet",
+    "display_name": "Bollinger Band Squeeze",
+    "short_description": "Price swings just narrowed sharply, which often comes before a big move.",
     "inputs": {
      "close": {
       "type": "series",
@@ -7109,6 +7181,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bb_upper_breakout', 'params': {'window': value, 'window_dev': value}}, df)",
     "formula": "close[t-1] <= hband[t-1] and close[t] > hband[t]",
+    "friendly_name": "Upside Range Breakout",
+    "display_name": "Bollinger Band Upper Breakout",
+    "short_description": "Price just broke above its normal trading range.",
     "inputs": {
      "close": {
       "type": "series",
@@ -7159,6 +7234,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bearish_engulfing_trigger', 'params': {}}, df)",
     "formula": "close[t-1] > open[t-1] and close[t] < open[t] and body_low_delta[t] < 0 and body_high_delta[t] > 0",
+    "friendly_name": "Sellers Overwhelm Buyers",
+    "display_name": "Bearish Engulfing",
+    "short_description": "A down candle fully swallowed the prior up candle, a strong sign of a turn lower.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7206,6 +7284,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bearish_harami_trigger', 'params': {}}, df)",
     "formula": "close[t-1] > open[t-1] and close[t] < open[t] and body_low_delta[t] > 0 and body_high_delta[t] < 0",
+    "friendly_name": "Rally Stalls",
+    "display_name": "Bearish Harami",
+    "short_description": "A small down candle formed inside the prior big up candle, a possible turn lower.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7253,6 +7334,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bearish_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, bearish harami, dark_cloud_cover, gravestone_doji, tweezer_tops, bearish pin_bar, evening_star, three_black_crows, three_inside_down",
+    "friendly_name": "Recent Selling Pattern",
+    "display_name": "Recent Bearish Candle Pattern",
+    "short_description": "A candle pattern that often comes before a drop appeared recently.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7308,6 +7392,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bearish_pin_bar_trigger', 'params': {'wick_ratio': value, 'body_position': value}}, df)",
     "formula": "body[t] > 0 and upper_wick[t] >= body[t] * wick_ratio and max(open[t], close[t]) < high[t] - range[t] * (1 - body_position)",
+    "friendly_name": "Rejected From Highs",
+    "display_name": "Bearish Pin Bar",
+    "short_description": "Price pushed up but was sold back down, leaving a long upper wick.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7370,6 +7457,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bop_bearish', 'params': {}}, df)",
     "formula": "bop[t] < 0",
+    "friendly_name": "Sellers Won The Bar",
+    "display_name": "Balance of Power Bearish",
+    "short_description": "Sellers controlled this bar: it closed below where it opened.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7417,6 +7507,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bop_bullish', 'params': {}}, df)",
     "formula": "bop[t] > 0",
+    "friendly_name": "Buyers Won The Bar",
+    "display_name": "Balance of Power Bullish",
+    "short_description": "Buyers controlled this bar: it closed above where it opened.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7464,6 +7557,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bop_cross_down', 'params': {}}, df)",
     "formula": "bop[t-1] >= 0 and bop[t] < 0",
+    "friendly_name": "Sellers Take Over",
+    "display_name": "Balance of Power Crosses Below Zero",
+    "short_description": "Control just shifted from buyers to sellers.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7511,6 +7607,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bop_cross_up', 'params': {}}, df)",
     "formula": "bop[t-1] <= 0 and bop[t] > 0",
+    "friendly_name": "Buyers Take Over",
+    "display_name": "Balance of Power Crosses Above Zero",
+    "short_description": "Control just shifted from sellers to buyers.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7558,6 +7657,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bullish_engulfing_trigger', 'params': {}}, df)",
     "formula": "close[t-1] < open[t-1] and close[t] > open[t] and body_low_delta[t] < 0 and body_high_delta[t] > 0",
+    "friendly_name": "Buyers Overwhelm Sellers",
+    "display_name": "Bullish Engulfing",
+    "short_description": "An up candle fully swallowed the prior down candle, a strong sign of a turn higher.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7605,6 +7707,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bullish_harami_trigger', 'params': {}}, df)",
     "formula": "close[t-1] < open[t-1] and close[t] > open[t] and body_low_delta[t] > 0 and body_high_delta[t] < 0",
+    "friendly_name": "Selloff Stalls",
+    "display_name": "Bullish Harami",
+    "short_description": "A small up candle formed inside the prior big down candle, a possible turn higher.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7652,6 +7757,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bullish_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, bullish harami, piercing_line, dragonfly_doji, tweezer_bottoms, bullish pin_bar, morning_star, three_white_soldiers, three_inside_up",
+    "friendly_name": "Recent Buying Pattern",
+    "display_name": "Recent Bullish Candle Pattern",
+    "short_description": "A candle pattern that often comes before a rise appeared recently.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7707,6 +7815,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bullish_pin_bar_trigger', 'params': {'wick_ratio': value, 'body_position': value}}, df)",
     "formula": "body[t] > 0 and lower_wick[t] >= body[t] * wick_ratio and min(open[t], close[t]) > low[t] + range[t] * (1 - body_position)",
+    "friendly_name": "Rejected From Lows",
+    "display_name": "Bullish Pin Bar",
+    "short_description": "Price dipped but was bought back up, leaving a long lower wick.",
     "inputs": {
      "open": {
       "type": "series",
@@ -7769,6 +7880,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cci_overbought', 'params': {'window': value, 'constant': value, 'threshold': value}}, df)",
     "formula": "cci[t] > threshold",
+    "friendly_name": "Unusually High Price",
+    "display_name": "CCI Overbought",
+    "short_description": "Price is well above its recent typical level; a pullback may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -7834,6 +7948,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cci_oversold', 'params': {'window': value, 'constant': value, 'threshold': value}}, df)",
     "formula": "cci[t] < threshold",
+    "friendly_name": "Unusually Low Price",
+    "display_name": "CCI Oversold",
+    "short_description": "Price is well below its recent typical level; a bounce may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -7899,6 +8016,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cl_above_low_offset', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "close[t] > low_offset[t]",
+    "friendly_name": "Well Off Lows",
+    "display_name": "Above Chandelier Exit (Low)",
+    "short_description": "Price has risen well above its recent low.",
     "inputs": {
      "high": {
       "type": "series",
@@ -7957,6 +8077,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cl_below_high_offset', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "close[t] < high_offset[t]",
+    "friendly_name": "Well Off Highs",
+    "display_name": "Below Chandelier Exit (High)",
+    "short_description": "Price has fallen well below its recent high.",
     "inputs": {
      "high": {
       "type": "series",
@@ -8015,6 +8138,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cl_high_offset_break', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "close[t-1] >= high_offset[t-1] and close[t] < high_offset[t]",
+    "friendly_name": "Falls Far From High",
+    "display_name": "Chandelier Exit (High) Break",
+    "short_description": "Price just fell well below its recent high, a common exit point for buyers.",
     "inputs": {
      "high": {
       "type": "series",
@@ -8073,6 +8199,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cl_low_offset_break', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "close[t-1] <= low_offset[t-1] and close[t] > low_offset[t]",
+    "friendly_name": "Climbs Far From Low",
+    "display_name": "Chandelier Exit (Low) Break",
+    "short_description": "Price just climbed well above its recent low.",
     "inputs": {
      "high": {
       "type": "series",
@@ -8131,6 +8260,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cmf_bearish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "cmf[t] < threshold",
+    "friendly_name": "Selling Outweighs Buying",
+    "display_name": "Chaikin Money Flow Bearish",
+    "short_description": "More money has been flowing out than in over recent bars.",
     "inputs": {
      "high": {
       "type": "series",
@@ -8193,6 +8325,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cmf_bullish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "cmf[t] > threshold",
+    "friendly_name": "Buying Outweighs Selling",
+    "display_name": "Chaikin Money Flow Bullish",
+    "short_description": "More money has been flowing in than out over recent bars.",
     "inputs": {
      "high": {
       "type": "series",
@@ -8255,6 +8390,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cmo_cross_down', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "cmo[t-1] >= threshold and cmo[t] < threshold",
+    "friendly_name": "Rally Starts Cooling",
+    "display_name": "CMO Crosses Below Overbought",
+    "short_description": "Momentum just dropped back from an extreme high, hinting a rally is cooling.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8305,6 +8443,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cmo_cross_up', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "cmo[t-1] <= threshold and cmo[t] > threshold",
+    "friendly_name": "Selloff Starts Easing",
+    "display_name": "CMO Crosses Above Oversold",
+    "short_description": "Momentum just recovered from an extreme low, hinting a selloff is easing.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8355,6 +8496,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cmo_overbought', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "cmo[t] >= threshold",
+    "friendly_name": "Heavily Bought Up",
+    "display_name": "CMO Overbought",
+    "short_description": "Buying has pushed momentum unusually high; a pullback may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8405,6 +8549,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cmo_oversold', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "cmo[t] <= threshold",
+    "friendly_name": "Heavily Sold Off",
+    "display_name": "CMO Oversold",
+    "short_description": "Selling has pushed momentum unusually low; a bounce may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8455,6 +8602,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'continuation_pattern_bearish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: three_black_crows, three_inside_down",
+    "friendly_name": "Downtrend Likely Continues",
+    "display_name": "Recent Bearish Continuation Pattern",
+    "short_description": "A run of strong down candles appeared recently, suggesting more downside.",
     "inputs": {
      "open": {
       "type": "series",
@@ -8510,6 +8660,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'continuation_pattern_bullish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: three_white_soldiers, three_inside_up",
+    "friendly_name": "Uptrend Likely Continues",
+    "display_name": "Recent Bullish Continuation Pattern",
+    "short_description": "A run of strong up candles appeared recently, suggesting more upside.",
     "inputs": {
      "open": {
       "type": "series",
@@ -8565,6 +8718,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cumulative_return_positive', 'params': {'threshold': value}}, df)",
     "formula": "cumulative_return[t] > threshold -- rebased by the caller's slice, since CumulativeReturn divides by close[0] of whatever series it is given",
+    "friendly_name": "Up Since Start",
+    "display_name": "Cumulative Return Positive",
+    "short_description": "Price is higher now than at the start of the period.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8608,6 +8764,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'cumulative_return_target', 'params': {'target': value}}, df)",
     "formula": "cumulative_return[t] >= target -- note >=, unlike the strict > of cumulative_return_positive",
+    "friendly_name": "Return Target Reached",
+    "display_name": "Cumulative Return Target",
+    "short_description": "Price has gained at least the target return since the start of the period.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8651,6 +8810,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'daily_return_negative', 'params': {'threshold': value}}, df)",
     "formula": "daily_return[t] < threshold",
+    "friendly_name": "Price Fell This Bar",
+    "display_name": "Daily Return Negative",
+    "short_description": "Price closed lower than the previous bar.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8694,6 +8856,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'daily_return_positive', 'params': {'threshold': value}}, df)",
     "formula": "daily_return[t] > threshold",
+    "friendly_name": "Price Rose This Bar",
+    "display_name": "Daily Return Positive",
+    "short_description": "Price closed higher than the previous bar.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8737,6 +8902,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dark_cloud_cover_trigger', 'params': {'min_penetration': value, 'require_gap': value}}, df)",
     "formula": "close[t-1] > open[t-1] and close[t] < open[t] and open[t] > close[t-1] and close[t] < close[t-1] - (close[t-1] - open[t-1]) * min_penetration -- open[t] > high[t-1] instead when require_gap is true, which cannot occur in a 24/7 market",
+    "friendly_name": "Sellers Push Back",
+    "display_name": "Dark Cloud Cover",
+    "short_description": "After an up candle, a down candle closed below its midpoint, a possible turn lower.",
     "inputs": {
      "open": {
       "type": "series",
@@ -8804,6 +8972,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dc_lower_breakout', 'params': {'window': value}}, df)",
     "formula": "close[t-1] >= lband[t-1] and close[t] < lband[t] -- the channel spans the bars PRECEDING each bar (include_current_bar=False)",
+    "friendly_name": "New Period Low",
+    "display_name": "Donchian Channel Lower Breakout",
+    "short_description": "Price just closed below the lowest low of the prior period.",
     "inputs": {
      "high": {
       "type": "series",
@@ -8855,6 +9026,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dc_upper_breakout', 'params': {'window': value}}, df)",
     "formula": "close[t-1] <= hband[t-1] and close[t] > hband[t] -- the channel spans the bars PRECEDING each bar (include_current_bar=False), which is what makes a break possible at all",
+    "friendly_name": "New Period High",
+    "display_name": "Donchian Channel Upper Breakout",
+    "short_description": "Price just closed above the highest high of the prior period.",
     "inputs": {
      "high": {
       "type": "series",
@@ -8906,6 +9080,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "dema(window_fast)[t-1] >= dema(window_slow)[t-1] and dema(window_fast)[t] < dema(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "DEMA Bearish Crossover",
+    "short_description": "Two quick-reacting price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -8956,6 +9133,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "dema(window_fast)[t-1] <= dema(window_slow)[t-1] and dema(window_fast)[t] > dema(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "DEMA Bullish Crossover",
+    "short_description": "Two quick-reacting price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9006,6 +9186,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'doji_trigger', 'params': {'body_threshold': value}}, df)",
     "formula": "range[t] > 0 and body[t] <= range[t] * body_threshold",
+    "friendly_name": "Indecision Bar",
+    "display_name": "Doji",
+    "short_description": "Price closed almost where it opened, so buyers and sellers are evenly matched.",
     "inputs": {
      "open": {
       "type": "series",
@@ -9072,6 +9255,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dpo_negative', 'params': {'window': value}}, df)",
     "formula": "dpo[t] < 0",
+    "friendly_name": "Below Its Cycle Average",
+    "display_name": "Detrended Price Oscillator Negative",
+    "short_description": "With the long-term trend removed, price is below its typical level.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9115,6 +9301,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dpo_positive', 'params': {'window': value}}, df)",
     "formula": "dpo[t] > 0",
+    "friendly_name": "Above Its Cycle Average",
+    "display_name": "Detrended Price Oscillator Positive",
+    "short_description": "With the long-term trend removed, price is above its typical level.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9158,6 +9347,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dragonfly_doji_trigger', 'params': {'body_threshold': value, 'upper_wick_max': value}}, df)",
     "formula": "range[t] > 0 and body[t] <= range[t] * body_threshold and upper_wick[t] <= range[t] * upper_wick_max and lower_wick[t] > body[t]",
+    "friendly_name": "Dip Fully Bought Back",
+    "display_name": "Dragonfly Doji",
+    "short_description": "Price fell sharply but recovered to close near the high, a possible bottom.",
     "inputs": {
      "open": {
       "type": "series",
@@ -9220,6 +9412,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "ema(window_fast)[t-1] >= ema(window_slow)[t-1] and ema(window_fast)[t] < ema(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "EMA Bearish Crossover",
+    "short_description": "Two widely used price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9270,6 +9465,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "ema(window_fast)[t-1] <= ema(window_slow)[t-1] and ema(window_fast)[t] > ema(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "EMA Bullish Crossover",
+    "short_description": "Two widely used price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9320,6 +9518,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ema_crossover', 'params': {'window_fast': value, 'window_slow': value, 'direction': value}}, df)",
     "formula": "direction == 'bullish': ema(window_fast)[t-1] <= ema(window_slow)[t-1] and ema(window_fast)[t] > ema(window_slow)[t]; direction == 'bearish': ema(window_fast)[t-1] >= ema(window_slow)[t-1] and ema(window_fast)[t] < ema(window_slow)[t]",
+    "friendly_name": "Trend Lines Cross",
+    "display_name": "EMA Crossover",
+    "short_description": "Two widely used price averages just crossed, in the direction you choose.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9377,6 +9578,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'eom_bearish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "eom[t] < threshold",
+    "friendly_name": "Price Falling Easily",
+    "display_name": "Ease of Movement Bearish",
+    "short_description": "Price is moving down with little volume needed to push it.",
     "inputs": {
      "high": {
       "type": "series",
@@ -9435,6 +9639,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'eom_bullish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "eom[t] > threshold",
+    "friendly_name": "Price Rising Easily",
+    "display_name": "Ease of Movement Bullish",
+    "short_description": "Price is moving up with little volume needed to push it.",
     "inputs": {
      "high": {
       "type": "series",
@@ -9493,6 +9700,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'epma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "epma(window_fast)[t-1] >= epma(window_slow)[t-1] and epma(window_fast)[t] < epma(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "EPMA Bearish Crossover",
+    "short_description": "Two trend lines fitted through recent prices just crossed downward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9543,6 +9753,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'epma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "epma(window_fast)[t-1] <= epma(window_slow)[t-1] and epma(window_fast)[t] > epma(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "EPMA Bullish Crossover",
+    "short_description": "Two trend lines fitted through recent prices just crossed upward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9593,6 +9806,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'evening_star_trigger', 'params': {'body_threshold': value}}, df)",
     "formula": "close[t-2] > open[t-2] and body[t-1] <= range[t-1] * body_threshold and close[t] < open[t] and close[t] < (open[t-2] + close[t-2]) / 2",
+    "friendly_name": "Three-Bar Top",
+    "display_name": "Evening Star",
+    "short_description": "An up bar, a small pause, then a strong down bar: a classic sign of a top.",
     "inputs": {
      "open": {
       "type": "series",
@@ -9657,6 +9873,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'force_bearish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "fi[t] < threshold",
+    "friendly_name": "Sellers Pushing Hard",
+    "display_name": "Force Index Bearish",
+    "short_description": "Price drops backed by volume are outweighing the gains.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9711,6 +9930,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'force_bullish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "fi[t] > threshold",
+    "friendly_name": "Buyers Pushing Hard",
+    "display_name": "Force Index Bullish",
+    "short_description": "Price gains backed by volume are outweighing the drops.",
     "inputs": {
      "close": {
       "type": "series",
@@ -9765,6 +9987,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'gravestone_doji_trigger', 'params': {'body_threshold': value, 'lower_wick_max': value}}, df)",
     "formula": "range[t] > 0 and body[t] <= range[t] * body_threshold and lower_wick[t] <= range[t] * lower_wick_max and upper_wick[t] > body[t]",
+    "friendly_name": "Rally Fully Sold Off",
+    "display_name": "Gravestone Doji",
+    "short_description": "Price rose sharply but fell back to close near the low, a possible top.",
     "inputs": {
      "open": {
       "type": "series",
@@ -9827,6 +10052,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'hammer_trigger', 'params': {'wick_ratio': value, 'upper_wick_max': value}}, df)",
     "formula": "body[t] > 0 and lower_wick[t] >= body[t] * wick_ratio and upper_wick[t] <= body[t] * upper_wick_max",
+    "friendly_name": "Buyers Step In",
+    "display_name": "Hammer",
+    "short_description": "Sellers pushed price down but buyers drove it back up by the close.",
     "inputs": {
      "open": {
       "type": "series",
@@ -9897,6 +10125,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'hanging_man_trigger', 'params': {'wick_ratio': value, 'upper_wick_max': value}}, df)",
     "formula": "body[t] > 0 and lower_wick[t] >= body[t] * wick_ratio and upper_wick[t] <= body[t] * upper_wick_max -- identical arithmetic to hammer_trigger; the two differ only by the prior trend, which this implementation does not encode",
+    "friendly_name": "Possible Top Warning",
+    "display_name": "Hanging Man",
+    "short_description": "A hammer-shaped candle that can warn of a top after a rise; same test as Hammer.",
     "inputs": {
      "open": {
       "type": "series",
@@ -9967,6 +10198,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'heikin_ashi_bearish', 'params': {}}, df)",
     "formula": "ha_close[t] < ha_open[t]",
+    "friendly_name": "Smoothed Price Falling",
+    "display_name": "Heikin-Ashi Bearish Candle",
+    "short_description": "The smoothed price bar closed lower than it opened, showing selling pressure.",
     "inputs": {
      "open": {
       "type": "series",
@@ -10014,6 +10248,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'heikin_ashi_bullish', 'params': {}}, df)",
     "formula": "ha_close[t] > ha_open[t] -- the Heikin-Ashi candle closes up, which is not the same as close[t] > open[t]",
+    "friendly_name": "Smoothed Price Rising",
+    "display_name": "Heikin-Ashi Bullish Candle",
+    "short_description": "The smoothed price bar closed higher than it opened, showing buying pressure.",
     "inputs": {
      "open": {
       "type": "series",
@@ -10061,6 +10298,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'hma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "hma(window_fast)[t-1] >= hma(window_slow)[t-1] and hma(window_fast)[t] < hma(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "HMA Bearish Crossover",
+    "short_description": "Two very fast price averages just crossed downward, an early sign of a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10111,6 +10351,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'hma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "hma(window_fast)[t-1] <= hma(window_slow)[t-1] and hma(window_fast)[t] > hma(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "HMA Bullish Crossover",
+    "short_description": "Two very fast price averages just crossed upward, an early sign of a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10161,6 +10404,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ichimoku_bearish', 'params': {'window_tenkan': value, 'window_kijun': value, 'window_senkou': value}}, df)",
     "formula": "close[t] < min(span_a[t], span_b[t])",
+    "friendly_name": "Below Trend Zone",
+    "display_name": "Ichimoku Price Below Cloud",
+    "short_description": "Price is below the Ichimoku cloud, a zone that marks a downtrend.",
     "inputs": {
      "high": {
       "type": "series",
@@ -10222,6 +10468,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ichimoku_bullish', 'params': {'window_tenkan': value, 'window_kijun': value, 'window_senkou': value}}, df)",
     "formula": "close[t] > max(span_a[t], span_b[t]) -- above the cloud, whichever span is on top",
+    "friendly_name": "Above Trend Zone",
+    "display_name": "Ichimoku Price Above Cloud",
+    "short_description": "Price is above the Ichimoku cloud, a zone that marks an uptrend.",
     "inputs": {
      "high": {
       "type": "series",
@@ -10283,6 +10532,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ichimoku_tk_cross', 'params': {'window_tenkan': value, 'window_kijun': value, 'window_senkou': value, 'direction': value}}, df)",
     "formula": "direction == 'bullish': conversion_line[t-1] <= base_line[t-1] and conversion_line[t] > base_line[t]; direction == 'bearish': conversion_line[t-1] >= base_line[t-1] and conversion_line[t] < base_line[t]",
+    "friendly_name": "Short-Term Trend Shift",
+    "display_name": "Ichimoku Tenkan/Kijun Cross",
+    "short_description": "Ichimoku's short and medium trend lines just crossed, in the direction you choose.",
     "inputs": {
      "high": {
       "type": "series",
@@ -10351,6 +10603,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'indecision_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: doji, spinning_top, inside_bar, narrow_range(7)",
+    "friendly_name": "Recent Indecision",
+    "display_name": "Recent Indecision Pattern",
+    "short_description": "A bar showing buyers and sellers evenly matched appeared recently.",
     "inputs": {
      "open": {
       "type": "series",
@@ -10406,6 +10661,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'inside_bar_trigger', 'params': {}}, df)",
     "formula": "range_high_delta[t] < 0 and range_low_delta[t] > 0",
+    "friendly_name": "Market Pauses",
+    "display_name": "Inside Bar",
+    "short_description": "This bar stayed within the prior bar's range, a pause that often comes before a breakout.",
     "inputs": {
      "high": {
       "type": "series",
@@ -10453,6 +10711,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'inverted_hammer_trigger', 'params': {'wick_ratio': value, 'lower_wick_max': value}}, df)",
     "formula": "body[t] > 0 and upper_wick[t] >= body[t] * wick_ratio and lower_wick[t] <= body[t] * lower_wick_max",
+    "friendly_name": "Buyers Test Higher",
+    "display_name": "Inverted Hammer",
+    "short_description": "Buyers pushed price up during the bar; after a drop this can signal a bottom.",
     "inputs": {
      "open": {
       "type": "series",
@@ -10523,6 +10784,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_alma', 'params': {'window': value, 'offset': value, 'sigma': value}}, df)",
     "formula": "close[t] > alma[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above ALMA",
+    "short_description": "Price is above a smoothed, fast-reacting average of recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10580,6 +10844,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_dema', 'params': {'window': value}}, df)",
     "formula": "close[t] > dema[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above DEMA",
+    "short_description": "Price is above a quick-reacting average of recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10623,6 +10890,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_epma', 'params': {'window': value}}, df)",
     "formula": "close[t] > epma[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above EPMA",
+    "short_description": "Price is above a trend line fitted through recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10666,6 +10936,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_hma', 'params': {'window': value}}, df)",
     "formula": "close[t] > hma[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above Hull Moving Average",
+    "short_description": "Price is above a very fast, smooth average of recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10709,6 +10982,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_mama', 'params': {'fast_limit': value, 'slow_limit': value, 'warmup_bars': value}}, df)",
     "formula": "close[t] > mama[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above MESA Adaptive Average",
+    "short_description": "Price is above an average that speeds up or slows down with the market.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10766,6 +11042,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_sma', 'params': {'window': value}}, df)",
     "formula": "close[t] > sma[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above Simple Moving Average",
+    "short_description": "Price is above its plain average over recent bars.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10809,6 +11088,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_smma', 'params': {'window': value}}, df)",
     "formula": "close[t] > smma[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above Smoothed Moving Average",
+    "short_description": "Price is above a slow, steady average of recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10852,6 +11134,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_t3', 'params': {'window': value, 'volume_factor': value}}, df)",
     "formula": "close[t] > t3[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above Tillson T3 Average",
+    "short_description": "Price is above its smoothed average trend.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10902,6 +11187,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_tema', 'params': {'window': value}}, df)",
     "formula": "close[t] > tema[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above TEMA",
+    "short_description": "Price is above a very fast average of recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10945,6 +11233,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_trima', 'params': {'window': value}}, df)",
     "formula": "close[t] > trima[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above Triangular Moving Average",
+    "short_description": "Price is above an extra-smooth average of recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -10988,6 +11279,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_vwma', 'params': {'window': value}}, df)",
     "formula": "close[t] > vwma[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above Volume-Weighted Average",
+    "short_description": "Price is above an average that gives more weight to high-volume bars.",
     "inputs": {
      "close": {
       "type": "series",
@@ -11035,6 +11329,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kama_cross_down', 'params': {'window': value, 'pow1': value, 'pow2': value}}, df)",
     "formula": "close[t-1] >= kama[t-1] and close[t] < kama[t]",
+    "friendly_name": "Drops Below Trend Line",
+    "display_name": "Price Crosses Below KAMA",
+    "short_description": "Price just fell below an average that adapts to market noise.",
     "inputs": {
      "close": {
       "type": "series",
@@ -11092,6 +11389,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kama_cross_up', 'params': {'window': value, 'pow1': value, 'pow2': value}}, df)",
     "formula": "close[t-1] <= kama[t-1] and close[t] > kama[t]",
+    "friendly_name": "Rises Above Trend Line",
+    "display_name": "Price Crosses Above KAMA",
+    "short_description": "Price just rose above an average that adapts to market noise.",
     "inputs": {
      "close": {
       "type": "series",
@@ -11149,6 +11449,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kc_above_upper', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
     "formula": "close[t] > hband[t] -- a STATE: true for every bar close sits above the band, unlike kc_upper_breakout which fires only on the bar that crosses it",
+    "friendly_name": "Above Volatility Channel",
+    "display_name": "Above Keltner Upper Band",
+    "short_description": "Price is trading above its normal volatility channel.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11214,6 +11517,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kc_below_lower', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
     "formula": "close[t] < lband[t] -- a STATE: true for every bar close sits below the band, unlike kc_lower_breakout which fires only on the bar that crosses it",
+    "friendly_name": "Below Volatility Channel",
+    "display_name": "Below Keltner Lower Band",
+    "short_description": "Price is trading below its normal volatility channel.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11279,6 +11585,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kc_lower_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value, 'original_version': value}}, df)",
     "formula": "close[t-1] >= lband[t-1] and close[t] < lband[t]",
+    "friendly_name": "Breaks Below Channel",
+    "display_name": "Keltner Channel Lower Breakout",
+    "short_description": "Price just broke below its normal volatility channel.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11351,6 +11660,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kc_upper_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value, 'original_version': value}}, df)",
     "formula": "close[t-1] <= hband[t-1] and close[t] > hband[t]",
+    "friendly_name": "Breaks Above Channel",
+    "display_name": "Keltner Channel Upper Breakout",
+    "short_description": "Price just broke above its normal volatility channel.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11423,6 +11735,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kst_bearish_cross', 'params': {'roc1': value, 'roc2': value, 'roc3': value, 'roc4': value, 'window_sma1': value, 'window_sma2': value, 'window_sma3': value, 'window_sma4': value, 'nsig': value}}, df)",
     "formula": "kst[t-1] >= kst_signal[t-1] and kst[t] < kst_signal[t]",
+    "friendly_name": "Long-Term Momentum Turns Down",
+    "display_name": "KST Bearish Crossover",
+    "short_description": "A blend of short and long-term momentum just turned downward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -11522,6 +11837,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kst_bullish_cross', 'params': {'roc1': value, 'roc2': value, 'roc3': value, 'roc4': value, 'window_sma1': value, 'window_sma2': value, 'window_sma3': value, 'window_sma4': value, 'nsig': value}}, df)",
     "formula": "kst[t-1] <= kst_signal[t-1] and kst[t] > kst_signal[t]",
+    "friendly_name": "Long-Term Momentum Turns Up",
+    "display_name": "KST Bullish Crossover",
+    "short_description": "A blend of short and long-term momentum just turned upward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -11621,6 +11939,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bearish', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
     "formula": "kvo[t] < kvo_signal[t] -- same simplified-variant caveat",
+    "friendly_name": "Volume Favoring Sellers",
+    "display_name": "Klinger Oscillator Bearish",
+    "short_description": "Volume flow is running below its recent average, favoring sellers.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11690,6 +12011,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bearish_cross', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
     "formula": "kvo[t-1] >= kvo_signal[t-1] and kvo[t] < kvo_signal[t]",
+    "friendly_name": "Volume Turns To Sellers",
+    "display_name": "Klinger Oscillator Bearish Crossover",
+    "short_description": "Volume flow just dropped below its recent average, shifting toward sellers.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11759,6 +12083,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bullish', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
     "formula": "kvo[t] > kvo_signal[t] -- the SIMPLIFIED KVO variant; its level is roughly 150x smaller than Klinger's original and the two are not comparable",
+    "friendly_name": "Volume Favoring Buyers",
+    "display_name": "Klinger Oscillator Bullish",
+    "short_description": "Volume flow is running above its recent average, favoring buyers.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11828,6 +12155,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'kvo_bullish_cross', 'params': {'fast': value, 'slow': value, 'signal_window': value}}, df)",
     "formula": "kvo[t-1] <= kvo_signal[t-1] and kvo[t] > kvo_signal[t]",
+    "friendly_name": "Volume Turns To Buyers",
+    "display_name": "Klinger Oscillator Bullish Crossover",
+    "short_description": "Volume flow just rose above its recent average, shifting toward buyers.",
     "inputs": {
      "high": {
       "type": "series",
@@ -11897,6 +12227,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'long_legged_doji_trigger', 'params': {'body_threshold': value, 'wick_threshold': value}}, df)",
     "formula": "range[t] > 0 and body[t] <= range[t] * body_threshold and upper_wick[t] >= range[t] * wick_threshold and lower_wick[t] >= range[t] * wick_threshold",
+    "friendly_name": "Extreme Indecision",
+    "display_name": "Long-Legged Doji",
+    "short_description": "Price swung far both ways but closed near the open, showing deep uncertainty.",
     "inputs": {
      "open": {
       "type": "series",
@@ -11959,6 +12292,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_bearish', 'params': {'windows': value}}, df)",
     "formula": "sma(windows[0])[t] < sma(windows[1])[t] < ... < sma(windows[-1])[t]",
+    "friendly_name": "Broad Downtrend",
+    "display_name": "Moving Average Ribbon Bearish",
+    "short_description": "Short, medium and long price averages are all stacked downward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12011,6 +12347,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_bullish', 'params': {'windows': value}}, df)",
     "formula": "sma(windows[0])[t] > sma(windows[1])[t] > ... > sma(windows[-1])[t] -- shortest window on top, every gap the same sign",
+    "friendly_name": "Broad Uptrend",
+    "display_name": "Moving Average Ribbon Bullish",
+    "short_description": "Short, medium and long price averages are all stacked upward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12063,6 +12402,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_tangled', 'params': {'windows': value}}, df)",
     "formula": "neither the bullish nor the bearish ordering holds across all of windows",
+    "friendly_name": "Choppy Market",
+    "display_name": "Moving Average Ribbon Tangled",
+    "short_description": "Price averages are tangled with no clear order, so the market is choppy.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12115,6 +12457,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_bearish_cross', 'params': {'window_fast': value, 'window_slow': value, 'window_sign': value}}, df)",
     "formula": "macd[t-1] >= signal[t-1] and macd[t] < signal[t]",
+    "friendly_name": "Downward Momentum Starts",
+    "display_name": "MACD Bearish Crossover",
+    "short_description": "Short-term momentum just turned downward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12172,6 +12517,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_bullish_cross', 'params': {'window_fast': value, 'window_slow': value, 'window_sign': value}}, df)",
     "formula": "macd[t-1] <= signal[t-1] and macd[t] > signal[t]",
+    "friendly_name": "Upward Momentum Starts",
+    "display_name": "MACD Bullish Crossover",
+    "short_description": "Short-term momentum just turned upward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12229,6 +12577,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "macd[t-1] >= 0 and macd[t] < 0",
+    "friendly_name": "Trend Flips Down",
+    "display_name": "MACD Line Crosses Below Zero",
+    "short_description": "The short-term average just fell below the long-term average.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12279,6 +12630,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "macd[t-1] <= 0 and macd[t] > 0",
+    "friendly_name": "Trend Flips Up",
+    "display_name": "MACD Line Crosses Above Zero",
+    "short_description": "The short-term average just rose above the long-term average.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12329,6 +12683,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_negative', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "macd[t] < 0 -- the MACD LINE, not the histogram",
+    "friendly_name": "In A Downswing",
+    "display_name": "MACD Line Negative",
+    "short_description": "The short-term average is below the long-term average.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12379,6 +12736,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_line_positive', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "macd[t] > 0 -- the MACD LINE, not the histogram",
+    "friendly_name": "In An Upswing",
+    "display_name": "MACD Line Positive",
+    "short_description": "The short-term average is above the long-term average.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12429,6 +12789,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_positive', 'params': {'window_fast': value, 'window_slow': value, 'window_sign': value}}, df)",
     "formula": "histogram[t] > 0 -- the HISTOGRAM, macd minus signal; macd_line_positive is the one that reads the MACD line itself",
+    "friendly_name": "Momentum Gaining",
+    "display_name": "MACD Histogram Positive",
+    "short_description": "Momentum is running above its recent average, favoring upside.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12486,6 +12849,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_down', 'params': {'fast_limit': value, 'slow_limit': value}}, df)",
     "formula": "mama[t-1] >= fama[t-1] and mama[t] < fama[t]",
+    "friendly_name": "Adaptive Trend Turns Down",
+    "display_name": "MAMA/FAMA Bearish Crossover",
+    "short_description": "An average that adapts to the market just crossed below its companion line.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12536,6 +12902,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_up', 'params': {'fast_limit': value, 'slow_limit': value}}, df)",
     "formula": "mama[t-1] <= fama[t-1] and mama[t] > fama[t] -- MAMA against its own following adaptive line FAMA, not a second window",
+    "friendly_name": "Adaptive Trend Turns Up",
+    "display_name": "MAMA/FAMA Bullish Crossover",
+    "short_description": "An average that adapts to the market just crossed above its companion line.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12586,6 +12955,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'marubozu_bearish_trigger', 'params': {'wick_tolerance': value}}, df)",
     "formula": "range[t] > 0 and upper_wick[t] <= range[t] * wick_tolerance and lower_wick[t] <= range[t] * wick_tolerance and signed_body[t] < 0",
+    "friendly_name": "Strong Selling Bar",
+    "display_name": "Bearish Marubozu",
+    "short_description": "A full down bar with little or no wick, showing strong selling conviction.",
     "inputs": {
      "open": {
       "type": "series",
@@ -12652,6 +13024,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'marubozu_bullish_trigger', 'params': {'wick_tolerance': value}}, df)",
     "formula": "range[t] > 0 and upper_wick[t] <= range[t] * wick_tolerance and lower_wick[t] <= range[t] * wick_tolerance and signed_body[t] > 0",
+    "friendly_name": "Strong Buying Bar",
+    "display_name": "Bullish Marubozu",
+    "short_description": "A full up bar with little or no wick, showing strong buying conviction.",
     "inputs": {
      "open": {
       "type": "series",
@@ -12718,6 +13093,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mass_reversal_signal', 'params': {'window_fast': value, 'window_slow': value, 'threshold_high': value, 'threshold_low': value}}, df)",
     "formula": "any(mass_index[t-9 .. t] > threshold_high) and mass_index[t] < threshold_low -- the reversal bulge: a spike above, then a fall back through the lower level",
+    "friendly_name": "Reversal Warning",
+    "display_name": "Mass Index Reversal Bulge",
+    "short_description": "Price swings widened and then narrowed, which often comes before a trend reversal.",
     "inputs": {
      "high": {
       "type": "series",
@@ -12786,6 +13164,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mfi_overbought', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "mfi[t] > threshold",
+    "friendly_name": "Heavy Volume Buying",
+    "display_name": "Money Flow Index Overbought",
+    "short_description": "Buying volume has been unusually heavy; a pullback may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -12848,6 +13229,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mfi_oversold', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "mfi[t] < threshold",
+    "friendly_name": "Heavy Volume Selling",
+    "display_name": "Money Flow Index Oversold",
+    "short_description": "Selling volume has been unusually heavy; a bounce may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -12910,6 +13294,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_bearish', 'params': {'window': value}}, df)",
     "formula": "mom[t] < 0",
+    "friendly_name": "Price Losing Ground",
+    "display_name": "Momentum Negative",
+    "short_description": "Price is lower than it was a set number of bars ago.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12953,6 +13340,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_bullish', 'params': {'window': value}}, df)",
     "formula": "mom[t] > 0",
+    "friendly_name": "Price Gaining Ground",
+    "display_name": "Momentum Positive",
+    "short_description": "Price is higher than it was a set number of bars ago.",
     "inputs": {
      "close": {
       "type": "series",
@@ -12996,6 +13386,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_cross_down', 'params': {'window': value}}, df)",
     "formula": "mom[t-1] >= 0 and mom[t] < 0",
+    "friendly_name": "Starts Losing Ground",
+    "display_name": "Momentum Crosses Below Zero",
+    "short_description": "Price just dropped below where it was a set number of bars ago.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13039,6 +13432,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mom_cross_up', 'params': {'window': value}}, df)",
     "formula": "mom[t-1] <= 0 and mom[t] > 0",
+    "friendly_name": "Starts Gaining Ground",
+    "display_name": "Momentum Crosses Above Zero",
+    "short_description": "Price just rose above where it was a set number of bars ago.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13082,6 +13478,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'morning_star_trigger', 'params': {'body_threshold': value}}, df)",
     "formula": "close[t-2] < open[t-2] and body[t-1] <= range[t-1] * body_threshold and close[t] > open[t] and close[t] > (open[t-2] + close[t-2]) / 2",
+    "friendly_name": "Three-Bar Bottom",
+    "display_name": "Morning Star",
+    "short_description": "A down bar, a small pause, then a strong up bar: a classic sign of a bottom.",
     "inputs": {
      "open": {
       "type": "series",
@@ -13146,6 +13545,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bearish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
     "formula": "higher_tf_trend[t] == -1",
+    "friendly_name": "Bigger Trend Is Down",
+    "display_name": "Higher-Timeframe Trend Bearish",
+    "short_description": "The trend on a longer chart (weekly by default) is pointing down.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13203,6 +13605,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bullish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
     "formula": "higher_tf_trend[t] == 1",
+    "friendly_name": "Bigger Trend Is Up",
+    "display_name": "Higher-Timeframe Trend Bullish",
+    "short_description": "The trend on a longer chart (weekly by default) is pointing up.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13260,6 +13665,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'natr_high_volatility', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "natr[t] > threshold",
+    "friendly_name": "Volatile Market",
+    "display_name": "Normalized ATR High Volatility",
+    "short_description": "Price is swinging more than usual as a percent of price.",
     "inputs": {
      "high": {
       "type": "series",
@@ -13318,6 +13726,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'natr_low_volatility', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "natr[t] < threshold",
+    "friendly_name": "Calm Market",
+    "display_name": "Normalized ATR Low Volatility",
+    "short_description": "Price is swinging less than usual, often before a larger move.",
     "inputs": {
      "high": {
       "type": "series",
@@ -13376,6 +13787,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'nr7_trigger', 'params': {'window': value}}, df)",
     "formula": "range[t] < min(range[t-window+1 .. t-1])",
+    "friendly_name": "Quietest Bar In 7",
+    "display_name": "Narrow Range 7 (NR7)",
+    "short_description": "This bar had the smallest range of the last 7; a bigger move often follows.",
     "inputs": {
      "high": {
       "type": "series",
@@ -13431,6 +13845,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'nvi_bearish', 'params': {'window': value}}, df)",
     "formula": "nvi[t] < nvi_ema[t] -- same seed-constant caveat as nvi_bullish",
+    "friendly_name": "Selling On Quiet Volume",
+    "display_name": "Negative Volume Index Bearish",
+    "short_description": "Price is slipping on lower-volume bars, often a sign of informed selling.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13478,6 +13895,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'nvi_bullish', 'params': {'window': value}}, df)",
     "formula": "nvi[t] > nvi_ema[t] -- NVI's level is set by an arbitrary seed constant, so every documented reading is positional against its own EMA rather than absolute",
+    "friendly_name": "Buying On Quiet Volume",
+    "display_name": "Negative Volume Index Bullish",
+    "short_description": "Price is rising on lower-volume bars, often a sign of informed buying.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13525,6 +13945,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'obv_bearish', 'params': {'window': value}}, df)",
     "formula": "obv[t] < obv[t-window+1]",
+    "friendly_name": "Volume Leaning Sell",
+    "display_name": "On-Balance Volume Falling",
+    "short_description": "More volume is trading on down bars than up bars lately.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13572,6 +13995,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'obv_bullish', 'params': {'window': value}}, df)",
     "formula": "obv[t] > obv[t-window+1] -- a rise over the window; OBV's level is an artefact of where the series begins",
+    "friendly_name": "Volume Leaning Buy",
+    "display_name": "On-Balance Volume Rising",
+    "short_description": "More volume is trading on up bars than down bars lately.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13619,6 +14045,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'outside_bar_trigger', 'params': {}}, df)",
     "formula": "range_high_delta[t] > 0 and range_low_delta[t] < 0",
+    "friendly_name": "Volatility Expands",
+    "display_name": "Outside Bar",
+    "short_description": "This bar's range covered the entire prior bar, showing a burst of volatility.",
     "inputs": {
      "high": {
       "type": "series",
@@ -13666,6 +14095,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'piercing_line_trigger', 'params': {'min_penetration': value, 'require_gap': value}}, df)",
     "formula": "close[t-1] < open[t-1] and close[t] > open[t] and open[t] < close[t-1] and close[t] > close[t-1] + (open[t-1] - close[t-1]) * min_penetration -- open[t] < low[t-1] instead when require_gap is true, which cannot occur in a 24/7 market",
+    "friendly_name": "Buyers Push Back",
+    "display_name": "Piercing Line",
+    "short_description": "After a down candle, an up candle closed above its midpoint, a possible turn higher.",
     "inputs": {
      "open": {
       "type": "series",
@@ -13733,6 +14165,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ppo_bearish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
     "formula": "ppo[t-1] >= ppo_signal[t-1] and ppo[t] < ppo_signal[t]",
+    "friendly_name": "Momentum Turns Down",
+    "display_name": "PPO Bearish Crossover",
+    "short_description": "Percentage-based momentum just turned downward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13790,6 +14225,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ppo_bullish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
     "formula": "ppo[t-1] <= ppo_signal[t-1] and ppo[t] > ppo_signal[t]",
+    "friendly_name": "Momentum Turns Up",
+    "display_name": "PPO Bullish Crossover",
+    "short_description": "Percentage-based momentum just turned upward.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13847,6 +14285,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'price_above_ema', 'params': {'window': value}}, df)",
     "formula": "close[t] > ema[t]",
+    "friendly_name": "Above Trend Line",
+    "display_name": "Above Exponential Moving Average",
+    "short_description": "Price is above an average that leans toward recent prices.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13890,6 +14331,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'pvo_bearish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
     "formula": "pvo[t-1] >= pvo_signal[t-1] and pvo[t] < pvo_signal[t] -- computed from VOLUME, not price",
+    "friendly_name": "Volume Starts Fading",
+    "display_name": "PVO Bearish Crossover",
+    "short_description": "Trading volume just started shrinking relative to its recent trend.",
     "inputs": {
      "volume": {
       "type": "series",
@@ -13947,6 +14391,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'pvo_bullish_cross', 'params': {'window_slow': value, 'window_fast': value, 'window_sign': value}}, df)",
     "formula": "pvo[t-1] <= pvo_signal[t-1] and pvo[t] > pvo_signal[t] -- computed from VOLUME, not price",
+    "friendly_name": "Volume Starts Surging",
+    "display_name": "PVO Bullish Crossover",
+    "short_description": "Trading volume just started growing relative to its recent trend.",
     "inputs": {
      "volume": {
       "type": "series",
@@ -14004,6 +14451,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'reversal_pattern_bearish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, dark_cloud_cover, gravestone_doji, evening_star",
+    "friendly_name": "Recent Top Pattern",
+    "display_name": "Recent Bearish Reversal Pattern",
+    "short_description": "A classic candle pattern that signals a possible top appeared recently.",
     "inputs": {
      "open": {
       "type": "series",
@@ -14059,6 +14509,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'reversal_pattern_bullish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, piercing_line, dragonfly_doji, morning_star",
+    "friendly_name": "Recent Bottom Pattern",
+    "display_name": "Recent Bullish Reversal Pattern",
+    "short_description": "A classic candle pattern that signals a possible bottom appeared recently.",
     "inputs": {
      "open": {
       "type": "series",
@@ -14114,6 +14567,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'roc_momentum_shift', 'params': {'window': value, 'direction': value}}, df)",
     "formula": "roc[t-1] <= 0 and roc[t] > 0 when direction is bullish; roc[t-1] >= 0 and roc[t] < 0 when bearish",
+    "friendly_name": "Momentum Shift",
+    "display_name": "Rate of Change Zero Cross",
+    "short_description": "Price change over recent bars just flipped sign, in the direction you choose.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14164,6 +14620,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'roc_negative', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "roc[t] < threshold",
+    "friendly_name": "Recent Price Decline",
+    "display_name": "Rate of Change Negative",
+    "short_description": "Price has fallen in percentage terms over recent bars.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14214,6 +14673,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'roc_positive', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "roc[t] > threshold",
+    "friendly_name": "Recent Price Gain",
+    "display_name": "Rate of Change Positive",
+    "short_description": "Price has risen in percentage terms over recent bars.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14264,6 +14726,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_bearish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
     "formula": "high_price_delta[t] > 0 and high_indicator_delta[t] < 0",
+    "friendly_name": "Rally Losing Steam",
+    "display_name": "RSI Bearish Divergence",
+    "short_description": "Price made a higher high but momentum did not, hinting the rise may fade.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14321,6 +14786,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_bullish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
     "formula": "low_price_delta[t] < 0 and low_indicator_delta[t] > 0 -- price fell between its last two confirmed swing lows while RSI rose",
+    "friendly_name": "Selloff Losing Steam",
+    "display_name": "RSI Bullish Divergence",
+    "short_description": "Price made a lower low but momentum did not, hinting the drop may fade.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14378,6 +14846,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_cross_down', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "rsi[t-1] >= threshold and rsi[t] < threshold",
+    "friendly_name": "Momentum Drops Below Level",
+    "display_name": "RSI Crosses Below Level",
+    "short_description": "Momentum just fell below the chosen level (50 by default).",
     "inputs": {
      "close": {
       "type": "series",
@@ -14428,6 +14899,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_cross_up', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "rsi[t-1] <= threshold and rsi[t] > threshold",
+    "friendly_name": "Momentum Rises Above Level",
+    "display_name": "RSI Crosses Above Level",
+    "short_description": "Momentum just rose above the chosen level (50 by default).",
     "inputs": {
      "close": {
       "type": "series",
@@ -14478,6 +14952,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_hidden_bearish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
     "formula": "high_price_delta[t] < 0 and high_indicator_delta[t] > 0",
+    "friendly_name": "Downtrend Bounce Fails",
+    "display_name": "RSI Hidden Bearish Divergence",
+    "short_description": "A bounce stalled below the last high, so the downtrend is likely to continue.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14535,6 +15012,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_hidden_bullish_divergence', 'params': {'rsi_window': value, 'swing_window': value, 'min_swing_distance': value}}, df)",
     "formula": "low_price_delta[t] > 0 and low_indicator_delta[t] < 0",
+    "friendly_name": "Uptrend Dip Holds",
+    "display_name": "RSI Hidden Bullish Divergence",
+    "short_description": "A pullback held above the last low, so the uptrend is likely to continue.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14592,6 +15072,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_overbought', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "rsi[t] > threshold",
+    "friendly_name": "Heavily Bought Up",
+    "display_name": "RSI Overbought",
+    "short_description": "Buying has pushed price unusually high; a pullback may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14642,6 +15125,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_oversold', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "rsi[t] < threshold",
+    "friendly_name": "Heavily Sold Off",
+    "display_name": "RSI Oversold",
+    "short_description": "Selling has pushed price unusually low; a bounce may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14692,6 +15178,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'shooting_star_trigger', 'params': {'wick_ratio': value, 'lower_wick_max': value}}, df)",
     "formula": "body[t] > 0 and upper_wick[t] >= body[t] * wick_ratio and lower_wick[t] <= body[t] * lower_wick_max -- identical arithmetic to inverted_hammer_trigger; the two differ only by the prior trend, which this implementation does not encode",
+    "friendly_name": "Rally Rejected",
+    "display_name": "Shooting Star",
+    "short_description": "Price spiked up and fell back, which can warn of a top; same test as Inverted Hammer.",
     "inputs": {
      "open": {
       "type": "series",
@@ -14762,6 +15251,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'sma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "sma(window_fast)[t-1] >= sma(window_slow)[t-1] and sma(window_fast)[t] < sma(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "SMA Bearish Crossover",
+    "short_description": "Two simple price averages just crossed downward, the classic death cross.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14812,6 +15304,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'sma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "sma(window_fast)[t-1] <= sma(window_slow)[t-1] and sma(window_fast)[t] > sma(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "SMA Bullish Crossover",
+    "short_description": "Two simple price averages just crossed upward, the classic golden cross.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14862,6 +15357,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'sma_crossover', 'params': {'window_fast': value, 'window_slow': value, 'direction': value}}, df)",
     "formula": "direction == 'bullish': sma(window_fast)[t-1] <= sma(window_slow)[t-1] and sma(window_fast)[t] > sma(window_slow)[t]; direction == 'bearish': sma(window_fast)[t-1] >= sma(window_slow)[t-1] and sma(window_fast)[t] < sma(window_slow)[t]",
+    "friendly_name": "Trend Lines Cross",
+    "display_name": "SMA Crossover",
+    "short_description": "Two simple price averages just crossed, in the direction you choose.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14919,6 +15417,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'smma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "smma(window_fast)[t-1] >= smma(window_slow)[t-1] and smma(window_fast)[t] < smma(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "SMMA Bearish Crossover",
+    "short_description": "Two slow, steady price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -14969,6 +15470,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'smma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "smma(window_fast)[t-1] <= smma(window_slow)[t-1] and smma(window_fast)[t] > smma(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "SMMA Bullish Crossover",
+    "short_description": "Two slow, steady price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15019,6 +15523,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'spinning_top_trigger', 'params': {'body_max': value, 'wick_min': value}}, df)",
     "formula": "range[t] > 0 and body[t] <= range[t] * body_max and upper_wick[t] >= range[t] * wick_min and lower_wick[t] >= range[t] * wick_min",
+    "friendly_name": "Undecided Bar",
+    "display_name": "Spinning Top",
+    "short_description": "A small body with wicks on both sides, showing neither side in control.",
     "inputs": {
      "open": {
       "type": "series",
@@ -15088,6 +15595,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'starc_lower_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
     "formula": "close[t] < starc_lband[t] -- a STATE despite the name: true for every bar close sits below the band",
+    "friendly_name": "Stretched Below Average",
+    "display_name": "Below STARC Lower Band",
+    "short_description": "Price is trading far below its average and may be overdone.",
     "inputs": {
      "high": {
       "type": "series",
@@ -15153,6 +15663,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'starc_upper_breakout', 'params': {'window': value, 'window_atr': value, 'multiplier': value}}, df)",
     "formula": "close[t] > starc_hband[t] -- a STATE despite the name: true for every bar close sits above the band, not only the bar that crosses it",
+    "friendly_name": "Stretched Above Average",
+    "display_name": "Above STARC Upper Band",
+    "short_description": "Price is trading far above its average and may be overextended.",
     "inputs": {
      "high": {
       "type": "series",
@@ -15218,6 +15731,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stc_overbought', 'params': {'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stc[t] > threshold",
+    "friendly_name": "Cycle Near Its Top",
+    "display_name": "Schaff Trend Cycle Overbought",
+    "short_description": "The market's trend cycle is near its top; a turn down may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15296,6 +15812,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stc_oversold', 'params': {'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stc[t] < threshold",
+    "friendly_name": "Cycle Near Its Bottom",
+    "display_name": "Schaff Trend Cycle Oversold",
+    "short_description": "The market's trend cycle is near its bottom; a turn up may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15374,6 +15893,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stoch_overbought', 'params': {'window': value, 'smooth_window': value, 'threshold': value}}, df)",
     "formula": "stoch_k[t] > threshold -- the FAST %K, unsmoothed",
+    "friendly_name": "Near Recent Highs",
+    "display_name": "Stochastic Overbought",
+    "short_description": "Price is closing near the top of its recent range; a pullback may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -15439,6 +15961,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stoch_oversold', 'params': {'window': value, 'smooth_window': value, 'threshold': value}}, df)",
     "formula": "stoch_k[t] < threshold -- the FAST %K, unsmoothed",
+    "friendly_name": "Near Recent Lows",
+    "display_name": "Stochastic Oversold",
+    "short_description": "Price is closing near the bottom of its recent range; a bounce may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -15504,6 +16029,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stochrsi_overbought', 'params': {'window': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stochrsi[t] > threshold -- StochRSI is on the 0..1 scale, so the conventional 80 level is 0.80 here",
+    "friendly_name": "Momentum Near Its Peak",
+    "display_name": "Stochastic RSI Overbought",
+    "short_description": "Momentum is near the top of its recent range; a pullback may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15568,6 +16096,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stochrsi_oversold', 'params': {'window': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stochrsi[t] < threshold -- 0..1 scale, so the conventional 20 level is 0.20",
+    "friendly_name": "Momentum Near Its Low",
+    "display_name": "Stochastic RSI Oversold",
+    "short_description": "Momentum is near the bottom of its recent range; a bounce may follow.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15632,6 +16163,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'strong_body_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires marubozu, bullish or bearish",
+    "friendly_name": "Recent Strong Bar",
+    "display_name": "Recent Marubozu",
+    "short_description": "A strong full-bodied bar, up or down, appeared recently.",
     "inputs": {
      "open": {
       "type": "series",
@@ -15687,6 +16221,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 't3_cross_down', 'params': {'window_fast': value, 'window_slow': value, 'volume_factor': value}}, df)",
     "formula": "t3(window_fast)[t-1] >= t3(window_slow)[t-1] and t3(window_fast)[t] < t3(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "T3 Bearish Crossover",
+    "short_description": "Two very smooth price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15744,6 +16281,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 't3_cross_up', 'params': {'window_fast': value, 'window_slow': value, 'volume_factor': value}}, df)",
     "formula": "t3(window_fast)[t-1] <= t3(window_slow)[t-1] and t3(window_fast)[t] > t3(window_slow)[t] -- both T3s share volume_factor",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "T3 Bullish Crossover",
+    "short_description": "Two very smooth price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15801,6 +16341,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "tema(window_fast)[t-1] >= tema(window_slow)[t-1] and tema(window_fast)[t] < tema(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "TEMA Bearish Crossover",
+    "short_description": "Two very fast price averages just crossed downward; quick, but prone to false alarms.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15851,6 +16394,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "tema(window_fast)[t-1] <= tema(window_slow)[t-1] and tema(window_fast)[t] > tema(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "TEMA Bullish Crossover",
+    "short_description": "Two very fast price averages just crossed upward; quick, but prone to false alarms.",
     "inputs": {
      "close": {
       "type": "series",
@@ -15901,6 +16447,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'three_black_crows_trigger', 'params': {'min_body_ratio': value}}, df)",
     "formula": "all three bars bearish, each closing lower than the last, each opening inside the prior body, and every body >= its own range * min_body_ratio",
+    "friendly_name": "Three Strong Down Bars",
+    "display_name": "Three Black Crows",
+    "short_description": "Three strong down bars in a row, each closing lower, a sign of heavy selling.",
     "inputs": {
      "open": {
       "type": "series",
@@ -15961,6 +16510,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'three_inside_down_trigger', 'params': {}}, df)",
     "formula": "close[t-2] > open[t-2] and close[t-1] < open[t-1] and open[t-1] < close[t-2] and close[t-1] > open[t-2] and close[t] < open[t] and close[t] < open[t-2]",
+    "friendly_name": "Confirmed Turn Down",
+    "display_name": "Three Inside Down",
+    "short_description": "A stalled rally was followed by a down bar closing below it, confirming a turn lower.",
     "inputs": {
      "open": {
       "type": "series",
@@ -16008,6 +16560,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'three_inside_up_trigger', 'params': {}}, df)",
     "formula": "close[t-2] < open[t-2] and close[t-1] > open[t-1] and open[t-1] > close[t-2] and close[t-1] < open[t-2] and close[t] > open[t] and close[t] > open[t-2]",
+    "friendly_name": "Confirmed Turn Up",
+    "display_name": "Three Inside Up",
+    "short_description": "A stalled selloff was followed by an up bar closing above it, confirming a turn higher.",
     "inputs": {
      "open": {
       "type": "series",
@@ -16055,6 +16610,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'three_white_soldiers_trigger', 'params': {'min_body_ratio': value}}, df)",
     "formula": "all three bars bullish, each closing higher than the last, each opening inside the prior body, and every body >= its own range * min_body_ratio",
+    "friendly_name": "Three Strong Up Bars",
+    "display_name": "Three White Soldiers",
+    "short_description": "Three strong up bars in a row, each closing higher, a sign of heavy buying.",
     "inputs": {
      "open": {
       "type": "series",
@@ -16115,6 +16673,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'trima_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "trima(window_fast)[t-1] >= trima(window_slow)[t-1] and trima(window_fast)[t] < trima(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "TRIMA Bearish Crossover",
+    "short_description": "Two extra-smooth price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -16165,6 +16726,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'trima_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "trima(window_fast)[t-1] <= trima(window_slow)[t-1] and trima(window_fast)[t] > trima(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "TRIMA Bullish Crossover",
+    "short_description": "Two extra-smooth price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -16215,6 +16779,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'trix_bearish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "trix[t] < threshold",
+    "friendly_name": "Smoothed Trend Falling",
+    "display_name": "TRIX Bearish",
+    "short_description": "A heavily smoothed price trend is heading down.",
     "inputs": {
      "close": {
       "type": "series",
@@ -16265,6 +16832,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'trix_bullish', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "trix[t] > threshold",
+    "friendly_name": "Smoothed Trend Rising",
+    "display_name": "TRIX Bullish",
+    "short_description": "A heavily smoothed price trend is heading up.",
     "inputs": {
      "close": {
       "type": "series",
@@ -16315,6 +16885,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tsi_bearish', 'params': {'window_slow': value, 'window_fast': value, 'threshold': value}}, df)",
     "formula": "tsi[t] < threshold",
+    "friendly_name": "Steady Downward Momentum",
+    "display_name": "True Strength Index Bearish",
+    "short_description": "Smoothed momentum is negative, favoring further downside.",
     "inputs": {
      "close": {
       "type": "series",
@@ -16372,6 +16945,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tsi_bullish', 'params': {'window_slow': value, 'window_fast': value, 'threshold': value}}, df)",
     "formula": "tsi[t] > threshold",
+    "friendly_name": "Steady Upward Momentum",
+    "display_name": "True Strength Index Bullish",
+    "short_description": "Smoothed momentum is positive, favoring further upside.",
     "inputs": {
      "close": {
       "type": "series",
@@ -16429,6 +17005,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_active', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
     "formula": "squeeze_depth[t] > 0 -- Bollinger Bands entirely inside the Keltner Channel",
+    "friendly_name": "Market Coiling",
+    "display_name": "TTM Squeeze Active",
+    "short_description": "Price swings are unusually tight, building up for a larger move.",
     "inputs": {
      "high": {
       "type": "series",
@@ -16508,6 +17087,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_fired_bearish', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
     "formula": "squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] < 0",
+    "friendly_name": "Quiet Market Breaks Down",
+    "display_name": "TTM Squeeze Fired Bearish",
+    "short_description": "A calm, tight market just released with a downward move.",
     "inputs": {
      "high": {
       "type": "series",
@@ -16587,6 +17169,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_fired_bullish', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
     "formula": "squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] > 0",
+    "friendly_name": "Quiet Market Breaks Up",
+    "display_name": "TTM Squeeze Fired Bullish",
+    "short_description": "A calm, tight market just released with an upward move.",
     "inputs": {
      "high": {
       "type": "series",
@@ -16666,6 +17251,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tweezer_bottoms_trigger', 'params': {'tolerance': value}}, df)",
     "formula": "abs(low[t] - low[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] < open[t-1] and close[t] > open[t]",
+    "friendly_name": "Double Bottom Bars",
+    "display_name": "Tweezer Bottoms",
+    "short_description": "Two bars hit the same low and the second closed up, a possible bottom.",
     "inputs": {
      "open": {
       "type": "series",
@@ -16729,6 +17317,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tweezer_tops_trigger', 'params': {'tolerance': value}}, df)",
     "formula": "abs(high[t] - high[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] > open[t-1] and close[t] < open[t]",
+    "friendly_name": "Double Top Bars",
+    "display_name": "Tweezer Tops",
+    "short_description": "Two bars hit the same high and the second closed down, a possible top.",
     "inputs": {
      "open": {
       "type": "series",
@@ -16792,6 +17383,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'two_bar_reversal_bearish_trigger', 'params': {'close_proximity': value}}, df)",
     "formula": "close[t-1] > open[t-1] and (high[t-1] - close[t-1]) <= range[t-1] * close_proximity and close[t] < open[t] and (close[t] - low[t]) <= range[t] * close_proximity and high[t] >= high[t-1] and close[t] < open[t-1]",
+    "friendly_name": "Sharp Two-Bar Reversal Down",
+    "display_name": "Bearish Two-Bar Reversal",
+    "short_description": "A strong up bar was fully reversed by a strong down bar.",
     "inputs": {
      "open": {
       "type": "series",
@@ -16847,6 +17441,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'two_bar_reversal_bullish_trigger', 'params': {'close_proximity': value}}, df)",
     "formula": "close[t-1] < open[t-1] and (close[t-1] - low[t-1]) <= range[t-1] * close_proximity and close[t] > open[t] and (high[t] - close[t]) <= range[t] * close_proximity and low[t] <= low[t-1] and close[t] > open[t-1]",
+    "friendly_name": "Sharp Two-Bar Reversal Up",
+    "display_name": "Bullish Two-Bar Reversal",
+    "short_description": "A strong down bar was fully reversed by a strong up bar.",
     "inputs": {
      "open": {
       "type": "series",
@@ -16902,6 +17499,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ulcer_high_risk', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "ulcer_index[t] > threshold",
+    "friendly_name": "Deep Drawdowns",
+    "display_name": "Ulcer Index High Risk",
+    "short_description": "Price has spent recent bars well below its highs, a sign of high downside risk.",
     "inputs": {
      "close": {
       "type": "series",
@@ -16952,6 +17552,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ulcer_low_risk', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "ulcer_index[t] < threshold",
+    "friendly_name": "Shallow Drawdowns",
+    "display_name": "Ulcer Index Low Risk",
+    "short_description": "Price has stayed close to its recent highs, a sign of low downside risk.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17002,6 +17605,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'uo_overbought', 'params': {'window_short': value, 'window_medium': value, 'window_long': value, 'threshold': value}}, df)",
     "formula": "ultimate_oscillator[t] > threshold",
+    "friendly_name": "Overheated On All Horizons",
+    "display_name": "Ultimate Oscillator Overbought",
+    "short_description": "Buying pressure is strong across short, medium and long windows; a pullback may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17074,6 +17680,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'uo_oversold', 'params': {'window_short': value, 'window_medium': value, 'window_long': value, 'threshold': value}}, df)",
     "formula": "ultimate_oscillator[t] < threshold",
+    "friendly_name": "Exhausted On All Horizons",
+    "display_name": "Ultimate Oscillator Oversold",
+    "short_description": "Buying pressure is weak across short, medium and long windows; a bounce may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17146,6 +17755,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 've_above_upper', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "close[t] >= vstop_hband[t]",
+    "friendly_name": "Unusual Jump Up",
+    "display_name": "Above Volatility Envelope",
+    "short_description": "Price closed far above the previous close compared with normal moves.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17196,6 +17808,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 've_below_lower', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "close[t] <= vstop_lband[t]",
+    "friendly_name": "Unusual Drop Down",
+    "display_name": "Below Volatility Envelope",
+    "short_description": "Price closed far below the previous close compared with normal moves.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17246,6 +17861,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vortex_bearish', 'params': {'window': value}}, df)",
     "formula": "vortex_neg[t] > vortex_pos[t]",
+    "friendly_name": "Sellers Leading",
+    "display_name": "Vortex Bearish",
+    "short_description": "Downward price movement is currently stronger than upward movement.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17297,6 +17915,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vortex_bullish', 'params': {'window': value}}, df)",
     "formula": "vortex_pos[t] > vortex_neg[t]",
+    "friendly_name": "Buyers Leading",
+    "display_name": "Vortex Bullish",
+    "short_description": "Upward price movement is currently stronger than downward movement.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17348,6 +17969,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vortex_crossover', 'params': {'window': value, 'direction': value}}, df)",
     "formula": "direction == 'bullish': vortex_pos[t-1] <= vortex_neg[t-1] and vortex_pos[t] > vortex_neg[t]; direction == 'bearish': vortex_pos[t-1] >= vortex_neg[t-1] and vortex_pos[t] < vortex_neg[t]",
+    "friendly_name": "Trend Leadership Flips",
+    "display_name": "Vortex Crossover",
+    "short_description": "Buyers and sellers just swapped the lead, in the direction you choose.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17406,6 +18030,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vpt_bearish', 'params': {'window': value}}, df)",
     "formula": "vpt[t] < vpt[t-window+1]",
+    "friendly_name": "Volume Confirms Decline",
+    "display_name": "Volume Price Trend Falling",
+    "short_description": "Price drops on heavy volume have outweighed the gains lately.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17453,6 +18080,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vpt_bullish', 'params': {'window': value}}, df)",
     "formula": "vpt[t] > vpt[t-window+1] -- a rise over the window; same cumulative-level caveat",
+    "friendly_name": "Volume Confirms Rise",
+    "display_name": "Volume Price Trend Rising",
+    "short_description": "Price gains on heavy volume have outweighed the drops lately.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17500,6 +18130,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vwap_above', 'params': {'window': value}}, df)",
     "formula": "close[t] > vwap[t]",
+    "friendly_name": "Above Average Traded Price",
+    "display_name": "Price Above VWAP",
+    "short_description": "Price is above the average price paid, weighted by volume.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17555,6 +18188,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vwap_below', 'params': {'window': value}}, df)",
     "formula": "close[t] < vwap[t]",
+    "friendly_name": "Below Average Traded Price",
+    "display_name": "Price Below VWAP",
+    "short_description": "Price is below the average price paid, weighted by volume.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17610,6 +18246,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vwma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "vwma(window_fast)[t-1] >= vwma(window_slow)[t-1] and vwma(window_fast)[t] < vwma(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "VWMA Bearish Crossover",
+    "short_description": "Two volume-weighted price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17664,6 +18303,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'vwma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "vwma(window_fast)[t-1] <= vwma(window_slow)[t-1] and vwma(window_fast)[t] > vwma(window_slow)[t] -- two VWMAs of different windows, not price against one",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "VWMA Bullish Crossover",
+    "short_description": "Two volume-weighted price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17718,6 +18360,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'williams_r_overbought', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "wr[t] > threshold -- Williams %R is NEGATIVE, so overbought is the band nearest zero and the default threshold is -20",
+    "friendly_name": "At Top Of Range",
+    "display_name": "Williams %R Overbought",
+    "short_description": "Price is closing at the very top of its recent range; a pullback may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17776,6 +18421,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'williams_r_oversold', 'params': {'window': value, 'threshold': value}}, df)",
     "formula": "wr[t] < threshold -- negative scale, so oversold is the default -80",
+    "friendly_name": "At Bottom Of Range",
+    "display_name": "Williams %R Oversold",
+    "short_description": "Price is closing at the very bottom of its recent range; a bounce may follow.",
     "inputs": {
      "high": {
       "type": "series",
@@ -17834,6 +18482,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'wma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "wma(window_fast)[t-1] >= wma(window_slow)[t-1] and wma(window_fast)[t] < wma(window_slow)[t]",
+    "friendly_name": "Trend Turns Down",
+    "display_name": "WMA Bearish Crossover",
+    "short_description": "Two recent-weighted price averages just crossed downward, pointing to a turn lower.",
     "inputs": {
      "close": {
       "type": "series",
@@ -17884,6 +18535,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'wma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "wma(window_fast)[t-1] <= wma(window_slow)[t-1] and wma(window_fast)[t] > wma(window_slow)[t]",
+    "friendly_name": "Trend Turns Up",
+    "display_name": "WMA Bullish Crossover",
+    "short_description": "Two recent-weighted price averages just crossed upward, pointing to a turn higher.",
     "inputs": {
      "close": {
       "type": "series",
@@ -45575,6 +46229,7 @@
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],
+  "signals_missing_labels": [],
   "indicators_missing_description": [],
   "doc_atoms": 7,
   "doc_atom_ids": [

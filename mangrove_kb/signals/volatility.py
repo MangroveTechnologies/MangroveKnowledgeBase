@@ -47,6 +47,10 @@ def bb_upper_breakout(
     the upper band, not while price remains above it. Crypto assets frequently test bands during
     high volatility; use with volume confirmation.
 
+    Friendly-Name: Upside Range Breakout
+    Display-Name: Bollinger Band Upper Breakout
+    Short-Description: Price just broke above its normal trading range.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
     Warmup: window
 
@@ -106,6 +110,10 @@ def bb_lower_breakout(
     the lower band, not while price remains below it. Crypto assets frequently test bands during
     high volatility; use with volume confirmation.
 
+    Friendly-Name: Downside Range Breakout
+    Display-Name: Bollinger Band Lower Breakout
+    Short-Description: Price just broke below its normal trading range.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
     Warmup: window
 
@@ -163,6 +171,10 @@ def bb_squeeze(
 
     Detect Bollinger Band squeeze onset (low volatility, potential breakout). Fires on the bar where
     band width drops below the threshold, not while it remains below.
+
+    Friendly-Name: Market Goes Quiet
+    Display-Name: Bollinger Band Squeeze
+    Short-Description: Price swings just narrowed sharply, which often comes before a big move.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/bollinger-bandwidth
     Warmup: window
@@ -238,6 +250,10 @@ def bb_above_upper(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
     every bar close sits above the band, unlike bb_upper_breakout which fires only on the bar that
     crosses it.
 
+    Friendly-Name: Above Usual Range
+    Display-Name: Above Bollinger Upper Band
+    Short-Description: Price is trading above its normal range.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
     Warmup: window - 1
 
@@ -299,6 +315,10 @@ def bb_below_lower(df: pd.DataFrame, window: int = 20, window_dev: int = 2) -> b
     every bar close sits below the band, unlike bb_lower_breakout which fires only on the bar that
     crosses it.
 
+    Friendly-Name: Below Usual Range
+    Display-Name: Below Bollinger Lower Band
+    Short-Description: Price is trading below its normal range.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/bollinger-bands
     Warmup: window - 1
 
@@ -348,6 +368,10 @@ def kc_above_upper(
 
     Check if price is currently above the upper Keltner Channel band. A state, not an event: true
     for every bar close sits above the band.
+
+    Friendly-Name: Above Volatility Channel
+    Display-Name: Above Keltner Upper Band
+    Short-Description: Price is trading above its normal volatility channel.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
     Warmup: max(window, window_atr) - 1
@@ -404,6 +428,10 @@ def kc_below_lower(
 
     Check if price is currently below the lower Keltner Channel band. A state, not an event: true
     for every bar close sits below the band.
+
+    Friendly-Name: Below Volatility Channel
+    Display-Name: Below Keltner Lower Band
+    Short-Description: Price is trading below its normal volatility channel.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
     Warmup: max(window, window_atr) - 1
@@ -465,6 +493,10 @@ def atr_high_volatility(
     Check if ATR indicates high volatility relative to price. High volatility (ATR as % of close >
     threshold) can indicate potential trading opportunities or increased risk.
 
+    Friendly-Name: Big Price Swings
+    Display-Name: ATR High Volatility
+    Short-Description: Typical bar-to-bar price swings are large relative to price.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-true-range-atr
     Warmup: window - 1
 
@@ -525,6 +557,10 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
 
     Detect price breaking above upper Keltner Channel band. Fires on the bar where price crosses
     above the upper band.
+
+    Friendly-Name: Breaks Above Channel
+    Display-Name: Keltner Channel Upper Breakout
+    Short-Description: Price just broke above its normal volatility channel.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
     Warmup: max(window, window_atr)
@@ -589,6 +625,10 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
 
     Detect price breaking below lower Keltner Channel band. Fires on the bar where price crosses
     below the lower band.
+
+    Friendly-Name: Breaks Below Channel
+    Display-Name: Keltner Channel Lower Breakout
+    Short-Description: Price just broke below its normal volatility channel.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/keltner-channels
     Warmup: max(window, window_atr)
@@ -660,6 +700,10 @@ def dc_upper_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     current bar so the current bar's high doesn't inflate the band it's compared against -- that is
     the Donchian convention and the indicator's own behaviour.
 
+    Friendly-Name: New Period High
+    Display-Name: Donchian Channel Upper Breakout
+    Short-Description: Price just closed above the highest high of the prior period.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/price-channels
     Warmup: window + 1
 
@@ -716,6 +760,10 @@ def dc_lower_breakout(df: pd.DataFrame, window: int = 20) -> bool:
     below the prior period's lower band. The channel is computed from the N bars BEFORE the current
     bar so the current bar's low doesn't deflate the band it's compared against -- that is the
     Donchian convention and the indicator's own behaviour.
+
+    Friendly-Name: New Period Low
+    Display-Name: Donchian Channel Lower Breakout
+    Short-Description: Price just closed below the lowest low of the prior period.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/price-channels
     Warmup: window + 1
@@ -776,6 +824,10 @@ def ulcer_high_risk(df: pd.DataFrame, window: int = 14, threshold: float = 10.0)
     Check if Ulcer Index indicates high downside risk. Higher Ulcer Index values indicate greater
     downside volatility.
 
+    Friendly-Name: Deep Drawdowns
+    Display-Name: Ulcer Index High Risk
+    Short-Description: Price has spent recent bars well below its highs, a sign of high downside risk.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index
     Warmup: window - 1
 
@@ -825,6 +877,10 @@ def ulcer_low_risk(df: pd.DataFrame, window: int = 14, threshold: float = 5.0) -
 
     Check if Ulcer Index indicates low downside risk. Lower Ulcer Index values indicate lower
     downside volatility.
+
+    Friendly-Name: Shallow Drawdowns
+    Display-Name: Ulcer Index Low Risk
+    Short-Description: Price has stayed close to its recent highs, a sign of low downside risk.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ulcer-index
     Warmup: window - 1
@@ -882,6 +938,10 @@ def natr_high_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 
     threshold is a percentage. Values above ~2-3% typically indicate elevated volatility in
     equities; crypto markets can run 4-6%+ routinely.
 
+    Friendly-Name: Volatile Market
+    Display-Name: Normalized ATR High Volatility
+    Short-Description: Price is swinging more than usual as a percent of price.
+
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/volatility_indicators.html
     Warmup: window
 
@@ -926,6 +986,10 @@ def natr_low_volatility(df: pd.DataFrame, window: int = 14, threshold: float = 1
 
     Check if normalized ATR is below a low-volatility threshold. Useful as a squeeze / consolidation
     filter.
+
+    Friendly-Name: Calm Market
+    Display-Name: Normalized ATR Low Volatility
+    Short-Description: Price is swinging less than usual, often before a larger move.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/volatility_indicators.html
     Warmup: window
@@ -1098,6 +1162,10 @@ def starc_upper_breakout(
 
     Check if close is above the STARC upper band (breakout).
 
+    Friendly-Name: Stretched Above Average
+    Display-Name: Above STARC Upper Band
+    Short-Description: Price is trading far above its average and may be overextended.
+
     Warmup: max(window, window_atr)
 
     Formula:
@@ -1148,6 +1216,10 @@ def starc_lower_breakout(
     """Signal: starc_lower_breakout
 
     Check if close is below the STARC lower band (breakdown).
+
+    Friendly-Name: Stretched Below Average
+    Display-Name: Below STARC Lower Band
+    Short-Description: Price is trading far below its average and may be overdone.
 
     Warmup: max(window, window_atr)
 
@@ -1202,6 +1274,10 @@ def ve_above_upper(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) 
     wording said "above the current bar", which would make the comparison vacuous. A STATE, not an
     event: true for every bar close stays at or beyond the band.
 
+    Friendly-Name: Unusual Jump Up
+    Display-Name: Above Volatility Envelope
+    Short-Description: Price closed far above the previous close compared with normal moves.
+
     Warmup: window
 
     Formula:
@@ -1246,6 +1322,10 @@ def ve_below_lower(df: pd.DataFrame, window: int = 20, multiplier: float = 2.0) 
     Check if close is at or below the volatility envelope's lower band. Mirror of `ve_above_upper`:
     today's close is at least `multiplier` standard deviations below yesterday's. A STATE, not an
     event.
+
+    Friendly-Name: Unusual Drop Down
+    Display-Name: Below Volatility Envelope
+    Short-Description: Price closed far below the previous close compared with normal moves.
 
     Warmup: window
 
@@ -1313,6 +1393,10 @@ def cl_below_high_offset(df: pd.DataFrame, window: int = 22, multiplier: float =
     twice -- `chandelier_long_stop_hit` is the released name and names a use (an exit for a long)
     rather than what is measured.
 
+    Friendly-Name: Well Off Highs
+    Display-Name: Below Chandelier Exit (High)
+    Short-Description: Price has fallen well below its recent high.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
     Warmup: window - 1
 
@@ -1360,6 +1444,10 @@ def cl_above_low_offset(df: pd.DataFrame, window: int = 22, multiplier: float = 
     The two offsets are anchored to opposite extremes and can cross, so this and
     `cl_below_high_offset` are both true on some bars -- 15 of 1,294 BTC daily bars at the defaults.
     That is not a contradiction: they are two independent levels, not a band pair.
+
+    Friendly-Name: Well Off Lows
+    Display-Name: Above Chandelier Exit (Low)
+    Short-Description: Price has risen well above its recent low.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
     Warmup: window - 1
@@ -1409,6 +1497,10 @@ def cl_high_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float =
     356 of 1,294 BTC daily bars at the defaults -- while this fires only on the bar that breaches
     it. A strategy wanting the event cannot recover it from the state without keeping its own
     history, which is why both exist.
+
+    Friendly-Name: Falls Far From High
+    Display-Name: Chandelier Exit (High) Break
+    Short-Description: Price just fell well below its recent high, a common exit point for buyers.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
     Warmup: window
@@ -1463,6 +1555,10 @@ def cl_low_offset_break(df: pd.DataFrame, window: int = 22, multiplier: float = 
     BTC daily bars at the defaults. They are two independent levels, not a band pair, and nothing
     here may assume high_offset >= low_offset. Simultaneous firing with `cl_high_offset_break` is
     therefore not excluded by construction, though it does not occur on any of the seven fixtures.
+
+    Friendly-Name: Climbs Far From Low
+    Display-Name: Chandelier Exit (Low) Break
+    Short-Description: Price just climbed well above its recent low.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/chandelier-exit
     Warmup: window
@@ -1539,6 +1635,10 @@ def ttm_squeeze_active(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.
     is how far inside the Keltner Channel the narrower Bollinger band sits, so a positive depth IS
     the squeeze. The indicator measures the distance; this decides that a positive distance counts.
 
+    Friendly-Name: Market Coiling
+    Display-Name: TTM Squeeze Active
+    Short-Description: Price swings are unusually tight, building up for a larger move.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
     Warmup: max(bb_window, kc_window) + need - 1
 
@@ -1602,6 +1702,10 @@ def ttm_squeeze_fired_bullish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
     through zero -- the Bollinger bands leaving the Keltner channel. Direction comes from Carter's
     momentum on the same bar.
 
+    Friendly-Name: Quiet Market Breaks Up
+    Display-Name: TTM Squeeze Fired Bullish
+    Short-Description: A calm, tight market just released with an upward move.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
     Warmup: max(bb_window, kc_window) + need - 1
 
@@ -1648,6 +1752,10 @@ def ttm_squeeze_fired_bearish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
     """Signal: ttm_squeeze_fired_bearish
 
     Detect a squeeze releasing with negative momentum. Mirror of `ttm_squeeze_fired_bullish`.
+
+    Friendly-Name: Quiet Market Breaks Down
+    Display-Name: TTM Squeeze Fired Bearish
+    Short-Description: A calm, tight market just released with a downward move.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
     Warmup: max(bb_window, kc_window) + need - 1

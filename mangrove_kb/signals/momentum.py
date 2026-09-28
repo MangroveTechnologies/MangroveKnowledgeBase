@@ -54,6 +54,10 @@ def roc_positive(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
 
     Check if Rate of Change indicates positive momentum.
 
+    Friendly-Name: Recent Price Gain
+    Display-Name: Rate of Change Positive
+    Short-Description: Price has risen in percentage terms over recent bars.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
     Warmup: window - 1
 
@@ -100,6 +104,10 @@ def roc_negative(df: pd.DataFrame, window: int = 12, threshold: float = 0.0) -> 
 
     Check if Rate of Change indicates negative momentum.
 
+    Friendly-Name: Recent Price Decline
+    Display-Name: Rate of Change Negative
+    Short-Description: Price has fallen in percentage terms over recent bars.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
     Warmup: window - 1
 
@@ -145,6 +153,10 @@ def roc_momentum_shift(df: pd.DataFrame, window: int = 12, direction: str = "bul
     """Signal: roc_momentum_shift
 
     Check if ROC crosses zero (momentum shift).
+
+    Friendly-Name: Momentum Shift
+    Display-Name: Rate of Change Zero Cross
+    Short-Description: Price change over recent bars just flipped sign, in the direction you choose.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
     Warmup: window
@@ -201,6 +213,10 @@ def ao_bullish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
 
     Check if Awesome Oscillator indicates bullish momentum.
 
+    Friendly-Name: Upward Momentum
+    Display-Name: Awesome Oscillator Bullish
+    Short-Description: Short-term price swings are stronger than longer-term ones, showing upward momentum.
+
     Reference: https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/
     Warmup: window_slow - 1
 
@@ -253,6 +269,10 @@ def ao_bearish(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34, th
 
     Check if Awesome Oscillator indicates bearish momentum.
 
+    Friendly-Name: Downward Momentum
+    Display-Name: Awesome Oscillator Bearish
+    Short-Description: Short-term price swings are weaker than longer-term ones, showing downward momentum.
+
     Reference: https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/
     Warmup: window_slow - 1
 
@@ -304,6 +324,10 @@ def ao_zero_cross(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34,
     """Signal: ao_zero_cross
 
     Check if Awesome Oscillator crosses zero line.
+
+    Friendly-Name: Momentum Flips
+    Display-Name: Awesome Oscillator Zero Cross
+    Short-Description: Momentum just flipped direction, up or down as you choose.
 
     Reference: https://www.tradingview.com/support/solutions/43000501826-awesome-oscillator-ao/
     Warmup: window_slow
@@ -369,6 +393,10 @@ def ppo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
 
     Check if PPO crosses above signal line (bullish).
 
+    Friendly-Name: Momentum Turns Up
+    Display-Name: PPO Bullish Crossover
+    Short-Description: Percentage-based momentum just turned upward.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo
     Warmup: window_slow + window_sign - 1
 
@@ -423,6 +451,10 @@ def ppo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
     """Signal: ppo_bearish_cross
 
     Check if PPO crosses below signal line (bearish).
+
+    Friendly-Name: Momentum Turns Down
+    Display-Name: PPO Bearish Crossover
+    Short-Description: Percentage-based momentum just turned downward.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-price-oscillator-ppo
     Warmup: window_slow + window_sign - 1
@@ -483,6 +515,10 @@ def pvo_bullish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
 
     Check if PVO crosses above signal line (bullish volume).
 
+    Friendly-Name: Volume Starts Surging
+    Display-Name: PVO Bullish Crossover
+    Short-Description: Trading volume just started growing relative to its recent trend.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo
     Warmup: window_slow + window_sign - 1
 
@@ -537,6 +573,10 @@ def pvo_bearish_cross(df: pd.DataFrame, window_slow: int = 26, window_fast: int 
     """Signal: pvo_bearish_cross
 
     Check if PVO crosses below signal line (bearish volume).
+
+    Friendly-Name: Volume Starts Fading
+    Display-Name: PVO Bearish Crossover
+    Short-Description: Trading volume just started shrinking relative to its recent trend.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/percentage-volume-oscillator-pvo
     Warmup: window_slow + window_sign - 1
@@ -605,6 +645,10 @@ def mom_bullish(df: pd.DataFrame, window: int = 10) -> bool:
     Check if Momentum (close - close[-n]) is positive. Indicates upward price momentum over the
     lookback window.
 
+    Friendly-Name: Price Gaining Ground
+    Display-Name: Momentum Positive
+    Short-Description: Price is higher than it was a set number of bars ago.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
     Warmup: window
 
@@ -647,6 +691,10 @@ def mom_bearish(df: pd.DataFrame, window: int = 10) -> bool:
     Check if Momentum (close - close[-n]) is negative. Indicates downward price momentum over the
     lookback window.
 
+    Friendly-Name: Price Losing Ground
+    Display-Name: Momentum Negative
+    Short-Description: Price is lower than it was a set number of bars ago.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
     Warmup: window
 
@@ -688,6 +736,10 @@ def mom_cross_up(df: pd.DataFrame, window: int = 10) -> bool:
 
     Detect Momentum crossing above zero (bullish zero-line cross).
 
+    Friendly-Name: Starts Gaining Ground
+    Display-Name: Momentum Crosses Above Zero
+    Short-Description: Price just rose above where it was a set number of bars ago.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
     Warmup: window + 1
 
@@ -726,6 +778,10 @@ def mom_cross_down(df: pd.DataFrame, window: int = 10) -> bool:
     """Signal: mom_cross_down
 
     Detect Momentum crossing below zero (bearish zero-line cross).
+
+    Friendly-Name: Starts Losing Ground
+    Display-Name: Momentum Crosses Below Zero
+    Short-Description: Price just dropped below where it was a set number of bars ago.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/rate-of-change-roc
     Warmup: window + 1
@@ -795,6 +851,10 @@ def macd_line_positive(df: pd.DataFrame, window_fast: int = 12, window_slow: int
 
     Check if the MACD line (EMA fast - EMA slow) is above zero (bullish momentum regime).
 
+    Friendly-Name: In An Upswing
+    Display-Name: MACD Line Positive
+    Short-Description: The short-term average is above the long-term average.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
     Warmup: window_slow - 1
 
@@ -837,6 +897,10 @@ def macd_line_negative(df: pd.DataFrame, window_fast: int = 12, window_slow: int
     """Signal: macd_line_negative
 
     Check if the MACD line is below zero (bearish momentum regime).
+
+    Friendly-Name: In A Downswing
+    Display-Name: MACD Line Negative
+    Short-Description: The short-term average is below the long-term average.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
     Warmup: window_slow - 1
@@ -881,6 +945,10 @@ def macd_line_cross_up(df: pd.DataFrame, window_fast: int = 12, window_slow: int
 
     Detect the MACD line crossing above zero (bullish momentum onset).
 
+    Friendly-Name: Trend Flips Up
+    Display-Name: MACD Line Crosses Above Zero
+    Short-Description: The short-term average just rose above the long-term average.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
     Warmup: window_slow
 
@@ -920,6 +988,10 @@ def macd_line_cross_down(df: pd.DataFrame, window_fast: int = 12, window_slow: i
     """Signal: macd_line_cross_down
 
     Detect the MACD line crossing below zero (bearish momentum onset).
+
+    Friendly-Name: Trend Flips Down
+    Display-Name: MACD Line Crosses Below Zero
+    Short-Description: The short-term average just fell below the long-term average.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
     Warmup: window_slow
@@ -985,6 +1057,10 @@ def adosc_bearish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
 
     Check if Chaikin A/D Oscillator is negative (distribution regime).
 
+    Friendly-Name: Selling Pressure Building
+    Display-Name: Chaikin Oscillator Negative
+    Short-Description: Recent money flow is weaker than the longer trend, showing selling pressure.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
     Warmup: slow
 
@@ -1035,6 +1111,10 @@ def adosc_bullish(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     fast EMA above its slow EMA, indicating short-term buying pressure relative to longer-term
     trend.
 
+    Friendly-Name: Buying Pressure Building
+    Display-Name: Chaikin Oscillator Positive
+    Short-Description: Recent money flow is stronger than the longer trend, showing buying pressure.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
     Warmup: slow
 
@@ -1082,6 +1162,10 @@ def adosc_cross_down(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
     """Signal: adosc_cross_down
 
     Detect ADOSC crossing below zero (distribution onset).
+
+    Friendly-Name: Selling Pressure Starts
+    Display-Name: Chaikin Oscillator Crosses Below Zero
+    Short-Description: Money flow just turned from buying to selling.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
     Warmup: slow + 1
@@ -1131,6 +1215,10 @@ def adosc_cross_up(df: pd.DataFrame, fast: int = 3, slow: int = 10) -> bool:
 
     Detect ADOSC crossing above zero (accumulation onset).
 
+    Friendly-Name: Buying Pressure Starts
+    Display-Name: Chaikin Oscillator Crosses Above Zero
+    Short-Description: Money flow just turned from selling to buying.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/chaikin-oscillator
     Warmup: slow + 1
 
@@ -1179,6 +1267,10 @@ def daily_return_negative(df: pd.DataFrame, threshold: float = 0.0) -> bool:
 
     Check if daily return is negative.
 
+    Friendly-Name: Price Fell This Bar
+    Display-Name: Daily Return Negative
+    Short-Description: Price closed lower than the previous bar.
+
     Warmup: 1
 
     Formula:
@@ -1222,6 +1314,10 @@ def daily_return_positive(df: pd.DataFrame, threshold: float = 0.0) -> bool:
 
     Check if daily return is positive.
 
+    Friendly-Name: Price Rose This Bar
+    Display-Name: Daily Return Positive
+    Short-Description: Price closed higher than the previous bar.
+
     Warmup: 1
 
     Formula:
@@ -1264,6 +1360,10 @@ def eom_bearish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
     """Signal: eom_bearish
 
     Check if Ease of Movement indicates bearish (easy downward movement).
+
+    Friendly-Name: Price Falling Easily
+    Display-Name: Ease of Movement Bearish
+    Short-Description: Price is moving down with little volume needed to push it.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv
     Warmup: window - 1
@@ -1316,6 +1416,10 @@ def eom_bullish(df: pd.DataFrame, window: int = 14, threshold: float = 0.0) -> b
     """Signal: eom_bullish
 
     Check if Ease of Movement indicates bullish (easy upward movement).
+
+    Friendly-Name: Price Rising Easily
+    Display-Name: Ease of Movement Bullish
+    Short-Description: Price is moving up with little volume needed to push it.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ease-of-movement-emv
     Warmup: window - 1
@@ -1370,6 +1474,10 @@ def force_bearish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
 
     Check if Force Index indicates bearish momentum.
 
+    Friendly-Name: Sellers Pushing Hard
+    Display-Name: Force Index Bearish
+    Short-Description: Price drops backed by volume are outweighing the gains.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index
     Warmup: window - 1
 
@@ -1417,6 +1525,10 @@ def force_bullish(df: pd.DataFrame, window: int = 13, threshold: float = 0.0) ->
     """Signal: force_bullish
 
     Check if Force Index indicates bullish momentum.
+
+    Friendly-Name: Buyers Pushing Hard
+    Display-Name: Force Index Bullish
+    Short-Description: Price gains backed by volume are outweighing the drops.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/force-index
     Warmup: window - 1
@@ -1468,6 +1580,10 @@ def kvo_bearish(
 
     Check if KVO is below its signal line (bearish volume regime).
 
+    Friendly-Name: Volume Favoring Sellers
+    Display-Name: Klinger Oscillator Bearish
+    Short-Description: Volume flow is running below its recent average, favoring sellers.
+
     Reference: https://www.tradingview.com/scripts/klingeroscillator/
     Warmup: slow + signal_window
 
@@ -1517,6 +1633,10 @@ def kvo_bearish_cross(
     """Signal: kvo_bearish_cross
 
     Detect KVO crossing below its signal line (bearish volume onset).
+
+    Friendly-Name: Volume Turns To Sellers
+    Display-Name: Klinger Oscillator Bearish Crossover
+    Short-Description: Volume flow just dropped below its recent average, shifting toward sellers.
 
     Reference: https://www.tradingview.com/scripts/klingeroscillator/
     Warmup: slow + signal_window
@@ -1568,6 +1688,10 @@ def kvo_bullish(
 
     Check if KVO is above its signal line (bullish volume regime).
 
+    Friendly-Name: Volume Favoring Buyers
+    Display-Name: Klinger Oscillator Bullish
+    Short-Description: Volume flow is running above its recent average, favoring buyers.
+
     Reference: https://www.tradingview.com/scripts/klingeroscillator/
     Warmup: slow + signal_window
 
@@ -1618,6 +1742,10 @@ def kvo_bullish_cross(
 
     Detect KVO crossing above its signal line (bullish volume onset). Classic Klinger entry trigger;
     often confirms a price divergence.
+
+    Friendly-Name: Volume Turns To Buyers
+    Display-Name: Klinger Oscillator Bullish Crossover
+    Short-Description: Volume flow just rose above its recent average, shifting toward buyers.
 
     Reference: https://www.tradingview.com/scripts/klingeroscillator/
     Warmup: slow + signal_window
@@ -1673,6 +1801,10 @@ def adx_bullish_di(df: pd.DataFrame, window: int = 14) -> bool:
     Check if +DI is greater than -DI (bullish directional movement). When +DI > -DI, bulls have the
     upper hand.
 
+    Friendly-Name: Buyers In Control
+    Display-Name: ADX Bullish Directional Bias
+    Short-Description: Upward pressure is currently stronger than downward pressure.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx
     Warmup: window * 2 - 1
 
@@ -1723,6 +1855,10 @@ def adx_strong_trend(df: pd.DataFrame, window: int = 14, threshold: float = 25.0
     Check if ADX indicates a strong trend. ADX values above 25 typically indicate a strong trend
     (either up or down).
 
+    Friendly-Name: Strong Trend
+    Display-Name: ADX Strong Trend
+    Short-Description: The market is trending strongly, either up or down.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/average-directional-index-adx
     Warmup: window * 2 - 1
 
@@ -1772,6 +1908,10 @@ def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullis
     """Signal: aroon_crossover
 
     Check if Aroon lines cross (trend change signal).
+
+    Friendly-Name: New Trend Emerging
+    Display-Name: Aroon Crossover
+    Short-Description: Recent highs just overtook recent lows, or the reverse, hinting at a new trend.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon
     Warmup: window
@@ -1835,6 +1975,10 @@ def aroon_down_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0
 
     Check if Aroon Down indicates strong downtrend.
 
+    Friendly-Name: Making Fresh Lows
+    Display-Name: Aroon Down Strong
+    Short-Description: Price has set a new low very recently, a sign of a strong downtrend.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon
     Warmup: window - 1
 
@@ -1883,6 +2027,10 @@ def aroon_up_trend(df: pd.DataFrame, window: int = 25, threshold: float = 70.0) 
     """Signal: aroon_up_trend
 
     Check if Aroon Up indicates strong uptrend.
+
+    Friendly-Name: Making Fresh Highs
+    Display-Name: Aroon Up Strong
+    Short-Description: Price has set a new high very recently, a sign of a strong uptrend.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/aroon
     Warmup: window - 1
@@ -1933,6 +2081,10 @@ def dpo_negative(df: pd.DataFrame, window: int = 20) -> bool:
 
     Check if DPO is negative (price below detrended average).
 
+    Friendly-Name: Below Its Cycle Average
+    Display-Name: Detrended Price Oscillator Negative
+    Short-Description: With the long-term trend removed, price is below its typical level.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo
     Warmup: window - 1
 
@@ -1976,6 +2128,10 @@ def dpo_positive(df: pd.DataFrame, window: int = 20) -> bool:
 
     Check if DPO is positive (price above detrended average).
 
+    Friendly-Name: Above Its Cycle Average
+    Display-Name: Detrended Price Oscillator Positive
+    Short-Description: With the long-term trend removed, price is above its typical level.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/detrended-price-oscillator-dpo
     Warmup: window - 1
 
@@ -2018,6 +2174,10 @@ def kst_bearish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
     """Signal: kst_bearish_cross
 
     Check if KST crosses below signal line (bearish).
+
+    Friendly-Name: Long-Term Momentum Turns Down
+    Display-Name: KST Bearish Crossover
+    Short-Description: A blend of short and long-term momentum just turned downward.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst
     Warmup: roc4 + window_sma4 + nsig - 1
@@ -2088,6 +2248,10 @@ def kst_bullish_cross(df: pd.DataFrame, roc1: int = 10, roc2: int = 15, roc3: in
     """Signal: kst_bullish_cross
 
     Check if KST crosses above signal line (bullish).
+
+    Friendly-Name: Long-Term Momentum Turns Up
+    Display-Name: KST Bullish Crossover
+    Short-Description: A blend of short and long-term momentum just turned upward.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/prings-know-sure-thing-kst
     Warmup: roc4 + window_sma4 + nsig - 1
@@ -2169,6 +2333,10 @@ def macd_bearish_cross(
     occurs when the MACD line crosses below the signal line, indicating potential downward momentum.
     Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
+    Friendly-Name: Downward Momentum Starts
+    Display-Name: MACD Bearish Crossover
+    Short-Description: Short-term momentum just turned downward.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
     Warmup: window_slow + window_sign - 1
 
@@ -2235,6 +2403,10 @@ def macd_bullish_cross(
     occurs when the MACD line crosses above the signal line, indicating potential upward momentum.
     Crypto's high volatility may produce frequent signals; use with trend confirmation.
 
+    Friendly-Name: Upward Momentum Starts
+    Display-Name: MACD Bullish Crossover
+    Short-Description: Short-term momentum just turned upward.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
     Warmup: window_slow + window_sign - 1
 
@@ -2300,6 +2472,10 @@ def macd_positive(
     Check if MACD histogram is positive (bullish momentum). Crypto's high volatility may produce
     frequent signals; use with trend confirmation.
 
+    Friendly-Name: Momentum Gaining
+    Display-Name: MACD Histogram Positive
+    Short-Description: Momentum is running above its recent average, favoring upside.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
     Warmup: min_periods - 1
 
@@ -2352,6 +2528,10 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
 
     Check if Mass Index signals potential reversal (reversal bulge). A reversal bulge occurs when
     Mass Index rises above 27 then falls below 26.5.
+
+    Friendly-Name: Reversal Warning
+    Display-Name: Mass Index Reversal Bulge
+    Short-Description: Price swings widened and then narrowed, which often comes before a trend reversal.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index
     Warmup: window_slow + window_fast - 1
@@ -2413,6 +2593,10 @@ def multi_tf_trend_bearish(
 
     Check if the higher-timeframe EMA is falling.
 
+    Friendly-Name: Bigger Trend Is Down
+    Display-Name: Higher-Timeframe Trend Bearish
+    Short-Description: The trend on a longer chart (weekly by default) is pointing down.
+
     Warmup: window * (base bars per higher_tf period)
 
     Formula:
@@ -2463,6 +2647,10 @@ def multi_tf_trend_bullish(
     closes, and returns True if the EMA slope is positive. Broadcasts back to the current bar's
     timestamp so lower-TF signals can be filtered by higher-TF trend.
 
+    Friendly-Name: Bigger Trend Is Up
+    Display-Name: Higher-Timeframe Trend Bullish
+    Short-Description: The trend on a longer chart (weekly by default) is pointing up.
+
     Warmup: window * (base bars per higher_tf period)
 
     Formula:
@@ -2507,6 +2695,10 @@ def trix_bearish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
     """Signal: trix_bearish
 
     Check if TRIX indicates bearish momentum.
+
+    Friendly-Name: Smoothed Trend Falling
+    Display-Name: TRIX Bearish
+    Short-Description: A heavily smoothed price trend is heading down.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix
     Warmup: window * 3 - 1
@@ -2553,6 +2745,10 @@ def trix_bullish(df: pd.DataFrame, window: int = 15, threshold: float = 0.0) -> 
 
     Check if TRIX indicates bullish momentum.
 
+    Friendly-Name: Smoothed Trend Rising
+    Display-Name: TRIX Bullish
+    Short-Description: A heavily smoothed price trend is heading up.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/trix
     Warmup: window * 3 - 1
 
@@ -2597,6 +2793,10 @@ def vortex_bearish(df: pd.DataFrame, window: int = 14) -> bool:
     """Signal: vortex_bearish
 
     Check if Vortex Indicator shows bearish trend (-VI > +VI).
+
+    Friendly-Name: Sellers Leading
+    Display-Name: Vortex Bearish
+    Short-Description: Downward price movement is currently stronger than upward movement.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator
     Warmup: window - 1
@@ -2647,6 +2847,10 @@ def vortex_bullish(df: pd.DataFrame, window: int = 14) -> bool:
 
     Check if Vortex Indicator shows bullish trend (+VI > -VI).
 
+    Friendly-Name: Buyers Leading
+    Display-Name: Vortex Bullish
+    Short-Description: Upward price movement is currently stronger than downward movement.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator
     Warmup: window - 1
 
@@ -2695,6 +2899,10 @@ def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bulli
     """Signal: vortex_crossover
 
     Check if Vortex lines cross (trend change).
+
+    Friendly-Name: Trend Leadership Flips
+    Display-Name: Vortex Crossover
+    Short-Description: Buyers and sellers just swapped the lead, in the direction you choose.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/vortex-indicator
     Warmup: window
@@ -2794,6 +3002,10 @@ def rsi_bullish_divergence(
     Detect a regular bullish RSI divergence: price lower low, RSI higher low. Price fell between its
     last two confirmed swing lows while RSI rose between the matching two.
 
+    Friendly-Name: Selloff Losing Steam
+    Display-Name: RSI Bullish Divergence
+    Short-Description: Price made a lower low but momentum did not, hinting the drop may fade.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1
 
@@ -2836,6 +3048,10 @@ def rsi_hidden_bullish_divergence(
 
     Detect a hidden bullish RSI divergence: price higher low, RSI lower low. Price rose between its
     last two confirmed swing lows while RSI fell between the matching two.
+
+    Friendly-Name: Uptrend Dip Holds
+    Display-Name: RSI Hidden Bullish Divergence
+    Short-Description: A pullback held above the last low, so the uptrend is likely to continue.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1
@@ -2880,6 +3096,10 @@ def rsi_bearish_divergence(
     Detect a regular bearish RSI divergence: price higher high, RSI lower high. Price rose between
     its last two confirmed swing highs while RSI fell between the matching two.
 
+    Friendly-Name: Rally Losing Steam
+    Display-Name: RSI Bearish Divergence
+    Short-Description: Price made a higher high but momentum did not, hinting the rise may fade.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1
 
@@ -2922,6 +3142,10 @@ def rsi_hidden_bearish_divergence(
 
     Detect a hidden bearish RSI divergence: price lower high, RSI higher high. Price fell between
     its last two confirmed swing highs while RSI rose between the matching two.
+
+    Friendly-Name: Downtrend Bounce Fails
+    Display-Name: RSI Hidden Bearish Divergence
+    Short-Description: A bounce stalled below the last high, so the downtrend is likely to continue.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/relative-strength-index-rsi
     Warmup: rsi_window + 2 * swing_window + min_swing_distance - 1

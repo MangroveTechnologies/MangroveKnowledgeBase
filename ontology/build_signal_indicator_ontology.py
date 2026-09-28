@@ -977,6 +977,9 @@ def _signal_lift(name, fn, facts):
         "abbreviation": None,
         "usage_example": f"RuleRegistry.evaluate({{'name': '{name}', 'params': {{{sig_params}}}}}, df)",
         "formula": a.get("formula"),
+        "friendly_name": a.get("friendly_name"),
+        "display_name": a.get("display_name"),
+        "short_description": a.get("short_description"),
         # NOTE there is no `consumes` here. Which indicator outputs a signal reads is a property of
         # the `uses` EDGE, not of the signal -- see `rel()`. `inputs` below is the same word for the
         # same concept: series the signal consumes. The two differ only by provenance, which is
@@ -1541,6 +1544,11 @@ out = {"atoms": atoms, "relations": rels,
                 "signals_missing_warmup": sorted(
                     a["title"] for a in atoms
                     if a["id"].startswith("procedure:signal-") and a["props"]["warmup_bars"] is None),
+                "signals_missing_labels": sorted(
+                    a["title"] for a in atoms
+                    if a["id"].startswith("procedure:signal-")
+                    and None in (a["props"]["friendly_name"], a["props"]["display_name"],
+                                 a["props"]["short_description"])),
                 # Every authored value comes from a docstring, so a missing description is a
                 # missing docstring section and the parser has already refused the build.
                 "indicators_missing_description": []}}

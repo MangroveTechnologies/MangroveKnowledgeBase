@@ -45,6 +45,10 @@ def kama_cross_up(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int =
 
     Check if price crosses above KAMA (bullish signal).
 
+    Friendly-Name: Rises Above Trend Line
+    Display-Name: Price Crosses Above KAMA
+    Short-Description: Price just rose above an average that adapts to market noise.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama
     Warmup: window + max(pow1, pow2) - 1
 
@@ -99,6 +103,10 @@ def kama_cross_down(df: pd.DataFrame, window: int = 10, pow1: int = 2, pow2: int
     """Signal: kama_cross_down
 
     Check if price crosses below KAMA (bearish signal).
+
+    Friendly-Name: Drops Below Trend Line
+    Display-Name: Price Crosses Below KAMA
+    Short-Description: Price just fell below an average that adapts to market noise.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/kaufmans-adaptive-moving-average-kama
     Warmup: window + max(pow1, pow2) - 1
@@ -157,6 +165,10 @@ def is_above_vwma(df: pd.DataFrame, window: int = 20) -> bool:
     bar's close by its volume, emphasizing high-participation bars. Useful as a filter that
     incorporates conviction from volume.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above Volume-Weighted Average
+    Short-Description: Price is above an average that gives more weight to high-volume bars.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window - 1
 
@@ -200,6 +212,10 @@ def vwap_above(df: pd.DataFrame, window: int = 14) -> bool:
     """Signal: vwap_above
 
     Check if price is above VWAP (bullish bias).
+
+    Friendly-Name: Above Average Traded Price
+    Display-Name: Price Above VWAP
+    Short-Description: Price is above the average price paid, weighted by volume.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap
     Warmup: window - 1
@@ -248,6 +264,10 @@ def vwap_below(df: pd.DataFrame, window: int = 14) -> bool:
 
     Check if price is below VWAP (bearish bias).
 
+    Friendly-Name: Below Average Traded Price
+    Display-Name: Price Below VWAP
+    Short-Description: Price is below the average price paid, weighted by volume.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/volume-weighted-average-price-vwap
     Warmup: window - 1
 
@@ -295,6 +315,10 @@ def vwma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
 
     Detect a bearish VWMA crossover (fast VWMA crosses below slow VWMA). Volume-weighted version of
     the classic SMA death cross.
+
+    Friendly-Name: Trend Turns Down
+    Display-Name: VWMA Bearish Crossover
+    Short-Description: Two volume-weighted price averages just crossed downward, pointing to a turn lower.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
@@ -346,6 +370,10 @@ def vwma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     Detect a bullish VWMA crossover (fast VWMA crosses above slow VWMA). Volume-weighted version of
     the classic SMA golden cross. High-volume bars carry more weight, so the signal is less
     susceptible to low-volume noise.
+
+    Friendly-Name: Trend Turns Up
+    Display-Name: VWMA Bullish Crossover
+    Short-Description: Two volume-weighted price averages just crossed upward, pointing to a turn higher.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
@@ -463,6 +491,10 @@ def alligator_bearish(
     Check if Williams Alligator lines are in bearish alignment (lips < teeth < jaw). Strong
     downtrend, all lines spreading downward.
 
+    Friendly-Name: Steady Downtrend
+    Display-Name: Williams Alligator Bearish Alignment
+    Short-Description: Three trend lines are lined up pointing down, showing a strong downtrend.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator
     Warmup: jaw + jaw_offset
 
@@ -518,6 +550,10 @@ def alligator_bullish(
 
     Check if Williams Alligator lines are in bullish alignment (lips > teeth > jaw). Bill Williams's
     "hungry alligator" state: strong uptrend, all lines spreading upward.
+
+    Friendly-Name: Steady Uptrend
+    Display-Name: Williams Alligator Bullish Alignment
+    Short-Description: Three trend lines are lined up pointing up, showing a strong uptrend.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator
     Warmup: jaw + jaw_offset
@@ -575,6 +611,10 @@ def alligator_sleeping(
     Check if the Williams Alligator is sleeping (lines tangled, no trend). True when lines are
     neither strictly bullish-aligned nor bearish-aligned. Used as a no-trade filter during
     consolidation.
+
+    Friendly-Name: No Clear Trend
+    Display-Name: Williams Alligator Sleeping
+    Short-Description: Trend lines are tangled together, so the market has no clear direction.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/alligator
     Warmup: jaw + jaw_offset
@@ -636,6 +676,10 @@ def alma_cross_down(
 
     Detect a bearish ALMA crossover (fast ALMA crosses below slow ALMA).
 
+    Friendly-Name: Trend Turns Down
+    Display-Name: ALMA Bearish Crossover
+    Short-Description: Two smoothed price averages just crossed downward, pointing to a turn lower.
+
     Warmup: window_slow
 
     Formula:
@@ -694,6 +738,10 @@ def alma_cross_up(
     Detect a bullish ALMA crossover (fast ALMA crosses above slow ALMA). Both ALMAs use the same
     offset and sigma; only the window differs.
 
+    Friendly-Name: Trend Turns Up
+    Display-Name: ALMA Bullish Crossover
+    Short-Description: Two smoothed price averages just crossed upward, pointing to a turn higher.
+
     Warmup: window_slow
 
     Formula:
@@ -746,6 +794,10 @@ def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     Detect a bearish DEMA crossover (fast DEMA crosses below slow DEMA). Lower-lag equivalent of an
     SMA/EMA death cross.
 
+    Friendly-Name: Trend Turns Down
+    Display-Name: DEMA Bearish Crossover
+    Short-Description: Two quick-reacting price averages just crossed downward, pointing to a turn lower.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
     Warmup: window_slow
 
@@ -783,6 +835,10 @@ def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     Detect a bullish DEMA crossover (fast DEMA crosses above slow DEMA). Lower-lag equivalent of an
     SMA/EMA golden cross.
 
+    Friendly-Name: Trend Turns Up
+    Display-Name: DEMA Bullish Crossover
+    Short-Description: Two quick-reacting price averages just crossed upward, pointing to a turn higher.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
     Warmup: window_slow
 
@@ -819,6 +875,10 @@ def ema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
 
     Detect bearish EMA crossover (fast EMA crosses below slow EMA). Common periods: 9/21
     (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Friendly-Name: Trend Turns Down
+    Display-Name: EMA Bearish Crossover
+    Short-Description: Two widely used price averages just crossed downward, pointing to a turn lower.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
@@ -876,6 +936,10 @@ def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
 
     Detect bullish EMA crossover (fast EMA crosses above slow EMA). Common periods: 9/21
     (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Friendly-Name: Trend Turns Up
+    Display-Name: EMA Bullish Crossover
+    Short-Description: Two widely used price averages just crossed upward, pointing to a turn higher.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
@@ -939,6 +1003,10 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
     window_slow AND current window_fast > current window_slow - Bearish: prev window_fast >= prev
     window_slow AND current window_fast < current window_slow Common periods: 9/21 (short-term),
     50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Friendly-Name: Trend Lines Cross
+    Display-Name: EMA Crossover
+    Short-Description: Two widely used price averages just crossed, in the direction you choose.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
@@ -1008,6 +1076,10 @@ def hma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25
     Detect a bearish HMA crossover (fast HMA crosses below slow HMA). Low-lag crossover; fires
     earlier than SMA/EMA equivalents.
 
+    Friendly-Name: Trend Turns Down
+    Display-Name: HMA Bearish Crossover
+    Short-Description: Two very fast price averages just crossed downward, an early sign of a turn lower.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
     Warmup: window_slow
 
@@ -1044,6 +1116,10 @@ def hma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) 
 
     Detect a bullish HMA crossover (fast HMA crosses above slow HMA). Low-lag crossover; fires
     earlier than SMA/EMA equivalents.
+
+    Friendly-Name: Trend Turns Up
+    Display-Name: HMA Bullish Crossover
+    Short-Description: Two very fast price averages just crossed upward, an early sign of a turn higher.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
     Warmup: window_slow
@@ -1082,6 +1158,10 @@ def is_above_alma(df: pd.DataFrame, window: int = 21, offset: float = 0.85, sigm
     Check if the current price is above the Arnaud Legoux Moving Average (ALMA). ALMA is a
     Gaussian-weighted MA that can be tuned to react faster (offset near 1, lower sigma) or smoother
     (offset near 0, higher sigma).
+
+    Friendly-Name: Above Trend Line
+    Display-Name: Above ALMA
+    Short-Description: Price is above a smoothed, fast-reacting average of recent prices.
 
     Warmup: window - 1
 
@@ -1129,6 +1209,10 @@ def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
     lag compared to a standard EMA by combining two EMA passes. Useful for trend-following filters
     where responsiveness matters.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above DEMA
+    Short-Description: Price is above a quick-reacting average of recent prices.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
     Warmup: window - 1
 
@@ -1164,6 +1248,10 @@ def is_above_hma(df: pd.DataFrame, window: int = 16) -> bool:
     Check if the current price is above the Hull Moving Average (HMA). HMA tracks price with very
     low lag while remaining smoother than WMA. A common crypto trend filter.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above Hull Moving Average
+    Short-Description: Price is above a very fast, smooth average of recent prices.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
     Warmup: window - 1
 
@@ -1198,6 +1286,10 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
 
     Check if the current price is above the MESA Adaptive Moving Average (MAMA). MAMA adapts its
     smoothing to volatility via a Hilbert transform.
+
+    Friendly-Name: Above Trend Line
+    Display-Name: Above MESA Adaptive Average
+    Short-Description: Price is above an average that speeds up or slows down with the market.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: warmup_bars
@@ -1245,6 +1337,10 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
     than the SMA value. Returns False if insufficient data is available. Common periods: 9/21
     (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above Simple Moving Average
+    Short-Description: Price is above its plain average over recent bars.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window - 1
 
@@ -1291,6 +1387,10 @@ def is_above_smma(df: pd.DataFrame, window: int = 14) -> bool:
     Wilder's smoothing (alpha=1/n) rather than EMA's 2/(n+1), producing a slower, more stable trend
     line. Same family used inside RSI and ATR.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above Smoothed Moving Average
+    Short-Description: Price is above a slow, steady average of recent prices.
+
     Warmup: window - 1
 
     Formula:
@@ -1324,6 +1424,10 @@ def is_above_t3(df: pd.DataFrame, window: int = 10, volume_factor: float = 0.7) 
 
     Check if the current price is above the Tillson T3 moving average. T3 is a smooth low-lag MA
     that combines 6 EMAs via the volume factor.
+
+    Friendly-Name: Above Trend Line
+    Display-Name: Above Tillson T3 Average
+    Short-Description: Price is above its smoothed average trend.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window * 6 - 1
@@ -1369,6 +1473,10 @@ def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
     Check if the current price is above the Triple Exponential Moving Average (TEMA). TEMA has even
     less lag than DEMA by combining three EMA passes.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above TEMA
+    Short-Description: Price is above a very fast average of recent prices.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
     Warmup: window - 1
 
@@ -1405,6 +1513,10 @@ def is_above_trima(df: pd.DataFrame, window: int = 20) -> bool:
     double-smoothed SMA that weights the middle of the window more heavily, producing a smoother
     trend line than SMA.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above Triangular Moving Average
+    Short-Description: Price is above an extra-smooth average of recent prices.
+
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window - 1
 
@@ -1438,6 +1550,10 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     """Signal: ma_ribbon_bearish
 
     Check if all MAs in the ribbon are in strict bearish alignment (faster below slower).
+
+    Friendly-Name: Broad Downtrend
+    Display-Name: Moving Average Ribbon Bearish
+    Short-Description: Short, medium and long price averages are all stacked downward.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
     Warmup: max(windows_list) - 1
@@ -1480,6 +1596,10 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     SMA(144). This is a strong trend filter -- when true, the market is in a clear uptrend across
     all horizons.
 
+    Friendly-Name: Broad Uptrend
+    Display-Name: Moving Average Ribbon Bullish
+    Short-Description: Short, medium and long price averages are all stacked upward.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
     Warmup: max(windows_list) - 1
 
@@ -1519,6 +1639,10 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Check if MAs in the ribbon are tangled (no strict alignment -- consolidation filter). Useful as
     a no-trade filter during choppy markets.
 
+    Friendly-Name: Choppy Market
+    Display-Name: Moving Average Ribbon Tangled
+    Short-Description: Price averages are tangled with no clear order, so the market is choppy.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
     Warmup: max(windows_list) - 1
 
@@ -1557,6 +1681,10 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
 
     Detect a bearish MAMA/FAMA crossover (MAMA crosses below FAMA). Classic Ehlers exit signal: MAMA
     falling below FAMA signals a downtrend.
+
+    Friendly-Name: Adaptive Trend Turns Down
+    Display-Name: MAMA/FAMA Bearish Crossover
+    Short-Description: An average that adapts to the market just crossed below its companion line.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: warmup_bars
@@ -1601,6 +1729,10 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
     Detect a bullish MAMA/FAMA crossover (MAMA crosses above FAMA). Classic Ehlers entry signal:
     MAMA rising above FAMA signals an uptrend.
 
+    Friendly-Name: Adaptive Trend Turns Up
+    Display-Name: MAMA/FAMA Bullish Crossover
+    Short-Description: An average that adapts to the market just crossed above its companion line.
+
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: warmup_bars
 
@@ -1643,6 +1775,10 @@ def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
 
     Check if price is above the EMA. Common periods: 9/21 (short-term), 50/200 (long-term). Adjust
     for crypto's 24/7 markets.
+
+    Friendly-Name: Above Trend Line
+    Display-Name: Above Exponential Moving Average
+    Short-Description: Price is above an average that leans toward recent prices.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window - 1
@@ -1692,6 +1828,10 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
     (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper
     around sma_crossover.
 
+    Friendly-Name: Trend Turns Down
+    Display-Name: SMA Bearish Crossover
+    Short-Description: Two simple price averages just crossed downward, the classic death cross.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
 
@@ -1731,6 +1871,10 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
     transition from bearish to bullish momentum. Common periods: 9/21 (short-term), 50/200
     (long-term). Adjust for crypto's 24/7 markets. Note: This is a backwards-compatible wrapper
     around sma_crossover.
+
+    Friendly-Name: Trend Turns Up
+    Display-Name: SMA Bullish Crossover
+    Short-Description: Two simple price averages just crossed upward, the classic golden cross.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
@@ -1774,6 +1918,10 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
     <= prev window_slow AND current window_fast > current window_slow - Bearish: prev window_fast >=
     prev window_slow AND current window_fast < current window_slow Common periods: 9/21
     (short-term), 50/200 (long-term). Adjust for crypto's 24/7 markets.
+
+    Friendly-Name: Trend Lines Cross
+    Display-Name: SMA Crossover
+    Short-Description: Two simple price averages just crossed, in the direction you choose.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-averages-simple-and-exponential
     Warmup: window_slow
@@ -1850,6 +1998,10 @@ def smma_cross_down(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 
     Detect a bearish SMMA crossover (fast SMMA crosses below slow SMMA). Slower, more stable
     crossover than EMA cross; fewer false triggers.
 
+    Friendly-Name: Trend Turns Down
+    Display-Name: SMMA Bearish Crossover
+    Short-Description: Two slow, steady price averages just crossed downward, pointing to a turn lower.
+
     Warmup: window_slow
 
     Formula:
@@ -1885,6 +2037,10 @@ def smma_cross_up(df: pd.DataFrame, window_fast: int = 14, window_slow: int = 50
 
     Detect a bullish SMMA crossover (fast SMMA crosses above slow SMMA). Slower, more stable
     crossover than EMA cross; fewer false triggers.
+
+    Friendly-Name: Trend Turns Up
+    Display-Name: SMMA Bullish Crossover
+    Short-Description: Two slow, steady price averages just crossed upward, pointing to a turn higher.
 
     Warmup: window_slow
 
@@ -1925,6 +2081,10 @@ def t3_cross_down(
     """Signal: t3_cross_down
 
     Detect a bearish T3 crossover (fast T3 crosses below slow T3).
+
+    Friendly-Name: Trend Turns Down
+    Display-Name: T3 Bearish Crossover
+    Short-Description: Two very smooth price averages just crossed downward, pointing to a turn lower.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window_slow * 6
@@ -1982,6 +2142,10 @@ def t3_cross_up(
     Detect a bullish T3 crossover (fast T3 crosses above slow T3). Very smooth, low-lag crossover.
     Both T3s share the same volume_factor.
 
+    Friendly-Name: Trend Turns Up
+    Display-Name: T3 Bullish Crossover
+    Short-Description: Two very smooth price averages just crossed upward, pointing to a turn higher.
+
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window_slow * 6
 
@@ -2033,6 +2197,10 @@ def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     Detect a bearish TEMA crossover (fast TEMA crosses below slow TEMA). Very low-lag cross signal;
     expect more whipsaw in noisy markets.
 
+    Friendly-Name: Trend Turns Down
+    Display-Name: TEMA Bearish Crossover
+    Short-Description: Two very fast price averages just crossed downward; quick, but prone to false alarms.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
     Warmup: window_slow
 
@@ -2070,6 +2238,10 @@ def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     Detect a bullish TEMA crossover (fast TEMA crosses above slow TEMA). Very low-lag cross signal;
     expect more whipsaw in noisy markets.
 
+    Friendly-Name: Trend Turns Up
+    Display-Name: TEMA Bullish Crossover
+    Short-Description: Two very fast price averages just crossed upward; quick, but prone to false alarms.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
     Warmup: window_slow
 
@@ -2105,6 +2277,10 @@ def trima_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int =
     """Signal: trima_cross_down
 
     Detect a bearish TRIMA crossover (fast TRIMA crosses below slow TRIMA).
+
+    Friendly-Name: Trend Turns Down
+    Display-Name: TRIMA Bearish Crossover
+    Short-Description: Two extra-smooth price averages just crossed downward, pointing to a turn lower.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window_slow
@@ -2142,6 +2318,10 @@ def trima_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 3
 
     Detect a bullish TRIMA crossover (fast TRIMA crosses above slow TRIMA).
 
+    Friendly-Name: Trend Turns Up
+    Display-Name: TRIMA Bullish Crossover
+    Short-Description: Two extra-smooth price averages just crossed upward, pointing to a turn higher.
+
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window_slow
 
@@ -2177,6 +2357,10 @@ def wma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21
     """Signal: wma_cross_down
 
     Check if fast WMA crosses below slow WMA (bearish).
+
+    Friendly-Name: Trend Turns Down
+    Display-Name: WMA Bearish Crossover
+    Short-Description: Two recent-weighted price averages just crossed downward, pointing to a turn lower.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window_slow
@@ -2227,6 +2411,10 @@ def wma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
     """Signal: wma_cross_up
 
     Check if fast WMA crosses above slow WMA (bullish).
+
+    Friendly-Name: Trend Turns Up
+    Display-Name: WMA Bullish Crossover
+    Short-Description: Two recent-weighted price averages just crossed upward, pointing to a turn higher.
 
     Reference: https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html
     Warmup: window_slow
@@ -2283,6 +2471,10 @@ def ichimoku_bullish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
 
     Check if Ichimoku indicates bullish signal (price above cloud).
 
+    Friendly-Name: Above Trend Zone
+    Display-Name: Ichimoku Price Above Cloud
+    Short-Description: Price is above the Ichimoku cloud, a zone that marks an uptrend.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud
     Warmup: window_senkou - 1
 
@@ -2338,6 +2530,10 @@ def ichimoku_bearish(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: int
 
     Check if Ichimoku indicates bearish signal (price below cloud).
 
+    Friendly-Name: Below Trend Zone
+    Display-Name: Ichimoku Price Below Cloud
+    Short-Description: Price is below the Ichimoku cloud, a zone that marks a downtrend.
+
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud
     Warmup: window_senkou - 1
 
@@ -2392,6 +2588,10 @@ def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: in
     """Signal: ichimoku_tk_cross
 
     Check if Tenkan-sen crosses Kijun-sen (TK cross).
+
+    Friendly-Name: Short-Term Trend Shift
+    Display-Name: Ichimoku Tenkan/Kijun Cross
+    Short-Description: Ichimoku's short and medium trend lines just crossed, in the direction you choose.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/ichimoku-cloud
     Warmup: window_senkou
@@ -2458,6 +2658,10 @@ def is_above_epma(df: pd.DataFrame, window: int = 20) -> bool:
     endpoint of a linear regression over the window, projecting the trend to "now" rather than
     averaging past values.
 
+    Friendly-Name: Above Trend Line
+    Display-Name: Above EPMA
+    Short-Description: Price is above a trend line fitted through recent prices.
+
     Warmup: window - 1
 
     Formula:
@@ -2490,6 +2694,10 @@ def epma_cross_up(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 30
     """Signal: epma_cross_up
 
     Detect a bullish EPMA crossover (fast EPMA crosses above slow EPMA).
+
+    Friendly-Name: Trend Turns Up
+    Display-Name: EPMA Bullish Crossover
+    Short-Description: Two trend lines fitted through recent prices just crossed upward.
 
     Warmup: window_slow
 
@@ -2525,6 +2733,10 @@ def epma_cross_down(df: pd.DataFrame, window_fast: int = 10, window_slow: int = 
     """Signal: epma_cross_down
 
     Detect a bearish EPMA crossover (fast EPMA crosses below slow EPMA).
+
+    Friendly-Name: Trend Turns Down
+    Display-Name: EPMA Bearish Crossover
+    Short-Description: Two trend lines fitted through recent prices just crossed downward.
 
     Warmup: window_slow
 
@@ -2562,6 +2774,10 @@ def heikin_ashi_bullish(df: pd.DataFrame) -> bool:
     Check if the current Heikin-Ashi candle is bullish (HA_close > HA_open). A bullish HA candle
     indicates buying pressure on the smoothed bar. Strings of bullish HA candles indicate a
     sustained uptrend.
+
+    Friendly-Name: Smoothed Price Rising
+    Display-Name: Heikin-Ashi Bullish Candle
+    Short-Description: The smoothed price bar closed higher than it opened, showing buying pressure.
 
     Warmup: 0
 
@@ -2601,6 +2817,10 @@ def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
     """Signal: heikin_ashi_bearish
 
     Check if the current Heikin-Ashi candle is bearish (HA_close < HA_open).
+
+    Friendly-Name: Smoothed Price Falling
+    Display-Name: Heikin-Ashi Bearish Candle
+    Short-Description: The smoothed price bar closed lower than it opened, showing selling pressure.
 
     Warmup: 0
 

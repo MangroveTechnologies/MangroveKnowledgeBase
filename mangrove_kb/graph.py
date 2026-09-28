@@ -124,6 +124,12 @@ SEARCH_TIERS: tuple[tuple[str, ...], ...] = (
      "principles", "practices", "examples"),
 )
 
+#: A signal's plain-language chip name and description restate its summary for display. They are
+#: not content, and indexing them let 218 near-identical phrases ("price is above...") outrank the
+#: nodes that answer a question: the semantic benchmark fell from 11 of 12 to 10. `display_name` is
+#: the signal's technical name ("RSI Overbought") and stays searchable.
+DISPLAY_LABELS = frozenset({"friendly_name", "short_description"})
+
 #: A link is provenance, not content. Left in the corpus, ``find("com")`` returned 336 of 498 nodes
 #: and ``find("http")`` 233, because every code-derived node cites a URL -- and one useless query
 #: that returns most of the graph teaches a caller not to trust the search at all.
@@ -243,7 +249,8 @@ def haystacks(source: dict) -> tuple[str, ...]:
     """
     ranked = {f for tier in SEARCH_TIERS for f in tier}
     tiers = [" ".join(_flatten(source.get(f)) for f in tier).lower() for tier in SEARCH_TIERS]
-    tiers.append(" ".join(_flatten(v) for k, v in source.items() if k not in ranked).lower())
+    tiers.append(" ".join(_flatten(v) for k, v in source.items()
+                          if k not in ranked and k not in DISPLAY_LABELS).lower())
     return tuple(_URL.sub(" ", t) for t in tiers)
 
 
