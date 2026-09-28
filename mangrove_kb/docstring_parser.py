@@ -11,6 +11,9 @@ Structured docstring tags parsed:
     Disabled:         True (only present when the signal is disabled)
     Disabled-Reason:  Explanation text (only present when Disabled: True)
     Args:             Parameter block in Google-style format with Range/Default
+    Friendly-Name:     Plain-language chip label (signals only, parse_authored)
+    Display-Name:      Readable technical name (signals only, parse_authored)
+    Short-Description: One plain sentence (signals only, parse_authored)
 
 Each parameter line in the Args block follows this format:
     name (type): Description. Range: min-max. Default: value.

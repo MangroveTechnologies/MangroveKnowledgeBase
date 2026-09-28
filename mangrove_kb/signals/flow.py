@@ -229,9 +229,9 @@ def nvi_bearish(df: pd.DataFrame, window: int = 255) -> bool:
     Check if NVI (Negative Volume Index) indicates smart money selling. NVI below its moving average
     suggests smart money distribution.
 
-    Friendly-Name: Quiet-Day Selling
+    Friendly-Name: Selling On Quiet Volume
     Display-Name: Negative Volume Index Bearish
-    Short-Description: Price is slipping on low-volume days, often a sign of informed selling.
+    Short-Description: Price is slipping on lower-volume bars, often a sign of informed selling.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi
     Warmup: window - 1
@@ -280,9 +280,9 @@ def nvi_bullish(df: pd.DataFrame, window: int = 255) -> bool:
     Check if NVI (Negative Volume Index) indicates smart money buying. NVI above its moving average
     suggests smart money accumulation.
 
-    Friendly-Name: Quiet-Day Buying
+    Friendly-Name: Buying On Quiet Volume
     Display-Name: Negative Volume Index Bullish
-    Short-Description: Price is rising on low-volume days, often a sign of informed buying.
+    Short-Description: Price is rising on lower-volume bars, often a sign of informed buying.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/negative-volume-index-nvi
     Warmup: window - 1

@@ -13845,9 +13845,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'nvi_bearish', 'params': {'window': value}}, df)",
     "formula": "nvi[t] < nvi_ema[t] -- same seed-constant caveat as nvi_bullish",
-    "friendly_name": "Quiet-Day Selling",
+    "friendly_name": "Selling On Quiet Volume",
     "display_name": "Negative Volume Index Bearish",
-    "short_description": "Price is slipping on low-volume days, often a sign of informed selling.",
+    "short_description": "Price is slipping on lower-volume bars, often a sign of informed selling.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13895,9 +13895,9 @@
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'nvi_bullish', 'params': {'window': value}}, df)",
     "formula": "nvi[t] > nvi_ema[t] -- NVI's level is set by an arbitrary seed constant, so every documented reading is positional against its own EMA rather than absolute",
-    "friendly_name": "Quiet-Day Buying",
+    "friendly_name": "Buying On Quiet Volume",
     "display_name": "Negative Volume Index Bullish",
-    "short_description": "Price is rising on low-volume days, often a sign of informed buying.",
+    "short_description": "Price is rising on lower-volume bars, often a sign of informed buying.",
     "inputs": {
      "close": {
       "type": "series",

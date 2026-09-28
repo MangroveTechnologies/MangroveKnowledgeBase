@@ -22,6 +22,9 @@ Shape and decisions: `ontology/example-bollinger-signals-subgraph.md`.
 | `formula` | the predicate, in domain terms |
 | `reference` | the published source for this rule |
 | `warmup_bars` | **only when the builder emits null** -- see below |
+| `friendly_name` | the chip label a person reads -- see "The three labels" |
+| `display_name` | the readable technical name, shown in the chip's tooltip |
+| `short_description` | one plain sentence, shown under `display_name` in the tooltip |
 
 `abbreviation` is `null` on every signal by convention and is **not** an authoring task. Signals have
 no abbreviation; it is held at null for consistency with the indicator layer, which already uses
@@ -54,6 +57,29 @@ by following `uses` to the indicator. Do not add them.
 
 Nor does the `uses` edge carry a description of the output it names. The edge says WHICH output
 flows across it; what that output means is authored once on the indicator that emits it.
+
+## The three labels
+
+Written as docstring sections after the summary paragraph, one line each:
+
+```
+Friendly-Name: Upside Range Breakout
+Display-Name: Bollinger Band Upper Breakout
+Short-Description: Price just broke above its normal trading range.
+```
+
+Read the formula and summary, not the name -- `starc_upper_breakout` is a state, not a breakout.
+
+- `friendly_name`: four words or fewer, Title Case, no indicator names and no jargon (divergence,
+  oversold, band, offset). Describe what the market is doing. A TRIGGER reads as something that just
+  happened ("Trend Turns Up"); a FILTER reads as a state ("Buyers In Control"). Say the direction.
+  Two signals may share a friendly name; `display_name` tells them apart.
+- `display_name`: the name a charting platform would use ("RSI Hidden Bullish Divergence", "Above
+  Tillson T3 Average"). Keep a well-known abbreviation (RSI, MACD, ADX, ATR, VWAP, TTM); spell out
+  the library's own shorthand (`bb` -> Bollinger Band, `kc` -> Keltner Channel, `cl` -> Chandelier).
+- `short_description`: one plain sentence, 95 characters or fewer, ASCII only, no jargon.
+
+`meta.signals_missing_labels` lists every signal still missing one.
 
 ## `formula` - the predicate in domain terms
 
