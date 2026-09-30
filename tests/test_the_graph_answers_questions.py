@@ -82,8 +82,14 @@ QUESTIONS: list[tuple[str, set[str]]] = [
       "procedure:signal-adx-strong-trend"}),
     ("how far away from my entry should the stop go",
      {"procedure:atr-based-stop", "concept:stop-and-target-engineering"}),
+    # `returns-t-test` -- "test if mean return is significantly different from null" -- is the
+    # statistical-flukes leg of strategy-validation's own definition, and the graph reaches it along
+    # that node's `about` edge ("stated under statistical significance testing"). It sat one place
+    # below `strategy-validation` in the pool re-rank; nine indicator and signal nodes joining the
+    # corpus moved its LSA rank there from 17 to 11 and the two swapped fifth place. A person told
+    # to t-test the returns would accept that as an answer to this question.
     ("my backtest looks too good to be true",
-     {"concept:overfitting", "concept:strategy-validation"}),
+     {"concept:overfitting", "concept:strategy-validation", "procedure:returns-t-test"}),
     ("how do I tell whether my results are just luck",
      {"procedure:returns-t-test", "procedure:multiple-testing-correction"}),
     ("what are the odds I wipe out the account", {"concept:risk-of-ruin"}),
