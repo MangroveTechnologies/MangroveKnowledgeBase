@@ -10,6 +10,7 @@ This module contains signal functions based on volatility indicators including:
 
 import logging
 
+import numpy as np
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
@@ -26,6 +27,7 @@ from mangrove_kb.indicators import (
     NATR,
     STARCBands,
     SqueezeDepth,
+    SuperTrendBands,
     UlcerIndex,
     VolatilityEnvelope,
 )
@@ -1794,6 +1796,244 @@ def ttm_squeeze_fired_bearish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
         bool: True on the bar the squeeze releases with momentum < 0.
     """
     return _squeeze_fired(df, bb_window, bb_std, kc_window, kc_atr_mult, mom_window, False)
+
+
+# =============================================================================
+# SuperTrend Signals
+# =============================================================================
+# SuperTrendBands emits the two ATR bands on every bar and nothing else. The long/short regime,
+# the ratchet that pins the trailed band while a regime lasts, and the bar the regime changes are
+# all decisions over those two levels, so they are made here.
+
+def _supertrend_regime(df: pd.DataFrame, window: int, multiplier: float):
+    """The regime SuperTrend's rule derives from the two bands: +1 long or -1 short on each bar.
+
+    A close above the previous bar's upper band puts the regime long; a close below the previous
+    bar's lower band puts it short; otherwise the regime holds and the band on its side only moves
+    in its favour -- the lower band never falls while long, the upper band never rises while short
+    -- which is what makes the trailed band a stop. The regime is long until the first lower-band
+    cross. NaN for the first `window` bars, where the previous bar's band is inside ATR's warmup;
+    None when the frame is shorter than window + 1.
+    """
+    if len(df) < window + 1:
+        return None
+    bands = SuperTrendBands.compute(
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
+        params={'window': window, 'multiplier': multiplier},
+    )
+    upper = bands['upper_band'].to_numpy(dtype=np.float64, copy=True)
+    lower = bands['lower_band'].to_numpy(dtype=np.float64, copy=True)
+    close = df["close"].to_numpy(dtype=np.float64, copy=False)
+    n = len(close)
+    regime = np.full(n, np.nan)
+    current = 1
+    for i in range(1, n):
+        if close[i] > upper[i - 1]:
+            current = 1
+        elif close[i] < lower[i - 1]:
+            current = -1
+        elif current == 1 and lower[i] < lower[i - 1]:
+            lower[i] = lower[i - 1]
+        elif current == -1 and upper[i] > upper[i - 1]:
+            upper[i] = upper[i - 1]
+        regime[i] = current
+    regime[:window] = np.nan
+    return pd.Series(regime, index=df.index, name='supertrend_regime')
+
+
+def _supertrend_flip(df: pd.DataFrame, window: int, multiplier: float, to: int) -> bool:
+    regime = _supertrend_regime(df, window, multiplier)
+    if regime is None or len(regime) < 2:
+        return False
+    prev, curr = regime.iloc[-2], regime.iloc[-1]
+    if pd.isna(prev) or pd.isna(curr):
+        return False
+    return bool(prev == -to and curr == to)
+
+
+@RuleRegistry.register("supertrend_long")
+def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """Signal: supertrend_long
+
+    Check if SuperTrend's regime is long: close has crossed above the trailed upper band more
+    recently than it crossed below the trailed lower band, so the lower band is the active trailing
+    stop. The indicator emits both bands every bar; the regime, and the ratchet that holds the
+    trailed band in place while it lasts, are decided here.
+
+    Friendly-Name: SuperTrend Says Up
+    Display-Name: SuperTrend Long Regime
+    Short-Description: Price has stayed above its volatility-scaled trailing stop since the last upside break.
+
+    Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
+    Warmup: window
+
+    Formula:
+        regime[t] == +1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour; long until the first lower-band cross
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=50]: ATR window
+        multiplier [default=3.0, min=0.5, max=10.0]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the regime on the current bar is long
+
+    Type: FILTER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if the regime on the current bar is long.
+    """
+    regime = _supertrend_regime(df, window, multiplier)
+    if regime is None or pd.isna(regime.iloc[-1]):
+        return False
+    return bool(regime.iloc[-1] == 1)
+
+
+@RuleRegistry.register("supertrend_short")
+def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """Signal: supertrend_short
+
+    Check if SuperTrend's regime is short: close has crossed below the trailed lower band more
+    recently than it crossed above the trailed upper band, so the upper band is the active trailing
+    stop. Mirror of `supertrend_long`.
+
+    Friendly-Name: SuperTrend Says Down
+    Display-Name: SuperTrend Short Regime
+    Short-Description: Price has stayed below its volatility-scaled trailing stop since the last downside break.
+
+    Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
+    Warmup: window
+
+    Formula:
+        regime[t] == -1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=50]: ATR window
+        multiplier [default=3.0, min=0.5, max=10.0]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the regime on the current bar is short
+
+    Type: FILTER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True if the regime on the current bar is short.
+    """
+    regime = _supertrend_regime(df, window, multiplier)
+    if regime is None or pd.isna(regime.iloc[-1]):
+        return False
+    return bool(regime.iloc[-1] == -1)
+
+
+@RuleRegistry.register("supertrend_flip_up")
+def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """Signal: supertrend_flip_up
+
+    Detect close crossing above the trailed upper band on this bar, ending a short regime. The
+    classic SuperTrend long entry.
+
+    Friendly-Name: SuperTrend Flips Up
+    Display-Name: SuperTrend Flip to Long
+    Short-Description: Price just broke above its trailing stop, turning the SuperTrend regime long.
+
+    Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
+    Warmup: window + 1
+
+    Formula:
+        regime[t-1] == -1 and regime[t] == +1 -- close[t] > upper_band[t-1] after a short regime
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=50]: ATR window
+        multiplier [default=3.0, min=0.5, max=10.0]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar the regime turns from short to long
+
+    Type: TRIGGER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True on the bar the regime turns from short to long.
+    """
+    return _supertrend_flip(df, window, multiplier, to=1)
+
+
+@RuleRegistry.register("supertrend_flip_down")
+def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0) -> bool:
+    """Signal: supertrend_flip_down
+
+    Detect close crossing below the trailed lower band on this bar, ending a long regime. The
+    classic SuperTrend short entry, and the long exit.
+
+    Friendly-Name: SuperTrend Flips Down
+    Display-Name: SuperTrend Flip to Short
+    Short-Description: Price just broke below its trailing stop, turning the SuperTrend regime short.
+
+    Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
+    Warmup: window + 1
+
+    Formula:
+        regime[t-1] == +1 and regime[t] == -1 -- close[t] < lower_band[t-1] after a long regime
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=50]: ATR window
+        multiplier [default=3.0, min=0.5, max=10.0]: ATR multiplier
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar the regime turns from long to short
+
+    Type: TRIGGER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): ATR window. Range: 5-50. Default: 10.
+        multiplier (float): ATR multiplier. Range: 0.5-10.0. Default: 3.0.
+
+    Returns:
+        bool: True on the bar the regime turns from long to short.
+    """
+    return _supertrend_flip(df, window, multiplier, to=-1)
 
 
 __getattr__ = renamed_signals("mangrove_kb.signals.volatility")
