@@ -52,9 +52,14 @@ def _canonical_columns(df: pd.DataFrame) -> pd.DataFrame:
     `myindicator` would be a silent data bug introduced by a convenience.
     """
     present = set(df.columns)
-    renames = {c: c.lower() for c in df.columns
-               if isinstance(c, str) and c.lower() in OHLCV and c != c.lower()
-               and c.lower() not in present}      # a frame holding BOTH `Close` and `close` keeps both
+    renames = {
+        c: c.lower()
+        for c in df.columns
+        if isinstance(c, str)
+        and c.lower() in OHLCV
+        and c != c.lower()
+        and c.lower() not in present
+    }  # a frame holding BOTH `Close` and `close` keeps both
     return df.rename(columns=renames) if renames else df
 
 
@@ -71,13 +76,12 @@ class RuleRegistry:
     @classmethod
     def register(cls, name, *, executable=True):
         def wrapper(fn):
-            from mangrove_kb.docstring_parser import parse_signal_docstring
+            from mangrove_kb.docstring_parser import parse_signal_policy
 
-            try:
-                disabled = parse_signal_docstring(fn).get("disabled", False)
-            except ValueError:
-                disabled = False
-            execution_allowed = executable and (not disabled or bool(getattr(fn, "deprecated_reason", None)))
+            disabled = parse_signal_policy(fn)["disabled"]
+            execution_allowed = executable and (
+                not disabled or bool(getattr(fn, "deprecated_reason", None))
+            )
 
             @functools.wraps(fn)
             def coerced(*args, **kwargs):
@@ -113,7 +117,8 @@ class RuleRegistry:
             f"signal {name!r} has been renamed to {target!r}; the old name still evaluates but "
             f"will be removed. Registered names are the strategy-facing contract, so this is a "
             f"rename with a grace period, not a break.",
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning,
+            stacklevel=3,
         )
         return target
 
@@ -150,7 +155,10 @@ class RuleRegistry:
         explicitly retained for stored strategies stay executable; an explicit
         runtime disable always wins. Aliases keep their requested identity.
         """
-        from mangrove_kb.docstring_parser import parse_signal_docstring
+        from mangrove_kb.docstring_parser import (
+            parse_signal_docstring,
+            parse_signal_policy,
+        )
 
         target = cls._aliases.get(name, name)
         fn = cls._registry.get(target)
@@ -159,21 +167,45 @@ class RuleRegistry:
         try:
             metadata = parse_signal_docstring(fn)
         except ValueError:
-            metadata = {"rule_name": target, "description": fn.__doc__ or "",
-                        "type": None, "requires": [], "params": {}}
+            metadata = {
+                "rule_name": target,
+                "description": fn.__doc__ or "",
+                "type": None,
+                "requires": [],
+                "params": {},
+            }
+        metadata.update(parse_signal_policy(fn))
         deprecated = getattr(fn, "deprecated_reason", None)
         runtime_disabled = getattr(fn, "runtime_disabled", False)
         disabled = runtime_disabled or metadata.get("disabled", False)
         legacy = bool(disabled and deprecated and not runtime_disabled)
-        status = "disabled" if disabled else "deprecated" if deprecated or name != target else "active"
-        reason = ("Disabled for runtime execution" if runtime_disabled else
-                  metadata.get("disabled_reason") if disabled else deprecated)
+        status = (
+            "disabled"
+            if disabled
+            else "deprecated"
+            if deprecated or name != target
+            else "active"
+        )
+        reason = (
+            "Disabled for runtime execution"
+            if runtime_disabled
+            else metadata.get("disabled_reason")
+            if disabled
+            else deprecated
+        )
         if name != target and not reason:
             reason = f"Renamed to {target}; the old spelling remains executable"
-        return {**metadata, "rule_name": name, "canonical_name": target,
-                "category": fn.__module__.rsplit(".", 1)[-1],
-                "status": status, "reason": reason, "composable": not disabled,
-                "executable": not disabled or legacy, "legacy_compatible": legacy}
+        return {
+            **metadata,
+            "rule_name": name,
+            "canonical_name": target,
+            "category": fn.__module__.rsplit(".", 1)[-1],
+            "status": status,
+            "reason": reason,
+            "composable": not disabled,
+            "executable": not disabled or legacy,
+            "legacy_compatible": legacy,
+        }
 
     @classmethod
     def catalog(cls) -> dict:
