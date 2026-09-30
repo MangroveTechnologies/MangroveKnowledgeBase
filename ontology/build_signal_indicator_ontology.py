@@ -90,38 +90,36 @@ CLASSES_DEF = {
 }
 ASSIGN = {
  'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator "
-               "EPMA Ichimoku HeikinAshi",
+               "EPMA Ichimoku HeikinAshi ParabolicSAR",
  'momentum': "ROC MOM TRIX MACD PPO KST AwesomeOscillator DPO PVO ForceIndex EaseOfMovement "
              "ADOSC KVO KlingerVolumeOscillator DailyReturn DailyLogReturn MassIndex ADX Aroon "
              "Vortex MultiTFSlope SwingDelta",
  'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
-               "ChandelierLevels VolatilityEnvelope SqueezeDepth",
+               "ChandelierLevels VolatilityEnvelope SqueezeDepth SuperTrendBands",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
 }
-# Not indicators: their outputs are VERDICTS, not measurements. SuperTrend emits `direction`
-# (+1 long / -1 short) and NaNs its bands according to it; PSAR emits flip flags; ATRTrailingStop
-# and VolatilityStop carry a position state forward. An indicator states what it measured, and
-# deciding what that means is the signal layer's job.
+# Not indicators: their outputs are VERDICTS, not measurements. An indicator states what it
+# measured, and deciding what that means is the signal layer's job. Every class here is kept,
+# deprecated and unchanged, for anything already calling it; none has a node, and the guard below
+# refuses any in-scope signal that reads one.
 #
-# TWO of the original five were on this list wrongly, both found by reading rather than by the
-# names: ChandelierExit and VolatilityStop. The list was built from what things were CALLED.
+# Five of the six have a measurement class that replaced them, emitting what the verdict was drawn
+# from: Divergence -> SwingDelta, TTMSqueeze -> SqueezeDepth, MultiTFTrend -> MultiTFSlope,
+# SuperTrend -> SuperTrendBands (the two ATR bands, every bar, before the ratchet), PSAR ->
+# ParabolicSAR (the level and its acceleration factor, without the flip flags). The decisions those
+# classes made -- a threshold, a sign, a regime, which side of a level price is on -- are made in
+# the signals that read the measurement, and each signal keeps its name and its role.
 #
-# ChandelierExit was on this list and should not have been: it emits two price levels, both defined
-# every bar, both plain functions of the window. It was excluded for being a "stateful policy rule"
-# when its own docstring says it is not a state machine. It is now `ChandelierLevels`, class
-# volatility. VolatilityStop likewise: its own docstring called it an envelope and said "not a
-# state machine", its outputs were already named vstop_hband / vstop_lband, and hband >= lband holds
-# on 100% of bars. It is now `VolatilityEnvelope`, class volatility.
+# ATRTrailingStop has no measurement class: it is a trade-management rule, not an indicator. Its
+# stop level accumulates forward from a position state and its only other output is `direction`.
+# The measurement underneath it is ATR, which is already classed. Its four signals stay registered
+# and deprecated because stored strategies name them.
+#
+# ChandelierExit and VolatilityStop were on this list once and should not have been, both found by
+# reading rather than by their names: each emits plain levels every bar and neither is a state
+# machine. They are `ChandelierLevels` and `VolatilityEnvelope`, class volatility.
 # See `signal-indicator-ontology.md`.
-# Divergence joined this list: all four of its outputs are `dtype=bool` (11, 15, 10 and 5 Trues in
-# 1,294 bars) -- it concludes rather than measures. Its measurement was split out as `SwingDelta`,
-# which emits the two changes the conclusion is drawn from, and the four sign comparisons moved to
-# the signals. The class itself is kept, deprecated and working, for anything already calling it.
-# TTMSqueeze and MultiTFTrend joined for the same reason as Divergence: each emitted a verdict
-# (two booleans / a ternary) beside a real measurement. Both were split -- SqueezeDepth and
-# MultiTFSlope emit the measurement, and the thresholds moved into the signals. The originals are
-# kept, deprecated and unchanged, for anything already calling them.
 REMOVED = "ATRTrailingStop SuperTrend PSAR Divergence TTMSqueeze MultiTFTrend".split()
 
 # --- ground truth from the installed package
@@ -1247,6 +1245,10 @@ SIGNAL_SCOPE = {
     "cl_above_low_offset", "cl_below_high_offset",
     "cl_high_offset_break", "cl_low_offset_break",
     "ve_above_upper", "ve_below_lower",
+    # SuperTrend's regime and its flips, decided over SuperTrendBands.
+    "supertrend_flip_down", "supertrend_flip_up", "supertrend_long", "supertrend_short",
+    # Which side of the parabolic SAR level price is on, decided over ParabolicSAR.
+    "psar_bearish", "psar_bullish", "psar_reversal",
     "epma_cross_down", "epma_cross_up", "is_above_epma", "ichimoku_bearish", "ichimoku_bullish",
     "ichimoku_tk_cross", "heikin_ashi_bearish", "heikin_ashi_bullish",
     "rsi_bearish_divergence", "rsi_bullish_divergence", "rsi_hidden_bearish_divergence",
@@ -1303,19 +1305,11 @@ SIGNAL_SCOPE = {
     "tweezer_bottoms_trigger", "tweezer_tops_trigger", "two_bar_reversal_bearish_trigger",
     "two_bar_reversal_bullish_trigger",
 
-    # Trend -- 64 of the file's 88 (86 after the two chandelier signals moved to volatility). The other 24 are held out for two different reasons.
-    #
-    # Seven read an indicator whose output is a VERDICT rather than a measurement, and must never
-    # enter the graph: psar_bearish, psar_bullish, psar_reversal (PSAR's flip flags);
-    # supertrend_flip_down, supertrend_flip_up, supertrend_long, supertrend_short (SuperTrend's
-    # +1/-1 `direction`). The guard below fails the build if one slips in. The two chandelier
-    # signals were on this list until ChandelierExit was found to emit plain levels; they are now
-    # cl_below_high_offset / cl_above_low_offset, in scope above.
-    #
-    # Fifteen more were held out while their indicator sat in an `unclassed` bucket -- HeikinAshi,
-    # Ichimoku, EPMA, and the two that became SwingDelta and SqueezeDepth. All five are classed
-    # now and all fifteen signals are in scope above, so the bucket is gone: every indicator has a
-    # class, and an empty class is a claim the graph no longer makes.
+    # Trend -- the signals that lived in `signals/trend.py` before the files were split onto the
+    # ontology class. Every one is in scope: the seven that read SuperTrend and PSAR were held out
+    # while those emitted verdicts, and are listed under volatility and averaging above now that
+    # they read SuperTrendBands and ParabolicSAR. The four atr_trailing_stop_* signals are the only
+    # ones still held out, for the reason at the top of this set.
     "adx_bullish_di", "adx_strong_trend", "alligator_bearish", "alligator_bullish",
     "alligator_sleeping", "alma_cross_down", "alma_cross_up", "aroon_crossover",
     "aroon_down_trend", "aroon_up_trend", "cci_overbought", "cci_oversold", "dema_cross_down",
@@ -1333,11 +1327,11 @@ SIGNAL_SCOPE = {
     "vortex_crossover", "wma_cross_down", "wma_cross_up",
 }
 
-# A signal built on one of the five excluded policy rules must not enter the graph. The design is
-# explicit -- "Excluded from this ontology AND FROM THE GRAPH" -- but excluding the indicator alone
-# does not exclude the signals standing on it, and six of them were added before this check existed.
-# They arrive looking like an ordinary signal with no class, which is indistinguishable from the
-# pattern signals that legitimately read raw OHLC, so it fails the build rather than being reported.
+# A signal built on one of the excluded classes must not enter the graph. Excluding the indicator
+# alone does not exclude the signals standing on it, and a signal reading a deprecated verdict class
+# arrives looking like an ordinary signal with no class -- indistinguishable from the pattern
+# signals that legitimately read raw OHLC -- so it fails the build rather than being reported. A
+# signal that moves onto the measurement class (SuperTrendBands rather than SuperTrend) passes.
 _on_removed = sorted(
     n for n in (RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCOPE)
     if set(SIGNAL_FACTS.get(n, {}).get("consumes", {})) & set(REMOVED))
@@ -1386,10 +1380,10 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
     #
     # Membership is tested against `assigned` -- the indicators that HAVE a node -- not against
     # `CLASSES`, which is every class importable from the indicator modules. The two differ by the
-    # five stateful policy rules (SuperTrend, PSAR, ChandelierExit, ATRTrailingStop, VolatilityStop)
-    # that the ontology deliberately excludes as not-indicators. They are still importable, so
-    # testing against CLASSES produced 15 edges pointing at nodes that do not exist. The 15 signals
-    # built on them genuinely have no class, and belong on the report rather than in a dangling edge.
+    # deprecated classes in REMOVED, which the ontology excludes as not-indicators. They are still
+    # importable, so testing against CLASSES produced edges pointing at nodes that do not exist. A
+    # signal built on one genuinely has no class, and belongs on the report rather than in a
+    # dangling edge.
     known = [i for i in facts["consumes"] if i in assigned]
     for ind in known:
         # Same nested-dict shape as a node's `inputs`, because it is the same concept: series the

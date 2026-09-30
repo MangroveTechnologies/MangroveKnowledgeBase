@@ -3733,6 +3733,76 @@
    }
   },
   {
+   "id": "procedure:indicator-parabolicsar",
+   "title": "ParabolicSAR",
+   "kind": "Procedure",
+   "summary": "Wilder's parabolic stop-and-reverse level and the acceleration factor driving it, as two measurements. The level starts at the extreme of the last move and accelerates toward the current one by `af` each bar; `af` grows by `step` every time the move makes a new extreme and is capped at `max_step`. Which side of price the level sits on, and the bar it changes side, are readings of this level against close, and they are made in the signals.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "trend_indicators",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
+    "warmup_bars": "2",
+    "abbreviation": "PSAR",
+    "usage_example": "ParabolicSAR.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'step': value, 'max_step': value})",
+    "formula": "rising:  psar[t] = psar[t-1] + af * (EP - psar[t-1]),  EP = highest high of the rise\nfalling: psar[t] = psar[t-1] - af * (psar[t-1] - EP),  EP = lowest low of the fall\npsar[t] is clamped to the prior two bars' lows (rising) or highs (falling)\naf[t] = min(af[t-1] + step, max_step) on a new EP, else af[t-1]; reset to step when\nlow[t] < psar[t] (rising) or high[t] > psar[t] (falling), where psar[t] restarts at EP",
+    "interpretation": "A trailing level that closes in on price at an accelerating pace while the move keeps making new extremes, and stalls when it does not. Price crossing it is Wilder's \"stop and reverse\", but the crossing is a comparison against close, not part of the level.",
+    "applications": "Trailing stop placement and reversal detection, both made by reading the level against close in the signals. `af` alone says how extended a move is: a factor at `max_step` has been setting new extremes for many bars.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "step": {
+      "type": "float",
+      "default": 0.02,
+      "min": 0.01,
+      "max": 0.1,
+      "description": "PSAR acceleration factor step"
+     },
+     "max_step": {
+      "type": "float",
+      "default": 0.2,
+      "min": 0.1,
+      "max": 0.5,
+      "description": "PSAR max acceleration factor"
+     }
+    },
+    "outputs": {
+     "psar": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "SAR",
+      "description": "The stop-and-reverse level for the bar. A recursion on its own previous value, so it carries the extreme of the current move forward the way an EMA carries its history; the first two bars are undefined because the recursion seeds from them. Below price while the move it trails is a rise, above it while a fall, and on the bar it changes side it restarts at the extreme of the move just ended."
+     },
+     "af": {
+      "type": "series",
+      "units": "ratio",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "Acceleration Factor",
+      "description": "The factor in force at the close of the bar, applied to the next bar's projection. `step` at the start of every move, `step` larger at each new extreme, never above `max_step`; so it reads how mature the current move is."
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-roc",
    "title": "ROC",
    "kind": "Procedure",
@@ -4424,6 +4494,76 @@
     "reference_chapter": [
      "indicators"
     ]
+   }
+  },
+  {
+   "id": "procedure:indicator-supertrendbands",
+   "title": "SuperTrendBands",
+   "kind": "Procedure",
+   "summary": "The two ATR-scaled bands SuperTrend is built from, hl2 +/- multiplier * ATR(window), both emitted on every bar. Nothing here is withheld or held in place: the long/short regime, the ratchet that pins a band while that regime lasts, and the choice of which band to show are all decisions over these two levels, and they live in the signals that read them.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility_indicators",
+    "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
+    "warmup_bars": "window - 1",
+    "abbreviation": "ST",
+    "usage_example": "SuperTrendBands.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'multiplier': value})",
+    "formula": "hl2[t] = (high[t] + low[t]) / 2\nupper_band[t] = hl2[t] + multiplier * atr[t]\nlower_band[t] = hl2[t] - multiplier * atr[t]",
+    "interpretation": "A symmetric volatility envelope around each bar's midpoint, one ATR multiple wide on each side. The bands say how far a close would have to travel, in the instrument's own recent range, to be outside the bar's neighbourhood; they do not say which side price is on.",
+    "applications": "The raw material of SuperTrend. A trend-following rule reads a close outside one band as a regime change and holds the opposite band as a trailing stop until the next; that rule, and the regime it remembers, is the signal layer's.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3,
+      "min": 0.5,
+      "max": 10,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "upper_band": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "Basic Upper Band",
+      "description": "The bar's midpoint plus multiplier times the Wilder ATR: the level a short regime trails. Emitted every bar, unratcheted, so it can move against the regime; holding it still is the signal's decision."
+     },
+     "lower_band": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       -Infinity,
+       Infinity
+      ],
+      "canonical_name": "Basic Lower Band",
+      "description": "The mirror below the midpoint, the level a long regime trails. Below zero only when multiplier * ATR exceeds the midpoint, which real prices do not produce."
+     }
+    }
    }
   },
   {
@@ -14318,6 +14458,196 @@
    }
   },
   {
+   "id": "procedure:signal-psar-bearish",
+   "title": "psar_bearish",
+   "kind": "Procedure",
+   "summary": "Check if the parabolic SAR level sits above the close. The level trails a fall from above, so close below it is Wilder's short side. Mirror of `psar_bullish`.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
+    "warmup_bars": "2",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'psar_bearish', 'params': {'step': value, 'max_step': value}}, df)",
+    "formula": "psar[t] > close[t]",
+    "friendly_name": "Dots Above Price",
+    "display_name": "Parabolic SAR Bearish",
+    "short_description": "The parabolic stop-and-reverse level is above the current close.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "step": {
+      "type": "float",
+      "default": 0.02,
+      "min": 0.01,
+      "max": 0.1,
+      "description": "PSAR acceleration factor step"
+     },
+     "max_step": {
+      "type": "float",
+      "default": 0.2,
+      "min": 0.1,
+      "max": 0.5,
+      "description": "PSAR max acceleration factor"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the SAR level is above the close"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-psar-bullish",
+   "title": "psar_bullish",
+   "kind": "Procedure",
+   "summary": "Check if the parabolic SAR level sits below the close. The level trails a rise from beneath, so close above it is Wilder's long side; the indicator measures the level and this decides which side of it price is on.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
+    "warmup_bars": "2",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'psar_bullish', 'params': {'step': value, 'max_step': value}}, df)",
+    "formula": "psar[t] < close[t]",
+    "friendly_name": "Dots Below Price",
+    "display_name": "Parabolic SAR Bullish",
+    "short_description": "The parabolic stop-and-reverse level is below the current close.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "step": {
+      "type": "float",
+      "default": 0.02,
+      "min": 0.01,
+      "max": 0.1,
+      "description": "PSAR acceleration factor step"
+     },
+     "max_step": {
+      "type": "float",
+      "default": 0.2,
+      "min": 0.1,
+      "max": 0.5,
+      "description": "PSAR max acceleration factor"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the SAR level is below the close"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-psar-reversal",
+   "title": "psar_reversal",
+   "kind": "Procedure",
+   "summary": "Detect the parabolic SAR level changing side on this bar: above the close on the previous bar and below it now (bullish), or the reverse (bearish). Wilder's stop-and-reverse, read as a comparison of the level against close on two consecutive bars.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "averaging",
+    "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
+    "warmup_bars": "3",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'psar_reversal', 'params': {'step': value, 'max_step': value, 'direction': value}}, df)",
+    "formula": "psar[t-1] > close[t-1] and psar[t] < close[t] when direction is bullish; psar[t-1] < close[t-1] and psar[t] > close[t] when bearish",
+    "friendly_name": "SAR Flips Sides",
+    "display_name": "Parabolic SAR Reversal",
+    "short_description": "The parabolic level just switched to the other side of price.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "step": {
+      "type": "float",
+      "default": 0.02,
+      "min": 0.01,
+      "max": 0.1,
+      "description": "PSAR acceleration factor step"
+     },
+     "max_step": {
+      "type": "float",
+      "default": 0.2,
+      "min": 0.1,
+      "max": 0.5,
+      "description": "PSAR max acceleration factor"
+     },
+     "direction": {
+      "type": "str",
+      "default": "bullish",
+      "min": null,
+      "max": null,
+      "description": "Reversal direction, 'bullish' (level moves below price) or 'bearish'"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar the SAR level changes side in the chosen direction"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-pvo-bearish-cross",
    "title": "pvo_bearish_cross",
    "kind": "Procedure",
@@ -16203,6 +16533,250 @@
       ],
       "canonical_name": "none",
       "description": "True if marubozu found in recent window, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-supertrend-flip-down",
+   "title": "supertrend_flip_down",
+   "kind": "Procedure",
+   "summary": "Detect close crossing below the trailed lower band on this bar, ending a long regime. The classic SuperTrend short entry, and the long exit.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_flip_down', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "regime[t-1] == +1 and regime[t] == -1 -- close[t] < lower_band[t-1] after a long regime",
+    "friendly_name": "SuperTrend Flips Down",
+    "display_name": "SuperTrend Flip to Short",
+    "short_description": "Price just broke below its trailing stop, turning the SuperTrend regime short.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": 10.0,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar the regime turns from long to short"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-supertrend-flip-up",
+   "title": "supertrend_flip_up",
+   "kind": "Procedure",
+   "summary": "Detect close crossing above the trailed upper band on this bar, ending a short regime. The classic SuperTrend long entry.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
+    "warmup_bars": "window + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_flip_up', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "regime[t-1] == -1 and regime[t] == +1 -- close[t] > upper_band[t-1] after a short regime",
+    "friendly_name": "SuperTrend Flips Up",
+    "display_name": "SuperTrend Flip to Long",
+    "short_description": "Price just broke above its trailing stop, turning the SuperTrend regime long.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": 10.0,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True on the bar the regime turns from short to long"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-supertrend-long",
+   "title": "supertrend_long",
+   "kind": "Procedure",
+   "summary": "Check if SuperTrend's regime is long: close has crossed above the trailed upper band more recently than it crossed below the trailed lower band, so the lower band is the active trailing stop. The indicator emits both bands every bar; the regime, and the ratchet that holds the trailed band in place while it lasts, are decided here.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_long', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "regime[t] == +1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour; long until the first lower-band cross",
+    "friendly_name": "SuperTrend Says Up",
+    "display_name": "SuperTrend Long Regime",
+    "short_description": "Price has stayed above its volatility-scaled trailing stop since the last upside break.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": 10.0,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the regime on the current bar is long"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-supertrend-short",
+   "title": "supertrend_short",
+   "kind": "Procedure",
+   "summary": "Check if SuperTrend's regime is short: close has crossed below the trailed lower band more recently than it crossed above the trailed upper band, so the upper band is the active trailing stop. Mirror of `supertrend_long`.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_short', 'params': {'window': value, 'multiplier': value}}, df)",
+    "formula": "regime[t] == -1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour",
+    "friendly_name": "SuperTrend Says Down",
+    "display_name": "SuperTrend Short Regime",
+    "short_description": "Price has stayed below its volatility-scaled trailing stop since the last downside break.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3.0,
+      "min": 0.5,
+      "max": 10.0,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the regime on the current bar is short"
      }
     }
    }
@@ -26719,6 +27293,22 @@
    "to_id": "concept:momentum"
   },
   {
+   "from": "ParabolicSAR",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-parabolicsar",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "ParabolicSAR",
+   "rel": "instance-of",
+   "to": "averaging",
+   "why": "class membership",
+   "from_id": "procedure:indicator-parabolicsar",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "ROC",
    "rel": "instance-of",
    "to": "Indicator",
@@ -26861,6 +27451,22 @@
    "why": "class membership",
    "from_id": "procedure:indicator-stochasticoscillator",
    "to_id": "concept:oscillator"
+  },
+  {
+   "from": "SuperTrendBands",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-supertrendbands",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "SuperTrendBands",
+   "rel": "instance-of",
+   "to": "volatility",
+   "why": "class membership",
+   "from_id": "procedure:indicator-supertrendbands",
+   "to_id": "concept:volatility"
   },
   {
    "from": "SwingDelta",
@@ -32953,6 +33559,117 @@
    "to_id": "concept:averaging"
   },
   {
+   "from": "psar_bearish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-psar-bearish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "psar_bearish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-psar-bearish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "psar_bearish",
+   "rel": "uses",
+   "to": "ParabolicSAR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-psar-bearish",
+   "to_id": "procedure:indicator-parabolicsar",
+   "inputs": {
+    "psar": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "psar_bearish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-psar-bearish",
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "psar_bullish",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-psar-bullish",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "psar_bullish",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-psar-bullish",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "psar_bullish",
+   "rel": "uses",
+   "to": "ParabolicSAR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-psar-bullish",
+   "to_id": "procedure:indicator-parabolicsar",
+   "inputs": {
+    "psar": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "psar_bullish",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-psar-bullish",
+   "to_id": "concept:averaging"
+  },
+  {
+   "from": "psar_reversal",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-psar-reversal",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "psar_reversal",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-psar-reversal",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "psar_reversal",
+   "rel": "uses",
+   "to": "ParabolicSAR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-psar-reversal",
+   "to_id": "procedure:indicator-parabolicsar",
+   "inputs": {
+    "psar": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "psar_reversal",
+   "rel": "about",
+   "to": "averaging",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-psar-reversal",
+   "to_id": "concept:averaging"
+  },
+  {
    "from": "pvo_bearish_cross",
    "rel": "instance-of",
    "to": "Signal",
@@ -34318,6 +35035,166 @@
    "why": "character it is concerned with, via the indicator it reads",
    "from_id": "procedure:signal-strong-body-recent",
    "to_id": "concept:pattern"
+  },
+  {
+   "from": "supertrend_flip_down",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-supertrend-flip-down",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "supertrend_flip_down",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-supertrend-flip-down",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "supertrend_flip_down",
+   "rel": "uses",
+   "to": "SuperTrendBands",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-supertrend-flip-down",
+   "to_id": "procedure:indicator-supertrendbands",
+   "inputs": {
+    "lower_band": {
+     "type": "series"
+    },
+    "upper_band": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "supertrend_flip_down",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-supertrend-flip-down",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "supertrend_flip_up",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-supertrend-flip-up",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "supertrend_flip_up",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-supertrend-flip-up",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "supertrend_flip_up",
+   "rel": "uses",
+   "to": "SuperTrendBands",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-supertrend-flip-up",
+   "to_id": "procedure:indicator-supertrendbands",
+   "inputs": {
+    "lower_band": {
+     "type": "series"
+    },
+    "upper_band": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "supertrend_flip_up",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-supertrend-flip-up",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "supertrend_long",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-supertrend-long",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "supertrend_long",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-supertrend-long",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "supertrend_long",
+   "rel": "uses",
+   "to": "SuperTrendBands",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-supertrend-long",
+   "to_id": "procedure:indicator-supertrendbands",
+   "inputs": {
+    "lower_band": {
+     "type": "series"
+    },
+    "upper_band": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "supertrend_long",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-supertrend-long",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "supertrend_short",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-supertrend-short",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "supertrend_short",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-supertrend-short",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "supertrend_short",
+   "rel": "uses",
+   "to": "SuperTrendBands",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-supertrend-short",
+   "to_id": "procedure:indicator-supertrendbands",
+   "inputs": {
+    "lower_band": {
+     "type": "series"
+    },
+    "upper_band": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "supertrend_short",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-supertrend-short",
+   "to_id": "concept:volatility"
   },
   {
    "from": "t3_cross_down",
@@ -46213,7 +47090,7 @@
  ],
  "meta": {
   "scope": "indicator class ontology",
-  "indicators": 71,
+  "indicators": 73,
   "classes": 6,
   "removed_not_indicators": [
    "ATRTrailingStop",
@@ -46223,9 +47100,9 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "signals": 218,
+  "signals": 225,
   "signals_registered": 249,
-  "signals_out_of_scope": 31,
+  "signals_out_of_scope": 24,
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],

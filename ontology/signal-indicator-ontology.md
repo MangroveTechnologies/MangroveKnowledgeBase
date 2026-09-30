@@ -59,22 +59,24 @@ later (an indicator strongly one class and weakly another), that bottom edge bec
 **Class is an edge, never a property.** It must not also appear as a field on the node, or there are
 two representations of one fact.
 
-### The seven classes -- 94 indicators
+### The seven classes -- 96 indicators
 
 | class | n | definition |
 |---|---|---|
 | `pattern` | 27 | shape of one or a few bars (candlestick geometry) |
 | `momentum` | 21 | rate of change -- how fast, and in which direction, the input is moving |
-| `averaging` | 16 | emits a reference level in price units, produced by averaging over a window |
+| `averaging` | 17 | emits a reference level in price units, produced by averaging over a window |
 | `oscillator` | 12 | bounded output where absolute thresholds are meaningful |
-| `volatility` | 8 | observed dispersion -- distance, width, or range |
+| `volatility` | 9 | observed dispersion -- distance, width, or range |
 | `flow` | 5 | running accumulation; level is arbitrary, direction carries the meaning |
 | `unclassed` | 0 | empty; kept so the class exists the moment something needs it |
 
 `unclassed` is now empty. Of the original five: `EPMA`, `Ichimoku` and `HeikinAshi` are
 `averaging` -- each emits reference levels in price units, which is what the class asks about the
 output, whatever the indicator is used for. `Divergence` and `TTMSqueeze` turned out not to be
-indicators at all and were replaced by `SwingDelta` and `SqueezeDepth`; see below.
+indicators at all and were replaced by `SwingDelta` and `SqueezeDepth`; see below. `ParabolicSAR`
+is `averaging` by the same reading as Ichimoku: a reference level in price units, recursively
+carried, and the class asks about the output rather than the recipe.
 
 ### Basis of division, and what it rejects
 
@@ -98,16 +100,39 @@ than the class, because consumers reason about derived signals and can read it.
 **Indicators are measurements, never verdicts. Signals are verdicts.**
 
 That is the whole criterion. An indicator states what it measured; deciding what the measurement
-means is the signal layer's job.
+means is the signal layer's job. A boolean is a verdict with two values, and the same argument
+applies to a ternary, a +1/-1 direction or any other flag.
 
-`ATRTrailingStop`, `SuperTrend` and `PSAR` fail it and are excluded from this ontology and from the
-graph. SuperTrend emits `direction` (+1 long / -1 short) and NaNs its bands according to that
-verdict; PSAR emits `psar_up_indicator` / `psar_down_indicator`, which are flip flags;
-ATRTrailingStop does both -- its stop level accumulates forward and it emits `direction` too. The
-measurement underneath the ATR-based ones is ATR, which is already classed.
+Six classes fail it and are excluded from this ontology and from the graph: `ATRTrailingStop`,
+`SuperTrend`, `PSAR`, `Divergence`, `TTMSqueeze` and `MultiTFTrend`. Every one is kept, deprecated
+and unchanged, for anything already calling it. For five of them the verdict was drawn from a
+measurement the class also computed, and that measurement now has a class of its own; the verdict
+moved into the signals, which keep their names, roles, parameters and evaluation results:
 
-This generalises the boolean-output rule below: a boolean is a verdict with two values, and the
-same argument applies to a ternary or any other flag.
+| excluded | verdict it emitted | measurement class | class | the decision, now in the signals |
+|---|---|---|---|---|
+| `Divergence` | four booleans | `SwingDelta` | momentum | the sign comparison of two swing deltas |
+| `TTMSqueeze` | `squeeze_on`, `squeeze_fired` | `SqueezeDepth` | volatility | the threshold at zero |
+| `MultiTFTrend` | ternary `higher_tf_trend` | `MultiTFSlope` | momentum | the slope threshold |
+| `SuperTrend` | `direction`, bands NaN by regime | `SuperTrendBands` | volatility | the regime, and the ratchet that holds the trailed band |
+| `PSAR` | `psar_up_indicator`, `psar_down_indicator`, the up/down halves | `ParabolicSAR` | averaging | which side of the level close is on, and the bar it changes |
+
+`SuperTrendBands` emits `upper_band` and `lower_band`, hl2 +/- multiplier x ATR, on every bar.
+SuperTrend's rule -- a close above the previous upper band is long, below the previous lower band
+is short, and between them the band on the regime's side only moves in its favour -- is a decision
+over those two levels, so `supertrend_long` / `supertrend_short` (FILTER) and `supertrend_flip_up`
+/ `supertrend_flip_down` (TRIGGER) make it. `ParabolicSAR` emits the level and its acceleration
+factor; the recursion is fine, an EMA is one too, and `psar_bullish` / `psar_bearish` (FILTER) and
+`psar_reversal` (TRIGGER) compare the level with close. Proven equivalent: the reconstructed regime
+equals `SuperTrend.direction` and the level equals `PSAR.psar` on every bar of all seven fixtures
+(57,590 bars across five timeframes), and each of the seven signals returns the same boolean as the
+deprecated indicator's own verdict on every sliding-window evaluation; `tests/test_supertrend_psar_equivalence.py`
+keeps that proof.
+
+`ATRTrailingStop` has no measurement class. It is a trade-management rule, not an indicator: its stop
+level accumulates forward from a position state and its only other output is `direction`. The
+measurement underneath it is ATR, which is already classed. Its four signals stay registered and
+deprecated because stored strategies name them.
 
 **Two of the original five were on that list wrongly**, and the list turns out to have been built
 from what things were CALLED rather than from what they do. Both were found by reading the
@@ -127,22 +152,15 @@ named `vstop_hband` / `vstop_lband`; and `hband >= lband` holds on 100% of bars,
 Chandelier offsets it is a genuine band pair. Only the word "Stop" was positional. It is now
 `VolatilityEnvelope`, class `volatility`, with signals `ve_above_upper` / `ve_below_lower`.
 
-**`Divergence` was not an indicator.** All four of its outputs were `dtype=bool` -- it stated that
-a divergence had occurred rather than measuring anything. What it measures underneath is two
-changes: how far price moved between its last two confirmed swings, and how far a companion
-indicator moved between the two that pair with them. That is now `SwingDelta`, class `momentum`,
-and the four sign comparisons moved into the four signals that read it. Proven equivalent: the sign
-predicates reproduce the old booleans bar-for-bar on all 1,294 fixture bars, and the rewritten
-signals disagree with the old implementation on zero of 1,254 expanding-window evaluations.
-`Divergence` itself is kept, deprecated and unchanged, for anything already calling it.
-
-**Known violation, pending a decision:** `MultiTFTrend` emits `higher_tf_trend`, a ternary
--1 / 0 / +1 state, and is currently classed `momentum` with two signals that read the verdict
-directly. `TTMSqueeze` is the same shape -- `squeeze_on` and `squeeze_fired` are booleans beside a
-real-valued `momentum` -- and is held in `unclassed` for the same reason. `SwingDelta` is the
-template for fixing both. By the rule above it does not belong in the indicator layer as it stands; the measurement
-is the normalised higher-timeframe slope, and the sign should be the signal's decision. Left in
-place deliberately rather than silently, so the rule and the data are not quietly inconsistent.
+**The template.** `Divergence` was the first split, and it set the shape the other four follow. All
+four of its outputs were `dtype=bool` -- it stated that a divergence had occurred rather than
+measuring anything. What it measures underneath is two changes: how far price moved between its
+last two confirmed swings, and how far a companion indicator moved between the two that pair with
+them. That is `SwingDelta`, and the four sign comparisons moved into the four signals that read it.
+The sign predicates reproduce the old booleans bar-for-bar on all 1,294 fixture bars, and the
+rewritten signals disagree with the old implementation on zero of 1,254 expanding-window
+evaluations. The same split, with the same proof, was then applied to `TTMSqueeze`, `MultiTFTrend`,
+`SuperTrend` and `PSAR`.
 
 ### Out of scope for now: the on-chain and DeFi Pro signals
 
