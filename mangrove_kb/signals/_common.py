@@ -149,5 +149,6 @@ def deprecated_signal(reason: str):
         def wrapper(*args, **kwargs):
             warnings.warn(f"{fn.__name__} is deprecated: {reason}", DeprecationWarning, stacklevel=2)
             return fn(*args, **kwargs)
+        wrapper.deprecated_reason = reason
         return wrapper
     return decorate
