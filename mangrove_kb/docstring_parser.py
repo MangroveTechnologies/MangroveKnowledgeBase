@@ -371,6 +371,19 @@ def _get_rule_name_from_source(func) -> Optional[str]:
 # Public API
 # ---------------------------------------------------------------------------
 
+def parse_signal_policy(func) -> dict:
+    """Read eligibility independently of descriptive parameter/type metadata.
+
+    Malformed descriptions must never turn an explicitly disabled signal active.
+    Functions without docstrings remain valid custom runtime registrations.
+    """
+    doc = inspect.getdoc(func) or ""
+    disabled = _DISABLED_RE.search(doc)
+    reason = _DISABLED_REASON_RE.search(doc)
+    return {"disabled": bool(disabled and disabled.group(1) == "True"),
+            "disabled_reason": reason.group(1).strip() if reason else None}
+
+
 def parse_signal_docstring(func) -> dict:
     """Parse a signal function's docstring into structured metadata.
 

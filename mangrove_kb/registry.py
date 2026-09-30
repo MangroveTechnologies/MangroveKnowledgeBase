@@ -1,5 +1,6 @@
 import functools
 import warnings
+from typing import ClassVar
 
 import numpy as np
 import pandas as pd
@@ -51,27 +52,41 @@ def _canonical_columns(df: pd.DataFrame) -> pd.DataFrame:
     `myindicator` would be a silent data bug introduced by a convenience.
     """
     present = set(df.columns)
-    renames = {c: c.lower() for c in df.columns
-               if isinstance(c, str) and c.lower() in OHLCV and c != c.lower()
-               and c.lower() not in present}      # a frame holding BOTH `Close` and `close` keeps both
+    renames = {
+        c: c.lower()
+        for c in df.columns
+        if isinstance(c, str)
+        and c.lower() in OHLCV
+        and c != c.lower()
+        and c.lower() not in present
+    }  # a frame holding BOTH `Close` and `close` keeps both
     return df.rename(columns=renames) if renames else df
 
 
 class RuleRegistry:
-    _registry = {}
+    _registry: ClassVar[dict] = {}
 
     #: Retired signal names -> the name that replaced them. A deprecated name must keep evaluating,
     #: because a stored strategy holds the name as a string and cannot be migrated by us. It must
     #: NOT appear in `names()` or the catalogue, or every rename would inflate the signal count and
     #: show the same signal twice. Registering the old name as a second signal did exactly that:
     #: 247 became 249.
-    _aliases = {}
+    _aliases: ClassVar[dict] = {}
 
     @classmethod
-    def register(cls, name):
+    def register(cls, name, *, executable=True):
         def wrapper(fn):
+            from mangrove_kb.docstring_parser import parse_signal_policy
+
+            disabled = parse_signal_policy(fn)["disabled"]
+            execution_allowed = executable and (
+                not disabled or bool(getattr(fn, "deprecated_reason", None))
+            )
+
             @functools.wraps(fn)
             def coerced(*args, **kwargs):
+                if not execution_allowed:
+                    raise ValueError(f"Signal {name!r} is disabled for execution")
                 # Every signal takes the frame first; `evaluate` and every caller pass it
                 # positionally, but accept it by name too rather than silently skipping the
                 # normalization for a caller who spells it out.
@@ -81,6 +96,7 @@ class RuleRegistry:
                     kwargs = {**kwargs, "df": _canonical_columns(kwargs["df"])}
                 return _to_native(fn(*args, **kwargs))
 
+            coerced.runtime_disabled = not executable
             cls._registry[name] = coerced
             return coerced
 
@@ -101,7 +117,8 @@ class RuleRegistry:
             f"signal {name!r} has been renamed to {target!r}; the old name still evaluates but "
             f"will be removed. Registered names are the strategy-facing contract, so this is a "
             f"rename with a grace period, not a break.",
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning,
+            stacklevel=3,
         )
         return target
 
@@ -129,6 +146,71 @@ class RuleRegistry:
         `evaluate` needs a DataFrame, so it was not usable as a validity check.
         """
         return name in cls._registry or name in cls._aliases
+
+    @classmethod
+    def describe(cls, name: str) -> dict:
+        """Runtime identity and eligibility, independent of ontology membership.
+
+        Disabled docstrings exclude new composition. Deprecated disabled signals
+        explicitly retained for stored strategies stay executable; an explicit
+        runtime disable always wins. Aliases keep their requested identity.
+        """
+        from mangrove_kb.docstring_parser import (
+            parse_signal_docstring,
+            parse_signal_policy,
+        )
+
+        target = cls._aliases.get(name, name)
+        fn = cls._registry.get(target)
+        if fn is None:
+            return {}
+        try:
+            metadata = parse_signal_docstring(fn)
+        except ValueError:
+            metadata = {
+                "rule_name": target,
+                "description": fn.__doc__ or "",
+                "type": None,
+                "requires": [],
+                "params": {},
+            }
+        metadata.update(parse_signal_policy(fn))
+        deprecated = getattr(fn, "deprecated_reason", None)
+        runtime_disabled = getattr(fn, "runtime_disabled", False)
+        disabled = runtime_disabled or metadata.get("disabled", False)
+        legacy = bool(disabled and deprecated and not runtime_disabled)
+        status = (
+            "disabled"
+            if disabled
+            else "deprecated"
+            if deprecated or name != target
+            else "active"
+        )
+        reason = (
+            "Disabled for runtime execution"
+            if runtime_disabled
+            else metadata.get("disabled_reason")
+            if disabled
+            else deprecated
+        )
+        if name != target and not reason:
+            reason = f"Renamed to {target}; the old spelling remains executable"
+        return {
+            **metadata,
+            "rule_name": name,
+            "canonical_name": target,
+            "category": fn.__module__.rsplit(".", 1)[-1],
+            "status": status,
+            "reason": reason,
+            "composable": not disabled,
+            "executable": not disabled or legacy,
+            "legacy_compatible": legacy,
+        }
+
+    @classmethod
+    def catalog(cls) -> dict:
+        """Canonical identities only; aliases are resolved explicitly by describe."""
+        return {name: cls.describe(name) for name in sorted(cls.names())}
 
     @classmethod
     def evaluate(cls, rule, df):
