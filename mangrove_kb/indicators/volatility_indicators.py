@@ -1208,3 +1208,82 @@ class ChandelierLevels(IndicatorInterface):
 #: Deprecated name. "Exit" states a use, not a measurement, and this ontology's indicator layer
 #: holds measurements only -- what to do about a level is the signal layer's business.
 ChandelierExit = ChandelierLevels
+
+
+class SuperTrendBands(IndicatorInterface):
+    """Indicator: SuperTrendBands
+
+    The two ATR-scaled bands SuperTrend is built from, hl2 +/- multiplier * ATR(window), both
+    emitted on every bar. Nothing here is withheld or held in place: the long/short regime, the
+    ratchet that pins a band while that regime lasts, and the choice of which band to show are all
+    decisions over these two levels, and they live in the signals that read them.
+
+    `SuperTrend` is the deprecated class: it emits these same bands only on the side its own
+    `direction` verdict selects, and NaNs the other. The bands it reads are identical to these, so a
+    signal that reconstructs the regime from `upper_band` and `lower_band` reproduces its verdict
+    exactly.
+
+    Abbreviation: ST
+    Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
+    Warmup: window - 1
+
+    Formula:
+        hl2[t] = (high[t] + low[t]) / 2
+        upper_band[t] = hl2[t] + multiplier * atr[t]
+        lower_band[t] = hl2[t] - multiplier * atr[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=50]: ATR window
+        multiplier [default=3.0, min=0.5, max=10.0]: ATR multiplier
+
+    Outputs:
+        upper_band [price, 0..inf] "Basic Upper Band":
+            The bar's midpoint plus multiplier times the Wilder ATR: the level a short regime
+            trails. Emitted every bar, unratcheted, so it can move against the regime; holding it
+            still is the signal's decision.
+        lower_band [price, -inf..inf] "Basic Lower Band":
+            The mirror below the midpoint, the level a long regime trails. Below zero only when
+            multiplier * ATR exceeds the midpoint, which real prices do not produce.
+
+    Interpretation:
+        A symmetric volatility envelope around each bar's midpoint, one ATR multiple wide on each
+        side. The bands say how far a close would have to travel, in the instrument's own recent
+        range, to be outside the bar's neighbourhood; they do not say which side price is on.
+
+    Applications:
+        The raw material of SuperTrend. A trend-following rule reads a close outside one band as a
+        regime change and holds the opposite band as a trailing stop until the next; that rule, and
+        the regime it remembers, is the signal layer's.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int, 'multiplier': float}
+
+    Returns:
+        {'upper_band': pd.Series, 'lower_band': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window", "multiplier"]
+    _outputs = ["upper_band", "lower_band"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        high = data['high']
+        low = data['low']
+        close = data['close']
+        window = params['window']
+        mult = float(params['multiplier'])
+
+        atr = ATR.compute({'high': high, 'low': low, 'close': close}, {'window': window})['atr']
+        atr_vals = atr.to_numpy(dtype=np.float64, copy=False)
+        hl2 = (high.to_numpy(dtype=np.float64, copy=False) + low.to_numpy(dtype=np.float64, copy=False)) / 2.0
+
+        return {
+            'upper_band': pd.Series(hl2 + mult * atr_vals, index=close.index, name='upper_band'),
+            'lower_band': pd.Series(hl2 - mult * atr_vals, index=close.index, name='lower_band'),
+        }
