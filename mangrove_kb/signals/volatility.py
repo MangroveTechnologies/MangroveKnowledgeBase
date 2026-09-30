@@ -1053,6 +1053,8 @@ def atr_trailing_stop_long(df: pd.DataFrame, window: int = 14, multiplier: float
 
     Type: FILTER
     Requires: high, low, close
+    Disabled: True
+    Disabled-Reason: ATRTrailingStop is a stop policy, not a measurement; a trailing stop belongs in the exit rules of an execution config, not in a signal pool. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1079,6 +1081,8 @@ def atr_trailing_stop_short(df: pd.DataFrame, window: int = 14, multiplier: floa
 
     Type: FILTER
     Requires: high, low, close
+    Disabled: True
+    Disabled-Reason: ATRTrailingStop is a stop policy, not a measurement; a trailing stop belongs in the exit rules of an execution config, not in a signal pool. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1107,6 +1111,8 @@ def atr_trailing_stop_flip_up(df: pd.DataFrame, window: int = 14, multiplier: fl
 
     Type: TRIGGER
     Requires: high, low, close
+    Disabled: True
+    Disabled-Reason: ATRTrailingStop is a stop policy, not a measurement; a trailing stop belongs in the exit rules of an execution config, not in a signal pool. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
@@ -1138,6 +1144,8 @@ def atr_trailing_stop_flip_down(df: pd.DataFrame, window: int = 14, multiplier: 
 
     Type: TRIGGER
     Requires: high, low, close
+    Disabled: True
+    Disabled-Reason: ATRTrailingStop is a stop policy, not a measurement; a trailing stop belongs in the exit rules of an execution config, not in a signal pool. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
