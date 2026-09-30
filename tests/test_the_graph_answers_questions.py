@@ -82,14 +82,13 @@ QUESTIONS: list[tuple[str, set[str]]] = [
       "procedure:signal-adx-strong-trend"}),
     ("how far away from my entry should the stop go",
      {"procedure:atr-based-stop", "concept:stop-and-target-engineering"}),
-    # `returns-t-test` -- "test if mean return is significantly different from null" -- is the
-    # statistical-flukes leg of strategy-validation's own definition, and the graph reaches it along
-    # that node's `about` edge ("stated under statistical significance testing"). It sat one place
-    # below `strategy-validation` in the pool re-rank; nine indicator and signal nodes joining the
-    # corpus moved its LSA rank there from 17 to 11 and the two swapped fifth place. A person told
-    # to t-test the returns would accept that as an answer to this question.
+    # A backtest that looks too good is answered by the validation procedures that expose an
+    # overfit: does it hold across time periods, across parameter settings, across the universe.
+    # A t-test on the returns is not one of them: an overfit backtest passes it as easily as a
+    # real edge, and "is it just luck" is the next question's own gold set.
     ("my backtest looks too good to be true",
-     {"concept:overfitting", "concept:strategy-validation", "procedure:returns-t-test"}),
+     {"concept:overfitting", "concept:strategy-validation", "procedure:time-period-stability",
+      "procedure:parameter-sensitivity", "procedure:universe-stability"}),
     ("how do I tell whether my results are just luck",
      {"procedure:returns-t-test", "procedure:multiple-testing-correction"}),
     ("what are the odds I wipe out the account", {"concept:risk-of-ruin"}),
