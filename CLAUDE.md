@@ -48,7 +48,7 @@ python -c "from mangrove_kb import RuleRegistry, sample_ohlcv; from mangrove_kb.
 
 Open-source trading signals, technical indicators, and knowledge base. Public developer docs now live in mangrove-platform-frontend-web (`content/docs/`), not here. Components:
 
-1. **Python Package** (`mangrove_kb`) -- 249 signal functions, 80 indicator classes, RuleRegistry,
+1. **Python Package** (`mangrove_kb`) -- 249 signal functions, 82 indicator classes, RuleRegistry,
    docstring parser, **and a knowledge graph of itself** (see below). Published on PyPI as
    `mangrove-kb`.
 2. **MCP server** (`mangrove_kb_mcp.py`) -- twelve read-only tools over the graph, run over stdio by whatever client wants them. A consumer of the installed package, not part of it. (It replaced `kb_server/`, a FastAPI + FastMCP server answering from SQLite FTS5 over markdown; that directory was deleted in 3.0.0 and is in git history.)
@@ -90,8 +90,8 @@ retired server, and gating has to be restored before this is served over HTTP to
 
 ## The Knowledge Graph
 
-`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 714 nodes
-and 2342 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
+`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 723 nodes
+and 2374 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
 source, and the trading knowledge base ingested from its eight chapters.
 
 ```python
@@ -179,7 +179,7 @@ installed copy.
 - Every signal docstring must include `Type:` (TRIGGER or FILTER) and `Requires:` (comma-separated column names)
 - Every parameter must include `Range: min-max` and `Default: value` in the Args section
 - Use `window` for all windowing parameters (not `lookback`, `period`, `length`)
-- Signal counts: 249 registered (119 TRIGGER, 130 FILTER); 218 are modelled in the graph
+- Signal counts: 249 registered (119 TRIGGER, 130 FILTER); 225 are modelled in the graph
 - Signal modules are named for the ontology class they hold: `averaging`, `flow`, `momentum`,
   `oscillator`, `pattern`, `volatility`, plus `trend`, `volume`, `onchain`, `defi_pro`
 - On-Chain signals consume alternative-data columns (SmartMoneyNetflow, SmartMoneyHoldings, ExchangeNetflow, WhaleNetInflow, HolderConcentration) the caller populates time-aligned to OHLCV bars; sourced from Nansen tgm/flows + historical-top-holders via the MangroveAI data layer. There is no total-holder-count series upstream, so holder-count signals are intentionally not shipped.

@@ -12,7 +12,7 @@ The join is what makes either half worth querying: ``procedure:atr-based-stop`` 
 states, and it ``uses`` an indicator the code defines.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (218 of 714 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (225 of 723 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -261,7 +261,7 @@ _ENV_VAR = "MANGROVE_KB_ONTOLOGY"
 _PACKAGED = Path(__file__).resolve().parent / "data" / "signal-indicator-ontology.json"
 _IN_REPO = Path(__file__).resolve().parent.parent / "ontology" / "signal-indicator-ontology.json"
 
-#: Default result caps. Small on purpose: a hub in this graph has degree 218, so an unbounded
+#: Default result caps. Small on purpose: a hub in this graph has degree 225, so an unbounded
 #: neighbour call returns most of the graph and swamps whatever asked for it. Callers raise them
 #: deliberately; every truncated result says so out loud rather than looking complete.
 DEFAULT_LIMIT = 25
@@ -568,7 +568,7 @@ class KnowledgeGraph:
         ``instance-of`` one; a signal is ``about`` one.
 
         This deliberately does **not** return every node the backbone points at. That set also holds
-        ``concept:indicator`` (71 results), ``concept:signal`` (218), ``concept:technical-analysis``
+        ``concept:indicator`` (73 results), ``concept:signal`` (225), ``concept:technical-analysis``
         (299 of 498 nodes) and ``property:role`` (2 -- the role values), and advertising those as the
         class vocabulary invites a filter that looks like a query and returns almost everything.
         They remain legal ``kind=`` arguments, and :meth:`find` documents them; they are just not
@@ -741,7 +741,7 @@ class KnowledgeGraph:
 
         The ``about`` edges are a projection of ``uses`` plus the class table, emitted by the builder
         in the same pass and checked there against the ``uses`` edge behind each one.
-        All 218 signals resolve this way, every one reading a classified indicator. (The node
+        All 225 signals resolve this way, every one reading a classified indicator. (The node
         property ``source_module`` carries the same string, but it is provenance, not the assertion
         -- the graph is the source of truth.)
 
@@ -960,7 +960,7 @@ class KnowledgeGraph:
         # zero vector and it returns nothing -- but a pretrained encoder embeds ANY string, and
         # `ask("zzzzqqq")` came back with the seven nodes nearest to gibberish.
         #
-        # A similarity floor cannot do this job: over these 714 nodes the best cosine for a real
+        # A similarity floor cannot do this job: over these 723 nodes the best cosine for a real
         # question runs down to 0.26 while nonsense reaches 0.28, so the two ranges overlap and any
         # threshold that rejects the nonsense also rejects real questions. Knowing the words is a
         # property of the corpus and is exactly what the old behaviour tested.
@@ -1274,7 +1274,7 @@ class KnowledgeGraph:
         That says "they are both signals", which is true and explains nothing. Excluded by default,
         because on this graph it is not a minority of the answers: between ``adosc_bearish`` and
         ``momentum`` there are 2 real routes and, at ``max_depth=5``, 9,638 of 9,785 paths are these
-        detours through ``concept:signal`` (degree 218). Pass ``sibling_hops=True`` when the shared
+        detours through ``concept:signal`` (degree 225). Pass ``sibling_hops=True`` when the shared
         parent IS the answer -- *"how are these two related?" "they both read RSI"* is the same shape
         and genuinely informative.
 
@@ -1286,7 +1286,7 @@ class KnowledgeGraph:
                        are almost all detours through a hub rather than explanations.
         ``limit``      how MANY paths come back. The house convention -- ``total`` and ``truncated``
                        report the rest.
-        ``max_steps``  how HARD to search before giving up. This graph has hubs of degree 218
+        ``max_steps``  how HARD to search before giving up. This graph has hubs of degree 225
                        (``concept:signal`` touches every signal), and enumerating simple paths
                        across one is combinatorial, so an unbounded search does not return.
 

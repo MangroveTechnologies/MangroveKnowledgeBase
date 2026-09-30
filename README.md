@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-ff9e18.svg" alt="License: PolyForm Noncommercial 1.0.0">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/graph%20%2B%20indices-in%20the%20wheel-2ec27e.svg" alt="Graph and both search indices ship in the wheel">
-  <img src="https://img.shields.io/badge/graph-714%20nodes%20%C2%B7%202342%20edges-42a7c6.svg" alt="Graph: 714 nodes, 2342 edges">
+  <img src="https://img.shields.io/badge/graph-723%20nodes%20%C2%B7%202374%20edges-42a7c6.svg" alt="Graph: 723 nodes, 2374 edges">
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
 
@@ -16,7 +16,7 @@
   <a href="https://pepy.tech/projects/mangrove-kb"><img src="https://static.pepy.tech/badge/mangrove-kb" alt="PyPI Downloads"></a>
 </p>
 
-**249 trading signal functions** (119 TRIGGER, 130 FILTER) and **80 technical indicator classes**,
+**249 trading signal functions** (119 TRIGGER, 130 FILTER) and **82 technical indicator classes**,
 every one with a machine-readable docstring — formula, inputs, parameters with ranges and defaults,
 typed outputs with units, and warmup.
 
@@ -24,7 +24,7 @@ How it is built, stored and searched is drawn in [`docs/architecture/`](docs/arc
 edge schema, the search corpus, `find()`, `ask()`, both search indices and how they are
 fused, and the three traversals that are easy to confuse.
 
-And a **knowledge graph** — 714 nodes and 2342 edges, with two halves on one schema. One is compiled
+And a **knowledge graph** — 723 nodes and 2374 edges, with two halves on one schema. One is compiled
 from the source above: what each computation is, what it measures, what it reads, and what part it
 plays. That half is exact, because it is read from the code rather than extracted from prose. The
 other is the trading knowledge base — market structure, instruments, risk, chart patterns,
@@ -263,7 +263,7 @@ detail one click away.
 | Pane | Where | What it holds |
 | --- | --- | --- |
 | Rail | left | filters, by kind of node and kind of edge |
-| Map | middle | 714 nodes, 2342 edges |
+| Map | middle | 723 nodes, 2374 edges |
 | Panel | right | everything the library records about whatever you clicked |
 
 ### The inspector — what a node actually carries
@@ -324,7 +324,7 @@ an instance of the family; a signal emits a boolean, so it is *about* the family
   <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 17 of 714'" width="100%">
 </p>
 
-714 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
+723 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
 selected node, and the choices combine — `neighbors` + `ancestors` gives you both:
 
 | | Keeps |
@@ -355,14 +355,14 @@ derived kind beneath it — so `signal` and `indicator` are separable inside `Pr
 is separable from `has-role` inside `descriptive`.
 
 Sub-kinds are **shades of their parent's hue**, never new colours: every dot in that group is a
-procedure, and the darker teal is the 71 indicators among them.
+procedure, and the darker teal is the 73 indicators among them.
 
 Parent and child are **AND-ed**. Unticking `Procedure` hides every procedure whatever the children
 say, and the children grey out to show why — so the canvas can never empty for a reason that is not
 visible in the rail.
 
 **Density** spreads or tightens the layout. **Labels** switches between always / never / on hover /
-on zoom — at 714 nodes, off is often clearer than on.
+on zoom — at 723 nodes, off is often clearer than on.
 
 <br clear="right">
 
@@ -390,10 +390,10 @@ rather than reimplemented in JS, and a test asserts the two agree on real querie
 
 The same graph, same filters, same inspector — drag to rotate, scroll to zoom, right-drag to pan. In
 either view, **double-click a node to hide or show what hangs off it**, which is how you make a hub
-with 218 signals attached readable.
+with 225 signals attached readable.
 
 A **green ring** marks the selected node; a **yellow ring** marks a deprecated one — it still runs,
-it just has a canonical replacement. Nothing else is ringed: 308 of 714 nodes are `ratified`, so
+it just has a canonical replacement. Nothing else is ringed: 317 of 723 nodes are `ratified`, so
 marking that would be decoration rather than information.
 
 Light, dark and follow-the-system are top right, and the choice is remembered.
@@ -420,14 +420,18 @@ A statement lives in exactly one place. Until it concerns a particular node it s
 Judgment; once it earns an `about` edge it moves onto that edge as its `why` — so the reason an
 answer is an answer travels with the connection, not in a list somewhere else.
 
-**The library half.** Of **249 registered signals**, **218 are modelled** in the graph, along with
-71 of the 80 indicator classes. That gap is deliberate:
+**The library half.** Of **249 registered signals**, **225 are modelled** in the graph, along with
+73 of the 82 indicator classes. That gap is deliberate:
 
 - **Signals with no indicator beneath them** — a signal reading raw price with no measurement in
   between has no class to derive, and would sit in the graph as an unclassifiable node.
-- **Stateful policy rules** — SuperTrend, PSAR, ChandelierExit, ATRTrailingStop, VolatilityStop.
-  Their outputs are *verdicts*, not measurements: they carry a position forward and emit a direction.
-  An indicator measures; these decide. They are excluded rather than mislabelled.
+- **Verdict indicators** — SuperTrend, PSAR, ATRTrailingStop, Divergence, TTMSqueeze, MultiTFTrend.
+  Their outputs are *verdicts*, not measurements: a direction, a flip flag, a boolean. An indicator
+  measures; these decide. Each is kept, deprecated, for anything already calling it, and all but
+  ATRTrailingStop have a measurement class in the graph in its place (`SuperTrendBands`,
+  `ParabolicSAR`, `SwingDelta`, `SqueezeDepth`, `MultiTFSlope`) with the decision moved into the
+  signals. ATRTrailingStop is a trade-management rule, not an indicator; its four signals stay
+  registered and deprecated because stored strategies name them.
 - **Private signal families** — on-chain and social signals ship in the package but are out of scope
   for the public ontology.
 
@@ -450,7 +454,7 @@ MangroveKnowledgeBase/
 │   ├── registry.py               ← RuleRegistry: evaluate a signal by name
 │   ├── docstring_parser.py       ← docstring → structured metadata
 │   ├── signals/                  ← 249 signal functions
-│   ├── indicators/               ← 80 indicator classes
+│   ├── indicators/               ← 82 indicator classes
 │   ├── viz/                      ← the self-contained graph viewer
 │   ├── data/                     ← the graph, bundled at build time
 │   └── skills/knowledge-graph/   ← SKILL.md + GUIDE.md, bundled at build time

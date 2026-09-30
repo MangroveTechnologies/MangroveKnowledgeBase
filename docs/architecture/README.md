@@ -286,7 +286,7 @@ together — it is where the meaning of "basis" or "delta" in trading is decided
 *English* puts together, which is how *"what are the odds I wipe out the account"* reaches
 `concept:risk-of-ruin`, whose summary is "the probability of losing a specified percentage of
 capital": the same sentence in different words, sharing none of them. No amount of co-occurrence
-across 714 documents teaches that, because nothing in them places those phrasings together.
+across 723 documents teaches that, because nothing in them places those phrasings together.
 
 ```mermaid
 flowchart TB
