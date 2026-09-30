@@ -46,7 +46,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 714, 2342
+s["nodes"], s["edges"]          # 723, 2374
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -55,10 +55,10 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  714 2342
+nodes, edges  723 2374
 primitives    {'Procedure': 295, 'Concept': 55, 'Property': 15, 'Object': 1,
                'Schema': 1, 'Fact': 2, 'Judgment': 1}
-relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 218,
+relations     {'instance-of': 364, 'uses': 234, 'about': 275, 'has-role': 225,
                'kind-of': 32, 'part-of': 31, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:oscillator', 'concept:pattern',
@@ -77,7 +77,7 @@ one and get an empty result you might misread as "there are none".
 also accepts the short name (`"momentum"`). Both work; the ids are what you get back.
 
 `classes` is deliberately the six and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (71), `"signal"` (218) and `"technical-analysis"` (375 of 714) — legal, occasionally
+`"indicator"` (73), `"signal"` (226) and `"technical-analysis"` (328 of 723) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -197,7 +197,7 @@ filters  = kg.find(kind="volatility", role="filter",  limit=None)
 ```
 
 ```
-momentum triggers   25      volatility filters  16
+momentum triggers   25      volatility filters  18
   procedure:signal-adosc-cross-down       procedure:signal-atr-high-volatility
   procedure:signal-adosc-cross-up         procedure:signal-bb-above-upper
   procedure:signal-ao-zero-cross          procedure:signal-bb-below-lower
@@ -299,7 +299,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 714 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 723 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -349,7 +349,7 @@ If you use `path` for an explanation, constrain it — `relations=["uses", "inst
 
 **Trap:** `all_paths` excludes routes through a shared parent by default. `adosc_bearish
 --instance-of--> Signal <--instance-of-- adosc_bullish` says "they are both signals", and with
-`concept:signal` at degree 218 those detours outnumber the real answers 9,638 to 2 at
+`concept:signal` at degree 225 those detours outnumber the real answers 9,638 to 2 at
 `max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
 related?" "they both read RSI"*.
 
@@ -671,7 +671,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 140 nodes
+kg.find(under="market foundations", limit=None)                 # 145 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```

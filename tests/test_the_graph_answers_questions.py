@@ -82,8 +82,13 @@ QUESTIONS: list[tuple[str, set[str]]] = [
       "procedure:signal-adx-strong-trend"}),
     ("how far away from my entry should the stop go",
      {"procedure:atr-based-stop", "concept:stop-and-target-engineering"}),
+    # A backtest that looks too good is answered by the validation procedures that expose an
+    # overfit: does it hold across time periods, across parameter settings, across the universe.
+    # A t-test on the returns is not one of them: an overfit backtest passes it as easily as a
+    # real edge, and "is it just luck" is the next question's own gold set.
     ("my backtest looks too good to be true",
-     {"concept:overfitting", "concept:strategy-validation"}),
+     {"concept:overfitting", "concept:strategy-validation", "procedure:time-period-stability",
+      "procedure:parameter-sensitivity", "procedure:universe-stability"}),
     ("how do I tell whether my results are just luck",
      {"procedure:returns-t-test", "procedure:multiple-testing-correction"}),
     ("what are the odds I wipe out the account", {"concept:risk-of-ruin"}),

@@ -9,10 +9,10 @@ pip install mangrove-kb
 ## What You Get
 
 - **249 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
-- **80 technical indicators** -- stateless `compute()` API returning named Series
+- **82 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
-- **A knowledge graph of the library itself** -- 714 nodes, 2342 edges, queryable, shipped in the package
+- **A knowledge graph of the library itself** -- 723 nodes, 2374 edges, queryable, shipped in the package
 - **Search by words or by meaning** -- `find()` matches terms; `ask()` takes a question in ordinary
   words, seeds from two indices and follows the edges out of what it finds. On twenty-five questions
   phrased the way a trader asks them, `find()` answers 5 and `ask()` answers 18.
@@ -91,8 +91,9 @@ upper, middle, lower = result["hband"], result["mavg"], result["lband"]
 | Flow | 5 | 10 |
 | Pattern | 3 | 40 |
 
-The nine unmodelled classes are stateful policy rules -- SuperTrend, PSAR, ChandelierExit and the
-like -- whose outputs are verdicts rather than measurements. `kg.stats()["classes"]` is the live list.
+The unmodelled classes are deprecated verdict indicators -- SuperTrend, PSAR, ATRTrailingStop and
+the like -- whose outputs are verdicts rather than measurements; each but ATRTrailingStop has a
+measurement class in the graph in its place. `kg.stats()["classes"]` is the live list.
 
 ## Signals
 
@@ -135,7 +136,7 @@ print(f"Available signals: {len(RuleRegistry._registry)}")
 
 ### Signal Categories
 
-**249 registered**, 218 modelled in the graph. Every signal carries two independent labels: the
+**249 registered**, 225 modelled in the graph. Every signal carries two independent labels: the
 class it is *about* (above) and the **role** it plays -- `trigger` (an event) or `filter` (an ongoing
 state). They are different questions, so the graph keeps them apart:
 

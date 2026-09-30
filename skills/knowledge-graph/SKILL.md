@@ -13,9 +13,9 @@ description: >-
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of **714 nodes, 2342 edges** with two halves on one schema:
+`mangrove_kb` ships a knowledge graph of **723 nodes, 2374 edges** with two halves on one schema:
 
-- **The library, compiled from its own source** — 71 indicators and 218 signals. Exact, not
+- **The library, compiled from its own source** — 73 indicators and 225 signals. Exact, not
   extracted: every answer here is a fact about the code as it is.
 - **The trading knowledge base, ingested from its chapters** — market foundations, instruments and
   mechanics, core concepts, strategy design, risk management, indicators, chart patterns,
@@ -99,7 +99,7 @@ adosc_bearish  --about-------->  momentum      it is concerned with it, because 
 adosc_bearish  --uses--------->  ADOSC         ...and this is the reason
 ```
 
-`find(kind=...)` returns both. All 218 signals carry an `about` edge, every one derived from a `uses`
+`find(kind=...)` returns both. All 225 signals carry an `about` edge, every one derived from a `uses`
 edge the builder checks it against — so the claim is in the file and the reason is one hop away.
 Four signals carry **two** — the RSI divergence signals read both an oscillator and a momentum
 indicator, and are genuinely about both. Do not assume class is single-valued.
@@ -116,7 +116,7 @@ kg.find(role="filter")                       # signals playing the filter part
 
 The graph holds two kinds of thing and they are queried identically.
 
-**Read off the code** -- 71 indicators and 218 signals, exact, with typed inputs and outputs.
+**Read off the code** -- 73 indicators and 225 signals, exact, with typed inputs and outputs.
 **Read off the knowledge base** -- the concepts a market is made of (orders, participants, venues,
 liquidity, spread), the formulas the chapters state, and two nodes per subject holding what is
 true of it (`Fact`) and what to do about it (`Judgment`).
@@ -179,7 +179,7 @@ when the query is a term and `ask()` when it is a sentence.
 It seeds from **two** indices and fuses them: LSA over this corpus, which knows that *"a breakout
 that fails"* belongs near *"read as a loss"*, and a pretrained sentence encoder, which knows that
 *"the odds I wipe out the account"* is `risk of ruin` — a paraphrase no amount of co-occurrence in
-714 documents would teach. Measured on twenty-five questions phrased the way a trader asks them:
+723 documents would teach. Measured on twenty-five questions phrased the way a trader asks them:
 `find()` answers 5, LSA alone 13, the encoder alone 15, the fused pair **18**. Expect roughly one
 question in four to still need a second phrasing or a `find()` on a term you can guess.
 
@@ -232,7 +232,7 @@ indicators.
 ## Rules of use
 
 - **Results are capped, and say so.** Defaults are small on purpose: `concept:signal` has degree
-  218, so an unbounded call returns most of the graph. A truncated result carries
+  225, so an unbounded call returns most of the graph. A truncated result carries
   `truncated: True` and a note — *"showing 10 of 47"*. **Read it.** A short list is not evidence
   that there are only ten; pass `limit=None` when you need the total.
 - **A miss offers candidates, not a dead end.** `NodeNotFound` carries suggestions. If you get one,

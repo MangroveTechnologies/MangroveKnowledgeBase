@@ -6,6 +6,29 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### SuperTrend and PSAR measured, not judged
+
+Two measurement indicators replace two verdict indicators in the graph, by the split already
+applied to Divergence, TTMSqueeze and MultiTFTrend:
+
+- `SuperTrendBands` (class volatility) emits `upper_band` and `lower_band`, hl2 +/- multiplier x
+  ATR, on every bar. SuperTrend's regime and the ratchet that holds the trailed band are decided in
+  `supertrend_long`, `supertrend_short`, `supertrend_flip_up` and `supertrend_flip_down`.
+- `ParabolicSAR` (class averaging) emits the stop-and-reverse level `psar` and its acceleration
+  factor `af`. Which side of the level close is on is decided in `psar_bullish`, `psar_bearish`
+  and `psar_reversal`.
+
+The seven signals keep their names, roles, parameters and results -- the reconstructed regime
+equals `SuperTrend.direction` and the level equals `PSAR.psar` on every bar of all seven fixtures,
+and each signal returns the same boolean as before on every sliding-window evaluation
+(`tests/test_supertrend_psar_equivalence.py`). They no longer warn, and they moved from
+`signals/trend.py` to `signals/volatility.py` and `signals/averaging.py`; the old import path
+still resolves with a DeprecationWarning. `SuperTrend` and `PSAR` stay, deprecated and unchanged.
+
+The graph gains 2 indicator and 7 signal nodes (723 nodes, 2374 edges; 73 indicators and 225
+signals modelled). `ATRTrailingStop` stays excluded as a trade-management rule; its four signals
+stay registered and deprecated, because stored strategies name them.
+
 ### Signals carry user-facing labels
 
 Every signal in the graph (218) carries three new properties, authored in its docstring as
@@ -163,7 +186,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 714 nodes, 2342 edges, in
+carries a formula stating the predicate it computes -- 723 nodes, 2374 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,

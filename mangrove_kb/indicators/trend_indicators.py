@@ -1959,13 +1959,13 @@ class Vortex(IndicatorInterface):
 
 
 class PSAR(IndicatorInterface):
-    """DEPRECATED for the ontology: its level is downstream of a verdict.
+    """DEPRECATED: use `ParabolicSAR`, which emits the level and its acceleration factor only.
 
-    `psar[i]` cannot be computed without the indicator having decided which regime it is in --
-    the anchor, the acceleration factor and the update rule all switch on `up_trend` -- and
-    `psar_up_indicator` / `psar_down_indicator` expose that decision as 0/1 flags. So unlike
-    ChandelierLevels, which is a pure function of its window, there is no regime-free
-    measurement to recover. Kept working and unchanged.
+    `psar_up` / `psar_down` split the level by a regime this class decides, and
+    `psar_up_indicator` / `psar_down_indicator` expose that decision as 0/1 flags -- verdicts,
+    not measurements. The level itself is a recursion like an EMA and is what `ParabolicSAR`
+    emits; which side of it close is on is decided in the `psar_*` signals. Kept working and
+    unchanged.
 Parabolic Stop and Reverse (Parabolic SAR)
 
     The Parabolic Stop and Reverse, more commonly known as the
@@ -2454,12 +2454,12 @@ class WilliamsAlligator(IndicatorInterface):
 
 
 class SuperTrend(IndicatorInterface):
-    """DEPRECATED for the ontology: emits a verdict, not only a measurement.
+    """DEPRECATED: use `SuperTrendBands`, which emits both bands on every bar.
 
     `direction` is +1 long / -1 short, and `long_band` / `short_band` are NaN according to it.
     Indicators here state what they measured; deciding what it means is the signal layer's
-    job. Unlike TTMSqueeze and MultiTFTrend there is no regime-free core to split out --
-    the bands themselves switch on the regime. Kept working and unchanged.
+    job. The two basic bands are the measurement and `SuperTrendBands` emits them; the regime
+    and the ratchet are decided in the `supertrend_*` signals. Kept working and unchanged.
 SuperTrend (Olivier Seban).
 
     ATR-scaled bands around hl2 with a trend-following flip rule. When close
@@ -2823,4 +2823,139 @@ class Divergence(IndicatorInterface):
             'regular_bearish': pd.Series(reg_bear, index=price.index, name='div_regular_bearish'),
             'hidden_bullish': pd.Series(hid_bull, index=price.index, name='div_hidden_bullish'),
             'hidden_bearish': pd.Series(hid_bear, index=price.index, name='div_hidden_bearish'),
+        }
+
+
+class ParabolicSAR(IndicatorInterface):
+    """Indicator: ParabolicSAR
+
+    Wilder's parabolic stop-and-reverse level and the acceleration factor driving it, as two
+    measurements. The level starts at the extreme of the last move and accelerates toward the
+    current one by `af` each bar; `af` grows by `step` every time the move makes a new extreme
+    and is capped at `max_step`. Which side of price the level sits on, and the bar it changes
+    side, are readings of this level against close, and they are made in the signals.
+
+    `PSAR` is the deprecated class: it emits the same level and, beside it, the up/down halves and
+    two 0/1 flip flags, which are verdicts rather than measurements. The level is bit-identical, so
+    a signal comparing `psar` with close reproduces those flags exactly.
+
+    Abbreviation: PSAR
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
+    Warmup: 2
+
+    Formula:
+        rising:  psar[t] = psar[t-1] + af * (EP - psar[t-1]),  EP = highest high of the rise
+        falling: psar[t] = psar[t-1] - af * (psar[t-1] - EP),  EP = lowest low of the fall
+        psar[t] is clamped to the prior two bars' lows (rising) or highs (falling)
+        af[t] = min(af[t-1] + step, max_step) on a new EP, else af[t-1]; reset to step when
+        low[t] < psar[t] (rising) or high[t] > psar[t] (falling), where psar[t] restarts at EP
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        step [default=0.02, min=0.01, max=0.1]: PSAR acceleration factor step
+        max_step [default=0.2, min=0.1, max=0.5]: PSAR max acceleration factor
+
+    Outputs:
+        psar [price, 0..inf] "SAR":
+            The stop-and-reverse level for the bar. A recursion on its own previous value, so it
+            carries the extreme of the current move forward the way an EMA carries its history;
+            the first two bars are undefined because the recursion seeds from them. Below price
+            while the move it trails is a rise, above it while a fall, and on the bar it changes
+            side it restarts at the extreme of the move just ended.
+        af [ratio, 0..1] "Acceleration Factor":
+            The factor in force at the close of the bar, applied to the next bar's projection.
+            `step` at the start of every move, `step` larger at each new extreme, never above
+            `max_step`; so it reads how mature the current move is.
+
+    Interpretation:
+        A trailing level that closes in on price at an accelerating pace while the move keeps making
+        new extremes, and stalls when it does not. Price crossing it is Wilder's "stop and reverse",
+        but the crossing is a comparison against close, not part of the level.
+
+    Applications:
+        Trailing stop placement and reversal detection, both made by reading the level against
+        close in the signals. `af` alone says how extended a move is: a factor at `max_step` has
+        been setting new extremes for many bars.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'step': float, 'max_step': float}
+
+    Returns:
+        {'psar': pd.Series, 'af': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["step", "max_step"]
+    _outputs = ["psar", "af"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        high = data['high'].to_numpy(dtype=np.float64, copy=False)
+        low = data['low'].to_numpy(dtype=np.float64, copy=False)
+        close = data['close']
+        c_arr = close.to_numpy(dtype=np.float64, copy=False)
+        step = float(params['step'])
+        max_step = float(params['max_step'])
+
+        n = len(c_arr)
+        psar = np.full(n, np.nan)
+        af_out = np.full(n, np.nan)
+        if n < 3:
+            return {
+                'psar': pd.Series(psar, index=close.index, name='psar'),
+                'af': pd.Series(af_out, index=close.index, name='af'),
+            }
+
+        # The recursion seeds from close[1] as the previous level, rising, with the extremes of
+        # bar 0; the seed itself is not a computed level, so bars 0 and 1 stay undefined.
+        rising = True
+        af = step
+        ep_high = high[0]
+        ep_low = low[0]
+        prev = c_arr[1]
+
+        for i in range(2, n):
+            reversal = False
+            if rising:
+                cur = prev + af * (ep_high - prev)
+                if low[i] < cur:
+                    reversal = True
+                    cur = ep_high
+                    ep_low = low[i]
+                    af = step
+                else:
+                    if high[i] > ep_high:
+                        ep_high = high[i]
+                        af = min(af + step, max_step)
+                    if low[i - 2] < cur:
+                        cur = low[i - 2]
+                    elif low[i - 1] < cur:
+                        cur = low[i - 1]
+            else:
+                cur = prev - af * (prev - ep_low)
+                if high[i] > cur:
+                    reversal = True
+                    cur = ep_low
+                    ep_high = high[i]
+                    af = step
+                else:
+                    if low[i] < ep_low:
+                        ep_low = low[i]
+                        af = min(af + step, max_step)
+                    if high[i - 2] > cur:
+                        cur = high[i - 2]
+                    elif high[i - 1] > cur:
+                        cur = high[i - 1]
+            rising = rising != reversal
+            psar[i] = cur
+            af_out[i] = af
+            prev = cur
+
+        return {
+            'psar': pd.Series(psar, index=close.index, name='psar'),
+            'af': pd.Series(af_out, index=close.index, name='af'),
         }

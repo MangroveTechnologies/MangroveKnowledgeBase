@@ -106,8 +106,8 @@ def test_uc3_rsi_readers(kg, guide):
 def test_uc4_both_axes_counts(kg, guide):
     t = kg.find(kind="momentum", role="trigger", limit=None).total
     f = kg.find(kind="volatility", role="filter", limit=None).total
-    assert (t, f) == (25, 16), f"guide says 25 / 16, graph says {t} / {f}"
-    assert "momentum triggers   25" in guide and "volatility filters  16" in guide
+    assert (t, f) == (25, 18), f"guide says 25 / 18, graph says {t} / {f}"
+    assert "momentum triggers   25" in guide and "volatility filters  18" in guide
 
 
 def test_uc5_rsi_oversold_requirements(kg, guide):

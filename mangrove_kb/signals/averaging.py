@@ -22,6 +22,7 @@ from mangrove_kb.indicators import (
     Ichimoku,
     KAMA,
     MAMA,
+    ParabolicSAR,
     SMA,
     SMMA,
     T3,
@@ -2854,3 +2855,174 @@ def heikin_ashi_bearish(df: pd.DataFrame) -> bool:
     if pd.isna(out['ha_close'].iloc[-1]) or pd.isna(out['ha_open'].iloc[-1]):
         return False
     return bool(out['ha_close'].iloc[-1] < out['ha_open'].iloc[-1])
+
+
+# =============================================================================
+# Parabolic SAR Signals
+# =============================================================================
+# ParabolicSAR emits the stop-and-reverse level and its acceleration factor. Which side of price
+# the level sits on, and the bar it changes side, are comparisons against close made here.
+
+def _psar_level(df: pd.DataFrame, step: float, max_step: float) -> pd.Series:
+    return ParabolicSAR.compute(
+        data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
+        params={'step': step, 'max_step': max_step},
+    )['psar']
+
+
+@RuleRegistry.register("psar_bullish")
+def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) -> bool:
+    """Signal: psar_bullish
+
+    Check if the parabolic SAR level sits below the close. The level trails a rise from beneath,
+    so close above it is Wilder's long side; the indicator measures the level and this decides
+    which side of it price is on.
+
+    Friendly-Name: Dots Below Price
+    Display-Name: Parabolic SAR Bullish
+    Short-Description: The parabolic stop-and-reverse level is below the current close.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
+    Warmup: 2
+
+    Formula:
+        psar[t] < close[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        step [default=0.02, min=0.01, max=0.1]: PSAR acceleration factor step
+        max_step [default=0.2, min=0.1, max=0.5]: PSAR max acceleration factor
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the SAR level is below the close
+
+    Type: FILTER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        step (float): PSAR acceleration factor step. Range: 0.01-0.1. Default: 0.02.
+        max_step (float): PSAR max acceleration factor. Range: 0.1-0.5. Default: 0.2.
+
+    Returns:
+        bool: True if the SAR level is below the close.
+    """
+    if len(df) < 3:
+        return False
+    psar = _psar_level(df, step, max_step)
+    if pd.isna(psar.iloc[-1]):
+        return False
+    return bool(float(psar.iloc[-1]) < float(df["close"].iloc[-1]))
+
+
+@RuleRegistry.register("psar_bearish")
+def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) -> bool:
+    """Signal: psar_bearish
+
+    Check if the parabolic SAR level sits above the close. The level trails a fall from above, so
+    close below it is Wilder's short side. Mirror of `psar_bullish`.
+
+    Friendly-Name: Dots Above Price
+    Display-Name: Parabolic SAR Bearish
+    Short-Description: The parabolic stop-and-reverse level is above the current close.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
+    Warmup: 2
+
+    Formula:
+        psar[t] > close[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        step [default=0.02, min=0.01, max=0.1]: PSAR acceleration factor step
+        max_step [default=0.2, min=0.1, max=0.5]: PSAR max acceleration factor
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the SAR level is above the close
+
+    Type: FILTER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        step (float): PSAR acceleration factor step. Range: 0.01-0.1. Default: 0.02.
+        max_step (float): PSAR max acceleration factor. Range: 0.1-0.5. Default: 0.2.
+
+    Returns:
+        bool: True if the SAR level is above the close.
+    """
+    if len(df) < 3:
+        return False
+    psar = _psar_level(df, step, max_step)
+    if pd.isna(psar.iloc[-1]):
+        return False
+    return bool(float(psar.iloc[-1]) > float(df["close"].iloc[-1]))
+
+
+@RuleRegistry.register("psar_reversal")
+def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, direction: str = "bullish") -> bool:
+    """Signal: psar_reversal
+
+    Detect the parabolic SAR level changing side on this bar: above the close on the previous bar
+    and below it now (bullish), or the reverse (bearish). Wilder's stop-and-reverse, read as a
+    comparison of the level against close on two consecutive bars.
+
+    Friendly-Name: SAR Flips Sides
+    Display-Name: Parabolic SAR Reversal
+    Short-Description: The parabolic level just switched to the other side of price.
+
+    Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
+    Warmup: 3
+
+    Formula:
+        psar[t-1] > close[t-1] and psar[t] < close[t] when direction is bullish; psar[t-1] < close[t-1] and psar[t] > close[t] when bearish
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        step [default=0.02, min=0.01, max=0.1]: PSAR acceleration factor step
+        max_step [default=0.2, min=0.1, max=0.5]: PSAR max acceleration factor
+        direction: Reversal direction, 'bullish' (level moves below price) or 'bearish'
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True on the bar the SAR level changes side in the chosen direction
+
+    Type: TRIGGER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        step (float): PSAR acceleration factor step. Range: 0.01-0.1. Default: 0.02.
+        max_step (float): PSAR max acceleration factor. Range: 0.1-0.5. Default: 0.2.
+        direction (str): Reversal direction, 'bullish' (level moves below price) or 'bearish'. Default: bullish.
+
+    Returns:
+        bool: True on the bar the SAR level changes side in the chosen direction.
+    """
+    if len(df) < 4:
+        return False
+    psar = _psar_level(df, step, max_step)
+    if pd.isna(psar.iloc[-1]) or pd.isna(psar.iloc[-2]):
+        return False
+    close = df["close"]
+    prev_level, curr_level = float(psar.iloc[-2]), float(psar.iloc[-1])
+    prev_close, curr_close = float(close.iloc[-2]), float(close.iloc[-1])
+    if direction.lower() == "bullish":
+        return prev_level > prev_close and curr_level < curr_close
+    if direction.lower() == "bearish":
+        return prev_level < prev_close and curr_level > curr_close
+    return False

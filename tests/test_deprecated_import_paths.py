@@ -167,17 +167,35 @@ def test_the_mangroveai_import_statement_verbatim():
 # ---------------------------------------------------------------------------
 # Signals the ontology will never model, marked deprecated but still working
 # ---------------------------------------------------------------------------
-# Eleven signals read an indicator that emits a verdict (SuperTrend's `direction`, PSAR's flip
-# flags, ATRTrailingStop's `direction`), or a level that is only defined relative to a regime the
-# indicator decided. They have no measurement to inherit a class from, so they will not enter the
-# graph -- but they are registered signals and a stored strategy may name any of them.
+# Four signals read ATRTrailingStop, a trade-management rule rather than an indicator: its stop
+# level accumulates forward and it emits a `direction` verdict. They have no measurement to inherit
+# a class from, so they will not enter the graph -- but they are registered signals, and stored
+# strategies on the platform name them, so they stay registered and deprecated.
 
 NOT_MODELLED = [
-    "supertrend_long", "supertrend_short", "supertrend_flip_up", "supertrend_flip_down",
-    "psar_bullish", "psar_bearish", "psar_reversal",
     "atr_trailing_stop_long", "atr_trailing_stop_short",
     "atr_trailing_stop_flip_up", "atr_trailing_stop_flip_down",
 ]
+
+#: The seven that read SuperTrend and PSAR were on this list until those two were split into
+#: measurement indicators (`SuperTrendBands`, `ParabolicSAR`). They are modelled now and must
+#: not warn.
+REMODELLED = [
+    "supertrend_long", "supertrend_short", "supertrend_flip_up", "supertrend_flip_down",
+    "psar_bullish", "psar_bearish", "psar_reversal",
+]
+
+
+@pytest.mark.parametrize("name", REMODELLED)
+def test_remodelled_signals_evaluate_without_a_deprecation_warning(name):
+    from mangrove_kb.sample_data import sample_ohlcv
+    df = sample_ohlcv(200)
+    assert RuleRegistry.has(name)
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = RuleRegistry.evaluate({"name": name, "params": {}}, df)
+    assert result in (True, False), name
+    assert not [w for w in caught if issubclass(w.category, DeprecationWarning)], name
 
 
 @pytest.mark.parametrize("name", NOT_MODELLED)
@@ -194,7 +212,8 @@ def test_not_modelled_signals_still_evaluate_and_warn(name):
 
 def test_the_three_excluded_indicators_are_importable_but_uncatalogued():
     """Deprecated, not deleted. Out of __all__ so they are not offered as indicators; still
-    importable so anything already calling them keeps working."""
+    importable so anything already calling them keeps working. SuperTrend and PSAR are excluded
+    as verdict indicators; their measurements are `SuperTrendBands` and `ParabolicSAR`."""
     import mangrove_kb.indicators as I
     for n in ("SuperTrend", "PSAR", "ATRTrailingStop"):
         assert getattr(I, n, None) is not None, n

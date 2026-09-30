@@ -36,8 +36,8 @@ REPO = Path(__file__).resolve().parent.parent
 def counts():
     """Graph counts AND library counts -- the two are different and both get quoted.
 
-    The graph holds what is *modelled* (71 indicators, 218 signals); the library ships more than it
-    models (249 registered signals, 80 indicator classes). Documents quote both, and quoting the
+    The graph holds what is *modelled* (73 indicators, 225 signals); the library ships more than it
+    models (249 registered signals, 82 indicator classes). Documents quote both, and quoting the
     wrong denominator is how README came to claim 247/70 and PKG_README 223/99 while SKILL.md --
     the only one previously guarded -- was right.
     """
