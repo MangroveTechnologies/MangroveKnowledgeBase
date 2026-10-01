@@ -125,7 +125,7 @@ class TestIndividualParsing:
         assert window["default"] == 14
 
     def test_parse_sma_cross_up(self):
-        """Verify parsing of a signal with required (no default) params."""
+        """Verify parsing of a signal whose window params declare defaults."""
         func = RuleRegistry._registry["sma_cross_up"]
         result = parse_signal_docstring(func)
 
@@ -135,8 +135,27 @@ class TestIndividualParsing:
 
         window_fast = result["params"]["window_fast"]
         assert window_fast["type"] == "int"
-        assert window_fast["optional"] is False
-        assert "default" not in window_fast
+        assert window_fast["optional"] is True
+        assert window_fast["default"] == 9
+        assert result["params"]["window_slow"]["default"] == 21
+
+    def test_parse_required_param(self):
+        """Verify parsing of a param with a range and no default."""
+        def required_window(df, window):
+            """Signal: required_window
+
+            Type: FILTER
+            Requires: close
+
+            Args:
+                df (pd.DataFrame): DataFrame with OHLCV data.
+                window (int): Window in bars. Range: 1-200.
+            """
+
+        window = parse_signal_docstring(required_window)["params"]["window"]
+        assert window["type"] == "int"
+        assert window["optional"] is False
+        assert "default" not in window
 
 
     def test_parse_str_param_no_range(self):

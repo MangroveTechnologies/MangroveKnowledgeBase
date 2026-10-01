@@ -993,7 +993,7 @@ def ema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) 
     return bool(prev_fast <= prev_slow and curr_fast > curr_slow)
 
 @RuleRegistry.register("ema_crossover")
-def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, direction: str = "bullish") -> bool:
+def ema_crossover(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21, direction: str = "bullish") -> bool:
     """Signal: ema_crossover
 
     Detect an EMA crossover signal with configurable direction (bullish or bearish). Uses EMA
@@ -1019,8 +1019,8 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
         close: closing price
 
     Params:
-        window_fast [min=1, max=200]: Fast EMA window in bars
-        window_slow [min=1, max=200]: Slow EMA window in bars
+        window_fast [default=9, min=1, max=200]: Fast EMA window in bars
+        window_slow [default=21, min=1, max=200]: Slow EMA window in bars
         direction: Crossover direction, 'bullish' or 'bearish'
 
     Outputs:
@@ -1032,8 +1032,8 @@ def ema_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast EMA window in bars. Range: 1-200.
-        window_slow (int): Slow EMA window in bars. Range: 1-200.
+        window_fast (int): Fast EMA window in bars. Range: 1-200. Default: 9.
+        window_slow (int): Slow EMA window in bars. Range: 1-200. Default: 21.
         direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
 
     Returns:
@@ -1330,7 +1330,7 @@ def is_above_mama(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
     return bool(df["close"].iloc[-1] > mama.iloc[-1])
 
 @RuleRegistry.register("is_above_sma")
-def is_above_sma(df: pd.DataFrame, window: int) -> bool:
+def is_above_sma(df: pd.DataFrame, window: int = 20) -> bool:
     """Signal: is_above_sma
 
     Check if the current price is above the Simple Moving Average. Uses SMA indicator to calculate
@@ -1352,7 +1352,7 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
         close: closing price
 
     Params:
-        window [min=1, max=200]: SMA window in bars
+        window [default=20, min=1, max=200]: SMA window in bars
 
     Outputs:
         fired [boolean, 0..1]:
@@ -1363,7 +1363,7 @@ def is_above_sma(df: pd.DataFrame, window: int) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window (int): SMA window in bars. Range: 1-200.
+        window (int): SMA window in bars. Range: 1-200. Default: 20.
 
     Returns:
         bool: True if close > SMA, False otherwise.
@@ -1820,7 +1820,7 @@ def price_above_ema(df: pd.DataFrame, window: int = 20) -> bool:
     return float(closes.iloc[-1]) > float(ema.iloc[-1])
 
 @RuleRegistry.register("sma_cross_down")
-def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
+def sma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
     """Signal: sma_cross_down
 
     Detect a bearish SMA crossover as an exit signal. Returns True when the window_fast SMA crosses
@@ -1843,8 +1843,8 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
         close: closing price
 
     Params:
-        window_fast [min=1, max=200]: Fast SMA window in bars
-        window_slow [min=1, max=200]: Slow SMA window in bars
+        window_fast [default=9, min=1, max=200]: Fast SMA window in bars
+        window_slow [default=21, min=1, max=200]: Slow SMA window in bars
 
     Outputs:
         fired [boolean, 0..1]:
@@ -1855,8 +1855,8 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast SMA window in bars. Range: 1-200.
-        window_slow (int): Slow SMA window in bars. Range: 1-200.
+        window_fast (int): Fast SMA window in bars. Range: 1-200. Default: 9.
+        window_slow (int): Slow SMA window in bars. Range: 1-200. Default: 21.
 
     Returns:
         bool: True if bearish crossover detected in the current bar, False otherwise.
@@ -1864,7 +1864,7 @@ def sma_cross_down(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool
     return sma_crossover(df, window_fast=window_fast, window_slow=window_slow, direction="bearish")
 
 @RuleRegistry.register("sma_cross_up")
-def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
+def sma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21) -> bool:
     """Signal: sma_cross_up
 
     Detect a bullish SMA crossover as an entry signal. Returns True when the window_fast SMA crosses
@@ -1887,8 +1887,8 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
         close: closing price
 
     Params:
-        window_fast [min=1, max=200]: Fast SMA window in bars
-        window_slow [min=1, max=200]: Slow SMA window in bars
+        window_fast [default=9, min=1, max=200]: Fast SMA window in bars
+        window_slow [default=21, min=1, max=200]: Slow SMA window in bars
 
     Outputs:
         fired [boolean, 0..1]:
@@ -1899,8 +1899,8 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast SMA window in bars. Range: 1-200.
-        window_slow (int): Slow SMA window in bars. Range: 1-200.
+        window_fast (int): Fast SMA window in bars. Range: 1-200. Default: 9.
+        window_slow (int): Slow SMA window in bars. Range: 1-200. Default: 21.
 
     Returns:
         bool: True if bullish crossover detected in the current bar, False otherwise.
@@ -1908,7 +1908,7 @@ def sma_cross_up(df: pd.DataFrame, window_fast: int, window_slow: int) -> bool:
     return sma_crossover(df, window_fast=window_fast, window_slow=window_slow, direction="bullish")
 
 @RuleRegistry.register("sma_crossover")
-def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, direction: str = "bullish") -> bool:
+def sma_crossover(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21, direction: str = "bullish") -> bool:
     """Signal: sma_crossover
 
     Detect an SMA crossover signal with configurable direction (bullish or bearish). Uses SMA
@@ -1934,8 +1934,8 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
         close: closing price
 
     Params:
-        window_fast [min=1, max=200]: Fast SMA window in bars
-        window_slow [min=1, max=200]: Slow SMA window in bars
+        window_fast [default=9, min=1, max=200]: Fast SMA window in bars
+        window_slow [default=21, min=1, max=200]: Slow SMA window in bars
         direction: Crossover direction, 'bullish' or 'bearish'
 
     Outputs:
@@ -1947,8 +1947,8 @@ def sma_crossover(df: pd.DataFrame, window_fast: int, window_slow: int, directio
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        window_fast (int): Fast SMA window in bars. Range: 1-200.
-        window_slow (int): Slow SMA window in bars. Range: 1-200.
+        window_fast (int): Fast SMA window in bars. Range: 1-200. Default: 9.
+        window_slow (int): Slow SMA window in bars. Range: 1-200. Default: 21.
         direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
 
     Returns:
