@@ -3965,7 +3965,7 @@
     "params": {
      "window": {
       "type": "int",
-      "default": null,
+      "default": 20,
       "min": 1,
       "max": 200,
       "description": "SMA window in bars"
@@ -9670,14 +9670,14 @@
     "params": {
      "window_fast": {
       "type": "int",
-      "default": null,
+      "default": 9,
       "min": 1,
       "max": 200,
       "description": "Fast EMA window in bars"
      },
      "window_slow": {
       "type": "int",
-      "default": null,
+      "default": 21,
       "min": 1,
       "max": 200,
       "description": "Slow EMA window in bars"
@@ -11194,7 +11194,7 @@
     "params": {
      "window": {
       "type": "int",
-      "default": null,
+      "default": 20,
       "min": 1,
       "max": 200,
       "description": "SMA window in bars"
@@ -15593,14 +15593,14 @@
     "params": {
      "window_fast": {
       "type": "int",
-      "default": null,
+      "default": 9,
       "min": 1,
       "max": 200,
       "description": "Fast SMA window in bars"
      },
      "window_slow": {
       "type": "int",
-      "default": null,
+      "default": 21,
       "min": 1,
       "max": 200,
       "description": "Slow SMA window in bars"
@@ -15646,14 +15646,14 @@
     "params": {
      "window_fast": {
       "type": "int",
-      "default": null,
+      "default": 9,
       "min": 1,
       "max": 200,
       "description": "Fast SMA window in bars"
      },
      "window_slow": {
       "type": "int",
-      "default": null,
+      "default": 21,
       "min": 1,
       "max": 200,
       "description": "Slow SMA window in bars"
@@ -15699,14 +15699,14 @@
     "params": {
      "window_fast": {
       "type": "int",
-      "default": null,
+      "default": 9,
       "min": 1,
       "max": 200,
       "description": "Fast SMA window in bars"
      },
      "window_slow": {
       "type": "int",
-      "default": null,
+      "default": 21,
       "min": 1,
       "max": 200,
       "description": "Slow SMA window in bars"

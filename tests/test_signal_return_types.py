@@ -63,7 +63,7 @@ def df() -> pd.DataFrame:
 
 
 # Signals explicitly called out in the bug report, with the args each needs to
-# reach its comparison return path (is_above_sma has no default window).
+# reach its comparison return path.
 REPORTED = [
     ("rsi_cross_up", {"window": 14, "threshold": 50.0}),
     ("rsi_cross_down", {"window": 14, "threshold": 50.0}),
