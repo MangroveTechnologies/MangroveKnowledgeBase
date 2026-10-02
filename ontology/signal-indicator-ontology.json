@@ -13695,7 +13695,7 @@
    "props": {
     "source_module": "momentum",
     "reference": null,
-    "warmup_bars": "window * bars_per(higher_tf)",
+    "warmup_bars": "(window + 3) * bars_per(higher_tf)",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bearish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
     "formula": "higher_tf_trend[t] == -1",
@@ -13755,7 +13755,7 @@
    "props": {
     "source_module": "momentum",
     "reference": null,
-    "warmup_bars": "window * bars_per(higher_tf)",
+    "warmup_bars": "(window + 3) * bars_per(higher_tf)",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bullish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
     "formula": "higher_tf_trend[t] == 1",

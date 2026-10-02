@@ -2597,7 +2597,7 @@ def multi_tf_trend_bearish(
     Display-Name: Higher-Timeframe Trend Bearish
     Short-Description: The trend on a longer chart (weekly by default) is pointing down.
 
-    Warmup: window * bars_per(higher_tf)
+    Warmup: (window + 3) * bars_per(higher_tf)
 
     Formula:
         higher_tf_trend[t] == -1
@@ -2618,7 +2618,7 @@ def multi_tf_trend_bearish(
     Requires: close
 
     Args:
-        df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
+        df (pd.DataFrame): DataFrame with OHLCV data, indexed by time or carrying a ``timestamp`` column.
         higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1W.
         window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
         slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
@@ -2627,6 +2627,8 @@ def multi_tf_trend_bearish(
         bool: True if higher-TF trend == -1 on the current bar.
     """
     closes = df["close"]
+    if not isinstance(closes.index, pd.DatetimeIndex) and "timestamp" in df:
+        closes = pd.Series(closes.to_numpy(), index=pd.to_datetime(df["timestamp"], utc=True))
     if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
         return False
     out = MultiTFSlope.compute(data={'close': closes},
@@ -2651,7 +2653,7 @@ def multi_tf_trend_bullish(
     Display-Name: Higher-Timeframe Trend Bullish
     Short-Description: The trend on a longer chart (weekly by default) is pointing up.
 
-    Warmup: window * bars_per(higher_tf)
+    Warmup: (window + 3) * bars_per(higher_tf)
 
     Formula:
         higher_tf_trend[t] == 1
@@ -2672,7 +2674,7 @@ def multi_tf_trend_bullish(
     Requires: close
 
     Args:
-        df (pd.DataFrame): DataFrame with OHLCV data (DatetimeIndex required).
+        df (pd.DataFrame): DataFrame with OHLCV data, indexed by time or carrying a ``timestamp`` column.
         higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1W.
         window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
         slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
@@ -2681,6 +2683,8 @@ def multi_tf_trend_bullish(
         bool: True if higher-TF trend == +1 on the current bar.
     """
     closes = df["close"]
+    if not isinstance(closes.index, pd.DatetimeIndex) and "timestamp" in df:
+        closes = pd.Series(closes.to_numpy(), index=pd.to_datetime(df["timestamp"], utc=True))
     if len(closes) < 2 or not isinstance(closes.index, pd.DatetimeIndex):
         return False
     out = MultiTFSlope.compute(data={'close': closes},
