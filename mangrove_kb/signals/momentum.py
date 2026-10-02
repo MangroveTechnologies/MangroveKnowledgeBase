@@ -2587,7 +2587,7 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
 
 @RuleRegistry.register("multi_tf_trend_bearish")
 def multi_tf_trend_bearish(
-    df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
+    df: pd.DataFrame, higher_tf: str = "1d", window: int = 10, slope_threshold: float = 0.0,
 ) -> bool:
     """Signal: multi_tf_trend_bearish
 
@@ -2595,7 +2595,7 @@ def multi_tf_trend_bearish(
 
     Friendly-Name: Bigger Trend Is Down
     Display-Name: Higher-Timeframe Trend Bearish
-    Short-Description: The trend on a longer chart (weekly by default) is pointing down.
+    Short-Description: The trend on a longer chart (daily by default) is pointing down.
 
     Warmup: (window + 3) * bars_per(higher_tf)
 
@@ -2619,7 +2619,7 @@ def multi_tf_trend_bearish(
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data, indexed by time or carrying a ``timestamp`` column.
-        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1W.
+        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1d.
         window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
         slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
 
@@ -2640,7 +2640,7 @@ def multi_tf_trend_bearish(
 
 @RuleRegistry.register("multi_tf_trend_bullish")
 def multi_tf_trend_bullish(
-    df: pd.DataFrame, higher_tf: str = "1W", window: int = 10, slope_threshold: float = 0.0,
+    df: pd.DataFrame, higher_tf: str = "1d", window: int = 10, slope_threshold: float = 0.0,
 ) -> bool:
     """Signal: multi_tf_trend_bullish
 
@@ -2651,7 +2651,7 @@ def multi_tf_trend_bullish(
 
     Friendly-Name: Bigger Trend Is Up
     Display-Name: Higher-Timeframe Trend Bullish
-    Short-Description: The trend on a longer chart (weekly by default) is pointing up.
+    Short-Description: The trend on a longer chart (daily by default) is pointing up.
 
     Warmup: (window + 3) * bars_per(higher_tf)
 
@@ -2675,7 +2675,7 @@ def multi_tf_trend_bullish(
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data, indexed by time or carrying a ``timestamp`` column.
-        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1W.
+        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1d.
         window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
         slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
 
