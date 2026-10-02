@@ -1577,7 +1577,7 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Options: (3, 5, 8, 13, 21), (5, 8, 13, 21, 34, 55, 89, 144), (8, 13, 21, 34, 55), (10, 20, 40, 80, 160, 320). Default: (5, 8, 13, 21, 34, 55, 89, 144).
 
     Returns:
         bool: True if ribbon is bearish-aligned on the current bar.
@@ -1622,7 +1622,7 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Options: (3, 5, 8, 13, 21), (5, 8, 13, 21, 34, 55, 89, 144), (8, 13, 21, 34, 55), (10, 20, 40, 80, 160, 320). Default: (5, 8, 13, 21, 34, 55, 89, 144).
 
     Returns:
         bool: True if ribbon is bullish-aligned on the current bar.
@@ -1665,7 +1665,7 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
-        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Default: (5, 8, 13, 21, 34, 55, 89, 144).
+        windows (tuple): Strictly increasing tuple of SMA periods. Range: 2-1000 per element. Options: (3, 5, 8, 13, 21), (5, 8, 13, 21, 34, 55, 89, 144), (8, 13, 21, 34, 55), (10, 20, 40, 80, 160, 320). Default: (5, 8, 13, 21, 34, 55, 89, 144).
 
     Returns:
         bool: True if ribbon is neither bullish nor bearish aligned.

@@ -415,7 +415,27 @@ _DEFAULT = re.compile(r"Default:\s*(\([^)]*\)|\S+?)[.,]?(?=\s|$)")
 # cannot express because it is numeric by construction. Lifted so the graph carries the
 # choice set a consumer needs in order to vary the parameter at all; without it a str
 # parameter has nothing to draw from and gets pinned at its default.
-_OPTIONS = re.compile(r"Options:\s*([^.]+?)\s*(?:\.|$)")
+_OPTIONS = re.compile(r"Options:\s*(.+?)\s*(?:\.\s|\.$|$)")
+
+
+def _option_members(text: str) -> list[str]:
+    """Members of an authored ``Options:`` clause, bracket-aware.
+
+    A sequence-valued parameter publishes a domain of sequences --
+    ``Options: (5, 8, 13), (8, 13, 21)`` -- so splitting on every comma would
+    shred each one into single numbers.
+    """
+    out, depth, cur = [], 0, []
+    for ch in text:
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth -= 1
+        if ch == "," and depth == 0:
+            out.append("".join(cur)); cur = []; continue
+        cur.append(ch)
+    out.append("".join(cur))
+    return [o.strip().strip("'\"") for o in out if o.strip()]
 
 
 def _num(x):
@@ -434,6 +454,17 @@ def _num(x):
     if f != f or f in (float("inf"), float("-inf")):   # NaN or infinite: no integer form
         return f
     return int(f) if f == int(f) else f
+
+
+def _lift_literal(ptype, raw):
+    """One authored literal, lifted the way a default is: `_num` for numeric and
+    boolean, `_authored_literal` for the types whose literals are not numbers, and
+    the raw text when neither answers."""
+    v = _num(raw)
+    if v is not None:
+        return v
+    v = _authored_literal(ptype, raw)
+    return raw if v is None else v
 
 
 def _authored_literal(ptype, raw):
@@ -558,10 +589,13 @@ def _signal_param_docs():
                 if opts:
                     # Only when authored. A null on every other parameter would claim the
                     # field was considered and left empty, which is what a null means here.
-                    choices = [o.strip().strip("'\"") for o in opts.group(1).split(",")]
+                    choices = _option_members(opts.group(1))
                     choices = [o for o in choices if o]
                     if choices:
-                        spec["options"] = [_authored_literal(ptype, o) or o for o in choices]
+                        # Same order the default above uses: `_num` owns numeric and
+                        # boolean literals, `_authored_literal` the rest. `x or o` would
+                        # be wrong -- a lifted False would fall back to the text "false".
+                        spec["options"] = [_lift_literal(ptype, o) for o in choices]
                 for t in targets:
                     out.setdefault(t, {}).setdefault(pname, spec)
     return out
@@ -975,11 +1009,10 @@ def _signal_lift(name, fn, facts):
         if opts:
             # Only when authored. A null on every other parameter would claim the field
             # was considered and left empty, which is what a null means in this record.
-            choices = [o.strip().strip("'\"") for o in opts.group(1).split(",")]
+            choices = _option_members(opts.group(1))
             choices = [o for o in choices if o]
             if choices:
-                params[pname]["options"] = [_authored_literal(ptype, o) or o
-                                            for o in choices]
+                params[pname]["options"] = [_lift_literal(ptype, o) for o in choices]
 
     ret = _SIG_RETURNS.search(doc)
     sig_params = ", ".join(f"'{p}': value" for p in params)
