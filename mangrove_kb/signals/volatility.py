@@ -1650,7 +1650,7 @@ def ttm_squeeze_active(df: pd.DataFrame, bb_window: int = 20, bb_std: float = 2.
     Short-Description: Price swings are unusually tight, building up for a larger move.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
-    Warmup: max(bb_window, kc_window) + need - 1
+    Warmup: max(bb_window, kc_window)
 
     Formula:
         squeeze_depth[t] > 0 -- Bollinger Bands entirely inside the Keltner Channel
@@ -1717,7 +1717,7 @@ def ttm_squeeze_fired_bullish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
     Short-Description: A calm, tight market just released with an upward move.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
-    Warmup: max(bb_window, kc_window) + need - 1
+    Warmup: max(bb_window, kc_window, mom_window) + 1
 
     Formula:
         squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] > 0
@@ -1768,7 +1768,7 @@ def ttm_squeeze_fired_bearish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
     Short-Description: A calm, tight market just released with a downward move.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze
-    Warmup: max(bb_window, kc_window) + need - 1
+    Warmup: max(bb_window, kc_window, mom_window) + 1
 
     Formula:
         squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] < 0

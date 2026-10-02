@@ -1557,7 +1557,7 @@ def ma_ribbon_bearish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Short-Description: Short, medium and long price averages are all stacked downward.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
-    Warmup: max(windows_list) - 1
+    Warmup: max(windows) - 1
 
     Formula:
         sma(windows[0])[t] < sma(windows[1])[t] < ... < sma(windows[-1])[t]
@@ -1602,7 +1602,7 @@ def ma_ribbon_bullish(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Short-Description: Short, medium and long price averages are all stacked upward.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
-    Warmup: max(windows_list) - 1
+    Warmup: max(windows) - 1
 
     Formula:
         sma(windows[0])[t] > sma(windows[1])[t] > ... > sma(windows[-1])[t] -- shortest window on top, every gap the same sign
@@ -1645,7 +1645,7 @@ def ma_ribbon_tangled(df: pd.DataFrame, windows: tuple = _DEFAULT_RIBBON_WINDOWS
     Short-Description: Price averages are tangled with no clear order, so the market is choppy.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon
-    Warmup: max(windows_list) - 1
+    Warmup: max(windows) - 1
 
     Formula:
         neither the bullish nor the bearish ordering holds across all of windows
@@ -1699,6 +1699,8 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
     Params:
         fast_limit [default=0.5, min=0.1]: Upper alpha bound
         slow_limit [default=0.05, min=0.01]: Lower alpha bound
+        warmup_bars [default=64, min=6, max=200]: Leading bars discarded as contaminated by the zero
+        seed
 
     Outputs:
         fired [boolean, 0..1]:
@@ -1711,6 +1713,7 @@ def mama_cross_down(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float
         df (pd.DataFrame): DataFrame with OHLCV data.
         fast_limit (float): Upper alpha bound. Range: 0.1-1.0. Default: 0.5.
         slow_limit (float): Lower alpha bound. Range: 0.01-0.5. Default: 0.05.
+        warmup_bars (int): Leading bars discarded as contaminated by the zero seed. Range: 6-200. Default: 64.
 
     Returns:
         bool: True if bearish MAMA/FAMA crossover detected on the current bar.
@@ -1746,6 +1749,8 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
     Params:
         fast_limit [default=0.5, min=0.1]: Upper alpha bound
         slow_limit [default=0.05, min=0.01]: Lower alpha bound
+        warmup_bars [default=64, min=6, max=200]: Leading bars discarded as contaminated by the zero
+        seed
 
     Outputs:
         fired [boolean, 0..1]:
@@ -1758,6 +1763,7 @@ def mama_cross_up(df: pd.DataFrame, fast_limit: float = 0.5, slow_limit: float =
         df (pd.DataFrame): DataFrame with OHLCV data.
         fast_limit (float): Upper alpha bound. Range: 0.1-1.0. Default: 0.5.
         slow_limit (float): Lower alpha bound. Range: 0.01-0.5. Default: 0.05.
+        warmup_bars (int): Leading bars discarded as contaminated by the zero seed. Range: 6-200. Default: 64.
 
     Returns:
         bool: True if bullish MAMA/FAMA crossover detected on the current bar.
