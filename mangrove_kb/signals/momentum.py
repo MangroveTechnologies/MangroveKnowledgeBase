@@ -2477,7 +2477,7 @@ def macd_positive(
     Short-Description: Momentum is running above its recent average, favoring upside.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator
-    Warmup: min_periods - 1
+    Warmup: window_slow + window_sign - 1
 
     Formula:
         histogram[t] > 0 -- the HISTOGRAM, macd minus signal; macd_line_positive is the one that reads the MACD line itself
@@ -2597,7 +2597,7 @@ def multi_tf_trend_bearish(
     Display-Name: Higher-Timeframe Trend Bearish
     Short-Description: The trend on a longer chart (weekly by default) is pointing down.
 
-    Warmup: window * (base bars per higher_tf period)
+    Warmup: window * bars_per(higher_tf)
 
     Formula:
         higher_tf_trend[t] == -1
@@ -2651,7 +2651,7 @@ def multi_tf_trend_bullish(
     Display-Name: Higher-Timeframe Trend Bullish
     Short-Description: The trend on a longer chart (weekly by default) is pointing up.
 
-    Warmup: window * (base bars per higher_tf period)
+    Warmup: window * bars_per(higher_tf)
 
     Formula:
         higher_tf_trend[t] == 1

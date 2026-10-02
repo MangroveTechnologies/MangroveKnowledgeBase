@@ -12428,7 +12428,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
-    "warmup_bars": "max(windows_list) - 1",
+    "warmup_bars": "max(windows) - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_bearish', 'params': {'windows': value}}, df)",
     "formula": "sma(windows[0])[t] < sma(windows[1])[t] < ... < sma(windows[-1])[t]",
@@ -12483,7 +12483,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
-    "warmup_bars": "max(windows_list) - 1",
+    "warmup_bars": "max(windows) - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_bullish', 'params': {'windows': value}}, df)",
     "formula": "sma(windows[0])[t] > sma(windows[1])[t] > ... > sma(windows[-1])[t] -- shortest window on top, every gap the same sign",
@@ -12538,7 +12538,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/moving-average-ribbon",
-    "warmup_bars": "max(windows_list) - 1",
+    "warmup_bars": "max(windows) - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ma_ribbon_tangled', 'params': {'windows': value}}, df)",
     "formula": "neither the bullish nor the bearish ordering holds across all of windows",
@@ -12925,7 +12925,7 @@
    "props": {
     "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/macd-moving-average-convergence-divergence-oscillator",
-    "warmup_bars": "min_periods - 1",
+    "warmup_bars": "window_slow + window_sign - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'macd_positive', 'params': {'window_fast': value, 'window_slow': value, 'window_sign': value}}, df)",
     "formula": "histogram[t] > 0 -- the HISTOGRAM, macd minus signal; macd_line_positive is the one that reads the MACD line itself",
@@ -12987,7 +12987,7 @@
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "warmup_bars",
     "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_down', 'params': {'fast_limit': value, 'slow_limit': value}}, df)",
+    "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_down', 'params': {'fast_limit': value, 'slow_limit': value, 'warmup_bars': value}}, df)",
     "formula": "mama[t-1] >= fama[t-1] and mama[t] < fama[t]",
     "friendly_name": "Adaptive Trend Turns Down",
     "display_name": "MAMA/FAMA Bearish Crossover",
@@ -13012,6 +13012,13 @@
       "min": 0.01,
       "max": 0.5,
       "description": "Lower alpha bound"
+     },
+     "warmup_bars": {
+      "type": "int",
+      "default": 64,
+      "min": 6,
+      "max": 200,
+      "description": "Leading bars discarded as contaminated by the zero seed"
      }
     },
     "outputs": {
@@ -13040,7 +13047,7 @@
     "reference": "https://ta-lib.github.io/ta-lib-python/func_groups/overlap_studies.html",
     "warmup_bars": "warmup_bars",
     "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_up', 'params': {'fast_limit': value, 'slow_limit': value}}, df)",
+    "usage_example": "RuleRegistry.evaluate({'name': 'mama_cross_up', 'params': {'fast_limit': value, 'slow_limit': value, 'warmup_bars': value}}, df)",
     "formula": "mama[t-1] <= fama[t-1] and mama[t] > fama[t] -- MAMA against its own following adaptive line FAMA, not a second window",
     "friendly_name": "Adaptive Trend Turns Up",
     "display_name": "MAMA/FAMA Bullish Crossover",
@@ -13065,6 +13072,13 @@
       "min": 0.01,
       "max": 0.5,
       "description": "Lower alpha bound"
+     },
+     "warmup_bars": {
+      "type": "int",
+      "default": 64,
+      "min": 6,
+      "max": 200,
+      "description": "Leading bars discarded as contaminated by the zero seed"
      }
     },
     "outputs": {
@@ -13681,7 +13695,7 @@
    "props": {
     "source_module": "momentum",
     "reference": null,
-    "warmup_bars": "window * (base bars per higher_tf period)",
+    "warmup_bars": "window * bars_per(higher_tf)",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bearish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
     "formula": "higher_tf_trend[t] == -1",
@@ -13741,7 +13755,7 @@
    "props": {
     "source_module": "momentum",
     "reference": null,
-    "warmup_bars": "window * (base bars per higher_tf period)",
+    "warmup_bars": "window * bars_per(higher_tf)",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'multi_tf_trend_bullish', 'params': {'higher_tf': value, 'window': value, 'slope_threshold': value}}, df)",
     "formula": "higher_tf_trend[t] == 1",
@@ -17575,7 +17589,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
-    "warmup_bars": "max(bb_window, kc_window) + need - 1",
+    "warmup_bars": "max(bb_window, kc_window)",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_active', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
     "formula": "squeeze_depth[t] > 0 -- Bollinger Bands entirely inside the Keltner Channel",
@@ -17657,7 +17671,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
-    "warmup_bars": "max(bb_window, kc_window) + need - 1",
+    "warmup_bars": "max(bb_window, kc_window, mom_window) + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_fired_bearish', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
     "formula": "squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] < 0",
@@ -17739,7 +17753,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/ttm-squeeze",
-    "warmup_bars": "max(bb_window, kc_window) + need - 1",
+    "warmup_bars": "max(bb_window, kc_window, mom_window) + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'ttm_squeeze_fired_bullish', 'params': {'bb_window': value, 'bb_std': value, 'kc_window': value, 'kc_atr_mult': value, 'mom_window': value}}, df)",
     "formula": "squeeze_depth[t-1] > 0 and squeeze_depth[t] <= 0 and momentum[t] > 0",
