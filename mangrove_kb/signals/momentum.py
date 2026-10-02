@@ -2597,7 +2597,7 @@ def multi_tf_trend_bearish(
     Display-Name: Higher-Timeframe Trend Bearish
     Short-Description: The trend on a longer chart (weekly by default) is pointing down.
 
-    Warmup: window * bars_per(higher_tf)
+    Warmup: (window + 3) * bars_per(higher_tf)
 
     Formula:
         higher_tf_trend[t] == -1
@@ -2651,7 +2651,7 @@ def multi_tf_trend_bullish(
     Display-Name: Higher-Timeframe Trend Bullish
     Short-Description: The trend on a longer chart (weekly by default) is pointing up.
 
-    Warmup: window * bars_per(higher_tf)
+    Warmup: (window + 3) * bars_per(higher_tf)
 
     Formula:
         higher_tf_trend[t] == 1
