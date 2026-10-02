@@ -181,7 +181,7 @@ def roc_momentum_shift(df: pd.DataFrame, window: int = 12, direction: str = "bul
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         window (int): ROC period. Range: 1-50. Default: 12.
-        direction (str): Direction: 'bullish' for cross above zero, 'bearish' for cross below. Default: bullish.
+        direction (str): Direction: 'bullish' for cross above zero, 'bearish' for cross below. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True if momentum shift detected, False otherwise.
@@ -355,7 +355,7 @@ def ao_zero_cross(df: pd.DataFrame, window_fast: int = 5, window_slow: int = 34,
         df (pd.DataFrame): DataFrame with OHLCV data.
         window_fast (int): Fast SMA window. Range: 2-15. Default: 5.
         window_slow (int): Slow SMA window. Range: 20-60. Default: 34.
-        direction (str): Direction: 'bullish' for cross above, 'bearish' for cross below. Default: bullish.
+        direction (str): Direction: 'bullish' for cross above, 'bearish' for cross below. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True if zero cross detected, False otherwise.
@@ -1937,7 +1937,7 @@ def aroon_crossover(df: pd.DataFrame, window: int = 25, direction: str = "bullis
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         window (int): Lookback period. Range: 10-50. Default: 25.
-        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True if crossover detected, False otherwise.
@@ -2619,7 +2619,7 @@ def multi_tf_trend_bearish(
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data, indexed by time or carrying a ``timestamp`` column.
-        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1d.
+        higher_tf (str): Pandas offset alias for the higher timeframe. Options: 4h, 1d, 1W. Default: 1d.
         window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
         slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
 
@@ -2675,7 +2675,7 @@ def multi_tf_trend_bullish(
 
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data, indexed by time or carrying a ``timestamp`` column.
-        higher_tf (str): Pandas offset alias for the higher timeframe. Range: 1min-1Y. Default: 1d.
+        higher_tf (str): Pandas offset alias for the higher timeframe. Options: 4h, 1d, 1W. Default: 1d.
         window (int): EMA period on the resampled close. Range: 2-100. Default: 10.
         slope_threshold (float): Relative slope threshold for non-flat classification. Range: 0.0-0.5. Default: 0.0.
 
@@ -2933,7 +2933,7 @@ def vortex_crossover(df: pd.DataFrame, window: int = 14, direction: str = "bulli
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         window (int): Vortex period. Range: 5-30. Default: 14.
-        direction (str): Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish'. Default: bullish.
+        direction (str): Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish'. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True if crossover detected, False otherwise.
