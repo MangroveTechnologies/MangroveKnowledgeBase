@@ -99,6 +99,14 @@ _RANGE_RE = re.compile(
     r"Range:\s*(-?[\d.]+)-(-?[\d.]+)"
 )
 
+#: ``Options: 4h, 1d, 1W`` -- the authored domain of a parameter that takes one of a
+#: set rather than anything in a range. A str parameter had nowhere to declare this:
+#: ``Range:`` is numeric-only by construction, so an authored ``Range: 1min-1Y`` never
+#: matched and the lifted spec came back with no bounds at all. A consumer then has
+#: nothing to choose from and pins the parameter at its default, which is how
+#: ``higher_tf`` stayed on ``1W`` for every run of every sweep.
+_OPTIONS_RE = re.compile(r"Options:\s*([^.]+?)\s*(?:\.|$)", re.MULTILINE)
+
 # Extracts Default from a description string: "Default: value." or "Default: value"
 _DEFAULT_RE = re.compile(
     r"Default:\s*(.+?)\.?\s*$"
@@ -132,6 +140,16 @@ def _convert_value(raw: str, type_str: str) -> Any:
     elif type_str == "str":
         # Strip surrounding quotes if present
         return raw.strip("'\"")
+    elif type_str in ("tuple", "list", "sequence"):
+        # Without this the default falls through to the else below and lifts as the
+        # literal text "(5, 8, 13, 21, 34, 55, 89, 144)". A consumer then hands a
+        # string to a signal that expects a sequence, and anything reading it
+        # elementwise -- max(windows), len(windows) -- is reading characters.
+        try:
+            parsed = ast.literal_eval(raw)
+        except (ValueError, SyntaxError):
+            return raw
+        return list(parsed) if isinstance(parsed, (list, tuple)) else raw
     else:
         return raw
 
@@ -286,9 +304,18 @@ def _parse_params_section(docstring: str) -> dict:
         desc_text = rest
         # Remove Range and Default portions to get clean description
         desc_clean = re.sub(r"\s*Range:.*$", "", desc_text)
+        desc_clean = re.sub(r"\s*Options:.*$", "", desc_clean)
         desc_clean = re.sub(r"\s*Default:.*$", "", desc_clean)
         desc_clean = desc_clean.strip().rstrip(".")
         param_meta["description"] = desc_clean
+
+        # Extract Options (a set-valued domain), which Range cannot express.
+        options_match = _OPTIONS_RE.search(rest)
+        if options_match:
+            opts = [o.strip().strip("'\"") for o in options_match.group(1).split(",")]
+            opts = [o for o in opts if o]
+            if opts:
+                param_meta["options"] = [_convert_value(o, clean_type) for o in opts]
 
         # Extract Range
         range_match = _RANGE_RE.search(rest)
@@ -704,7 +731,7 @@ def parse_authored(docstring: str) -> dict:
                 if br:
                     for part in rest.rstrip("]").split(","):
                         kk, _, vv = part.partition("=")
-                        if kk.strip() in ("default", "min", "max"):
+                        if kk.strip() in ("default", "min", "max", "options"):
                             spec[kk.strip()] = ast.literal_eval(vv.strip())
                 out[head.strip()] = spec
             res[_key] = out

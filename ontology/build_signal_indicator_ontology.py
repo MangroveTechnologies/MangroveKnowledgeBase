@@ -411,6 +411,11 @@ _RANGE = re.compile(r"Range:\s*(-?[\d.]+?)\s*-\s*(-?[\d.]+?)[.,]?(?=\s|$)")
 # The alternation's first arm keeps a parenthesized tuple whole: `Default: (5, 8, 13)` is one
 # value, and the bare-token arm stopped at `(5` -- see `_default_value`.
 _DEFAULT = re.compile(r"Default:\s*(\([^)]*\)|\S+?)[.,]?(?=\s|$)")
+# `Options: 4h, 1d, 1W` -- the authored domain of a set-valued parameter, which `Range:`
+# cannot express because it is numeric by construction. Lifted so the graph carries the
+# choice set a consumer needs in order to vary the parameter at all; without it a str
+# parameter has nothing to draw from and gets pinned at its default.
+_OPTIONS = re.compile(r"Options:\s*([^.]+?)\s*(?:\.|$)")
 
 
 def _num(x):
@@ -539,14 +544,24 @@ def _signal_param_docs():
                 if not m or m.group(1) == "df":
                     continue
                 pname, ptype, rest = m.group(1), m.group(2).strip(), m.group(3).strip()
-                desc = re.split(r"\s*(?:Range|Default):", rest)[0].strip().rstrip(".")
+                # Options belongs in this list: it is an authored clause like Range and
+                # Default, so leaving it out leaked the clause text into the description.
+                desc = re.split(r"\s*(?:Range|Options|Default):", rest)[0].strip().rstrip(".")
                 rng, dflt = _RANGE.search(rest), _DEFAULT.search(rest)
+                opts = _OPTIONS.search(rest)
                 dval = (_num(dflt.group(1)) if _num(dflt.group(1)) is not None
                         else _authored_literal(ptype, dflt.group(1))) if dflt else None
                 spec = {"description": desc or None,
                         "min": _num(rng.group(1)) if rng else None,
                         "max": _num(rng.group(2)) if rng else None,
                         "default": dval}
+                if opts:
+                    # Only when authored. A null on every other parameter would claim the
+                    # field was considered and left empty, which is what a null means here.
+                    choices = [o.strip().strip("'\"") for o in opts.group(1).split(",")]
+                    choices = [o for o in choices if o]
+                    if choices:
+                        spec["options"] = [_authored_literal(ptype, o) or o for o in choices]
                 for t in targets:
                     out.setdefault(t, {}).setdefault(pname, spec)
     return out
@@ -939,8 +954,11 @@ def _signal_lift(name, fn, facts):
         if not m or m.group(1) == "df":
             continue
         pname, ptype, rest = m.group(1), m.group(2).strip(), m.group(3).strip()
-        desc = re.split(r"\s*(?:Range|Default):", rest)[0].strip().rstrip(".")
+        # Options is an authored clause like Range and Default, so it belongs in this
+        # split; leaving it out leaked the clause text into the description.
+        desc = re.split(r"\s*(?:Range|Options|Default):", rest)[0].strip().rstrip(".")
         rng, dflt = _RANGE.search(rest), _DEFAULT.search(rest)
+        opts = _OPTIONS.search(rest)
 
         # `_num` narrows an integral value to int, which is right for an int param and wrong for a
         # float one: `threshold` is declared float with default 5.0 and Range 1-20, and came out
@@ -954,6 +972,14 @@ def _signal_lift(name, fn, facts):
                          "min": cast(_num(rng.group(1))) if rng else None,
                          "max": cast(_num(rng.group(2))) if rng else None,
                          "description": desc or None}
+        if opts:
+            # Only when authored. A null on every other parameter would claim the field
+            # was considered and left empty, which is what a null means in this record.
+            choices = [o.strip().strip("'\"") for o in opts.group(1).split(",")]
+            choices = [o for o in choices if o]
+            if choices:
+                params[pname]["options"] = [_authored_literal(ptype, o) or o
+                                            for o in choices]
 
     ret = _SIG_RETURNS.search(doc)
     sig_params = ", ".join(f"'{p}': value" for p in params)

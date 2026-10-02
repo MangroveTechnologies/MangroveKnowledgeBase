@@ -1034,7 +1034,7 @@ def ema_crossover(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21,
         df (pd.DataFrame): DataFrame with OHLCV data.
         window_fast (int): Fast EMA window in bars. Range: 1-200. Default: 9.
         window_slow (int): Slow EMA window in bars. Range: 1-200. Default: 21.
-        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True if crossover detected in the specified direction, False otherwise.
@@ -1955,7 +1955,7 @@ def sma_crossover(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21,
         df (pd.DataFrame): DataFrame with OHLCV data.
         window_fast (int): Fast SMA window in bars. Range: 1-200. Default: 9.
         window_slow (int): Slow SMA window in bars. Range: 1-200. Default: 21.
-        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True if crossover detected in the specified direction, False otherwise.
@@ -2628,7 +2628,7 @@ def ichimoku_tk_cross(df: pd.DataFrame, window_tenkan: int = 9, window_kijun: in
         window_tenkan (int): Tenkan-sen (conversion line) window. Range: 5-20. Default: 9.
         window_kijun (int): Kijun-sen (base line) window. Range: 15-40. Default: 26.
         window_senkou (int): Senkou Span B (leading span B) window. Range: 30-70. Default: 52.
-        direction (str): Crossover direction, 'bullish' or 'bearish'. Default: bullish.
+        direction (str): Crossover direction, 'bullish' or 'bearish'. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True if TK cross detected, False otherwise.
@@ -3014,7 +3014,7 @@ def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, d
         df (pd.DataFrame): DataFrame with OHLCV data.
         step (float): PSAR acceleration factor step. Range: 0.01-0.1. Default: 0.02.
         max_step (float): PSAR max acceleration factor. Range: 0.1-0.5. Default: 0.2.
-        direction (str): Reversal direction, 'bullish' (level moves below price) or 'bearish'. Default: bullish.
+        direction (str): Reversal direction, 'bullish' (level moves below price) or 'bearish'. Options: bullish, bearish. Default: bullish.
 
     Returns:
         bool: True on the bar the SAR level changes side in the chosen direction.

@@ -37,7 +37,7 @@ def test_a_decimal_maximum_survives_the_sentence_period(params):
 
 def test_a_str_default_is_authored_not_null(params):
     assert params["procedure:signal-ema-crossover"]["direction"]["default"] == "bullish"
-    assert params["procedure:signal-multi-tf-trend-bullish"]["higher_tf"]["default"] == "1W"
+    assert params["procedure:signal-multi-tf-trend-bullish"]["higher_tf"]["default"] == "1d"
 
 
 def test_a_tuple_default_lands_as_a_list(params):

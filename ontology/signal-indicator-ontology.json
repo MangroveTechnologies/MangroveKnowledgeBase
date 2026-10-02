@@ -3323,7 +3323,7 @@
     "params": {
      "higher_tf": {
       "type": "str",
-      "default": "1W",
+      "default": "1d",
       "min": null,
       "max": null,
       "description": "Pandas offset alias for the higher timeframe"
@@ -6839,7 +6839,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Direction: 'bullish' for cross above, 'bearish' for cross below"
+      "description": "Direction: 'bullish' for cross above, 'bearish' for cross below",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
@@ -6896,7 +6900,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Crossover direction, 'bullish' or 'bearish'"
+      "description": "Crossover direction, 'bullish' or 'bearish'",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
@@ -9687,7 +9695,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Crossover direction, 'bullish' or 'bearish'"
+      "description": "Crossover direction, 'bullish' or 'bearish'",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
@@ -10712,7 +10724,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Crossover direction, 'bullish' or 'bearish'"
+      "description": "Crossover direction, 'bullish' or 'bearish'",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
@@ -13701,7 +13717,7 @@
     "formula": "higher_tf_trend[t] == -1",
     "friendly_name": "Bigger Trend Is Down",
     "display_name": "Higher-Timeframe Trend Bearish",
-    "short_description": "The trend on a longer chart (weekly by default) is pointing down.",
+    "short_description": "The trend on a longer chart (daily by default) is pointing down.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13711,10 +13727,15 @@
     "params": {
      "higher_tf": {
       "type": "str",
-      "default": "1W",
+      "default": "1d",
       "min": null,
       "max": null,
-      "description": "Pandas offset alias for the higher timeframe"
+      "description": "Pandas offset alias for the higher timeframe",
+      "options": [
+       "4h",
+       "1d",
+       "1W"
+      ]
      },
      "window": {
       "type": "int",
@@ -13761,7 +13782,7 @@
     "formula": "higher_tf_trend[t] == 1",
     "friendly_name": "Bigger Trend Is Up",
     "display_name": "Higher-Timeframe Trend Bullish",
-    "short_description": "The trend on a longer chart (weekly by default) is pointing up.",
+    "short_description": "The trend on a longer chart (daily by default) is pointing up.",
     "inputs": {
      "close": {
       "type": "series",
@@ -13771,10 +13792,15 @@
     "params": {
      "higher_tf": {
       "type": "str",
-      "default": "1W",
+      "default": "1d",
       "min": null,
       "max": null,
-      "description": "Pandas offset alias for the higher timeframe"
+      "description": "Pandas offset alias for the higher timeframe",
+      "options": [
+       "4h",
+       "1d",
+       "1W"
+      ]
      },
      "window": {
       "type": "int",
@@ -14644,7 +14670,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Reversal direction, 'bullish' (level moves below price) or 'bearish'"
+      "description": "Reversal direction, 'bullish' (level moves below price) or 'bearish'",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
@@ -14933,7 +14963,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Direction: 'bullish' for cross above zero, 'bearish' for cross below"
+      "description": "Direction: 'bullish' for cross above zero, 'bearish' for cross below",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
@@ -15730,7 +15764,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Crossover direction, 'bullish' or 'bearish'"
+      "description": "Crossover direction, 'bullish' or 'bearish'",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
@@ -18587,7 +18625,11 @@
       "default": "bullish",
       "min": null,
       "max": null,
-      "description": "Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish'"
+      "description": "Crossover direction, 'bullish' (+VI crosses above -VI) or 'bearish'",
+      "options": [
+       "bullish",
+       "bearish"
+      ]
      }
     },
     "outputs": {
