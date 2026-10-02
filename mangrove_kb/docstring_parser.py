@@ -105,7 +105,7 @@ _RANGE_RE = re.compile(
 #: matched and the lifted spec came back with no bounds at all. A consumer then has
 #: nothing to choose from and pins the parameter at its default, which is how
 #: ``higher_tf`` stayed on ``1W`` for every run of every sweep.
-_OPTIONS_RE = re.compile(r"Options:\s*([^.]+?)\s*(?:\.|$)", re.MULTILINE)
+_OPTIONS_RE = re.compile(r"Options:\s*(.+?)\s*(?:\.\s|\.$|$)", re.MULTILINE)
 
 # Extracts Default from a description string: "Default: value." or "Default: value"
 _DEFAULT_RE = re.compile(
@@ -116,6 +116,28 @@ _DEFAULT_RE = re.compile(
 # ---------------------------------------------------------------------------
 # Value conversion helpers
 # ---------------------------------------------------------------------------
+
+def _split_options(text: str) -> list[str]:
+    """Split an authored ``Options:`` clause into its members.
+
+    Bracket-aware, because a sequence-valued parameter publishes its domain as a
+    list of sequences -- ``Options: (5, 8, 13), (8, 13, 21)`` -- and splitting on
+    every comma would shred those into single numbers.
+    """
+    out, depth, cur = [], 0, []
+    for ch in text:
+        if ch in "([":
+            depth += 1
+        elif ch in ")]":
+            depth -= 1
+        if ch == "," and depth == 0:
+            out.append("".join(cur))
+            cur = []
+            continue
+        cur.append(ch)
+    out.append("".join(cur))
+    return [o.strip().strip("'\"") for o in out if o.strip()]
+
 
 def _convert_value(raw: str, type_str: str) -> Any:
     """Convert a raw string value to the appropriate Python type.
@@ -312,8 +334,7 @@ def _parse_params_section(docstring: str) -> dict:
         # Extract Options (a set-valued domain), which Range cannot express.
         options_match = _OPTIONS_RE.search(rest)
         if options_match:
-            opts = [o.strip().strip("'\"") for o in options_match.group(1).split(",")]
-            opts = [o for o in opts if o]
+            opts = _split_options(options_match.group(1))
             if opts:
                 param_meta["options"] = [_convert_value(o, clean_type) for o in opts]
 

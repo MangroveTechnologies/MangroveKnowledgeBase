@@ -808,7 +808,7 @@ def piercing_line_trigger(df: pd.DataFrame, min_penetration: float = 0.5, requir
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         min_penetration (float): Minimum penetration into previous body. Range: 0.3-0.8. Default: 0.5.
-        require_gap (bool): If True, requires open below previous low (classic Nison), which cannot occur in a 24/7 market. If False, requires open below previous close. Range: true-false. Default: false.
+        require_gap (bool): If True, requires open below previous low (classic Nison), which cannot occur in a 24/7 market. If False, requires open below previous close. Options: true, false. Default: false.
 
     Returns:
         bool: True if piercing line detected on current bar, False otherwise.
@@ -862,7 +862,7 @@ def dark_cloud_cover_trigger(df: pd.DataFrame, min_penetration: float = 0.5, req
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         min_penetration (float): Minimum penetration into previous body. Range: 0.3-0.8. Default: 0.5.
-        require_gap (bool): If True, requires open above previous high (classic Nison), which cannot occur in a 24/7 market. If False, requires open above previous close. Range: true-false. Default: false.
+        require_gap (bool): If True, requires open above previous high (classic Nison), which cannot occur in a 24/7 market. If False, requires open above previous close. Options: true, false. Default: false.
 
     Returns:
         bool: True if dark cloud cover detected on current bar, False otherwise.

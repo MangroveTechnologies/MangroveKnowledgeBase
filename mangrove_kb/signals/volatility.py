@@ -593,7 +593,7 @@ def kc_upper_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
         window (int): EMA period. Range: 10-50. Default: 20.
         window_atr (int): ATR period. Range: 5-30. Default: 10.
         multiplier (float): ATR multiplier for band width. Range: 0.5-5.0. Default: 2.0.
-        original_version (bool): Use original Keltner Channel formula instead of EMA+ATR. Default: False.
+        original_version (bool): Use original Keltner Channel formula instead of EMA+ATR. Options: true, false. Default: False.
 
     Returns:
         bool: True on the bar where close crosses above upper band.
@@ -661,7 +661,7 @@ def kc_lower_breakout(df: pd.DataFrame, window: int = 20, window_atr: int = 10, 
         window (int): EMA period. Range: 10-50. Default: 20.
         window_atr (int): ATR period. Range: 5-30. Default: 10.
         multiplier (float): ATR multiplier for band width. Range: 0.5-5.0. Default: 2.0.
-        original_version (bool): Use original Keltner Channel formula instead of EMA+ATR. Default: False.
+        original_version (bool): Use original Keltner Channel formula instead of EMA+ATR. Options: true, false. Default: False.
 
     Returns:
         bool: True on the bar where close crosses below lower band.

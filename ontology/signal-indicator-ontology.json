@@ -9084,7 +9084,11 @@
       "default": false,
       "min": null,
       "max": null,
-      "description": "If True, requires open above previous high (classic Nison), which cannot occur in a 24/7 market. If False, requires open above previous close"
+      "description": "If True, requires open above previous high (classic Nison), which cannot occur in a 24/7 market. If False, requires open above previous close",
+      "options": [
+       true,
+       false
+      ]
      }
     },
     "outputs": {
@@ -11785,7 +11789,11 @@
       "default": false,
       "min": null,
       "max": null,
-      "description": "Use original Keltner Channel formula instead of EMA+ATR"
+      "description": "Use original Keltner Channel formula instead of EMA+ATR",
+      "options": [
+       true,
+       false
+      ]
      }
     },
     "outputs": {
@@ -11860,7 +11868,11 @@
       "default": false,
       "min": null,
       "max": null,
-      "description": "Use original Keltner Channel formula instead of EMA+ATR"
+      "description": "Use original Keltner Channel formula instead of EMA+ATR",
+      "options": [
+       true,
+       false
+      ]
      }
     },
     "outputs": {
@@ -12472,7 +12484,41 @@
       ],
       "min": 2,
       "max": 1000,
-      "description": "Strictly increasing tuple of SMA periods"
+      "description": "Strictly increasing tuple of SMA periods",
+      "options": [
+       [
+        3,
+        5,
+        8,
+        13,
+        21
+       ],
+       [
+        5,
+        8,
+        13,
+        21,
+        34,
+        55,
+        89,
+        144
+       ],
+       [
+        8,
+        13,
+        21,
+        34,
+        55
+       ],
+       [
+        10,
+        20,
+        40,
+        80,
+        160,
+        320
+       ]
+      ]
      }
     },
     "outputs": {
@@ -12527,7 +12573,41 @@
       ],
       "min": 2,
       "max": 1000,
-      "description": "Strictly increasing tuple of SMA periods"
+      "description": "Strictly increasing tuple of SMA periods",
+      "options": [
+       [
+        3,
+        5,
+        8,
+        13,
+        21
+       ],
+       [
+        5,
+        8,
+        13,
+        21,
+        34,
+        55,
+        89,
+        144
+       ],
+       [
+        8,
+        13,
+        21,
+        34,
+        55
+       ],
+       [
+        10,
+        20,
+        40,
+        80,
+        160,
+        320
+       ]
+      ]
      }
     },
     "outputs": {
@@ -12582,7 +12662,41 @@
       ],
       "min": 2,
       "max": 1000,
-      "description": "Strictly increasing tuple of SMA periods"
+      "description": "Strictly increasing tuple of SMA periods",
+      "options": [
+       [
+        3,
+        5,
+        8,
+        13,
+        21
+       ],
+       [
+        5,
+        8,
+        13,
+        21,
+        34,
+        55,
+        89,
+        144
+       ],
+       [
+        8,
+        13,
+        21,
+        34,
+        55
+       ],
+       [
+        10,
+        20,
+        40,
+        80,
+        160,
+        320
+       ]
+      ]
      }
     },
     "outputs": {
@@ -14309,7 +14423,11 @@
       "default": false,
       "min": null,
       "max": null,
-      "description": "If True, requires open below previous low (classic Nison), which cannot occur in a 24/7 market. If False, requires open below previous close"
+      "description": "If True, requires open below previous low (classic Nison), which cannot occur in a 24/7 market. If False, requires open below previous close",
+      "options": [
+       true,
+       false
+      ]
      }
     },
     "outputs": {
