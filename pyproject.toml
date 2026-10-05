@@ -41,33 +41,51 @@ dependencies = [
 # model that built the vectors, and there is no way to embed a phrase the model has not seen
 # without the model.
 #
-# It is an extra rather than a requirement because of what it weighs. `sentence-transformers` pulls
-# torch, and pip's default torch wheel bundles the whole CUDA stack -- measured in clean venvs:
+# `onnxruntime` + `tokenizers` read an ONNX export of the same checkpoint that is bundled in the
+# wheel (`mangrove_kb/data/onnx-encoder/`, written by `ontology/build_onnx_encoder.py`) -- no
+# `torch`, no network, no download. Measured against the torch encoder this replaced, over this
+# graph's corpus plus the question set `tests/test_the_graph_answers_questions.py` uses: cosine
+# similarity min 0.99999982 / mean 1.0, so this is a lossless re-export, not an approximation.
+# Loading it costs ~157 MiB RSS and ~0.3 s for the first question, against ~464 MiB and ~6.4 s for
+# `sentence-transformers` (measured fresh-process, Python 3.11, `/proc/self/status`).
 #
-#     pip install mangrove-kb                    373 MB    ask() answers 13 of 25
-#     pip install mangrove-kb[semantic]        5,276 MB    ask() answers 18 of 25
-#     ...with CPU-only torch installed first   1,402 MB    ask() answers 18 of 25
+# Without this extra, `ask()` still answers, seeded by the LSA index alone. Worse, never broken.
+semantic = [
+    "onnxruntime>=1.17",
+    "tokenizers>=0.19",
+]
+
+# The torch encoder this library used before the ONNX export above, kept as a fallback rather than
+# removed -- `DenseIndex.model` tries ONNX first and falls back to this only if the ONNX path
+# cannot load. Nobody needs it to use `ask()`; it exists for a model swap that leaves this
+# checkpoint behind, or a GPU host that wants torch's batching over onnxruntime's. Pulls the whole
+# torch dependency tree, which is why it is its own extra and not folded into `semantic`:
 #
-# 3.4 GB of that is nvidia CUDA libraries and triton, for a GPU nothing here uses: the node vectors
-# are precomputed, and the only inference is one short question per call, ~50ms on a CPU.
+#     pip install mangrove-kb                        285 MB    ask() answers 13 of 25
+#     pip install mangrove-kb[semantic]              395 MB    ask() answers 18 of 25
+#     pip install mangrove-kb[semantic-torch]      5,873 MB    ask() answers 18 of 25 (same answers)
+#     ...with CPU-only torch installed first       1,438 MB    ask() answers 18 of 25
+#
+# 3.4 GB of the GPU figure is nvidia CUDA libraries and triton, for a GPU nothing here uses: the
+# node vectors are precomputed, and the only inference is one short question per call.
 #
 # **CPU or GPU is chosen at install time, not here.** There is no `torch-cpu` on PyPI and torch
 # publishes no extra for it -- the `+cpu` wheels carry the same version from a different index -- so
 # no dependency declaration can express it. Install torch first to choose:
 #
 #     pip install torch --index-url https://download.pytorch.org/whl/cpu   # CPU
-#     pip install mangrove-kb[semantic]
-#
-# Without this extra, `ask()` still answers, seeded by the LSA index alone. Worse, never broken.
-semantic = [
+#     pip install mangrove-kb[semantic-torch]
+semantic-torch = [
     "sentence-transformers>=3.0",
 ]
 
 dev = [
-    # The `semantic` extra, so the suite exercises the encoder path. Without it CI installs a
-    # graph with no way to embed a question, and every test that measures `ask()` fails on an
-    # ImportError rather than on anything about the graph.
+    # Both encoder paths, so the suite exercises each. Without `semantic` CI installs a graph with
+    # no way to embed a question at all, and every test that measures `ask()` fails on an
+    # ImportError rather than on anything about the graph. `semantic-torch` is here only to keep
+    # the fallback path from rotting unexercised; nothing in the default path needs it.
     "mangrove-kb[semantic]",
+    "mangrove-kb[semantic-torch]",
     # Builds the semantic index (`ontology/build_semantic_index.py`); never needed to read one --
     # the query side folds a question through the saved projection with numpy alone.
     "scikit-learn>=1.3",
@@ -128,6 +146,12 @@ mangrove_kb = [
     # numpy alone. It lives inside the package because it is data the library reads at runtime, not
     # documentation about it.
     "data/*.npz",
+    # The ONNX encoder: `model.onnx` + `tokenizer.json`, exported by `ontology/build_onnx_encoder.py`.
+    # 79.3 MiB compressed, of an 83.7 MiB wheel (model.onnx is 86.2 MiB raw; zip's DEFLATE gets
+    # it to 79.0 MiB). Bundled rather than fetched at install or build time so
+    # `KnowledgeGraph.load().ask()` needs no network at all, the same guarantee the rest of the
+    # package already makes.
+    "data/onnx-encoder/*",
 ]
 
 [tool.setuptools_scm]
@@ -142,7 +166,8 @@ target-version = ["py310"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 markers = [
-    # Loads the sentence encoder, which downloads ~90 MB the first time. Deselect with
+    # Loads the `sentence-transformers` TORCH FALLBACK, which downloads ~90 MB the first time --
+    # the default path is the bundled ONNX export and needs no network. Deselect with
     # `-m "not model"` on a machine with no network and no HuggingFace cache.
-    "model: needs the sentence-transformers model, not just the committed vectors",
+    "model: needs the sentence-transformers fallback model, not just the committed vectors",
 ]

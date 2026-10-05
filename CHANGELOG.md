@@ -6,6 +6,47 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### The dense encoder is ONNX by default; torch is now an optional fallback
+
+`DenseIndex.model` loads `onnxruntime` + `tokenizers` over an ONNX export of the MiniLM checkpoint
+bundled in the wheel (`mangrove_kb/data/onnx-encoder/`, written by the new
+`ontology/build_onnx_encoder.py`) instead of `sentence-transformers`. No torch, no network, no
+download -- the `semantic` extra is now `onnxruntime>=1.17` + `tokenizers>=0.19`.
+
+Measured against the torch model it replaces, over this graph's corpus (1,630 rows) and the
+question set `tests/test_the_graph_answers_questions.py` uses (25 questions): cosine similarity
+min 0.99999982, mean 1.0 -- a lossless re-export. `ask()`'s paraphrase floor is unchanged (18/25).
+A fresh-process load of the first question costs ~157 MiB RSS and ~0.3 s, against ~464 MiB and
+~6.4 s for the torch path (measured via `/proc/self/status`, Python 3.11). Installed size:
+`mangrove-kb[semantic]` is 395 MB, down from 5,873 MB for the torch-backed extra.
+
+An int8-quantized export was measured and not shipped: 22 MiB against 86 MiB fp32, but cosine
+similarity drops to min 0.8796 / mean 0.9447 against the torch model -- large enough to change
+which node a query seeds from. fp32 keeps the wheel at 83.7 MiB, comfortably under PyPI's
+100 MB-per-file limit, so there was nothing to buy with the loss.
+
+`sentence-transformers` is kept as an opt-in fallback, `mangrove-kb[semantic-torch]` -- tried only
+if the bundled ONNX export cannot load. `DenseIndex.model`, `DenseIndex.embed()` and
+`KnowledgeGraph.dense_index()` keep their existing signatures and return types; nothing that reads
+the dense index needs to change.
+
+### `import mangrove_kb.graph` no longer imports pandas
+
+`RuleRegistry`, `sample_ohlcv`, `indicators` and `signals` were imported eagerly by
+`mangrove_kb/__init__.py`, and `signals/__init__.py` imports every signal module to register it --
+so any import that touches the package, including `import mangrove_kb.graph`, paid for the whole
+pandas-backed signal library whether or not it ever evaluated a signal. Measured fresh-process via
+`/proc/self/status`: `import mangrove_kb.graph` alone costs +10.7 MB RSS; also importing
+`indicators` and `signals`, which this package used to do unconditionally, costs +98.6 MB -- an
+~88 MB saving for a graph-only consumer.
+
+The four names now resolve through a module-level `__getattr__` (PEP 562) instead: nothing imports
+until something asks for `RuleRegistry`, `sample_ohlcv`, `indicators` or `signals` by name, and the
+result is cached on first access. `from mangrove_kb import RuleRegistry` and
+`from mangrove_kb import indicators` are unchanged for a caller; `tests/test_lazy_imports.py` runs
+`import mangrove_kb.graph` in a subprocess and asserts neither `pandas` nor `numpy` lands in
+`sys.modules`.
+
 ### SuperTrend and PSAR measured, not judged
 
 Two measurement indicators replace two verdict indicators in the graph, by the split already

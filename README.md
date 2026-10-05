@@ -82,18 +82,28 @@ Python 3.10+. The graph, both search indices, the agent skill and the viewer all
 wheel**, so `KnowledgeGraph.load()` needs no network and no configuration.
 
 `ask()` works out of the box on the LSA index. Its second index — a pretrained encoder, worth 13/25
-to 18/25 — is an **extra**, because `sentence-transformers` pulls torch and pip's default torch wheel
-bundles the whole CUDA stack: `mangrove-kb` is 373 MB installed, `mangrove-kb[semantic]` is 5,276 MB,
-and 3.4 GB of that is GPU support this never uses.
+to 18/25 — needs the `semantic` **extra** to embed a question: `onnxruntime` and `tokenizers`, no
+torch. The ONNX export of the encoder ships inside the wheel, so nothing is fetched at install time
+either: `mangrove-kb` is 285 MB installed, `mangrove-kb[semantic]` is 395 MB.
 
 ```bash
-pip install torch --index-url https://download.pytorch.org/whl/cpu   # 1,402 MB instead of 5,276
 pip install "mangrove-kb[semantic]"
 ```
 
+A torch-backed fallback exists for a GPU host or a model swap: `mangrove-kb[semantic-torch]` pulls
+`sentence-transformers`, and pip's default torch wheel bundles the whole CUDA stack --
+`mangrove-kb[semantic-torch]` is 5,873 MB installed, 3.4 GB of it GPU support `ask()` never uses.
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu   # 1,438 MB instead of 5,873
+pip install "mangrove-kb[semantic-torch]"
+```
+
 CPU or GPU is chosen there and cannot be declared by the package — there is no `torch-cpu` on PyPI,
-and the `+cpu` wheels carry the same version from a different index. Without the extra, `ask()`
-answers on one index rather than two; nothing raises.
+and the `+cpu` wheels carry the same version from a different index. `DenseIndex.model` tries the
+ONNX path first regardless of which extra is installed, so `semantic-torch` alone still answers the
+same 18/25, by falling back to it. Without either extra, `ask()` answers on one index rather than
+two; nothing raises.
 
 ---
 

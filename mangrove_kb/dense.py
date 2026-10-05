@@ -22,13 +22,20 @@ from there. There is no passage store and no second copy of the text.
 
 The vectors are a build artifact -- ``ontology/build_dense_index.py`` writes them from the committed
 graph and stamps that graph's checksum, so a stale index is detectable rather than quietly answering
-about a graph that has changed. Encoding a *query* needs the model itself, which is why
-``sentence-transformers`` is a hard dependency; the model downloads once on first use and is cached
-by ``huggingface_hub`` thereafter.
+about a graph that has changed.
+
+Encoding a *query* needs the model itself, and the default path for that is ``onnxruntime`` plus
+``tokenizers`` over an ONNX export bundled in the wheel (``mangrove_kb/data/onnx-encoder/``, written
+by ``ontology/build_onnx_encoder.py``) -- no network, no ``torch``. Measured against the torch
+encoder over this graph's corpus and the question set ``tests/test_the_graph_answers_questions.py``
+uses: cosine similarity min 0.99999982, mean 1.0 -- a lossless re-export, not an approximation.
+``sentence-transformers`` is kept as an optional fallback (``pip install 'mangrove-kb[semantic-torch]'``),
+tried only if the ONNX path cannot load; nothing here chooses it first.
 """
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import os
 from dataclasses import dataclass, field
@@ -41,6 +48,51 @@ __all__ = ["DenseIndex", "DenseIndexNotFound"]
 
 _ENV_VAR = "MANGROVE_KB_DENSE_INDEX"
 _PACKAGED = Path(__file__).resolve().parent / "data" / "dense-index.npz"
+_ONNX_DIR = Path(__file__).resolve().parent / "data" / "onnx-encoder"
+
+
+def encoder_available() -> bool:
+    """Whether something could embed a question right now, without loading it.
+
+    Checked before :class:`DenseIndex` is trusted to answer: the vectors are a plain ``.npz`` and
+    load with neither encoder installed, which used to mean ``ask()`` reported a dense index present
+    and then raised from inside the query. The ONNX path is tried first and needs the bundled
+    export plus two small libraries; ``sentence-transformers`` is the fallback.
+    """
+    if (_ONNX_DIR / "model.onnx").is_file() and importlib.util.find_spec(
+            "onnxruntime") is not None and importlib.util.find_spec("tokenizers") is not None:
+        return True
+    return importlib.util.find_spec("sentence_transformers") is not None
+
+
+def _load_encoder(model_name: str | None) -> Any:
+    """The encoder, chosen by what is importable -- ONNX first, torch as the fallback.
+
+    A missing ONNX dependency is not fatal here; it only rules out the preferred path. Only a
+    missing fallback too raises, and names both ways to fix it.
+    """
+    onnx_error: Exception | None = None
+    if (_ONNX_DIR / "model.onnx").is_file():
+        try:
+            from .onnx_encoder import OnnxEncoder   # noqa: PLC0415 -- optional, the default path
+
+            return OnnxEncoder(_ONNX_DIR)
+        except ImportError as exc:
+            onnx_error = exc
+    try:
+        from sentence_transformers import SentenceTransformer   # noqa: PLC0415
+    except ImportError as exc:
+        raise ImportError(
+            "no encoder is available to embed a question. Install one of:\n"
+            "    pip install 'mangrove-kb[semantic]'        # onnxruntime + tokenizers, no torch\n"
+            "    pip install 'mangrove-kb[semantic-torch]'  # sentence-transformers, pulls torch\n"
+            "Reaching this means the index was handed out without either -- "
+            "`KnowledgeGraph.dense_index()` checks `encoder_available()` and returns None, so "
+            "`ask()` should have fallen back to the word index rather than arriving here."
+            + (f" (ONNX path failed with: {onnx_error})" if onnx_error else "")) from exc
+    if model_name is None:
+        raise ImportError("the dense index names no model to fall back to")
+    return SentenceTransformer(model_name)
 
 
 class DenseIndexNotFound(FileNotFoundError):
@@ -82,21 +134,12 @@ class DenseIndex:
     def model(self):
         """The encoder, loaded on first query and kept.
 
-        Deferred rather than loaded with the vectors: importing sentence-transformers costs seconds
-        and pulls in torch, and a caller who only reads the graph should pay neither.
+        Deferred rather than loaded with the vectors: importing an encoder costs time, and a caller
+        who only reads the graph should pay nothing for it. ONNX first (no torch); see
+        :func:`_load_encoder` for the fallback.
         """
         if self._model is None:
-            try:
-                from sentence_transformers import SentenceTransformer   # noqa: PLC0415
-            except ImportError as exc:                                  # pragma: no cover
-                raise ImportError(
-                    "sentence-transformers is required to encode a question. It is an extra:\n"
-                    "    pip install 'mangrove-kb[semantic]'\n"
-                    "Reaching this means the index was handed out without it -- "
-                    "`KnowledgeGraph.dense_index()` checks for the encoder and returns None, so "
-                    "`ask()` should have fallen back to the word index rather than arriving "
-                    "here.") from exc
-            self._model = SentenceTransformer(self.built_with["model"])
+            self._model = _load_encoder(self.built_with.get("model"))
         return self._model
 
     def embed(self, text: str) -> np.ndarray:
