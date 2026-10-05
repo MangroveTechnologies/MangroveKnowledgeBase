@@ -297,7 +297,7 @@ flowchart TB
     enc --> st[["vectors · several rows per node<br/>float16, keyed by node id"]]
   end
 
-  subgraph q[Query · needs the model]
+  subgraph q[Query · needs an encoder for THIS checkpoint]
     qq([question]) --> qe["encode the question<br/>same model, same space"]
     qe --> cos["cosine against every row"]
     cos --> best["a node scores as its BEST row,<br/>never its average"]
@@ -318,10 +318,13 @@ Every row is still keyed by a node id. Chunking here is a way to read a node com
 passage store: nothing returns a fragment of text, and the edges still do the explaining.
 
 **This costs a runtime dependency and the LSA index does not.** A query has to be encoded by the same
-model that built the rows, so `sentence-transformers` is a hard dependency and the model downloads
-once on a fresh machine. The first `ask()` in a process pays ~4 s to load it and ~50 ms per call
-after; `find()` never pays it, and neither does loading the graph — the import is deferred to first
-use.
+model that built the rows. The default is an ONNX export of that checkpoint, bundled in the wheel
+(`mangrove_kb/data/onnx-encoder/`) and read by `onnxruntime` + `tokenizers` -- no `torch`, no
+download, no network, measured at ~157 MiB RSS and ~0.3 s to embed the first question in a fresh
+process. `sentence-transformers` is kept as a fallback (`mangrove-kb[semantic-torch]`), tried only
+if the ONNX path cannot load; it costs ~464 MiB and ~6.4 s the same way, and the model it loads
+downloads once on a fresh machine with no cache. `find()` never pays either cost, and neither does
+loading the graph -- the import is deferred to first use.
 
 ## 8. Three walks that are easy to confuse
 

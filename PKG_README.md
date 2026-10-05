@@ -26,26 +26,28 @@ takes it from 13 of 25 to 18 -- install the extra:
 pip install "mangrove-kb[semantic]"
 ```
 
-**Choose CPU or GPU when you install it**, because nothing in the package can. `sentence-transformers`
-pulls torch, and pip's default torch wheel bundles the entire CUDA stack:
+That is `onnxruntime` + `tokenizers`, no torch: the encoder ships as an ONNX export inside the
+wheel, so nothing downloads at install time or at query time either.
 
 | | installed size | `ask()` |
 |---|---|---|
-| `mangrove-kb` | 373 MB | 13/25 |
-| `mangrove-kb[semantic]` | 5,276 MB | 18/25 |
-| ...with CPU-only torch first | **1,402 MB** | 18/25 |
+| `mangrove-kb` | 285 MB | 13/25 |
+| `mangrove-kb[semantic]` | 395 MB | 18/25 |
+| `mangrove-kb[semantic-torch]` | 5,873 MB | 18/25 (same answers) |
+| ...with CPU-only torch first | **1,438 MB** | 18/25 |
 
-3.4 GB of that is nvidia libraries and triton for a GPU this never uses -- the node vectors are
-precomputed and the only inference is one short question per call, ~50 ms on a CPU. For CPU:
+The last two rows are a fallback (`mangrove-kb[semantic-torch]`), tried only if the ONNX path
+cannot load. It pulls `sentence-transformers`, and pip's default torch wheel bundles the entire
+CUDA stack -- 3.4 GB of that is nvidia libraries and triton for a GPU this never uses, since the
+node vectors are precomputed and the only inference is one short question per call. For CPU:
 
 ```bash
 pip install torch --index-url https://download.pytorch.org/whl/cpu
-pip install "mangrove-kb[semantic]"
+pip install "mangrove-kb[semantic-torch]"
 ```
 
 There is no `torch-cpu` on PyPI and torch publishes no extra for it, so this is an install-time
-choice rather than something a dependency can declare. The model itself (~90 MB) downloads on first
-`ask()` and is cached thereafter.
+choice rather than something a dependency can declare.
 
 ## Indicators
 

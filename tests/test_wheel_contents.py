@@ -78,6 +78,29 @@ def test_the_semantic_index_is_in_the_wheel(wheel):
         f"{[n for n in wheel.namelist() if '/data/' in n] or 'none'}")
 
 
+def test_the_onnx_encoder_is_in_the_wheel(wheel):
+    """Without these two files the `semantic` extra's default path has no model to load, and
+    `DenseIndex._load_encoder` falls all the way through to the torch fallback -- quietly, since a
+    missing ONNX file is treated the same as a missing `onnxruntime`."""
+    for name in ("model.onnx", "tokenizer.json"):
+        want = f"{PKG}/data/onnx-encoder/{name}"
+        assert want in wheel.namelist(), (
+            f"{want} is not in the wheel; present data files: "
+            f"{[n for n in wheel.namelist() if '/data/' in n] or 'none'}")
+
+
+def test_the_wheel_stays_under_pypis_per_file_limit(wheel):
+    """86 MiB of this wheel is the ONNX encoder, bundled rather than fetched -- the trade this test
+    guards is real: PyPI's limit is configurable per project but defaults to far less than this, and
+    a future export (a bigger model, fp32 growing another head) could cross it without anyone
+    measuring the wheel directly. 100 MB is the ceiling named when this was bundled; checked with
+    margin, not against the limit itself, so a regression is caught before it is a release surprise.
+    """
+    size = Path(wheel.filename).stat().st_size
+    assert size < 95 * 1024 * 1024, (
+        f"the wheel is {size / 1024 / 1024:.1f} MiB -- comfortably under 100 MB stopped being true")
+
+
 def test_the_skills_are_in_the_wheel(wheel):
     """An agent that installs the package should get the instructions for using it."""
     for name in ("SKILL.md", "GUIDE.md"):

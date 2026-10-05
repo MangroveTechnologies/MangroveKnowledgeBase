@@ -28,20 +28,23 @@ improves; never lower one to make a change pass.
 """
 from __future__ import annotations
 
-import importlib.util
 import re
 from pathlib import Path
 
 import pytest
 
+from mangrove_kb.dense import encoder_available
 from mangrove_kb.graph import KnowledgeGraph
 
 #: The floors below are measured with BOTH indices. The encoder is an extra, so a plain install
 #: reaches only the LSA one and answers 13 rather than 18 -- a worse search, not a broken one, and
-#: not something to assert a floor against.
+#: not something to assert a floor against. Either encoder extra does it: the default is the
+#: bundled ONNX export (`semantic`, no network), `semantic-torch` is the sentence-transformers
+#: fallback -- the floor was measured against the torch path and holds for the ONNX one too,
+#: which embeds within 0.99999982 cosine of it (`ontology/build_onnx_encoder.py`).
 needs_encoder = pytest.mark.skipif(
-    importlib.util.find_spec("sentence_transformers") is None,
-    reason="the paraphrase floor is measured with the semantic extra installed")
+    not encoder_available(),
+    reason="the paraphrase floor is measured with an encoder extra installed")
 
 RAW = Path(__file__).resolve().parent.parent / "ontology" / "raw"
 

@@ -23,13 +23,23 @@ GRAPH = REPO / "ontology" / "signal-indicator-ontology.json"
 
 dense = pytest.importorskip("mangrove_kb.dense", reason="numpy is required to read the index")
 
-#: Whether the `semantic` extra is installed. The encoder is optional -- the dense vectors ship in
-#: the wheel but embedding a QUESTION needs the model -- so a plain install skips these rather than
-#: failing on an ImportError that says nothing about the graph. CI installs `[dev]`, which carries
-#: the extra, so they run there.
-HAS_ENCODER = importlib.util.find_spec("sentence_transformers") is not None
+#: Whether SOME encoder is installed -- the bundled ONNX export (`semantic`) or the torch fallback
+#: (`semantic-torch`). The dense vectors ship in the wheel either way, but embedding a QUESTION
+#: needs one of the two, so a plain install skips these rather than failing on an ImportError that
+#: says nothing about the graph. CI installs `[dev]`, which carries both, so they run there.
+HAS_ENCODER = dense.encoder_available()
 needs_encoder = pytest.mark.skipif(not HAS_ENCODER,
-                                   reason="needs the semantic extra: pip install 'mangrove-kb[semantic]'")
+                                   reason="needs an encoder: pip install 'mangrove-kb[semantic]'")
+
+HAS_ONNX = (importlib.util.find_spec("onnxruntime") is not None
+           and importlib.util.find_spec("tokenizers") is not None)
+needs_onnx = pytest.mark.skipif(not HAS_ONNX,
+                                reason="needs the onnx extra: pip install 'mangrove-kb[semantic]'")
+
+HAS_TORCH_ENCODER = importlib.util.find_spec("sentence_transformers") is not None
+needs_torch_encoder = pytest.mark.skipif(
+    not HAS_TORCH_ENCODER,
+    reason="needs the torch fallback: pip install 'mangrove-kb[semantic-torch]'")
 
 
 
@@ -93,7 +103,6 @@ def test_no_node_is_split_into_more_rows_than_the_builder_allows(index):
     assert worst[1] <= MAX_CHUNKS, f"{worst[0]} contributes {worst[1]} rows, cap is {MAX_CHUNKS}"
 
 
-@pytest.mark.model
 @needs_encoder
 def test_it_reaches_a_paraphrase_lsa_cannot(index):
     """The reason this index exists, as a single case.
@@ -101,12 +110,15 @@ def test_it_reaches_a_paraphrase_lsa_cannot(index):
     `risk of ruin` is defined as "the probability of losing a specified percentage of capital". The
     question says "odds" and "wipe out the account" and shares no content word with it; LSA does not
     rank it anywhere, because nothing in 714 documents puts those phrasings together.
+
+    Not marked `model`: the default encoder is the bundled ONNX export, and loading it needs no
+    network. That marker is reserved for what actually needs one -- see the torch-fallback tests
+    below.
     """
     hits = [nid for nid, _ in index.similar("what are the odds I wipe out the account", limit=5)]
     assert "concept:risk-of-ruin" in hits, hits
 
 
-@pytest.mark.model
 @needs_encoder
 def test_a_node_is_scored_by_its_best_row_not_its_average(index):
     """Chunking is only worth its complexity if one good passage can carry a long node."""
@@ -115,21 +127,24 @@ def test_a_node_is_scored_by_its_best_row_not_its_average(index):
 
 
 def test_ask_degrades_rather_than_raising_when_the_encoder_is_absent(kg, monkeypatch):
-    """`sentence-transformers` is an extra, so most installs will not have it.
+    """Neither encoder extra is guaranteed installed, so a bare install must degrade, not raise.
 
-    The vectors are a numpy `.npz` and load without it. So `DenseIndex.load()` succeeded, the graph
-    reported a dense index, and `ask()` then raised `ImportError` from inside the query -- a missing
-    OPTIONAL dependency breaking the call rather than lowering its quality. `ask()` has to keep
-    answering on the LSA index alone.
+    The vectors are a numpy `.npz` and load without an encoder. So `DenseIndex.load()` succeeded,
+    the graph reported a dense index, and `ask()` then raised `ImportError` from inside the query --
+    a missing OPTIONAL dependency breaking the call rather than lowering its quality. `ask()` has to
+    keep answering on the LSA index alone. Both `onnxruntime`/`tokenizers` (the default path) and
+    `sentence-transformers` (the fallback) are blinded, because blinding only one used to leave the
+    other able to carry the call -- this has to simulate neither extra being installed at all.
     """
     import importlib.util
 
     from mangrove_kb.graph import KnowledgeGraph
 
     real = importlib.util.find_spec
+    blinded = {"sentence_transformers", "onnxruntime", "tokenizers"}
 
     def blind(name, *a, **k):
-        return None if name == "sentence_transformers" else real(name, *a, **k)
+        return None if name in blinded else real(name, *a, **k)
 
     monkeypatch.setattr(importlib.util, "find_spec", blind)
     bare = KnowledgeGraph.load()
@@ -138,3 +153,66 @@ def test_ask_degrades_rather_than_raising_when_the_encoder_is_absent(kg, monkeyp
 
     answered = bare.ask("how far away from my entry should the stop go", limit=5)
     assert answered.total > 0, "ask() stopped answering without the optional extra"
+
+
+# --- the ONNX encoder: the default path, no torch -------------------------------------------------
+
+@needs_onnx
+def test_the_default_path_needs_no_torch(index):
+    """`DenseIndex.model` must not import torch when the bundled ONNX export can serve the query."""
+    import sys
+
+    for name in ("torch", "sentence_transformers"):
+        sys.modules.pop(name, None)
+    from mangrove_kb.onnx_encoder import OnnxEncoder
+
+    assert isinstance(index.model, OnnxEncoder)
+    assert "torch" not in sys.modules, "loading the onnx encoder imported torch"
+    assert "sentence_transformers" not in sys.modules
+
+
+@needs_onnx
+def test_the_onnx_encoder_returns_unit_vectors(index):
+    import numpy as np
+
+    vec = index.embed("how far away from my entry should the stop go")
+    assert vec.shape == (index.built_with["dim"],)
+    assert abs(float(np.linalg.norm(vec)) - 1.0) < 1e-4
+
+
+@pytest.mark.model
+@needs_onnx
+@needs_torch_encoder
+def test_the_onnx_encoder_matches_the_torch_encoder_it_replaced():
+    """The parity gate, as a fast spot check -- not the full corpus-plus-question-set sweep that
+    `ontology/build_onnx_encoder.py`'s docstring reports (min 0.99999982, mean 1.0 there); this is
+    enough to catch a regression without re-encoding the whole graph on every test run."""
+    import numpy as np
+    from sentence_transformers import SentenceTransformer
+
+    from mangrove_kb.onnx_encoder import OnnxEncoder
+    from mangrove_kb.dense import _ONNX_DIR
+
+    texts = ["how far away from my entry should the stop go",
+             "what are the odds I wipe out the account",
+             "three peaks and the middle one is the highest"]
+    onnx_vecs = OnnxEncoder(_ONNX_DIR).encode(texts, normalize_embeddings=True)
+    torch_vecs = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2").encode(
+        texts, normalize_embeddings=True, convert_to_numpy=True, show_progress_bar=False)
+    sims = np.sum(onnx_vecs * torch_vecs, axis=1)
+    assert sims.min() > 0.999, sims.tolist()
+
+
+@pytest.mark.model
+def test_the_torch_fallback_is_only_reached_without_the_onnx_files(monkeypatch):
+    """`_load_encoder` tries ONNX first; this proves the fallback branch is live rather than dead
+    code, by hiding the bundled export and checking the torch path is the one that answers."""
+    if not HAS_TORCH_ENCODER:
+        pytest.skip("needs the torch fallback: pip install 'mangrove-kb[semantic-torch]'")
+    import mangrove_kb.dense as dense_mod
+
+    monkeypatch.setattr(dense_mod, "_ONNX_DIR", dense_mod._ONNX_DIR.parent / "does-not-exist")
+    fresh = dense.DenseIndex.load()
+    from sentence_transformers import SentenceTransformer
+
+    assert isinstance(fresh.model, SentenceTransformer)
