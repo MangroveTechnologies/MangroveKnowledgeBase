@@ -2582,8 +2582,23 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
     recent = mi.iloc[-10:]
     was_above = any(float(v) > threshold_high for v in recent if not pd.isna(v))
     now_below = float(mi.iloc[-1]) < threshold_low
+    if not (was_above and now_below):
+        return False
 
-    return was_above and now_below
+    # The bulge keeps satisfying that condition on every bar until the spike
+    # ages out of the ten-bar lookback, and longer still if the index crosses
+    # back above again meanwhile. Reporting it on every one of those bars makes
+    # one reversal look like a signal that is true for a long stretch, which is
+    # a state and not the one-bar event this is declared to be. So the same
+    # test is applied one bar earlier, and the signal fires only where it turns
+    # from false to true.
+    if len(mi) < 2:
+        return True
+    before = mi.iloc[-11:-1]
+    was_above_before = any(float(v) > threshold_high for v in before if not pd.isna(v))
+    prev = mi.iloc[-2]
+    was_below_before = (not pd.isna(prev)) and float(prev) < threshold_low
+    return not (was_above_before and was_below_before)
 
 @RuleRegistry.register("multi_tf_trend_bearish")
 def multi_tf_trend_bearish(
