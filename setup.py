@@ -25,6 +25,7 @@ into a silent packaging failure -- which is how it shipped in the first place.
 """
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -39,6 +40,12 @@ BUNDLED = [
     (HERE / "skills" / "knowledge-graph" / "SKILL.md", "skills/knowledge-graph/SKILL.md"),
     (HERE / "skills" / "knowledge-graph" / "GUIDE.md", "skills/knowledge-graph/GUIDE.md"),
 ]
+_catalog = HERE / "mangrove_kb" / "data" / "document-catalog.json"
+BUNDLED.append((_catalog, "data/document-catalog.json"))
+BUNDLED.extend(
+    (HERE / "knowledge-base" / name, f"data/documents/{name}")
+    for name in json.loads(_catalog.read_text())["documents"]
+)
 
 
 class build_py(_build_py):

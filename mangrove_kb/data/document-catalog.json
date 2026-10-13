@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "documents": [
+    "00-table-of-contents.md",
+    "01-market-foundations.md",
+    "02-instruments-market-mechanics.md",
+    "03-core-trading-concepts.md",
+    "04-strategy-design-modeling.md",
+    "05-risk-management.md",
+    "06-indicators.md",
+    "07-chart-patterns.md",
+    "08-quantitative-analysis.md",
+    "09-glossary.md",
+    "10-signals-quick-reference.md"
+  ]
+}

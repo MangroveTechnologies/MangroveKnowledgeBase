@@ -273,6 +273,10 @@ class GraphError(Exception):
     """Base class for graph query errors."""
 
 
+class GraphQueryError(GraphError, ValueError):
+    """Invalid query arguments; safe to report to the caller."""
+
+
 class NodeNotFound(GraphError):
     """Raised when an id does not resolve. Carries suggestions so the caller can recover.
 
@@ -802,17 +806,17 @@ class KnowledgeGraph:
             borne = set(self.bearers(rid))
             pool = borne if pool is None else (pool & borne)
         if status is not None and status not in (known := self.statuses()):
-            raise GraphError(f"unknown status {status!r}; known: {', '.join(sorted(known))}")
+            raise GraphQueryError(f"unknown status {status!r}; known: {', '.join(sorted(known))}")
         if requires is not None and requires not in (cols := self.input_columns()):
-            raise GraphError(f"nothing declares the input {requires!r}; "
+            raise GraphQueryError(f"nothing declares the input {requires!r}; "
                              f"declared: {', '.join(sorted(cols))}")
         if param is not None and param not in (names := self.params()):
-            raise GraphError(f"nothing takes a parameter called {param!r}; "
+            raise GraphQueryError(f"nothing takes a parameter called {param!r}; "
                              f"taken: {', '.join(sorted(names))}")
 
         terms = query_terms(query)
         if query.strip() and not terms:
-            raise GraphError(
+            raise GraphQueryError(
                 f"a query needs {MIN_QUERY} characters to mean anything; {query.strip()!r} would "
                 "match most of the graph. Use find(kind=...), find(under=...) or resolve() instead.")
         eligible = [n for n in self.nodes.values()
@@ -1065,7 +1069,7 @@ class KnowledgeGraph:
             kg.outputs("histogram")                          # who produces one, and what it means
         """
         if units is not None and units not in (known := self.units()):
-            raise GraphError(f"unknown units {units!r}; known: {', '.join(sorted(known))}")
+            raise GraphQueryError(f"unknown units {units!r}; known: {', '.join(sorted(known))}")
         pool = self.in_class(kind) if kind is not None else None
 
         needle = name.lower().strip()
@@ -1107,11 +1111,11 @@ class KnowledgeGraph:
         """
         nid = self.resolve(ref)
         if direction not in ("in", "out", "both"):
-            raise GraphError(f"direction must be 'in', 'out' or 'both', not {direction!r}")
+            raise GraphQueryError(f"direction must be 'in', 'out' or 'both', not {direction!r}")
         if relation and relation not in RELATIONS:
-            raise GraphError(f"unknown relation {relation!r}; known: {', '.join(RELATIONS)}")
+            raise GraphQueryError(f"unknown relation {relation!r}; known: {', '.join(RELATIONS)}")
         if category and category not in CATEGORIES:
-            raise GraphError(f"unknown category {category!r}; known: {', '.join(CATEGORIES)}")
+            raise GraphQueryError(f"unknown category {category!r}; known: {', '.join(CATEGORIES)}")
 
         why_terms = query_terms(why or "")
         rows: list[dict[str, Any]] = []
@@ -1153,11 +1157,11 @@ class KnowledgeGraph:
         """
         nid = self.resolve(ref)
         if radius < 0:
-            raise GraphError("radius must be >= 0")
+            raise GraphQueryError("radius must be >= 0")
         allowed = set(relations) if relations else None
         why_terms = query_terms(why or "")
         if allowed and (bad := allowed - set(RELATIONS)):
-            raise GraphError(f"unknown relation(s): {', '.join(sorted(bad))}")
+            raise GraphQueryError(f"unknown relation(s): {', '.join(sorted(bad))}")
 
         seen = {nid}
         frontier = [nid]

@@ -80,6 +80,7 @@ semantic-torch = [
 ]
 
 dev = [
+    "build>=1.0",
     # Both encoder paths, so the suite exercises each. Without `semantic` CI installs a graph with
     # no way to embed a question at all, and every test that measures `ask()` fails on an
     # ImportError rather than on anything about the graph. `semantic-torch` is here only to keep
@@ -139,6 +140,7 @@ include = ["mangrove_kb*"]
 # are copied in from OUTSIDE the package directory; these live inside it and only need declaring.
 [tool.setuptools.package-data]
 mangrove_kb = [
+    "data/document-catalog.json",
     "viz/assets/*.svg",      # the Mangrove wordmark, light and dark
     "viz/vendor/*.js",       # vendored 3d-force-graph -- the 3D view is dead without it
     "viz/*.sql",             # store schema
