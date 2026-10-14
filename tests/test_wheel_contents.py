@@ -10,9 +10,11 @@ So the check has to be made against a REAL BUILT ARTIFACT. Reading `pyproject.to
 about what setuptools would include is what produced the bug.
 """
 import os
+import json
 import shutil
 import subprocess
 import sys
+import tarfile
 import zipfile
 from pathlib import Path
 
@@ -33,14 +35,20 @@ _NOT_SOURCE = shutil.ignore_patterns(".git", "build", "dist", "*.egg-info", "__p
 
 
 @pytest.fixture(scope="module")
-def wheel(tmp_path_factory):
+def source_tree(tmp_path_factory):
+    src = tmp_path_factory.mktemp("src") / "repo"
+    shutil.copytree(REPO, src, ignore=_NOT_SOURCE)
+    return src
+
+
+@pytest.fixture(scope="module")
+def wheel(tmp_path_factory, source_tree):
     """A wheel built from a pristine copy of this checkout, as the release workflow builds it.
 
     Hermetic on purpose. Building in place reuses `build/`, and `--no-cache-dir` alone does not save
     you -- pip's wheel cache is only one of the two things that can hand back a stale artifact.
     """
-    src = tmp_path_factory.mktemp("src") / "repo"
-    shutil.copytree(REPO, src, ignore=_NOT_SOURCE)
+    src = source_tree
 
     out = tmp_path_factory.mktemp("wheel")
     env = {**os.environ, "SETUPTOOLS_SCM_PRETEND_VERSION": "0.0.0"}   # the copy has no .git
@@ -60,6 +68,49 @@ def test_the_graph_is_in_the_wheel(wheel):
         f"{want} is not in the wheel. `pip install mangrove-kb` would give a package whose "
         f"KnowledgeGraph.load() raises. Present json files: "
         f"{[n for n in wheel.namelist() if n.endswith('.json')] or 'none'}")
+
+
+def test_documents_are_retrievable_without_the_source_checkout(wheel, tmp_path):
+    catalog = json.loads(wheel.read(f"{PKG}/data/document-catalog.json"))
+    for name in catalog["documents"]:
+        assert wheel.read(f"{PKG}/data/documents/{name}") == (REPO / "knowledge-base" / name).read_bytes()
+    target = tmp_path / "installed"
+    wheel.extractall(target)
+    code = """
+from mangrove_kb.documents import DocumentStore
+store = DocumentStore()
+listing = store.list_documents()
+assert listing['total'] == 11
+assert listing['source']['source_kind'] == 'package'
+assert listing['source']['package_version'] == '0.0.0'
+for doc in listing['documents']:
+    result = store.get_document(doc['slug'], 20)
+    assert result['returned_chars'] == 20
+    assert result['truncated'] is True
+    assert result['source'] == listing['source']
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", code], cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(target)}, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_document_sources_survive_sdist(source_tree, tmp_path):
+    proc = subprocess.run(
+        [sys.executable, "-m", "build", "--sdist", "--outdir", str(tmp_path), str(source_tree)],
+        env={**os.environ, "SETUPTOOLS_SCM_PRETEND_VERSION": "0.0.0"},
+        capture_output=True, text=True, timeout=900,
+    )
+    assert proc.returncode == 0, proc.stderr[-2000:]
+    with tarfile.open(next(tmp_path.glob("*.tar.gz"))) as archive:
+        members = {"/".join(name.split("/")[1:]): name for name in archive.getnames()}
+        catalog = json.loads((REPO / PKG / "data/document-catalog.json").read_text())
+        paths = [f"{PKG}/data/document-catalog.json", f"{PKG}/documents.py"]
+        paths.extend(f"knowledge-base/{name}" for name in catalog["documents"])
+        for path in paths:
+            assert path in members
+            assert archive.extractfile(members[path]).read() == (REPO / path).read_bytes()
 
 
 def test_the_packaged_graph_is_the_committed_graph(wheel):

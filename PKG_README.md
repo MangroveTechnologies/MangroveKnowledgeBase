@@ -287,3 +287,91 @@ Free for noncommercial use under the [PolyForm Noncommercial License 1.0.0](http
 **Commercial use requires a paid license.** Using mangrove-kb in a product or service you sell, or internally in a for-profit business, needs one -- contact **support@mangrove.ai**.
 
 Releases published before this change remain under the MIT license they shipped with.
+
+## Offline knowledge documents
+
+The document catalog is separate from graph node IDs and executable signal names.
+It bundles the eleven reviewed knowledge-base chapters and requires no server or
+semantic-search dependencies.
+
+```python
+from mangrove_kb.documents import get_document_store
+
+store = get_document_store()
+catalog = store.list_documents()
+document = store.get_document("6-indicators", max_chars=2000)
+print(document["content"])
+print(document["truncated"], document["source"]["artifact_sha256"])
+```
+
+Use the exact `slug` returned by the catalog. Listing follows chapter order.
+Omit `max_chars` for full content; accepted budgets are integers from zero through
+1,000,000. `content_length` is the full character count, `returned_chars` is the
+returned count, and `truncated` explicitly identifies an excerpt. Section content
+uses the same document prefix, so sections cannot reveal text omitted by the budget.
+Sections retain H2/H3 navigation anchors and parent references; code-block headings
+are excluded and repeated anchors receive numeric suffixes.
+
+`DocumentNotFoundError` means a valid slug is absent. `ValueError` means invalid
+arguments. `DocumentUnavailableError` means the reviewed artifact cannot be read;
+a missing or corrupt file never becomes a successful empty or partial catalog.
+Responses contain a schema version and artifact hash. Package installations also
+report their installed package version; checkout/custom sources are labeled and do
+not claim an installed version. The singleton is an immutable process snapshot;
+restart consumers after upgrading the package.
+
+### Document search and glossary
+
+`mangrove_kb.document_search.get_document_search().query("RSI", limit=5)` searches
+the same reviewed documents using an in-memory FTS5 index, historical synonyms
+and glossary-first ranking. `mangrove_kb.document_glossary.get_glossary_entry("RSI")`
+uses exact case-insensitive matching followed by a partial match. These modules
+require the packaged document artifacts and do not call the retired KB HTTP service.
+
+These additions require a new package release. They are not available in the
+backend’s existing 3.7.1 dependency. Search/glossary and cross-repository validation
+are pending; earlier document-store checks do not cover these new operations.
+
+Document searches treat input as natural-language text rather than raw FTS syntax.
+Search responses include `returned` and `truncated`; `limit` is an upper bound,
+and a roughly 24 KB response budget can reduce the number returned. Snippets are
+limited to 500 characters. Each result carries at most 16 tags and a
+`tags_truncated` flag; `tags_matched` is limited to 64 with its own truncation flag.
+Use document retrieval for complete content and document tags.
+
+### Paged document transport (contract version 2)
+
+`DocumentStore.get_document_page(slug, max_chars=None, offset=0, full=False)`
+backs the shared backend document and quick-reference tools. It defaults to 6,000
+characters, caps page requests at 12,000 characters, and bounds serialized package
+responses to 24 KB. `content` is the only text body; `sections` contains overlapping
+section metadata with absolute `start_char`/`end_char` offsets. Document tags are
+limited to 16 with `tags_truncated` indicating omission.
+
+Continue using `next_offset` as `offset` while `has_more` is true. `max_chars=0`
+returns metadata without advancing; use a positive size to continue. `truncated`
+indicates that this response is not the entire document. For explicit non-chat
+downloads, `full=True` returns all text and section metadata without duplication;
+it cannot be combined with an offset or size and is not subject to the page budget.
+
+This changes backend/SDK defaults from full content to paging and removes section
+bodies from transport responses. The package's internal `get_document` interface
+remains available for search indexing and glossary parsing.
+
+### Overview and section views
+
+The same `get_document_page` operation accepts `view="overview"` to return the
+source summary and every section heading/anchor without document text. This view
+has no content continuation and does not accept `max_chars`, `offset` or `full`.
+Use it for questions about what a guide covers, without reading every page.
+
+For a particular topic, pass `view="section", section_anchor="..."` with an exact
+anchor from overview or search. A section includes its nested subsections and stops
+before its next sibling. Pagination offsets and `content_length` then refer to the
+selected section body; section metadata retains absolute document offsets. Unknown
+anchors return not-found, never the full document. `full=True` is only available
+with `view="content"`. Existing content-view defaults remain unchanged.
+
+Both backend document tools, the SDK knowledge/document namespaces and agent HTTP
+adapters forward these options to this implementation. MCP schemas come from the
+backend tool signatures; reconnect clients after deploying a schema change.

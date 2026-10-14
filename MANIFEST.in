@@ -1,0 +1,2 @@
+include mangrove_kb/data/document-catalog.json
+include knowledge-base/*.md
