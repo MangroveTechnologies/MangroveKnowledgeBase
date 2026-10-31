@@ -20,6 +20,8 @@ Signal Categories:
     - onchain: smart-money flows, exchange flows, whale activity, holder concentration
     - defi_pro: token-unlock pressure, perp funding regime, ETF-flow momentum,
       treasury accumulation, lending-rate spread (DeFiLlama Pro)
+    - cambrian: social-sentiment surges and regimes (Deep42) and Solana holder growth
+      and whale share (Cambrian holder distribution)
 
 Deprecated paths: `volume` (split four ways) and `patterns` (now `pattern`) survive as shim modules
 that re-export from the new homes and warn on import. They are deliberately NOT imported below --
@@ -37,3 +39,4 @@ from mangrove_kb.signals import oscillator
 from mangrove_kb.signals import averaging
 from mangrove_kb.signals import onchain
 from mangrove_kb.signals import defi_pro
+from mangrove_kb.signals import cambrian

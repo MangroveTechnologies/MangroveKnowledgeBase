@@ -8,7 +8,7 @@ pip install mangrove-kb
 
 ## What You Get
 
-- **249 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
+- **255 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
 - **82 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
@@ -138,7 +138,7 @@ print(f"Available signals: {len(RuleRegistry._registry)}")
 
 ### Signal Categories
 
-**249 registered**, 225 modelled in the graph. Every signal carries two independent labels: the
+**255 registered**, 225 modelled in the graph. Every signal carries two independent labels: the
 class it is *about* (above) and the **role** it plays -- `trigger` (an event) or `filter` (an ongoing
 state). They are different questions, so the graph keeps them apart:
 

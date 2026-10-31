@@ -16,7 +16,7 @@
   <a href="https://pepy.tech/projects/mangrove-kb"><img src="https://static.pepy.tech/badge/mangrove-kb" alt="PyPI Downloads"></a>
 </p>
 
-**249 trading signal functions** (119 TRIGGER, 130 FILTER) and **82 technical indicator classes**,
+**255 trading signal functions** (123 TRIGGER, 132 FILTER) and **82 technical indicator classes**,
 every one with a machine-readable docstring — formula, inputs, parameters with ranges and defaults,
 typed outputs with units, and warmup.
 
@@ -34,7 +34,7 @@ The join is what makes either half worth querying: `procedure:atr-based-stop` is
 chapter states, and it `uses` an indicator the code defines, so one query crosses from *why* to
 *what it computes*.
 
-The point is the second thing. A library of 249 functions is only useful if you can find the right
+The point is the second thing. A library of 255 functions is only useful if you can find the right
 one, and `grep` cannot answer *"which indicators produce a bounded oscillator"*, *"what reads RSI's
 third output"*, or *"is there already a signal for this"*. The graph can, and the answers are facts
 about the code as it is.
@@ -430,7 +430,7 @@ A statement lives in exactly one place. Until it concerns a particular node it s
 Judgment; once it earns an `about` edge it moves onto that edge as its `why` — so the reason an
 answer is an answer travels with the connection, not in a list somewhere else.
 
-**The library half.** Of **249 registered signals**, **225 are modelled** in the graph, along with
+**The library half.** Of **255 registered signals**, **225 are modelled** in the graph, along with
 73 of the 82 indicator classes. That gap is deliberate:
 
 - **Signals with no indicator beneath them** — a signal reading raw price with no measurement in
@@ -463,7 +463,7 @@ MangroveKnowledgeBase/
 │   │                                neighbors · subgraph · path · all_paths)
 │   ├── registry.py               ← RuleRegistry: evaluate a signal by name
 │   ├── docstring_parser.py       ← docstring → structured metadata
-│   ├── signals/                  ← 249 signal functions
+│   ├── signals/                  ← 255 signal functions
 │   ├── indicators/               ← 82 indicator classes
 │   ├── viz/                      ← the self-contained graph viewer
 │   ├── data/                     ← the graph, bundled at build time
