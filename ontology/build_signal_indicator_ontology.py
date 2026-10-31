@@ -87,7 +87,16 @@ CLASSES_DEF = {
                "observed distance, width, or range.",
  'flow': "Running accumulation whose level is arbitrary but whose direction carries meaning.",
  'pattern': "Shape of one or a few bars (candlestick geometry).",
+ # Alternative data. These two are divided by WHAT is read rather than by the character of the
+ # computation, because their inputs are not the market's own price and volume -- which is what
+ # `technical analysis` is defined as. They hang from `alternative data` instead (ALT_CLASSES).
+ 'social': "Measures a crowd reading about an asset -- what people post, scored for sentiment or "
+           "counted for attention -- aligned to the bars.",
+ 'onchain': "Measures blockchain state or flow for an asset -- holders, balances, transfers, the "
+            "share of supply value held by large wallets -- aligned to the bars.",
 }
+#: Classes whose parent is `alternative data`, not `technical analysis`.
+ALT_CLASSES = ("social", "onchain")
 ASSIGN = {
  'averaging': "SMA EMA WMA DEMA TEMA TRIMA SMMA HMA ALMA T3 KAMA VWMA VWAP MAMA WilliamsAlligator "
                "EPMA Ichimoku HeikinAshi ParabolicSAR",
@@ -98,6 +107,8 @@ ASSIGN = {
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
                "ChandelierLevels VolatilityEnvelope SqueezeDepth SuperTrendBands",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
+ 'social': "SocialZScore SocialBaselineShift",
+ 'onchain': "OnchainChange",
 }
 # Not indicators: their outputs are VERDICTS, not measurements. An indicator states what it
 # measured, and deciding what that means is the signal layer's job. Every class here is kept,
@@ -670,7 +681,8 @@ def _load_classes():
     """{indicator name: class} for every registered indicator."""
     found = {}
     for mn in ("momentum_indicators", "trend_indicators", "volatility_indicators",
-               "volume_indicators", "return_indicators", "pattern_indicators"):
+               "volume_indicators", "return_indicators", "pattern_indicators",
+               "social_indicators", "onchain_indicators"):
         mod = importlib.import_module(f"mangrove_kb.indicators.{mn}")
         for nm, c in vars(mod).items():
             if isinstance(c, type) and hasattr(c, "_outputs") and c.__module__ == mod.__name__:
@@ -1233,7 +1245,21 @@ atom(TA_ID, "technical analysis", "Concept",
      reference_chapter=[CH_INDICATORS])
 rel("technical analysis", "part-of", ROOT_TITLE,
     "the domain this knowledge space covers", TA_ID, ROOT)
+#: The sibling domain for inputs that are not the market's own price and volume.
+ALT_ID = "concept:alternative-data"
+atom(ALT_ID, "alternative data", "Concept",
+     "Reading a market from data other than its own price and volume history: what people post "
+     "about an asset, and what its blockchain records. The caller aligns each reading to the bars "
+     "without lookahead; the indicators that measure them and the signals that read them attach to "
+     "its divisions the same way technical analysis is divided.")
+rel("alternative data", "part-of", ROOT_TITLE,
+    "the domain this knowledge space covers", ALT_ID, ROOT)
 for cls, desc in CLASSES_DEF.items():
+    if cls in ALT_CLASSES:
+        # No chapter covers alternative data yet, so there is no chapter reference to cite.
+        atom(f"concept:{cls}", cls, "Concept", desc)
+        rel(cls, "kind-of", "alternative data", "data read", f"concept:{cls}", ALT_ID)
+        continue
     # `pattern` is candlestick geometry, documented in 7.1 -- chapter 06 has no candlestick
     # section. Every other character class is one of 06's indicator categories.
     atom(f"concept:{cls}", cls, "Concept", desc,
@@ -1384,6 +1410,11 @@ SIGNAL_SCOPE = {
     "t3_cross_down", "t3_cross_up", "tema_cross_down", "tema_cross_up", "trima_cross_down",
     "trima_cross_up", "trix_bearish", "trix_bullish", "vortex_bearish", "vortex_bullish",
     "vortex_crossover", "wma_cross_down", "wma_cross_up",
+    # Alternative data that reads a named indicator: social readings through SocialZScore and
+    # SocialBaselineShift, holder distribution through OnchainChange, price legs through ROC. The
+    # older on-chain and DeFi Pro signals still compute inline and stay out until they read one too.
+    "social_sentiment_surge", "social_sentiment_capitulation", "social_crowd_bullish",
+    "social_price_divergence", "holder_growth_trend", "whale_share_divergence",
 }
 
 # A signal built on one of the excluded classes must not enter the graph. Excluding the indicator

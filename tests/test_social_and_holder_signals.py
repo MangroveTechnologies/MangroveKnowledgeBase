@@ -1,4 +1,4 @@
-"""Cambrian signal families: fire on the intended pattern, fail closed otherwise."""
+"""Social and holder signals (and the indicators they read): fire on the intended pattern, fail closed otherwise."""
 
 import numpy as np
 import pandas as pd
@@ -6,7 +6,11 @@ import pytest
 
 from mangrove_kb.docstring_parser import parse_signal_policy
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals import cambrian as cs
+from mangrove_kb.indicators import OnchainChange, SocialBaselineShift, SocialZScore
+from mangrove_kb.signals import onchain, social
+
+cs = type("Signals", (), {**{k: staticmethod(v) for k, v in vars(onchain).items() if callable(v)},
+                            **{k: staticmethod(v) for k, v in vars(social).items() if callable(v)}})
 
 TRIGGERS = ["social_sentiment_surge", "social_sentiment_capitulation", "social_price_divergence", "whale_share_divergence"]
 FILTERS = ["social_crowd_bullish", "holder_growth_trend"]
@@ -33,9 +37,9 @@ def _noisy(n, mean, seed=0):
 def test_registered_with_types():
     assert set(NAMES) <= RuleRegistry.names()
     for name in NAMES:
-        doc = cs.__dict__[name].__doc__
+        doc = getattr(cs, name).__doc__
         assert ("Type: TRIGGER" in doc) == (name in TRIGGERS)
-        assert not parse_signal_policy(cs.__dict__[name])["disabled"]
+        assert not parse_signal_policy(getattr(cs, name))["disabled"]
 
 
 @pytest.mark.parametrize("name", NAMES)
@@ -87,3 +91,24 @@ def test_holder_signals():
 
 def test_nan_buckets_are_skipped():
     assert cs.social_sentiment_surge(_frame(_noisy(40, 5.5) + [np.nan, 7.0])) is True
+
+
+def test_indicators_match_their_formulas():
+    v = pd.Series([1.0, 2.0, 3.0, 4.0, 10.0])
+    z = SocialZScore.compute(data={"value": v}, params={"window": 4})["zscore"]
+    base = v.iloc[:4]
+    assert z.iloc[:4].isna().all()
+    assert z.iloc[-1] == pytest.approx((10.0 - base.mean()) / base.std())
+    assert SocialZScore.compute(data={"value": pd.Series([5.0] * 6)}, params={"window": 4})["zscore"].isna().all()
+
+    shift = SocialBaselineShift.compute(data={"value": pd.Series([1.0, 1.0, 1.0, 3.0, 3.0])},
+                                        params={"window": 2, "window_baseline": 3})
+    assert shift["recent"].iloc[-1] == 3.0 and shift["baseline"].iloc[-1] == 1.0
+    assert shift["shift"].iloc[-1] == 2.0 and shift["ratio"].iloc[-1] == 3.0
+    signed = SocialBaselineShift.compute(data={"value": pd.Series([-0.2, -0.2, -0.2, 0.1, 0.1])},
+                                         params={"window": 2, "window_baseline": 3})
+    assert pd.isna(signed["ratio"].iloc[-1]) and signed["shift"].iloc[-1] == pytest.approx(0.3)
+
+    ch = OnchainChange.compute(data={"value": pd.Series([100.0, 105.0, 110.0])}, params={"window": 2})
+    assert ch["pct_change"].iloc[-1] == pytest.approx(10.0) and ch["change"].iloc[-1] == 10.0
+    assert pd.isna(OnchainChange.compute(data={"value": pd.Series([0.0, 1.0])}, params={"window": 1})["pct_change"].iloc[-1])

@@ -12,7 +12,7 @@ The join is what makes either half worth querying: ``procedure:atr-based-stop`` 
 states, and it ``uses`` an indicator the code defines.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (225 of 723 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (231 of 735 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -98,6 +98,9 @@ ROLE_RELATION = "has-role"
 #: return every indicator, every signal, or the two role values -- filters that read as a query and
 #: act as a no-op.
 CLASS_AXIS_ROOT = "concept:technical-analysis"
+#: Every domain the classes divide: technical analysis by what a computation measures, alternative
+#: data (``social``, ``onchain``) by what is read. A class is an immediate subclass of either.
+CLASS_AXIS_ROOTS: tuple[str, ...] = (CLASS_AXIS_ROOT, "concept:alternative-data")
 
 CATEGORIES: tuple[str, ...] = ("structural", "descriptive", "associative", "meta")
 
@@ -568,8 +571,9 @@ class KnowledgeGraph:
     def classes(self) -> set[str]:
         """The character classes -- the vocabulary ``find(kind=...)`` is *for*.
 
-        The six divisions of technical analysis: what a computation measures. An indicator is
-        ``instance-of`` one; a signal is ``about`` one.
+        The six divisions of technical analysis (what a computation measures) and the two of
+        alternative data (``social``, ``onchain``: what is read). An indicator is ``instance-of``
+        one; a signal is ``about`` one.
 
         This deliberately does **not** return every node the backbone points at. That set also holds
         ``concept:indicator`` (73 results), ``concept:signal`` (225), ``concept:technical-analysis``
@@ -579,7 +583,7 @@ class KnowledgeGraph:
         classes.
         """
         return {e.src for e in self.edges
-                if e.relation == "kind-of" and e.dst == CLASS_AXIS_ROOT}
+                if e.relation == "kind-of" and e.dst in CLASS_AXIS_ROOTS}
 
     def statuses(self) -> set[str]:
         """Every status a node actually carries. Enumerable so ``find(status=...)`` cannot miss."""
@@ -745,7 +749,7 @@ class KnowledgeGraph:
 
         The ``about`` edges are a projection of ``uses`` plus the class table, emitted by the builder
         in the same pass and checked there against the ``uses`` edge behind each one.
-        All 225 signals resolve this way, every one reading a classified indicator. (The node
+        All 231 signals resolve this way, every one reading a classified indicator. (The node
         property ``source_module`` carries the same string, but it is provenance, not the assertion
         -- the graph is the source of truth.)
 

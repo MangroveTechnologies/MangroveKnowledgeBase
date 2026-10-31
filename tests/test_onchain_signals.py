@@ -28,8 +28,8 @@ def parsed_onchain() -> dict:
 # Coverage                                                                    #
 # --------------------------------------------------------------------------- #
 class TestOnChainCoverage:
-    EXPECTED_TRIGGER_COUNT = 4
-    EXPECTED_FILTER_COUNT = 6
+    EXPECTED_TRIGGER_COUNT = 5  # + whale_share_divergence (Cambrian holder distribution)
+    EXPECTED_FILTER_COUNT = 7   # + holder_growth_trend (Cambrian holder distribution)
     EXPECTED_TOTAL = EXPECTED_TRIGGER_COUNT + EXPECTED_FILTER_COUNT
 
     def test_total_count(self, parsed_onchain):
@@ -58,6 +58,10 @@ class TestOnChainMetadata:
         "ExchangeNetflow",
         "WhaleNetInflow",
         "HolderConcentration",
+        # Cambrian holder distribution, and price for the divergence leg.
+        "HolderCount",
+        "WhaleHeldShare",
+        "close",
     }
 
     def test_type_and_requires(self, parsed_onchain):

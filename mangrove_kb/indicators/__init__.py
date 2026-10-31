@@ -125,10 +125,25 @@ from .pattern_indicators import (
     CandleRelation,
 )
 
+# Social indicators (alternative data: per-bar social readings)
+from .social_indicators import (
+    SocialZScore,
+    SocialBaselineShift,
+)
+
+# On-chain indicators (alternative data: per-bar on-chain readings)
+from .onchain_indicators import (
+    OnchainChange,
+)
+
 __all__ = [
     "CandleGeometry",
     "CandleRaw",
     "CandleRelation",
+    # Social and on-chain indicators
+    "SocialZScore",
+    "SocialBaselineShift",
+    "OnchainChange",
     # Interface
     "IndicatorInterface",
     # Utilities
