@@ -1415,6 +1415,7 @@ SIGNAL_SCOPE = {
     # older on-chain and DeFi Pro signals still compute inline and stay out until they read one too.
     "social_sentiment_surge", "social_sentiment_capitulation", "social_crowd_bullish",
     "social_price_divergence", "holder_growth_trend", "whale_share_divergence",
+    "x_post_count_spike", "x_attention_elevated", "x_attention_price_divergence",
 }
 
 # A signal built on one of the excluded classes must not enter the graph. Excluding the indicator
