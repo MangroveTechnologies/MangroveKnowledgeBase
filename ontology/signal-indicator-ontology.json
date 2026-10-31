@@ -19926,6 +19926,230 @@
    }
   },
   {
+   "id": "procedure:signal-x-attention-elevated",
+   "title": "x_attention_elevated",
+   "kind": "Procedure",
+   "summary": "Check whether recent X attention runs above its longer baseline (regime filter).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "reference": null,
+    "warmup_bars": "window + window_baseline - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_attention_elevated', 'params': {'window': value, 'window_baseline': value, 'min_ratio': value, 'x_query': value}}, df)",
+    "formula": "ratio(XPostCount, window, window_baseline)[t] >= min_ratio",
+    "friendly_name": "X Attention Elevated",
+    "display_name": "X Attention Elevated",
+    "short_description": "People have been posting about this asset on X more than usual lately.",
+    "inputs": {
+     "XPostCount": {
+      "type": "series",
+      "description": "X posts matching the asset's cashtag query per bar"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 6,
+      "min": 1,
+      "max": 90,
+      "description": "Recent bars averaged"
+     },
+     "window_baseline": {
+      "type": "int",
+      "default": 72,
+      "min": 5,
+      "max": 365,
+      "description": "Bars before the recent window forming the norm"
+     },
+     "min_ratio": {
+      "type": "float",
+      "default": 1.5,
+      "min": 1.0,
+      "max": 20.0,
+      "description": "Required ratio of the recent mean to the baseline mean"
+     },
+     "x_query": {
+      "type": "str",
+      "default": "all",
+      "min": null,
+      "max": null,
+      "description": "X query variant the data layer counts",
+      "options": [
+       "all",
+       "en_original"
+      ]
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the mean post count over the last window bars is at least min_ratio times the mean of the preceding window_baseline bars"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-x-attention-price-divergence",
+   "title": "x_attention_price_divergence",
+   "kind": "Procedure",
+   "summary": "Detect a price drop accompanied by an X attention spike (capitulation chatter, contrarian).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_attention_price_divergence', 'params': {'window_price': value, 'min_drop_pct': value, 'window': value, 'z_threshold': value, 'x_query': value}}, df)",
+    "formula": "roc(close, window_price)[t] <= -min_drop_pct\nAND zscore(log1p(XPostCount), window)[t] >= z_threshold",
+    "friendly_name": "X Capitulation Chatter",
+    "display_name": "X Attention Price Divergence",
+    "short_description": "Price fell while posts about this asset on X spiked.",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
+     "XPostCount": {
+      "type": "series",
+      "description": "X posts matching the asset's cashtag query per bar"
+     }
+    },
+    "params": {
+     "window_price": {
+      "type": "int",
+      "default": 24,
+      "min": 1,
+      "max": 50,
+      "description": "Bars over which the price drop is measured"
+     },
+     "min_drop_pct": {
+      "type": "float",
+      "default": 5.0,
+      "min": 0.5,
+      "max": 90.0,
+      "description": "Minimum percentage fall in close over window_price"
+     },
+     "window": {
+      "type": "int",
+      "default": 72,
+      "min": 6,
+      "max": 365,
+      "description": "Prior bars forming the attention baseline (latest excluded)"
+     },
+     "z_threshold": {
+      "type": "float",
+      "default": 2.0,
+      "min": 0.5,
+      "max": 10.0,
+      "description": "Standard deviations of log1p(count) above the baseline mean required"
+     },
+     "x_query": {
+      "type": "str",
+      "default": "all",
+      "min": null,
+      "max": null,
+      "description": "X query variant the data layer counts",
+      "options": [
+       "all",
+       "en_original"
+      ]
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if close fell at least min_drop_pct over window_price bars and the latest post count's log1p is z_threshold standard deviations above the prior window"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-x-post-count-spike",
+   "title": "x_post_count_spike",
+   "kind": "Procedure",
+   "summary": "Detect an unusual burst of X posts about the asset on the latest bar.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_post_count_spike', 'params': {'window': value, 'z_threshold': value, 'min_count': value, 'x_query': value}}, df)",
+    "formula": "zscore(log1p(XPostCount), window)[t] >= z_threshold AND XPostCount[t] >= min_count",
+    "friendly_name": "X Post Spike",
+    "display_name": "X Post Count Spike",
+    "short_description": "Far more people are posting about this asset on X than usual.",
+    "inputs": {
+     "XPostCount": {
+      "type": "series",
+      "description": "X posts matching the asset's cashtag query per bar"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 48,
+      "min": 6,
+      "max": 365,
+      "description": "Prior bars forming the baseline (latest excluded)"
+     },
+     "z_threshold": {
+      "type": "float",
+      "default": 3.0,
+      "min": 1.0,
+      "max": 10.0,
+      "description": "Standard deviations of log1p(count) above the baseline mean required"
+     },
+     "min_count": {
+      "type": "int",
+      "default": 20,
+      "min": 0,
+      "max": 100000,
+      "description": "Minimum posts on the latest bar, guarding thin assets"
+     },
+     "x_query": {
+      "type": "str",
+      "default": "all",
+      "min": null,
+      "max": null,
+      "description": "X query variant the data layer counts",
+      "options": [
+       "all",
+       "en_original"
+      ]
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the latest post count is at least min_count and its log1p is z_threshold standard deviations above the prior window"
+     }
+    }
+   }
+  },
+  {
    "id": "concept:chart-pattern",
    "title": "chart pattern",
    "kind": "Concept",
@@ -37817,6 +38041,138 @@
    "to_id": "concept:averaging"
   },
   {
+   "from": "x_attention_elevated",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-attention-elevated",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_attention_elevated",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-x-attention-elevated",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "x_attention_elevated",
+   "rel": "uses",
+   "to": "SocialBaselineShift",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-x-attention-elevated",
+   "to_id": "procedure:indicator-socialbaselineshift",
+   "inputs": {
+    "ratio": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "x_attention_elevated",
+   "rel": "about",
+   "to": "social",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-x-attention-elevated",
+   "to_id": "concept:social"
+  },
+  {
+   "from": "x_attention_price_divergence",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-attention-price-divergence",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_attention_price_divergence",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-x-attention-price-divergence",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "x_attention_price_divergence",
+   "rel": "uses",
+   "to": "ROC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-x-attention-price-divergence",
+   "to_id": "procedure:indicator-roc",
+   "inputs": {
+    "roc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "x_attention_price_divergence",
+   "rel": "uses",
+   "to": "SocialZScore",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-x-attention-price-divergence",
+   "to_id": "procedure:indicator-socialzscore",
+   "inputs": {
+    "zscore": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "x_attention_price_divergence",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-x-attention-price-divergence",
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "x_attention_price_divergence",
+   "rel": "about",
+   "to": "social",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-x-attention-price-divergence",
+   "to_id": "concept:social"
+  },
+  {
+   "from": "x_post_count_spike",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-post-count-spike",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_post_count_spike",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-x-post-count-spike",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "x_post_count_spike",
+   "rel": "uses",
+   "to": "SocialZScore",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-x-post-count-spike",
+   "to_id": "procedure:indicator-socialzscore",
+   "inputs": {
+    "zscore": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "x_post_count_spike",
+   "rel": "about",
+   "to": "social",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-x-post-count-spike",
+   "to_id": "concept:social"
+  },
+  {
    "from": "hammer_trigger",
    "rel": "supersedes",
    "to": "hanging_man_trigger",
@@ -48213,8 +48569,8 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "signals": 231,
-  "signals_registered": 255,
+  "signals": 234,
+  "signals_registered": 258,
   "signals_out_of_scope": 24,
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],

@@ -46,7 +46,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 735, 2411
+s["nodes"], s["edges"]          # 738, 2425
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -55,7 +55,7 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  735 2411
+nodes, edges  738 2425
 primitives    {'Procedure': 415, 'Concept': 205, 'Property': 74, 'Fact': 23,
                'Judgment': 16, 'Object': 1, 'Schema': 1}
 relations     {'about': 1022, 'instance-of': 387, 'part-of': 369, 'uses': 299,
@@ -118,7 +118,7 @@ Text search is the wider net, for when they did *not* name an indicator, or name
 have:
 
 ```
-find("divergence") -> 45 matches, name matches first
+find("divergence") -> 46 matches, name matches first
   concept:hidden-divergence                        <- the knowledge-base concepts, also named for it
   concept:volume-divergence
   procedure:signal-rsi-bearish-divergence
@@ -142,7 +142,7 @@ first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
-shown you 10 of 45.
+shown you 10 of 46.
 
 **See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
@@ -198,7 +198,7 @@ filters  = kg.find(kind="volatility", role="filter",  limit=None)
 ```
 
 ```
-momentum triggers   27      volatility filters  18
+momentum triggers   28      volatility filters  18
   procedure:signal-adosc-cross-down       procedure:signal-atr-high-volatility
   procedure:signal-adosc-cross-up         procedure:signal-bb-above-upper
   procedure:signal-ao-zero-cross          procedure:signal-bb-below-lower
@@ -300,7 +300,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 735 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 738 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
