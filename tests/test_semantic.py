@@ -118,4 +118,10 @@ def test_it_answers_the_measured_questions(kg):
         ("what settles two days later", "concept:equity-settlement"),
     ]
     answered = sum(want in [x["id"] for x in kg.ask(q, limit=5)] for q, want in cases)
-    assert answered >= 11, f"semantic retrieval answered {answered} of {len(cases)}"
+    # Bar lowered from 11 to 10 on 2026-10-31, approved by Tim, when the social and on-chain
+    # families added 12 nodes. Their prose uses "price" often, which lowers that term's weight in
+    # the LSA index; "what is the fairest price today" then ranks concept:point-of-control 6th
+    # instead of 5th. Nothing new outranks it -- existing nodes reshuffled. Misses at 10/12:
+    # "sideways market" (also missed before) and "fairest price" (6th). A third miss is a real
+    # regression, not drift.
+    assert answered >= 10, f"semantic retrieval answered {answered} of {len(cases)}"

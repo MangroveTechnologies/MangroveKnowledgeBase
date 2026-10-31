@@ -17,9 +17,11 @@ Signal Categories:
     - pattern: Doji, Hammer, Engulfing, MorningStar, InsideBar, NR7, etc.
     - trend: SMA, EMA, MACD, ADX, Aroon, Ichimoku, PSAR, etc.
     - volatility: Bollinger Bands, ATR, Keltner Channel, Donchian, etc.
-    - onchain: smart-money flows, exchange flows, whale activity, holder concentration
+    - onchain: smart-money flows, exchange flows, whale activity, holder concentration,
+      holder growth and whale share (Cambrian holder distribution)
     - defi_pro: token-unlock pressure, perp funding regime, ETF-flow momentum,
       treasury accumulation, lending-rate spread (DeFiLlama Pro)
+    - social: social-sentiment surges, crowd regime and price divergence (Deep42 today)
 
 Deprecated paths: `volume` (split four ways) and `patterns` (now `pattern`) survive as shim modules
 that re-export from the new homes and warn on import. They are deliberately NOT imported below --
@@ -37,3 +39,4 @@ from mangrove_kb.signals import oscillator
 from mangrove_kb.signals import averaging
 from mangrove_kb.signals import onchain
 from mangrove_kb.signals import defi_pro
+from mangrove_kb.signals import social

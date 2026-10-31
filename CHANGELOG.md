@@ -6,6 +6,24 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Social and on-chain signal families, modelled in the graph
+
+Six alternative-data signals from Cambrian data, built the way the technical signals are: each one
+reads a named indicator, so the graph builder links it and the signals are modelled (231 of 255,
+up from 225).
+
+- **Indicators** (`indicators/social_indicators.py`, `indicators/onchain_indicators.py`):
+  `SocialZScore` (latest reading against the prior window, in standard deviations),
+  `SocialBaselineShift` (recent mean against a non-overlapping baseline: `recent`, `baseline`,
+  `shift`, `ratio`) and `OnchainChange` (`pct_change`, `change` over a window). Each takes the
+  reading as `value`; the signal chooses the column.
+- **Signals**: `social_sentiment_surge`, `social_sentiment_capitulation`, `social_crowd_bullish`,
+  `social_price_divergence` (`signals/social.py`, Deep42 sentiment), and `holder_growth_trend`,
+  `whale_share_divergence` (`signals/onchain.py`, Solana holder distribution). Price legs read `ROC`.
+  The caller supplies the columns aligned without lookahead; every signal fails closed without them.
+- **Graph**: classes `social` and `onchain` under a new `concept:alternative-data`, beside technical
+  analysis, because their inputs are not price and volume. 12 nodes and 37 edges added, none changed.
+
 ### The dense encoder is ONNX by default; torch is now an optional fallback
 
 `DenseIndex.model` loads `onnxruntime` + `tokenizers` over an ONNX export of the MiniLM checkpoint
@@ -227,7 +245,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 723 nodes, 2374 edges, in
+carries a formula stating the predicate it computes -- 735 nodes, 2411 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,

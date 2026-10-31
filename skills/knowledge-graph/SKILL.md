@@ -13,9 +13,9 @@ description: >-
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of **723 nodes, 2374 edges** with two halves on one schema:
+`mangrove_kb` ships a knowledge graph of **735 nodes, 2411 edges** with two halves on one schema:
 
-- **The library, compiled from its own source** — 73 indicators and 225 signals. Exact, not
+- **The library, compiled from its own source** — 76 indicators and 231 signals. Exact, not
   extracted: every answer here is a fact about the code as it is.
 - **The trading knowledge base, ingested from its chapters** — market foundations, instruments and
   mechanics, core concepts, strategy design, risk management, indicators, chart patterns,
@@ -99,7 +99,7 @@ adosc_bearish  --about-------->  momentum      it is concerned with it, because 
 adosc_bearish  --uses--------->  ADOSC         ...and this is the reason
 ```
 
-`find(kind=...)` returns both. All 225 signals carry an `about` edge, every one derived from a `uses`
+`find(kind=...)` returns both. All 231 signals carry an `about` edge, every one derived from a `uses`
 edge the builder checks it against — so the claim is in the file and the reason is one hop away.
 Four signals carry **two** — the RSI divergence signals read both an oscillator and a momentum
 indicator, and are genuinely about both. Do not assume class is single-valued.

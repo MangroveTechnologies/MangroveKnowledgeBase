@@ -88,8 +88,8 @@ def test_uc1_orientation_values(kg, guide):
 
 def test_uc2_divergence_search(kg, guide):
     r = kg.find("divergence", limit=None)
-    assert r.total == 40, "the guide says 40 matches"
-    assert "40 matches" in guide and "10 of 40" in guide
+    assert r.total == 45, "the guide says 45 matches"
+    assert "45 matches" in guide and "10 of 45" in guide
     top4 = [x["id"] for x in r.items[:4]]
     assert all("divergence" in i for i in top4), "name matches must still lead"
     for i in top4:
@@ -106,8 +106,8 @@ def test_uc3_rsi_readers(kg, guide):
 def test_uc4_both_axes_counts(kg, guide):
     t = kg.find(kind="momentum", role="trigger", limit=None).total
     f = kg.find(kind="volatility", role="filter", limit=None).total
-    assert (t, f) == (25, 18), f"guide says 25 / 18, graph says {t} / {f}"
-    assert "momentum triggers   25" in guide and "volatility filters  18" in guide
+    assert (t, f) == (27, 18), f"guide says 27 / 18, graph says {t} / {f}"
+    assert "momentum triggers   27" in guide and "volatility filters  18" in guide
 
 
 def test_uc5_rsi_oversold_requirements(kg, guide):
@@ -189,7 +189,7 @@ def test_uc9_output_index(kg, guide):
     assert hist[0]["description"].startswith("macd minus signal. Crosses zero exactly when macd")
     assert hist[0]["description"][:60] in guide
 
-    assert kg.outputs(units="percent", limit=None).total == 28 and "percent` matches 28" in guide
+    assert kg.outputs(units="percent", limit=None).total == 29 and "percent` matches 29" in guide
     # The guide's trap rests on SwingDelta's unit being DEFERRED -- it is whatever the companion
     # indicator carries. If that ever became a concrete unit the trap would be misinformation.
     assert {r["id"] for r in kg.outputs(units="indicator units", limit=None)} == \

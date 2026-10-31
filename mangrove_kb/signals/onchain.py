@@ -29,15 +29,23 @@ the metric for that bar:
 See docs/data-providers.mdx for the upstream provider coverage map and how a
 series is fetched and time-aligned to OHLCV bars.
 
-Note: a total token-holder-count series is intentionally NOT provided -- Nansen
-exposes per-wallet-category holder counts but no clean total-holders time
-series, so signals that would depend on it are not shipped.
+Holder-distribution columns (Cambrian /solana/tokens/holder-distribution-over-time,
+through MangroveRoots; Solana tokens only), read through `OnchainChange`:
+
+    HolderCount         wallets holding the token (all USD bands), per snapshot.
+    WhaleHeldShare      share of USD held by $100,000+ wallets, 0.0-1.0.
+
+Nansen exposes no clean total-holders series; Cambrian's holder distribution does,
+which is what `holder_growth_trend` reads. USD bands move with price (a falling
+price pushes wallets into smaller bands), so the holder signals use counts and a
+share of USD held, which largely cancel price.
 """
 
 import logging
 
 import pandas as pd
 
+from mangrove_kb.indicators import ROC, OnchainChange
 from mangrove_kb.registry import RuleRegistry
 
 logger = logging.getLogger(__name__)
@@ -343,3 +351,113 @@ def holder_concentration_falling(df: pd.DataFrame, window: int = 14) -> bool:
         return False
 
     return float(series.iloc[-1]) < float(series.iloc[-1 - window])
+
+
+# =============================================================================
+# Holder distribution (OnchainChange, ROC)
+# =============================================================================
+
+@RuleRegistry.register("holder_growth_trend")
+def holder_growth_trend(df: pd.DataFrame, window: int = 14, min_growth_pct: float = 1.0) -> bool:
+    """Signal: holder_growth_trend
+
+    Check whether the token's holder base is growing (adoption filter).
+
+    Friendly-Name: Holder Base Growing
+    Display-Name: Holder Growth Trend
+    Short-Description: More wallets hold the token than a few weeks ago.
+
+    Warmup: window
+
+    Formula:
+        pct_change(HolderCount, window)[t] >= min_growth_pct
+
+    Inputs:
+        HolderCount: wallets holding the token, per bar
+
+    Params:
+        window [default=14, min=2, max=180]: readings between the two holder counts compared
+        min_growth_pct [default=1.0, min=0.0, max=50.0]: minimum percentage growth in holders over window
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the holder count grew at least min_growth_pct percent over the last window
+            readings
+
+    Type: FILTER
+    Requires: HolderCount
+
+    Args:
+        df (pd.DataFrame): DataFrame with a HolderCount column.
+        window (int): Readings between the two holder counts compared. Range: 2-180. Default: 14.
+        min_growth_pct (float): Minimum percentage growth in holders over window. Range: 0.0-50.0. Default: 1.0.
+
+    Returns:
+        bool: True if the holder count grew at least min_growth_pct percent over the last
+            window readings.
+    """
+    if len(df) < window + 1:
+        return False
+    series = _clean_series(df, "HolderCount")
+    if series is None:
+        return False
+    growth = OnchainChange.compute(data={'value': series}, params={'window': window})['pct_change'].iloc[-1]
+    return not pd.isna(growth) and float(growth) >= min_growth_pct
+
+
+@RuleRegistry.register("whale_share_divergence")
+def whale_share_divergence(df: pd.DataFrame, window: int = 7, min_drop_pct: float = 5.0,
+                           min_share_rise: float = 0.0) -> bool:
+    """Signal: whale_share_divergence
+
+    Detect large holders gaining share of the supply value while price falls.
+
+    Friendly-Name: Whales Buying the Drop
+    Display-Name: Whale Share Divergence
+    Short-Description: Price fell while large wallets held a bigger share.
+
+    Warmup: window
+
+    Formula:
+        roc(close, window)[t] <= -min_drop_pct AND change(WhaleHeldShare, window)[t] > min_share_rise
+
+    Inputs:
+        close: closing price
+        WhaleHeldShare: share of USD held by $100,000+ wallets per bar, 0-1
+
+    Params:
+        window [default=7, min=2, max=60]: bars over which price and share changes are measured
+        min_drop_pct [default=5.0, min=1.0, max=50.0]: minimum percentage fall in close over window
+        min_share_rise [default=0.0, min=0.0, max=0.2]: minimum rise in WhaleHeldShare over window, in share points
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if close fell at least min_drop_pct over window bars while the share of USD held by
+            $100,000+ wallets rose by more than min_share_rise
+
+    Type: TRIGGER
+    Requires: close, WhaleHeldShare
+
+    Args:
+        df (pd.DataFrame): DataFrame with close and WhaleHeldShare columns.
+        window (int): Bars over which price and share changes are measured. Range: 2-60. Default: 7.
+        min_drop_pct (float): Minimum percentage fall in close over window. Range: 1.0-50.0. Default: 5.0.
+        min_share_rise (float): Minimum rise in WhaleHeldShare over window (absolute, 0-1 scale). Range: 0.0-0.2. Default: 0.0.
+
+    Returns:
+        bool: True if close fell at least min_drop_pct over window bars while the share of
+            USD held by $100,000+ wallets rose by more than min_share_rise. A falling price
+            mechanically pushes whales below the band threshold, so a rising share is against
+            that drift.
+    """
+    if len(df) < window + 1:
+        return False
+    close = _clean_series(df, "close")
+    share = _clean_series(df, "WhaleHeldShare")
+    if close is None or share is None:
+        return False
+    drop = ROC.compute(data={'close': close}, params={'window': window})['roc'].iloc[-1]
+    rise = OnchainChange.compute(data={'value': share}, params={'window': window})['change'].iloc[-1]
+    if pd.isna(drop) or pd.isna(rise):
+        return False
+    return float(drop) <= -min_drop_pct and float(rise) > min_share_rise

@@ -32,8 +32,9 @@ def test_stats_enumerates_every_filter_value(kg):
         assert kg.find(role=role, limit=1) is not None
     for cls in s["classes"]:
         assert kg.find(kind=cls, limit=1) is not None
-    assert len(s["classes"]) == 7, (
-        "classes is the CHARACTER vocabulary -- the divisions of technical analysis. "
+    assert len(s["classes"]) == 9, (
+        "classes is the class vocabulary -- the divisions of technical analysis, plus social and "
+        "onchain dividing alternative data. "
         "It once returned every backbone target, which swept in concept:indicator (71 "
         "results), concept:signal (218), concept:technical-analysis (295 of 303) and "
         "property:role (the role values), advertising filters that act as no-ops. Six are "
@@ -285,7 +286,7 @@ def test_all_paths_distinguishes_its_two_truncated_states(kg):
     """"Showing 10 of 47" is a claim that 47 exist. After an early stop you cannot make it."""
     complete = kg.all_paths("procedure:signal-adosc-bearish", "concept:momentum",
                             max_depth=4, sibling_hops=True, limit=3)
-    assert complete.truncated and "showing 3 of 220" in complete.note
+    assert complete.truncated and "showing 3 of 224" in complete.note
     assert "stopped" not in complete.note, "a finished search must not hedge"
 
     # The step bound is not decorative: the same query one hop deeper trips the default.
