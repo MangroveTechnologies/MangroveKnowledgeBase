@@ -15,8 +15,11 @@ graph models them (234 of 258). They measure how much people post, not what they
   standard deviations above the prior `window`, with a `min_count` floor), `x_attention_elevated`
   (recent mean against a non-overlapping baseline, `min_ratio`), and
   `x_attention_price_divergence` (price down `min_drop_pct` over `window_price` while the count
-  z-score clears `z_threshold`). Each reads the `x_post_count` column and fails closed without it;
+  z-score clears `z_threshold`). Each reads the `XPostCount` column and fails closed without it;
   missing hours stay missing rather than becoming zero.
+- **`SocialZScore`**: a flat baseline is now an explicit tolerance, `sd <= 1e-12 * max(1, |mean|)`,
+  rather than `sd == 0`, so a z-score over identical readings is undefined whichever standard
+  deviation computes it. Unchanged for any baseline of distinct integer counts.
 - **Graph**: 3 nodes and 14 edges added, none changed. Each uses `SocialZScore` or
   `SocialBaselineShift` (and `ROC` for the price leg) and sits under `concept:social`.
 

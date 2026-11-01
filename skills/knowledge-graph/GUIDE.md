@@ -56,10 +56,10 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 
 ```
 nodes, edges  738 2425
-primitives    {'Procedure': 415, 'Concept': 205, 'Property': 74, 'Fact': 23,
+primitives    {'Procedure': 418, 'Concept': 205, 'Property': 74, 'Fact': 23,
                'Judgment': 16, 'Object': 1, 'Schema': 1}
-relations     {'about': 1022, 'instance-of': 387, 'part-of': 369, 'uses': 299,
-               'has-role': 231, 'kind-of': 101, 'supersedes': 2}
+relations     {'about': 1026, 'instance-of': 390, 'part-of': 369, 'uses': 303,
+               'has-role': 234, 'kind-of': 101, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:onchain', 'concept:oscillator',
                'concept:pattern', 'concept:social', 'concept:volatility']
@@ -78,7 +78,7 @@ also accepts the short name (`"momentum"`). Both work; the ids are what you get 
 
 `classes` is deliberately the eight -- six dividing technical analysis, plus `social` and `onchain`
 dividing alternative data -- and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (76), `"signal"` (232) and `"technical-analysis"` (330 of 735) — legal, occasionally
+`"indicator"` (76), `"signal"` (235) and `"technical-analysis"` (331 of 738) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -350,8 +350,8 @@ If you use `path` for an explanation, constrain it — `relations=["uses", "inst
 
 **Trap:** `all_paths` excludes routes through a shared parent by default. `adosc_bearish
 --instance-of--> Signal <--instance-of-- adosc_bullish` says "they are both signals", and with
-`concept:signal` at degree 225 those detours outnumber the real answers 9,638 to 2 at
-`max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
+`concept:signal` at degree 237 those detours outnumber the real answers 6,502 to 2 at
+`max_depth=5` before the default `max_steps` runs out. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
 related?" "they both read RSI"*.
 
 **See also:** [SKILL · the two axes](SKILL.md#the-two-axes-the-thing-to-understand) · [§15 reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [§4 compose](GUIDE.md#4-compose-a-strategy-from-both-axes)

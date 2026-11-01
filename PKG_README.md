@@ -138,7 +138,7 @@ print(f"Available signals: {len(RuleRegistry._registry)}")
 
 ### Signal Categories
 
-**255 registered**, 225 modelled in the graph. Every signal carries two independent labels: the
+**258 registered**, 234 modelled in the graph. Every signal carries two independent labels: the
 class it is *about* (above) and the **role** it plays -- `trigger` (an event) or `filter` (an ongoing
 state). They are different questions, so the graph keeps them apart:
 

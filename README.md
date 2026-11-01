@@ -34,7 +34,7 @@ The join is what makes either half worth querying: `procedure:atr-based-stop` is
 chapter states, and it `uses` an indicator the code defines, so one query crosses from *why* to
 *what it computes*.
 
-The point is the second thing. A library of 255 functions is only useful if you can find the right
+The point is the second thing. A library of 258 functions is only useful if you can find the right
 one, and `grep` cannot answer *"which indicators produce a bounded oscillator"*, *"what reads RSI's
 third output"*, or *"is there already a signal for this"*. The graph can, and the answers are facts
 about the code as it is.
@@ -402,7 +402,7 @@ rather than reimplemented in JS, and a test asserts the two agree on real querie
 
 The same graph, same filters, same inspector — drag to rotate, scroll to zoom, right-drag to pan. In
 either view, **double-click a node to hide or show what hangs off it**, which is how you make a hub
-with 231 signals attached readable.
+with 234 signals attached readable.
 
 A **green ring** marks the selected node; a **yellow ring** marks a deprecated one — it still runs,
 it just has a canonical replacement. Nothing else is ringed: 329 of 738 nodes are `ratified`, so
@@ -465,7 +465,7 @@ MangroveKnowledgeBase/
 │   │                                neighbors · subgraph · path · all_paths)
 │   ├── registry.py               ← RuleRegistry: evaluate a signal by name
 │   ├── docstring_parser.py       ← docstring → structured metadata
-│   ├── signals/                  ← 255 signal functions
+│   ├── signals/                  ← 258 signal functions
 │   ├── indicators/               ← 82 indicator classes
 │   ├── viz/                      ← the self-contained graph viewer
 │   ├── data/                     ← the graph, bundled at build time
