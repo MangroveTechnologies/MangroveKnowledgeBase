@@ -12,7 +12,7 @@ The join is what makes either half worth querying: ``procedure:atr-based-stop`` 
 states, and it ``uses`` an indicator the code defines.
 
 **Two classification axes, and they are not interchangeable.** Every signal is simultaneously an
-``instance-of`` a type and a bearer of a ``has-role`` role (231 of 735 nodes carry both). These are
+``instance-of`` a type and a bearer of a ``has-role`` role (232 of 736 nodes carry both). These are
 kept strictly apart throughout this module:
 
 * ``instance-of`` / ``kind-of`` is the **rigid backbone** -- what a thing *is*. It is transitively
@@ -749,7 +749,7 @@ class KnowledgeGraph:
 
         The ``about`` edges are a projection of ``uses`` plus the class table, emitted by the builder
         in the same pass and checked there against the ``uses`` edge behind each one.
-        All 231 signals resolve this way, every one reading a classified indicator. (The node
+        All 232 signals resolve this way, every one reading a classified indicator. (The node
         property ``source_module`` carries the same string, but it is provenance, not the assertion
         -- the graph is the source of truth.)
 

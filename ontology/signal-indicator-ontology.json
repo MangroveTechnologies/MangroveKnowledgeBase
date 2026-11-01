@@ -16357,6 +16357,66 @@
    }
   },
   {
+   "id": "procedure:signal-social-crowd-cooling",
+   "title": "social_crowd_cooling",
+   "kind": "Procedure",
+   "summary": "Check whether the crowd is no more bullish than usual: the complement of social_crowd_bullish at the same windows and margin 0 (contrarian regime filter).",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "reference": null,
+    "warmup_bars": "window + window_baseline - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'social_crowd_cooling', 'params': {'window': value, 'window_baseline': value, 'margin': value}}, df)",
+    "formula": "shift(SocialNetBullShare, window, window_baseline)[t] <= -margin",
+    "friendly_name": "Crowd Not Running Hot",
+    "display_name": "Social Crowd Cooling",
+    "short_description": "Recent posts lean no more bullish than this asset's norm.",
+    "inputs": {
+     "SocialNetBullShare": {
+      "type": "series",
+      "description": "bullish minus bearish share of posts per bar, -1 to 1"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 7,
+      "min": 1,
+      "max": 60,
+      "description": "Recent readings averaged"
+     },
+     "window_baseline": {
+      "type": "int",
+      "default": 60,
+      "min": 14,
+      "max": 365,
+      "description": "Readings before the recent window forming the norm"
+     },
+     "margin": {
+      "type": "float",
+      "default": 0.0,
+      "min": 0.0,
+      "max": 0.5,
+      "description": "Amount the recent average must sit at or below the norm by"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True if the mean net bullish share over the last window readings is at or below the mean of the preceding window_baseline readings minus margin"
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:signal-social-price-divergence",
    "title": "social_price_divergence",
    "kind": "Procedure",
@@ -35572,6 +35632,43 @@
    "to_id": "concept:social"
   },
   {
+   "from": "social_crowd_cooling",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-social-crowd-cooling",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "social_crowd_cooling",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-social-crowd-cooling",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "social_crowd_cooling",
+   "rel": "uses",
+   "to": "SocialBaselineShift",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-social-crowd-cooling",
+   "to_id": "procedure:indicator-socialbaselineshift",
+   "inputs": {
+    "shift": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "social_crowd_cooling",
+   "rel": "about",
+   "to": "social",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-social-crowd-cooling",
+   "to_id": "concept:social"
+  },
+  {
    "from": "social_price_divergence",
    "rel": "instance-of",
    "to": "Signal",
@@ -48213,8 +48310,8 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "signals": 231,
-  "signals_registered": 255,
+  "signals": 232,
+  "signals_registered": 256,
   "signals_out_of_scope": 24,
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],

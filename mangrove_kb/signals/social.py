@@ -203,6 +203,58 @@ def social_crowd_bullish(df: pd.DataFrame, window: int = 7, window_baseline: int
     return shift is not None and shift > margin
 
 
+@RuleRegistry.register("social_crowd_cooling")
+def social_crowd_cooling(df: pd.DataFrame, window: int = 7, window_baseline: int = 60, margin: float = 0.0) -> bool:
+    """Signal: social_crowd_cooling
+
+    Check whether the crowd is no more bullish than usual: the complement of social_crowd_bullish
+    at the same windows and margin 0 (contrarian regime filter).
+
+    Friendly-Name: Crowd Not Running Hot
+    Display-Name: Social Crowd Cooling
+    Short-Description: Recent posts lean no more bullish than this asset's norm.
+
+    Warmup: window + window_baseline - 1
+
+    Formula:
+        shift(SocialNetBullShare, window, window_baseline)[t] <= -margin
+
+    Inputs:
+        SocialNetBullShare: bullish minus bearish share of posts per bar, -1 to 1
+
+    Params:
+        window [default=7, min=1, max=60]: recent readings averaged
+        window_baseline [default=60, min=14, max=365]: readings before the recent window forming the norm
+        margin [default=0.0, min=0.0, max=0.5]: amount the recent average must sit at or below the norm by
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True if the mean net bullish share over the last window readings is at or below the mean
+            of the preceding window_baseline readings minus margin
+
+    Type: FILTER
+    Requires: SocialNetBullShare
+
+    Args:
+        df (pd.DataFrame): DataFrame with a SocialNetBullShare column.
+        window (int): Recent readings averaged. Range: 1-60. Default: 7.
+        window_baseline (int): Readings before the recent window forming the norm. Range: 14-365. Default: 60.
+        margin (float): Amount the recent average must sit at or below the norm by. Range: 0.0-0.5. Default: 0.0.
+
+    Returns:
+        bool: True if the mean net bullish share over the last window readings is at or
+            below the mean of the preceding window_baseline readings minus margin.
+    """
+    if len(df) < window + window_baseline:
+        return False
+    s = _series(df, "SocialNetBullShare")
+    if s is None:
+        return False
+    shift = _last(SocialBaselineShift.compute(
+        data={'value': s}, params={'window': window, 'window_baseline': window_baseline})['shift'])
+    return shift is not None and shift <= -margin
+
+
 @RuleRegistry.register("social_price_divergence")
 def social_price_divergence(df: pd.DataFrame, window: int = 7, min_drop_pct: float = 5.0, window_baseline: int = 30) -> bool:
     """Signal: social_price_divergence

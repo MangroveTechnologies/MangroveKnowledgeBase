@@ -1413,7 +1413,7 @@ SIGNAL_SCOPE = {
     # Alternative data that reads a named indicator: social readings through SocialZScore and
     # SocialBaselineShift, holder distribution through OnchainChange, price legs through ROC. The
     # older on-chain and DeFi Pro signals still compute inline and stay out until they read one too.
-    "social_sentiment_surge", "social_sentiment_capitulation", "social_crowd_bullish",
+    "social_sentiment_surge", "social_sentiment_capitulation", "social_crowd_bullish", "social_crowd_cooling",
     "social_price_divergence", "holder_growth_trend", "whale_share_divergence",
 }
 
