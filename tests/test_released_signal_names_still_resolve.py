@@ -226,6 +226,7 @@ RELEASED_SIGNAL_NAMES = (
     'smma_cross_down',
     'smma_cross_up',
     'social_crowd_bullish',
+    'social_crowd_cooling',
     'social_price_divergence',
     'social_sentiment_capitulation',
     'social_sentiment_surge',
