@@ -367,7 +367,7 @@ derived kind beneath it — so `signal` and `indicator` are separable inside `Pr
 is separable from `has-role` inside `descriptive`.
 
 Sub-kinds are **shades of their parent's hue**, never new colours: every dot in that group is a
-procedure, and the darker teal is the 73 indicators among them.
+procedure, and the darker teal is the 76 indicators among them.
 
 Parent and child are **AND-ed**. Unticking `Procedure` hides every procedure whatever the children
 say, and the children grey out to show why — so the canvas can never empty for a reason that is not
@@ -444,8 +444,12 @@ answer is an answer travels with the connection, not in a list somewhere else.
   `ParabolicSAR`, `SwingDelta`, `SqueezeDepth`, `MultiTFSlope`) with the decision moved into the
   signals. ATRTrailingStop is a trade-management rule, not an indicator; its four signals stay
   registered and deprecated because stored strategies name them.
-- **Private signal families** — on-chain and social signals ship in the package but are out of scope
-  for the public ontology.
+- **Alternative-data signals that compute inline** - the ten older on-chain signals (Nansen-sourced
+  columns) and the ten DeFi Pro signals read a data column directly rather than through an
+  indicator, so the builder has no class to derive and they stay out of the graph. The six
+  signals that read an alternative-data indicator (four social, two Solana holder signals) are
+  modelled under the `social` and `onchain` classes. The five older `x_*` social signals are not
+  in this repository at all; they remain private in MangroveAI.
 
 The graph is regenerated from a clean tree on every build, and a test rebuilds it into an empty path
 and diffs against the committed file — so it cannot drift from the code it describes.
@@ -466,7 +470,7 @@ MangroveKnowledgeBase/
 │   ├── registry.py               ← RuleRegistry: evaluate a signal by name
 │   ├── docstring_parser.py       ← docstring → structured metadata
 │   ├── signals/                  ← 255 signal functions
-│   ├── indicators/               ← 82 indicator classes
+│   ├── indicators/               ← 85 indicator classes
 │   ├── viz/                      ← the self-contained graph viewer
 │   ├── data/                     ← the graph, bundled at build time
 │   └── skills/knowledge-graph/   ← SKILL.md + GUIDE.md, bundled at build time

@@ -124,7 +124,7 @@ whole tasks).** Both ship in the wheel, and every example in them is re-executed
 - **Docstrings carry signal metadata** (Type, Requires, param ranges), parsed by `docstring_parser.py`. They are **not** a "single source of truth" for anything beyond that -- do not treat this line as licence to write new kinds of metadata into docstrings. Ontology/knowledge-graph properties do NOT go here; they belong in the graph nodes.
 - **Metadata free, computation x402** -- signal/indicator discovery is open, evaluation/computation requires payment on both REST and MCP.
 - **MangroveAI imports signals/indicators from `mangrove-kb` PyPI package** -- no embedded copy, no toggle.
-- **5 social signals stay private** in MangroveAI. They are not in this open-source repo.
+- **The 5 older `x_*` social signals stay private** in MangroveAI. They are not in this open-source repo. The 4 Deep42 social signals (`social_sentiment_surge`, `social_sentiment_capitulation`, `social_crowd_bullish`, `social_price_divergence`) are in the open KB, in `signals/social.py`.
 - **KB server is standalone** -- zero code dependencies on MangroveAI.
 - **Signal parameter naming** -- standardized to `window` (not `lookback`, `period`, `length`). Backward compat mapping in `RuleRegistry.evaluate()`.
 
