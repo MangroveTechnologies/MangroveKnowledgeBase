@@ -116,7 +116,7 @@ kg.find(role="filter")                       # signals playing the filter part
 
 The graph holds two kinds of thing and they are queried identically.
 
-**Read off the code** -- 73 indicators and 225 signals, exact, with typed inputs and outputs.
+**Read off the code** -- 76 indicators and 231 signals, exact, with typed inputs and outputs.
 **Read off the knowledge base** -- the concepts a market is made of (orders, participants, venues,
 liquidity, spread), the formulas the chapters state, and two nodes per subject holding what is
 true of it (`Fact`) and what to do about it (`Judgment`).

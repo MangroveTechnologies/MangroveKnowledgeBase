@@ -24,6 +24,16 @@ up from 225).
 - **Graph**: classes `social` and `onchain` under a new `concept:alternative-data`, beside technical
   analysis, because their inputs are not price and volume. 12 nodes and 37 edges added, none changed.
 
+### Documentation: counts and scope text after the social and on-chain families
+
+Prose the family change left behind is corrected: the README's indicator counts (76 in the graph,
+85 classes) and its note that on-chain and social signals are out of scope for the public ontology
+(the six Cambrian signals are modelled; the ten older on-chain and ten DeFi Pro signals compute
+inline and stay out), the PyPI README's modelled-signal count (231), the knowledge-graph skill's
+code-half counts, and CLAUDE.md's line on private social signals (the five older `x_*` signals stay
+in MangroveAI; the four Deep42 social signals are in this repository). `tests/test_documented_counts.py`
+now pins each of those sentences. No code, graph or chapter change.
+
 ### The dense encoder is ONNX by default; torch is now an optional fallback
 
 `DenseIndex.model` loads `onnxruntime` + `tokenizers` over an ONNX export of the MiniLM checkpoint
