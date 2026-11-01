@@ -11,6 +11,11 @@ import pandas as pd
 
 from mangrove_kb.indicators.indicator_interface import IndicatorInterface
 
+#: Relative spread at or below which a baseline is flat: ``sd <= FLAT_BASELINE_TOLERANCE * max(1, |mean|)``.
+#: Identical readings round to about 1e-16 relative under a two-pass standard deviation; two
+#: distinct integer counts below 1e9 differ by more than 1e-12.
+FLAT_BASELINE_TOLERANCE = 1e-12
+
 
 class SocialZScore(IndicatorInterface):
     """Indicator: SocialZScore
@@ -27,7 +32,7 @@ class SocialZScore(IndicatorInterface):
         sd[t]   = std(value[t-window .. t-1])     (sample, ddof=1)
         zscore  = (value[t] - mean[t]) / sd[t]
 
-        Undefined (NaN) where the baseline is flat (sd = 0).
+        Undefined (NaN) where the baseline is flat: sd <= 1e-12 * max(1, |mean|).
 
     Inputs:
         value: per-bar social reading (sentiment score, bullish share, post count, ...)
@@ -71,8 +76,12 @@ class SocialZScore(IndicatorInterface):
         window = params['window']
 
         prior = value.shift(1).rolling(window, min_periods=window)
+        mean = prior.mean()
         sd = prior.std()
-        z = (value - prior.mean()) / sd.where(sd > 0)
+        # A baseline whose spread is within the tolerance of zero, relative to its magnitude,
+        # is flat; the z-score is undefined there.
+        flat = sd <= FLAT_BASELINE_TOLERANCE * mean.abs().clip(lower=1.0)
+        z = (value - mean) / sd.where(~flat)
         return {'zscore': pd.Series(z.replace([np.inf, -np.inf], np.nan), name="social_zscore")}
 
 
