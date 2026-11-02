@@ -167,3 +167,23 @@ def test_invalid_execution_contract_is_rejected_at_registration(kwargs):
     with pytest.raises(ValueError):
         RuleRegistry.register("_invalid_live_contract", **kwargs)
     assert not RuleRegistry.has("_invalid_live_contract")
+
+
+def test_historical_audit_reports_live_rules_as_skipped_without_provider_io(monkeypatch, tmp_path):
+    from scripts.audit.audit_signals import (
+        classify_signals, generate_signal_report, review_filter_signals, smoke_test_all,
+    )
+
+    social.configure_x_provider(lambda: pytest.fail("historical audit resolved an X provider"))
+    monkeypatch.setattr(RuleRegistry, "_registry", {name: RuleRegistry._registry[name] for name in CASES})
+    smoke = smoke_test_all(pd.DataFrame())
+    reviews = review_filter_signals()
+    assert len(smoke) == 5 and len(reviews) == 2
+    assert all(r.get("skipped") and r["error"] is None for r in smoke)
+    assert all(r.get("skipped") and r["pass"] is None for r in reviews)
+    report = generate_signal_report(smoke, [], reviews, classify_signals(), tmp_path / "report.md")
+    assert "| Total signals tested | 0 |" in report
+    assert "| Skipped (live provider; not historical) | 5 |" in report
+    assert "| Bad return type (not bool) | 0 |" in report
+    for name in CASES:
+        assert f"SKIP `{name}`" in report
