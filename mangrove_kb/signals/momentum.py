@@ -2534,7 +2534,7 @@ def mass_reversal_signal(df: pd.DataFrame, window_fast: int = 9, window_slow: in
     Short-Description: Price swings widened and then narrowed, which often comes before a trend reversal.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index
-    Warmup: window_slow + window_fast - 1
+    Warmup: 2 * window_fast + window_slow + 6
 
     Formula:
         any(mass_index[t-9 .. t] > threshold_high) and mass_index[t] < threshold_low -- the reversal bulge: a spike above, then a fall back through the lower level

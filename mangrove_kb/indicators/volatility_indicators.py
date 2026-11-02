@@ -1214,9 +1214,9 @@ class SuperTrendBands(IndicatorInterface):
     """Indicator: SuperTrendBands
 
     The two ATR-scaled bands SuperTrend is built from, hl2 +/- multiplier * ATR(window), both
-    emitted on every bar. Nothing here is withheld or held in place: the long/short regime, the
-    ratchet that pins a band while that regime lasts, and the choice of which band to show are all
-    decisions over these two levels, and they live in the signals that read them.
+    emitted on every bar. Nothing here is withheld or held in place: the long/short regime and the
+    ratchet that pins a band while that regime lasts are carried by `SuperTrendTrail`, which reads
+    these two levels. That is a recursion over the whole series and cannot be decided over a window.
 
     `SuperTrend` is the deprecated class: it emits these same bands only on the side its own
     `direction` verdict selects, and NaNs the other. The bands it reads are identical to these, so a
@@ -1245,7 +1245,7 @@ class SuperTrendBands(IndicatorInterface):
         upper_band [price, 0..inf] "Basic Upper Band":
             The bar's midpoint plus multiplier times the Wilder ATR: the level a short regime
             trails. Emitted every bar, unratcheted, so it can move against the regime; holding it
-            still is the signal's decision.
+            still is `SuperTrendTrail`'s ratchet.
         lower_band [price, -inf..inf] "Basic Lower Band":
             The mirror below the midpoint, the level a long regime trails. Below zero only when
             multiplier * ATR exceeds the midpoint, which real prices do not produce.
@@ -1286,4 +1286,107 @@ class SuperTrendBands(IndicatorInterface):
         return {
             'upper_band': pd.Series(hl2 + mult * atr_vals, index=close.index, name='upper_band'),
             'lower_band': pd.Series(hl2 - mult * atr_vals, index=close.index, name='lower_band'),
+        }
+
+
+class SuperTrendTrail(IndicatorInterface):
+    """Indicator: SuperTrendTrail
+
+    The trailing stop SuperTrend carries over `SuperTrendBands`: which band is trailing price, and
+    both bands as trailed. A close above the previous bar's trailed upper band starts a long trail; a
+    close below the previous bar's trailed lower band starts a short one; otherwise the trail holds
+    and its band only moves in its favour -- the lower band never falls while long, the upper band
+    never rises while short.
+
+    This is a recursion over the whole series, like `ParabolicSAR`: the trail on a bar depends on
+    every bar since price last crossed a band, however long ago that was. A function of a bounded
+    window cannot carry it, so it is computed here, over the series it is handed, and the signals
+    read its last value. Computed inside the signals, a strategy evaluated on a rolling window
+    restarted the trail at the window's first bar, and the answer changed with the window's length
+    -- which is set by the longest warmup among ALL of the strategy's rules.
+
+    The trail starts long on the first bar. A trail started later agrees with the whole-series one
+    once price has crossed a band in both, so the start stops mattering after enough bars. How many
+    depends on the data and grows with the multiplier: on the seven fixtures, window 10 needs 150
+    bars at multiplier 3 and 300 at multiplier 5. The signals' Warmup lines carry that requirement.
+
+    Abbreviation: ST
+    Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
+    Warmup: window
+
+    Formula:
+        upper_band, lower_band = SuperTrendBands(window, multiplier)
+        regime[t] = +1 if close[t] > upper_trail[t-1]; -1 if close[t] < lower_trail[t-1]; else regime[t-1]
+        lower_trail[t] = max(lower_band[t], lower_trail[t-1]) while the regime holds long, else lower_band[t]
+        upper_trail[t] = min(upper_band[t], upper_trail[t-1]) while the regime holds short, else upper_band[t]
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=10, min=5, max=50]: ATR window
+        multiplier [default=3.0, min=0.5, max=10.0]: ATR multiplier
+
+    Outputs:
+        regime [direction, -1..1] "Trail Side":
+            +1 while the lower band trails price, -1 while the upper band does. NaN for the first
+            `window` bars, where the previous bar's band is inside ATR's warmup.
+        upper_trail [price, 0..inf] "Trailed Upper Band":
+            The upper band as the trail holds it: pinned from above while the trail is short, the
+            basic band otherwise.
+        lower_trail [price, -inf..inf] "Trailed Lower Band":
+            The lower band as the trail holds it: pinned from below while the trail is long, the
+            basic band otherwise.
+
+    Interpretation:
+        Which side of price SuperTrend's trailing stop is on. The stop changes side only when a
+        close gets past the trailed band, so a long run on one side means price has not retraced a
+        full multiplier of ATR against the move since it began.
+
+    Applications:
+        Trend-following entries and filters that hold until price crosses the trailing stop, and
+        the trailed band itself as a stop level for exits.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int, 'multiplier': float}
+
+    Returns:
+        {'regime': pd.Series, 'upper_trail': pd.Series, 'lower_trail': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window", "multiplier"]
+    _outputs = ["regime", "upper_trail", "lower_trail"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close_s = data['close']
+        window = params['window']
+        bands = SuperTrendBands.compute(
+            {'high': data['high'], 'low': data['low'], 'close': close_s},
+            {'window': window, 'multiplier': params['multiplier']},
+        )
+        upper = bands['upper_band'].to_numpy(dtype=np.float64, copy=True)
+        lower = bands['lower_band'].to_numpy(dtype=np.float64, copy=True)
+        close = close_s.to_numpy(dtype=np.float64, copy=False)
+        n = len(close)
+        regime = np.full(n, np.nan)
+        current = 1
+        for i in range(1, n):
+            if close[i] > upper[i - 1]:
+                current = 1
+            elif close[i] < lower[i - 1]:
+                current = -1
+            elif current == 1 and lower[i] < lower[i - 1]:
+                lower[i] = lower[i - 1]
+            elif current == -1 and upper[i] > upper[i - 1]:
+                upper[i] = upper[i - 1]
+            regime[i] = current
+        regime[:window] = np.nan
+        return {
+            'regime': pd.Series(regime, index=close_s.index, name='regime'),
+            'upper_trail': pd.Series(upper, index=close_s.index, name='upper_trail'),
+            'lower_trail': pd.Series(lower, index=close_s.index, name='lower_trail'),
         }

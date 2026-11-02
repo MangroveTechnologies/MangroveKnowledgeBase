@@ -10,7 +10,6 @@ This module contains signal functions based on volatility indicators including:
 
 import logging
 
-import numpy as np
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
@@ -27,7 +26,7 @@ from mangrove_kb.indicators import (
     NATR,
     STARCBands,
     SqueezeDepth,
-    SuperTrendBands,
+    SuperTrendTrail,
     UlcerIndex,
     VolatilityEnvelope,
 )
@@ -1809,44 +1808,23 @@ def ttm_squeeze_fired_bearish(df: pd.DataFrame, bb_window: int = 20, bb_std: flo
 # =============================================================================
 # SuperTrend Signals
 # =============================================================================
-# SuperTrendBands emits the two ATR bands on every bar and nothing else. The long/short regime,
-# the ratchet that pins the trailed band while a regime lasts, and the bar the regime changes are
-# all decisions over those two levels, so they are made here.
+# SuperTrendTrail carries the trailing stop over SuperTrendBands: the side it is on and the ratchet
+# that pins the trailed band. That is a recursion with no bounded memory, so it lives in the
+# indicator, which is computed over the whole series; here the signals only read its last bars.
+# Making the regime here, over whatever window a strategy handed in, restarted it at the window's
+# first bar, so its answer depended on the window length and so on the strategy's other rules.
 
 def _supertrend_regime(df: pd.DataFrame, window: int, multiplier: float):
-    """The regime SuperTrend's rule derives from the two bands: +1 long or -1 short on each bar.
-
-    A close above the previous bar's upper band puts the regime long; a close below the previous
-    bar's lower band puts it short; otherwise the regime holds and the band on its side only moves
-    in its favour -- the lower band never falls while long, the upper band never rises while short
-    -- which is what makes the trailed band a stop. The regime is long until the first lower-band
-    cross. NaN for the first `window` bars, where the previous bar's band is inside ATR's warmup;
-    None when the frame is shorter than window + 1.
+    """SuperTrend's regime on each bar: +1 while the lower band trails price, -1 while the upper
+    band does (`SuperTrendTrail.regime`). NaN for the first `window` bars, where the previous bar's
+    band is inside ATR's warmup; None when the frame is shorter than window + 1.
     """
     if len(df) < window + 1:
         return None
-    bands = SuperTrendBands.compute(
+    return SuperTrendTrail.compute(
         data={'high': df["high"], 'low': df["low"], 'close': df["close"]},
         params={'window': window, 'multiplier': multiplier},
-    )
-    upper = bands['upper_band'].to_numpy(dtype=np.float64, copy=True)
-    lower = bands['lower_band'].to_numpy(dtype=np.float64, copy=True)
-    close = df["close"].to_numpy(dtype=np.float64, copy=False)
-    n = len(close)
-    regime = np.full(n, np.nan)
-    current = 1
-    for i in range(1, n):
-        if close[i] > upper[i - 1]:
-            current = 1
-        elif close[i] < lower[i - 1]:
-            current = -1
-        elif current == 1 and lower[i] < lower[i - 1]:
-            lower[i] = lower[i - 1]
-        elif current == -1 and upper[i] > upper[i - 1]:
-            upper[i] = upper[i - 1]
-        regime[i] = current
-    regime[:window] = np.nan
-    return pd.Series(regime, index=df.index, name='supertrend_regime')
+    )['regime']
 
 
 def _supertrend_flip(df: pd.DataFrame, window: int, multiplier: float, to: int) -> bool:
@@ -1865,15 +1843,15 @@ def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0)
 
     Check if SuperTrend's regime is long: close has crossed above the trailed upper band more
     recently than it crossed below the trailed lower band, so the lower band is the active trailing
-    stop. The indicator emits both bands every bar; the regime, and the ratchet that holds the
-    trailed band in place while it lasts, are decided here.
+    stop. Reads `SuperTrendTrail`, which carries the regime over the whole series; the Warmup is the
+    history a trail started late needs to agree with it (measured on the seven fixtures).
 
     Friendly-Name: SuperTrend Says Up
     Display-Name: SuperTrend Long Regime
     Short-Description: Price has stayed above its volatility-scaled trailing stop since the last upside break.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: window
+    Warmup: 10 * window + 50 * multiplier
 
     Formula:
         regime[t] == +1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour; long until the first lower-band cross
@@ -1921,7 +1899,7 @@ def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0
     Short-Description: Price has stayed below its volatility-scaled trailing stop since the last downside break.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: window
+    Warmup: 10 * window + 50 * multiplier
 
     Formula:
         regime[t] == -1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour
@@ -1968,7 +1946,7 @@ def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3
     Short-Description: Price just broke above its trailing stop, turning the SuperTrend regime long.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: window + 1
+    Warmup: 10 * window + 50 * multiplier + 1
 
     Formula:
         regime[t-1] == -1 and regime[t] == +1 -- close[t] > upper_band[t-1] after a short regime
@@ -2012,7 +1990,7 @@ def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float =
     Short-Description: Price just broke below its trailing stop, turning the SuperTrend regime short.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: window + 1
+    Warmup: 10 * window + 50 * multiplier + 1
 
     Formula:
         regime[t-1] == +1 and regime[t] == -1 -- close[t] < lower_band[t-1] after a long regime

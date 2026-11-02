@@ -800,7 +800,7 @@ def dema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     Short-Description: Two quick-reacting price averages just crossed downward, pointing to a turn lower.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
-    Warmup: window_slow
+    Warmup: 2 * window_slow - 1
 
     Formula:
         dema(window_fast)[t-1] >= dema(window_slow)[t-1] and dema(window_fast)[t] < dema(window_slow)[t]
@@ -841,7 +841,7 @@ def dema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     Short-Description: Two quick-reacting price averages just crossed upward, pointing to a turn higher.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
-    Warmup: window_slow
+    Warmup: 2 * window_slow - 1
 
     Formula:
         dema(window_fast)[t-1] <= dema(window_slow)[t-1] and dema(window_fast)[t] > dema(window_slow)[t]
@@ -1082,7 +1082,7 @@ def hma_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25
     Short-Description: Two very fast price averages just crossed downward, an early sign of a turn lower.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
-    Warmup: window_slow
+    Warmup: window_slow + window_slow // 4
 
     Formula:
         hma(window_fast)[t-1] >= hma(window_slow)[t-1] and hma(window_fast)[t] < hma(window_slow)[t]
@@ -1123,7 +1123,7 @@ def hma_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 25) 
     Short-Description: Two very fast price averages just crossed upward, an early sign of a turn higher.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
-    Warmup: window_slow
+    Warmup: window_slow + window_slow // 4
 
     Formula:
         hma(window_fast)[t-1] <= hma(window_slow)[t-1] and hma(window_fast)[t] > hma(window_slow)[t]
@@ -1215,7 +1215,7 @@ def is_above_dema(df: pd.DataFrame, window: int = 21) -> bool:
     Short-Description: Price is above a quick-reacting average of recent prices.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema
-    Warmup: window - 1
+    Warmup: 2 * window - 2
 
     Formula:
         close[t] > dema[t]
@@ -1254,7 +1254,7 @@ def is_above_hma(df: pd.DataFrame, window: int = 16) -> bool:
     Short-Description: Price is above a very fast, smooth average of recent prices.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma
-    Warmup: window - 1
+    Warmup: window + window // 4 - 1
 
     Formula:
         close[t] > hma[t]
@@ -1479,7 +1479,7 @@ def is_above_tema(df: pd.DataFrame, window: int = 21) -> bool:
     Short-Description: Price is above a very fast average of recent prices.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
-    Warmup: window - 1
+    Warmup: 3 * window - 3
 
     Formula:
         close[t] > tema[t]
@@ -2209,7 +2209,7 @@ def tema_cross_down(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 2
     Short-Description: Two very fast price averages just crossed downward; quick, but prone to false alarms.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
-    Warmup: window_slow
+    Warmup: 3 * window_slow - 2
 
     Formula:
         tema(window_fast)[t-1] >= tema(window_slow)[t-1] and tema(window_fast)[t] < tema(window_slow)[t]
@@ -2250,7 +2250,7 @@ def tema_cross_up(df: pd.DataFrame, window_fast: int = 9, window_slow: int = 21)
     Short-Description: Two very fast price averages just crossed upward; quick, but prone to false alarms.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema
-    Warmup: window_slow
+    Warmup: 3 * window_slow - 2
 
     Formula:
         tema(window_fast)[t-1] <= tema(window_slow)[t-1] and tema(window_fast)[t] > tema(window_slow)[t]
@@ -2889,7 +2889,7 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Short-Description: The parabolic stop-and-reverse level is below the current close.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
-    Warmup: 2
+    Warmup: 5 / step
 
     Formula:
         psar[t] < close[t]
@@ -2938,7 +2938,7 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Short-Description: The parabolic stop-and-reverse level is above the current close.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
-    Warmup: 2
+    Warmup: 5 / step
 
     Formula:
         psar[t] > close[t]
@@ -2988,7 +2988,7 @@ def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, d
     Short-Description: The parabolic level just switched to the other side of price.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
-    Warmup: 3
+    Warmup: 5 / step + 1
 
     Formula:
         psar[t-1] > close[t-1] and psar[t] < close[t] when direction is bullish; psar[t-1] < close[t-1] and psar[t] > close[t] when bearish

@@ -885,7 +885,7 @@ def tweezer_tops_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     Short-Description: Two bars hit the same high and the second closed down, a possible top.
 
     Reference: https://thepatternsite.com/TweezersTop.html
-    Warmup: 1
+    Warmup: 19
 
     Formula:
         abs(high[t] - high[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] > open[t-1] and close[t] < open[t]
@@ -932,7 +932,7 @@ def tweezer_bottoms_trigger(df: pd.DataFrame, tolerance: float = 0.01) -> bool:
     Short-Description: Two bars hit the same low and the second closed up, a possible bottom.
 
     Reference: https://thepatternsite.com/TweezersBottom.html
-    Warmup: 1
+    Warmup: 19
 
     Formula:
         abs(low[t] - low[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] < open[t-1] and close[t] > open[t]
@@ -1579,7 +1579,7 @@ def bullish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A candle pattern that often comes before a rise appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
-    Warmup: 2
+    Warmup: window + 18
 
     Formula:
         any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, bullish harami, piercing_line, dragonfly_doji, tweezer_bottoms, bullish pin_bar, morning_star, three_white_soldiers, three_inside_up
@@ -1653,7 +1653,7 @@ def bearish_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A candle pattern that often comes before a drop appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
-    Warmup: 2
+    Warmup: window + 18
 
     Formula:
         any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, bearish harami, dark_cloud_cover, gravestone_doji, tweezer_tops, bearish pin_bar, evening_star, three_black_crows, three_inside_down
@@ -1726,7 +1726,7 @@ def reversal_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A classic candle pattern that signals a possible bottom appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns
-    Warmup: 2
+    Warmup: window + 1
 
     Formula:
         any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, piercing_line, dragonfly_doji, morning_star
@@ -1789,7 +1789,7 @@ def reversal_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A classic candle pattern that signals a possible top appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns
-    Warmup: 2
+    Warmup: window + 1
 
     Formula:
         any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, dark_cloud_cover, gravestone_doji, evening_star
@@ -1851,7 +1851,7 @@ def continuation_pattern_bullish(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A run of strong up candles appeared recently, suggesting more upside.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
-    Warmup: 2
+    Warmup: window + 1
 
     Formula:
         any bar in [t-window+1 .. t] fires any of: three_white_soldiers, three_inside_up
@@ -1902,7 +1902,7 @@ def continuation_pattern_bearish(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A run of strong down candles appeared recently, suggesting more downside.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary
-    Warmup: 2
+    Warmup: window + 1
 
     Formula:
         any bar in [t-window+1 .. t] fires any of: three_black_crows, three_inside_down
@@ -1953,7 +1953,7 @@ def indecision_pattern_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A bar showing buyers and sellers evenly matched appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
-    Warmup: 6
+    Warmup: window + 5
 
     Formula:
         any bar in [t-window+1 .. t] fires any of: doji, spinning_top, inside_bar, narrow_range(7)
@@ -2009,7 +2009,7 @@ def strong_body_recent(df: pd.DataFrame, window: int = 5) -> bool:
     Short-Description: A strong full-bodied bar, up or down, appeared recently.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks
-    Warmup: 0
+    Warmup: window - 1
 
     Formula:
         any bar in [t-window+1 .. t] fires marubozu, bullish or bearish

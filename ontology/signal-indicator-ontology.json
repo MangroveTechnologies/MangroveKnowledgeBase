@@ -4734,7 +4734,7 @@
    "id": "procedure:indicator-supertrendbands",
    "title": "SuperTrendBands",
    "kind": "Procedure",
-   "summary": "The two ATR-scaled bands SuperTrend is built from, hl2 +/- multiplier * ATR(window), both emitted on every bar. Nothing here is withheld or held in place: the long/short regime, the ratchet that pins a band while that regime lasts, and the choice of which band to show are all decisions over these two levels, and they live in the signals that read them.",
+   "summary": "The two ATR-scaled bands SuperTrend is built from, hl2 +/- multiplier * ATR(window), both emitted on every bar. Nothing here is withheld or held in place: the long/short regime and the ratchet that pins a band while that regime lasts are carried by `SuperTrendTrail`, which reads these two levels. That is a recursion over the whole series and cannot be decided over a window.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4770,9 +4770,9 @@
      },
      "multiplier": {
       "type": "float",
-      "default": 3,
+      "default": 3.0,
       "min": 0.5,
-      "max": 10,
+      "max": 10.0,
       "description": "ATR multiplier"
      }
     },
@@ -4785,7 +4785,7 @@
        Infinity
       ],
       "canonical_name": "Basic Upper Band",
-      "description": "The bar's midpoint plus multiplier times the Wilder ATR: the level a short regime trails. Emitted every bar, unratcheted, so it can move against the regime; holding it still is the signal's decision."
+      "description": "The bar's midpoint plus multiplier times the Wilder ATR: the level a short regime trails. Emitted every bar, unratcheted, so it can move against the regime; holding it still is `SuperTrendTrail`'s ratchet."
      },
      "lower_band": {
       "type": "series",
@@ -4796,6 +4796,86 @@
       ],
       "canonical_name": "Basic Lower Band",
       "description": "The mirror below the midpoint, the level a long regime trails. Below zero only when multiplier * ATR exceeds the midpoint, which real prices do not produce."
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:indicator-supertrendtrail",
+   "title": "SuperTrendTrail",
+   "kind": "Procedure",
+   "summary": "The trailing stop SuperTrend carries over `SuperTrendBands`: which band is trailing price, and both bands as trailed. A close above the previous bar's trailed upper band starts a long trail; a close below the previous bar's trailed lower band starts a short one; otherwise the trail holds and its band only moves in its favour -- the lower band never falls while long, the upper band never rises while short.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility_indicators",
+    "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
+    "warmup_bars": "window",
+    "abbreviation": "ST",
+    "usage_example": "SuperTrendTrail.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value, 'multiplier': value})",
+    "formula": "upper_band, lower_band = SuperTrendBands(window, multiplier)\nregime[t] = +1 if close[t] > upper_trail[t-1]; -1 if close[t] < lower_trail[t-1]; else regime[t-1]\nlower_trail[t] = max(lower_band[t], lower_trail[t-1]) while the regime holds long, else lower_band[t]\nupper_trail[t] = min(upper_band[t], upper_trail[t-1]) while the regime holds short, else upper_band[t]",
+    "interpretation": "Which side of price SuperTrend's trailing stop is on. The stop changes side only when a close gets past the trailed band, so a long run on one side means price has not retraced a full multiplier of ATR against the move since it began.",
+    "applications": "Trend-following entries and filters that hold until price crosses the trailing stop, and the trailed band itself as a stop level for exits.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 10,
+      "min": 5,
+      "max": 50,
+      "description": "ATR window"
+     },
+     "multiplier": {
+      "type": "float",
+      "default": 3,
+      "min": 0.5,
+      "max": 10,
+      "description": "ATR multiplier"
+     }
+    },
+    "outputs": {
+     "regime": {
+      "type": "series",
+      "units": "direction",
+      "range": [
+       -1,
+       1
+      ],
+      "canonical_name": "Trail Side",
+      "description": "+1 while the lower band trails price, -1 while the upper band does. NaN for the first `window` bars, where the previous bar's band is inside ATR's warmup."
+     },
+     "upper_trail": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "Trailed Upper Band",
+      "description": "The upper band as the trail holds it: pinned from above while the trail is short, the basic band otherwise."
+     },
+     "lower_trail": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       -Infinity,
+       Infinity
+      ],
+      "canonical_name": "Trailed Lower Band",
+      "description": "The lower band as the trail holds it: pinned from below while the trail is long, the basic band otherwise."
      }
     }
    }
@@ -7712,7 +7792,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
-    "warmup_bars": "2",
+    "warmup_bars": "window + 18",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bearish_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, bearish harami, dark_cloud_cover, gravestone_doji, tweezer_tops, bearish pin_bar, evening_star, three_black_crows, three_inside_down",
@@ -8135,7 +8215,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
-    "warmup_bars": "2",
+    "warmup_bars": "window + 18",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'bullish_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, bullish harami, piercing_line, dragonfly_doji, tweezer_bottoms, bullish pin_bar, morning_star, three_white_soldiers, three_inside_up",
@@ -8980,7 +9060,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
-    "warmup_bars": "2",
+    "warmup_bars": "window + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'continuation_pattern_bearish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: three_black_crows, three_inside_down",
@@ -9038,7 +9118,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-pattern-dictionary",
-    "warmup_bars": "2",
+    "warmup_bars": "window + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'continuation_pattern_bullish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: three_white_soldiers, three_inside_up",
@@ -9462,7 +9542,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
-    "warmup_bars": "window_slow",
+    "warmup_bars": "2 * window_slow - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "dema(window_fast)[t-1] >= dema(window_slow)[t-1] and dema(window_fast)[t] < dema(window_slow)[t]",
@@ -9515,7 +9595,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
-    "warmup_bars": "window_slow",
+    "warmup_bars": "2 * window_slow - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'dema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "dema(window_fast)[t-1] <= dema(window_slow)[t-1] and dema(window_fast)[t] > dema(window_slow)[t]",
@@ -10684,7 +10764,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
-    "warmup_bars": "window_slow",
+    "warmup_bars": "window_slow + window_slow // 4",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'hma_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "hma(window_fast)[t-1] >= hma(window_slow)[t-1] and hma(window_fast)[t] < hma(window_slow)[t]",
@@ -10737,7 +10817,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
-    "warmup_bars": "window_slow",
+    "warmup_bars": "window_slow + window_slow // 4",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'hma_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "hma(window_fast)[t-1] <= hma(window_slow)[t-1] and hma(window_fast)[t] > hma(window_slow)[t]",
@@ -11046,7 +11126,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
-    "warmup_bars": "6",
+    "warmup_bars": "window + 5",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'indecision_pattern_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: doji, spinning_top, inside_bar, narrow_range(7)",
@@ -11287,7 +11367,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/double-exponential-moving-average-dema",
-    "warmup_bars": "window - 1",
+    "warmup_bars": "2 * window - 2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_dema', 'params': {'window': value}}, df)",
     "formula": "close[t] > dema[t]",
@@ -11379,7 +11459,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/hull-moving-average-hma",
-    "warmup_bars": "window - 1",
+    "warmup_bars": "window + window // 4 - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_hma', 'params': {'window': value}}, df)",
     "formula": "close[t] > hma[t]",
@@ -11630,7 +11710,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
-    "warmup_bars": "window - 1",
+    "warmup_bars": "3 * window - 3",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'is_above_tema', 'params': {'window': value}}, df)",
     "formula": "close[t] > tema[t]",
@@ -13660,7 +13740,7 @@
    "props": {
     "source_module": "momentum",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/mass-index",
-    "warmup_bars": "window_slow + window_fast - 1",
+    "warmup_bars": "2 * window_fast + window_slow + 6",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'mass_reversal_signal', 'params': {'window_fast': value, 'window_slow': value, 'threshold_high': value, 'threshold_low': value}}, df)",
     "formula": "any(mass_index[t-9 .. t] > threshold_high) and mass_index[t] < threshold_low -- the reversal bulge: a spike above, then a fall back through the lower level",
@@ -14912,7 +14992,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
-    "warmup_bars": "2",
+    "warmup_bars": "5 / step",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'psar_bearish', 'params': {'step': value, 'max_step': value}}, df)",
     "formula": "psar[t] > close[t]",
@@ -14973,7 +15053,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
-    "warmup_bars": "2",
+    "warmup_bars": "5 / step",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'psar_bullish', 'params': {'step': value, 'max_step': value}}, df)",
     "formula": "psar[t] < close[t]",
@@ -15034,7 +15114,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
-    "warmup_bars": "3",
+    "warmup_bars": "5 / step + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'psar_reversal', 'params': {'step': value, 'max_step': value, 'direction': value}}, df)",
     "formula": "psar[t-1] > close[t-1] and psar[t] < close[t] when direction is bullish; psar[t-1] < close[t-1] and psar[t] > close[t] when bearish",
@@ -15226,7 +15306,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bearish-reversal-patterns",
-    "warmup_bars": "2",
+    "warmup_bars": "window + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'reversal_pattern_bearish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hanging_man, shooting_star, bearish engulfing, dark_cloud_cover, gravestone_doji, evening_star",
@@ -15284,7 +15364,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/candlestick-bullish-reversal-patterns",
-    "warmup_bars": "2",
+    "warmup_bars": "window + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'reversal_pattern_bullish', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires any of: hammer, inverted_hammer, bullish engulfing, piercing_line, dragonfly_doji, morning_star",
@@ -16762,7 +16842,7 @@
    "props": {
     "source_module": "oscillator",
     "reference": null,
-    "warmup_bars": "window_slow + cycle - 1",
+    "warmup_bars": "window_slow + 2 * cycle + smooth1 + smooth2 - 5",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stc_overbought', 'params': {'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stc[t] > threshold",
@@ -16843,7 +16923,7 @@
    "props": {
     "source_module": "oscillator",
     "reference": null,
-    "warmup_bars": "window_slow + cycle - 1",
+    "warmup_bars": "window_slow + 2 * cycle + smooth1 + smooth2 - 5",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stc_oversold', 'params': {'window_slow': value, 'window_fast': value, 'cycle': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stc[t] < threshold",
@@ -17060,7 +17140,7 @@
    "props": {
     "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
-    "warmup_bars": "window + smooth1 + smooth2 - 1",
+    "warmup_bars": "2 * window - 2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stochrsi_overbought', 'params': {'window': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stochrsi[t] > threshold -- StochRSI is on the 0..1 scale, so the conventional 80 level is 0.80 here",
@@ -17127,7 +17207,7 @@
    "props": {
     "source_module": "oscillator",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi",
-    "warmup_bars": "window + smooth1 + smooth2 - 1",
+    "warmup_bars": "2 * window - 2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'stochrsi_oversold', 'params': {'window': value, 'smooth1': value, 'smooth2': value, 'threshold': value}}, df)",
     "formula": "stochrsi[t] < threshold -- 0..1 scale, so the conventional 20 level is 0.20",
@@ -17194,7 +17274,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/chart-analysis/candlestick-charts/introduction-to-candlesticks",
-    "warmup_bars": "0",
+    "warmup_bars": "window - 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'strong_body_recent', 'params': {'window': value}}, df)",
     "formula": "any bar in [t-window+1 .. t] fires marubozu, bullish or bearish",
@@ -17252,7 +17332,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "window + 1",
+    "warmup_bars": "10 * window + 50 * multiplier + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_flip_down', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t-1] == +1 and regime[t] == -1 -- close[t] < lower_band[t-1] after a long regime",
@@ -17313,7 +17393,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "window + 1",
+    "warmup_bars": "10 * window + 50 * multiplier + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_flip_up', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t-1] == -1 and regime[t] == +1 -- close[t] > upper_band[t-1] after a short regime",
@@ -17368,13 +17448,13 @@
    "id": "procedure:signal-supertrend-long",
    "title": "supertrend_long",
    "kind": "Procedure",
-   "summary": "Check if SuperTrend's regime is long: close has crossed above the trailed upper band more recently than it crossed below the trailed lower band, so the lower band is the active trailing stop. The indicator emits both bands every bar; the regime, and the ratchet that holds the trailed band in place while it lasts, are decided here.",
+   "summary": "Check if SuperTrend's regime is long: close has crossed above the trailed upper band more recently than it crossed below the trailed lower band, so the lower band is the active trailing stop. Reads `SuperTrendTrail`, which carries the regime over the whole series; the Warmup is the history a trail started late needs to agree with it (measured on the seven fixtures).",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "window",
+    "warmup_bars": "10 * window + 50 * multiplier",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_long', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t] == +1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour; long until the first lower-band cross",
@@ -17435,7 +17515,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "window",
+    "warmup_bars": "10 * window + 50 * multiplier",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_short', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t] == -1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour",
@@ -17616,7 +17696,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
-    "warmup_bars": "window_slow",
+    "warmup_bars": "3 * window_slow - 2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tema_cross_down', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "tema(window_fast)[t-1] >= tema(window_slow)[t-1] and tema(window_fast)[t] < tema(window_slow)[t]",
@@ -17669,7 +17749,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/triple-exponential-moving-average-tema",
-    "warmup_bars": "window_slow",
+    "warmup_bars": "3 * window_slow - 2",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tema_cross_up', 'params': {'window_fast': value, 'window_slow': value}}, df)",
     "formula": "tema(window_fast)[t-1] <= tema(window_slow)[t-1] and tema(window_fast)[t] > tema(window_slow)[t]",
@@ -18526,7 +18606,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://thepatternsite.com/TweezersBottom.html",
-    "warmup_bars": "1",
+    "warmup_bars": "19",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tweezer_bottoms_trigger', 'params': {'tolerance': value}}, df)",
     "formula": "abs(low[t] - low[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] < open[t-1] and close[t] > open[t]",
@@ -18592,7 +18672,7 @@
    "props": {
     "source_module": "pattern",
     "reference": "https://thepatternsite.com/TweezersTop.html",
-    "warmup_bars": "1",
+    "warmup_bars": "19",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'tweezer_tops_trigger', 'params': {'tolerance': value}}, df)",
     "formula": "abs(high[t] - high[t-1]) <= mean(range) over the trailing 14 bars * tolerance and close[t-1] > open[t-1] and close[t] < open[t]",
@@ -28538,6 +28618,22 @@
    "to_id": "concept:volatility"
   },
   {
+   "from": "SuperTrendTrail",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-supertrendtrail",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "SuperTrendTrail",
+   "rel": "instance-of",
+   "to": "volatility",
+   "why": "class membership",
+   "from_id": "procedure:indicator-supertrendtrail",
+   "to_id": "concept:volatility"
+  },
+  {
    "from": "SwingDelta",
    "rel": "instance-of",
    "to": "Indicator",
@@ -36309,15 +36405,12 @@
   {
    "from": "supertrend_flip_down",
    "rel": "uses",
-   "to": "SuperTrendBands",
+   "to": "SuperTrendTrail",
    "why": "reads indicator output",
    "from_id": "procedure:signal-supertrend-flip-down",
-   "to_id": "procedure:indicator-supertrendbands",
+   "to_id": "procedure:indicator-supertrendtrail",
    "inputs": {
-    "lower_band": {
-     "type": "series"
-    },
-    "upper_band": {
+    "regime": {
      "type": "series"
     }
    }
@@ -36349,15 +36442,12 @@
   {
    "from": "supertrend_flip_up",
    "rel": "uses",
-   "to": "SuperTrendBands",
+   "to": "SuperTrendTrail",
    "why": "reads indicator output",
    "from_id": "procedure:signal-supertrend-flip-up",
-   "to_id": "procedure:indicator-supertrendbands",
+   "to_id": "procedure:indicator-supertrendtrail",
    "inputs": {
-    "lower_band": {
-     "type": "series"
-    },
-    "upper_band": {
+    "regime": {
      "type": "series"
     }
    }
@@ -36389,15 +36479,12 @@
   {
    "from": "supertrend_long",
    "rel": "uses",
-   "to": "SuperTrendBands",
+   "to": "SuperTrendTrail",
    "why": "reads indicator output",
    "from_id": "procedure:signal-supertrend-long",
-   "to_id": "procedure:indicator-supertrendbands",
+   "to_id": "procedure:indicator-supertrendtrail",
    "inputs": {
-    "lower_band": {
-     "type": "series"
-    },
-    "upper_band": {
+    "regime": {
      "type": "series"
     }
    }
@@ -36429,15 +36516,12 @@
   {
    "from": "supertrend_short",
    "rel": "uses",
-   "to": "SuperTrendBands",
+   "to": "SuperTrendTrail",
    "why": "reads indicator output",
    "from_id": "procedure:signal-supertrend-short",
-   "to_id": "procedure:indicator-supertrendbands",
+   "to_id": "procedure:indicator-supertrendtrail",
    "inputs": {
-    "lower_band": {
-     "type": "series"
-    },
-    "upper_band": {
+    "regime": {
      "type": "series"
     }
    }
@@ -48534,7 +48618,7 @@
  ],
  "meta": {
   "scope": "indicator class ontology",
-  "indicators": 76,
+  "indicators": 77,
   "classes": 8,
   "removed_not_indicators": [
    "ATRTrailingStop",
