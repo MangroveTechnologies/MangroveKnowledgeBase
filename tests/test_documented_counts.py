@@ -123,6 +123,13 @@ CLAIMS = [
     ("CLAUDE.md",      r"(\d+) are modelled in the graph",            "signals"),
     ("CLAUDE.md",      r"(\d+) nodes\n?and [\d,]+ edges",             "nodes"),
     ("CLAUDE.md",      r"[\d,]+ nodes\n?and (\d+) edges",             "edges"),
+    # Sentences the social/on-chain families left stale (73 / 82 / 225 after the counts moved).
+    ("README.md",      r"the (\d+) indicators among them",             "indicators"),
+    ("README.md",      r"\u2190 (\d+) signal functions",                "registered_signals"),
+    ("README.md",      r"\u2190 (\d+) indicator classes",               "indicator_classes"),
+    ("PKG_README.md",  r"\*\*\d+ registered\*\*, (\d+) modelled in the graph", "signals"),
+    ("skills/knowledge-graph/SKILL.md", r"code\*\* -- (\d+) indicators and",  "indicators"),
+    ("skills/knowledge-graph/SKILL.md", r"indicators and (\d+) signals, exact", "signals"),
 ]
 
 #: Files whose numbers are historical and MUST NOT be "corrected". Listed so the exclusion is a
