@@ -6,6 +6,20 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### `social_price_divergence` disabled for new strategies
+
+- **Signal** (`signals/social.py`): marked `Disabled: True` with a `Disabled-Reason`, and
+  `@deprecated_signal`, the pattern the `atr_trailing_stop_*` signals use. It is no longer
+  composable for new strategies; stored strategies and research notebooks that name it keep
+  evaluating, with a `DeprecationWarning`. The code was checked bar by bar and is correct; the idea
+  loses money as a long entry. Oracle engine backtests on BTC, ETH, SOL, XRP, DOGE, BNB and LINK
+  (daily bars, April 2025 to October 2026, platform default execution config): -2.35% mean return,
+  -13.5 USDT per trade, 28.7% win rate, and 0 of 7 coins beat the `rsi_cross_up` baseline (+7.39%).
+  None of 41 variants (parameters, trend filters, redefinitions, surge versions) fixed it. The crowd
+  usually turns bearish on a drop, so a drop it has not reacted to yet tends to begin a longer decline.
+- **Graph**: removed from `SIGNAL_SCOPE`, so it leaves the graph. 1 node and 6 edges removed, nothing
+  added or changed. 259 registered signals (125 TRIGGER, 134 FILTER), 234 modelled.
+
 ### `social_crowd_cooling`: crowd sentiment at or below its own baseline
 
 - **Signal** (`signals/social.py`, FILTER): True when the recent mean of `SocialNetBullShare` sits at
@@ -280,7 +294,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 739 nodes, 2429 edges, in
+carries a formula stating the predicate it computes -- 738 nodes, 2423 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
