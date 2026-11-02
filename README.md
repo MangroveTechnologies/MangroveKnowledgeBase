@@ -448,8 +448,8 @@ answer is an answer travels with the connection, not in a list somewhere else.
   columns) and the ten DeFi Pro signals read a data column directly rather than through an
   indicator, so the builder has no class to derive and they stay out of the graph. The six
   signals that read an alternative-data indicator (four social, two Solana holder signals) are
-  modelled under the `social` and `onchain` classes. The five older `x_*` social signals are not
-  in this repository at all; they remain private in MangroveAI.
+  modelled under the `social` and `onchain` classes. The five older `x_*` social signals were retired
+  and are deleted from MangroveAI (MangroveAI#1523); no signal is defined outside this package.
 
 The graph is regenerated from a clean tree on every build, and a test rebuilds it into an empty path
 and diffs against the committed file — so it cannot drift from the code it describes.

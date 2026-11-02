@@ -6,6 +6,17 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Documentation: the five retired `x_*` signals leave chapter 10
+
+- **Chapter 10** (`knowledge-base/10-signals-quick-reference.md`): the `X` section listed five
+  signals this package never defined (`x_social_sentiment_trigger`, `x_topic_mention_trigger`,
+  `x_topic_sentiment_filter`, `x_user_influence_filter`, `x_user_post_trigger`). They were
+  private to MangroveAI, called X live at evaluation time, were disabled for execution, and are
+  deleted there by MangroveAI#1523, so the section is removed. The X signals that exist are the three X
+  attention signals in `signals/social.py`.
+- **CLAUDE.md, README**: the lines saying those five stay private in MangroveAI now say they are
+  retired. Every signal is defined in this package. No code or graph change.
+
 ### `social_price_divergence` disabled for new strategies
 
 - **Signal** (`signals/social.py`): marked `Disabled: True` with a `Disabled-Reason`, and
