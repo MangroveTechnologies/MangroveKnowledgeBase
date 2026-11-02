@@ -15,8 +15,10 @@ cs = type("Signals", (), {**{k: staticmethod(v) for k, v in vars(onchain).items(
 TRIGGERS = ["social_sentiment_surge", "social_sentiment_capitulation", "social_price_divergence", "whale_share_divergence"]
 FILTERS = ["social_crowd_bullish", "social_crowd_cooling", "holder_growth_trend"]
 NAMES = TRIGGERS + FILTERS
-#: Disabled for new strategies (lost money as a long entry) but kept executable for stored ones.
-DISABLED = {"social_price_divergence"}
+#: Disabled for new strategies (lost to price-filtered references in strategy backtests) but kept
+#: executable for stored ones. social_price_divergence is enabled again, as an exit for longs.
+DISABLED = {"social_sentiment_surge", "social_sentiment_capitulation", "social_crowd_bullish",
+            "social_crowd_cooling", "whale_share_divergence", "holder_growth_trend"}
 
 
 def _frame(sentiment, net_bull=None, close=None, authors=50, holders=None, whale_share=None):
@@ -44,22 +46,66 @@ def test_registered_with_types():
         assert parse_signal_policy(getattr(cs, name))["disabled"] is (name in DISABLED)
 
 
-def test_price_divergence_is_disabled_for_new_strategies_but_still_executes():
+#: A frame each disabled signal fires on, so the legacy path is shown to still compute.
+def _firing_frame(name):
+    n = 80
+    drop = [100.0] * (n - 7) + list(np.linspace(100, 90, 7))
+    return {
+        "social_sentiment_surge": lambda: _frame(_noisy(40, 5.5) + [7.0]),
+        "social_sentiment_capitulation": lambda: _frame(_noisy(40, 5.5) + [4.0]),
+        "social_crowd_bullish": lambda: _frame(_noisy(n, 5.5), net_bull=[0.3] * (n - 7) + [0.5] * 7),
+        "social_crowd_cooling": lambda: _frame(_noisy(n, 5.5), net_bull=[0.5] * (n - 7) + [0.3] * 7),
+        "holder_growth_trend": lambda: _frame(_noisy(30, 5.5), holders=list(np.linspace(1000, 1050, 30))),
+        "whale_share_divergence": lambda: _frame(
+            _noisy(n, 5.5), close=drop, whale_share=[0.30] * (n - 7) + list(np.linspace(0.30, 0.33, 7))),
+    }[name]()
+
+
+@pytest.mark.parametrize("name", sorted(DISABLED))
+def test_disabled_for_new_strategies_but_still_executes(name):
     """The atr_trailing_stop_* pattern: not composable, not in the graph, stored strategies run."""
     from mangrove_kb.graph import KnowledgeGraph
 
-    d = RuleRegistry.describe("social_price_divergence")
+    d = RuleRegistry.describe(name)
     assert d["status"] == "disabled"
     assert d["composable"] is False
     assert d["executable"] is True and d["legacy_compatible"] is True
-    assert "lost money" in d["reason"] and "Stored strategies" in d["reason"]
+    assert "Oracle engine strategy backtests" in d["reason"] and "Stored strategies" in d["reason"]
     assert d["reason"].isascii()
-    assert "procedure:signal-social-price-divergence" not in KnowledgeGraph.load().nodes
+    assert f"procedure:signal-{name.replace('_', '-')}" not in KnowledgeGraph.load().nodes
 
-    n = 50
-    drop = [100.0] * (n - 7) + list(np.linspace(100, 90, 7))
     with pytest.warns(DeprecationWarning):
+        assert RuleRegistry.evaluate({"name": name}, _firing_frame(name)) is True
+
+
+def test_price_divergence_is_an_exit_composable_and_in_the_graph():
+    """Enabled again as an exit for long positions, with the defaults the exit backtests chose."""
+    import inspect
+    import warnings
+    from mangrove_kb.graph import KnowledgeGraph
+
+    d = RuleRegistry.describe("social_price_divergence")
+    assert d["status"] == "active" and d["composable"] is True and not d["disabled"]
+    assert d["type"] == "TRIGGER"
+    defaults = {k: v.default for k, v in inspect.signature(cs.social_price_divergence).parameters.items()
+                if k != "df"}
+    assert defaults == {"window": 7, "min_drop_pct": 3.0, "window_baseline": 60}
+    assert {k: v["default"] for k, v in d["params"].items()} == defaults
+    doc = cs.social_price_divergence.__doc__
+    assert "Exit signal for long positions" in doc and "Do not use it as an entry" in doc
+    assert "Short-Description: Exit a long when price falls while the crowd stays bullish." in doc
+
+    kg = KnowledgeGraph.load()
+    node = "procedure:signal-social-price-divergence"
+    assert node in kg.nodes
+    assert node in {x["id"] for x in kg.find(kind="social", role="trigger", limit=None).items}
+
+    n = 80
+    drop = [100.0] * (n - 7) + list(np.linspace(100, 96, 7))  # a 4% fall: fires at 3.0, not at 5.0
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
         assert RuleRegistry.evaluate({"name": "social_price_divergence"}, _frame(_noisy(n, 5.5), close=drop)) is True
+    assert cs.social_price_divergence(_frame(_noisy(n, 5.5), close=drop), min_drop_pct=5.0) is False
 
 
 @pytest.mark.parametrize("name", NAMES)
@@ -111,7 +157,7 @@ def test_crowd_cooling_is_the_complement_of_crowd_bullish_at_margin_zero(seed):
 
 
 def test_price_divergence_accepts_either_close_case():
-    n = 50
+    n = 80  # window + window_baseline = 67 bars at the defaults
     drop = [100.0] * (n - 7) + list(np.linspace(100, 90, 7))
     df = _frame(_noisy(n, 5.5), close=drop)
     assert cs.social_price_divergence(df) is True
