@@ -6,6 +6,14 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### `social_crowd_cooling`, the contrarian side of `social_crowd_bullish`
+
+- **Signal** (`signals/social.py`, FILTER): True when the recent mean of `SocialNetBullShare` sits at
+  or below its baseline by `margin`, read through `SocialBaselineShift`; at margin 0 it is the exact
+  complement of `social_crowd_bullish`. Fails closed on a missing column or short history. 259
+  registered signals (125 TRIGGER, 134 FILTER), 235 modelled; the graph gains 1 node and 4 edges,
+  none changed.
+
 ### X attention signals in the social family
 
 Three signals on X (Twitter) post counts, read through the same two social indicators, so the
@@ -272,7 +280,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 738 nodes, 2425 edges, in
+carries a formula stating the predicate it computes -- 739 nodes, 2429 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,

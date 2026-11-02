@@ -13,7 +13,7 @@ cs = type("Signals", (), {**{k: staticmethod(v) for k, v in vars(onchain).items(
                             **{k: staticmethod(v) for k, v in vars(social).items() if callable(v)}})
 
 TRIGGERS = ["social_sentiment_surge", "social_sentiment_capitulation", "social_price_divergence", "whale_share_divergence"]
-FILTERS = ["social_crowd_bullish", "holder_growth_trend"]
+FILTERS = ["social_crowd_bullish", "social_crowd_cooling", "holder_growth_trend"]
 NAMES = TRIGGERS + FILTERS
 
 
@@ -66,6 +66,28 @@ def test_crowd_bullish():
     n = 80
     assert cs.social_crowd_bullish(_frame(_noisy(n, 5.5), net_bull=[0.3] * (n - 7) + [0.5] * 7)) is True
     assert cs.social_crowd_bullish(_frame(_noisy(n, 5.5), net_bull=[0.5] * (n - 7) + [0.3] * 7)) is False
+
+
+def test_crowd_cooling():
+    n = 80
+    assert "social_crowd_cooling" in RuleRegistry.names()
+    below = [0.5] * (n - 7) + [0.3] * 7
+    level = [0.25] * n  # exactly representable, so the shift is exactly 0: at the norm fires
+    above = [0.3] * (n - 7) + [0.5] * 7
+    assert cs.social_crowd_cooling(_frame(_noisy(n, 5.5), net_bull=below)) is True
+    assert cs.social_crowd_cooling(_frame(_noisy(n, 5.5), net_bull=level)) is True
+    assert cs.social_crowd_cooling(_frame(_noisy(n, 5.5), net_bull=above)) is False
+    assert cs.social_crowd_cooling(_frame(_noisy(n, 5.5), net_bull=below), margin=0.3) is False
+
+
+@pytest.mark.parametrize("seed", range(25))
+def test_crowd_cooling_is_the_complement_of_crowd_bullish_at_margin_zero(seed):
+    rng = np.random.default_rng(seed)
+    n = int(rng.integers(67, 200))
+    window, window_baseline = int(rng.integers(1, 15)), int(rng.integers(14, 60))
+    df = _frame(_noisy(n, 5.5, seed), net_bull=list(rng.uniform(-1, 1, n)))
+    kw = {"window": window, "window_baseline": window_baseline, "margin": 0.0}
+    assert cs.social_crowd_cooling(df, **kw) is (not cs.social_crowd_bullish(df, **kw))
 
 
 def test_price_divergence_accepts_either_close_case():
