@@ -225,7 +225,7 @@
    "id": "concept:social",
    "title": "social",
    "kind": "Concept",
-   "summary": "Measures a crowd reading about an asset -- what people post, scored for sentiment or counted for attention -- aligned to the bars.",
+   "summary": "Measures a crowd reading about an asset -- what people post, scored for sentiment or counted for attention -- as bar-aligned readings or live observations.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {}
@@ -19845,6 +19845,284 @@
    }
   },
   {
+   "id": "procedure:signal-x-social-sentiment-trigger",
+   "title": "x_social_sentiment_trigger",
+   "kind": "Procedure",
+   "summary": "Fires when the mention-volume score reaches its threshold.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "evaluation_mode": "live",
+    "data_provider": "x",
+    "reference": null,
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_social_sentiment_trigger', 'params': {'symbol': value, 'threshold': value, 'time_window_hours': value}}, df)",
+    "formula": "min(mention_volume(symbol, time_window_hours) * 10, 100) >= threshold",
+    "friendly_name": "Social Interest Reaches Threshold",
+    "display_name": "X Mention Volume Trigger",
+    "short_description": "Recent cashtag post volume reaches the requested score threshold.",
+    "inputs": {},
+    "params": {
+     "symbol": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Crypto symbol (e.g., 'BTC', 'ETH')"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 70.0,
+      "min": 0.0,
+      "max": 100.0,
+      "description": "Mention-volume score threshold (0-100)"
+     },
+     "time_window_hours": {
+      "type": "int",
+      "default": 24,
+      "min": 1,
+      "max": 168,
+      "description": "Analysis time window (hours)"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when the requested live X condition is met; False on provider read failure"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-x-topic-mention-trigger",
+   "title": "x_topic_mention_trigger",
+   "kind": "Procedure",
+   "summary": "Compares the provider's reported topic-mention count with the requested threshold.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "evaluation_mode": "live",
+    "data_provider": "x",
+    "reference": null,
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_topic_mention_trigger', 'params': {'topic': value, 'min_mentions': value, 'min_followers': value, 'time_window_hours': value}}, df)",
+    "formula": "influential_mentions(topic, min_followers, time_window_hours) >= min_mentions",
+    "friendly_name": "Topic Draws Attention",
+    "display_name": "X Influential Topic Mentions",
+    "short_description": "The provider-reported topic mention count reaches the requested threshold.",
+    "inputs": {},
+    "params": {
+     "topic": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Topic/keyword to monitor"
+     },
+     "min_mentions": {
+      "type": "int",
+      "default": 3,
+      "min": 1,
+      "max": 100,
+      "description": "Minimum influential mentions"
+     },
+     "min_followers": {
+      "type": "int",
+      "default": 10000,
+      "min": 100,
+      "max": 10000000,
+      "description": "Minimum followers for influential users"
+     },
+     "time_window_hours": {
+      "type": "int",
+      "default": 1,
+      "min": 1,
+      "max": 168,
+      "description": "Analysis time window (hours)"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when the requested live X condition is met; False on provider read failure"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-x-topic-sentiment-filter",
+   "title": "x_topic_sentiment_filter",
+   "kind": "Procedure",
+   "summary": "Checks if topic has sufficient social interest.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "evaluation_mode": "live",
+    "data_provider": "x",
+    "reference": null,
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_topic_sentiment_filter', 'params': {'topic': value, 'min_sentiment': value}}, df)",
+    "formula": "min(mention_volume(topic, 24) * 10, 100) >= min_sentiment",
+    "friendly_name": "Topic Has Social Interest",
+    "display_name": "X Topic Mention Volume Filter",
+    "short_description": "Recent cashtag post volume meets the requested social interest score.",
+    "inputs": {},
+    "params": {
+     "topic": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "Topic to analyze"
+     },
+     "min_sentiment": {
+      "type": "float",
+      "default": 60.0,
+      "min": 0.0,
+      "max": 100.0,
+      "description": "Minimum sentiment score (0-100)"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when the requested live X condition is met; False on provider read failure"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-x-user-influence-filter",
+   "title": "x_user_influence_filter",
+   "kind": "Procedure",
+   "summary": "Checks if X user has sufficient influence.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "evaluation_mode": "live",
+    "data_provider": "x",
+    "reference": null,
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_user_influence_filter', 'params': {'username': value, 'min_influence_score': value}}, df)",
+    "formula": "influence_score(username) >= min_influence_score",
+    "friendly_name": "User Has Influence",
+    "display_name": "X User Influence Filter",
+    "short_description": "The X account meets the requested influence score.",
+    "inputs": {},
+    "params": {
+     "username": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "X username to check"
+     },
+     "min_influence_score": {
+      "type": "float",
+      "default": 50.0,
+      "min": 0.0,
+      "max": 100.0,
+      "description": "Minimum influence score (0-100)"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when the requested live X condition is met; False on provider read failure"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-x-user-post-trigger",
+   "title": "x_user_post_trigger",
+   "kind": "Procedure",
+   "summary": "Fires when a specific X user posts about a topic.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "social",
+    "evaluation_mode": "live",
+    "data_provider": "x",
+    "reference": null,
+    "warmup_bars": "0",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'x_user_post_trigger', 'params': {'username': value, 'topic': value, 'max_age_hours': value}}, df)",
+    "formula": "recent_posts(username, topic, max_age_hours) > 0",
+    "friendly_name": "User Posts About Topic",
+    "display_name": "X User Post Trigger",
+    "short_description": "A monitored X user has posted about the requested topic.",
+    "inputs": {},
+    "params": {
+     "username": {
+      "type": "str",
+      "default": null,
+      "min": null,
+      "max": null,
+      "description": "X username to monitor (without @)"
+     },
+     "topic": {
+      "type": "str",
+      "default": "None",
+      "min": null,
+      "max": null,
+      "description": "Topic keyword to filter posts"
+     },
+     "max_age_hours": {
+      "type": "int",
+      "default": 1,
+      "min": 1,
+      "max": 168,
+      "description": "How recent the post must be (hours)"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when the requested live X condition is met; False on provider read failure"
+     }
+    }
+   }
+  },
+  {
    "id": "concept:chart-pattern",
    "title": "chart pattern",
    "kind": "Concept",
@@ -37662,6 +37940,126 @@
    "to_id": "concept:social"
   },
   {
+   "from": "x_social_sentiment_trigger",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-social-sentiment-trigger",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_social_sentiment_trigger",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-x-social-sentiment-trigger",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "x_social_sentiment_trigger",
+   "rel": "about",
+   "to": "social",
+   "why": "reads live X provider observations",
+   "from_id": "procedure:signal-x-social-sentiment-trigger",
+   "to_id": "concept:social"
+  },
+  {
+   "from": "x_topic_mention_trigger",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-topic-mention-trigger",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_topic_mention_trigger",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-x-topic-mention-trigger",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "x_topic_mention_trigger",
+   "rel": "about",
+   "to": "social",
+   "why": "reads live X provider observations",
+   "from_id": "procedure:signal-x-topic-mention-trigger",
+   "to_id": "concept:social"
+  },
+  {
+   "from": "x_topic_sentiment_filter",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-topic-sentiment-filter",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_topic_sentiment_filter",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-x-topic-sentiment-filter",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "x_topic_sentiment_filter",
+   "rel": "about",
+   "to": "social",
+   "why": "reads live X provider observations",
+   "from_id": "procedure:signal-x-topic-sentiment-filter",
+   "to_id": "concept:social"
+  },
+  {
+   "from": "x_user_influence_filter",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-user-influence-filter",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_user_influence_filter",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-x-user-influence-filter",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "x_user_influence_filter",
+   "rel": "about",
+   "to": "social",
+   "why": "reads live X provider observations",
+   "from_id": "procedure:signal-x-user-influence-filter",
+   "to_id": "concept:social"
+  },
+  {
+   "from": "x_user_post_trigger",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-x-user-post-trigger",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "x_user_post_trigger",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-x-user-post-trigger",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "x_user_post_trigger",
+   "rel": "about",
+   "to": "social",
+   "why": "reads live X provider observations",
+   "from_id": "procedure:signal-x-user-post-trigger",
+   "to_id": "concept:social"
+  },
+  {
    "from": "hammer_trigger",
    "rel": "supersedes",
    "to": "hanging_man_trigger",
@@ -48058,10 +48456,17 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "signals": 229,
-  "signals_registered": 259,
+  "signals": 234,
+  "signals_registered": 264,
   "signals_out_of_scope": 30,
   "signals_with_no_indicator": [],
+  "live_provider_signals": [
+   "x_social_sentiment_trigger",
+   "x_topic_mention_trigger",
+   "x_topic_sentiment_filter",
+   "x_user_influence_filter",
+   "x_user_post_trigger"
+  ],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],
   "signals_missing_labels": [],

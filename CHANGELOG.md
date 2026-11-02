@@ -6,6 +6,17 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Live X signal definitions move into the knowledge base
+
+- The five `x_user_post_trigger`, `x_topic_mention_trigger`, `x_social_sentiment_trigger`,
+  `x_user_influence_filter` and `x_topic_sentiment_filter` rules are active in `signals/social.py`.
+  Registered names, parameters, defaults and mention-volume thresholds are preserved.
+- The consumer configures a lazy X provider factory; no MangroveAI or MangroveRoots import is
+  required. Historical evaluation rejects live rules before any provider call.
+- The graph models the five live-provider contracts without inventing time-series indicators
+  -- 738 nodes, 2418 edges, in the rebuilt record. 264 registered signals (128 TRIGGER,
+  136 FILTER), 234 modelled. Existing frame-based graph invariants remain enforced.
+
 ### Six Cambrian signals disabled; `social_price_divergence` back as an exit
 
 Oracle engine strategy backtests, every strategy one entry trigger plus a price filter, platform

@@ -74,7 +74,14 @@ class RuleRegistry:
     _aliases: ClassVar[dict] = {}
 
     @classmethod
-    def register(cls, name, *, executable=True):
+    def register(cls, name, *, executable=True, evaluation_mode="frame", data_provider=None):
+        if evaluation_mode not in {"frame", "live"}:
+            raise ValueError(f"Unknown signal evaluation mode: {evaluation_mode}")
+        if (evaluation_mode == "live") != bool(data_provider):
+            raise ValueError("Live signals require a data provider; frame signals must not declare one")
+        if data_provider is not None and not isinstance(data_provider, str):
+            raise TypeError("Signal data provider must be a string")
+
         def wrapper(fn):
             from mangrove_kb.docstring_parser import parse_signal_policy
 
@@ -96,6 +103,8 @@ class RuleRegistry:
                     kwargs = {**kwargs, "df": _canonical_columns(kwargs["df"])}
                 return _to_native(fn(*args, **kwargs))
 
+            coerced.evaluation_mode = evaluation_mode
+            coerced.data_provider = data_provider
             coerced.runtime_disabled = not executable
             cls._registry[name] = coerced
             return coerced
@@ -134,8 +143,8 @@ class RuleRegistry:
         successful with no orders -- indistinguishable from a valid signal that simply did not fire.
 
         Reflects whatever is registered at call time, not an import-time snapshot: a consumer
-        registering its own signals must validate against the registry it evaluates with, and
-        MangroveAI does register additional signals of its own.
+        registering its own signals must validate against the registry it evaluates with,
+        including temporary registrations in tests.
         """
         return frozenset(cls._registry)
 
@@ -199,6 +208,8 @@ class RuleRegistry:
             **metadata,
             "rule_name": name,
             "canonical_name": target,
+            "evaluation_mode": getattr(fn, "evaluation_mode", "frame"),
+            "data_provider": getattr(fn, "data_provider", None),
             "category": fn.__module__.rsplit(".", 1)[-1],
             "status": status,
             "reason": reason,
@@ -213,7 +224,26 @@ class RuleRegistry:
         return {name: cls.describe(name) for name in sorted(cls.names())}
 
     @classmethod
-    def evaluate(cls, rule, df):
+    def validate_evaluation_mode(cls, rule, mode):
+        """Reject live-provider readings in historical evaluation before any I/O.
+
+        ``rule`` may be a registered name or the usual rule mapping. Frame-based
+        signals support both modes; live readings cannot represent an earlier bar.
+        """
+        if mode not in {"live", "historical"}:
+            raise ValueError(f"Unknown evaluation mode: {mode}")
+        name = rule if isinstance(rule, str) else rule["name"]
+        target = cls.resolve(name)
+        fn = cls._registry.get(target)
+        if fn is None:
+            raise ValueError(f"Unknown rule name: {name}")
+        if mode == "historical" and getattr(fn, "evaluation_mode", "frame") == "live":
+            raise ValueError(f"Signal {name!r} requires live {fn.data_provider} data and cannot be evaluated historically")
+
+    @classmethod
+    def evaluate(cls, rule, df, *, mode=None):
+        if mode is not None:
+            cls.validate_evaluation_mode(rule, mode)
         rule_name = cls.resolve(rule["name"])
         if rule_name not in cls._registry:
             raise ValueError(f"Unknown rule name: {rule_name}")

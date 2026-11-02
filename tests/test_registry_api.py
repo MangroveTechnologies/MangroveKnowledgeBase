@@ -18,7 +18,7 @@ from mangrove_kb.registry import RuleRegistry
 def test_names_returns_every_registered_signal():
     names = RuleRegistry.names()
     assert isinstance(names, frozenset)
-    assert len(names) == 259
+    assert len(names) == 264
     # Spot-check across modules rather than trusting the count alone.
     for expected in ("rsi_oversold", "bb_above_upper", "ma_ribbon_bullish",
                      "macd_line_positive", "funding_flip_positive"):
@@ -42,7 +42,7 @@ def test_has_matches_names_without_evaluating():
 
 
 def test_names_reflects_registrations_made_after_import():
-    """Not an import-time snapshot. A consumer that registers its own signals -- MangroveAI does --
+    """Not an import-time snapshot. A consumer that registers a test-local signal
     must see them, because it has to validate against the registry it evaluates with."""
     assert not RuleRegistry.has("_probe_signal_for_test")
 

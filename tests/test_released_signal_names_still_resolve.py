@@ -296,6 +296,11 @@ RELEASED_SIGNAL_NAMES = (
     'x_attention_elevated',
     'x_attention_price_divergence',
     'x_post_count_spike',
+    'x_user_post_trigger',
+    'x_topic_mention_trigger',
+    'x_social_sentiment_trigger',
+    'x_user_influence_filter',
+    'x_topic_sentiment_filter',
 )
 
 
