@@ -16417,70 +16417,6 @@
    }
   },
   {
-   "id": "procedure:signal-social-price-divergence",
-   "title": "social_price_divergence",
-   "kind": "Procedure",
-   "summary": "Detect a price drop that the crowd is not following (bullish divergence).",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "social",
-    "reference": null,
-    "warmup_bars": "window + window_baseline - 1",
-    "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'social_price_divergence', 'params': {'window': value, 'min_drop_pct': value, 'window_baseline': value}}, df)",
-    "formula": "roc(close, window)[t] <= -min_drop_pct\nAND shift(SocialNetBullShare, window, window_baseline)[t] >= 0",
-    "friendly_name": "Crowd Holds Through Drop",
-    "display_name": "Social Price Divergence",
-    "short_description": "Price fell but the crowd stayed as bullish as usual.",
-    "inputs": {
-     "close": {
-      "type": "series",
-      "description": "closing price"
-     },
-     "SocialNetBullShare": {
-      "type": "series",
-      "description": "bullish minus bearish share of posts per bar, -1 to 1"
-     }
-    },
-    "params": {
-     "window": {
-      "type": "int",
-      "default": 7,
-      "min": 2,
-      "max": 60,
-      "description": "Bars over which the price drop and the recent social mean are measured"
-     },
-     "min_drop_pct": {
-      "type": "float",
-      "default": 5.0,
-      "min": 1.0,
-      "max": 50.0,
-      "description": "Minimum percentage fall in close over window"
-     },
-     "window_baseline": {
-      "type": "int",
-      "default": 30,
-      "min": 7,
-      "max": 180,
-      "description": "Social readings before the recent window forming the norm"
-     }
-    },
-    "outputs": {
-     "fired": {
-      "type": "bool",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "True if close fell at least min_drop_pct over window bars while the mean net bullish share over the same bars stayed at or above its baseline mean"
-     }
-    }
-   }
-  },
-  {
    "id": "procedure:signal-social-sentiment-capitulation",
    "title": "social_sentiment_capitulation",
    "kind": "Procedure",
@@ -35893,64 +35829,6 @@
    "to_id": "concept:social"
   },
   {
-   "from": "social_price_divergence",
-   "rel": "instance-of",
-   "to": "Signal",
-   "why": "entity type",
-   "from_id": "procedure:signal-social-price-divergence",
-   "to_id": "concept:signal"
-  },
-  {
-   "from": "social_price_divergence",
-   "rel": "has-role",
-   "to": "trigger",
-   "why": "role",
-   "from_id": "procedure:signal-social-price-divergence",
-   "to_id": "property:role-trigger"
-  },
-  {
-   "from": "social_price_divergence",
-   "rel": "uses",
-   "to": "ROC",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-social-price-divergence",
-   "to_id": "procedure:indicator-roc",
-   "inputs": {
-    "roc": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "social_price_divergence",
-   "rel": "uses",
-   "to": "SocialBaselineShift",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-social-price-divergence",
-   "to_id": "procedure:indicator-socialbaselineshift",
-   "inputs": {
-    "shift": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "social_price_divergence",
-   "rel": "about",
-   "to": "momentum",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-social-price-divergence",
-   "to_id": "concept:momentum"
-  },
-  {
-   "from": "social_price_divergence",
-   "rel": "about",
-   "to": "social",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-social-price-divergence",
-   "to_id": "concept:social"
-  },
-  {
    "from": "social_sentiment_capitulation",
    "rel": "instance-of",
    "to": "Signal",
@@ -48666,9 +48544,9 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "signals": 235,
+  "signals": 234,
   "signals_registered": 259,
-  "signals_out_of_scope": 24,
+  "signals_out_of_scope": 25,
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],

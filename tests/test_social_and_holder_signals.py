@@ -15,6 +15,8 @@ cs = type("Signals", (), {**{k: staticmethod(v) for k, v in vars(onchain).items(
 TRIGGERS = ["social_sentiment_surge", "social_sentiment_capitulation", "social_price_divergence", "whale_share_divergence"]
 FILTERS = ["social_crowd_bullish", "social_crowd_cooling", "holder_growth_trend"]
 NAMES = TRIGGERS + FILTERS
+#: Disabled for new strategies (lost money as a long entry) but kept executable for stored ones.
+DISABLED = {"social_price_divergence"}
 
 
 def _frame(sentiment, net_bull=None, close=None, authors=50, holders=None, whale_share=None):
@@ -39,7 +41,25 @@ def test_registered_with_types():
     for name in NAMES:
         doc = getattr(cs, name).__doc__
         assert ("Type: TRIGGER" in doc) == (name in TRIGGERS)
-        assert not parse_signal_policy(getattr(cs, name))["disabled"]
+        assert parse_signal_policy(getattr(cs, name))["disabled"] is (name in DISABLED)
+
+
+def test_price_divergence_is_disabled_for_new_strategies_but_still_executes():
+    """The atr_trailing_stop_* pattern: not composable, not in the graph, stored strategies run."""
+    from mangrove_kb.graph import KnowledgeGraph
+
+    d = RuleRegistry.describe("social_price_divergence")
+    assert d["status"] == "disabled"
+    assert d["composable"] is False
+    assert d["executable"] is True and d["legacy_compatible"] is True
+    assert "lost money" in d["reason"] and "Stored strategies" in d["reason"]
+    assert d["reason"].isascii()
+    assert "procedure:signal-social-price-divergence" not in KnowledgeGraph.load().nodes
+
+    n = 50
+    drop = [100.0] * (n - 7) + list(np.linspace(100, 90, 7))
+    with pytest.warns(DeprecationWarning):
+        assert RuleRegistry.evaluate({"name": "social_price_divergence"}, _frame(_noisy(n, 5.5), close=drop)) is True
 
 
 @pytest.mark.parametrize("name", NAMES)

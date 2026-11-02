@@ -33,6 +33,7 @@ import pandas as pd
 
 from mangrove_kb.indicators import ROC, SocialBaselineShift, SocialZScore
 from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.signals._common import deprecated_signal
 
 
 def _series(df: pd.DataFrame, column: str) -> "pd.Series | None":
@@ -264,6 +265,10 @@ def social_crowd_cooling(df: pd.DataFrame, window: int = 7, window_baseline: int
 
 
 @RuleRegistry.register("social_price_divergence")
+@deprecated_signal(
+    "it lost money as a long entry in strategy backtests, so it is disabled for new strategies "
+    "and not in the ontology graph; stored strategies that name it keep evaluating"
+)
 def social_price_divergence(df: pd.DataFrame, window: int = 7, min_drop_pct: float = 5.0, window_baseline: int = 30) -> bool:
     """Signal: social_price_divergence
 
@@ -295,6 +300,8 @@ def social_price_divergence(df: pd.DataFrame, window: int = 7, min_drop_pct: flo
 
     Type: TRIGGER
     Requires: close, SocialNetBullShare
+    Disabled: True
+    Disabled-Reason: As a long entry it lost money in Oracle engine backtests on BTC, ETH, SOL, XRP, DOGE, BNB and LINK (daily bars, April 2025 to October 2026, platform default execution config): -2.35% mean return, -13.5 USDT per trade, 28.7% win rate, and 0 of 7 coins beat the rsi_cross_up baseline (+7.39%). None of 41 variants (parameters, trend filters, redefinitions, surge versions) fixed it. The crowd usually turns bearish on a drop, so a drop it has not reacted to yet tends to begin a longer decline. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with close and SocialNetBullShare columns.

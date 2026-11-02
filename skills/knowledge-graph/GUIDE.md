@@ -46,7 +46,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 739, 2429
+s["nodes"], s["edges"]          # 738, 2423
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -55,11 +55,11 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  739 2429
-primitives    {'Procedure': 419, 'Concept': 205, 'Property': 74, 'Fact': 23,
+nodes, edges  738 2423
+primitives    {'Procedure': 418, 'Concept': 205, 'Property': 74, 'Fact': 23,
                'Judgment': 16, 'Object': 1, 'Schema': 1}
-relations     {'about': 1027, 'instance-of': 391, 'part-of': 369, 'uses': 304,
-               'has-role': 235, 'kind-of': 101, 'supersedes': 2}
+relations     {'about': 1025, 'instance-of': 390, 'part-of': 369, 'uses': 302,
+               'has-role': 234, 'kind-of': 101, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:onchain', 'concept:oscillator',
                'concept:pattern', 'concept:social', 'concept:volatility']
@@ -78,7 +78,7 @@ also accepts the short name (`"momentum"`). Both work; the ids are what you get 
 
 `classes` is deliberately the eight -- six dividing technical analysis, plus `social` and `onchain`
 dividing alternative data -- and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (76), `"signal"` (236) and `"technical-analysis"` (331 of 739) — legal, occasionally
+`"indicator"` (76), `"signal"` (235) and `"technical-analysis"` (330 of 738) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -118,15 +118,15 @@ Text search is the wider net, for when they did *not* name an indicator, or name
 have:
 
 ```
-find("divergence") -> 46 matches, name matches first
+find("divergence") -> 45 matches, name matches first
   concept:hidden-divergence                        <- the knowledge-base concepts, also named for it
   concept:volume-divergence
   procedure:signal-rsi-bearish-divergence
   procedure:signal-rsi-bullish-divergence
   procedure:signal-rsi-hidden-bearish-divergence
   procedure:signal-rsi-hidden-bullish-divergence
-  procedure:signal-social-price-divergence
   procedure:signal-whale-share-divergence
+  procedure:signal-x-attention-price-divergence
   procedure:indicator-kvo                          <- from here down, matched in prose only
   procedure:indicator-swingdelta
 ```
@@ -142,7 +142,7 @@ first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
-shown you 10 of 46.
+shown you 10 of 45.
 
 **See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
@@ -198,7 +198,7 @@ filters  = kg.find(kind="volatility", role="filter",  limit=None)
 ```
 
 ```
-momentum triggers   28      volatility filters  18
+momentum triggers   27      volatility filters  18
   procedure:signal-adosc-cross-down       procedure:signal-atr-high-volatility
   procedure:signal-adosc-cross-up         procedure:signal-bb-above-upper
   procedure:signal-ao-zero-cross          procedure:signal-bb-below-lower
@@ -300,7 +300,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 739 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 738 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 

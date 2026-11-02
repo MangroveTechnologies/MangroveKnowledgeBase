@@ -1413,8 +1413,11 @@ SIGNAL_SCOPE = {
     # Alternative data that reads a named indicator: social readings through SocialZScore and
     # SocialBaselineShift, holder distribution through OnchainChange, price legs through ROC. The
     # older on-chain and DeFi Pro signals still compute inline and stay out until they read one too.
+    # social_price_divergence is NOT here: disabled for new strategies after it lost money as a
+    # long entry (its Disabled-Reason has the numbers). It stays registered and deprecated because
+    # stored strategies name it, the same way the four atr_trailing_stop_* signals do.
     "social_sentiment_surge", "social_sentiment_capitulation", "social_crowd_bullish", "social_crowd_cooling",
-    "social_price_divergence", "holder_growth_trend", "whale_share_divergence",
+    "holder_growth_trend", "whale_share_divergence",
     "x_post_count_spike", "x_attention_elevated", "x_attention_price_divergence",
 }
 

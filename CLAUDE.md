@@ -90,8 +90,8 @@ retired server, and gating has to be restored before this is served over HTTP to
 
 ## The Knowledge Graph
 
-`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 739 nodes
-and 2429 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
+`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 738 nodes
+and 2423 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
 source, and the trading knowledge base ingested from its eight chapters.
 
 ```python
@@ -124,7 +124,7 @@ whole tasks).** Both ship in the wheel, and every example in them is re-executed
 - **Docstrings carry signal metadata** (Type, Requires, param ranges), parsed by `docstring_parser.py`. They are **not** a "single source of truth" for anything beyond that -- do not treat this line as licence to write new kinds of metadata into docstrings. Ontology/knowledge-graph properties do NOT go here; they belong in the graph nodes.
 - **Metadata free, computation x402** -- signal/indicator discovery is open, evaluation/computation requires payment on both REST and MCP.
 - **MangroveAI imports signals/indicators from `mangrove-kb` PyPI package** -- no embedded copy, no toggle.
-- **The 5 older `x_*` social signals stay private** in MangroveAI. They are not in this open-source repo. The 5 Deep42 social signals (`social_sentiment_surge`, `social_sentiment_capitulation`, `social_crowd_bullish`, `social_crowd_cooling`, `social_price_divergence`) and the 3 X attention signals (`x_post_count_spike`, `x_attention_elevated`, `x_attention_price_divergence`) are in the open KB, in `signals/social.py`.
+- **The 5 older `x_*` social signals stay private** in MangroveAI. They are not in this open-source repo. The 5 Deep42 social signals (`social_sentiment_surge`, `social_sentiment_capitulation`, `social_crowd_bullish`, `social_crowd_cooling`, and `social_price_divergence`, which is disabled for new strategies and kept executable for stored ones) and the 3 X attention signals (`x_post_count_spike`, `x_attention_elevated`, `x_attention_price_divergence`) are in the open KB, in `signals/social.py`.
 - **KB server is standalone** -- zero code dependencies on MangroveAI.
 - **Signal parameter naming** -- standardized to `window` (not `lookback`, `period`, `length`). Backward compat mapping in `RuleRegistry.evaluate()`.
 
@@ -182,7 +182,7 @@ installed copy.
 - Every signal docstring must include `Type:` (TRIGGER or FILTER) and `Requires:` (comma-separated column names)
 - Every parameter must include `Range: min-max` and `Default: value` in the Args section
 - Use `window` for all windowing parameters (not `lookback`, `period`, `length`)
-- Signal counts: 259 registered (125 TRIGGER, 134 FILTER); 235 are modelled in the graph
+- Signal counts: 259 registered (125 TRIGGER, 134 FILTER); 234 are modelled in the graph
 - Signal modules are named for the ontology class they hold: `averaging`, `flow`, `momentum`,
   `oscillator`, `pattern`, `volatility`, plus `trend`, `volume`, `social`, `onchain`, `defi_pro`
 - On-Chain signals consume alternative-data columns (SmartMoneyNetflow, SmartMoneyHoldings, ExchangeNetflow, WhaleNetInflow, HolderConcentration) the caller populates time-aligned to OHLCV bars; sourced from Nansen tgm/flows + historical-top-holders via the MangroveAI data layer. The holder signals (`holder_growth_trend`, `whale_share_divergence`) read HolderCount and WhaleHeldShare from Cambrian's Solana holder distribution through `OnchainChange`.

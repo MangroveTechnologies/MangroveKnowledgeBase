@@ -12,7 +12,7 @@ pip install mangrove-kb
 - **85 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
-- **A knowledge graph of the library itself** -- 739 nodes, 2429 edges, queryable, shipped in the package
+- **A knowledge graph of the library itself** -- 738 nodes, 2423 edges, queryable, shipped in the package
 - **Search by words or by meaning** -- `find()` matches terms; `ask()` takes a question in ordinary
   words, seeds from two indices and follows the edges out of what it finds. On twenty-five questions
   phrased the way a trader asks them, `find()` answers 5 and `ask()` answers 18.
@@ -138,7 +138,7 @@ print(f"Available signals: {len(RuleRegistry._registry)}")
 
 ### Signal Categories
 
-**259 registered**, 235 modelled in the graph. Every signal carries two independent labels: the
+**259 registered**, 234 modelled in the graph. Every signal carries two independent labels: the
 class it is *about* (above) and the **role** it plays -- `trigger` (an event) or `filter` (an ongoing
 state). They are different questions, so the graph keeps them apart:
 
