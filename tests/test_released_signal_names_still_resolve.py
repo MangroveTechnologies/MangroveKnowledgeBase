@@ -292,6 +292,9 @@ RELEASED_SIGNAL_NAMES = (
     'williams_r_oversold',
     'wma_cross_down',
     'wma_cross_up',
+    'x_attention_elevated',
+    'x_attention_price_divergence',
+    'x_post_count_spike',
 )
 
 

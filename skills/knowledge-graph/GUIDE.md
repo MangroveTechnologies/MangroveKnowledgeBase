@@ -46,7 +46,7 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 735, 2411
+s["nodes"], s["edges"]          # 738, 2425
 s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
 s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
@@ -55,11 +55,11 @@ kg.schema()                     # the (subject, relation, object) shapes that ac
 ```
 
 ```
-nodes, edges  735 2411
-primitives    {'Procedure': 415, 'Concept': 205, 'Property': 74, 'Fact': 23,
+nodes, edges  738 2425
+primitives    {'Procedure': 418, 'Concept': 205, 'Property': 74, 'Fact': 23,
                'Judgment': 16, 'Object': 1, 'Schema': 1}
-relations     {'about': 1022, 'instance-of': 387, 'part-of': 369, 'uses': 299,
-               'has-role': 231, 'kind-of': 101, 'supersedes': 2}
+relations     {'about': 1026, 'instance-of': 390, 'part-of': 369, 'uses': 303,
+               'has-role': 234, 'kind-of': 101, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:onchain', 'concept:oscillator',
                'concept:pattern', 'concept:social', 'concept:volatility']
@@ -78,7 +78,7 @@ also accepts the short name (`"momentum"`). Both work; the ids are what you get 
 
 `classes` is deliberately the eight -- six dividing technical analysis, plus `social` and `onchain`
 dividing alternative data -- and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (76), `"signal"` (232) and `"technical-analysis"` (330 of 735) — legal, occasionally
+`"indicator"` (76), `"signal"` (235) and `"technical-analysis"` (331 of 738) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -118,7 +118,7 @@ Text search is the wider net, for when they did *not* name an indicator, or name
 have:
 
 ```
-find("divergence") -> 45 matches, name matches first
+find("divergence") -> 46 matches, name matches first
   concept:hidden-divergence                        <- the knowledge-base concepts, also named for it
   concept:volume-divergence
   procedure:signal-rsi-bearish-divergence
@@ -142,7 +142,7 @@ first one is the sanity check.
 
 **Trap:** results are capped at 10 by default. `Result.truncated` and `Result.note` tell you when
 there are more. Pass `limit=None` when the count itself is the answer — here the default would have
-shown you 10 of 45.
+shown you 10 of 46.
 
 **See also:** [§3 what breaks](GUIDE.md#3-work-out-what-a-change-breaks) · [§11 name to id](GUIDE.md#11-turn-what-the-user-said-into-a-node) · [§14 what the knowledge base says](GUIDE.md#14-pull-what-the-knowledge-base-says-about-a-subject)
 
@@ -198,7 +198,7 @@ filters  = kg.find(kind="volatility", role="filter",  limit=None)
 ```
 
 ```
-momentum triggers   27      volatility filters  18
+momentum triggers   28      volatility filters  18
   procedure:signal-adosc-cross-down       procedure:signal-atr-high-volatility
   procedure:signal-adosc-cross-up         procedure:signal-bb-above-upper
   procedure:signal-ao-zero-cross          procedure:signal-bb-below-lower
@@ -300,7 +300,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 735 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 738 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -350,8 +350,8 @@ If you use `path` for an explanation, constrain it — `relations=["uses", "inst
 
 **Trap:** `all_paths` excludes routes through a shared parent by default. `adosc_bearish
 --instance-of--> Signal <--instance-of-- adosc_bullish` says "they are both signals", and with
-`concept:signal` at degree 225 those detours outnumber the real answers 9,638 to 2 at
-`max_depth=5`. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
+`concept:signal` at degree 237 those detours outnumber the real answers 6,502 to 2 at
+`max_depth=5` before the default `max_steps` runs out. Pass `sibling_hops=True` when the shared parent *is* the answer — *"how are these two
 related?" "they both read RSI"*.
 
 **See also:** [SKILL · the two axes](SKILL.md#the-two-axes-the-thing-to-understand) · [§15 reasoning behind advice](GUIDE.md#15-find-the-reasoning-behind-a-piece-of-advice) · [§4 compose](GUIDE.md#4-compose-a-strategy-from-both-axes)
