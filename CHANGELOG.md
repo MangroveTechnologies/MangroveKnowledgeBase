@@ -10,9 +10,26 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 - **Signal** (`signals/social.py`, FILTER): True when the recent mean of `SocialNetBullShare` sits at
   or below its baseline by `margin`, read through `SocialBaselineShift`; at margin 0 it is the exact
-  complement of `social_crowd_bullish`. Fails closed on a missing column or short history. 256
-  registered signals (123 TRIGGER, 133 FILTER), 232 modelled; the graph gains 1 node and 4 edges,
+  complement of `social_crowd_bullish`. Fails closed on a missing column or short history. 259
+  registered signals (125 TRIGGER, 134 FILTER), 235 modelled; the graph gains 1 node and 4 edges,
   none changed.
+
+### X attention signals in the social family
+
+Three signals on X (Twitter) post counts, read through the same two social indicators, so the
+graph models them (234 of 258). They measure how much people post, not what they say.
+
+- **Signals** (`signals/social.py`): `x_post_count_spike` (latest hourly count `z_threshold`
+  standard deviations above the prior `window`, with a `min_count` floor), `x_attention_elevated`
+  (recent mean against a non-overlapping baseline, `min_ratio`), and
+  `x_attention_price_divergence` (price down `min_drop_pct` over `window_price` while the count
+  z-score clears `z_threshold`). Each reads the `XPostCount` column and fails closed without it;
+  missing hours stay missing rather than becoming zero.
+- **`SocialZScore`**: a flat baseline is now an explicit tolerance, `sd <= 1e-12 * max(1, |mean|)`,
+  rather than `sd == 0`, so a z-score over identical readings is undefined whichever standard
+  deviation computes it. Unchanged for any baseline of distinct integer counts.
+- **Graph**: 3 nodes and 14 edges added, none changed. Each uses `SocialZScore` or
+  `SocialBaselineShift` (and `ROC` for the price leg) and sits under `concept:social`.
 
 ### Social and on-chain signal families, modelled in the graph
 
@@ -37,9 +54,9 @@ up from 225).
 Prose the family change left behind is corrected: the README's indicator counts (76 in the graph,
 85 classes) and its note that on-chain and social signals are out of scope for the public ontology
 (the six Cambrian signals are modelled; the ten older on-chain and ten DeFi Pro signals compute
-inline and stay out), the PyPI README's modelled-signal count (231), the knowledge-graph skill's
-code-half counts, and CLAUDE.md's line on private social signals (the five older `x_*` signals stay
-in MangroveAI; the four Deep42 social signals are in this repository). `tests/test_documented_counts.py`
+inline and stay out), the PyPI README's modelled-signal count (234 after the X attention signals), the knowledge-graph
+skill's code-half counts, and CLAUDE.md's line on private social signals (the five older `x_*` signals
+stay in MangroveAI; the four Deep42 and three X attention social signals are in this repository). `tests/test_documented_counts.py`
 now pins each of those sentences. No code, graph or chapter change.
 
 ### The dense encoder is ONNX by default; torch is now an optional fallback
@@ -263,7 +280,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 736 nodes, 2415 edges, in
+carries a formula stating the predicate it computes -- 739 nodes, 2429 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,
