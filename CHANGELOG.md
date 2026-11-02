@@ -6,7 +6,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### `social_crowd_cooling`, the contrarian side of `social_crowd_bullish`
+### `social_crowd_cooling`: crowd sentiment at or below its own baseline
 
 - **Signal** (`signals/social.py`, FILTER): True when the recent mean of `SocialNetBullShare` sits at
   or below its baseline by `margin`, read through `SocialBaselineShift`; at margin 0 it is the exact
