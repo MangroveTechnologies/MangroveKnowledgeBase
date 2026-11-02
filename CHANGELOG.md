@@ -37,7 +37,46 @@ so a signal whose answer moves with the window's length changes when an unrelate
   requirement, a longer one, and the whole prefix; and pins each corrected Warmup against the output
   the signal reads.
 - **Graph**: 1 node and 2 edges added (`SuperTrendTrail` and its classes; the four SuperTrend
-  signals' `uses` edges move to it); 32 nodes changed (Warmup and prose). 739 nodes, 2425 edges.
+  signals' `uses` edges move to it); 32 nodes changed (Warmup and prose). 734 nodes, 2405 edges.
+
+### Six Cambrian signals disabled; `social_price_divergence` back as an exit
+
+Oracle engine strategy backtests, every strategy one entry trigger plus a price filter, platform
+default execution config, daily bars. Settings were chosen on a selection window and the chosen
+version was reported untouched on a holdout window.
+
+- **Disabled for new strategies** (`@deprecated_signal`, `Disabled: True`, a `Disabled-Reason` with
+  the numbers; stored strategies keep evaluating, with a `DeprecationWarning`):
+  - `social_sentiment_surge`: buys after the run-up (entries followed a median +6.2% week, 55% hit
+    the stop); with `is_above_sma` it made 1.52% and 0.52% against 5.12% and 3.25% for
+    `rsi_cross_up` with `is_above_sma`.
+  - `social_sentiment_capitulation`: buys falling knives (76 of 101 unfiltered entries below the
+    20-day SMA); as an exit it sold dips that recovered (10 of 12 would have reached the target).
+  - `social_crowd_bullish`: a crowd already above its norm marks a late entry (-7.2 USDT per trade,
+    33% win on the selection window); at the default it made -0.01% and 1.30%.
+  - `social_crowd_cooling`: raises P&L per trade but total return trails (best version 4.56% and
+    2.93% against 5.12% and 3.25%).
+  - `whale_share_divergence`: `WhaleHeldShare` moves with price, so the share leg is a noisy copy
+    of the price drop; -2.09%, 62 trades, -20.2 USDT per trade on six Solana tokens.
+  - `holder_growth_trend`: Solana holder counts rise almost every day, so it removes trades without
+    improving them (86 to 73 trades, P&L per trade -19.2 to -21.6 USDT).
+
+  Social signals: BTC, ETH, SOL, XRP, DOGE, BNB and LINK, selection 2025-04-01 to 2026-01-31,
+  holdout 2026-02-01 to 2026-11-01, 211 configurations; none of the 83 surge, capitulation,
+  crowd_bullish and crowd_cooling variants qualified on the selection window. Holder signals: JUP,
+  WIF, PYTH, RAY, JTO and ORCA, selection 2025-07-01 to 2026-03-31, holdout 2026-04-01 to
+  2026-10-31, 213 variants; none held up on the holdout.
+- **`social_price_divergence` enabled again, as an exit for long positions**: the deprecated and
+  disabled markers are removed, so it is composable and back in the graph. New defaults
+  `min_drop_pct` 3.0 (was 5.0) and `window_baseline` 60 (was 30); `window` stays 7. The KB has no
+  exit-only type, so it stays `Type: TRIGGER`; its description, Friendly-Name and
+  Short-Description say it is an exit and never an entry. As the exit of `rsi_cross_up` with
+  `is_above_sma`: holdout 4.00% against 3.25% without it, Sharpe 1.12 against 0.61, 6 of 7 coins.
+  On three filtered strategies it was never below the strategy without it in either window, over
+  31 signal exits; the effect is small. As an entry it lost money in every form tested, as the
+  entry below records.
+- **Graph**: 6 nodes and 26 edges removed, 1 node and 6 edges added, nothing changed. 733 nodes,
+  2403 edges. 259 registered signals (125 TRIGGER, 134 FILTER), 229 modelled.
 
 ### `social_price_divergence` disabled for new strategies
 
@@ -327,7 +366,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 739 nodes, 2425 edges, in
+carries a formula stating the predicate it computes -- 734 nodes, 2405 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,

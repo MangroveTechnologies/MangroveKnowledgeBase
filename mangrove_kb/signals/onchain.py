@@ -47,6 +47,7 @@ import pandas as pd
 
 from mangrove_kb.indicators import ROC, OnchainChange
 from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.signals._common import deprecated_signal
 
 logger = logging.getLogger(__name__)
 
@@ -358,6 +359,10 @@ def holder_concentration_falling(df: pd.DataFrame, window: int = 14) -> bool:
 # =============================================================================
 
 @RuleRegistry.register("holder_growth_trend")
+@deprecated_signal(
+    "it removed trades without improving them in strategy backtests, so it is disabled for new "
+    "strategies and not in the ontology graph; stored strategies that name it keep evaluating"
+)
 def holder_growth_trend(df: pd.DataFrame, window: int = 14, min_growth_pct: float = 1.0) -> bool:
     """Signal: holder_growth_trend
 
@@ -386,6 +391,8 @@ def holder_growth_trend(df: pd.DataFrame, window: int = 14, min_growth_pct: floa
 
     Type: FILTER
     Requires: HolderCount
+    Disabled: True
+    Disabled-Reason: In Oracle engine strategy backtests on JUP, WIF, PYTH, RAY, JTO and ORCA (daily bars, platform default execution config, every strategy one entry trigger plus a price filter, settings chosen on 2025-07-01 to 2026-03-31 and reported untouched on 2026-04-01 to 2026-10-31), Solana holder counts rise almost every day whatever price does (14-day growth of 1% or more on 30-80% of days), so as a filter it removes trades nearly at random: on rsi_cross_up it cut 86 trades to 73 and P&L per trade went from -19.2 to -21.6 USDT (-2.63% over 2025-07-01 to 2026-10-31). None of 31 holder-count filter variants held up on the holdout; the selected one (window 7, 1%) made 0.77% vs 3.88% for rsi_cross_up with is_above_sma. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with a HolderCount column.
@@ -406,6 +413,10 @@ def holder_growth_trend(df: pd.DataFrame, window: int = 14, min_growth_pct: floa
 
 
 @RuleRegistry.register("whale_share_divergence")
+@deprecated_signal(
+    "it lost money in strategy backtests, so it is disabled for new strategies and not in the "
+    "ontology graph; stored strategies that name it keep evaluating"
+)
 def whale_share_divergence(df: pd.DataFrame, window: int = 7, min_drop_pct: float = 5.0,
                            min_share_rise: float = 0.0) -> bool:
     """Signal: whale_share_divergence
@@ -437,6 +448,8 @@ def whale_share_divergence(df: pd.DataFrame, window: int = 7, min_drop_pct: floa
 
     Type: TRIGGER
     Requires: close, WhaleHeldShare
+    Disabled: True
+    Disabled-Reason: In Oracle engine strategy backtests on JUP, WIF, PYTH, RAY, JTO and ORCA (daily bars, platform default execution config, every strategy one entry trigger plus a price filter, settings chosen on 2025-07-01 to 2026-03-31 and reported untouched on 2026-04-01 to 2026-10-31), it lost money as an entry: -2.09%, 62 trades, -20.2 USDT per trade, 32% win rate over 2025-07-01 to 2026-10-31. WhaleHeldShare is a share of USD held in $100,000+ wallets, so it moves with price (14-day correlation +0.46 to +0.89 per token) and the share condition is a noisy copy of the price drop: 51 of 62 entries were below the 20-day SMA. No divergence or convergence form, as trigger, filter or exit, beat a price-filtered rsi_cross_up reference on the holdout or its own price-only version (96 trigger variants; the selected one made -2.70% vs +0.33% on the holdout). Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with close and WhaleHeldShare columns.

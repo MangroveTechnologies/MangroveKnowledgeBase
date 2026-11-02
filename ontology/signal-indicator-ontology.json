@@ -10861,59 +10861,6 @@
    }
   },
   {
-   "id": "procedure:signal-holder-growth-trend",
-   "title": "holder_growth_trend",
-   "kind": "Procedure",
-   "summary": "Check whether the token's holder base is growing (adoption filter).",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "onchain",
-    "reference": null,
-    "warmup_bars": "window",
-    "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'holder_growth_trend', 'params': {'window': value, 'min_growth_pct': value}}, df)",
-    "formula": "pct_change(HolderCount, window)[t] >= min_growth_pct",
-    "friendly_name": "Holder Base Growing",
-    "display_name": "Holder Growth Trend",
-    "short_description": "More wallets hold the token than a few weeks ago.",
-    "inputs": {
-     "HolderCount": {
-      "type": "series",
-      "description": "wallets holding the token, per bar"
-     }
-    },
-    "params": {
-     "window": {
-      "type": "int",
-      "default": 14,
-      "min": 2,
-      "max": 180,
-      "description": "Readings between the two holder counts compared"
-     },
-     "min_growth_pct": {
-      "type": "float",
-      "default": 1.0,
-      "min": 0.0,
-      "max": 50.0,
-      "description": "Minimum percentage growth in holders over window"
-     }
-    },
-    "outputs": {
-     "fired": {
-      "type": "bool",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "True if the holder count grew at least min_growth_pct percent over the last window readings"
-     }
-    }
-   }
-  },
-  {
    "id": "procedure:signal-ichimoku-bearish",
    "title": "ichimoku_bearish",
    "kind": "Procedure",
@@ -16377,10 +16324,10 @@
    }
   },
   {
-   "id": "procedure:signal-social-crowd-bullish",
-   "title": "social_crowd_bullish",
+   "id": "procedure:signal-social-price-divergence",
+   "title": "social_price_divergence",
    "kind": "Procedure",
-   "summary": "Check whether the crowd is more bullish than usual (regime filter).",
+   "summary": "Exit signal for long positions: detect a price drop that the crowd is not following. Use it only in the exit rules of a strategy that already has its own entry trigger and a price filter. Do not use it as an entry: it lost money as a long entry in every form tested. It is typed TRIGGER because the knowledge base has no exit-only type.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -16388,12 +16335,16 @@
     "reference": null,
     "warmup_bars": "window + window_baseline - 1",
     "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'social_crowd_bullish', 'params': {'window': value, 'window_baseline': value, 'margin': value}}, df)",
-    "formula": "shift(SocialNetBullShare, window, window_baseline)[t] > margin",
-    "friendly_name": "Crowd Running Bullish",
-    "display_name": "Social Crowd Bullish",
-    "short_description": "Recent posts lean more bullish than this asset's norm.",
+    "usage_example": "RuleRegistry.evaluate({'name': 'social_price_divergence', 'params': {'window': value, 'min_drop_pct': value, 'window_baseline': value}}, df)",
+    "formula": "roc(close, window)[t] <= -min_drop_pct\nAND shift(SocialNetBullShare, window, window_baseline)[t] >= 0",
+    "friendly_name": "Crowd Ignores Drop Exit",
+    "display_name": "Social Price Divergence",
+    "short_description": "Exit a long when price falls while the crowd stays bullish.",
     "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     },
      "SocialNetBullShare": {
       "type": "series",
       "description": "bullish minus bearish share of posts per bar, -1 to 1"
@@ -16403,147 +16354,23 @@
      "window": {
       "type": "int",
       "default": 7,
-      "min": 1,
+      "min": 2,
       "max": 60,
-      "description": "Recent readings averaged"
+      "description": "Bars over which the price drop and the recent social mean are measured"
+     },
+     "min_drop_pct": {
+      "type": "float",
+      "default": 3.0,
+      "min": 1.0,
+      "max": 50.0,
+      "description": "Minimum percentage fall in close over window"
      },
      "window_baseline": {
       "type": "int",
       "default": 60,
-      "min": 14,
-      "max": 365,
-      "description": "Readings before the recent window forming the norm"
-     },
-     "margin": {
-      "type": "float",
-      "default": 0.0,
-      "min": 0.0,
-      "max": 0.5,
-      "description": "Amount the recent average must exceed the norm by"
-     }
-    },
-    "outputs": {
-     "fired": {
-      "type": "bool",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "True if the mean net bullish share over the last window readings exceeds the mean of the preceding window_baseline readings by more than margin"
-     }
-    }
-   }
-  },
-  {
-   "id": "procedure:signal-social-crowd-cooling",
-   "title": "social_crowd_cooling",
-   "kind": "Procedure",
-   "summary": "Check whether the crowd is no more bullish than usual: the complement of social_crowd_bullish at the same windows and margin 0 (contrarian regime filter).",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "social",
-    "reference": null,
-    "warmup_bars": "window + window_baseline - 1",
-    "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'social_crowd_cooling', 'params': {'window': value, 'window_baseline': value, 'margin': value}}, df)",
-    "formula": "shift(SocialNetBullShare, window, window_baseline)[t] <= -margin",
-    "friendly_name": "Crowd Not Running Hot",
-    "display_name": "Social Crowd Cooling",
-    "short_description": "Recent posts lean no more bullish than this asset's norm.",
-    "inputs": {
-     "SocialNetBullShare": {
-      "type": "series",
-      "description": "bullish minus bearish share of posts per bar, -1 to 1"
-     }
-    },
-    "params": {
-     "window": {
-      "type": "int",
-      "default": 7,
-      "min": 1,
-      "max": 60,
-      "description": "Recent readings averaged"
-     },
-     "window_baseline": {
-      "type": "int",
-      "default": 60,
-      "min": 14,
-      "max": 365,
-      "description": "Readings before the recent window forming the norm"
-     },
-     "margin": {
-      "type": "float",
-      "default": 0.0,
-      "min": 0.0,
-      "max": 0.5,
-      "description": "Amount the recent average must sit at or below the norm by"
-     }
-    },
-    "outputs": {
-     "fired": {
-      "type": "bool",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "True if the mean net bullish share over the last window readings is at or below the mean of the preceding window_baseline readings minus margin"
-     }
-    }
-   }
-  },
-  {
-   "id": "procedure:signal-social-sentiment-capitulation",
-   "title": "social_sentiment_capitulation",
-   "kind": "Procedure",
-   "summary": "Detect an unusually bearish social-sentiment reading on the latest bar (contrarian).",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "social",
-    "reference": null,
-    "warmup_bars": "window",
-    "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'social_sentiment_capitulation', 'params': {'window': value, 'z_threshold': value, 'min_authors': value}}, df)",
-    "formula": "zscore(SocialSentiment, window)[t] <= -z_threshold AND SocialAuthors[t] >= min_authors",
-    "friendly_name": "Sentiment Capitulation",
-    "display_name": "Social Sentiment Capitulation",
-    "short_description": "The crowd is far more bearish than usual today.",
-    "inputs": {
-     "SocialSentiment": {
-      "type": "series",
-      "description": "average post sentiment per bar, 0-10"
-     },
-     "SocialAuthors": {
-      "type": "series",
-      "description": "unique authors behind each bar's reading"
-     }
-    },
-    "params": {
-     "window": {
-      "type": "int",
-      "default": 30,
       "min": 7,
       "max": 180,
-      "description": "Prior readings forming the baseline (latest excluded)"
-     },
-     "z_threshold": {
-      "type": "float",
-      "default": 2.0,
-      "min": 0.5,
-      "max": 5.0,
-      "description": "Standard deviations below the baseline mean required"
-     },
-     "min_authors": {
-      "type": "int",
-      "default": 20,
-      "min": 1,
-      "max": 1000,
-      "description": "Minimum unique authors behind the latest reading"
+      "description": "Social readings before the recent window forming the norm"
      }
     },
     "outputs": {
@@ -16555,71 +16382,7 @@
        1
       ],
       "canonical_name": "none",
-      "description": "True if the latest sentiment is at least z_threshold standard deviations below the prior window and enough authors contributed"
-     }
-    }
-   }
-  },
-  {
-   "id": "procedure:signal-social-sentiment-surge",
-   "title": "social_sentiment_surge",
-   "kind": "Procedure",
-   "summary": "Detect an unusually bullish social-sentiment reading on the latest bar.",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "social",
-    "reference": null,
-    "warmup_bars": "window",
-    "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'social_sentiment_surge', 'params': {'window': value, 'z_threshold': value, 'min_authors': value}}, df)",
-    "formula": "zscore(SocialSentiment, window)[t] >= z_threshold AND SocialAuthors[t] >= min_authors",
-    "friendly_name": "Sentiment Surge",
-    "display_name": "Social Sentiment Surge",
-    "short_description": "The crowd is far more bullish than usual today.",
-    "inputs": {
-     "SocialSentiment": {
-      "type": "series",
-      "description": "average post sentiment per bar, 0-10"
-     },
-     "SocialAuthors": {
-      "type": "series",
-      "description": "unique authors behind each bar's reading"
-     }
-    },
-    "params": {
-     "window": {
-      "type": "int",
-      "default": 30,
-      "min": 7,
-      "max": 180,
-      "description": "Prior readings forming the baseline (latest excluded)"
-     },
-     "z_threshold": {
-      "type": "float",
-      "default": 2.0,
-      "min": 0.5,
-      "max": 5.0,
-      "description": "Standard deviations above the baseline mean required"
-     },
-     "min_authors": {
-      "type": "int",
-      "default": 20,
-      "min": 1,
-      "max": 1000,
-      "description": "Minimum unique authors behind the latest reading"
-     }
-    },
-    "outputs": {
-     "fired": {
-      "type": "bool",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "True if the latest sentiment is at least z_threshold standard deviations above the prior window and enough authors contributed"
+      "description": "True if close fell at least min_drop_pct over window bars while the mean net bullish share over the same bars stayed at or above its baseline mean; True means exit the long"
      }
     }
    }
@@ -19705,70 +19468,6 @@
       ],
       "canonical_name": "none",
       "description": "True if bullish VWMA crossover detected on the current bar"
-     }
-    }
-   }
-  },
-  {
-   "id": "procedure:signal-whale-share-divergence",
-   "title": "whale_share_divergence",
-   "kind": "Procedure",
-   "summary": "Detect large holders gaining share of the supply value while price falls.",
-   "epistemic": "observed",
-   "status": "ratified",
-   "props": {
-    "source_module": "onchain",
-    "reference": null,
-    "warmup_bars": "window",
-    "abbreviation": null,
-    "usage_example": "RuleRegistry.evaluate({'name': 'whale_share_divergence', 'params': {'window': value, 'min_drop_pct': value, 'min_share_rise': value}}, df)",
-    "formula": "roc(close, window)[t] <= -min_drop_pct AND change(WhaleHeldShare, window)[t] > min_share_rise",
-    "friendly_name": "Whales Buying the Drop",
-    "display_name": "Whale Share Divergence",
-    "short_description": "Price fell while large wallets held a bigger share.",
-    "inputs": {
-     "close": {
-      "type": "series",
-      "description": "closing price"
-     },
-     "WhaleHeldShare": {
-      "type": "series",
-      "description": "share of USD held by $100,000+ wallets per bar, 0-1"
-     }
-    },
-    "params": {
-     "window": {
-      "type": "int",
-      "default": 7,
-      "min": 2,
-      "max": 60,
-      "description": "Bars over which price and share changes are measured"
-     },
-     "min_drop_pct": {
-      "type": "float",
-      "default": 5.0,
-      "min": 1.0,
-      "max": 50.0,
-      "description": "Minimum percentage fall in close over window"
-     },
-     "min_share_rise": {
-      "type": "float",
-      "default": 0.0,
-      "min": 0.0,
-      "max": 0.2,
-      "description": "Minimum rise in WhaleHeldShare over window (absolute, 0-1 scale)"
-     }
-    },
-    "outputs": {
-     "fired": {
-      "type": "bool",
-      "units": "boolean",
-      "range": [
-       0,
-       1
-      ],
-      "canonical_name": "none",
-      "description": "True if close fell at least min_drop_pct over window bars while the share of USD held by $100,000+ wallets rose by more than min_share_rise"
      }
     }
    }
@@ -32152,43 +31851,6 @@
    "to_id": "concept:averaging"
   },
   {
-   "from": "holder_growth_trend",
-   "rel": "instance-of",
-   "to": "Signal",
-   "why": "entity type",
-   "from_id": "procedure:signal-holder-growth-trend",
-   "to_id": "concept:signal"
-  },
-  {
-   "from": "holder_growth_trend",
-   "rel": "has-role",
-   "to": "filter",
-   "why": "role",
-   "from_id": "procedure:signal-holder-growth-trend",
-   "to_id": "property:role-filter"
-  },
-  {
-   "from": "holder_growth_trend",
-   "rel": "uses",
-   "to": "OnchainChange",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-holder-growth-trend",
-   "to_id": "procedure:indicator-onchainchange",
-   "inputs": {
-    "pct_change": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "holder_growth_trend",
-   "rel": "about",
-   "to": "onchain",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-holder-growth-trend",
-   "to_id": "concept:onchain"
-  },
-  {
    "from": "ichimoku_bearish",
    "rel": "instance-of",
    "to": "Signal",
@@ -35851,27 +35513,40 @@
    "to_id": "concept:averaging"
   },
   {
-   "from": "social_crowd_bullish",
+   "from": "social_price_divergence",
    "rel": "instance-of",
    "to": "Signal",
    "why": "entity type",
-   "from_id": "procedure:signal-social-crowd-bullish",
+   "from_id": "procedure:signal-social-price-divergence",
    "to_id": "concept:signal"
   },
   {
-   "from": "social_crowd_bullish",
+   "from": "social_price_divergence",
    "rel": "has-role",
-   "to": "filter",
+   "to": "trigger",
    "why": "role",
-   "from_id": "procedure:signal-social-crowd-bullish",
-   "to_id": "property:role-filter"
+   "from_id": "procedure:signal-social-price-divergence",
+   "to_id": "property:role-trigger"
   },
   {
-   "from": "social_crowd_bullish",
+   "from": "social_price_divergence",
+   "rel": "uses",
+   "to": "ROC",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-social-price-divergence",
+   "to_id": "procedure:indicator-roc",
+   "inputs": {
+    "roc": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "social_price_divergence",
    "rel": "uses",
    "to": "SocialBaselineShift",
    "why": "reads indicator output",
-   "from_id": "procedure:signal-social-crowd-bullish",
+   "from_id": "procedure:signal-social-price-divergence",
    "to_id": "procedure:indicator-socialbaselineshift",
    "inputs": {
     "shift": {
@@ -35880,122 +35555,19 @@
    }
   },
   {
-   "from": "social_crowd_bullish",
+   "from": "social_price_divergence",
+   "rel": "about",
+   "to": "momentum",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-social-price-divergence",
+   "to_id": "concept:momentum"
+  },
+  {
+   "from": "social_price_divergence",
    "rel": "about",
    "to": "social",
    "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-social-crowd-bullish",
-   "to_id": "concept:social"
-  },
-  {
-   "from": "social_crowd_cooling",
-   "rel": "instance-of",
-   "to": "Signal",
-   "why": "entity type",
-   "from_id": "procedure:signal-social-crowd-cooling",
-   "to_id": "concept:signal"
-  },
-  {
-   "from": "social_crowd_cooling",
-   "rel": "has-role",
-   "to": "filter",
-   "why": "role",
-   "from_id": "procedure:signal-social-crowd-cooling",
-   "to_id": "property:role-filter"
-  },
-  {
-   "from": "social_crowd_cooling",
-   "rel": "uses",
-   "to": "SocialBaselineShift",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-social-crowd-cooling",
-   "to_id": "procedure:indicator-socialbaselineshift",
-   "inputs": {
-    "shift": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "social_crowd_cooling",
-   "rel": "about",
-   "to": "social",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-social-crowd-cooling",
-   "to_id": "concept:social"
-  },
-  {
-   "from": "social_sentiment_capitulation",
-   "rel": "instance-of",
-   "to": "Signal",
-   "why": "entity type",
-   "from_id": "procedure:signal-social-sentiment-capitulation",
-   "to_id": "concept:signal"
-  },
-  {
-   "from": "social_sentiment_capitulation",
-   "rel": "has-role",
-   "to": "trigger",
-   "why": "role",
-   "from_id": "procedure:signal-social-sentiment-capitulation",
-   "to_id": "property:role-trigger"
-  },
-  {
-   "from": "social_sentiment_capitulation",
-   "rel": "uses",
-   "to": "SocialZScore",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-social-sentiment-capitulation",
-   "to_id": "procedure:indicator-socialzscore",
-   "inputs": {
-    "zscore": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "social_sentiment_capitulation",
-   "rel": "about",
-   "to": "social",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-social-sentiment-capitulation",
-   "to_id": "concept:social"
-  },
-  {
-   "from": "social_sentiment_surge",
-   "rel": "instance-of",
-   "to": "Signal",
-   "why": "entity type",
-   "from_id": "procedure:signal-social-sentiment-surge",
-   "to_id": "concept:signal"
-  },
-  {
-   "from": "social_sentiment_surge",
-   "rel": "has-role",
-   "to": "trigger",
-   "why": "role",
-   "from_id": "procedure:signal-social-sentiment-surge",
-   "to_id": "property:role-trigger"
-  },
-  {
-   "from": "social_sentiment_surge",
-   "rel": "uses",
-   "to": "SocialZScore",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-social-sentiment-surge",
-   "to_id": "procedure:indicator-socialzscore",
-   "inputs": {
-    "zscore": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "social_sentiment_surge",
-   "rel": "about",
-   "to": "social",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-social-sentiment-surge",
+   "from_id": "procedure:signal-social-price-divergence",
    "to_id": "concept:social"
   },
   {
@@ -37892,64 +37464,6 @@
    "why": "character it is concerned with, via the indicator it reads",
    "from_id": "procedure:signal-vwma-cross-up",
    "to_id": "concept:averaging"
-  },
-  {
-   "from": "whale_share_divergence",
-   "rel": "instance-of",
-   "to": "Signal",
-   "why": "entity type",
-   "from_id": "procedure:signal-whale-share-divergence",
-   "to_id": "concept:signal"
-  },
-  {
-   "from": "whale_share_divergence",
-   "rel": "has-role",
-   "to": "trigger",
-   "why": "role",
-   "from_id": "procedure:signal-whale-share-divergence",
-   "to_id": "property:role-trigger"
-  },
-  {
-   "from": "whale_share_divergence",
-   "rel": "uses",
-   "to": "OnchainChange",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-whale-share-divergence",
-   "to_id": "procedure:indicator-onchainchange",
-   "inputs": {
-    "change": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "whale_share_divergence",
-   "rel": "uses",
-   "to": "ROC",
-   "why": "reads indicator output",
-   "from_id": "procedure:signal-whale-share-divergence",
-   "to_id": "procedure:indicator-roc",
-   "inputs": {
-    "roc": {
-     "type": "series"
-    }
-   }
-  },
-  {
-   "from": "whale_share_divergence",
-   "rel": "about",
-   "to": "momentum",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-whale-share-divergence",
-   "to_id": "concept:momentum"
-  },
-  {
-   "from": "whale_share_divergence",
-   "rel": "about",
-   "to": "onchain",
-   "why": "character it is concerned with, via the indicator it reads",
-   "from_id": "procedure:signal-whale-share-divergence",
-   "to_id": "concept:onchain"
   },
   {
    "from": "williams_r_overbought",
@@ -48628,9 +48142,9 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "signals": 234,
+  "signals": 229,
   "signals_registered": 259,
-  "signals_out_of_scope": 25,
+  "signals_out_of_scope": 30,
   "signals_with_no_indicator": [],
   "signals_with_unknown_role": [],
   "signals_missing_warmup": [],

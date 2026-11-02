@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-ff9e18.svg" alt="License: PolyForm Noncommercial 1.0.0">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/graph%20%2B%20indices-in%20the%20wheel-2ec27e.svg" alt="Graph and both search indices ship in the wheel">
-  <img src="https://img.shields.io/badge/graph-739%20nodes%20%C2%B7%202425%20edges-42a7c6.svg" alt="Graph: 739 nodes, 2425 edges">
+  <img src="https://img.shields.io/badge/graph-734%20nodes%20%C2%B7%202405%20edges-42a7c6.svg" alt="Graph: 734 nodes, 2405 edges">
   <img src="https://img.shields.io/badge/agent-skill%20%2B%20guide-9b5cff.svg" alt="Agent skill + guide">
 </p>
 
@@ -24,7 +24,7 @@ How it is built, stored and searched is drawn in [`docs/architecture/`](docs/arc
 edge schema, the search corpus, `find()`, `ask()`, both search indices and how they are
 fused, and the three traversals that are easy to confuse.
 
-And a **knowledge graph** — 739 nodes and 2425 edges, with two halves on one schema. One is compiled
+And a **knowledge graph** — 734 nodes and 2405 edges, with two halves on one schema. One is compiled
 from the source above: what each computation is, what it measures, what it reads, and what part it
 plays. That half is exact, because it is read from the code rather than extracted from prose. The
 other is the trading knowledge base — market structure, instruments, risk, chart patterns,
@@ -275,7 +275,7 @@ detail one click away.
 | Pane | Where | What it holds |
 | --- | --- | --- |
 | Rail | left | filters, by kind of node and kind of edge |
-| Map | middle | 739 nodes, 2425 edges |
+| Map | middle | 734 nodes, 2405 edges |
 | Panel | right | everything the library records about whatever you clicked |
 
 ### The inspector — what a node actually carries
@@ -336,7 +336,7 @@ an instance of the family; a signal emits a boolean, so it is *about* the family
   <img src="assets/viewer-action.png" alt="The Action section with neighbors and ancestors both selected, and a bar over the map reading 'showing 17 of 714'" width="100%">
 </p>
 
-739 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
+734 nodes at once is a picture, not an answer. **show only** keeps part of the graph around the
 selected node, and the choices combine — `neighbors` + `ancestors` gives you both:
 
 | | Keeps |
@@ -374,7 +374,7 @@ say, and the children grey out to show why — so the canvas can never empty for
 visible in the rail.
 
 **Density** spreads or tightens the layout. **Labels** switches between always / never / on hover /
-on zoom — at 739 nodes, off is often clearer than on.
+on zoom — at 734 nodes, off is often clearer than on.
 
 <br clear="right">
 
@@ -402,10 +402,10 @@ rather than reimplemented in JS, and a test asserts the two agree on real querie
 
 The same graph, same filters, same inspector — drag to rotate, scroll to zoom, right-drag to pan. In
 either view, **double-click a node to hide or show what hangs off it**, which is how you make a hub
-with 234 signals attached readable.
+with 229 signals attached readable.
 
 A **green ring** marks the selected node; a **yellow ring** marks a deprecated one — it still runs,
-it just has a canonical replacement. Nothing else is ringed: 333 of 739 nodes are `ratified`, so
+it just has a canonical replacement. Nothing else is ringed: 328 of 734 nodes are `ratified`, so
 marking that would be decoration rather than information.
 
 Light, dark and follow-the-system are top right, and the choice is remembered.
@@ -432,7 +432,7 @@ A statement lives in exactly one place. Until it concerns a particular node it s
 Judgment; once it earns an `about` edge it moves onto that edge as its `why` — so the reason an
 answer is an answer travels with the connection, not in a list somewhere else.
 
-**The library half.** Of **259 registered signals**, **234 are modelled** in the graph, along with
+**The library half.** Of **259 registered signals**, **229 are modelled** in the graph, along with
 77 of the 86 indicator classes. That gap is deliberate:
 
 - **Signals with no indicator beneath them** — a signal reading raw price with no measurement in
@@ -446,10 +446,15 @@ answer is an answer travels with the connection, not in a list somewhere else.
   registered and deprecated because stored strategies name them.
 - **Alternative-data signals that compute inline** - the ten older on-chain signals (Nansen-sourced
   columns) and the ten DeFi Pro signals read a data column directly rather than through an
-  indicator, so the builder has no class to derive and they stay out of the graph. The six
-  signals that read an alternative-data indicator (four social, two Solana holder signals) are
-  modelled under the `social` and `onchain` classes. The five older `x_*` social signals are not
-  in this repository at all; they remain private in MangroveAI.
+  indicator, so the builder has no class to derive and they stay out of the graph. The four
+  enabled signals that read an alternative-data indicator (`social_price_divergence`, an exit for
+  long positions, and the three X attention signals) are modelled under the `social` class. The five
+  older `x_*` social signals are not in this repository at all; they remain private in MangroveAI.
+- **Signals disabled for new strategies** - four Deep42 social signals (`social_sentiment_surge`,
+  `social_sentiment_capitulation`, `social_crowd_bullish`, `social_crowd_cooling`) and the two
+  Solana holder signals (`holder_growth_trend`, `whale_share_divergence`) lost to price-filtered
+  references in strategy backtests. They stay registered and deprecated because stored strategies
+  name them; each docstring's `Disabled-Reason` has the numbers.
 
 The graph is regenerated from a clean tree on every build, and a test rebuilds it into an empty path
 and diffs against the committed file — so it cannot drift from the code it describes.
