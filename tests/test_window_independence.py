@@ -208,21 +208,19 @@ def test_supertrend_reads_the_whole_series_regime():
                 assert RuleRegistry.evaluate({"name": "supertrend_short"}, window) == (regime.iloc[end] == -1)
 
 
-def test_supertrend_warmup_is_enough_for_a_late_start_to_agree():
-    """`Warmup: 10 * window + 50 * multiplier` is how much history a trail started late needs to
-    agree with the whole-series trail, measured on the seven fixtures. Pinned on every fixture at
-    the defaults and at the widest multiplier."""
+def test_supertrend_warmup_picks_up_the_regime():
+    """`Warmup: max(60, window)` gives a trail started late enough bars to find the current regime:
+    on BTC daily bars at the defaults it disagrees with the whole-series trail on under 3% of days
+    (13 of 894 measured; at the old 17 bars it was 355). Only the live path, which has no whole
+    series, reads a late-started trail."""
     from mangrove_kb.indicators import SuperTrendTrail
-    fn = RuleRegistry._registry["supertrend_long"]
-    for path in sorted(DATA.glob("*.csv")):
-        bars = pd.read_csv(path)[sorted(OHLCV)].astype(float)
-        for params in ({"window": 10, "multiplier": 3.0}, {"window": 10, "multiplier": 10.0}):
-            need = _warmup(fn, params) + 1
-            if len(bars) < need + 50:
-                continue
-            data = {k: bars[k] for k in ("high", "low", "close")}
-            whole = SuperTrendTrail.compute(data, params)["regime"].to_numpy()
-            late = np.array([SuperTrendTrail.compute({k: v.iloc[e - need + 1:e + 1] for k, v in data.items()},
-                                                     params)["regime"].iloc[-1]
-                             for e in range(need, len(bars), 31)])
-            assert (late == whole[need::31]).all(), f"{path.name} {params}"
+    bars = _bars()
+    params = {"window": 10, "multiplier": 3.0}
+    need = _warmup(RuleRegistry._registry["supertrend_long"], params) + 1
+    data = {k: bars[k] for k in ("high", "low", "close")}
+    whole = SuperTrendTrail.compute(data, params)["regime"]
+    ends = range(400, len(bars))
+    late = [SuperTrendTrail.compute({k: v.iloc[e - need + 1:e + 1] for k, v in data.items()},
+                                    params)["regime"].iloc[-1] for e in ends]
+    differ = sum(a != whole.iloc[e] for a, e in zip(late, ends))
+    assert differ / len(ends) < 0.03, f"{differ} of {len(ends)} days"

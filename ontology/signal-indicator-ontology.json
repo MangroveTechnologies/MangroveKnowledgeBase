@@ -14939,7 +14939,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
-    "warmup_bars": "5 / step",
+    "warmup_bars": "60",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'psar_bearish', 'params': {'step': value, 'max_step': value}}, df)",
     "formula": "psar[t] > close[t]",
@@ -15000,7 +15000,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
-    "warmup_bars": "5 / step",
+    "warmup_bars": "60",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'psar_bullish', 'params': {'step': value, 'max_step': value}}, df)",
     "formula": "psar[t] < close[t]",
@@ -15061,7 +15061,7 @@
    "props": {
     "source_module": "averaging",
     "reference": "https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar",
-    "warmup_bars": "5 / step + 1",
+    "warmup_bars": "61",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'psar_reversal', 'params': {'step': value, 'max_step': value, 'direction': value}}, df)",
     "formula": "psar[t-1] > close[t-1] and psar[t] < close[t] when direction is bullish; psar[t-1] < close[t-1] and psar[t] > close[t] when bearish",
@@ -17095,7 +17095,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "10 * window + 50 * multiplier + 1",
+    "warmup_bars": "max(60, window) + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_flip_down', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t-1] == +1 and regime[t] == -1 -- close[t] < lower_band[t-1] after a long regime",
@@ -17156,7 +17156,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "10 * window + 50 * multiplier + 1",
+    "warmup_bars": "max(60, window) + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_flip_up', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t-1] == -1 and regime[t] == +1 -- close[t] > upper_band[t-1] after a short regime",
@@ -17211,13 +17211,13 @@
    "id": "procedure:signal-supertrend-long",
    "title": "supertrend_long",
    "kind": "Procedure",
-   "summary": "Check if SuperTrend's regime is long: close has crossed above the trailed upper band more recently than it crossed below the trailed lower band, so the lower band is the active trailing stop. Reads `SuperTrendTrail`, which carries the regime over the whole series; the Warmup is the history a trail started late needs to agree with it (measured on the seven fixtures).",
+   "summary": "Check if SuperTrend's regime is long: close has crossed above the trailed upper band more recently than it crossed below the trailed lower band, so the lower band is the active trailing stop. Reads `SuperTrendTrail`, which carries the regime over the whole series. The Warmup gives a trail started late 60 bars to pick up the current regime: on BTC daily bars at the defaults, 63 bars disagree with the whole history on 13 of 894 days, 17 bars on 355.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "10 * window + 50 * multiplier",
+    "warmup_bars": "max(60, window)",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_long', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t] == +1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour; long until the first lower-band cross",
@@ -17278,7 +17278,7 @@
    "props": {
     "source_module": "volatility",
     "reference": "https://www.tradingview.com/support/solutions/43000634738-supertrend/",
-    "warmup_bars": "10 * window + 50 * multiplier",
+    "warmup_bars": "max(60, window)",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'supertrend_short', 'params': {'window': value, 'multiplier': value}}, df)",
     "formula": "regime[t] == -1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour",

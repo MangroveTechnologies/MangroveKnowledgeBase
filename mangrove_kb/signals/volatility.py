@@ -1843,15 +1843,16 @@ def supertrend_long(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0)
 
     Check if SuperTrend's regime is long: close has crossed above the trailed upper band more
     recently than it crossed below the trailed lower band, so the lower band is the active trailing
-    stop. Reads `SuperTrendTrail`, which carries the regime over the whole series; the Warmup is the
-    history a trail started late needs to agree with it (measured on the seven fixtures).
+    stop. Reads `SuperTrendTrail`, which carries the regime over the whole series. The Warmup gives a
+    trail started late 60 bars to pick up the current regime: on BTC daily bars at the defaults, 63
+    bars disagree with the whole history on 13 of 894 days, 17 bars on 355.
 
     Friendly-Name: SuperTrend Says Up
     Display-Name: SuperTrend Long Regime
     Short-Description: Price has stayed above its volatility-scaled trailing stop since the last upside break.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: 10 * window + 50 * multiplier
+    Warmup: max(60, window)
 
     Formula:
         regime[t] == +1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour; long until the first lower-band cross
@@ -1899,7 +1900,7 @@ def supertrend_short(df: pd.DataFrame, window: int = 10, multiplier: float = 3.0
     Short-Description: Price has stayed below its volatility-scaled trailing stop since the last downside break.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: 10 * window + 50 * multiplier
+    Warmup: max(60, window)
 
     Formula:
         regime[t] == -1, where regime[t] = +1 if close[t] > upper_band[t-1], -1 if close[t] < lower_band[t-1], else regime[t-1] with the trailed band ratcheted in its favour
@@ -1946,7 +1947,7 @@ def supertrend_flip_up(df: pd.DataFrame, window: int = 10, multiplier: float = 3
     Short-Description: Price just broke above its trailing stop, turning the SuperTrend regime long.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: 10 * window + 50 * multiplier + 1
+    Warmup: max(60, window) + 1
 
     Formula:
         regime[t-1] == -1 and regime[t] == +1 -- close[t] > upper_band[t-1] after a short regime
@@ -1990,7 +1991,7 @@ def supertrend_flip_down(df: pd.DataFrame, window: int = 10, multiplier: float =
     Short-Description: Price just broke below its trailing stop, turning the SuperTrend regime short.
 
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/
-    Warmup: 10 * window + 50 * multiplier + 1
+    Warmup: max(60, window) + 1
 
     Formula:
         regime[t-1] == +1 and regime[t] == -1 -- close[t] < lower_band[t-1] after a long regime

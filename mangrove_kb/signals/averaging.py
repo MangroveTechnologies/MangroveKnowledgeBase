@@ -2889,7 +2889,7 @@ def psar_bullish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Short-Description: The parabolic stop-and-reverse level is below the current close.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
-    Warmup: 5 / step
+    Warmup: 60
 
     Formula:
         psar[t] < close[t]
@@ -2938,7 +2938,7 @@ def psar_bearish(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2) ->
     Short-Description: The parabolic stop-and-reverse level is above the current close.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
-    Warmup: 5 / step
+    Warmup: 60
 
     Formula:
         psar[t] > close[t]
@@ -2988,7 +2988,7 @@ def psar_reversal(df: pd.DataFrame, step: float = 0.02, max_step: float = 0.2, d
     Short-Description: The parabolic level just switched to the other side of price.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-overlays/parabolic-sar
-    Warmup: 5 / step + 1
+    Warmup: 61
 
     Formula:
         psar[t-1] > close[t-1] and psar[t] < close[t] when direction is bullish; psar[t-1] < close[t-1] and psar[t] > close[t] when bearish

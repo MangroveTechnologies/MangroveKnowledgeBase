@@ -1306,9 +1306,9 @@ class SuperTrendTrail(IndicatorInterface):
     -- which is set by the longest warmup among ALL of the strategy's rules.
 
     The trail starts long on the first bar. A trail started later agrees with the whole-series one
-    once price has crossed a band in both, so the start stops mattering after enough bars. How many
-    depends on the data and grows with the multiplier: on the seven fixtures, window 10 needs 150
-    bars at multiplier 3 and 300 at multiplier 5. The signals' Warmup lines carry that requirement.
+    once price has crossed a band in both, so the start stops mattering after enough bars. The
+    signals ask for 60: on BTC daily bars at window 10, multiplier 3, a trail started 63 bars back
+    disagrees with the whole-series one on 13 of 894 days, one started 17 bars back on 355.
 
     Abbreviation: ST
     Reference: https://www.tradingview.com/support/solutions/43000634738-supertrend/

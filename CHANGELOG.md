@@ -19,10 +19,10 @@ so a signal whose answer moves with the window's length changes when an unrelate
   the 16-bar window and the whole history disagreed on 51 of 198 days, and an RSI + SuperTrend
   strategy lost half its trades (24 to 12) when a never-firing 60-bar exit rule was added. The four
   signals now read `SuperTrendTrail` and return what they returned before on any given frame.
-- **Warmup** for the SuperTrend and PSAR signals is now the history a recursion started late needs
-  to agree with the whole-series one, measured on the seven fixtures over each parameter range:
-  `10 * window + 50 * multiplier` for SuperTrend (250 bars at the defaults; 150 measured), `5 / step`
-  for PSAR (250 at the defaults; 200 measured). It was `window` and `2`.
+- **Warmup** for the SuperTrend and PSAR signals is 60 bars (`max(60, window)` for SuperTrend), up
+  from `window` and `2`, so a trail started late (the live path) has picked up the current regime: on
+  BTC daily bars at the defaults SuperTrend on 63 bars disagrees with the whole history on 13 of 894
+  days, on 17 bars on 355.
 - **Warmup** lines that were shorter than the indicator the signal reads, so the signal could not
   fire on a window of its declared size: `is_above_dema` / `dema_cross_*` (`2 * window - 2`, was
   `window - 1`), `is_above_tema` / `tema_cross_*` (`3 * window - 3`), `is_above_hma` / `hma_cross_*`
@@ -34,8 +34,8 @@ so a signal whose answer moves with the window's length changes when an unrelate
   `strong_body_recent`: the bars they scan plus what their patterns read).
 - **Tests**: `test_window_independence.py` serves indicators from the whole series, as the engine
   does, and requires every OHLCV signal to answer the same on a window of exactly its declared
-  requirement, a longer one, and the whole prefix; and pins each corrected Warmup against the output
-  the signal reads.
+  requirement, a longer one, and the whole prefix; pins each corrected Warmup against the output the
+  signal reads; and pins SuperTrend's 60 bars at under 3% of days off the whole-series regime.
 - **Graph**: 1 node and 2 edges added (`SuperTrendTrail` and its classes; the four SuperTrend
   signals' `uses` edges move to it); 32 nodes changed (Warmup and prose). 734 nodes, 2405 edges.
 
