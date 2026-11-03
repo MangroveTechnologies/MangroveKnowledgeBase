@@ -1423,10 +1423,9 @@ SIGNAL_SCOPE = {
     # social_price_divergence is here as an EXIT for long positions (its docstring says so; the KB
     # has no exit-only type). Six Cambrian signals are NOT here: social_sentiment_surge,
     # social_sentiment_capitulation, social_crowd_bullish, social_crowd_cooling,
-    # holder_growth_trend and whale_share_divergence are disabled for new strategies after they
-    # lost to price-filtered references in strategy backtests (each Disabled-Reason has the
-    # numbers). They stay registered and deprecated because stored strategies name them, the same
-    # way the four atr_trailing_stop_* signals do.
+    # holder_growth_trend and whale_share_divergence are disabled for new strategies (see each
+    # Disabled-Reason). They stay registered and deprecated because stored strategies name them,
+    # the same way the four atr_trailing_stop_* signals do.
     "social_price_divergence",
     "x_post_count_spike", "x_attention_elevated", "x_attention_price_divergence",
 }
