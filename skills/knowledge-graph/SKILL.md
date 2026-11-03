@@ -13,9 +13,9 @@ description: >-
 
 # Ask the graph before you read the source
 
-`mangrove_kb` ships a knowledge graph of **733 nodes, 2403 edges** with two halves on one schema:
+`mangrove_kb` ships a knowledge graph of **734 nodes, 2405 edges** with two halves on one schema:
 
-- **The library, compiled from its own source** — 76 indicators and 229 signals. Exact, not
+- **The library, compiled from its own source** — 77 indicators and 229 signals. Exact, not
   extracted: every answer here is a fact about the code as it is.
 - **The trading knowledge base, ingested from its chapters** — market foundations, instruments and
   mechanics, core concepts, strategy design, risk management, indicators, chart patterns,
@@ -116,7 +116,7 @@ kg.find(role="filter")                       # signals playing the filter part
 
 The graph holds two kinds of thing and they are queried identically.
 
-**Read off the code** -- 76 indicators and 229 signals, exact, with typed inputs and outputs.
+**Read off the code** -- 77 indicators and 229 signals, exact, with typed inputs and outputs.
 **Read off the knowledge base** -- the concepts a market is made of (orders, participants, venues,
 liquidity, spread), the formulas the chapters state, and two nodes per subject holding what is
 true of it (`Fact`) and what to do about it (`Judgment`).

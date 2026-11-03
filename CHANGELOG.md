@@ -6,6 +6,39 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### A signal's answer no longer depends on the window it is handed
+
+A strategy evaluates each rule on a rolling window as long as the longest warmup among ALL its rules,
+so a signal whose answer moves with the window's length changes when an unrelated rule is added.
+
+- **`SuperTrendTrail`** (new indicator, class volatility): SuperTrend's regime and the ratchet that
+  pins the trailed band, carried over the whole series it is handed. Outputs `regime` (+1/-1),
+  `upper_trail`, `lower_trail`. The `supertrend_*` signals made the regime themselves, in a loop over
+  the window, so it restarted long at the window's first bar. MangroveAI's backtest engine computes
+  indicators once over the whole series, which cannot reach a signal's own loop: on BTC daily bars
+  the 16-bar window and the whole history disagreed on 51 of 198 days, and an RSI + SuperTrend
+  strategy lost half its trades (24 to 12) when a never-firing 60-bar exit rule was added. The four
+  signals now read `SuperTrendTrail` and return what they returned before on any given frame.
+- **Warmup** for the SuperTrend and PSAR signals is 60 bars (`max(60, window)` for SuperTrend), up
+  from `window` and `2`, so a trail started late (the live path) has picked up the current regime: on
+  BTC daily bars at the defaults SuperTrend on 63 bars disagrees with the whole history on 13 of 894
+  days, on 17 bars on 355.
+- **Warmup** lines that were shorter than the indicator the signal reads, so the signal could not
+  fire on a window of its declared size: `is_above_dema` / `dema_cross_*` (`2 * window - 2`, was
+  `window - 1`), `is_above_tema` / `tema_cross_*` (`3 * window - 3`), `is_above_hma` / `hma_cross_*`
+  (`window + window // 4 - 1`, an upper bound on `window + floor(sqrt(window)) - 2` in the grammar the
+  engines evaluate), `stochrsi_*` (`2 * window - 2`), `stc_*` (the indicator's own
+  `window_slow + 2 * cycle + smooth1 + smooth2 - 5`), `mass_reversal_signal`
+  (`2 * window_fast + window_slow + 6`, which includes the 10 bars it scans), the tweezer triggers
+  (19: a 20-bar average range) and the eight recent-pattern scanners (`*_pattern_*`,
+  `strong_body_recent`: the bars they scan plus what their patterns read).
+- **Tests**: `test_window_independence.py` serves indicators from the whole series, as the engine
+  does, and requires every OHLCV signal to answer the same on a window of exactly its declared
+  requirement, a longer one, and the whole prefix; pins each corrected Warmup against the output the
+  signal reads; and pins SuperTrend's 60 bars at under 3% of days off the whole-series regime.
+- **Graph**: 1 node and 2 edges added (`SuperTrendTrail` and its classes; the four SuperTrend
+  signals' `uses` edges move to it); 32 nodes changed (Warmup and prose). 734 nodes, 2405 edges.
+
 ### Six Cambrian signals disabled; `social_price_divergence` back as an exit
 
 Oracle engine strategy backtests, every strategy one entry trigger plus a price filter, platform
@@ -333,7 +366,7 @@ reason -- so an answer arrives with its grounds rather than a relevance score.
 
 **A signal/indicator knowledge graph, and the reorganisation it forced.** Every indicator now
 carries a class describing what its output tells you about its input, and every modelled signal
-carries a formula stating the predicate it computes -- 733 nodes, 2403 edges, in
+carries a formula stating the predicate it computes -- 734 nodes, 2405 edges, in
 `ontology/signal-indicator-ontology.json`.
 
 Major, because files moved and things were renamed. **No registered signal name changed meaning,

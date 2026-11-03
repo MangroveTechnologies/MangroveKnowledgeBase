@@ -383,7 +383,7 @@ def stochrsi_overbought(df: pd.DataFrame, window: int = 14, smooth1: int = 3, sm
     Short-Description: Momentum is near the top of its recent range; a pullback may follow.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi
-    Warmup: window + smooth1 + smooth2 - 1
+    Warmup: 2 * window - 2
 
     Formula:
         stochrsi[t] > threshold -- StochRSI is on the 0..1 scale, so the conventional 80 level is 0.80 here
@@ -441,7 +441,7 @@ def stochrsi_oversold(df: pd.DataFrame, window: int = 14, smooth1: int = 3, smoo
     Short-Description: Momentum is near the bottom of its recent range; a bounce may follow.
 
     Reference: https://chartschool.stockcharts.com/table-of-contents/technical-indicators-and-overlays/technical-indicators/stochrsi
-    Warmup: window + smooth1 + smooth2 - 1
+    Warmup: 2 * window - 2
 
     Formula:
         stochrsi[t] < threshold -- 0..1 scale, so the conventional 20 level is 0.20
@@ -1543,7 +1543,7 @@ def stc_overbought(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 2
     Display-Name: Schaff Trend Cycle Overbought
     Short-Description: The market's trend cycle is near its top; a turn down may follow.
 
-    Warmup: window_slow + cycle - 1
+    Warmup: window_slow + 2 * cycle + smooth1 + smooth2 - 5
 
     Formula:
         stc[t] > threshold
@@ -1608,7 +1608,7 @@ def stc_oversold(df: pd.DataFrame, window_slow: int = 50, window_fast: int = 23,
     Display-Name: Schaff Trend Cycle Oversold
     Short-Description: The market's trend cycle is near its bottom; a turn up may follow.
 
-    Warmup: window_slow + cycle - 1
+    Warmup: window_slow + 2 * cycle + smooth1 + smooth2 - 5
 
     Formula:
         stc[t] < threshold

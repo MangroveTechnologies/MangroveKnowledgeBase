@@ -48,7 +48,7 @@ python -c "from mangrove_kb import RuleRegistry, sample_ohlcv; from mangrove_kb.
 
 Open-source trading signals, technical indicators, and knowledge base. Public developer docs now live in mangrove-platform-frontend-web (`content/docs/`), not here. Components:
 
-1. **Python Package** (`mangrove_kb`) -- 259 signal functions, 85 indicator classes, RuleRegistry,
+1. **Python Package** (`mangrove_kb`) -- 259 signal functions, 86 indicator classes, RuleRegistry,
    docstring parser, **and a knowledge graph of itself** (see below). Published on PyPI as
    `mangrove-kb`.
 2. **MCP server** (`mangrove_kb_mcp.py`) -- twelve read-only tools over the graph, run over stdio by whatever client wants them. A consumer of the installed package, not part of it. (It replaced `kb_server/`, a FastAPI + FastMCP server answering from SQLite FTS5 over markdown; that directory was deleted in 3.0.0 and is in git history.)
@@ -90,8 +90,8 @@ retired server, and gating has to be restored before this is served over HTTP to
 
 ## The Knowledge Graph
 
-`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 733 nodes
-and 2403 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
+`mangrove_kb/graph.py` is a query layer over `ontology/signal-indicator-ontology.json` -- 734 nodes
+and 2405 edges, shipped inside the wheel. Two halves on one schema: the library compiled from its own
 source, and the trading knowledge base ingested from its eight chapters.
 
 ```python
