@@ -34,6 +34,7 @@ OHLCV columns arrive lowercase (the registry canonicalizes them).
 """
 
 import logging
+from typing import Callable, Optional, Protocol
 
 import numpy as np
 import pandas as pd
@@ -547,17 +548,38 @@ def x_attention_price_divergence(df: pd.DataFrame, window_price: int = 24, min_d
 # =============================================================================
 
 logger = logging.getLogger(__name__)
-_x_provider_factory = None
 
 
-def configure_x_provider(factory):
+class XSignalProvider(Protocol):
+    """What the live X rules read. The consuming application supplies an object with these methods."""
+
+    def check_user_post_signal(
+        self, *, username: str, topic: Optional[str], max_posts_age_hours: int
+    ) -> bool: ...
+
+    def check_topic_mention_signal(
+        self, *, topic: str, min_mentions: int, min_followers: int, time_window_hours: int
+    ) -> bool: ...
+
+    def get_user_influence_score(self, username: str) -> float: ...
+
+    def detect_social_sentiment(self, *, symbol: str, time_window_hours: int) -> dict: ...
+
+
+class _ProviderNotConfigured(RuntimeError):
+    """No provider factory has been configured."""
+
+
+_x_provider_factory: Optional[Callable[[], XSignalProvider]] = None
+_unconfigured_warned: set = set()
+
+
+def configure_x_provider(factory: Optional[Callable[[], XSignalProvider]]) -> None:
     """Configure a lazy X provider factory, or pass None to remove it.
 
     No client is constructed and no network request is made during import or
-    configuration. The provider implements ``check_user_post_signal``,
-    ``check_topic_mention_signal``, ``get_user_influence_score`` and
-    ``detect_social_sentiment``. MangroveRoots' XProvider implements this contract;
-    the KB has no dependency on MangroveRoots, credentials or MangroveAI.
+    configuration. The factory returns an :class:`XSignalProvider`; the KB has
+    no dependency on MangroveRoots, credentials or MangroveAI.
     """
     if factory is not None and not callable(factory):
         raise TypeError("X provider factory must be callable or None")
@@ -565,11 +587,22 @@ def configure_x_provider(factory):
     _x_provider_factory = factory
 
 
-def _get_x_provider():
+def _get_x_provider() -> XSignalProvider:
     factory = _x_provider_factory
     if factory is None:
-        raise RuntimeError("Live X signals require social.configure_x_provider(factory)")
+        raise _ProviderNotConfigured("Live X signals require social.configure_x_provider(factory)")
     return factory()
+
+
+def _provider_unconfigured(rule_name: str) -> None:
+    """Warn once per rule that no provider factory is configured; the rule does not fire."""
+    if rule_name not in _unconfigured_warned:
+        _unconfigured_warned.add(rule_name)
+        logger.warning(
+            "Live X signal %s did not fire: no provider is configured; "
+            "call social.configure_x_provider(factory)",
+            rule_name,
+        )
 
 
 def _mention_volume_score(symbol: str, time_window_hours: int, *, provider=None) -> float:
@@ -623,13 +656,13 @@ def x_user_post_trigger(
         df (pd.DataFrame): DataFrame with OHLCV data.
         username (str): X username to monitor (without @).
         topic (str): Topic keyword to filter posts. Default: None.
-        max_age_hours (int): How recent the post must be (hours). Range: 1-168. Default: 1.
+        max_age_hours (int): How recent the post must be (hours); the provider's recent-search window bounds it. Range: 1-168. Default: 1.
 
     Returns:
         bool: True if user posted about topic within time window.
     """
-    provider = _get_x_provider()
     try:
+        provider = _get_x_provider()
         logger.info(f"TRIGGER: Checking if @{username} posted about '{topic}' in last {max_age_hours}h")
 
         triggered = provider.check_user_post_signal(
@@ -639,6 +672,9 @@ def x_user_post_trigger(
         )
 
         return triggered
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_user_post_trigger")
+        return False
     except Exception as e:
         logger.error(f"Error checking user post trigger for @{username}: {e}")
         return False
@@ -684,13 +720,13 @@ def x_topic_mention_trigger(
         topic (str): Topic/keyword to monitor.
         min_mentions (int): Minimum influential mentions. Range: 1-100. Default: 3.
         min_followers (int): Minimum followers for influential users. Range: 100-10000000. Default: 10000.
-        time_window_hours (int): Analysis time window (hours). Range: 1-168. Default: 1.
+        time_window_hours (int): Analysis time window (hours); the provider's recent-search window bounds it. Range: 1-168. Default: 1.
 
     Returns:
         bool: True if the provider reports that the topic mention threshold is met.
     """
-    provider = _get_x_provider()
     try:
+        provider = _get_x_provider()
         logger.info(f"TRIGGER: Checking if '{topic}' mentioned {min_mentions}+ times by users >{min_followers} followers in {time_window_hours}h")
 
         triggered = provider.check_topic_mention_signal(
@@ -701,6 +737,9 @@ def x_topic_mention_trigger(
         )
 
         return triggered
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_topic_mention_trigger")
+        return False
     except Exception as e:
         logger.error(f"Error checking topic mention trigger for '{topic}': {e}")
         return False
@@ -742,13 +781,13 @@ def x_social_sentiment_trigger(
         df (pd.DataFrame): DataFrame with OHLCV data.
         symbol (str): Crypto symbol (e.g., 'BTC', 'ETH').
         threshold (float): Mention-volume score threshold (0-100). Range: 0-100. Default: 70.0.
-        time_window_hours (int): Analysis time window (hours). Range: 1-168. Default: 24.
+        time_window_hours (int): Analysis time window (hours); the provider's recent-search window bounds it. Range: 1-168. Default: 24.
 
     Returns:
         bool: True if the mention-volume score reaches the threshold.
     """
-    provider = _get_x_provider()
     try:
+        provider = _get_x_provider()
         logger.info(f"TRIGGER: Checking if ${symbol} social sentiment > {threshold} in {time_window_hours}h")
         # Mention-volume score; a failed X search raises and the signal does not fire.
         score = _mention_volume_score(symbol, time_window_hours, provider=provider)
@@ -756,6 +795,9 @@ def x_social_sentiment_trigger(
         if triggered:
             logger.info(f"SOCIAL_SENTIMENT_SIGNAL: ${symbol} sentiment {score:.1f} >= {threshold}")
         return triggered
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_social_sentiment_trigger")
+        return False
     except Exception as e:
         logger.error(f"Error checking social sentiment trigger for ${symbol}: {e}")
         return False
@@ -797,12 +839,15 @@ def x_user_influence_filter(
     Returns:
         bool: True if user influence meets threshold.
     """
-    provider = _get_x_provider()
     try:
+        provider = _get_x_provider()
         influence_score = provider.get_user_influence_score(username)
         meets_threshold = influence_score >= min_influence_score
         logger.debug(f"FILTER: @{username} influence {influence_score:.1f} >= {min_influence_score}: {meets_threshold}")
         return meets_threshold
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_user_influence_filter")
+        return False
     except Exception as e:
         logger.error(f"Error checking user influence filter for @{username}: {e}")
         return False
@@ -839,18 +884,21 @@ def x_topic_sentiment_filter(
     Args:
         df (pd.DataFrame): DataFrame with OHLCV data.
         topic (str): Topic to analyze.
-        min_sentiment (float): Minimum sentiment score (0-100). Range: 0-100. Default: 60.0.
+        min_sentiment (float): Minimum mention-volume score, ten points per recent cashtag post capped at 100, not keyword polarity. Range: 0-100. Default: 60.0.
 
     Returns:
         bool: True if topic sentiment meets threshold.
     """
-    provider = _get_x_provider()
     try:
+        provider = _get_x_provider()
         # Mention-volume score; a failed X search raises and the filter is not met.
         sentiment_score = _mention_volume_score(topic, 24, provider=provider)
         meets_threshold = sentiment_score >= min_sentiment
         logger.debug(f"FILTER: '{topic}' sentiment {sentiment_score:.1f} >= {min_sentiment}: {meets_threshold}")
         return meets_threshold
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_topic_sentiment_filter")
+        return False
     except Exception as e:
         logger.error(f"Error checking topic sentiment filter for '{topic}': {e}")
         return False
