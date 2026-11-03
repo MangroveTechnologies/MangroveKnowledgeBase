@@ -496,6 +496,10 @@ def _authored_literal(ptype, raw):
     list, which is the only sequence JSON has.
     """
     import ast
+    # An optional string can default to Python None. Quoted "None" remains a
+    # literal word; the unquoted sentinel must not become a topic filter.
+    if raw.strip().lower() == "none":
+        return None
     if ptype == "str":
         return raw.strip().strip("'\"") or None
     if ptype == "tuple":

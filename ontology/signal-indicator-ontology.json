@@ -20175,7 +20175,7 @@
      },
      "topic": {
       "type": "str",
-      "default": "None",
+      "default": null,
       "min": null,
       "max": null,
       "description": "Topic keyword to filter posts"

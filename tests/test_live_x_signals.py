@@ -159,6 +159,29 @@ def test_graph_models_live_provider_contract_without_invented_indicators():
             assert any(e["from_id"] == nid and e["rel"] == "uses" for e in record["relations"]), nid
 
 
+def test_optional_topic_none_is_not_advertised_as_a_literal_keyword():
+    record = json.loads((Path(__file__).parents[1] / "ontology/signal-indicator-ontology.json").read_text())
+    node = next(a for a in record["atoms"] if a["id"] == "procedure:signal-x-user-post-trigger")
+    assert node["props"]["params"]["topic"]["default"] is None
+    runtime = RuleRegistry.describe("x_user_post_trigger")["params"]["topic"]
+    assert runtime["optional"] is True
+    assert "default" not in runtime
+
+
+def test_graph_literal_parser_distinguishes_none_from_a_quoted_word():
+    import ast
+
+    source = (Path(__file__).parents[1] / "ontology/build_signal_indicator_ontology.py").read_text()
+    parser = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "_authored_literal")
+    namespace = {}
+    exec(compile(ast.Module(body=[parser], type_ignores=[]), "ontology_literals", "exec"), namespace)
+    lift = namespace["_authored_literal"]
+    assert lift("str", "None") is None
+    assert lift("str", "'None'") == "None"
+    assert lift("str", '"None"') == "None"
+    assert lift("str", "bullish") == "bullish"
+
+
 @pytest.mark.parametrize("kwargs", [
     {"evaluation_mode": "unknown"}, {"evaluation_mode": "live"},
     {"data_provider": "x"},
