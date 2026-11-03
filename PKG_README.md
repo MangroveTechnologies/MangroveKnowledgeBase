@@ -9,10 +9,10 @@ pip install mangrove-kb
 ## What You Get
 
 - **264 trading signals** -- boolean functions that evaluate market conditions on OHLCV DataFrames
-- **85 technical indicators** -- stateless `compute()` API returning named Series
+- **86 technical indicators** -- stateless `compute()` API returning named Series
 - **RuleRegistry** -- evaluate signals by name with parameter dicts (for strategy engines)
 - **Docstring parser** -- extract structured metadata (type, params, ranges) from any signal at runtime
-- **A knowledge graph of the library itself** -- 738 nodes, 2418 edges, queryable, shipped in the package
+- **A knowledge graph of the library itself** -- 739 nodes, 2420 edges, queryable, shipped in the package
 - **Search by words or by meaning** -- `find()` matches terms; `ask()` takes a question in ordinary
   words, seeds from two indices and follows the edges out of what it finds. On twenty-five questions
   phrased the way a trader asks them, `find()` answers 5 and `ask()` answers 18.

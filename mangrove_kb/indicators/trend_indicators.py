@@ -2459,7 +2459,8 @@ class SuperTrend(IndicatorInterface):
     `direction` is +1 long / -1 short, and `long_band` / `short_band` are NaN according to it.
     Indicators here state what they measured; deciding what it means is the signal layer's
     job. The two basic bands are the measurement and `SuperTrendBands` emits them; the regime
-    and the ratchet are decided in the `supertrend_*` signals. Kept working and unchanged.
+    and the ratchet are `SuperTrendTrail`, a recursion over the whole series that the
+    `supertrend_*` signals read. Kept working and unchanged.
 SuperTrend (Olivier Seban).
 
     ATR-scaled bands around hl2 with a trend-following flip rule. When close

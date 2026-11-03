@@ -187,3 +187,38 @@ def test_historical_audit_reports_live_rules_as_skipped_without_provider_io(monk
     assert "| Bad return type (not bool) | 0 |" in report
     for name in CASES:
         assert f"SKIP `{name}`" in report
+
+
+@pytest.mark.parametrize("name,params", CASES.items())
+def test_historical_comparison_rejects_live_rules_before_replay(name, params):
+    import numpy as np
+    from scripts.audit.compare import verify_signal
+
+    social.configure_x_provider(lambda: pytest.fail("historical comparison resolved an X provider"))
+    with pytest.raises(ValueError, match="cannot be evaluated historically"):
+        verify_signal(name, params, pd.DataFrame(index=range(3)), np.zeros(3), start_bar=0)
+
+
+def test_validation_notebook_rejects_live_rules_before_swallowing_errors(tmp_path):
+    import ast
+    import runpy
+
+    root = Path(__file__).parents[1]
+    notebook = json.loads((root / "notebooks/signal_validation.ipynb").read_text())
+    generator = runpy.run_path(str(root / "scripts/generate-validation-notebook.py"))
+    generator["build_notebook"].__globals__["OUTPUT_PATH"] = str(tmp_path / "generated.ipynb")
+    generator["build_notebook"]()
+    generated = json.loads((tmp_path / "generated.ipynb").read_text())
+    helpers = []
+    for artifact in (notebook, generated):
+        source = next("".join(c["source"]) for c in artifact["cells"]
+                      if "def evaluate_signal_rolling" in "".join(c["source"]))
+        node = ast.parse(source).body[0]
+        helpers.append(ast.dump(node))
+        namespace = {"RuleRegistry": RuleRegistry}
+        exec(compile(ast.Module(body=[node], type_ignores=[]), "validation_notebook", "exec"), namespace)
+        social.configure_x_provider(lambda: pytest.fail("historical notebook resolved an X provider"))
+        for name, params in CASES.items():
+            with pytest.raises(ValueError, match="cannot be evaluated historically"):
+                namespace["evaluate_signal_rolling"](name, pd.DataFrame(index=range(3)), warmup=0, params=params)
+    assert helpers[0] == helpers[1]

@@ -53,6 +53,7 @@ from .volatility_indicators import (  # noqa: F401
     VolatilityStop,
     SqueezeDepth,
     SuperTrendBands,
+    SuperTrendTrail,
     TTMSqueeze,
     ChandelierLevels,
     ChandelierExit,
@@ -176,6 +177,7 @@ __all__ = [
     "VolatilityEnvelope",
     "SqueezeDepth",
     "SuperTrendBands",
+    "SuperTrendTrail",
     # Trend indicators
     "SMA",
     "EMA",

@@ -105,7 +105,7 @@ ASSIGN = {
              "Vortex MultiTFSlope SwingDelta",
  'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
  'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
-               "ChandelierLevels VolatilityEnvelope SqueezeDepth SuperTrendBands",
+               "ChandelierLevels VolatilityEnvelope SqueezeDepth SuperTrendBands SuperTrendTrail",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
  'social': "SocialZScore SocialBaselineShift",
  'onchain': "OnchainChange",
@@ -121,6 +121,13 @@ ASSIGN = {
 # ParabolicSAR (the level and its acceleration factor, without the flip flags). The decisions those
 # classes made -- a threshold, a sign, a regime, which side of a level price is on -- are made in
 # the signals that read the measurement, and each signal keeps its name and its role.
+#
+# One exception to that split, for the same reason ParabolicSAR's level is an indicator: a decision
+# that carries unbounded state forward cannot be made on a window. SuperTrend's regime holds until
+# price crosses a band, however long ago that was, and a signal deciding it over the rolling window a
+# strategy hands in restarted it at the window's first bar -- so its answer moved with the window's
+# length, which the longest warmup among ALL the strategy's rules sets. `SuperTrendTrail` carries
+# the regime and the ratchet over the whole series; the supertrend_* signals read its last bars.
 #
 # ATRTrailingStop has no measurement class: it is a trade-management rule, not an indicator. Its
 # stop level accumulates forward from a position state and its only other output is `direction`.
@@ -1332,7 +1339,7 @@ SIGNAL_SCOPE = {
     "cl_above_low_offset", "cl_below_high_offset",
     "cl_high_offset_break", "cl_low_offset_break",
     "ve_above_upper", "ve_below_lower",
-    # SuperTrend's regime and its flips, decided over SuperTrendBands.
+    # SuperTrend's regime and its flips, read from SuperTrendTrail.
     "supertrend_flip_down", "supertrend_flip_up", "supertrend_long", "supertrend_short",
     # Which side of the parabolic SAR level price is on, decided over ParabolicSAR.
     "psar_bearish", "psar_bullish", "psar_reversal",
@@ -1395,7 +1402,7 @@ SIGNAL_SCOPE = {
     # Trend -- the signals that lived in `signals/trend.py` before the files were split onto the
     # ontology class. Every one is in scope: the seven that read SuperTrend and PSAR were held out
     # while those emitted verdicts, and are listed under volatility and averaging above now that
-    # they read SuperTrendBands and ParabolicSAR. The four atr_trailing_stop_* signals are the only
+    # they read SuperTrendTrail and ParabolicSAR. The four atr_trailing_stop_* signals are the only
     # ones still held out, for the reason at the top of this set.
     "adx_bullish_di", "adx_strong_trend", "alligator_bearish", "alligator_bullish",
     "alligator_sleeping", "alma_cross_down", "alma_cross_up", "aroon_crossover",
@@ -1432,7 +1439,7 @@ SIGNAL_SCOPE = {
 # alone does not exclude the signals standing on it, and a signal reading a deprecated verdict class
 # arrives looking like an ordinary signal with no class -- indistinguishable from the pattern
 # signals that legitimately read raw OHLC -- so it fails the build rather than being reported. A
-# signal that moves onto the measurement class (SuperTrendBands rather than SuperTrend) passes.
+# signal that moves onto the measurement class (SuperTrendTrail rather than SuperTrend) passes.
 _on_removed = sorted(
     n for n in (RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCOPE)
     if set(SIGNAL_FACTS.get(n, {}).get("consumes", {})) & set(REMOVED))
