@@ -461,7 +461,8 @@ The live X rules preserve their existing names, parameters and mention-volume th
 The consumer calls `mangrove_kb.signals.social.configure_x_provider(factory)` with its lazy
 provider factory. Importing the package makes no provider request. Historical evaluators call
 `RuleRegistry.validate_evaluation_mode(rule, "historical")` before replay; a live X reading
-cannot stand in for a past bar. Runtime descriptors and graph nodes expose this distinction.
+cannot stand in for a past bar. `RuleRegistry.evaluate` defaults to `mode="historical"` and raises
+`LiveSignalNotAllowed` for a live rule; a live caller passes `mode="live"`. Runtime descriptors and graph nodes expose this distinction.
 
 The graph is regenerated from a clean tree on every build, and a test rebuilds it into an empty path
 and diffs against the committed file — so it cannot drift from the code it describes.

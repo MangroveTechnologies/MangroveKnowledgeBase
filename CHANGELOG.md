@@ -23,6 +23,16 @@ This project uses [Semantic Versioning](https://semver.org/).
   Registered names, parameters, defaults and mention-volume thresholds are preserved.
 - The consumer configures a lazy X provider factory; no MangroveAI or MangroveRoots import is
   required. Historical evaluation rejects live rules before any provider call.
+- `RuleRegistry.evaluate(rule, df)` defaults to `mode="historical"`; a live rule raises
+  `LiveSignalNotAllowed` (a `ValueError`) naming the rule and provider, and evaluates only with
+  `mode="live"`. Frame signals evaluate in both modes.
+- `RuleRegistry.register` raises `ValueError` when a registered name is registered again with a
+  different evaluation mode or data provider; identical re-registration is allowed.
+- A live X rule with no configured provider returns False and logs one warning per rule name;
+  every other provider failure logs an error and returns False.
+- `social.XSignalProvider` (a `typing.Protocol`) declares the four provider methods the rules call.
+- Docstrings state that the X sentiment-filter score is mention volume (ten points per recent
+  cashtag post, capped at 100) and that the provider's recent-search window bounds the time window.
 - The graph models the five live-provider contracts without inventing time-series indicators
   -- 739 nodes, 2420 edges, in the rebuilt record. 264 registered signals (128 TRIGGER,
   136 FILTER), 234 modelled. Existing frame-based graph invariants remain enforced.

@@ -6,7 +6,8 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from mangrove_kb.registry import RuleRegistry
+from mangrove_kb import sample_ohlcv
+from mangrove_kb.registry import LiveSignalNotAllowed, RuleRegistry
 from mangrove_kb.signals import social
 
 CASES = {
@@ -50,9 +51,13 @@ class Provider:
 @pytest.fixture(autouse=True)
 def provider_reset():
     previous = social._x_provider_factory
+    previous_warned = set(social._unconfigured_warned)
     social.configure_x_provider(None)
+    social._unconfigured_warned.clear()
     yield
     social.configure_x_provider(previous)
+    social._unconfigured_warned.clear()
+    social._unconfigured_warned.update(previous_warned)
 
 
 @pytest.mark.parametrize("name,params", CASES.items())
@@ -70,16 +75,102 @@ def test_direct_and_registry_execute_live_signals(name, params, fires):
 
 
 @pytest.mark.parametrize("name,params", CASES.items())
-def test_missing_factory_is_a_configuration_error(name, params):
-    with pytest.raises(RuntimeError, match="configure_x_provider"):
-        RuleRegistry.evaluate({"name": name, "params": params}, pd.DataFrame())
+def test_missing_factory_returns_false_and_warns_once_per_rule(name, params, caplog):
+    rule = {"name": name, "params": params}
+    with caplog.at_level("WARNING", logger=social.logger.name):
+        assert RuleRegistry.evaluate(rule, pd.DataFrame(), mode="live") is False
+        assert [r.levelname for r in caplog.records] == ["WARNING"]
+        assert name in caplog.records[0].getMessage()
+        assert "configure_x_provider" in caplog.records[0].getMessage()
+        assert RuleRegistry.evaluate(rule, pd.DataFrame(), mode="live") is False
+    assert len(caplog.records) == 1
 
 
 @pytest.mark.parametrize("name,params", CASES.items())
 def test_provider_outage_does_not_fire(name, params):
     provider = Provider(failure=RuntimeError("provider unavailable"))
     social.configure_x_provider(lambda: provider)
-    assert RuleRegistry.evaluate({"name": name, "params": params}, pd.DataFrame()) is False
+    assert RuleRegistry.evaluate({"name": name, "params": params}, pd.DataFrame(), mode="live") is False
+
+
+@pytest.mark.parametrize("name,params", CASES.items())
+def test_factory_failure_is_logged_as_error_and_does_not_fire(name, params, caplog):
+    def broken():
+        raise ConnectionError("factory down")
+    social.configure_x_provider(broken)
+    with caplog.at_level("ERROR", logger=social.logger.name):
+        assert RuleRegistry.evaluate({"name": name, "params": params}, pd.DataFrame(), mode="live") is False
+    assert any(r.levelname == "ERROR" for r in caplog.records)
+
+
+@pytest.mark.parametrize("name,params", CASES.items())
+def test_default_mode_rejects_live_rules_before_provider_access(name, params):
+    def unexpected():
+        pytest.fail("default evaluation resolved an X provider")
+    social.configure_x_provider(unexpected)
+    with pytest.raises(LiveSignalNotAllowed) as info:
+        RuleRegistry.evaluate({"name": name, "params": params}, pd.DataFrame())
+    message = str(info.value)
+    assert name in message and "'x'" in message and 'mode="live"' in message
+    assert isinstance(info.value, ValueError)
+
+
+def test_default_mode_still_evaluates_frame_signals():
+    assert RuleRegistry.evaluate({"name": "rsi_oversold"}, sample_ohlcv()) in (True, False)
+    assert RuleRegistry.evaluate({"name": "rsi_oversold"}, sample_ohlcv(), mode="live") in (True, False)
+    assert RuleRegistry.evaluate({"name": "rsi_oversold"}, sample_ohlcv(), mode="historical") in (True, False)
+
+
+def test_unknown_mode_and_unknown_rule_stay_value_errors():
+    with pytest.raises(ValueError, match="Unknown evaluation mode") as info:
+        RuleRegistry.validate_evaluation_mode("rsi_oversold", "paper")
+    assert not isinstance(info.value, LiveSignalNotAllowed)
+    with pytest.raises(ValueError, match="Unknown rule name") as info:
+        RuleRegistry.validate_evaluation_mode("missing_signal", "live")
+    assert not isinstance(info.value, LiveSignalNotAllowed)
+
+
+@pytest.fixture
+def scratch_registry(monkeypatch):
+    monkeypatch.setattr(RuleRegistry, "_registry", dict(RuleRegistry._registry))
+
+
+def test_registration_cannot_downgrade_a_live_rule(scratch_registry):
+    original = RuleRegistry._registry["x_user_post_trigger"]
+    with pytest.raises(ValueError, match="x_user_post_trigger.*live.*frame"):
+        RuleRegistry.register("x_user_post_trigger")(lambda df: True)
+    assert RuleRegistry._registry["x_user_post_trigger"] is original
+
+
+def test_registration_cannot_upgrade_a_frame_rule_or_change_provider(scratch_registry):
+    with pytest.raises(ValueError, match="rsi_oversold.*frame.*live"):
+        RuleRegistry.register("rsi_oversold", evaluation_mode="live", data_provider="x")(lambda df: True)
+    with pytest.raises(ValueError, match="x_user_post_trigger.*'x'.*'other'"):
+        RuleRegistry.register("x_user_post_trigger", evaluation_mode="live", data_provider="other")(lambda df: True)
+
+
+def test_identical_reregistration_is_allowed(scratch_registry):
+    RuleRegistry.register("x_user_post_trigger", evaluation_mode="live", data_provider="x")(lambda df: True)
+    assert RuleRegistry._registry["x_user_post_trigger"].evaluation_mode == "live"
+    RuleRegistry.register("rsi_oversold")(lambda df: True)
+    assert RuleRegistry._registry["rsi_oversold"].evaluation_mode == "frame"
+
+
+def test_provider_protocol_declares_the_four_methods_the_rules_call():
+    methods = {
+        "check_user_post_signal": ["username", "topic", "max_posts_age_hours"],
+        "check_topic_mention_signal": ["topic", "min_mentions", "min_followers", "time_window_hours"],
+        "get_user_influence_score": ["username"],
+        "detect_social_sentiment": ["symbol", "time_window_hours"],
+    }
+    for method, names in methods.items():
+        declared = list(inspect.signature(getattr(social.XSignalProvider, method)).parameters)
+        assert declared == ["self", *names], method
+    keyword_only = {
+        n for n, p in inspect.signature(social.XSignalProvider.check_user_post_signal).parameters.items()
+        if p.kind is inspect.Parameter.KEYWORD_ONLY
+    }
+    assert keyword_only == {"username", "topic", "max_posts_age_hours"}
 
 
 @pytest.mark.parametrize("name", CASES)
@@ -87,9 +178,9 @@ def test_historical_validation_never_resolves_provider(name):
     def unexpected():
         pytest.fail("historical evaluation resolved an X provider")
     social.configure_x_provider(unexpected)
-    with pytest.raises(ValueError, match="cannot be evaluated historically"):
+    with pytest.raises(LiveSignalNotAllowed, match="cannot be evaluated historically"):
         RuleRegistry.evaluate({"name": name, "params": CASES[name]}, pd.DataFrame(), mode="historical")
-    with pytest.raises(ValueError, match="cannot be evaluated historically"):
+    with pytest.raises(LiveSignalNotAllowed, match="cannot be evaluated historically"):
         RuleRegistry.validate_evaluation_mode(name, "historical")
 
 
@@ -245,3 +336,31 @@ def test_validation_notebook_rejects_live_rules_before_swallowing_errors(tmp_pat
             with pytest.raises(ValueError, match="cannot be evaluated historically"):
                 namespace["evaluate_signal_rolling"](name, pd.DataFrame(index=range(3)), warmup=0, params=params)
     assert helpers[0] == helpers[1]
+
+
+def test_a_failing_provider_logs_error_once_then_debug(caplog, monkeypatch):
+    import logging
+    from mangrove_kb.signals import social
+
+    class Boom:
+        def check_user_post_signal(self, **kwargs):
+            raise RuntimeError("held back")
+
+    social._provider_failed_logged.clear()
+    social.configure_x_provider(lambda: Boom())
+    try:
+        rule = {"name": "x_user_post_trigger", "parameters": {"username": "u"}}
+        with caplog.at_level(logging.DEBUG, logger="mangrove_kb.signals.social"):
+            assert RuleRegistry.evaluate(rule, pd.DataFrame({"close": [1.0]}), mode="live") is False
+            assert RuleRegistry.evaluate(rule, pd.DataFrame({"close": [1.0]}), mode="live") is False
+        errors = [r for r in caplog.records if r.levelno == logging.ERROR and "did not fire" in r.getMessage()]
+        debugs = [r for r in caplog.records if r.levelno == logging.DEBUG and "did not fire" in r.getMessage()]
+        assert len(errors) == 1 and len(debugs) == 1
+        monkeypatch.setattr(social.time, "monotonic", lambda: social._provider_failed_logged[("x_user_post_trigger", "RuntimeError")] + 901)
+        with caplog.at_level(logging.DEBUG, logger="mangrove_kb.signals.social"):
+            assert RuleRegistry.evaluate(rule, pd.DataFrame({"close": [1.0]}), mode="live") is False
+        errors = [r for r in caplog.records if r.levelno == logging.ERROR and "did not fire" in r.getMessage()]
+        assert len(errors) == 2
+    finally:
+        social.configure_x_provider(None)
+        social._provider_failed_logged.clear()

@@ -225,7 +225,7 @@ def test_the_viewer_runs_from_the_wheel_alone(wheel, tmp_path):
 import importlib.util
 import pandas as pd
 from mangrove_kb.signals import social
-from mangrove_kb.registry import RuleRegistry
+from mangrove_kb.registry import LiveSignalNotAllowed, RuleRegistry
 from mangrove_kb.graph import KnowledgeGraph
 assert importlib.util.find_spec('MangroveAI') is None
 assert importlib.util.find_spec('mangrove_roots') is None
@@ -237,12 +237,13 @@ for name in names:
     assert d['status'] == 'active' and d['composable'] and d['executable']
     assert d['evaluation_mode'] == 'live' and d['data_provider'] == 'x'
     assert kg.get('procedure:signal-' + name.replace('_', '-'))
+assert social.x_user_post_trigger(pd.DataFrame(), 'alice') is False
 try:
-    social.x_user_post_trigger(pd.DataFrame(), 'alice')
-except RuntimeError as exc:
-    assert 'configure_x_provider' in str(exc)
+    RuleRegistry.evaluate({'name': 'x_user_post_trigger', 'params': {'username': 'alice'}}, pd.DataFrame())
+except LiveSignalNotAllowed:
+    pass
 else:
-    raise AssertionError('an unconfigured live signal must fail explicitly')
+    raise AssertionError('a live signal must not evaluate by default')
 """
     proc = subprocess.run([str(py), "-c", code], capture_output=True, text=True,
                           cwd=str(tmp_path), timeout=60)

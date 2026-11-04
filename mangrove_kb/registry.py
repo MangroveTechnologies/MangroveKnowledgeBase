@@ -63,6 +63,10 @@ def _canonical_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns=renames) if renames else df
 
 
+class LiveSignalNotAllowed(ValueError):
+    """A live-provider signal was asked to evaluate somewhere only historical readings are valid."""
+
+
 class RuleRegistry:
     _registry: ClassVar[dict] = {}
 
@@ -81,6 +85,16 @@ class RuleRegistry:
             raise ValueError("Live signals require a data provider; frame signals must not declare one")
         if data_provider is not None and not isinstance(data_provider, str):
             raise TypeError("Signal data provider must be a string")
+        existing = cls._registry.get(name)
+        if existing is not None:
+            current_mode = getattr(existing, "evaluation_mode", "frame")
+            current_provider = getattr(existing, "data_provider", None)
+            if (current_mode, current_provider) != (evaluation_mode, data_provider):
+                raise ValueError(
+                    f"Signal {name!r} is already registered with evaluation mode {current_mode!r}"
+                    f" and data provider {current_provider!r}; it cannot be re-registered with"
+                    f" evaluation mode {evaluation_mode!r} and data provider {data_provider!r}"
+                )
 
         def wrapper(fn):
             from mangrove_kb.docstring_parser import parse_signal_policy
@@ -238,12 +252,14 @@ class RuleRegistry:
         if fn is None:
             raise ValueError(f"Unknown rule name: {name}")
         if mode == "historical" and getattr(fn, "evaluation_mode", "frame") == "live":
-            raise ValueError(f"Signal {name!r} requires live {fn.data_provider} data and cannot be evaluated historically")
+            raise LiveSignalNotAllowed(
+                f"Signal {name!r} requires live {fn.data_provider!r} data and cannot be evaluated"
+                f" historically; pass mode=\"live\" to evaluate it against the live provider"
+            )
 
     @classmethod
-    def evaluate(cls, rule, df, *, mode=None):
-        if mode is not None:
-            cls.validate_evaluation_mode(rule, mode)
+    def evaluate(cls, rule, df, *, mode="historical"):
+        cls.validate_evaluation_mode(rule, mode)
         rule_name = cls.resolve(rule["name"])
         if rule_name not in cls._registry:
             raise ValueError(f"Unknown rule name: {rule_name}")

@@ -19964,7 +19964,7 @@
       "default": 24,
       "min": 1,
       "max": 168,
-      "description": "Analysis time window (hours)"
+      "description": "Analysis time window (hours); the provider's recent-search window bounds it"
      }
     },
     "outputs": {
@@ -20028,7 +20028,7 @@
       "default": 1,
       "min": 1,
       "max": 168,
-      "description": "Analysis time window (hours)"
+      "description": "Analysis time window (hours); the provider's recent-search window bounds it"
      }
     },
     "outputs": {
@@ -20078,7 +20078,7 @@
       "default": 60.0,
       "min": 0.0,
       "max": 100.0,
-      "description": "Minimum sentiment score (0-100)"
+      "description": "Minimum mention-volume score, ten points per recent cashtag post capped at 100, not keyword polarity"
      }
     },
     "outputs": {
@@ -20185,7 +20185,7 @@
       "default": 1,
       "min": 1,
       "max": 168,
-      "description": "How recent the post must be (hours)"
+      "description": "How recent the post must be (hours); the provider's recent-search window bounds it"
      }
     },
     "outputs": {
