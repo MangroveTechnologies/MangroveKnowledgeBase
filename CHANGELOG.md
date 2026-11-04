@@ -16,6 +16,17 @@ This project uses [Semantic Versioning](https://semver.org/).
   states its use as an exit for long positions.
 - The graph, the LSA index and the dense index are rebuilt for the changed description.
 
+### Live X signal definitions move into the knowledge base
+
+- The five `x_user_post_trigger`, `x_topic_mention_trigger`, `x_social_sentiment_trigger`,
+  `x_user_influence_filter` and `x_topic_sentiment_filter` rules are active in `signals/social.py`.
+  Registered names, parameters, defaults and mention-volume thresholds are preserved.
+- The consumer configures a lazy X provider factory; no MangroveAI or MangroveRoots import is
+  required. Historical evaluation rejects live rules before any provider call.
+- The graph models the five live-provider contracts without inventing time-series indicators
+  -- 739 nodes, 2420 edges, in the rebuilt record. 264 registered signals (128 TRIGGER,
+  136 FILTER), 234 modelled. Existing frame-based graph invariants remain enforced.
+
 ### A signal's answer no longer depends on the window it is handed
 
 A strategy evaluates each rule on a rolling window as long as the longest warmup among ALL its rules,

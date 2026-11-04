@@ -91,7 +91,7 @@ CLASSES_DEF = {
  # computation, because their inputs are not the market's own price and volume -- which is what
  # `technical analysis` is defined as. They hang from `alternative data` instead (ALT_CLASSES).
  'social': "Measures a crowd reading about an asset -- what people post, scored for sentiment or "
-           "counted for attention -- aligned to the bars.",
+           "counted for attention -- as bar-aligned readings or live observations.",
  'onchain': "Measures blockchain state or flow for an asset -- holders, balances, transfers, the "
             "share of supply value held by large wallets -- aligned to the bars.",
 }
@@ -496,6 +496,10 @@ def _authored_literal(ptype, raw):
     list, which is the only sequence JSON has.
     """
     import ast
+    # An optional string can default to Python None. Quoted "None" remains a
+    # literal word; the unquoted sentinel must not become a topic filter.
+    if raw.strip().lower() == "none":
+        return None
     if ptype == "str":
         return raw.strip().strip("'\"") or None
     if ptype == "tuple":
@@ -989,7 +993,7 @@ def _signal_lift(name, fn, facts):
     inputs = {}
     for tok in (re.split(r"[,/]", req.group(1)) if req else []):
         tok = tok.strip()
-        if not tok:
+        if not tok or tok.lower() == "none":
             continue
         # Taken exactly as declared. This used to lowercase OHLCV, on the reasoning that the graph
         # should speak one vocabulary -- but signals genuinely required capitalised DataFrame
@@ -1046,6 +1050,8 @@ def _signal_lift(name, fn, facts):
     a = _AUTHORED[name]
     return {
         "source_module": facts["module"],
+        **({"evaluation_mode": "live", "data_provider": fn.data_provider}
+           if getattr(fn, "evaluation_mode", "frame") == "live" else {}),
         "reference": a.get("reference"),
         "warmup_bars": a.get("warmup"),
         # Signals have no abbreviation. Held at null for consistency with the indicator layer, which
@@ -1428,6 +1434,8 @@ SIGNAL_SCOPE = {
     # the same way the four atr_trailing_stop_* signals do.
     "social_price_divergence",
     "x_post_count_spike", "x_attention_elevated", "x_attention_price_divergence",
+    "x_user_post_trigger", "x_topic_mention_trigger", "x_social_sentiment_trigger",
+    "x_user_influence_filter", "x_topic_sentiment_filter",
 }
 
 # A signal built on one of the excluded classes must not enter the graph. Excluding the indicator
@@ -1444,7 +1452,14 @@ if _on_removed:
           file=sys.stderr)
     sys.exit(1)
 
+# Live-provider signals read current observations, not time-series indicators.
+# This narrow source declaration is separate from the frame-signal invariant:
+# only the X/social provider contract is modeled, and it must declare no frame
+# inputs or indicator consumption. Unknown provider contracts fail the build.
+LIVE_PROVIDER_CLASSES = {"x": "social"}
 signal_no_indicator, signal_unknown_role, deprecated_signals = [], [], []
+live_provider_signals = []
+live_provider_classes = {}
 for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCOPE):
     facts = SIGNAL_FACTS.get(sname)
     if not facts:
@@ -1509,7 +1524,16 @@ for sname in sorted(RuleRegistry.names() if SIGNAL_SCOPE is None else SIGNAL_SCO
     for _cls in sorted({assigned[i] for i in known}):
         rel(sname, "about", _cls, "character it is concerned with, via the indicator it reads",
             sid, f"concept:{_cls}")
-    if not known:
+    if getattr(fn, "evaluation_mode", "frame") == "live":
+        provider_class = LIVE_PROVIDER_CLASSES.get(getattr(fn, "data_provider", None))
+        if (provider_class != facts["module"] or facts["consumes"] or lifted["inputs"]):
+            sys.exit(f"ABORT live-provider signal {sname!r} has an unsupported provider, "
+                     "module, indicator dependency or frame input")
+        rel(sname, "about", provider_class, "reads live X provider observations",
+            sid, f"concept:{provider_class}")
+        live_provider_signals.append(sname)
+        live_provider_classes[sid] = f"concept:{provider_class}"
+    elif not known:
         signal_no_indicator.append(sname)
 
 # `supersedes` edges for the duplicate signals. Emitted after the loop so both endpoints exist --
@@ -1550,7 +1574,7 @@ if dangling:
     print(f"ABORT {len(dangling)} dangling edges:\n  " + "\n  ".join(dangling), file=sys.stderr)
     sys.exit(1)
 
-# --- invariant: every `about` edge is backed by the `uses` edge it was derived from. The 222 `about`
+# --- invariant: every `about` edge is backed by its indicator or validated live-provider contract. The 222 `about`
 # edges are a projection, not an authored value, and the only thing keeping them honest is that one
 # loop emits both. That guarantee is incidental today; this makes it checked. A signal claiming a
 # character it has no route to is the failure it prevents -- `path()` could not explain it, and the
@@ -1563,7 +1587,8 @@ for r in rels:
         if _match:
             _uses_classes.setdefault(r["from_id"], set()).add(assigned[_match])
 unbacked = [f"{r['from']} --about--> {r['to']}" for r in rels if r["rel"] == "about"
-            and r["to_id"].removeprefix("concept:") not in _uses_classes.get(r["from_id"], set())]
+            and r["to_id"].removeprefix("concept:") not in _uses_classes.get(r["from_id"], set())
+            and live_provider_classes.get(r["from_id"]) != r["to_id"]]
 if unbacked:
     print(f"ABORT {len(unbacked)} `about` edges with no `uses` edge behind them:\n  "
           + "\n  ".join(unbacked), file=sys.stderr)
@@ -1580,7 +1605,7 @@ if uses_without_inputs:
           + "\n  ".join(uses_without_inputs), file=sys.stderr)
     sys.exit(1)
 
-# --- invariant: every signal in the graph reads an indicator. A signal is a verdict on a
+# --- invariant: every frame-based signal in the graph reads an indicator. A signal is a verdict on a
 # measurement, so a signal with nothing behind it is either reading raw prices (which means the
 # measurement it uses has no name -- CandleRaw exists because four candlestick patterns were in
 # exactly that state) or reading an indicator this scan cannot see, which is the same defect the
@@ -1637,6 +1662,7 @@ out = {"atoms": atoms, "relations": rels,
                 # Reported, never silently defaulted. A signal with no `uses` edge has no class,
                 # because class is reached through that edge -- so this list IS the classless set.
                 "signals_with_no_indicator": sorted(signal_no_indicator),
+                "live_provider_signals": sorted(live_provider_signals),
                 "signals_with_unknown_role": sorted(signal_unknown_role),
                 "signals_missing_warmup": sorted(
                     a["title"] for a in atoms

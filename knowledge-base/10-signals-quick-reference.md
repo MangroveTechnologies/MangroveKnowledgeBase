@@ -900,32 +900,36 @@ Where parameter values are provided in this reference, they serve as **examples 
 
 ### X
 
+These five active signals are defined in `mangrove_kb.signals.social`. They read live X
+observations through a provider configured by the consumer. They cannot be replayed on
+historical bars; use the frame-based X attention family for count-series backtests.
+
 **x_social_sentiment_trigger**
 - Type: TRIGGER
-- Parent Indicator: X (Twitter) Social Signals
-- Category: Unknown
-- Description: Fires when social sentiment exceeds threshold
+- Data provider: X (live observations)
+- Category: Social
+- Description: Fires when the mention-volume score reaches its threshold (ten points per post, capped at 100)
 
 **x_topic_mention_trigger**
 - Type: TRIGGER
-- Parent Indicator: X (Twitter) Social Signals
-- Category: Unknown
-- Description: Fires when topic mentioned by enough influential users
+- Data provider: X (live observations)
+- Category: Social
+- Description: Compares the provider-reported topic mention count with its threshold; follower filtering depends on provider capability
 
 **x_topic_sentiment_filter**
 - Type: FILTER
-- Parent Indicator: X (Twitter) Social Signals
-- Category: Unknown
+- Data provider: X (live observations)
+- Category: Social
 - Description: Checks if topic has sufficient social interest
 
 **x_user_influence_filter**
 - Type: FILTER
-- Parent Indicator: X (Twitter) Social Signals
-- Category: Unknown
+- Data provider: X (live observations)
+- Category: Social
 - Description: Checks if X user has sufficient influence
 
 **x_user_post_trigger**
 - Type: TRIGGER
-- Parent Indicator: X (Twitter) Social Signals
-- Category: Unknown
+- Data provider: X (live observations)
+- Category: Social
 - Description: Fires when a specific X user posts about a topic

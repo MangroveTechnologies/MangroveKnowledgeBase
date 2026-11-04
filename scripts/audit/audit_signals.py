@@ -31,11 +31,19 @@ from mangrove_kb.indicators import RSI, SMA, EMA, MACD
 # Part 1: Smoke test all registered signals
 # ---------------------------------------------------------------------------
 
+def _live_skip_reason(name: str) -> str | None:
+    metadata = RuleRegistry.describe(name)
+    if metadata.get("evaluation_mode") == "live":
+        return f"live {metadata['data_provider']} provider rule; historical-bar audit does not apply"
+    return None
+
+
 def smoke_test_all(df: pd.DataFrame) -> list[dict]:
-    """Run every registered signal with default params and record results.
+    """Run frame signals with default params and explicitly report live skips.
 
     Some signals have required positional args (no defaults). We supply
-    sensible values via EXPLICIT_PARAMS so that every signal gets tested.
+    sensible values via EXPLICIT_PARAMS. Live-provider rules cannot be tested
+    against historical bars; their direct/registry contracts have separate tests.
     """
     # Signals that lack default values for required params
     EXPLICIT_PARAMS = {
@@ -51,6 +59,10 @@ def smoke_test_all(df: pd.DataFrame) -> list[dict]:
 
     for name, fn in sorted(registry.items()):
         rec = {"signal": name, "result": None, "type_ok": False, "error": None}
+        if reason := _live_skip_reason(name):
+            rec.update(skipped=reason, elapsed_ms=0.0)
+            results.append(rec)
+            continue
         t0 = time.time()
         try:
             kwargs = EXPLICIT_PARAMS.get(name, {})
@@ -328,6 +340,9 @@ def review_filter_signals() -> list[dict]:
     reviews = []
 
     for name in classifications["FILTER"]:
+        if reason := _live_skip_reason(name):
+            reviews.append({"signal": name, "skipped": reason, "pass": None, "issues": []})
+            continue
         fn = registry[name]
         src = inspect.getsource(fn)
 
@@ -386,6 +401,8 @@ def generate_signal_report(
     lines.append("")
 
     # ---- Overall summary ----
+    skipped_smoke = [r for r in smoke_results if r.get("skipped")]
+    smoke_results = [r for r in smoke_results if not r.get("skipped")]
     total = len(smoke_results)
     passed = sum(1 for r in smoke_results if r["error"] is None and r["type_ok"])
     errored = sum(1 for r in smoke_results if r["error"] is not None)
@@ -401,6 +418,10 @@ def generate_signal_report(
     lines.append(f"| Passed (no error + returns bool) | {passed} |")
     lines.append(f"| Errored (raised exception) | {errored} |")
     lines.append(f"| Bad return type (not bool) | {bad_type} |")
+    lines.append(f"| Skipped (live provider; not historical) | {len(skipped_smoke)} |")
+    lines.append("")
+    for r in skipped_smoke:
+        lines.append(f"- SKIP `{r['signal']}`: {r['skipped']}")
     lines.append("")
 
     # Signal type breakdown
@@ -437,7 +458,7 @@ def generate_signal_report(
             lines.append(f"| `{r['signal']}` | `{type(r['result']).__name__}` | `{r['result']}` |")
         lines.append("")
     else:
-        lines.append("### All signals return bool.")
+        lines.append("### All tested signals return bool.")
         lines.append("")
 
     # ---- Crossover accuracy ----
@@ -507,6 +528,11 @@ def generate_signal_report(
     # ---- FILTER code review ----
     lines.append("## 4. FILTER Signal Code Review")
     lines.append("")
+    skipped_filters = [r for r in filter_reviews if r.get("skipped")]
+    filter_reviews = [r for r in filter_reviews if not r.get("skipped")]
+    for r in skipped_filters:
+        lines.append(f"- SKIP `{r['signal']}`: {r['skipped']}")
+    lines.append("")
     standard_filters = [r for r in filter_reviews if not r.get("is_pattern_scan")]
     pattern_scans = [r for r in filter_reviews if r.get("is_pattern_scan")]
     standard_passed = sum(1 for r in standard_filters if r["pass"])
@@ -537,7 +563,7 @@ def generate_signal_report(
             lines.append(f"| `{r['signal']}` | {ftype} | {issues} |")
         lines.append("")
     else:
-        lines.append("### All FILTER signals pass code review.")
+        lines.append("### All tested FILTER signals pass code review.")
         lines.append("")
 
     # ---- Conclusion ----
@@ -586,12 +612,15 @@ def main():
     elapsed = time.time() - t0
     passed = sum(1 for r in smoke_results if r["error"] is None and r["type_ok"])
     errored = sum(1 for r in smoke_results if r["error"] is not None)
-    print(f"  {passed}/{len(smoke_results)} passed ({errored} errors) in {elapsed:.1f}s")
+    skipped = sum(1 for r in smoke_results if r.get("skipped"))
+    print(f"  {passed}/{len(smoke_results) - skipped} passed ({errored} errors, {skipped} skipped) in {elapsed:.1f}s")
     for r in smoke_results:
+        if r.get("skipped"):
+            print(f"  SKIP: {r['signal']}: {r['skipped']}")
         if r["error"]:
             print(f"  ERROR: {r['signal']}: {r['error']}")
     for r in smoke_results:
-        if r["error"] is None and not r["type_ok"]:
+        if not r.get("skipped") and r["error"] is None and not r["type_ok"]:
             print(f"  BAD TYPE: {r['signal']} returned {type(r['result']).__name__}")
     print()
 
@@ -629,9 +658,12 @@ def main():
     print("[5/5] Reviewing FILTER signal source code...")
     filter_reviews = review_filter_signals()
     filter_passed = sum(1 for r in filter_reviews if r["pass"])
-    print(f"  {filter_passed}/{len(filter_reviews)} FILTER signals pass code review")
+    filter_skipped = sum(1 for r in filter_reviews if r.get("skipped"))
+    print(f"  {filter_passed}/{len(filter_reviews) - filter_skipped} FILTER signals pass code review ({filter_skipped} skipped)")
     for r in filter_reviews:
-        if not r["pass"]:
+        if r.get("skipped"):
+            print(f"  SKIP: {r['signal']}: {r['skipped']}")
+        elif not r["pass"]:
             print(f"  ISSUE: {r['signal']}: {'; '.join(r['issues'])}")
     print()
 

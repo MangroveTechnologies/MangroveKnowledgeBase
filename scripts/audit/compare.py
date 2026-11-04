@@ -259,6 +259,7 @@ def verify_signal(
     from mangrove_kb.registry import RuleRegistry
     import mangrove_kb.signals  # ensure registration
 
+    RuleRegistry.validate_evaluation_mode(signal_name, "historical")
     n = len(df)
     if len(truth) != n:
         raise ValueError(f"truth length {len(truth)} != df length {n}")
