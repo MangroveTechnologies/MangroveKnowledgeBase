@@ -6,6 +6,16 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Cambrian signal docstrings describe the signal, not its test results
+
+- The six disabled Cambrian signals (`social_sentiment_surge`, `social_sentiment_capitulation`,
+  `social_crowd_bullish`, `social_crowd_cooling`, `holder_growth_trend`, `whale_share_divergence`)
+  carry a one-line `Disabled-Reason` and deprecation message stating their status; the backtest
+  figures that were in them live in the research notebooks.
+- `social_price_divergence` loses the comment block of backtest figures above it; its docstring
+  states its use as an exit for long positions.
+- The graph, the LSA index and the dense index are rebuilt for the changed description.
+
 ### Live X signal definitions move into the knowledge base
 
 - The five `x_user_post_trigger`, `x_topic_mention_trigger`, `x_social_sentiment_trigger`,

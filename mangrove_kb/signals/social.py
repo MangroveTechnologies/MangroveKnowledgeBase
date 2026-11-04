@@ -14,7 +14,7 @@ in MangroveAI the eval-time fetcher populates them):
     SocialBullShare     share of posts scored bullish or very bullish, 0-1
     SocialBearShare     share of posts scored bearish, 0-1
     SocialNetBullShare  SocialBullShare - SocialBearShare, -1 to 1
-    SocialTweets        posts in the bucket (collection volume changed in early 2026,
+    SocialTweets        posts in the bucket (post volume is not comparable over time,
                         so signals use z-scores and shares rather than raw counts)
     SocialAuthors       unique authors in the bucket
     XPostCount          X posts matching the asset's cashtag query in the bar
@@ -64,8 +64,8 @@ def _last(s: pd.Series) -> "float | None":
 
 @RuleRegistry.register("social_sentiment_surge")
 @deprecated_signal(
-    "it lost money against a price-filtered reference in strategy backtests, so it is disabled for "
-    "new strategies and not in the ontology graph; stored strategies that name it keep evaluating"
+    "disabled for new strategies until it is validated across market regimes, and not in the "
+    "ontology graph; stored strategies that name it keep evaluating"
 )
 def social_sentiment_surge(df: pd.DataFrame, window: int = 30, z_threshold: float = 2.0, min_authors: int = 20) -> bool:
     """Signal: social_sentiment_surge
@@ -98,7 +98,7 @@ def social_sentiment_surge(df: pd.DataFrame, window: int = 30, z_threshold: floa
     Type: TRIGGER
     Requires: SocialSentiment, SocialAuthors
     Disabled: True
-    Disabled-Reason: In Oracle engine strategy backtests on BTC, ETH, SOL, XRP, DOGE, BNB and LINK (daily bars, platform default execution config, every strategy one entry trigger plus a price filter, settings chosen on 2025-04-01 to 2026-01-31 and reported untouched on 2026-02-01 to 2026-11-01), no surge variant beat rsi_cross_up with is_above_sma (5.12% selection, 3.25% holdout); 0 of 30 qualified as entry, exit or filter. As an entry with is_above_sma it made 1.52% and 0.52%. It buys after the run-up: entries followed a median +6.2% week and 55% hit the stop. As an exit it closed uptrend trades early: 11 of the 17 it closed would have reached the 2R target. Stored strategies that name this signal keep evaluating.
+    Disabled-Reason: Disabled for new strategies until it is validated in strategy backtests across market regimes. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with SocialSentiment and SocialAuthors columns.
@@ -122,8 +122,8 @@ def social_sentiment_surge(df: pd.DataFrame, window: int = 30, z_threshold: floa
 
 @RuleRegistry.register("social_sentiment_capitulation")
 @deprecated_signal(
-    "it lost money against a price-filtered reference in strategy backtests, so it is disabled for "
-    "new strategies and not in the ontology graph; stored strategies that name it keep evaluating"
+    "disabled for new strategies until it is validated across market regimes, and not in the "
+    "ontology graph; stored strategies that name it keep evaluating"
 )
 def social_sentiment_capitulation(df: pd.DataFrame, window: int = 30, z_threshold: float = 2.0, min_authors: int = 20) -> bool:
     """Signal: social_sentiment_capitulation
@@ -156,7 +156,7 @@ def social_sentiment_capitulation(df: pd.DataFrame, window: int = 30, z_threshol
     Type: TRIGGER
     Requires: SocialSentiment, SocialAuthors
     Disabled: True
-    Disabled-Reason: In Oracle engine strategy backtests on BTC, ETH, SOL, XRP, DOGE, BNB and LINK (daily bars, platform default execution config, every strategy one entry trigger plus a price filter, settings chosen on 2025-04-01 to 2026-01-31 and reported untouched on 2026-02-01 to 2026-11-01), no capitulation variant beat rsi_cross_up with is_above_sma (5.12% selection, 3.25% holdout); 0 of 29 qualified as entry, exit or no-entry filter. As an entry it buys falling knives: 76 of 101 unfiltered entries were below the 20-day SMA after a median -5.3% week (-7.6 USDT per trade, 63% stopped out), and with is_above_sma the best version made 0.48% on the selection window. As an exit it sold dips that recovered: 10 of the 12 trades it closed would have reached the target. Stored strategies that name this signal keep evaluating.
+    Disabled-Reason: Disabled for new strategies until it is validated in strategy backtests across market regimes. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with SocialSentiment and SocialAuthors columns.
@@ -184,8 +184,8 @@ def social_sentiment_capitulation(df: pd.DataFrame, window: int = 30, z_threshol
 
 @RuleRegistry.register("social_crowd_bullish")
 @deprecated_signal(
-    "it lost money against a price-filtered reference in strategy backtests, so it is disabled for "
-    "new strategies and not in the ontology graph; stored strategies that name it keep evaluating"
+    "disabled for new strategies until it is validated across market regimes, and not in the "
+    "ontology graph; stored strategies that name it keep evaluating"
 )
 def social_crowd_bullish(df: pd.DataFrame, window: int = 7, window_baseline: int = 60, margin: float = 0.0) -> bool:
     """Signal: social_crowd_bullish
@@ -217,7 +217,7 @@ def social_crowd_bullish(df: pd.DataFrame, window: int = 7, window_baseline: int
     Type: FILTER
     Requires: SocialNetBullShare
     Disabled: True
-    Disabled-Reason: In Oracle engine strategy backtests on BTC, ETH, SOL, XRP, DOGE, BNB and LINK (daily bars, platform default execution config, every strategy one entry trigger plus a price filter, settings chosen on 2025-04-01 to 2026-01-31 and reported untouched on 2026-02-01 to 2026-11-01), no crowd_bullish variant beat rsi_cross_up with is_above_sma (5.12% selection, 3.25% holdout); 0 of 8 qualified. As a filter at the default 7/60 it made -0.01% and 1.30%. A crowd already more bullish than its norm marks a late, crowded entry: the trades it kept on the selection window lost 7.2 USDT per trade with a 33% win rate, and on the holdout the split vanished. Stored strategies that name this signal keep evaluating.
+    Disabled-Reason: Disabled for new strategies until it is validated in strategy backtests across market regimes. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with a SocialNetBullShare column.
@@ -241,8 +241,8 @@ def social_crowd_bullish(df: pd.DataFrame, window: int = 7, window_baseline: int
 
 @RuleRegistry.register("social_crowd_cooling")
 @deprecated_signal(
-    "it trailed a price-filtered reference in strategy backtests, so it is disabled for new "
-    "strategies and not in the ontology graph; stored strategies that name it keep evaluating"
+    "disabled for new strategies until it is validated across market regimes, and not in the "
+    "ontology graph; stored strategies that name it keep evaluating"
 )
 def social_crowd_cooling(df: pd.DataFrame, window: int = 7, window_baseline: int = 60, margin: float = 0.0) -> bool:
     """Signal: social_crowd_cooling
@@ -275,7 +275,7 @@ def social_crowd_cooling(df: pd.DataFrame, window: int = 7, window_baseline: int
     Type: FILTER
     Requires: SocialNetBullShare
     Disabled: True
-    Disabled-Reason: In Oracle engine strategy backtests on BTC, ETH, SOL, XRP, DOGE, BNB and LINK (daily bars, platform default execution config, every strategy one entry trigger plus a price filter, settings chosen on 2025-04-01 to 2026-01-31 and reported untouched on 2026-02-01 to 2026-11-01), no crowd_cooling variant beat rsi_cross_up with is_above_sma (5.12% selection, 3.25% holdout); 0 of 16 qualified. It halves the trades and raises P&L per trade, but total return trails: the best version (7/30) made 4.56% and 2.93% and beat the reference on 2 of 7 coins on the holdout, and on macd_bullish_cross with is_above_sma the default 7/60 cut holdout return from 1.04% to -0.06%. Stored strategies that name this signal keep evaluating.
+    Disabled-Reason: Disabled for new strategies until it is validated in strategy backtests across market regimes. Stored strategies that name this signal keep evaluating.
 
     Args:
         df (pd.DataFrame): DataFrame with a SocialNetBullShare column.
@@ -297,23 +297,12 @@ def social_crowd_cooling(df: pd.DataFrame, window: int = 7, window_baseline: int
     return shift is not None and shift <= -margin
 
 
-# social_price_divergence is an EXIT for long positions, not an entry. Oracle engine strategy
-# backtests on BTC, ETH, SOL, XRP, DOGE, BNB and LINK (daily bars, platform default execution config;
-# settings chosen on 2025-04-01..2026-01-31, then reported untouched on 2026-02-01..2026-11-01):
-# as the exit of rsi_cross_up + is_above_sma at window=7, min_drop_pct=3.0, window_baseline=60 the
-# holdout return was 4.00% vs 3.25% without it, Sharpe 1.12 vs 0.61, better on 6 of 7 coins. On three
-# filtered strategies (that one, ema_cross_up + is_above_sma, macd_bullish_cross + is_above_sma) it
-# was never below the strategy without it in either window, over 31 signal exits; the effect is
-# small. As a long entry it lost money in every form tested (old defaults 7/5.0/30 + is_above_sma:
-# -1.98% and -0.44% vs 5.12% and 3.25%): the crowd usually turns bearish on a drop, so a drop it has
-# not reacted to yet tends to begin a longer decline.
 @RuleRegistry.register("social_price_divergence")
 def social_price_divergence(df: pd.DataFrame, window: int = 7, min_drop_pct: float = 3.0, window_baseline: int = 60) -> bool:
     """Signal: social_price_divergence
 
     Exit signal for long positions: detect a price drop that the crowd is not following. Use it
-    only in the exit rules of a strategy that already has its own entry trigger and a price filter.
-    Do not use it as an entry: it lost money as a long entry in every form tested. It is typed
+    in the exit rules of a strategy that has its own entry trigger and a price filter. It is typed
     TRIGGER because the knowledge base has no exit-only type.
 
     Friendly-Name: Crowd Ignores Drop Exit

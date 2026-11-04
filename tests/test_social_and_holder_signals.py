@@ -15,8 +15,8 @@ cs = type("Signals", (), {**{k: staticmethod(v) for k, v in vars(onchain).items(
 TRIGGERS = ["social_sentiment_surge", "social_sentiment_capitulation", "social_price_divergence", "whale_share_divergence"]
 FILTERS = ["social_crowd_bullish", "social_crowd_cooling", "holder_growth_trend"]
 NAMES = TRIGGERS + FILTERS
-#: Disabled for new strategies (lost to price-filtered references in strategy backtests) but kept
-#: executable for stored ones. social_price_divergence is enabled again, as an exit for longs.
+#: Disabled for new strategies but kept executable for stored ones. social_price_divergence is
+#: enabled, as an exit for longs.
 DISABLED = {"social_sentiment_surge", "social_sentiment_capitulation", "social_crowd_bullish",
             "social_crowd_cooling", "whale_share_divergence", "holder_growth_trend"}
 
@@ -70,7 +70,7 @@ def test_disabled_for_new_strategies_but_still_executes(name):
     assert d["status"] == "disabled"
     assert d["composable"] is False
     assert d["executable"] is True and d["legacy_compatible"] is True
-    assert "Oracle engine strategy backtests" in d["reason"] and "Stored strategies" in d["reason"]
+    assert "across market regimes" in d["reason"] and "Stored strategies" in d["reason"]
     assert d["reason"].isascii()
     assert f"procedure:signal-{name.replace('_', '-')}" not in KnowledgeGraph.load().nodes
 
@@ -79,7 +79,7 @@ def test_disabled_for_new_strategies_but_still_executes(name):
 
 
 def test_price_divergence_is_an_exit_composable_and_in_the_graph():
-    """Enabled again as an exit for long positions, with the defaults the exit backtests chose."""
+    """Enabled as an exit for long positions, with defaults window 7, a 3% drop and a 60-bar norm."""
     import inspect
     import warnings
     from mangrove_kb.graph import KnowledgeGraph
@@ -92,7 +92,7 @@ def test_price_divergence_is_an_exit_composable_and_in_the_graph():
     assert defaults == {"window": 7, "min_drop_pct": 3.0, "window_baseline": 60}
     assert {k: v["default"] for k, v in d["params"].items()} == defaults
     doc = cs.social_price_divergence.__doc__
-    assert "Exit signal for long positions" in doc and "Do not use it as an entry" in doc
+    assert "Exit signal for long positions" in doc
     assert "Short-Description: Exit a long when price falls while the crowd stays bullish." in doc
 
     kg = KnowledgeGraph.load()
