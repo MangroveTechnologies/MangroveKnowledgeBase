@@ -107,6 +107,7 @@ print(f"Date range: {df['Timestamp'].iloc[0].date()} to {df['Timestamp'].iloc[-1
     # Helper functions
     cells.append(code_cell("""def evaluate_signal_rolling(name, df, warmup=50, params=None):
     \"\"\"Evaluate a signal on every bar from warmup to end. Returns list of fire indices.\"\"\"
+    RuleRegistry.validate_evaluation_mode(name, "historical")
     if params is None:
         params = REQUIRED_PARAMS.get(name, {})
     fire_indices = []

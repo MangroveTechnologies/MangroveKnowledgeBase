@@ -46,20 +46,20 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 734, 2405
-s["primitives"]                 # {'Procedure': 295, 'Concept': 55, 'Property': 15, ...}
-s["relations"]                  # {'instance-of': 364, 'uses': 234, 'about': 275, ...}
+s["nodes"], s["edges"]          # 739, 2420
+s["primitives"]                 # {'Procedure': 419, 'Concept': 205, 'Property': 74, ...}
+s["relations"]                  # {'instance-of': 392, 'uses': 297, 'about': 1025, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  734 2405
-primitives    {'Procedure': 414, 'Concept': 205, 'Property': 74, 'Fact': 23,
+nodes, edges  739 2420
+primitives    {'Procedure': 419, 'Concept': 205, 'Property': 74, 'Fact': 23,
                'Judgment': 16, 'Object': 1, 'Schema': 1}
-relations     {'about': 1020, 'instance-of': 385, 'part-of': 369, 'uses': 297,
-               'has-role': 229, 'kind-of': 101, 'supersedes': 2}
+relations     {'about': 1025, 'instance-of': 392, 'part-of': 369, 'uses': 297,
+               'has-role': 234, 'kind-of': 101, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:onchain', 'concept:oscillator',
                'concept:pattern', 'concept:social', 'concept:volatility']
@@ -78,7 +78,7 @@ also accepts the short name (`"momentum"`). Both work; the ids are what you get 
 
 `classes` is deliberately the eight -- six dividing technical analysis, plus `social` and `onchain`
 dividing alternative data -- and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (77), `"signal"` (230) and `"technical-analysis"` (331 of 734) — legal, occasionally
+`"indicator"` (77), `"signal"` (235) and `"technical-analysis"` (331 of 739) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -300,7 +300,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 734 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 739 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 

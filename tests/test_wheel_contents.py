@@ -219,6 +219,36 @@ def test_the_viewer_runs_from_the_wheel_alone(wheel, tmp_path):
     assert proc.returncode == 0, f"the viewer does not run from a wheel install:\n{proc.stderr[-1500:]}"
     assert "data:image/svg" in proc.stdout, "the wordmark did not embed -- the SVG is missing"
     assert len(proc.stdout) > 1_000_000, "the page is too small to contain the vendored 3D library"
+    # The five live X definitions and their graph entries must ship without either
+    # private consumer package. No provider is configured or called in this check.
+    code = """
+import importlib.util
+import pandas as pd
+from mangrove_kb.signals import social
+from mangrove_kb.registry import LiveSignalNotAllowed, RuleRegistry
+from mangrove_kb.graph import KnowledgeGraph
+assert importlib.util.find_spec('MangroveAI') is None
+assert importlib.util.find_spec('mangrove_roots') is None
+names = ['x_user_post_trigger', 'x_topic_mention_trigger', 'x_social_sentiment_trigger',
+         'x_user_influence_filter', 'x_topic_sentiment_filter']
+kg = KnowledgeGraph.load()
+for name in names:
+    d = RuleRegistry.describe(name)
+    assert d['status'] == 'active' and d['composable'] and d['executable']
+    assert d['evaluation_mode'] == 'live' and d['data_provider'] == 'x'
+    assert kg.get('procedure:signal-' + name.replace('_', '-'))
+assert social.x_user_post_trigger(pd.DataFrame(), 'alice') is False
+try:
+    RuleRegistry.evaluate({'name': 'x_user_post_trigger', 'params': {'username': 'alice'}}, pd.DataFrame())
+except LiveSignalNotAllowed:
+    pass
+else:
+    raise AssertionError('a live signal must not evaluate by default')
+"""
+    proc = subprocess.run([str(py), "-c", code], capture_output=True, text=True,
+                          cwd=str(tmp_path), timeout=60)
+    assert proc.returncode == 0, proc.stderr
+
 
 
 def test_no_dependency_is_a_direct_url_reference(wheel):

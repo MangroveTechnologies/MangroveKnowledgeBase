@@ -83,6 +83,7 @@ def _native_type(value) -> bool:
 _REQUIRED_DEFAULTS = {
     "window": 14, "window_fast": 10, "window_slow": 30, "window_signal": 9,
     "threshold": 50.0, "multiplier": 3.0,
+    "username": "alice", "topic": "ETH", "symbol": "ETH",
 }
 
 
@@ -126,6 +127,20 @@ class TestReportedSignals:
 
 class TestEverySignalContract:
     """No registered signal may leak a numpy primitive on realistic data."""
+
+    @pytest.fixture(autouse=True)
+    def live_provider(self):
+        from mangrove_kb.signals import social
+        from types import SimpleNamespace
+        old = social._x_provider_factory
+        social.configure_x_provider(lambda: SimpleNamespace(
+            check_user_post_signal=lambda **kw: np.bool_(True),
+            check_topic_mention_signal=lambda **kw: np.bool_(True),
+            get_user_influence_score=lambda username: np.float64(70.0),
+            detect_social_sentiment=lambda **kw: {"mention_volume": np.int64(8)},
+        ))
+        yield
+        social.configure_x_provider(old)
 
     def test_no_numpy_leakage_across_registry(self, df):
         offenders = []

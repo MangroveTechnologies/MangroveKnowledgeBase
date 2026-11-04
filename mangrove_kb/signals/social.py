@@ -25,8 +25,17 @@ in MangroveAI the eval-time fetcher populates them):
                         hour. The ``x_query`` param names the query variant the
                         data layer counts; the signals themselves do not read it.
 
+The five live X rules below preserve their existing parameter and score contracts.
+They read the provider configured by the consuming application at evaluation time,
+not a historical bar. They are active live signals; historical callers must use
+``RuleRegistry.validate_evaluation_mode(rule, "historical")`` before a replay.
+
 OHLCV columns arrive lowercase (the registry canonicalizes them).
 """
+
+import logging
+import time
+from typing import Callable, Optional, Protocol
 
 import numpy as np
 import pandas as pd
@@ -533,3 +542,382 @@ def x_attention_price_divergence(df: pd.DataFrame, window_price: int = 24, min_d
     drop = _last(ROC.compute(data={'close': close}, params={'window': window_price})['roc'])
     z = _last(SocialZScore.compute(data={'value': np.log1p(s.clip(lower=0))}, params={'window': window})['zscore'])
     return drop is not None and z is not None and drop <= -min_drop_pct and z >= z_threshold
+
+
+# =============================================================================
+# Live X signals. Provider ownership stays with the consuming application.
+# =============================================================================
+
+logger = logging.getLogger(__name__)
+
+
+class XSignalProvider(Protocol):
+    """What the live X rules read. The consuming application supplies an object with these methods."""
+
+    def check_user_post_signal(
+        self, *, username: str, topic: Optional[str], max_posts_age_hours: int
+    ) -> bool: ...
+
+    def check_topic_mention_signal(
+        self, *, topic: str, min_mentions: int, min_followers: int, time_window_hours: int
+    ) -> bool: ...
+
+    def get_user_influence_score(self, username: str) -> float: ...
+
+    def detect_social_sentiment(self, *, symbol: str, time_window_hours: int) -> dict: ...
+
+
+class _ProviderNotConfigured(RuntimeError):
+    """No provider factory has been configured."""
+
+
+_x_provider_factory: Optional[Callable[[], XSignalProvider]] = None
+_unconfigured_warned: set = set()
+
+
+def configure_x_provider(factory: Optional[Callable[[], XSignalProvider]]) -> None:
+    """Configure a lazy X provider factory, or pass None to remove it.
+
+    No client is constructed and no network request is made during import or
+    configuration. The factory returns an :class:`XSignalProvider`; the KB has
+    no dependency on MangroveRoots, credentials or MangroveAI.
+    """
+    if factory is not None and not callable(factory):
+        raise TypeError("X provider factory must be callable or None")
+    global _x_provider_factory
+    _x_provider_factory = factory
+
+
+def _get_x_provider() -> XSignalProvider:
+    factory = _x_provider_factory
+    if factory is None:
+        raise _ProviderNotConfigured("Live X signals require social.configure_x_provider(factory)")
+    return factory()
+
+
+_PROVIDER_FAILURE_RELOG_SECONDS = 900.0
+_provider_failed_logged: dict = {}
+
+
+def _provider_failed(rule_name: str, exc: Exception) -> None:
+    """Log a provider failure at ERROR the first time a rule sees that failure type,
+    then at DEBUG for the next 15 minutes, so a held-back provider does not write an
+    ERROR line on every bar."""
+    key = (rule_name, type(exc).__name__)
+    now = time.monotonic()
+    last = _provider_failed_logged.get(key)
+    if last is not None and now - last < _PROVIDER_FAILURE_RELOG_SECONDS:
+        logger.debug("Live X signal %s did not fire: %s: %s", rule_name, type(exc).__name__, exc)
+        return
+    _provider_failed_logged[key] = now
+    logger.error("Live X signal %s did not fire: %s: %s", rule_name, type(exc).__name__, exc)
+
+
+def _provider_unconfigured(rule_name: str) -> None:
+    """Warn once per rule that no provider factory is configured; the rule does not fire."""
+    if rule_name not in _unconfigured_warned:
+        _unconfigured_warned.add(rule_name)
+        logger.warning(
+            "Live X signal %s did not fire: no provider is configured; "
+            "call social.configure_x_provider(factory)",
+            rule_name,
+        )
+
+
+def _mention_volume_score(symbol: str, time_window_hours: int, *, provider=None) -> float:
+    """Ten points per recent cashtag post, capped at 100; not keyword polarity.
+
+    An unavailable or malformed reading raises, so even a zero threshold cannot
+    turn a failed request into a signal. This keeps the five existing score
+    contracts independent of the provider's keyword-polarity score.
+    """
+    if provider is None:
+        provider = _get_x_provider()
+    reading = provider.detect_social_sentiment(symbol=symbol, time_window_hours=time_window_hours)
+    if not isinstance(reading, dict) or reading.get("success") is False or reading.get("error"):
+        raise ValueError("X mention-volume reading is unavailable")
+    volume = reading.get("mention_volume", reading.get("total_mentions"))
+    if volume is None or not np.isfinite(float(volume)) or float(volume) < 0:
+        raise ValueError("X mention-volume reading has no valid post count")
+    return float(min(int(volume) * 10, 100))
+
+
+@RuleRegistry.register("x_user_post_trigger", evaluation_mode="live", data_provider="x")
+def x_user_post_trigger(
+    df: pd.DataFrame,
+    username: str,
+    topic: str = None,
+    max_age_hours: int = 1
+) -> bool:
+    """Signal: x_user_post_trigger
+
+    Fires when a specific X user posts about a topic.
+
+    Reads live X data at evaluation time. The DataFrame is accepted for the
+    registry contract but is not a historical data source for this rule.
+
+    Friendly-Name: User Posts About Topic
+    Display-Name: X User Post Trigger
+    Short-Description: A monitored X user has posted about the requested topic.
+    Warmup: 0
+
+    Formula:
+        recent_posts(username, topic, max_age_hours) > 0
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when the requested live X condition is met; False on provider read failure
+
+    Type: TRIGGER
+    Requires: None
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        username (str): X username to monitor (without @).
+        topic (str): Topic keyword to filter posts. Default: None.
+        max_age_hours (int): How recent the post must be (hours); the provider's recent-search window bounds it. Range: 1-168. Default: 1.
+
+    Returns:
+        bool: True if user posted about topic within time window.
+    """
+    try:
+        provider = _get_x_provider()
+        logger.info(f"TRIGGER: Checking if @{username} posted about '{topic}' in last {max_age_hours}h")
+
+        triggered = provider.check_user_post_signal(
+            username=username,
+            topic=topic,
+            max_posts_age_hours=max_age_hours
+        )
+
+        return triggered
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_user_post_trigger")
+        return False
+    except Exception as e:
+        _provider_failed("x_user_post_trigger", e)
+        return False
+
+
+@RuleRegistry.register("x_topic_mention_trigger", evaluation_mode="live", data_provider="x")
+def x_topic_mention_trigger(
+    df: pd.DataFrame,
+    topic: str,
+    min_mentions: int = 3,
+    min_followers: int = 10000,
+    time_window_hours: int = 1
+) -> bool:
+    """Signal: x_topic_mention_trigger
+
+    Compares the provider's reported topic-mention count with the requested threshold.
+
+    The follower and time-window parameters are forwarded unchanged. Filtering
+    depends on the provider: MangroveRoots 0.21 reports follower_filter_applied=False
+    and counts all returned posts on its basic X path, so this does not establish
+    that the observed authors meet min_followers.
+
+    Reads live X data at evaluation time. The DataFrame is accepted for the
+    registry contract but is not a historical data source for this rule.
+
+    Friendly-Name: Topic Draws Attention
+    Display-Name: X Influential Topic Mentions
+    Short-Description: The provider-reported topic mention count reaches the requested threshold.
+    Warmup: 0
+
+    Formula:
+        influential_mentions(topic, min_followers, time_window_hours) >= min_mentions
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when the requested live X condition is met; False on provider read failure
+
+    Type: TRIGGER
+    Requires: None
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        topic (str): Topic/keyword to monitor.
+        min_mentions (int): Minimum influential mentions. Range: 1-100. Default: 3.
+        min_followers (int): Minimum followers for influential users. Range: 100-10000000. Default: 10000.
+        time_window_hours (int): Analysis time window (hours); the provider's recent-search window bounds it. Range: 1-168. Default: 1.
+
+    Returns:
+        bool: True if the provider reports that the topic mention threshold is met.
+    """
+    try:
+        provider = _get_x_provider()
+        logger.info(f"TRIGGER: Checking if '{topic}' mentioned {min_mentions}+ times by users >{min_followers} followers in {time_window_hours}h")
+
+        triggered = provider.check_topic_mention_signal(
+            topic=topic,
+            min_mentions=min_mentions,
+            min_followers=min_followers,
+            time_window_hours=time_window_hours
+        )
+
+        return triggered
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_topic_mention_trigger")
+        return False
+    except Exception as e:
+        _provider_failed("x_topic_mention_trigger", e)
+        return False
+
+
+@RuleRegistry.register("x_social_sentiment_trigger", evaluation_mode="live", data_provider="x")
+def x_social_sentiment_trigger(
+    df: pd.DataFrame,
+    symbol: str,
+    threshold: float = 70.0,
+    time_window_hours: int = 24
+) -> bool:
+    """Signal: x_social_sentiment_trigger
+
+    Fires when the mention-volume score reaches its threshold.
+
+    The requested time window is forwarded; the current basic X provider reads
+    recent search (roughly seven days) rather than enforcing that window.
+
+    Reads live X data at evaluation time. The DataFrame is accepted for the
+    registry contract but is not a historical data source for this rule.
+
+    Friendly-Name: Social Interest Reaches Threshold
+    Display-Name: X Mention Volume Trigger
+    Short-Description: Recent cashtag post volume reaches the requested score threshold.
+    Warmup: 0
+
+    Formula:
+        min(mention_volume(symbol, time_window_hours) * 10, 100) >= threshold
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when the requested live X condition is met; False on provider read failure
+
+    Type: TRIGGER
+    Requires: None
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        symbol (str): Crypto symbol (e.g., 'BTC', 'ETH').
+        threshold (float): Mention-volume score threshold (0-100). Range: 0-100. Default: 70.0.
+        time_window_hours (int): Analysis time window (hours); the provider's recent-search window bounds it. Range: 1-168. Default: 24.
+
+    Returns:
+        bool: True if the mention-volume score reaches the threshold.
+    """
+    try:
+        provider = _get_x_provider()
+        logger.info(f"TRIGGER: Checking if ${symbol} social sentiment > {threshold} in {time_window_hours}h")
+        # Mention-volume score; a failed X search raises and the signal does not fire.
+        score = _mention_volume_score(symbol, time_window_hours, provider=provider)
+        triggered = score >= threshold
+        if triggered:
+            logger.info(f"SOCIAL_SENTIMENT_SIGNAL: ${symbol} sentiment {score:.1f} >= {threshold}")
+        return triggered
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_social_sentiment_trigger")
+        return False
+    except Exception as e:
+        _provider_failed("x_social_sentiment_trigger", e)
+        return False
+
+
+@RuleRegistry.register("x_user_influence_filter", evaluation_mode="live", data_provider="x")
+def x_user_influence_filter(
+    df: pd.DataFrame,
+    username: str,
+    min_influence_score: float = 50.0
+) -> bool:
+    """Signal: x_user_influence_filter
+
+    Checks if X user has sufficient influence.
+
+    Reads live X data at evaluation time. The DataFrame is accepted for the
+    registry contract but is not a historical data source for this rule.
+
+    Friendly-Name: User Has Influence
+    Display-Name: X User Influence Filter
+    Short-Description: The X account meets the requested influence score.
+    Warmup: 0
+
+    Formula:
+        influence_score(username) >= min_influence_score
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when the requested live X condition is met; False on provider read failure
+
+    Type: FILTER
+    Requires: None
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        username (str): X username to check.
+        min_influence_score (float): Minimum influence score (0-100). Range: 0-100. Default: 50.0.
+
+    Returns:
+        bool: True if user influence meets threshold.
+    """
+    try:
+        provider = _get_x_provider()
+        influence_score = provider.get_user_influence_score(username)
+        meets_threshold = influence_score >= min_influence_score
+        logger.debug(f"FILTER: @{username} influence {influence_score:.1f} >= {min_influence_score}: {meets_threshold}")
+        return meets_threshold
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_user_influence_filter")
+        return False
+    except Exception as e:
+        _provider_failed("x_user_influence_filter", e)
+        return False
+
+
+@RuleRegistry.register("x_topic_sentiment_filter", evaluation_mode="live", data_provider="x")
+def x_topic_sentiment_filter(
+    df: pd.DataFrame,
+    topic: str,
+    min_sentiment: float = 60.0
+) -> bool:
+    """Signal: x_topic_sentiment_filter
+
+    Checks if topic has sufficient social interest.
+
+    Reads live X data at evaluation time. The DataFrame is accepted for the
+    registry contract but is not a historical data source for this rule.
+
+    Friendly-Name: Topic Has Social Interest
+    Display-Name: X Topic Mention Volume Filter
+    Short-Description: Recent cashtag post volume meets the requested social interest score.
+    Warmup: 0
+
+    Formula:
+        min(mention_volume(topic, 24) * 10, 100) >= min_sentiment
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when the requested live X condition is met; False on provider read failure
+
+    Type: FILTER
+    Requires: None
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        topic (str): Topic to analyze.
+        min_sentiment (float): Minimum mention-volume score, ten points per recent cashtag post capped at 100, not keyword polarity. Range: 0-100. Default: 60.0.
+
+    Returns:
+        bool: True if topic sentiment meets threshold.
+    """
+    try:
+        provider = _get_x_provider()
+        # Mention-volume score; a failed X search raises and the filter is not met.
+        sentiment_score = _mention_volume_score(topic, 24, provider=provider)
+        meets_threshold = sentiment_score >= min_sentiment
+        logger.debug(f"FILTER: '{topic}' sentiment {sentiment_score:.1f} >= {min_sentiment}: {meets_threshold}")
+        return meets_threshold
+    except _ProviderNotConfigured:
+        _provider_unconfigured("x_topic_sentiment_filter")
+        return False
+    except Exception as e:
+        _provider_failed("x_topic_sentiment_filter", e)
+        return False
