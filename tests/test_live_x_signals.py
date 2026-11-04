@@ -336,3 +336,31 @@ def test_validation_notebook_rejects_live_rules_before_swallowing_errors(tmp_pat
             with pytest.raises(ValueError, match="cannot be evaluated historically"):
                 namespace["evaluate_signal_rolling"](name, pd.DataFrame(index=range(3)), warmup=0, params=params)
     assert helpers[0] == helpers[1]
+
+
+def test_a_failing_provider_logs_error_once_then_debug(caplog, monkeypatch):
+    import logging
+    from mangrove_kb.signals import social
+
+    class Boom:
+        def check_user_post_signal(self, **kwargs):
+            raise RuntimeError("held back")
+
+    social._provider_failed_logged.clear()
+    social.configure_x_provider(lambda: Boom())
+    try:
+        rule = {"name": "x_user_post_trigger", "parameters": {"username": "u"}}
+        with caplog.at_level(logging.DEBUG, logger="mangrove_kb.signals.social"):
+            assert RuleRegistry.evaluate(rule, pd.DataFrame({"close": [1.0]}), mode="live") is False
+            assert RuleRegistry.evaluate(rule, pd.DataFrame({"close": [1.0]}), mode="live") is False
+        errors = [r for r in caplog.records if r.levelno == logging.ERROR and "did not fire" in r.getMessage()]
+        debugs = [r for r in caplog.records if r.levelno == logging.DEBUG and "did not fire" in r.getMessage()]
+        assert len(errors) == 1 and len(debugs) == 1
+        monkeypatch.setattr(social.time, "monotonic", lambda: social._provider_failed_logged[("x_user_post_trigger", "RuntimeError")] + 901)
+        with caplog.at_level(logging.DEBUG, logger="mangrove_kb.signals.social"):
+            assert RuleRegistry.evaluate(rule, pd.DataFrame({"close": [1.0]}), mode="live") is False
+        errors = [r for r in caplog.records if r.levelno == logging.ERROR and "did not fire" in r.getMessage()]
+        assert len(errors) == 2
+    finally:
+        social.configure_x_provider(None)
+        social._provider_failed_logged.clear()

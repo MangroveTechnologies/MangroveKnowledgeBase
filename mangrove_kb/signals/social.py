@@ -34,6 +34,7 @@ OHLCV columns arrive lowercase (the registry canonicalizes them).
 """
 
 import logging
+import time
 from typing import Callable, Optional, Protocol
 
 import numpy as np
@@ -594,6 +595,24 @@ def _get_x_provider() -> XSignalProvider:
     return factory()
 
 
+_PROVIDER_FAILURE_RELOG_SECONDS = 900.0
+_provider_failed_logged: dict = {}
+
+
+def _provider_failed(rule_name: str, exc: Exception) -> None:
+    """Log a provider failure at ERROR the first time a rule sees that failure type,
+    then at DEBUG for the next 15 minutes, so a held-back provider does not write an
+    ERROR line on every bar."""
+    key = (rule_name, type(exc).__name__)
+    now = time.monotonic()
+    last = _provider_failed_logged.get(key)
+    if last is not None and now - last < _PROVIDER_FAILURE_RELOG_SECONDS:
+        logger.debug("Live X signal %s did not fire: %s: %s", rule_name, type(exc).__name__, exc)
+        return
+    _provider_failed_logged[key] = now
+    logger.error("Live X signal %s did not fire: %s: %s", rule_name, type(exc).__name__, exc)
+
+
 def _provider_unconfigured(rule_name: str) -> None:
     """Warn once per rule that no provider factory is configured; the rule does not fire."""
     if rule_name not in _unconfigured_warned:
@@ -676,7 +695,7 @@ def x_user_post_trigger(
         _provider_unconfigured("x_user_post_trigger")
         return False
     except Exception as e:
-        logger.error(f"Error checking user post trigger for @{username}: {e}")
+        _provider_failed("x_user_post_trigger", e)
         return False
 
 
@@ -741,7 +760,7 @@ def x_topic_mention_trigger(
         _provider_unconfigured("x_topic_mention_trigger")
         return False
     except Exception as e:
-        logger.error(f"Error checking topic mention trigger for '{topic}': {e}")
+        _provider_failed("x_topic_mention_trigger", e)
         return False
 
 
@@ -799,7 +818,7 @@ def x_social_sentiment_trigger(
         _provider_unconfigured("x_social_sentiment_trigger")
         return False
     except Exception as e:
-        logger.error(f"Error checking social sentiment trigger for ${symbol}: {e}")
+        _provider_failed("x_social_sentiment_trigger", e)
         return False
 
 
@@ -849,7 +868,7 @@ def x_user_influence_filter(
         _provider_unconfigured("x_user_influence_filter")
         return False
     except Exception as e:
-        logger.error(f"Error checking user influence filter for @{username}: {e}")
+        _provider_failed("x_user_influence_filter", e)
         return False
 
 
@@ -900,5 +919,5 @@ def x_topic_sentiment_filter(
         _provider_unconfigured("x_topic_sentiment_filter")
         return False
     except Exception as e:
-        logger.error(f"Error checking topic sentiment filter for '{topic}': {e}")
+        _provider_failed("x_topic_sentiment_filter", e)
         return False
