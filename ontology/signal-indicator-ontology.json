@@ -16327,7 +16327,7 @@
    "id": "procedure:signal-social-price-divergence",
    "title": "social_price_divergence",
    "kind": "Procedure",
-   "summary": "Exit signal for long positions: detect a price drop that the crowd is not following. Use it only in the exit rules of a strategy that already has its own entry trigger and a price filter. Do not use it as an entry: it lost money as a long entry in every form tested. It is typed TRIGGER because the knowledge base has no exit-only type.",
+   "summary": "Exit signal for long positions: detect a price drop that the crowd is not following. Use it in the exit rules of a strategy that has its own entry trigger and a price filter. It is typed TRIGGER because the knowledge base has no exit-only type.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
