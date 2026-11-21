@@ -46,20 +46,20 @@ Do not start by listing files. Start with the graph's own summary:
 
 ```python
 s = kg.stats()
-s["nodes"], s["edges"]          # 739, 2420
-s["primitives"]                 # {'Procedure': 419, 'Concept': 205, 'Property': 74, ...}
-s["relations"]                  # {'instance-of': 392, 'uses': 297, 'about': 1025, ...}
+s["nodes"], s["edges"]          # 744, 2436
+s["primitives"]                 # {'Procedure': 424, 'Concept': 205, 'Property': 74, ...}
+s["relations"]                  # {'instance-of': 399, 'uses': 300, 'about': 1028, ...}
 s["classes"]                    # the seven character classes -- what find(kind=) is for
 s["roles"]                      # ['property:role-filter', 'property:role-trigger']
 kg.schema()                     # the (subject, relation, object) shapes that actually occur
 ```
 
 ```
-nodes, edges  739 2420
-primitives    {'Procedure': 419, 'Concept': 205, 'Property': 74, 'Fact': 23,
+nodes, edges  744 2436
+primitives    {'Procedure': 424, 'Concept': 205, 'Property': 74, 'Fact': 23,
                'Judgment': 16, 'Object': 1, 'Schema': 1}
-relations     {'about': 1025, 'instance-of': 392, 'part-of': 369, 'uses': 297,
-               'has-role': 234, 'kind-of': 101, 'supersedes': 2}
+relations     {'about': 1028, 'instance-of': 399, 'part-of': 369, 'uses': 300,
+               'has-role': 237, 'kind-of': 101, 'supersedes': 2}
 classes       ['concept:averaging', 'concept:chart-pattern', 'concept:flow',
                'concept:momentum', 'concept:onchain', 'concept:oscillator',
                'concept:pattern', 'concept:social', 'concept:volatility']
@@ -78,7 +78,7 @@ also accepts the short name (`"momentum"`). Both work; the ids are what you get 
 
 `classes` is deliberately the eight -- six dividing technical analysis, plus `social` and `onchain`
 dividing alternative data -- and not every class-like node. `find(kind=...)` *also* accepts
-`"indicator"` (77), `"signal"` (235) and `"technical-analysis"` (331 of 739) — legal, occasionally
+`"indicator"` (79), `"signal"` (238) and `"technical-analysis"` (336 of 744) — legal, occasionally
 useful, and not classes. A filter that returns almost everything reads like a query and acts like a
 no-op, so they are documented here rather than advertised as vocabulary.
 
@@ -198,10 +198,10 @@ filters  = kg.find(kind="volatility", role="filter",  limit=None)
 ```
 
 ```
-momentum triggers   27      volatility filters  18
-  procedure:signal-adosc-cross-down       procedure:signal-atr-high-volatility
-  procedure:signal-adosc-cross-up         procedure:signal-bb-above-upper
-  procedure:signal-ao-zero-cross          procedure:signal-bb-below-lower
+momentum triggers   27      volatility filters  20
+  procedure:signal-adosc-cross-down       procedure:signal-atr-change-expansion
+  procedure:signal-adosc-cross-up         procedure:signal-atr-elevated-score-not-fading
+  procedure:signal-ao-zero-cross          procedure:signal-atr-high-volatility
 ```
 
 `kind` is the character a computation is concerned with; `role` is the part it *plays*. They are
@@ -300,7 +300,7 @@ The `why` on the edge carries the reason — here, *"computes the same thing und
 name"*. That is the difference between "renamed" and "replaced because it was wrong", and you should
 report which.
 
-**Trap:** `status` is on the node, not the edge, and only 2 of 739 nodes are deprecated. Check it
+**Trap:** `status` is on the node, not the edge, and only 2 of 744 nodes are deprecated. Check it
 explicitly; nothing else surfaces it.
 
 
@@ -367,11 +367,11 @@ values themselves, so you can ask by what they *are*:
 
 ```python
 rows = kg.outputs(bounded=True, kind="oscillator", limit=None)
-rows.total                       # 48
+rows.total                       # 50
 ```
 
-**48 is not the answer**, and this is the trap worth internalising: `bounded=True` means *has two
-finite endpoints*, not *on the same scale*. Those 48 span five different ranges — 37 of them are
+`bounded=True` selects outputs with two finite endpoints. The 50 matched outputs span five
+different ranges. Of these, 38 are
 `[0, 1]`, two are `[-1, 1]`, two `[-100, 100]`, one `[-100, 0]`. Putting them on one panel would be
 wrong. The range is on every row, so filter it:
 
@@ -380,9 +380,10 @@ panel = [r for r in rows if r["range"] == [0, 100]]
 ```
 
 ```
-6 of 48 are actually on [0, 100]
+7 of 50 are actually on [0, 100]
   mfi                   mfi                  dimensionless  [0, 100]
   rsi                   rsi                  dimensionless  [0, 100]
+  smaseededrsi          rsi                  dimensionless  [0, 100]
   stc                   stc                  dimensionless  [0, 100]
   stochasticoscillator  stoch_d              dimensionless  [0, 100]
   stochasticoscillator  stoch_k              dimensionless  [0, 100]
@@ -520,10 +521,10 @@ Every use case up to here stops at a query result. This is the one that closes t
 names a function, and the same package runs it.
 
 ```python
-trigger = kg.find(kind="momentum",   role="trigger", limit=None).items[0]
-filt    = kg.find(kind="volatility", role="filter",  limit=None).items[0]
-
-t, f = kg.get(trigger["id"]), kg.get(filt["id"])
+triggers = kg.find(kind="momentum", role="trigger", limit=None)
+filters = kg.find(kind="volatility", role="filter", limit=None)
+t = kg.get(next(row["id"] for row in triggers if row["name"] == "adosc_cross_down"))
+f = kg.get(next(row["id"] for row in filters if row["name"] == "atr_high_volatility"))
 sorted(set(t["inputs"]) | set(f["inputs"]))     # the columns your data must have
 t["warmup_bars"], f["warmup_bars"]              # expressions in each one's own params
 ```
@@ -672,7 +673,7 @@ Widen by subject rather than by node when the question is broader. `find(under=�
 — `part-of` as well as `kind-of` and `instance-of` — and is primitive-blind:
 
 ```python
-kg.find(under="market foundations", limit=None)                 # 146 nodes
+kg.find(under="market foundations", limit=None)                 # 149 nodes
 kg.find(under="market foundations", primitive="Procedure")      # just its computations
 kg.find("spread", under="market foundations")                   # scoped text search
 ```

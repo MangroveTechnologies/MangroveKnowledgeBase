@@ -108,6 +108,58 @@ class ATR(IndicatorInterface):
         return {'atr': pd.Series(atr_arr, index=close.index, name='atr')}
 
 
+class WeightedATR(IndicatorInterface):
+    """Indicator: WeightedATR
+
+    Measures average true range with linearly increasing weights. The most recent bar
+    has weight `window` and the oldest has weight 1.
+
+    Warmup: window - 1
+
+    Formula:
+        tr[t] = max(high[t] - low[t], abs(high[t] - close[t-1]), abs(low[t] - close[t-1]))
+        weighted_atr[t] = sum(i * tr[t - window + i], i = 1..window) / sum(i, i = 1..window)
+
+    Inputs:
+        high: highest price traded during the bar
+        low: lowest price traded during the bar
+        close: closing price
+
+    Params:
+        window [default=31, min=2, max=100]: number of true-range values in the moving average
+
+    Outputs:
+        weighted_atr [price, 0..inf] "Weighted Average True Range":
+            Linearly weighted average of true range, in the instrument's price units.
+
+    Interpretation:
+        - Larger values indicate wider typical price moves.
+        - New price ranges carry more weight than older price ranges.
+
+    Applications:
+        - Compare recent range expansion with its historical baseline.
+        - Track changes in volatility during a rebound.
+
+    Args:
+        data: {'high': pd.Series, 'low': pd.Series, 'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'weighted_atr': pd.Series}
+    """
+    _data = ["high", "low", "close"]
+    _params = ["window"]
+    _outputs = ["weighted_atr"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        from mangrove_kb.indicators.trend_indicators import WMA
+
+        ranges = true_range(data["high"], data["low"], data["close"])
+        weighted_atr = WMA.compute({"close": ranges}, {"window": params["window"]})["wma"]
+        return {"weighted_atr": weighted_atr.rename("weighted_atr")}
+
+
 class BollingerBands(IndicatorInterface):
     """Indicator: BollingerBands
 

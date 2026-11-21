@@ -103,8 +103,8 @@ ASSIGN = {
  'momentum': "ROC MOM TRIX MACD PPO KST AwesomeOscillator DPO PVO ForceIndex EaseOfMovement "
              "ADOSC KVO KlingerVolumeOscillator DailyReturn DailyLogReturn MassIndex ADX Aroon "
              "Vortex MultiTFSlope SwingDelta",
- 'oscillator': "RSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
- 'volatility': "ATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
+ 'oscillator': "RSI SMASeededRSI StochasticOscillator StochRSI WilliamsR MFI UltimateOscillator CMO TSI BOP STC CCI CMF",
+ 'volatility': "ATR WeightedATR TrueRange NATR UlcerIndex BollingerBands KeltnerChannel DonchianChannel STARCBands "
                "ChandelierLevels VolatilityEnvelope SqueezeDepth SuperTrendBands SuperTrendTrail",
  'flow': "OBV ADI VPT NVI CumulativeReturn",
  'social': "SocialZScore SocialBaselineShift",
@@ -1352,7 +1352,8 @@ SIGNAL_SCOPE = {
     "rsi_bearish_divergence", "rsi_bullish_divergence", "rsi_hidden_bearish_divergence",
     "rsi_hidden_bullish_divergence", "ttm_squeeze_active", "ttm_squeeze_fired_bearish",
     "ttm_squeeze_fired_bullish",
-    "atr_high_volatility", 
+    "atr_high_volatility", "atr_change_expansion", "atr_elevated_score_not_fading",
+    "rsi_rebound_confirmation",
     "bb_above_upper",
     "bb_below_lower", "bb_lower_breakout", "bb_squeeze",
     "bb_upper_breakout", "dc_lower_breakout", "dc_upper_breakout",

@@ -106,8 +106,8 @@ def test_uc3_rsi_readers(kg, guide):
 def test_uc4_both_axes_counts(kg, guide):
     t = kg.find(kind="momentum", role="trigger", limit=None).total
     f = kg.find(kind="volatility", role="filter", limit=None).total
-    assert (t, f) == (27, 18), f"guide says 27 / 18, graph says {t} / {f}"
-    assert "momentum triggers   27" in guide and "volatility filters  18" in guide
+    assert (t, f) == (27, 20), f"guide says 27 / 20, graph says {t} / {f}"
+    assert "momentum triggers   27" in guide and "volatility filters  20" in guide
 
 
 def test_uc5_rsi_oversold_requirements(kg, guide):
@@ -170,8 +170,8 @@ def test_uc8_derivation_path(kg, guide):
 
 def test_uc9_output_index(kg, guide):
     rows = kg.outputs(bounded=True, kind="oscillator", limit=None)
-    assert rows.total == 48, f"guide says 48 outputs, graph says {rows.total}"
-    assert "rows.total                       # 48" in guide
+    assert rows.total == 50, f"guide says 50 outputs, graph says {rows.total}"
+    assert "rows.total                       # 50" in guide
 
     # The point of the case: bounded does NOT mean same-scale. If these ever collapsed to one
     # range the guide's warning would be misinformation.
@@ -179,8 +179,8 @@ def test_uc9_output_index(kg, guide):
     assert len(spread) > 1, f"bounded oscillators now share one range ({spread}); the trap is gone"
 
     panel = [r for r in rows if r["range"] == [0, 100]]
-    assert len(panel) == 6, f"guide says 6 of 48 are on [0, 100], graph says {len(panel)}"
-    assert "6 of 48 are actually on [0, 100]" in guide
+    assert len(panel) == 7, f"guide says 7 of 50 are on [0, 100], graph says {len(panel)}"
+    assert "7 of 50 are actually on [0, 100]" in guide
     for name in ("mfi", "rsi", "stc", "stoch_d", "stoch_k", "ultimate_oscillator"):
         assert any(r["output"] == name for r in panel), f"guide quotes {name}, no longer on [0, 100]"
 
@@ -262,8 +262,10 @@ def test_uc12_graph_to_evaluation(kg, guide):
     from mangrove_kb import RuleRegistry, sample_ohlcv
     import mangrove_kb.signals.momentum, mangrove_kb.signals.volatility  # noqa: F401
 
-    t = kg.get(kg.find(kind="momentum", role="trigger", limit=None).items[0]["id"])
-    f = kg.get(kg.find(kind="volatility", role="filter", limit=None).items[0]["id"])
+    triggers = kg.find(kind="momentum", role="trigger", limit=None)
+    filters = kg.find(kind="volatility", role="filter", limit=None)
+    t = kg.get(next(row["id"] for row in triggers if row["name"] == "adosc_cross_down"))
+    f = kg.get(next(row["id"] for row in filters if row["name"] == "atr_high_volatility"))
     assert (t["name"], f["name"]) == ("adosc_cross_down", "atr_high_volatility")
     assert t["name"] in guide and f["name"] in guide
     assert sorted(set(t["inputs"]) | set(f["inputs"])) == ["close", "high", "low", "volume"]

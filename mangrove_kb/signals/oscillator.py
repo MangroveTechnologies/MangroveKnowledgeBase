@@ -18,6 +18,7 @@ from mangrove_kb.indicators import (
     CMO,
     MFI,
     RSI,
+    SMASeededRSI,
     STC,
     StochRSI,
     StochasticOscillator,
@@ -27,6 +28,63 @@ from mangrove_kb.indicators import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+@RuleRegistry.register("rsi_rebound_confirmation")
+def rsi_rebound_confirmation(
+    df: pd.DataFrame, window: int = 32, threshold: float = 45.0, window_threshold: int = 2880
+) -> bool:
+    """Signal: rsi_rebound_confirmation
+
+    Fires when RSI rises below a weakness threshold, or when RSI has risen for three bars
+    following recent weakness and an unusually large RSI increase below the threshold.
+    The variability baseline uses only bars before the increase it measures.
+
+    Friendly-Name: Momentum Picks Up
+    Display-Name: RSI Rebound Confirmation
+    Short-Description: Buying momentum is rising during or soon after a period of weakness.
+
+    Warmup: window + window_threshold + 3
+
+    Formula:
+        change[t] = rsi[t] / rsi[t-1] - 1
+        baseline[t] = sample_std(abs(change[t-window_threshold:t]))
+        strong[t] = rsi[t] < threshold and change[t] > baseline[t]
+        With baseline defined at t through t-2:
+        change[t] > 0 and (rsi[t] < threshold or (any(rsi[t-4:t+1] < threshold)
+        and all(change[t-2:t+1] > 0) and any(strong[t-2:t+1])))
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when a rebound is confirmed.
+
+    Type: TRIGGER
+    Requires: close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): RSI calculation window. Range: 2-100. Default: 32.
+        threshold (float): RSI weakness threshold. Range: 0-100. Default: 45.0.
+        window_threshold (int): Prior bars used to measure RSI change variability. Range: 2-5760. Default: 2880.
+
+    Returns:
+        bool: True when a rebound is confirmed.
+    """
+    if len(df) < window + window_threshold + 4:
+        return False
+
+    rsi = SMASeededRSI.compute({"close": df["close"]}, {"window": window})["rsi"]
+    change = rsi.pct_change(fill_method=None)
+    baseline = change.abs().shift(1).rolling(window_threshold).std(ddof=1).iloc[-3:]
+    if baseline.isna().any() or not change.iloc[-1] > 0:
+        return False
+
+    if rsi.iloc[-1] < threshold:
+        return True
+
+    recent_changes = change.iloc[-3:]
+    strong = rsi.iloc[-3:].lt(threshold) & recent_changes.gt(baseline)
+    return bool(rsi.iloc[-5:].lt(threshold).any() and recent_changes.gt(0).all() and strong.any())
 
 
 @RuleRegistry.register("rsi_overbought")

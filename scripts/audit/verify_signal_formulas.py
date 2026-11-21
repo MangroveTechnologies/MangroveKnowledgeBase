@@ -333,7 +333,7 @@ def report(results):
 def spec_volatility(df):
     from mangrove_kb.indicators import (ATR, NATR, BollingerBands, ChandelierLevels,
                                         DonchianChannel, KeltnerChannel, SqueezeDepth, STARCBands,
-                                        UlcerIndex, VolatilityEnvelope)
+                                        UlcerIndex, VolatilityEnvelope, WeightedATR)
     H, L, C = df["High"], df["Low"], df["Close"]
     atr = ATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["atr"]
     natr = NATR.compute({"high": H, "low": L, "close": C}, {"window": 14})["natr"]
@@ -362,6 +362,26 @@ def spec_volatility(df):
     sqp = {"bb_window": 20, "bb_std": 2.0, "kc_window": 20, "kc_atr_mult": 1.5, "mom_window": 12}
     sq = SqueezeDepth.compute({"high": H, "low": L, "close": C}, dict(sqp))
     depth, ttm_mom = sq["squeeze_depth"], sq["momentum"]
+    wap = {"window": 31}
+    weighted_atr = WeightedATR.compute({"high": H, "low": L, "close": C}, wap)["weighted_atr"]
+    wap_expansion = {**wap, "window_threshold": 120}
+    wap_elevation = {**wap, "window_elevation": 33}
+    growth = (weighted_atr / weighted_atr.shift() - 1).clip(lower=0)
+    prior_growth = growth.shift().rolling(wap_expansion["window_threshold"]).std()
+    atr_window = weighted_atr.rolling(wap_elevation["window_elevation"])
+    cutoff = atr_window.mean() + atr_window.std()
+
+    def recent_expansion(t):
+        if not defined(prior_growth.iloc[t], prior_growth.iloc[t - 1]):
+            return False
+        return any(growth.iloc[i] > prior_growth.iloc[i] for i in (t - 1, t))
+
+    def elevation_not_fading(t):
+        if not defined(cutoff.iloc[t], cutoff.iloc[t - 1]):
+            return False
+        previous, current = (weighted_atr.iloc[i] if weighted_atr.iloc[i] > cutoff.iloc[i]
+                             else 0.0 for i in (t - 1, t))
+        return current >= previous
 
     def fired(momentum_positive):
         def f(t):
@@ -389,6 +409,8 @@ def spec_volatility(df):
         "bb_below_lower": (bbp, outside_below(C, bb["lband"])),
         "bb_squeeze": ({**bbp, "threshold": 5.0}, crosses_down(bb["wband"], 5.0)),
         # ATR read as a percent of price, so the threshold is comparable across instruments
+        "atr_change_expansion": (wap_expansion, recent_expansion),
+        "atr_elevated_score_not_fading": (wap_elevation, elevation_not_fading),
         "atr_high_volatility": ({"window": 14, "threshold_pct": 2.0},
                                 lambda t: defined(atr.iloc[t]) and C.iloc[t] != 0
                                           and (atr.iloc[t] / C.iloc[t]) * 100 > 2.0),
@@ -410,7 +432,7 @@ def spec_volatility(df):
 
 def spec_momentum(df):
     from mangrove_kb.indicators import (BOP, CMO, KAMA, MACD, MOM, PPO, PVO, ROC, RSI, TSI,
-                                        AwesomeOscillator, StochasticOscillator, StochRSI,
+                                        AwesomeOscillator, SMASeededRSI, StochasticOscillator, StochRSI,
                                         UltimateOscillator, WilliamsR)
     O, H, L, C, V = df["Open"], df["High"], df["Low"], df["Close"], df["Volume"]
     ao = AwesomeOscillator.compute({"high": H, "low": L}, {"window1": 5, "window2": 34})["ao"]
@@ -434,6 +456,24 @@ def spec_momentum(df):
     aop = {"window_fast": 5, "window_slow": 34}
     mp = {"window_fast": 12, "window_slow": 26}
     sp = {"window_slow": 26, "window_fast": 12, "window_sign": 9}
+    rebound_params = {"window": 32, "threshold": 45.0, "window_threshold": 120}
+    seeded = SMASeededRSI.compute({"close": C}, {"window": rebound_params["window"]})["rsi"]
+    change = seeded / seeded.shift() - 1
+    prior_change = change.abs().shift().rolling(rebound_params["window_threshold"]).std()
+    weakness = rebound_params["threshold"]
+
+    def rebound_confirmed(t):
+        recent = range(t - 2, t + 1)
+        if not defined(*(prior_change.iloc[i] for i in recent)) or change.iloc[t] <= 0:
+            return False
+        return (
+            seeded.iloc[t] < weakness
+            or (any(seeded.iloc[i] < weakness for i in range(t - 4, t + 1))
+                and all(change.iloc[i] > 0 for i in recent)
+                and any(seeded.iloc[i] < weakness and change.iloc[i] > prior_change.iloc[i]
+                        for i in recent))
+        )
+
     return {
         "ao_bullish": ({**aop, "threshold": 0.0}, above(ao, 0.0)),
         "ao_bearish": ({**aop, "threshold": 0.0}, below(ao, 0.0)),
@@ -462,6 +502,7 @@ def spec_momentum(df):
         "roc_positive": ({"window": 12, "threshold": 0.0}, above(roc, 0.0)),
         "roc_negative": ({"window": 12, "threshold": 0.0}, below(roc, 0.0)),
         "roc_momentum_shift": ({"window": 12, "direction": "bullish"}, crosses_up(roc)),
+        "rsi_rebound_confirmation": (rebound_params, rebound_confirmed),
         "rsi_overbought": ({"window": 14, "threshold": 70.0}, above(rsi, 70.0)),
         "rsi_oversold": ({"window": 14, "threshold": 30.0}, below(rsi, 30.0)),
         "rsi_cross_up": ({"window": 14, "threshold": 30.0}, crosses_up(rsi, 30.0)),

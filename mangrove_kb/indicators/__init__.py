@@ -21,6 +21,7 @@ from .utils import true_range, get_min_max
 # Momentum indicators
 from .momentum_indicators import (
     RSI,
+    SMASeededRSI,
     TSI,
     UltimateOscillator,
     StochasticOscillator,
@@ -41,6 +42,7 @@ from .momentum_indicators import (
 # the indicator catalogue.
 from .volatility_indicators import (  # noqa: F401
     ATR,
+    WeightedATR,
     BollingerBands,
     KeltnerChannel,
     DonchianChannel,
@@ -152,6 +154,7 @@ __all__ = [
     "get_min_max",
     # Momentum indicators
     "RSI",
+    "SMASeededRSI",
     "TSI",
     "UltimateOscillator",
     "StochasticOscillator",
@@ -167,6 +170,7 @@ __all__ = [
     "CMO",
     # Volatility indicators
     "ATR",
+    "WeightedATR",
     "BollingerBands",
     "KeltnerChannel",
     "DonchianChannel",

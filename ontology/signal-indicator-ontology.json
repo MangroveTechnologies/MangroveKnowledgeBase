@@ -4079,6 +4079,57 @@
    }
   },
   {
+   "id": "procedure:indicator-smaseededrsi",
+   "title": "SMASeededRSI",
+   "kind": "Procedure",
+   "summary": "Measures the balance of recent gains and losses using Wilder's recursive averages, initialized from the arithmetic mean of the first full window of price changes.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "momentum_indicators",
+    "reference": null,
+    "warmup_bars": "window",
+    "abbreviation": "RSI",
+    "usage_example": "SMASeededRSI.compute(data={'close': df['close']}, params={'window': value})",
+    "formula": "gain[t] = max(close[t] - close[t-1], 0)\nloss[t] = max(close[t-1] - close[t], 0)\nSeed each average with the mean of its first window of observations.\navg[t] = (avg[t-1] * (window - 1) + observation[t]) / window\nrsi[t] = 100 - 100 / (1 + avg_gain[t] / avg_loss[t])",
+    "interpretation": [
+     "Higher RSI indicates that average gains outweigh average losses.",
+     "Lower RSI indicates that average losses outweigh average gains."
+    ],
+    "applications": [
+     "Measure the speed of a recovery after a selloff.",
+     "Track changes in buying and selling pressure."
+    ],
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 32,
+      "min": 2,
+      "max": 100,
+      "description": "number of price changes in the seed window"
+     }
+    },
+    "outputs": {
+     "rsi": {
+      "type": "series",
+      "units": "dimensionless",
+      "range": [
+       0,
+       100
+      ],
+      "canonical_name": "SMA-Seeded Relative Strength Index",
+      "description": "RSI with a full-window arithmetic seed. No losses with positive gains yields 100. With no gains and no losses, the value is undefined."
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-smma",
    "title": "SMMA",
    "kind": "Procedure",
@@ -5915,6 +5966,65 @@
    }
   },
   {
+   "id": "procedure:indicator-weightedatr",
+   "title": "WeightedATR",
+   "kind": "Procedure",
+   "summary": "Measures average true range with linearly increasing weights. The most recent bar has weight `window` and the oldest has weight 1.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility_indicators",
+    "reference": null,
+    "warmup_bars": "window - 1",
+    "abbreviation": null,
+    "usage_example": "WeightedATR.compute(data={'high': df['high'], 'low': df['low'], 'close': df['close']}, params={'window': value})",
+    "formula": "tr[t] = max(high[t] - low[t], abs(high[t] - close[t-1]), abs(low[t] - close[t-1]))\nweighted_atr[t] = sum(i * tr[t - window + i], i = 1..window) / sum(i, i = 1..window)",
+    "interpretation": [
+     "Larger values indicate wider typical price moves.",
+     "New price ranges carry more weight than older price ranges."
+    ],
+    "applications": [
+     "Compare recent range expansion with its historical baseline.",
+     "Track changes in volatility during a rebound."
+    ],
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": "highest price traded during the bar"
+     },
+     "low": {
+      "type": "series",
+      "description": "lowest price traded during the bar"
+     },
+     "close": {
+      "type": "series",
+      "description": "closing price"
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 31,
+      "min": 2,
+      "max": 100,
+      "description": "number of true-range values in the moving average"
+     }
+    },
+    "outputs": {
+     "weighted_atr": {
+      "type": "series",
+      "units": "price",
+      "range": [
+       0,
+       Infinity
+      ],
+      "canonical_name": "Weighted Average True Range",
+      "description": "Linearly weighted average of true range, in the instrument's price units."
+     }
+    }
+   }
+  },
+  {
    "id": "procedure:indicator-williamsalligator",
    "title": "WilliamsAlligator",
    "kind": "Procedure",
@@ -7345,6 +7455,128 @@
       ],
       "canonical_name": "none",
       "description": "True if Aroon Up > threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-atr-change-expansion",
+   "title": "atr_change_expansion",
+   "kind": "Procedure",
+   "summary": "Passes when positive weighted ATR growth exceeds its own prior variability on the current or immediately preceding bar. Each baseline excludes the bar whose growth is being tested.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "window + window_threshold + 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'atr_change_expansion', 'params': {'window': value, 'window_threshold': value}}, df)",
+    "formula": "growth[t] = max(weighted_atr[t] / weighted_atr[t-1] - 1, 0)\nbaseline[t] = sample_std(growth[t-window_threshold:t])\nWith baseline[t] and baseline[t-1] defined:\ngrowth[t] > baseline[t] or growth[t-1] > baseline[t-1]",
+    "friendly_name": "Recent Range Expansion",
+    "display_name": "Weighted ATR Change Expansion",
+    "short_description": "Typical price swings grew faster than usual on one of the last two bars.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": null
+     },
+     "low": {
+      "type": "series",
+      "description": null
+     },
+     "close": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 31,
+      "min": 2,
+      "max": 100,
+      "description": "Weighted true-range window"
+     },
+     "window_threshold": {
+      "type": "int",
+      "default": 2880,
+      "min": 2,
+      "max": 5760,
+      "description": "Prior bars used to measure ATR growth variability"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when unusual range expansion occurred within two bars."
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-atr-elevated-score-not-fading",
+   "title": "atr_elevated_score_not_fading",
+   "kind": "Procedure",
+   "summary": "A bar's score equals its weighted ATR when it exceeds the recent mean plus one sample standard deviation, and is zero otherwise. The comparison passes when the score is steady or rising. Two consecutive zero scores also pass.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "volatility",
+    "reference": null,
+    "warmup_bars": "window + window_elevation - 1",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'atr_elevated_score_not_fading', 'params': {'window': value, 'window_elevation': value}}, df)",
+    "formula": "cutoff[t] = mean(weighted_atr[t-window_elevation+1:t+1])\n+ sample_std(weighted_atr[t-window_elevation+1:t+1])\nscore[t] = weighted_atr[t] if weighted_atr[t] > cutoff[t] else 0\nWith cutoff[t] and cutoff[t-1] defined: score[t] >= score[t-1]",
+    "friendly_name": "Range Score Steady",
+    "display_name": "ATR Elevation Score Not Fading",
+    "short_description": "The price range score is steady or rising, including when it stays at zero.",
+    "inputs": {
+     "high": {
+      "type": "series",
+      "description": null
+     },
+     "low": {
+      "type": "series",
+      "description": null
+     },
+     "close": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 31,
+      "min": 2,
+      "max": 100,
+      "description": "Weighted true-range window"
+     },
+     "window_elevation": {
+      "type": "int",
+      "default": 33,
+      "min": 2,
+      "max": 100,
+      "description": "ATR baseline window"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when the range elevation score is steady or rising."
      }
     }
    }
@@ -15970,6 +16202,66 @@
       ],
       "canonical_name": "none",
       "description": "True if RSI < threshold, False otherwise"
+     }
+    }
+   }
+  },
+  {
+   "id": "procedure:signal-rsi-rebound-confirmation",
+   "title": "rsi_rebound_confirmation",
+   "kind": "Procedure",
+   "summary": "Fires when RSI rises below a weakness threshold, or when RSI has risen for three bars following recent weakness and an unusually large RSI increase below the threshold. The variability baseline uses only bars before the increase it measures.",
+   "epistemic": "observed",
+   "status": "ratified",
+   "props": {
+    "source_module": "oscillator",
+    "reference": null,
+    "warmup_bars": "window + window_threshold + 3",
+    "abbreviation": null,
+    "usage_example": "RuleRegistry.evaluate({'name': 'rsi_rebound_confirmation', 'params': {'window': value, 'threshold': value, 'window_threshold': value}}, df)",
+    "formula": "change[t] = rsi[t] / rsi[t-1] - 1\nbaseline[t] = sample_std(abs(change[t-window_threshold:t]))\nstrong[t] = rsi[t] < threshold and change[t] > baseline[t]\nWith baseline defined at t through t-2:\nchange[t] > 0 and (rsi[t] < threshold or (any(rsi[t-4:t+1] < threshold)\nand all(change[t-2:t+1] > 0) and any(strong[t-2:t+1])))",
+    "friendly_name": "Momentum Picks Up",
+    "display_name": "RSI Rebound Confirmation",
+    "short_description": "Buying momentum is rising during or soon after a period of weakness.",
+    "inputs": {
+     "close": {
+      "type": "series",
+      "description": null
+     }
+    },
+    "params": {
+     "window": {
+      "type": "int",
+      "default": 32,
+      "min": 2,
+      "max": 100,
+      "description": "RSI calculation window"
+     },
+     "threshold": {
+      "type": "float",
+      "default": 45.0,
+      "min": 0.0,
+      "max": 100.0,
+      "description": "RSI weakness threshold"
+     },
+     "window_threshold": {
+      "type": "int",
+      "default": 2880,
+      "min": 2,
+      "max": 5760,
+      "description": "Prior bars used to measure RSI change variability"
+     }
+    },
+    "outputs": {
+     "fired": {
+      "type": "bool",
+      "units": "boolean",
+      "range": [
+       0,
+       1
+      ],
+      "canonical_name": "none",
+      "description": "True when a rebound is confirmed."
      }
     }
    }
@@ -28451,6 +28743,22 @@
    "to_id": "concept:averaging"
   },
   {
+   "from": "SMASeededRSI",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-smaseededrsi",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "SMASeededRSI",
+   "rel": "instance-of",
+   "to": "oscillator",
+   "why": "class membership",
+   "from_id": "procedure:indicator-smaseededrsi",
+   "to_id": "concept:oscillator"
+  },
+  {
    "from": "SMMA",
    "rel": "instance-of",
    "to": "Indicator",
@@ -28849,6 +29157,22 @@
    "why": "class membership",
    "from_id": "procedure:indicator-wma",
    "to_id": "concept:averaging"
+  },
+  {
+   "from": "WeightedATR",
+   "rel": "instance-of",
+   "to": "Indicator",
+   "why": "entity type",
+   "from_id": "procedure:indicator-weightedatr",
+   "to_id": "concept:indicator"
+  },
+  {
+   "from": "WeightedATR",
+   "rel": "instance-of",
+   "to": "volatility",
+   "why": "class membership",
+   "from_id": "procedure:indicator-weightedatr",
+   "to_id": "concept:volatility"
   },
   {
    "from": "WilliamsAlligator",
@@ -29608,6 +29932,80 @@
    "why": "character it is concerned with, via the indicator it reads",
    "from_id": "procedure:signal-aroon-up-trend",
    "to_id": "concept:momentum"
+  },
+  {
+   "from": "atr_change_expansion",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-atr-change-expansion",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "atr_change_expansion",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-atr-change-expansion",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "atr_change_expansion",
+   "rel": "uses",
+   "to": "WeightedATR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-atr-change-expansion",
+   "to_id": "procedure:indicator-weightedatr",
+   "inputs": {
+    "weighted_atr": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "atr_change_expansion",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-atr-change-expansion",
+   "to_id": "concept:volatility"
+  },
+  {
+   "from": "atr_elevated_score_not_fading",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-atr-elevated-score-not-fading",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "atr_elevated_score_not_fading",
+   "rel": "has-role",
+   "to": "filter",
+   "why": "role",
+   "from_id": "procedure:signal-atr-elevated-score-not-fading",
+   "to_id": "property:role-filter"
+  },
+  {
+   "from": "atr_elevated_score_not_fading",
+   "rel": "uses",
+   "to": "WeightedATR",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-atr-elevated-score-not-fading",
+   "to_id": "procedure:indicator-weightedatr",
+   "inputs": {
+    "weighted_atr": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "atr_elevated_score_not_fading",
+   "rel": "about",
+   "to": "volatility",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-atr-elevated-score-not-fading",
+   "to_id": "concept:volatility"
   },
   {
    "from": "atr_high_volatility",
@@ -35560,6 +35958,43 @@
    "to": "oscillator",
    "why": "character it is concerned with, via the indicator it reads",
    "from_id": "procedure:signal-rsi-oversold",
+   "to_id": "concept:oscillator"
+  },
+  {
+   "from": "rsi_rebound_confirmation",
+   "rel": "instance-of",
+   "to": "Signal",
+   "why": "entity type",
+   "from_id": "procedure:signal-rsi-rebound-confirmation",
+   "to_id": "concept:signal"
+  },
+  {
+   "from": "rsi_rebound_confirmation",
+   "rel": "has-role",
+   "to": "trigger",
+   "why": "role",
+   "from_id": "procedure:signal-rsi-rebound-confirmation",
+   "to_id": "property:role-trigger"
+  },
+  {
+   "from": "rsi_rebound_confirmation",
+   "rel": "uses",
+   "to": "SMASeededRSI",
+   "why": "reads indicator output",
+   "from_id": "procedure:signal-rsi-rebound-confirmation",
+   "to_id": "procedure:indicator-smaseededrsi",
+   "inputs": {
+    "rsi": {
+     "type": "series"
+    }
+   }
+  },
+  {
+   "from": "rsi_rebound_confirmation",
+   "rel": "about",
+   "to": "oscillator",
+   "why": "character it is concerned with, via the indicator it reads",
+   "from_id": "procedure:signal-rsi-rebound-confirmation",
    "to_id": "concept:oscillator"
   },
   {
@@ -48530,7 +48965,7 @@
  ],
  "meta": {
   "scope": "indicator class ontology",
-  "indicators": 77,
+  "indicators": 79,
   "classes": 8,
   "removed_not_indicators": [
    "ATRTrailingStop",
@@ -48540,8 +48975,8 @@
    "SuperTrend",
    "TTMSqueeze"
   ],
-  "signals": 234,
-  "signals_registered": 264,
+  "signals": 237,
+  "signals_registered": 267,
   "signals_out_of_scope": 30,
   "signals_with_no_indicator": [],
   "live_provider_signals": [

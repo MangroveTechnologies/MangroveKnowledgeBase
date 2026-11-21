@@ -115,6 +115,77 @@ class RSI(IndicatorInterface):
         return {'rsi': pd.Series(rsi, index=close.index, name="rsi")}
 
 
+class SMASeededRSI(IndicatorInterface):
+    """Indicator: SMASeededRSI
+
+    Measures the balance of recent gains and losses using Wilder's recursive averages,
+    initialized from the arithmetic mean of the first full window of price changes.
+
+    Abbreviation: RSI
+    Warmup: window
+
+    Formula:
+        gain[t] = max(close[t] - close[t-1], 0)
+        loss[t] = max(close[t-1] - close[t], 0)
+        Seed each average with the mean of its first window of observations.
+        avg[t] = (avg[t-1] * (window - 1) + observation[t]) / window
+        rsi[t] = 100 - 100 / (1 + avg_gain[t] / avg_loss[t])
+
+    Inputs:
+        close: closing price
+
+    Params:
+        window [default=32, min=2, max=100]: number of price changes in the seed window
+
+    Outputs:
+        rsi [dimensionless, 0..100] "SMA-Seeded Relative Strength Index":
+            RSI with a full-window arithmetic seed. No losses with positive gains yields
+            100. With no gains and no losses, the value is undefined.
+
+    Interpretation:
+        - Higher RSI indicates that average gains outweigh average losses.
+        - Lower RSI indicates that average losses outweigh average gains.
+
+    Applications:
+        - Measure the speed of a recovery after a selloff.
+        - Track changes in buying and selling pressure.
+
+    Args:
+        data: {'close': pd.Series}
+        params: {'window': int}
+
+    Returns:
+        {'rsi': pd.Series}
+    """
+    _data = ["close"]
+    _params = ["window"]
+    _outputs = ["rsi"]
+
+    @classmethod
+    def _compute(cls, data, params):
+        close = data["close"]
+        window = params["window"]
+        changes = close.diff().to_numpy(dtype=np.float64)
+        gains = np.maximum(changes, 0.0)
+        losses = np.maximum(-changes, 0.0)
+        average_gain = np.full(len(close), np.nan)
+        average_loss = np.full(len(close), np.nan)
+        finite = np.isfinite(changes)
+        seed = next((end for end in range(window - 1, len(close))
+                     if finite[end - window + 1:end + 1].all()), None)
+        if seed is not None:
+            seed_window = slice(seed - window + 1, seed + 1)
+            average_gain[seed] = gains[seed_window].mean()
+            average_loss[seed] = losses[seed_window].mean()
+            for i in range(seed + 1, len(close)):
+                average_gain[i] = (average_gain[i - 1] * (window - 1) + gains[i]) / window
+                average_loss[i] = (average_loss[i - 1] * (window - 1) + losses[i]) / window
+
+        with np.errstate(divide="ignore", invalid="ignore"):
+            rsi = 100 - 100 / (1 + average_gain / average_loss)
+        return {"rsi": pd.Series(rsi, index=close.index, name="rsi")}
+
+
 class TSI(IndicatorInterface):
     """Indicator: TSI
 
