@@ -120,6 +120,8 @@ class SMASeededRSI(IndicatorInterface):
 
     Measures the balance of recent gains and losses using Wilder's recursive averages,
     initialized from the arithmetic mean of the first full window of price changes.
+    A missing close leaves the value undefined until a full window of price changes
+    follows it, and the averages are then initialized again from that window.
 
     Abbreviation: RSI
     Warmup: window
@@ -130,6 +132,8 @@ class SMASeededRSI(IndicatorInterface):
         Seed each average with the mean of its first window of observations.
         avg[t] = (avg[t-1] * (window - 1) + observation[t]) / window
         rsi[t] = 100 - 100 / (1 + avg_gain[t] / avg_loss[t])
+        A price change that is not finite makes both averages undefined. They are
+        seeded again with the mean of the next window of consecutive finite observations.
 
     Inputs:
         close: closing price
@@ -171,13 +175,19 @@ class SMASeededRSI(IndicatorInterface):
         average_gain = np.full(len(close), np.nan)
         average_loss = np.full(len(close), np.nan)
         finite = np.isfinite(changes)
-        seed = next((end for end in range(window - 1, len(close))
-                     if finite[end - window + 1:end + 1].all()), None)
-        if seed is not None:
-            seed_window = slice(seed - window + 1, seed + 1)
-            average_gain[seed] = gains[seed_window].mean()
-            average_loss[seed] = losses[seed_window].mean()
-            for i in range(seed + 1, len(close)):
+        # Consecutive finite price changes ending at the current bar. The averages are defined
+        # once this reaches `window`, and a change that is not finite starts the count again.
+        run = 0
+        for i in range(len(close)):
+            if not finite[i]:
+                run = 0
+                continue
+            run += 1
+            if run == window:
+                seed_window = slice(i - window + 1, i + 1)
+                average_gain[i] = gains[seed_window].mean()
+                average_loss[i] = losses[seed_window].mean()
+            elif run > window:
                 average_gain[i] = (average_gain[i - 1] * (window - 1) + gains[i]) / window
                 average_loss[i] = (average_loss[i - 1] * (window - 1) + losses[i]) / window
 

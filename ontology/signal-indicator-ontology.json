@@ -4082,7 +4082,7 @@
    "id": "procedure:indicator-smaseededrsi",
    "title": "SMASeededRSI",
    "kind": "Procedure",
-   "summary": "Measures the balance of recent gains and losses using Wilder's recursive averages, initialized from the arithmetic mean of the first full window of price changes.",
+   "summary": "Measures the balance of recent gains and losses using Wilder's recursive averages, initialized from the arithmetic mean of the first full window of price changes. A missing close leaves the value undefined until a full window of price changes follows it, and the averages are then initialized again from that window.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -4091,7 +4091,7 @@
     "warmup_bars": "window",
     "abbreviation": "RSI",
     "usage_example": "SMASeededRSI.compute(data={'close': df['close']}, params={'window': value})",
-    "formula": "gain[t] = max(close[t] - close[t-1], 0)\nloss[t] = max(close[t-1] - close[t], 0)\nSeed each average with the mean of its first window of observations.\navg[t] = (avg[t-1] * (window - 1) + observation[t]) / window\nrsi[t] = 100 - 100 / (1 + avg_gain[t] / avg_loss[t])",
+    "formula": "gain[t] = max(close[t] - close[t-1], 0)\nloss[t] = max(close[t-1] - close[t], 0)\nSeed each average with the mean of its first window of observations.\navg[t] = (avg[t-1] * (window - 1) + observation[t]) / window\nrsi[t] = 100 - 100 / (1 + avg_gain[t] / avg_loss[t])\nA price change that is not finite makes both averages undefined. They are\nseeded again with the mean of the next window of consecutive finite observations.",
     "interpretation": [
      "Higher RSI indicates that average gains outweigh average losses.",
      "Lower RSI indicates that average losses outweigh average gains."
@@ -7463,7 +7463,7 @@
    "id": "procedure:signal-atr-change-expansion",
    "title": "atr_change_expansion",
    "kind": "Procedure",
-   "summary": "Passes when positive weighted ATR growth exceeds its own prior variability on the current or immediately preceding bar. Each baseline excludes the bar whose growth is being tested.",
+   "summary": "Passes when positive weighted ATR growth exceeds its own prior variability on the current or immediately preceding bar. Each baseline excludes the bar whose growth is being tested. A bar whose growth is not finite is left out of the baseline: growth is undefined while weighted ATR stays at zero or is missing, and infinite on the bar where weighted ATR rises from zero, which counts as an expansion on that bar.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -7472,7 +7472,7 @@
     "warmup_bars": "window + window_threshold + 1",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'atr_change_expansion', 'params': {'window': value, 'window_threshold': value}}, df)",
-    "formula": "growth[t] = max(weighted_atr[t] / weighted_atr[t-1] - 1, 0)\nbaseline[t] = sample_std(growth[t-window_threshold:t])\nWith baseline[t] and baseline[t-1] defined:\ngrowth[t] > baseline[t] or growth[t-1] > baseline[t-1]",
+    "formula": "growth[t] = max(weighted_atr[t] / weighted_atr[t-1] - 1, 0)\nbaseline[t] = sample_std(finite values of growth[t-window_threshold:t])\nbaseline[t] is defined when at least half of those values, and at least two, are finite.\nWith baseline[t] and baseline[t-1] defined:\ngrowth[t] > baseline[t] or growth[t-1] > baseline[t-1]",
     "friendly_name": "Recent Range Expansion",
     "display_name": "Weighted ATR Change Expansion",
     "short_description": "Typical price swings grew faster than usual on one of the last two bars.",
@@ -16210,7 +16210,7 @@
    "id": "procedure:signal-rsi-rebound-confirmation",
    "title": "rsi_rebound_confirmation",
    "kind": "Procedure",
-   "summary": "Fires when RSI rises below a weakness threshold, or when RSI has risen for three bars following recent weakness and an unusually large RSI increase below the threshold. The variability baseline uses only bars before the increase it measures.",
+   "summary": "Fires when RSI rises below a weakness threshold, or when RSI has risen for three bars following recent weakness and an unusually large RSI increase below the threshold. The variability baseline uses only bars before the increase it measures. A bar whose RSI change is not finite, such as one after a missing close, is left out of the baseline.",
    "epistemic": "observed",
    "status": "ratified",
    "props": {
@@ -16219,7 +16219,7 @@
     "warmup_bars": "window + window_threshold + 3",
     "abbreviation": null,
     "usage_example": "RuleRegistry.evaluate({'name': 'rsi_rebound_confirmation', 'params': {'window': value, 'threshold': value, 'window_threshold': value}}, df)",
-    "formula": "change[t] = rsi[t] / rsi[t-1] - 1\nbaseline[t] = sample_std(abs(change[t-window_threshold:t]))\nstrong[t] = rsi[t] < threshold and change[t] > baseline[t]\nWith baseline defined at t through t-2:\nchange[t] > 0 and (rsi[t] < threshold or (any(rsi[t-4:t+1] < threshold)\nand all(change[t-2:t+1] > 0) and any(strong[t-2:t+1])))",
+    "formula": "change[t] = rsi[t] / rsi[t-1] - 1\nbaseline[t] = sample_std(finite values of abs(change[t-window_threshold:t]))\nbaseline[t] is defined when at least half of those values, and at least two, are finite.\nstrong[t] = rsi[t] < threshold and change[t] > baseline[t]\nWith baseline defined at t through t-2:\nchange[t] > 0 and (rsi[t] < threshold or (any(rsi[t-4:t+1] < threshold)\nand all(change[t-2:t+1] > 0) and any(strong[t-2:t+1])))",
     "friendly_name": "Momentum Picks Up",
     "display_name": "RSI Rebound Confirmation",
     "short_description": "Buying momentum is rising during or soon after a period of weakness.",

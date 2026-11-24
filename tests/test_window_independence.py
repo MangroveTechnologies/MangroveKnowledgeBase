@@ -17,6 +17,11 @@ exactly its declared requirement, on a longer one, and on the whole prefix. They
 `test_the_declared_warmup_covers_what_the_signal_reads` pins the Warmup lines that were too short
 for the indicator the signal reads: at exactly Warmup + 1 bars, the output it reads is defined on
 every bar it reads.
+
+`test_long_baseline_signals_answer_from_earlier_bars_only` covers the signals whose baseline spans
+2,880 bars by default. The BTC daily fixture has 1,294 bars, fewer than those signals need before
+they answer at all, so the first test never reaches their baselines. This one uses a 6,400-bar
+series, and also checks that the answer at a bar is the same when later bars exist.
 """
 import ast
 import inspect
@@ -136,6 +141,51 @@ def test_whole_series_indicators_leave_nothing_window_dependent():
                     differ.setdefault(name, []).append(end)
     assert not differ, ("answer depends on the window length (signal: first bars): "
                         + "; ".join(f"{k}: {v[:3]}" for k, v in sorted(differ.items())))
+
+
+def _long_series(degenerate):
+    """6,400 bars of a random walk on an integer index. The degenerate variant has one bar with no
+    prices and a 41-bar stretch with no range, both inside the baselines the test reads."""
+    rng = np.random.default_rng(29)
+    count = 6400
+    close = 100.0 * np.exp(np.cumsum(rng.normal(0, 0.004, count)))
+    open_ = np.concatenate([[100.0], close[:-1]])
+    high = np.maximum(open_, close) * (1 + np.abs(rng.normal(0, 0.002, count)))
+    low = np.minimum(open_, close) * (1 - np.abs(rng.normal(0, 0.002, count)))
+    bars = pd.DataFrame({"open": open_, "high": high, "low": low, "close": close,
+                         "volume": rng.uniform(1, 10, count)})
+    if degenerate:
+        bars.loc[3400, ["open", "high", "low", "close"]] = np.nan
+        bars.loc[4200:4240, ["open", "high", "low", "close"]] = float(bars.loc[4199, "close"])
+    return bars
+
+
+@pytest.mark.parametrize("degenerate", [False, True], ids=["clean", "missing-bar-and-flat-stretch"])
+@pytest.mark.parametrize("name", ["rsi_rebound_confirmation", "atr_change_expansion",
+                                  "atr_elevated_score_not_fading"])
+def test_long_baseline_signals_answer_from_earlier_bars_only(name, degenerate):
+    """At the default parameters, the answer at a bar is the same in three settings: the series
+    ends at that bar; the indicator was computed over a series that runs on past it; and the signal
+    is handed a window of exactly its declared requirement instead of the whole history."""
+    bars = _long_series(degenerate)
+    full = {k: bars[k] for k in bars.columns}
+    fn = RuleRegistry._registry[name]
+    rule = {"name": name, "params": {}}
+    need = _warmup(fn) + 1
+    first = max(need, 2916) + 40    # every signal is read where the 2,880-bar baselines are defined
+    ends = [end for end in range(first, len(bars) - 300, 31) if end != 3400]
+    assert len(ends) > 90
+
+    series_ends_at_the_bar = [RuleRegistry.evaluate(rule, bars.iloc[:end + 1]) for end in ends]
+    with _whole_series(full):
+        later_bars_exist = [RuleRegistry.evaluate(rule, bars.iloc[:end + 1]) for end in ends]
+        declared_window = [RuleRegistry.evaluate(rule, bars.iloc[end - need + 1:end + 1])
+                           for end in ends]
+
+    assert later_bars_exist == series_ends_at_the_bar
+    assert declared_window == series_ends_at_the_bar
+    assert any(series_ends_at_the_bar) and not all(series_ends_at_the_bar), (
+        "the signal gives one answer on every sampled bar, so agreement shows nothing")
 
 
 #: (signal, params, what it reads, bars back it reads). Each `read` returns the output series the

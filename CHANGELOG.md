@@ -12,6 +12,11 @@ This project uses [Semantic Versioning](https://semver.org/).
   or rising ATR elevation score. The RSI and ATR growth baselines use only preceding bars.
 - Add SMA-seeded RSI and linearly weighted ATR indicators. Existing RSI and ATR rules keep their
   calculation and defaults.
+- A bar whose RSI change or weighted ATR growth is not finite is left out of those baselines, so
+  a missing price or a stretch with no range does not silence either rule for the length of its
+  baseline. A baseline is defined when at least half of its bars, and at least two, are finite.
+  SMA-seeded RSI is seeded again from the next full window of price changes after a missing
+  close, and weighted ATR rising from zero counts as an expansion on that bar.
 - The graph and search indices include the new rules and their warmup requirements
   -- 744 nodes, 2436 edges, in the rebuilt record. 267 registered signals (129 TRIGGER,
   138 FILTER), 237 modelled.

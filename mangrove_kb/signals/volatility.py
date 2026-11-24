@@ -13,7 +13,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals._common import deprecated_signal, renamed_signals
+from mangrove_kb.signals._common import deprecated_signal, prior_finite_std, renamed_signals
 
 # Import volatility indicator classes
 from mangrove_kb.indicators import (
@@ -497,7 +497,10 @@ def atr_change_expansion(df: pd.DataFrame, window: int = 31, window_threshold: i
 
     Passes when positive weighted ATR growth exceeds its own prior variability
     on the current or immediately preceding bar. Each baseline excludes the
-    bar whose growth is being tested.
+    bar whose growth is being tested. A bar whose growth is not finite is left
+    out of the baseline: growth is undefined while weighted ATR stays at zero or
+    is missing, and infinite on the bar where weighted ATR rises from zero, which
+    counts as an expansion on that bar.
 
     Friendly-Name: Recent Range Expansion
     Display-Name: Weighted ATR Change Expansion
@@ -507,7 +510,8 @@ def atr_change_expansion(df: pd.DataFrame, window: int = 31, window_threshold: i
 
     Formula:
         growth[t] = max(weighted_atr[t] / weighted_atr[t-1] - 1, 0)
-        baseline[t] = sample_std(growth[t-window_threshold:t])
+        baseline[t] = sample_std(finite values of growth[t-window_threshold:t])
+        baseline[t] is defined when at least half of those values, and at least two, are finite.
         With baseline[t] and baseline[t-1] defined:
         growth[t] > baseline[t] or growth[t-1] > baseline[t-1]
 
@@ -531,7 +535,7 @@ def atr_change_expansion(df: pd.DataFrame, window: int = 31, window_threshold: i
 
     atr = _weighted_atr(df, window)
     growth = atr.pct_change(fill_method=None).clip(lower=0)
-    baseline = growth.shift(1).rolling(window_threshold).std(ddof=1).iloc[-2:]
+    baseline = prior_finite_std(growth, window_threshold, bars=2)
     return bool(baseline.notna().all() and growth.iloc[-2:].gt(baseline).any())
 
 

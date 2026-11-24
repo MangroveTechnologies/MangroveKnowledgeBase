@@ -10,7 +10,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals._common import zero_cross
+from mangrove_kb.signals._common import prior_finite_std, zero_cross
 from mangrove_kb.indicators import (
     BOP,
     CCI,
@@ -38,7 +38,8 @@ def rsi_rebound_confirmation(
 
     Fires when RSI rises below a weakness threshold, or when RSI has risen for three bars
     following recent weakness and an unusually large RSI increase below the threshold.
-    The variability baseline uses only bars before the increase it measures.
+    The variability baseline uses only bars before the increase it measures. A bar whose
+    RSI change is not finite, such as one after a missing close, is left out of the baseline.
 
     Friendly-Name: Momentum Picks Up
     Display-Name: RSI Rebound Confirmation
@@ -48,7 +49,8 @@ def rsi_rebound_confirmation(
 
     Formula:
         change[t] = rsi[t] / rsi[t-1] - 1
-        baseline[t] = sample_std(abs(change[t-window_threshold:t]))
+        baseline[t] = sample_std(finite values of abs(change[t-window_threshold:t]))
+        baseline[t] is defined when at least half of those values, and at least two, are finite.
         strong[t] = rsi[t] < threshold and change[t] > baseline[t]
         With baseline defined at t through t-2:
         change[t] > 0 and (rsi[t] < threshold or (any(rsi[t-4:t+1] < threshold)
@@ -75,7 +77,7 @@ def rsi_rebound_confirmation(
 
     rsi = SMASeededRSI.compute({"close": df["close"]}, {"window": window})["rsi"]
     change = rsi.pct_change(fill_method=None)
-    baseline = change.abs().shift(1).rolling(window_threshold).std(ddof=1).iloc[-3:]
+    baseline = prior_finite_std(change.abs(), window_threshold, bars=3)
     if baseline.isna().any() or not change.iloc[-1] > 0:
         return False
 
