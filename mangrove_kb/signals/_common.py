@@ -9,7 +9,27 @@ import functools
 import importlib
 import warnings
 
+import numpy as np
 import pandas as pd
+
+
+def prior_finite_std(values: pd.Series, window: int, bars: int) -> pd.Series:
+    """Sample standard deviation of the `window` values before each of the last `bars` bars.
+
+    The value at a bar is excluded from that bar's result, so comparing a bar with its result reads
+    only earlier bars. Values that are not finite are left out of the calculation. A result is
+    undefined when fewer than `window` values precede the bar, or when fewer than half of them, or
+    fewer than two, are finite.
+    """
+    observed = values.to_numpy(dtype=np.float64)
+    first = max(len(observed) - bars, 0)
+    out = []
+    for end in range(first, len(observed)):
+        prior = observed[end - window:end] if end >= window else observed[:0]
+        prior = prior[np.isfinite(prior)]
+        defined = len(prior) >= 2 and 2 * len(prior) >= window
+        out.append(prior.std(ddof=1) if defined else np.nan)
+    return pd.Series(out, index=values.index[first:], dtype=np.float64)
 
 
 def zero_cross(series: pd.Series, direction: str) -> bool:

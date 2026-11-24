@@ -13,7 +13,7 @@ import logging
 import pandas as pd
 
 from mangrove_kb.registry import RuleRegistry
-from mangrove_kb.signals._common import deprecated_signal, renamed_signals
+from mangrove_kb.signals._common import deprecated_signal, prior_finite_std, renamed_signals
 
 # Import volatility indicator classes
 from mangrove_kb.indicators import (
@@ -29,6 +29,7 @@ from mangrove_kb.indicators import (
     SuperTrendTrail,
     UlcerIndex,
     VolatilityEnvelope,
+    WeightedATR,
 )
 
 logger = logging.getLogger(__name__)
@@ -484,6 +485,106 @@ def kc_below_lower(
 # =============================================================================
 # ATR/Volatility Signals
 # =============================================================================
+
+def _weighted_atr(df: pd.DataFrame, window: int) -> pd.Series:
+    ohlc = {"high": df["high"], "low": df["low"], "close": df["close"]}
+    return WeightedATR.compute(ohlc, {"window": window})["weighted_atr"]
+
+
+@RuleRegistry.register("atr_change_expansion")
+def atr_change_expansion(df: pd.DataFrame, window: int = 31, window_threshold: int = 2880) -> bool:
+    """Signal: atr_change_expansion
+
+    Passes when positive weighted ATR growth exceeds its own prior variability
+    on the current or immediately preceding bar. Each baseline excludes the
+    bar whose growth is being tested. A bar whose growth is not finite is left
+    out of the baseline: growth is undefined while weighted ATR stays at zero or
+    is missing, and infinite on the bar where weighted ATR rises from zero, which
+    counts as an expansion on that bar.
+
+    Friendly-Name: Recent Range Expansion
+    Display-Name: Weighted ATR Change Expansion
+    Short-Description: Typical price swings grew faster than usual on one of the last two bars.
+
+    Warmup: window + window_threshold + 1
+
+    Formula:
+        growth[t] = max(weighted_atr[t] / weighted_atr[t-1] - 1, 0)
+        baseline[t] = sample_std(finite values of growth[t-window_threshold:t])
+        baseline[t] is defined when at least half of those values, and at least two, are finite.
+        With baseline[t] and baseline[t-1] defined:
+        growth[t] > baseline[t] or growth[t-1] > baseline[t-1]
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when unusual range expansion occurred within two bars.
+
+    Type: FILTER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Weighted true-range window. Range: 2-100. Default: 31.
+        window_threshold (int): Prior bars used to measure ATR growth variability. Range: 2-5760. Default: 2880.
+
+    Returns:
+        bool: True when unusual weighted ATR expansion occurred within the last two bars.
+    """
+    if len(df) < window + window_threshold + 2:
+        return False
+
+    atr = _weighted_atr(df, window)
+    growth = atr.pct_change(fill_method=None).clip(lower=0)
+    baseline = prior_finite_std(growth, window_threshold, bars=2)
+    return bool(baseline.notna().all() and growth.iloc[-2:].gt(baseline).any())
+
+
+@RuleRegistry.register("atr_elevated_score_not_fading")
+def atr_elevated_score_not_fading(
+    df: pd.DataFrame, window: int = 31, window_elevation: int = 33
+) -> bool:
+    """Signal: atr_elevated_score_not_fading
+
+    A bar's score equals its weighted ATR when it exceeds the recent mean plus one
+    sample standard deviation, and is zero otherwise. The comparison passes when
+    the score is steady or rising. Two consecutive zero scores also pass.
+
+    Friendly-Name: Range Score Steady
+    Display-Name: ATR Elevation Score Not Fading
+    Short-Description: The price range score is steady or rising, including when it stays at zero.
+
+    Warmup: window + window_elevation - 1
+
+    Formula:
+        cutoff[t] = mean(weighted_atr[t-window_elevation+1:t+1])
+        + sample_std(weighted_atr[t-window_elevation+1:t+1])
+        score[t] = weighted_atr[t] if weighted_atr[t] > cutoff[t] else 0
+        With cutoff[t] and cutoff[t-1] defined: score[t] >= score[t-1]
+
+    Outputs:
+        fired [boolean, 0..1]:
+            True when the range elevation score is steady or rising.
+
+    Type: FILTER
+    Requires: high, low, close
+
+    Args:
+        df (pd.DataFrame): DataFrame with OHLCV data.
+        window (int): Weighted true-range window. Range: 2-100. Default: 31.
+        window_elevation (int): ATR baseline window. Range: 2-100. Default: 33.
+
+    Returns:
+        bool: True when the current ATR elevation score is at least the preceding score.
+    """
+    if len(df) < window + window_elevation:
+        return False
+
+    atr = _weighted_atr(df, window)
+    recent = atr.rolling(window_elevation)
+    cutoff = recent.mean() + recent.std(ddof=1)
+    score = atr.where(atr.gt(cutoff), 0.0).where(cutoff.notna())
+    return bool(score.iloc[-1] >= score.iloc[-2])
+
 
 @RuleRegistry.register("atr_high_volatility")
 def atr_high_volatility(

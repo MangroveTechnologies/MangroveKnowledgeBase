@@ -18,10 +18,11 @@ from mangrove_kb.registry import RuleRegistry
 def test_names_returns_every_registered_signal():
     names = RuleRegistry.names()
     assert isinstance(names, frozenset)
-    assert len(names) == 264
+    assert len(names) == 267
     # Spot-check across modules rather than trusting the count alone.
     for expected in ("rsi_oversold", "bb_above_upper", "ma_ribbon_bullish",
-                     "macd_line_positive", "funding_flip_positive"):
+                     "macd_line_positive", "funding_flip_positive",
+                     "rsi_rebound_confirmation", "atr_change_expansion", "atr_elevated_score_not_fading"):
         assert expected in names, expected
 
 

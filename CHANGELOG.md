@@ -6,6 +6,21 @@ This project uses [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### RSI rebound and weighted ATR signals
+
+- Add an RSI rebound trigger, a recent weighted ATR expansion filter, and a filter for a steady
+  or rising ATR elevation score. The RSI and ATR growth baselines use only preceding bars.
+- Add SMA-seeded RSI and linearly weighted ATR indicators. Existing RSI and ATR rules keep their
+  calculation and defaults.
+- A bar whose RSI change or weighted ATR growth is not finite is left out of those baselines, so
+  a missing price or a stretch with no range does not silence either rule for the length of its
+  baseline. A baseline is defined when at least half of its bars, and at least two, are finite.
+  SMA-seeded RSI is seeded again from the next full window of price changes after a missing
+  close, and weighted ATR rising from zero counts as an expansion on that bar.
+- The graph and search indices include the new rules and their warmup requirements
+  -- 744 nodes, 2436 edges, in the rebuilt record. 267 registered signals (129 TRIGGER,
+  138 FILTER), 237 modelled.
+
 ### Cambrian signal docstrings describe the signal, not its test results
 
 - The six disabled Cambrian signals (`social_sentiment_surge`, `social_sentiment_capitulation`,
@@ -34,8 +49,7 @@ This project uses [Semantic Versioning](https://semver.org/).
 - Docstrings state that the X sentiment-filter score is mention volume (ten points per recent
   cashtag post, capped at 100) and that the provider's recent-search window bounds the time window.
 - The graph models the five live-provider contracts without inventing time-series indicators
-  -- 739 nodes, 2420 edges, in the rebuilt record. 264 registered signals (128 TRIGGER,
-  136 FILTER), 234 modelled. Existing frame-based graph invariants remain enforced.
+  and preserves existing frame-based graph invariants.
 
 ### A signal's answer no longer depends on the window it is handed
 
